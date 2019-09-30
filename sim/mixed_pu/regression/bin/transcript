@@ -1,0 +1,43 @@
+# vsim -c -do "run.do" work.riscv_pu 
+# Start time: 07:20:39 on Sep 27,2019
+# Loading sv_std.std
+# Loading work.riscv_pu
+# Loading work.riscv_core
+# Loading work.riscv_if
+# Loading work.riscv_rf
+# Loading work.riscv_imem_ctrl
+# Loading work.riscv_mux
+# Loading work.riscv_dmem_ctrl
+# Loading work.riscv_icache_core
+# Loading work.riscv_dcache_core
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading ieee.math_real(body)
+# Loading work.riscv_mpsoc_pkg
+# Loading work.riscv_id(rtl)
+# Loading work.riscv_execution(rtl)
+# Loading work.riscv_alu(rtl)
+# Loading work.riscv_lsu(rtl)
+# Loading work.riscv_bu(rtl)
+# Loading work.riscv_memory(rtl)
+# Loading work.riscv_wb(rtl)
+# Loading work.riscv_state(rtl)
+# Loading work.riscv_bp(rtl)
+# Loading work.riscv_ram_1r1w(rtl)
+# Loading work.riscv_ram_1r1w_generic(rtl)
+# Loading work.riscv_du(rtl)
+# Loading work.riscv_membuf(rtl)
+# Loading work.riscv_ram_queue(rtl)
+# Loading work.riscv_memmisaligned(rtl)
+# Loading work.riscv_mmu(rtl)
+# Loading work.riscv_pmachk(rtl)
+# Loading work.riscv_pmpchk(rtl)
+# Loading work.riscv_ram_1rw(rtl)
+# Loading work.riscv_ram_1rw_generic(rtl)
+# Loading work.riscv_dext(rtl)
+# Loading work.riscv_biu(rtl)
+# do run.do
+# End time: 07:20:39 on Sep 27,2019, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0

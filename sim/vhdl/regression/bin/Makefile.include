@@ -1,0 +1,94 @@
+###################################################################################
+##                                            __ _      _     _                  ##
+##                                           / _(_)    | |   | |                 ##
+##                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |                 ##
+##               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |                 ##
+##              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |                 ##
+##               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|                 ##
+##                  | |                                                          ##
+##                  |_|                                                          ##
+##                                                                               ##
+##                                                                               ##
+##              MPSoC-RV64 CPU                                                   ##
+##              Simulator Include File                                           ##
+##                                                                               ##
+###################################################################################
+
+###################################################################################
+##                                                                               ##
+## Copyright (c) 2017-2018 by the author(s)                                      ##
+##                                                                               ##
+## Permission is hereby granted, free of charge, to any person obtaining a copy  ##
+## of this software and associated documentation files (the "Software"), to deal ##
+## in the Software without restriction, including without limitation the rights  ##
+## to use, copy, modify, merge, publish, distribute, sublicense, and/or sell     ##
+## copies of the Software, and to permit persons to whom the Software is         ##
+## furnished to do so, subject to the following conditions:                      ##
+##                                                                               ##
+## The above copyright notice and this permission notice shall be included in    ##
+## all copies or substantial portions of the Software.                           ##
+##                                                                               ##
+## THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR    ##
+## IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,      ##
+## FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE   ##
+## AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER        ##
+## LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, ##
+## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN     ##
+## THE SOFTWARE.                                                                 ##
+##                                                                               ##
+## ============================================================================= ##
+## Author(s):                                                                    ##
+##   Francisco Javier Reina Campo <frareicam@gmail.com>                          ##
+##                                                                               ##
+###################################################################################
+
+#####################################################################
+# Design Sources
+#####################################################################
+RTL_TOP  = riscv_mpsoc
+DUT_SRC_DIR=$(ROOT_DIR)/rtl/vhdl
+RTL_VLOG =
+RTL_VHDL = $(DUT_SRC_DIR)/core/cache/riscv_dcache_core.vhd \
+           $(DUT_SRC_DIR)/core/cache/riscv_dext.vhd \
+           $(DUT_SRC_DIR)/core/cache/riscv_icache_core.vhd \
+           $(DUT_SRC_DIR)/core/execution/riscv_alu.vhd \
+           $(DUT_SRC_DIR)/core/execution/riscv_bu.vhd \
+           $(DUT_SRC_DIR)/core/execution/riscv_div.vhd \
+           $(DUT_SRC_DIR)/core/execution/riscv_lsu.vhd \
+           $(DUT_SRC_DIR)/core/execution/riscv_mul.vhd \
+           $(DUT_SRC_DIR)/core/memory/riscv_dmem_ctrl.vhd \
+           $(DUT_SRC_DIR)/core/memory/riscv_imem_ctrl.vhd \
+           $(DUT_SRC_DIR)/core/memory/riscv_membuf.vhd \
+           $(DUT_SRC_DIR)/core/memory/riscv_memmisaligned.vhd \
+           $(DUT_SRC_DIR)/core/memory/riscv_mmu.vhd \
+           $(DUT_SRC_DIR)/core/memory/riscv_mux.vhd \
+           $(DUT_SRC_DIR)/core/memory/riscv_pmachk.vhd \
+           $(DUT_SRC_DIR)/core/memory/riscv_pmpchk.vhd \
+           $(DUT_SRC_DIR)/core/riscv_bp.vhd \
+           $(DUT_SRC_DIR)/core/riscv_core.vhd \
+           $(DUT_SRC_DIR)/core/riscv_du.vhd \
+           $(DUT_SRC_DIR)/core/riscv_execution.vhd \
+           $(DUT_SRC_DIR)/core/riscv_id.vhd \
+           $(DUT_SRC_DIR)/core/riscv_if.vhd \
+           $(DUT_SRC_DIR)/core/riscv_memory.vhd \
+           $(DUT_SRC_DIR)/core/riscv_rf.vhd \
+           $(DUT_SRC_DIR)/core/riscv_state.vhd \
+           $(DUT_SRC_DIR)/core/riscv_wb.vhd \
+           $(DUT_SRC_DIR)/memory/riscv_ram_1r1w_generic.vhd \
+           $(DUT_SRC_DIR)/memory/riscv_ram_1r1w.vhd \
+           $(DUT_SRC_DIR)/memory/riscv_ram_1rw_generic.vhd \
+           $(DUT_SRC_DIR)/memory/riscv_ram_1rw.vhd \
+           $(DUT_SRC_DIR)/memory/riscv_ram_queue.vhd \
+           $(DUT_SRC_DIR)/pu/riscv_biu.vhd \
+           $(DUT_SRC_DIR)/pu/riscv_pu.vhd
+
+
+#####################################################################
+# Testbench Sources
+#####################################################################
+TB_TOP=riscv_testbench
+TB_SRC_DIR=$(ROOT_DIR)/bench/vhdl/regression
+TB_VLOG =
+TB_VHDL = $(TB_SRC_DIR)/riscv_testbench.vhd \
+          $(TB_SRC_DIR)/riscv_memory_model.vhd \
+          $(TB_SRC_DIR)/riscv_dbg_bfm.vhd

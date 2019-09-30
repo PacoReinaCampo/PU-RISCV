@@ -1,0 +1,13 @@
+rm -rf sim/mixed/regression/run
+rm -rf sim/verilog/regression/run
+rm -rf sim/vhdl/regression/run
+
+rm -rf sim/mixed_pu/regression/bin/work
+rm -rf sim/verilog_pu/regression/bin/work
+rm -rf sim/vhdl_pu/regression/bin/work
+
+rm -rf synthesis
+
+rm -rf work-obj93.cf
+rm -rf system.vvp
+rm -rf riscv_pu_testbench.tree
