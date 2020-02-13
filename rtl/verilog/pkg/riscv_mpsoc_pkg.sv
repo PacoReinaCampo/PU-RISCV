@@ -138,9 +138,9 @@
   `define CORES              `NODES*`CORES_PER_TILE
 
   //noc parameters
-  `define CHANNELS           2
-  `define PCHANNELS          2
-  `define VCHANNELS          2
+  `define CHANNELS           7
+  `define PCHANNELS          1
+  `define VCHANNELS          7
 
   `define ENABLE_VCHANNELS   1
 
@@ -291,8 +291,8 @@
   * 0x201        PPC  Previous Program Counter
   */
 
-  `define DBG_GPR 12'b0000_000?_????
-  `define DBG_FPR 12'b0001_000?_????
+  `define DBG_GPR 12'b0000_0000_0000
+  `define DBG_FPR 12'b0001_0000_0000
   `define DBG_NPC 12'h200
   `define DBG_PPC 12'h201
 

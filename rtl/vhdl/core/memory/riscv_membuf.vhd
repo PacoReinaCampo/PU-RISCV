@@ -54,23 +54,23 @@ entity riscv_membuf is
     DBITS : integer := 64
   );
   port (
-    rst_ni : in std_ulogic;
-    clk_i  : in std_ulogic;
+    rst_ni : in std_logic;
+    clk_i  : in std_logic;
 
-    clr_i : in std_ulogic;  --clear pending requests
-    ena_i : in std_ulogic;
+    clr_i : in std_logic;  --clear pending requests
+    ena_i : in std_logic;
 
     --CPU side
-    req_i : in std_ulogic;
-    d_i   : in std_ulogic_vector(DBITS-1 downto 0);
+    req_i : in std_logic;
+    d_i   : in std_logic_vector(DBITS-1 downto 0);
 
     --Memory system side
-    req_o : out std_ulogic;
-    ack_i : in  std_ulogic;
-    q_o   : out std_ulogic_vector(DBITS-1 downto 0);
+    req_o : out std_logic;
+    ack_i : in  std_logic;
+    q_o   : out std_logic_vector(DBITS-1 downto 0);
 
-    empty_o : out std_ulogic;
-    full_o  : out std_ulogic
+    empty_o : out std_logic;
+    full_o  : out std_logic
   );
 end riscv_membuf;
 
@@ -83,22 +83,22 @@ architecture RTL of riscv_membuf is
       ALMOST_FULL_THRESHOLD  : integer := 2
     );
     port (
-      rst_ni : in std_ulogic;  --asynchronous, active low reset
-      clk_i  : in std_ulogic;  --rising edge triggered clock
+      rst_ni : in std_logic;  --asynchronous, active low reset
+      clk_i  : in std_logic;  --rising edge triggered clock
 
-      clr_i : in std_ulogic;  --clear all queue entries (synchronous reset)
-      ena_i : in std_ulogic;  --clock enable
+      clr_i : in std_logic;  --clear all queue entries (synchronous reset)
+      ena_i : in std_logic;  --clock enable
 
-      we_i : in std_ulogic;                           --Queue write enable
-      d_i  : in std_ulogic_vector(DBITS-1 downto 0);  --Queue write data
+      we_i : in std_logic;                           --Queue write enable
+      d_i  : in std_logic_vector(DBITS-1 downto 0);  --Queue write data
 
-      re_i : in  std_ulogic;                           --Queue read enable
-      q_o  : out std_ulogic_vector(DBITS-1 downto 0);  --Queue read data
+      re_i : in  std_logic;                           --Queue read enable
+      q_o  : out std_logic_vector(DBITS-1 downto 0);  --Queue read data
 
-      empty_o        : out std_ulogic;   --Queue is empty
-      full_o         : out std_ulogic;   --Queue is full
-      almost_empty_o : out std_ulogic;   --Programmable almost empty
-      almost_full_o  : out std_ulogic    --Programmable almost full
+      empty_o        : out std_logic;   --Queue is empty
+      full_o         : out std_logic;   --Queue is full
+      almost_empty_o : out std_logic;   --Programmable almost empty
+      almost_full_o  : out std_logic    --Programmable almost full
     );
   end component;
 
@@ -107,9 +107,9 @@ architecture RTL of riscv_membuf is
   -- Functions
   --
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -118,9 +118,9 @@ architecture RTL of riscv_membuf is
   end reduce_or;
 
   function reduce_nor (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -132,13 +132,13 @@ architecture RTL of riscv_membuf is
   --
   -- Variables
   --
-  signal queue_q  : std_ulogic_vector(DBITS-1 downto 0);
-  signal queue_we : std_ulogic;
-  signal queue_re : std_ulogic;
+  signal queue_q  : std_logic_vector(DBITS-1 downto 0);
+  signal queue_we : std_logic;
+  signal queue_re : std_logic;
 
-  signal access_pending : std_ulogic_vector(integer(log2(real(DEPTH))) downto 0);
+  signal access_pending : std_logic_vector(integer(log2(real(DEPTH))) downto 0);
 
-  signal empty : std_ulogic;
+  signal empty : std_logic;
 
 begin
   --////////////////////////////////////////////////////////////////
@@ -171,7 +171,7 @@ begin
 
   --control signals
   processing_0 : process (clk_i, rst_ni)
-    variable req_ack : std_ulogic_vector(1 downto 0);
+    variable req_ack : std_logic_vector(1 downto 0);
   begin
     if (rst_ni = '0') then
       access_pending <= (others => '0');
@@ -182,9 +182,9 @@ begin
         req_ack := req_i & ack_i;
         case (req_ack) is
           when "01" =>
-            access_pending <= std_ulogic_vector(unsigned(access_pending)-(access_pending'range => '1'));
+            access_pending <= std_logic_vector(unsigned(access_pending)-(access_pending'range => '1'));
           when "10" =>
-            access_pending <= std_ulogic_vector(unsigned(access_pending)+(access_pending'range => '1'));
+            access_pending <= std_logic_vector(unsigned(access_pending)+(access_pending'range => '1'));
           when others =>
             --do nothing
             null;

@@ -53,19 +53,19 @@ use work.riscv_mpsoc_pkg.all;
 entity riscv_memmisaligned is
   generic (
     XLEN    : integer := 64;
-    HAS_RVC : std_ulogic := '1'
+    HAS_RVC : std_logic := '1'
   );
   port (
-    clk_i : in std_ulogic;
+    clk_i : in std_logic;
 
     --CPU side
-    instruction_i : in std_ulogic;
-    req_i         : in std_ulogic;
-    adr_i         : in std_ulogic_vector(XLEN-1 downto 0);
-    size_i        : in std_ulogic_vector(2 downto 0);
+    instruction_i : in std_logic;
+    req_i         : in std_logic;
+    adr_i         : in std_logic_vector(XLEN-1 downto 0);
+    size_i        : in std_logic_vector(2 downto 0);
 
     --To memory subsystem
-    misaligned_o : out std_ulogic
+    misaligned_o : out std_logic
     );
 end riscv_memmisaligned;
 
@@ -75,9 +75,9 @@ architecture RTL of riscv_memmisaligned is
   -- Functions
   --
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -89,7 +89,7 @@ architecture RTL of riscv_memmisaligned is
   --
   -- Variables
   --
-  signal misaligned : std_ulogic;
+  signal misaligned : std_logic;
 
 begin
   --////////////////////////////////////////////////////////////////

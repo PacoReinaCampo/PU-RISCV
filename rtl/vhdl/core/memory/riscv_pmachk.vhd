@@ -61,22 +61,22 @@ entity riscv_pmachk is
     pma_adr_i : M_PMA_CNT_PLEN;
 
     --Memory Access
-    instruction_i : in std_ulogic;  --This is an instruction access
-    req_i         : in std_ulogic;  --Memory access requested
-    adr_i         : in std_ulogic_vector(PLEN-1 downto 0);  --Physical Memory address (i.e. after translation)
-    size_i        : in std_ulogic_vector(2 downto 0);  --Transfer size
-    lock_i        : in std_ulogic;  --AMO : TODO: specify AMO type
-    we_i          : in std_ulogic;
+    instruction_i : in std_logic;  --This is an instruction access
+    req_i         : in std_logic;  --Memory access requested
+    adr_i         : in std_logic_vector(PLEN-1 downto 0);  --Physical Memory address (i.e. after translation)
+    size_i        : in std_logic_vector(2 downto 0);  --Transfer size
+    lock_i        : in std_logic;  --AMO : TODO: specify AMO type
+    we_i          : in std_logic;
 
-    misaligned_i : in std_ulogic;  --Misaligned access
+    misaligned_i : in std_logic;  --Misaligned access
 
     --Output
-    pma_o             : out std_ulogic_vector(13 downto 0);
-    exception_o       : out std_ulogic;
-    misaligned_o      : out std_ulogic;
-    is_cache_access_o : out std_ulogic;
-    is_ext_access_o   : out std_ulogic;
-    is_tcm_access_o   : out std_ulogic
+    pma_o             : out std_logic_vector(13 downto 0);
+    exception_o       : out std_logic;
+    misaligned_o      : out std_logic;
+    is_cache_access_o : out std_logic;
+    is_ext_access_o   : out std_logic;
+    is_tcm_access_o   : out std_logic
   );
 end riscv_pmachk;
 
@@ -88,7 +88,7 @@ architecture RTL of riscv_pmachk is
 
   --convert transfer size in number of bytes in transfer
   function size2bytes (
-    size : std_ulogic_vector(2 downto 0)
+    size : std_logic_vector(2 downto 0)
     ) return integer is
     variable size2bytes_return : integer;
   begin
@@ -111,13 +111,13 @@ architecture RTL of riscv_pmachk is
 
   --Lower and Upper bounds for NA4/NAPOT
   function napot_lb (
-    na4    : std_ulogic;  --special case na4
-    pmaddr : std_ulogic_vector(PLEN-1 downto 2)
-    ) return std_ulogic_vector is
+    na4    : std_logic;  --special case na4
+    pmaddr : std_logic_vector(PLEN-1 downto 2)
+    ) return std_logic_vector is
     variable n               : integer;
-    variable truth           : std_ulogic;
-    variable mask            : std_ulogic_vector(PLEN-1 downto 2);
-    variable napot_lb_return : std_ulogic_vector(PLEN-1 downto 2);
+    variable truth           : std_logic;
+    variable mask            : std_logic_vector(PLEN-1 downto 2);
+    variable napot_lb_return : std_logic_vector(PLEN-1 downto 2);
   begin
     --find 'n' boundary = 2^(n+2) bytes
     n := 0;
@@ -136,7 +136,7 @@ architecture RTL of riscv_pmachk is
     end if;
 
     --create mask
-    mask := std_ulogic_vector(to_unsigned(1, PLEN-2) sll n);
+    mask := std_logic_vector(to_unsigned(1, PLEN-2) sll n);
 
     --lower bound address
     napot_lb_return := pmaddr and mask;
@@ -144,14 +144,14 @@ architecture RTL of riscv_pmachk is
   end napot_lb;
 
   function napot_ub (
-    na4    : std_ulogic;  --special case na4
-    pmaddr : std_ulogic_vector(PLEN-1 downto 2)
-  ) return std_ulogic_vector is
+    na4    : std_logic;  --special case na4
+    pmaddr : std_logic_vector(PLEN-1 downto 2)
+  ) return std_logic_vector is
     variable n               : integer;
-    variable truth           : std_ulogic;
-    variable mask            : std_ulogic_vector(PLEN-1 downto 2);
-    variable incr            : std_ulogic_vector(PLEN-1 downto 2);
-    variable napot_ub_return : std_ulogic_vector(PLEN-1 downto 2);
+    variable truth           : std_logic;
+    variable mask            : std_logic_vector(PLEN-1 downto 2);
+    variable incr            : std_logic_vector(PLEN-1 downto 2);
+    variable napot_ub_return : std_logic_vector(PLEN-1 downto 2);
   begin
     --find 'n' boundary = 2^(n+2) bytes
     n := 0;
@@ -170,23 +170,23 @@ architecture RTL of riscv_pmachk is
     end if;
 
     --create mask and increment
-    mask := std_ulogic_vector(to_unsigned(1, PLEN-2) sll n);
-    incr := std_ulogic_vector(to_unsigned(1, PLEN-2) sll n);
+    mask := std_logic_vector(to_unsigned(1, PLEN-2) sll n);
+    incr := std_logic_vector(to_unsigned(1, PLEN-2) sll n);
 
     --upper bound address
-    napot_ub_return := std_ulogic_vector(unsigned(pmaddr)+unsigned(incr)) and mask;
+    napot_ub_return := std_logic_vector(unsigned(pmaddr)+unsigned(incr)) and mask;
     return napot_ub_return;
   end napot_ub;
 
   --Is ANY byte of 'access' in pma range?
   function match_any (
-    access_lb : std_ulogic_vector(PLEN-1 downto 2);
-    access_ub : std_ulogic_vector(PLEN-1 downto 2);
-    pma_lb    : std_ulogic_vector(PLEN-1 downto 2);
-    pma_ub    : std_ulogic_vector(PLEN-1 downto 2)
+    access_lb : std_logic_vector(PLEN-1 downto 2);
+    access_ub : std_logic_vector(PLEN-1 downto 2);
+    pma_lb    : std_logic_vector(PLEN-1 downto 2);
+    pma_ub    : std_logic_vector(PLEN-1 downto 2)
 
-    ) return std_ulogic is
-    variable match_any_return : std_ulogic;
+    ) return std_logic is
+    variable match_any_return : std_logic;
   begin
     --    Check if ANY byte of the access lies within the PMA range
     --  *   pma_lb <= range < pma_ub
@@ -205,13 +205,13 @@ architecture RTL of riscv_pmachk is
 
   --Are ALL bytes of 'access' in PMA range?
   function match_all (
-    access_lb : std_ulogic_vector(PLEN-1 downto 2);
-    access_ub : std_ulogic_vector(PLEN-1 downto 2);
-    pma_lb    : std_ulogic_vector(PLEN-1 downto 2);
-    pma_ub    : std_ulogic_vector(PLEN-1 downto 2)
+    access_lb : std_logic_vector(PLEN-1 downto 2);
+    access_ub : std_logic_vector(PLEN-1 downto 2);
+    pma_lb    : std_logic_vector(PLEN-1 downto 2);
+    pma_ub    : std_logic_vector(PLEN-1 downto 2)
 
-    ) return std_ulogic is
-    variable match_all_return : std_ulogic;
+    ) return std_logic is
+    variable match_all_return : std_logic;
   begin
     if (access_lb >= pma_lb) or (access_ub <  pma_ub) then
       match_all_return := '0';
@@ -224,7 +224,7 @@ architecture RTL of riscv_pmachk is
 
   --get highest priority (==lowest number) PMA that matches
   function highest_priority_match (
-    m : std_ulogic_vector(PMA_CNT-1 downto 0)
+    m : std_logic_vector(PMA_CNT-1 downto 0)
   ) return integer is
     variable n : integer;
     variable highest_priority_match_return : integer;
@@ -241,7 +241,7 @@ architecture RTL of riscv_pmachk is
 
   function to_stdlogic (
     input : boolean
-  ) return std_ulogic is
+  ) return std_logic is
   begin
     if input then
       return('1');
@@ -251,9 +251,9 @@ architecture RTL of riscv_pmachk is
   end function to_stdlogic;
 
   function reduce_nor (
-    reduce_nor_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_nor_out : std_ulogic := '0';
+    reduce_nor_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_nor_out : std_logic := '0';
   begin
     for i in reduce_nor_in'range loop
       reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
@@ -265,25 +265,25 @@ architecture RTL of riscv_pmachk is
   --
   -- Types
   --
-  type M_PMA_CNT_PLEN2 is array (PMA_CNT-1 downto 0) of std_ulogic_vector(PLEN-1 downto 2);
+  type M_PMA_CNT_PLEN2 is array (PMA_CNT-1 downto 0) of std_logic_vector(PLEN-1 downto 2);
 
   --////////////////////////////////////////////////////////////////
   --
   -- Variables
   --
-  signal access_ub         : std_ulogic_vector(PLEN-1 downto 0);
-  signal access_lb         : std_ulogic_vector(PLEN-1 downto 0);
+  signal access_ub         : std_logic_vector(PLEN-1 downto 0);
+  signal access_lb         : std_logic_vector(PLEN-1 downto 0);
   signal pma_ub            : M_PMA_CNT_PLEN2;
   signal pma_lb            : M_PMA_CNT_PLEN2;
-  signal pma_match         : std_ulogic_vector(PMA_CNT-1 downto 0);
-  signal pma_match_all     : std_ulogic_vector(PMA_CNT-1 downto 0);
-  signal matched_pma_idx   : std_ulogic_vector(PLEN-1 downto 0);
+  signal pma_match         : std_logic_vector(PMA_CNT-1 downto 0);
+  signal pma_match_all     : std_logic_vector(PMA_CNT-1 downto 0);
+  signal matched_pma_idx   : std_logic_vector(PLEN-1 downto 0);
   signal pmacfg            : M_PMA_CNT_13;
-  signal matched_pma       : std_ulogic_vector(13 downto 0);
+  signal matched_pma       : std_logic_vector(13 downto 0);
 
   --Outputto 0);
-  signal exception         : std_ulogic;
-  signal misaligned        : std_ulogic;
+  signal exception         : std_logic;
+  signal misaligned        : std_logic;
 
 begin
   --////////////////////////////////////////////////////////////////
@@ -316,7 +316,7 @@ begin
 
   --Address Range Matching
   access_lb <= adr_i;
-  access_ub <= std_ulogic_vector(unsigned(adr_i)+("0000000000000" & unsigned(size_i))-"0000000000000001");
+  access_ub <= std_logic_vector(unsigned(adr_i)+("0000000000000" & unsigned(size_i))-"0000000000000001");
 
   generating_1 : for i in 0 to PMA_CNT - 1 generate
     --lower bounds
@@ -363,7 +363,7 @@ begin
     pma_match_all(i) <= match_any(access_lb(PLEN-1 downto 2), access_ub(PLEN-1 downto 2), pma_lb(i), pma_ub(i)) and to_stdlogic(pmacfg(i)(1 downto 0) /= OFF);
   end generate;
 
-  matched_pma_idx <= std_ulogic_vector(to_unsigned(highest_priority_match(pma_match_all), PLEN));
+  matched_pma_idx <= std_logic_vector(to_unsigned(highest_priority_match(pma_match_all), PLEN));
   matched_pma     <= pmacfg(to_integer(unsigned(matched_pma_idx)));
   pma_o           <= matched_pma;
 

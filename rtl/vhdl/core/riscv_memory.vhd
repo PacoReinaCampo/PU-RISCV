@@ -56,35 +56,35 @@ entity riscv_memory is
 
     EXCEPTION_SIZE : integer := 16;
 
-    PC_INIT : std_ulogic_vector(63 downto 0) := X"0000000080000000"
+    PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
   );
   port (
-    rstn : in std_ulogic;
-    clk  : in std_ulogic;
+    rstn : in std_logic;
+    clk  : in std_logic;
 
-    wb_stall : in std_ulogic;
+    wb_stall : in std_logic;
 
     --Program counter
-    ex_pc  : in  std_ulogic_vector(XLEN-1 downto 0);
-    mem_pc : out std_ulogic_vector(XLEN-1 downto 0);
+    ex_pc  : in  std_logic_vector(XLEN-1 downto 0);
+    mem_pc : out std_logic_vector(XLEN-1 downto 0);
 
     --Instruction
-    ex_bubble  : in  std_ulogic;
-    ex_instr   : in  std_ulogic_vector(ILEN-1 downto 0);
-    mem_bubble : out std_ulogic;
-    mem_instr  : out std_ulogic_vector(ILEN-1 downto 0);
+    ex_bubble  : in  std_logic;
+    ex_instr   : in  std_logic_vector(ILEN-1 downto 0);
+    mem_bubble : out std_logic;
+    mem_instr  : out std_logic_vector(ILEN-1 downto 0);
 
-    ex_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    wb_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    mem_exception : out std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
+    ex_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    wb_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    mem_exception : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
     --From EX
-    ex_r     : in std_ulogic_vector(XLEN-1 downto 0);
-    dmem_adr : in std_ulogic_vector(XLEN-1 downto 0);
+    ex_r     : in std_logic_vector(XLEN-1 downto 0);
+    dmem_adr : in std_logic_vector(XLEN-1 downto 0);
 
     --To WB
-    mem_r      : out std_ulogic_vector(XLEN-1 downto 0);
-    mem_memadr : out std_ulogic_vector(XLEN-1 downto 0)
+    mem_r      : out std_logic_vector(XLEN-1 downto 0);
+    mem_memadr : out std_logic_vector(XLEN-1 downto 0)
   );
 end riscv_memory;
 
@@ -94,9 +94,9 @@ architecture RTL of riscv_memory is
   -- Functions
   --
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -108,7 +108,7 @@ architecture RTL of riscv_memory is
   --
   -- Variables
   --
-  signal mem_exception_signal : std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
+  signal mem_exception_signal : std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
 begin
   --//////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 # vsim -c -do "run.do" work.riscv_pu 
-# Start time: 07:47:23 on Sep 27,2019
+# Start time: 16:37:01 on Nov 27,2019
 # Loading std.standard
 # Loading std.textio(body)
 # Loading ieee.std_logic_1164(body)
@@ -39,8 +39,8 @@
 # Loading work.riscv_dmem_ctrl(rtl)
 # Loading work.riscv_dcache_core(rtl)
 # Loading work.riscv_biu(rtl)
-# ** Warning: Design size of 20193 statements exceeds ModelSim-Intel FPGA Starter Edition recommended capacity.
+# ** Warning: Design size of 20199 statements exceeds ModelSim-Intel FPGA Starter Edition recommended capacity.
 # Expect performance to be adversely affected.
 # do run.do
-# End time: 07:47:23 on Sep 27,2019, Elapsed time: 0:00:00
+# End time: 16:37:02 on Nov 27,2019, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 1

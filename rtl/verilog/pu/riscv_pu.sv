@@ -45,7 +45,7 @@
 module riscv_pu #(
   parameter            XLEN               = 64,
   parameter            PLEN               = 64,
-  parameter [XLEN-1:0] PC_INIT            = 'h200,
+  parameter [XLEN-1:0] PC_INIT            = 'h8000_0000,
   parameter            HAS_USER           = 1,
   parameter            HAS_SUPER          = 1,
   parameter            HAS_HYPER          = 1,
@@ -83,11 +83,11 @@ module riscv_pu #(
 
   parameter            TECHNOLOGY         = "GENERIC",
 
-  parameter            MNMIVEC_DEFAULT    = PC_INIT - 'h004,
-  parameter            MTVEC_DEFAULT      = PC_INIT - 'h040,
-  parameter            HTVEC_DEFAULT      = PC_INIT - 'h080,
-  parameter            STVEC_DEFAULT      = PC_INIT - 'h0C0,
-  parameter            UTVEC_DEFAULT      = PC_INIT - 'h100,
+  parameter [XLEN-1:0] MNMIVEC_DEFAULT    = PC_INIT - 'h004,
+  parameter [XLEN-1:0] MTVEC_DEFAULT      = PC_INIT - 'h040,
+  parameter [XLEN-1:0] HTVEC_DEFAULT      = PC_INIT - 'h080,
+  parameter [XLEN-1:0] STVEC_DEFAULT      = PC_INIT - 'h0C0,
+  parameter [XLEN-1:0] UTVEC_DEFAULT      = PC_INIT - 'h100,
 
   parameter            JEDEC_BANK            = 10,
   parameter            JEDEC_MANUFACTURER_ID = 'h6e,

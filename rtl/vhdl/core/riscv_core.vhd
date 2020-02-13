@@ -55,18 +55,18 @@ entity riscv_core is
     PLEN                  : integer := 64;
     ILEN                  : integer := 64;
     EXCEPTION_SIZE        : integer := 16;
-    HAS_USER              : std_ulogic := '1';
-    HAS_SUPER             : std_ulogic := '1';
-    HAS_HYPER             : std_ulogic := '1';
-    HAS_BPU               : std_ulogic := '1';
-    HAS_FPU               : std_ulogic := '1';
-    HAS_MMU               : std_ulogic := '1';
-    HAS_RVA               : std_ulogic := '1';
-    HAS_RVM               : std_ulogic := '1';
-    HAS_RVC               : std_ulogic := '1';
-    IS_RV32E              : std_ulogic := '1';
+    HAS_USER              : std_logic := '1';
+    HAS_SUPER             : std_logic := '1';
+    HAS_HYPER             : std_logic := '1';
+    HAS_BPU               : std_logic := '1';
+    HAS_FPU               : std_logic := '1';
+    HAS_MMU               : std_logic := '1';
+    HAS_RVA               : std_logic := '1';
+    HAS_RVM               : std_logic := '1';
+    HAS_RVC               : std_logic := '1';
+    IS_RV32E              : std_logic := '1';
 
-    MULT_LATENCY          : std_ulogic := '1';
+    MULT_LATENCY          : std_logic := '1';
 
     BREAKPOINTS           : integer := 8;
 
@@ -82,70 +82,70 @@ entity riscv_core is
 
     TECHNOLOGY            : string := "GENERIC";
 
-    PC_INIT               : std_ulogic_vector(63 downto 0) := X"0000000080000000";
+    PC_INIT               : std_logic_vector(63 downto 0) := X"0000000080000000";
 
-    MNMIVEC_DEFAULT       : std_ulogic_vector(63 downto 0) := X"0000000000000004";
-    MTVEC_DEFAULT         : std_ulogic_vector(63 downto 0) := X"0000000000000040";
-    HTVEC_DEFAULT         : std_ulogic_vector(63 downto 0) := X"0000000000000080";
-    STVEC_DEFAULT         : std_ulogic_vector(63 downto 0) := X"00000000000000C0";
-    UTVEC_DEFAULT         : std_ulogic_vector(63 downto 0) := X"0000000000000100";
+    MNMIVEC_DEFAULT       : std_logic_vector(63 downto 0) := X"0000000000000004";
+    MTVEC_DEFAULT         : std_logic_vector(63 downto 0) := X"0000000000000040";
+    HTVEC_DEFAULT         : std_logic_vector(63 downto 0) := X"0000000000000080";
+    STVEC_DEFAULT         : std_logic_vector(63 downto 0) := X"00000000000000C0";
+    UTVEC_DEFAULT         : std_logic_vector(63 downto 0) := X"0000000000000100";
 
     JEDEC_BANK            : integer := 10;
-    JEDEC_MANUFACTURER_ID : std_ulogic_vector(7 downto 0) := X"6E";
+    JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
 
     HARTID                : integer := 0;
 
     PARCEL_SIZE           : integer := 64
   );
   port (
-    rstn : in std_ulogic;  --Reset
-    clk  : in std_ulogic;  --Clock
+    rstn : in std_logic;  --Reset
+    clk  : in std_logic;  --Clock
 
     --Instruction Memory Access bus
-    if_stall_nxt_pc      : in  std_ulogic;
-    if_nxt_pc            : out std_ulogic_vector(XLEN-1 downto 0);
-    if_stall             : out std_ulogic;
-    if_flush             : out std_ulogic;
-    if_parcel            : in  std_ulogic_vector(PARCEL_SIZE-1 downto 0);
-    if_parcel_pc         : in  std_ulogic_vector(XLEN-1 downto 0);
-    if_parcel_valid      : in  std_ulogic_vector(PARCEL_SIZE/16-1 downto 0);
-    if_parcel_misaligned : in  std_ulogic;
-    if_parcel_page_fault : in  std_ulogic;
+    if_stall_nxt_pc      : in  std_logic;
+    if_nxt_pc            : out std_logic_vector(XLEN-1 downto 0);
+    if_stall             : out std_logic;
+    if_flush             : out std_logic;
+    if_parcel            : in  std_logic_vector(PARCEL_SIZE-1 downto 0);
+    if_parcel_pc         : in  std_logic_vector(XLEN-1 downto 0);
+    if_parcel_valid      : in  std_logic_vector(PARCEL_SIZE/16-1 downto 0);
+    if_parcel_misaligned : in  std_logic;
+    if_parcel_page_fault : in  std_logic;
 
     --Data Memory Access bus
-    dmem_adr         : out std_ulogic_vector(XLEN-1 downto 0);
-    dmem_d           : out std_ulogic_vector(XLEN-1 downto 0);
-    dmem_q           : in  std_ulogic_vector(XLEN-1 downto 0);
-    dmem_we          : out std_ulogic;
-    dmem_size        : out std_ulogic_vector(2 downto 0);
-    dmem_req         : out std_ulogic;
-    dmem_ack         : in  std_ulogic;
-    dmem_err         : in  std_ulogic;
-    dmem_misaligned  : in  std_ulogic;
-    dmem_page_fault  : in  std_ulogic;
+    dmem_adr         : out std_logic_vector(XLEN-1 downto 0);
+    dmem_d           : out std_logic_vector(XLEN-1 downto 0);
+    dmem_q           : in  std_logic_vector(XLEN-1 downto 0);
+    dmem_we          : out std_logic;
+    dmem_size        : out std_logic_vector(2 downto 0);
+    dmem_req         : out std_logic;
+    dmem_ack         : in  std_logic;
+    dmem_err         : in  std_logic;
+    dmem_misaligned  : in  std_logic;
+    dmem_page_fault  : in  std_logic;
 
     --cpu state
-    st_prv     : out std_ulogic_vector(1 downto 0);
+    st_prv     : out std_logic_vector(1 downto 0);
     st_pmpcfg  : out M_PMP_CNT_7;
     st_pmpaddr : out M_PMP_CNT_PLEN;
 
-    bu_cacheflush : out std_ulogic;
+    bu_cacheflush : out std_logic;
 
     --Interrupts
-    ext_nmi  : in std_ulogic;
-    ext_tint : in std_ulogic;
-    ext_sint : in std_ulogic;
-    ext_int  : in std_ulogic_vector(3 downto 0);
+    ext_nmi  : in std_logic;
+    ext_tint : in std_logic;
+    ext_sint : in std_logic;
+    ext_int  : in std_logic_vector(3 downto 0);
 
     --Debug Interface
-    dbg_stall : in  std_ulogic;
-    dbg_strb  : in  std_ulogic;
-    dbg_we    : in  std_ulogic;
-    dbg_addr  : in  std_ulogic_vector(PLEN-1 downto 0);
-    dbg_dati  : in  std_ulogic_vector(XLEN-1 downto 0);
-    dbg_dato  : out std_ulogic_vector(XLEN-1 downto 0);
-    dbg_ack   : out std_ulogic;
-    dbg_bp    : out std_ulogic
+    dbg_stall : in  std_logic;
+    dbg_strb  : in  std_logic;
+    dbg_we    : in  std_logic;
+    dbg_addr  : in  std_logic_vector(PLEN-1 downto 0);
+    dbg_dati  : in  std_logic_vector(XLEN-1 downto 0);
+    dbg_dato  : out std_logic_vector(XLEN-1 downto 0);
+    dbg_ack   : out std_logic;
+    dbg_bp    : out std_logic
   );
 end riscv_core;
 
@@ -157,39 +157,39 @@ architecture RTL of riscv_core is
       PARCEL_SIZE    : integer := 64;
       EXCEPTION_SIZE : integer := 16;
 
-      PC_INIT : std_ulogic_vector(63 downto 0) := X"0000000080000000"
+      PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
     );
     port (
-      rstn     : in std_ulogic;  --Reset
-      clk      : in std_ulogic;  --Clock
-      id_stall : in std_ulogic;
+      rstn     : in std_logic;  --Reset
+      clk      : in std_logic;  --Clock
+      id_stall : in std_logic;
 
-      if_stall_nxt_pc      : in std_ulogic;
-      if_parcel            : in std_ulogic_vector(PARCEL_SIZE-1 downto 0);
-      if_parcel_pc         : in std_ulogic_vector(XLEN-1 downto 0);
-      if_parcel_valid      : in std_ulogic_vector(PARCEL_SIZE/16-1 downto 0);
-      if_parcel_misaligned : in std_ulogic;
-      if_parcel_page_fault : in std_ulogic;
+      if_stall_nxt_pc      : in std_logic;
+      if_parcel            : in std_logic_vector(PARCEL_SIZE-1 downto 0);
+      if_parcel_pc         : in std_logic_vector(XLEN-1 downto 0);
+      if_parcel_valid      : in std_logic_vector(PARCEL_SIZE/16-1 downto 0);
+      if_parcel_misaligned : in std_logic;
+      if_parcel_page_fault : in std_logic;
 
-      if_instr     : out std_ulogic_vector(ILEN-1 downto 0);  --Instruction out
-      if_bubble    : out std_ulogic;  --Insert bubble in the pipe (NOP instruction)
-      if_exception : out std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);  --Exceptions
+      if_instr     : out std_logic_vector(ILEN-1 downto 0);  --Instruction out
+      if_bubble    : out std_logic;  --Insert bubble in the pipe (NOP instruction)
+      if_exception : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);  --Exceptions
 
 
-      bp_bp_predict : in  std_ulogic_vector(1 downto 0);  --Branch Prediction bits
-      if_bp_predict : out std_ulogic_vector(1 downto 0);  --push down the pipe
+      bp_bp_predict : in  std_logic_vector(1 downto 0);  --Branch Prediction bits
+      if_bp_predict : out std_logic_vector(1 downto 0);  --push down the pipe
 
-      bu_flush : in std_ulogic;  --flush pipe & load new program counter
-      st_flush : in std_ulogic;
-      du_flush : in std_ulogic;  --flush pipe after debug exit
+      bu_flush : in std_logic;  --flush pipe & load new program counter
+      st_flush : in std_logic;
+      du_flush : in std_logic;  --flush pipe after debug exit
 
-      bu_nxt_pc : in std_ulogic_vector(XLEN-1 downto 0);  --Branch Unit Next Program Counter
-      st_nxt_pc : in std_ulogic_vector(XLEN-1 downto 0);  --State Next Program Counter
+      bu_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  --Branch Unit Next Program Counter
+      st_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  --State Next Program Counter
 
-      if_nxt_pc : out std_ulogic_vector(XLEN-1 downto 0);  --next Program Counter
-      if_stall  : out std_ulogic;  --stall instruction fetch BIU (cache/bus-interface)
-      if_flush  : out std_ulogic;  --flush instruction fetch BIU (cache/bus-interface)
-      if_pc     : out std_ulogic_vector(XLEN-1 downto 0)   --Program Counter
+      if_nxt_pc : out std_logic_vector(XLEN-1 downto 0);  --next Program Counter
+      if_stall  : out std_logic;  --stall instruction fetch BIU (cache/bus-interface)
+      if_flush  : out std_logic;  --flush instruction fetch BIU (cache/bus-interface)
+      if_pc     : out std_logic_vector(XLEN-1 downto 0)   --Program Counter
     );
   end component;
 
@@ -200,74 +200,74 @@ architecture RTL of riscv_core is
       EXCEPTION_SIZE : integer := 16
     );
     port (
-      rstn : in std_ulogic;
-      clk  : in std_ulogic;
+      rstn : in std_logic;
+      clk  : in std_logic;
 
-      id_stall : out std_ulogic;
-      ex_stall : in  std_ulogic;
-      du_stall : in  std_ulogic;
+      id_stall : out std_logic;
+      ex_stall : in  std_logic;
+      du_stall : in  std_logic;
 
-      bu_flush : in std_ulogic;
-      st_flush : in std_ulogic;
-      du_flush : in std_ulogic;
+      bu_flush : in std_logic;
+      st_flush : in std_logic;
+      du_flush : in std_logic;
 
-      bu_nxt_pc : in std_ulogic_vector(XLEN-1 downto 0);
-      st_nxt_pc : in std_ulogic_vector(XLEN-1 downto 0);
+      bu_nxt_pc : in std_logic_vector(XLEN-1 downto 0);
+      st_nxt_pc : in std_logic_vector(XLEN-1 downto 0);
 
       --Program counter
-      if_pc         : in  std_ulogic_vector(XLEN-1 downto 0);
-      id_pc         : out std_ulogic_vector(XLEN-1 downto 0);
-      if_bp_predict : in  std_ulogic_vector(1 downto 0);
-      id_bp_predict : out std_ulogic_vector(1 downto 0);
+      if_pc         : in  std_logic_vector(XLEN-1 downto 0);
+      id_pc         : out std_logic_vector(XLEN-1 downto 0);
+      if_bp_predict : in  std_logic_vector(1 downto 0);
+      id_bp_predict : out std_logic_vector(1 downto 0);
 
       --Instruction
-      if_instr   : in  std_ulogic_vector(ILEN-1 downto 0);
-      if_bubble  : in  std_ulogic;
-      id_instr   : out std_ulogic_vector(ILEN-1 downto 0);
-      id_bubble  : out std_ulogic;
-      ex_instr   : in  std_ulogic_vector(ILEN-1 downto 0);
-      ex_bubble  : in  std_ulogic;
-      mem_instr  : in  std_ulogic_vector(ILEN-1 downto 0);
-      mem_bubble : in  std_ulogic;
-      wb_instr   : in  std_ulogic_vector(ILEN-1 downto 0);
-      wb_bubble  : in  std_ulogic;
+      if_instr   : in  std_logic_vector(ILEN-1 downto 0);
+      if_bubble  : in  std_logic;
+      id_instr   : out std_logic_vector(ILEN-1 downto 0);
+      id_bubble  : out std_logic;
+      ex_instr   : in  std_logic_vector(ILEN-1 downto 0);
+      ex_bubble  : in  std_logic;
+      mem_instr  : in  std_logic_vector(ILEN-1 downto 0);
+      mem_bubble : in  std_logic;
+      wb_instr   : in  std_logic_vector(ILEN-1 downto 0);
+      wb_bubble  : in  std_logic;
 
       --Exceptions
-      if_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-      ex_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-      mem_exception : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-      wb_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-      id_exception  : out std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
+      if_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+      ex_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+      mem_exception : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+      wb_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+      id_exception  : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
       --From State
-      st_prv        : in std_ulogic_vector(1 downto 0);
-      st_xlen       : in std_ulogic_vector(1 downto 0);
-      st_tvm        : in std_ulogic;
-      st_tw         : in std_ulogic;
-      st_tsr        : in std_ulogic;
-      st_mcounteren : in std_ulogic_vector(XLEN-1 downto 0);
-      st_scounteren : in std_ulogic_vector(XLEN-1 downto 0);
+      st_prv        : in std_logic_vector(1 downto 0);
+      st_xlen       : in std_logic_vector(1 downto 0);
+      st_tvm        : in std_logic;
+      st_tw         : in std_logic;
+      st_tsr        : in std_logic;
+      st_mcounteren : in std_logic_vector(XLEN-1 downto 0);
+      st_scounteren : in std_logic_vector(XLEN-1 downto 0);
 
       --To RF
-      id_src1 : out std_ulogic_vector(4 downto 0);
-      id_src2 : out std_ulogic_vector(4 downto 0);
+      id_src1 : out std_logic_vector(4 downto 0);
+      id_src2 : out std_logic_vector(4 downto 0);
 
       --To execution units
-      id_opA : out std_ulogic_vector(XLEN-1 downto 0);
-      id_opB : out std_ulogic_vector(XLEN-1 downto 0);
+      id_opA : out std_logic_vector(XLEN-1 downto 0);
+      id_opB : out std_logic_vector(XLEN-1 downto 0);
 
-      id_userf_opA  : out std_ulogic;
-      id_userf_opB  : out std_ulogic;
-      id_bypex_opA  : out std_ulogic;
-      id_bypex_opB  : out std_ulogic;
-      id_bypmem_opA : out std_ulogic;
-      id_bypmem_opB : out std_ulogic;
-      id_bypwb_opA  : out std_ulogic;
-      id_bypwb_opB  : out std_ulogic;
+      id_userf_opA  : out std_logic;
+      id_userf_opB  : out std_logic;
+      id_bypex_opA  : out std_logic;
+      id_bypex_opB  : out std_logic;
+      id_bypmem_opA : out std_logic;
+      id_bypmem_opB : out std_logic;
+      id_bypwb_opA  : out std_logic;
+      id_bypwb_opB  : out std_logic;
 
       --from MEM/WB
-      mem_r : in std_ulogic_vector(XLEN-1 downto 0);
-      wb_r  : in std_ulogic_vector(XLEN-1 downto 0)
+      mem_r : in std_logic_vector(XLEN-1 downto 0);
+      wb_r  : in std_logic_vector(XLEN-1 downto 0)
     );
   end component;
 
@@ -277,95 +277,95 @@ architecture RTL of riscv_core is
       ILEN           : integer := 64;
       EXCEPTION_SIZE : integer := 16;
       BP_GLOBAL_BITS : integer := 2;
-      HAS_RVC        : std_ulogic := '1';
-      HAS_RVA        : std_ulogic := '1';
-      HAS_RVM        : std_ulogic := '1';
-      MULT_LATENCY   : std_ulogic := '1';
+      HAS_RVC        : std_logic := '1';
+      HAS_RVA        : std_logic := '1';
+      HAS_RVM        : std_logic := '1';
+      MULT_LATENCY   : std_logic := '1';
 
-      PC_INIT : std_ulogic_vector(63 downto 0) := X"0000000080000000"
+      PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
     );
     port (
-      rstn : in std_ulogic;
-      clk  : in std_ulogic;
+      rstn : in std_logic;
+      clk  : in std_logic;
 
-      wb_stall : in  std_ulogic;
-      ex_stall : out std_ulogic;
+      wb_stall : in  std_logic;
+      ex_stall : out std_logic;
 
       --Program counter
-      id_pc         : in  std_ulogic_vector(XLEN-1 downto 0);
-      ex_pc         : out std_ulogic_vector(XLEN-1 downto 0);
-      bu_nxt_pc     : out std_ulogic_vector(XLEN-1 downto 0);
-      bu_flush      : out std_ulogic;
-      bu_cacheflush : out std_ulogic;
-      id_bp_predict : in  std_ulogic_vector(1 downto 0);
-      bu_bp_predict : out std_ulogic_vector(1 downto 0);
-      bu_bp_history : out std_ulogic_vector(BP_GLOBAL_BITS-1 downto 0);
-      bu_bp_btaken  : out std_ulogic;
-      bu_bp_update  : out std_ulogic;
+      id_pc         : in  std_logic_vector(XLEN-1 downto 0);
+      ex_pc         : out std_logic_vector(XLEN-1 downto 0);
+      bu_nxt_pc     : out std_logic_vector(XLEN-1 downto 0);
+      bu_flush      : out std_logic;
+      bu_cacheflush : out std_logic;
+      id_bp_predict : in  std_logic_vector(1 downto 0);
+      bu_bp_predict : out std_logic_vector(1 downto 0);
+      bu_bp_history : out std_logic_vector(BP_GLOBAL_BITS-1 downto 0);
+      bu_bp_btaken  : out std_logic;
+      bu_bp_update  : out std_logic;
 
       --Instruction
-      id_bubble : in  std_ulogic;
-      id_instr  : in  std_ulogic_vector(ILEN-1 downto 0);
-      ex_bubble : out std_ulogic;
-      ex_instr  : out std_ulogic_vector(ILEN-1 downto 0);
+      id_bubble : in  std_logic;
+      id_instr  : in  std_logic_vector(ILEN-1 downto 0);
+      ex_bubble : out std_logic;
+      ex_instr  : out std_logic_vector(ILEN-1 downto 0);
 
-      id_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-      mem_exception : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-      wb_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-      ex_exception  : out std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
+      id_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+      mem_exception : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+      wb_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+      ex_exception  : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
       --from ID
-      id_userf_opA  : in std_ulogic;
-      id_userf_opB  : in std_ulogic;
-      id_bypex_opA  : in std_ulogic;
-      id_bypex_opB  : in std_ulogic;
-      id_bypmem_opA : in std_ulogic;
-      id_bypmem_opB : in std_ulogic;
-      id_bypwb_opA  : in std_ulogic;
-      id_bypwb_opB  : in std_ulogic;
-      id_opA        : in std_ulogic_vector(XLEN-1 downto 0);
-      id_opB        : in std_ulogic_vector(XLEN-1 downto 0);
+      id_userf_opA  : in std_logic;
+      id_userf_opB  : in std_logic;
+      id_bypex_opA  : in std_logic;
+      id_bypex_opB  : in std_logic;
+      id_bypmem_opA : in std_logic;
+      id_bypmem_opB : in std_logic;
+      id_bypwb_opA  : in std_logic;
+      id_bypwb_opB  : in std_logic;
+      id_opA        : in std_logic_vector(XLEN-1 downto 0);
+      id_opB        : in std_logic_vector(XLEN-1 downto 0);
 
       --from RF
-      rf_srcv1 : in std_ulogic_vector(XLEN-1 downto 0);
-      rf_srcv2 : in std_ulogic_vector(XLEN-1 downto 0);
+      rf_srcv1 : in std_logic_vector(XLEN-1 downto 0);
+      rf_srcv2 : in std_logic_vector(XLEN-1 downto 0);
 
       --to MEM
-      ex_r : out std_ulogic_vector(XLEN-1 downto 0);
+      ex_r : out std_logic_vector(XLEN-1 downto 0);
 
       --Bypasses
-      mem_r : in std_ulogic_vector(XLEN-1 downto 0);
-      wb_r  : in std_ulogic_vector(XLEN-1 downto 0);
+      mem_r : in std_logic_vector(XLEN-1 downto 0);
+      wb_r  : in std_logic_vector(XLEN-1 downto 0);
 
       --To State
-      ex_csr_reg  : out std_ulogic_vector(11 downto 0);
-      ex_csr_wval : out std_ulogic_vector(XLEN-1 downto 0);
-      ex_csr_we   : out std_ulogic;
+      ex_csr_reg  : out std_logic_vector(11 downto 0);
+      ex_csr_wval : out std_logic_vector(XLEN-1 downto 0);
+      ex_csr_we   : out std_logic;
 
       --From State
-      st_prv      : in std_ulogic_vector(1 downto 0);
-      st_xlen     : in std_ulogic_vector(1 downto 0);
-      st_flush    : in std_ulogic;
-      st_csr_rval : in std_ulogic_vector(XLEN-1 downto 0);
+      st_prv      : in std_logic_vector(1 downto 0);
+      st_xlen     : in std_logic_vector(1 downto 0);
+      st_flush    : in std_logic;
+      st_csr_rval : in std_logic_vector(XLEN-1 downto 0);
 
       --To DCACHE/Memory
-      dmem_adr        : out std_ulogic_vector(XLEN-1 downto 0);
-      dmem_d          : out std_ulogic_vector(XLEN-1 downto 0);
-      dmem_req        : out std_ulogic;
-      dmem_we         : out std_ulogic;
-      dmem_size       : out std_ulogic_vector(2 downto 0);
-      dmem_ack        : in  std_ulogic;
-      dmem_q          : in  std_ulogic_vector(XLEN-1 downto 0);
-      dmem_misaligned : in  std_ulogic;
-      dmem_page_fault : in  std_ulogic;
+      dmem_adr        : out std_logic_vector(XLEN-1 downto 0);
+      dmem_d          : out std_logic_vector(XLEN-1 downto 0);
+      dmem_req        : out std_logic;
+      dmem_we         : out std_logic;
+      dmem_size       : out std_logic_vector(2 downto 0);
+      dmem_ack        : in  std_logic;
+      dmem_q          : in  std_logic_vector(XLEN-1 downto 0);
+      dmem_misaligned : in  std_logic;
+      dmem_page_fault : in  std_logic;
 
       --Debug Unit
-      du_stall     : in std_ulogic;
-      du_stall_dly : in std_ulogic;
-      du_flush     : in std_ulogic;
-      du_we_pc     : in std_ulogic;
-      du_dato      : in std_ulogic_vector(XLEN-1 downto 0);
-      du_ie        : in std_ulogic_vector(31 downto 0)
+      du_stall     : in std_logic;
+      du_stall_dly : in std_logic;
+      du_flush     : in std_logic;
+      du_we_pc     : in std_logic;
+      du_dato      : in std_logic_vector(XLEN-1 downto 0);
+      du_ie        : in std_logic_vector(31 downto 0)
     );
   end component;
 
@@ -376,35 +376,35 @@ architecture RTL of riscv_core is
 
       EXCEPTION_SIZE : integer := 16;
 
-      PC_INIT : std_ulogic_vector(63 downto 0) := X"0000000080000000"
+      PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
     );
     port (
-      rstn : in std_ulogic;
-      clk  : in std_ulogic;
+      rstn : in std_logic;
+      clk  : in std_logic;
 
-      wb_stall : in std_ulogic;
+      wb_stall : in std_logic;
 
       --Program counter
-      ex_pc  : in  std_ulogic_vector(XLEN-1 downto 0);
-      mem_pc : out std_ulogic_vector(XLEN-1 downto 0);
+      ex_pc  : in  std_logic_vector(XLEN-1 downto 0);
+      mem_pc : out std_logic_vector(XLEN-1 downto 0);
 
       --Instruction
-      ex_bubble  : in  std_ulogic;
-      ex_instr   : in  std_ulogic_vector(ILEN-1 downto 0);
-      mem_bubble : out std_ulogic;
-      mem_instr  : out std_ulogic_vector(ILEN-1 downto 0);
+      ex_bubble  : in  std_logic;
+      ex_instr   : in  std_logic_vector(ILEN-1 downto 0);
+      mem_bubble : out std_logic;
+      mem_instr  : out std_logic_vector(ILEN-1 downto 0);
 
-      ex_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-      wb_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-      mem_exception : out std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
+      ex_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+      wb_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+      mem_exception : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
       --From EX
-      ex_r     : in  std_ulogic_vector(XLEN-1 downto 0);
-      dmem_adr : in  std_ulogic_vector(XLEN-1 downto 0);
+      ex_r     : in  std_logic_vector(XLEN-1 downto 0);
+      dmem_adr : in  std_logic_vector(XLEN-1 downto 0);
 
       --To WB
-      mem_r      : out std_ulogic_vector(XLEN-1 downto 0);
-      mem_memadr : out std_ulogic_vector(XLEN-1 downto 0)
+      mem_r      : out std_logic_vector(XLEN-1 downto 0);
+      mem_memadr : out std_logic_vector(XLEN-1 downto 0)
     );
   end component;
 
@@ -415,40 +415,40 @@ architecture RTL of riscv_core is
 
       EXCEPTION_SIZE : integer := 16;
 
-      PC_INIT : std_ulogic_vector(63 downto 0) := X"0000000080000000"
+      PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
     );
     port (
-      rst_ni : in std_ulogic;  --Reset
-      clk_i  : in std_ulogic;  --Clock
+      rst_ni : in std_logic;  --Reset
+      clk_i  : in std_logic;  --Clock
 
-      wb_stall_o : out std_ulogic;  --Stall on memory-wait
+      wb_stall_o : out std_logic;  --Stall on memory-wait
 
-      mem_pc_i : in  std_ulogic_vector(XLEN-1 downto 0);
-      wb_pc_o  : out std_ulogic_vector(XLEN-1 downto 0);
+      mem_pc_i : in  std_logic_vector(XLEN-1 downto 0);
+      wb_pc_o  : out std_logic_vector(XLEN-1 downto 0);
 
-      mem_instr_i  : in  std_ulogic_vector(ILEN-1 downto 0);
-      mem_bubble_i : in  std_ulogic;
-      wb_instr_o   : out std_ulogic_vector(ILEN-1 downto 0);
-      wb_bubble_o  : out std_ulogic;
+      mem_instr_i  : in  std_logic_vector(ILEN-1 downto 0);
+      mem_bubble_i : in  std_logic;
+      wb_instr_o   : out std_logic_vector(ILEN-1 downto 0);
+      wb_bubble_o  : out std_logic;
 
-      mem_exception_i : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-      wb_exception_o  : out std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-      wb_badaddr_o    : out std_ulogic_vector(XLEN-1 downto 0);
+      mem_exception_i : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+      wb_exception_o  : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+      wb_badaddr_o    : out std_logic_vector(XLEN-1 downto 0);
 
-      mem_r_i      : in std_ulogic_vector(XLEN-1 downto 0);
-      mem_memadr_i : in std_ulogic_vector(XLEN-1 downto 0);
+      mem_r_i      : in std_logic_vector(XLEN-1 downto 0);
+      mem_memadr_i : in std_logic_vector(XLEN-1 downto 0);
 
       --From Memory System
-      dmem_ack_i        : in std_ulogic;
-      dmem_err_i        : in std_ulogic;
-      dmem_q_i          : in std_ulogic_vector(XLEN-1 downto 0);
-      dmem_misaligned_i : in std_ulogic;
-      dmem_page_fault_i : in std_ulogic;
+      dmem_ack_i        : in std_logic;
+      dmem_err_i        : in std_logic;
+      dmem_q_i          : in std_logic_vector(XLEN-1 downto 0);
+      dmem_misaligned_i : in std_logic;
+      dmem_page_fault_i : in std_logic;
 
       --To Register File
-      wb_dst_o : out std_ulogic_vector(4 downto 0);
-      wb_r_o   : out std_ulogic_vector(XLEN-1 downto 0);
-      wb_we_o  : out std_ulogic
+      wb_dst_o : out std_logic_vector(4 downto 0);
+      wb_r_o   : out std_logic_vector(XLEN-1 downto 0);
+      wb_we_o  : out std_logic
     );
   end component;
 
@@ -459,88 +459,88 @@ architecture RTL of riscv_core is
       ILEN            : integer := 64;
       EXCEPTION_SIZE  : integer := 16;
 
-      IS_RV32E        : std_ulogic := '0';
-      HAS_RVN         : std_ulogic := '1';
-      HAS_RVC         : std_ulogic := '1';
-      HAS_FPU         : std_ulogic := '1';
-      HAS_MMU         : std_ulogic := '1';
-      HAS_RVM         : std_ulogic := '1';
-      HAS_RVA         : std_ulogic := '1';
-      HAS_RVB         : std_ulogic := '1';
-      HAS_RVT         : std_ulogic := '1';
-      HAS_RVP         : std_ulogic := '1';
-      HAS_EXT         : std_ulogic := '1';
+      IS_RV32E        : std_logic := '0';
+      HAS_RVN         : std_logic := '1';
+      HAS_RVC         : std_logic := '1';
+      HAS_FPU         : std_logic := '1';
+      HAS_MMU         : std_logic := '1';
+      HAS_RVM         : std_logic := '1';
+      HAS_RVA         : std_logic := '1';
+      HAS_RVB         : std_logic := '1';
+      HAS_RVT         : std_logic := '1';
+      HAS_RVP         : std_logic := '1';
+      HAS_EXT         : std_logic := '1';
 
-      HAS_USER        : std_ulogic := '1';
-      HAS_SUPER       : std_ulogic := '1';
-      HAS_HYPER       : std_ulogic := '1';
+      HAS_USER        : std_logic := '1';
+      HAS_SUPER       : std_logic := '1';
+      HAS_HYPER       : std_logic := '1';
 
-      PC_INIT         : std_ulogic_vector(63 downto 0) := X"0000000080000000";
+      PC_INIT         : std_logic_vector(63 downto 0) := X"0000000080000000";
 
-      MNMIVEC_DEFAULT : std_ulogic_vector(63 downto 0) := X"0000000000000004";
-      MTVEC_DEFAULT   : std_ulogic_vector(63 downto 0) := X"0000000000000040";
-      HTVEC_DEFAULT   : std_ulogic_vector(63 downto 0) := X"0000000000000080";
-      STVEC_DEFAULT   : std_ulogic_vector(63 downto 0) := X"00000000000000C0";
-      UTVEC_DEFAULT   : std_ulogic_vector(63 downto 0) := X"0000000000000100";
+      MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
+      MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
+      HTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000080";
+      STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
+      UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
 
       JEDEC_BANK            : integer := 10;
-      JEDEC_MANUFACTURER_ID : std_ulogic_vector(7 downto 0) := X"6E";
+      JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
 
       PMP_CNT               : integer := 16;
       HARTID                : integer := 0
     );
     port (
-    rstn : in std_ulogic;
-    clk  : in std_ulogic;
+    rstn : in std_logic;
+    clk  : in std_logic;
 
-    id_pc     : in std_ulogic_vector(XLEN-1 downto 0);
-    id_bubble : in std_ulogic;
-    id_instr  : in std_ulogic_vector(ILEN-1 downto 0);
-    id_stall  : in std_ulogic;
+    id_pc     : in std_logic_vector(XLEN-1 downto 0);
+    id_bubble : in std_logic;
+    id_instr  : in std_logic_vector(ILEN-1 downto 0);
+    id_stall  : in std_logic;
 
-    bu_flush  : in  std_ulogic;
-    bu_nxt_pc : in  std_ulogic_vector(XLEN-1 downto 0);
-    st_flush  : out std_ulogic;
-    st_nxt_pc : out std_ulogic_vector(XLEN-1 downto 0);
+    bu_flush  : in  std_logic;
+    bu_nxt_pc : in  std_logic_vector(XLEN-1 downto 0);
+    st_flush  : out std_logic;
+    st_nxt_pc : out std_logic_vector(XLEN-1 downto 0);
 
-    wb_pc        : in std_ulogic_vector(XLEN-1 downto 0);
-    wb_bubble    : in std_ulogic;
-    wb_instr     : in std_ulogic_vector(ILEN-1 downto 0);
-    wb_exception : in std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    wb_badaddr   : in std_ulogic_vector(XLEN-1 downto 0);
+    wb_pc        : in std_logic_vector(XLEN-1 downto 0);
+    wb_bubble    : in std_logic;
+    wb_instr     : in std_logic_vector(ILEN-1 downto 0);
+    wb_exception : in std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    wb_badaddr   : in std_logic_vector(XLEN-1 downto 0);
 
-    st_interrupt  : out std_ulogic;
-    st_prv        : out std_ulogic_vector(1 downto 0);  --Privilege level
-    st_xlen       : out std_ulogic_vector(1 downto 0);  --Active Architecture
-    st_tvm        : out std_ulogic;      --trap on satp access or SFENCE.VMA
-    st_tw         : out std_ulogic;      --trap on WFI (after time >=0)
-    st_tsr        : out std_ulogic;      --trap SRET
-    st_mcounteren : out std_ulogic_vector(XLEN-1 downto 0);
-    st_scounteren : out std_ulogic_vector(XLEN-1 downto 0);
+    st_interrupt  : out std_logic;
+    st_prv        : out std_logic_vector(1 downto 0);  --Privilege level
+    st_xlen       : out std_logic_vector(1 downto 0);  --Active Architecture
+    st_tvm        : out std_logic;      --trap on satp access or SFENCE.VMA
+    st_tw         : out std_logic;      --trap on WFI (after time >=0)
+    st_tsr        : out std_logic;      --trap SRET
+    st_mcounteren : out std_logic_vector(XLEN-1 downto 0);
+    st_scounteren : out std_logic_vector(XLEN-1 downto 0);
     st_pmpcfg     : out M_PMP_CNT_7;
     st_pmpaddr    : out M_PMP_CNT_PLEN;
 
 
     --interrupts (3=M-mode, 0=U-mode)
-    ext_int  : in std_ulogic_vector(3 downto 0);  --external interrupt (per privilege mode; determined by PIC)
-    ext_tint : in std_ulogic;            --machine timer interrupt
-    ext_sint : in std_ulogic;            --machine software interrupt (for ipi)
-    ext_nmi  : in std_ulogic;            --non-maskable interrupt
+    ext_int  : in std_logic_vector(3 downto 0);  --external interrupt (per privilege mode; determined by PIC)
+    ext_tint : in std_logic;            --machine timer interrupt
+    ext_sint : in std_logic;            --machine software interrupt (for ipi)
+    ext_nmi  : in std_logic;            --non-maskable interrupt
 
     --CSR interface
-    ex_csr_reg  : in  std_ulogic_vector(11 downto 0);
-    ex_csr_we   : in  std_ulogic;
-    ex_csr_wval : in  std_ulogic_vector(XLEN-1 downto 0);
-    st_csr_rval : out std_ulogic_vector(XLEN-1 downto 0);
+    ex_csr_reg  : in  std_logic_vector(11 downto 0);
+    ex_csr_we   : in  std_logic;
+    ex_csr_wval : in  std_logic_vector(XLEN-1 downto 0);
+    st_csr_rval : out std_logic_vector(XLEN-1 downto 0);
 
     --Debug interface
-    du_stall      : in  std_ulogic;
-    du_flush      : in  std_ulogic;
-    du_we_csr     : in  std_ulogic;
-    du_dato       : in  std_ulogic_vector(XLEN-1 downto 0);  --output from debug unit
-    du_addr       : in  std_ulogic_vector(11 downto 0);
-    du_ie         : in  std_ulogic_vector(31 downto 0);
-    du_exceptions : out std_ulogic_vector(31 downto 0)
+    du_stall      : in  std_logic;
+    du_flush      : in  std_logic;
+    du_we_csr     : in  std_logic;
+    du_dato       : in  std_logic_vector(XLEN-1 downto 0);  --output from debug unit
+    du_addr       : in  std_logic_vector(11 downto 0);
+    du_ie         : in  std_logic_vector(31 downto 0);
+    du_exceptions : out std_logic_vector(31 downto 0)
     );
   end component;
 
@@ -552,8 +552,8 @@ architecture RTL of riscv_core is
       WRPORTS : integer := 1
     );
     port (
-      rstn : in std_ulogic;
-      clk  : in std_ulogic;
+      rstn : in std_logic;
+      clk  : in std_logic;
 
       --Register File read
       rf_src1  : in  M_RDPORTS_AR_BITS;
@@ -564,14 +564,14 @@ architecture RTL of riscv_core is
       --Register File write
       rf_dst  : in M_WRPORTS_AR_BITS;
       rf_dstv : in M_WRPORTS_XLEN;
-      rf_we   : in std_ulogic_vector(WRPORTS-1 downto 0);
+      rf_we   : in std_logic_vector(WRPORTS-1 downto 0);
 
       --Debug Interface
-      du_stall   : in  std_ulogic;
-      du_we_rf   : in  std_ulogic;
-      du_dato    : in  std_ulogic_vector(XLEN-1 downto 0);  --output from debug unit
-      du_dati_rf : out std_ulogic_vector(XLEN-1 downto 0);
-      du_addr    : in  std_ulogic_vector(11 downto 0)
+      du_stall   : in  std_logic;
+      du_we_rf   : in  std_logic;
+      du_dato    : in  std_logic_vector(XLEN-1 downto 0);  --output from debug unit
+      du_dati_rf : out std_logic_vector(XLEN-1 downto 0);
+      du_addr    : in  std_logic_vector(11 downto 0)
     );
   end component;
 
@@ -579,7 +579,7 @@ architecture RTL of riscv_core is
     generic (
       XLEN : integer := 64;
 
-      HAS_BPU : std_ulogic := '1';
+      HAS_BPU : std_logic := '1';
 
       BP_GLOBAL_BITS : integer := 2;
       BP_LOCAL_BITS : integer := 10;
@@ -587,25 +587,25 @@ architecture RTL of riscv_core is
 
       TECHNOLOGY : string := "GENERIC";
 
-      AVOID_X : std_ulogic := '0';
+      AVOID_X : std_logic := '0';
 
-      PC_INIT : std_ulogic_vector(63 downto 0) := X"0000000080000000"
+      PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
     );
     port (
-      rst_ni : in std_ulogic;
-      clk_i  : in std_ulogic;
+      rst_ni : in std_logic;
+      clk_i  : in std_logic;
 
       --Read side
-      id_stall_i      : in  std_ulogic;
-      if_parcel_pc_i  : in  std_ulogic_vector(XLEN-1 downto 0);
-      bp_bp_predict_o : out std_ulogic_vector(1 downto 0);
+      id_stall_i      : in  std_logic;
+      if_parcel_pc_i  : in  std_logic_vector(XLEN-1 downto 0);
+      bp_bp_predict_o : out std_logic_vector(1 downto 0);
 
       --Write side
-      ex_pc_i         : in std_ulogic_vector(XLEN-1 downto 0);
-      bu_bp_history_i : in std_ulogic_vector(BP_GLOBAL_BITS-1 downto 0);  --branch history
-      bu_bp_predict_i : in std_ulogic_vector(1 downto 0);  --prediction bits for branch
-      bu_bp_btaken_i  : in std_ulogic;
-      bu_bp_update_i  : in std_ulogic
+      ex_pc_i         : in std_logic_vector(XLEN-1 downto 0);
+      bu_bp_history_i : in std_logic_vector(BP_GLOBAL_BITS-1 downto 0);  --branch history
+      bu_bp_predict_i : in std_logic_vector(1 downto 0);  --prediction bits for branch
+      bu_bp_btaken_i  : in std_logic;
+      bu_bp_update_i  : in std_logic
     );
   end component;
 
@@ -623,51 +623,51 @@ architecture RTL of riscv_core is
       BREAKPOINTS : integer := 3
     );
     port (
-      rstn : in std_ulogic;
-      clk  : in std_ulogic;
+      rstn : in std_logic;
+      clk  : in std_logic;
 
       --Debug Port interface
-      dbg_stall : in  std_ulogic;
-      dbg_strb  : in  std_ulogic;
-      dbg_we    : in  std_ulogic;
-      dbg_addr  : in  std_ulogic_vector(PLEN-1 downto 0);
-      dbg_dati  : in  std_ulogic_vector(XLEN-1 downto 0);
-      dbg_dato  : out std_ulogic_vector(XLEN-1 downto 0);
-      dbg_ack   : out std_ulogic;
-      dbg_bp    : out std_ulogic;
+      dbg_stall : in  std_logic;
+      dbg_strb  : in  std_logic;
+      dbg_we    : in  std_logic;
+      dbg_addr  : in  std_logic_vector(PLEN-1 downto 0);
+      dbg_dati  : in  std_logic_vector(XLEN-1 downto 0);
+      dbg_dato  : out std_logic_vector(XLEN-1 downto 0);
+      dbg_ack   : out std_logic;
+      dbg_bp    : out std_logic;
 
       --CPU signals
-      du_stall     : out std_ulogic;
-      du_stall_dly : out std_ulogic;
-      du_flush     : out std_ulogic;
-      du_we_rf     : out std_ulogic;
-      du_we_frf    : out std_ulogic;
-      du_we_csr    : out std_ulogic;
-      du_we_pc     : out std_ulogic;
-      du_addr      : out std_ulogic_vector(DU_ADDR_SIZE-1 downto 0);
-      du_dato      : out std_ulogic_vector(XLEN-1 downto 0);
-      du_ie        : out std_ulogic_vector(31 downto 0);
-      du_dati_rf   : in  std_ulogic_vector(XLEN-1 downto 0);
-      du_dati_frf  : in  std_ulogic_vector(XLEN-1 downto 0);
-      st_csr_rval  : in  std_ulogic_vector(XLEN-1 downto 0);
-      if_pc        : in  std_ulogic_vector(XLEN-1 downto 0);
-      id_pc        : in  std_ulogic_vector(XLEN-1 downto 0);
-      ex_pc        : in  std_ulogic_vector(XLEN-1 downto 0);
-      bu_nxt_pc    : in  std_ulogic_vector(XLEN-1 downto 0);
-      bu_flush     : in  std_ulogic;
-      st_flush     : in  std_ulogic;
+      du_stall     : out std_logic;
+      du_stall_dly : out std_logic;
+      du_flush     : out std_logic;
+      du_we_rf     : out std_logic;
+      du_we_frf    : out std_logic;
+      du_we_csr    : out std_logic;
+      du_we_pc     : out std_logic;
+      du_addr      : out std_logic_vector(DU_ADDR_SIZE-1 downto 0);
+      du_dato      : out std_logic_vector(XLEN-1 downto 0);
+      du_ie        : out std_logic_vector(31 downto 0);
+      du_dati_rf   : in  std_logic_vector(XLEN-1 downto 0);
+      du_dati_frf  : in  std_logic_vector(XLEN-1 downto 0);
+      st_csr_rval  : in  std_logic_vector(XLEN-1 downto 0);
+      if_pc        : in  std_logic_vector(XLEN-1 downto 0);
+      id_pc        : in  std_logic_vector(XLEN-1 downto 0);
+      ex_pc        : in  std_logic_vector(XLEN-1 downto 0);
+      bu_nxt_pc    : in  std_logic_vector(XLEN-1 downto 0);
+      bu_flush     : in  std_logic;
+      st_flush     : in  std_logic;
 
-      if_instr      : in std_ulogic_vector(ILEN-1 downto 0);
-      mem_instr     : in std_ulogic_vector(ILEN-1 downto 0);
-      if_bubble     : in std_ulogic;
-      mem_bubble    : in std_ulogic;
-      mem_exception : in std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-      mem_memadr    : in std_ulogic_vector(XLEN-1 downto 0);
-      dmem_ack      : in std_ulogic;
-      ex_stall      : in std_ulogic;
+      if_instr      : in std_logic_vector(ILEN-1 downto 0);
+      mem_instr     : in std_logic_vector(ILEN-1 downto 0);
+      if_bubble     : in std_logic;
+      mem_bubble    : in std_logic;
+      mem_exception : in std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+      mem_memadr    : in std_logic_vector(XLEN-1 downto 0);
+      dmem_ack      : in std_logic;
+      ex_stall      : in std_logic;
 
       --From state
-      du_exceptions : in std_ulogic_vector(31 downto 0)
+      du_exceptions : in std_logic_vector(31 downto 0)
     );
   end component;
 
@@ -675,118 +675,118 @@ architecture RTL of riscv_core is
   --
   -- Variables
   --
-  signal bu_nxt_pc : std_ulogic_vector(XLEN-1 downto 0);
-  signal st_nxt_pc : std_ulogic_vector(XLEN-1 downto 0);
-  signal if_pc     : std_ulogic_vector(XLEN-1 downto 0);
-  signal id_pc     : std_ulogic_vector(XLEN-1 downto 0);
-  signal ex_pc     : std_ulogic_vector(XLEN-1 downto 0);
-  signal mem_pc    : std_ulogic_vector(XLEN-1 downto 0);
-  signal wb_pc     : std_ulogic_vector(XLEN-1 downto 0);
+  signal bu_nxt_pc : std_logic_vector(XLEN-1 downto 0);
+  signal st_nxt_pc : std_logic_vector(XLEN-1 downto 0);
+  signal if_pc     : std_logic_vector(XLEN-1 downto 0);
+  signal id_pc     : std_logic_vector(XLEN-1 downto 0);
+  signal ex_pc     : std_logic_vector(XLEN-1 downto 0);
+  signal mem_pc    : std_logic_vector(XLEN-1 downto 0);
+  signal wb_pc     : std_logic_vector(XLEN-1 downto 0);
 
-  signal if_instr  : std_ulogic_vector(ILEN-1 downto 0);
-  signal id_instr  : std_ulogic_vector(ILEN-1 downto 0);
-  signal ex_instr  : std_ulogic_vector(ILEN-1 downto 0);
-  signal mem_instr : std_ulogic_vector(ILEN-1 downto 0);
-  signal wb_instr  : std_ulogic_vector(ILEN-1 downto 0);
+  signal if_instr  : std_logic_vector(ILEN-1 downto 0);
+  signal id_instr  : std_logic_vector(ILEN-1 downto 0);
+  signal ex_instr  : std_logic_vector(ILEN-1 downto 0);
+  signal mem_instr : std_logic_vector(ILEN-1 downto 0);
+  signal wb_instr  : std_logic_vector(ILEN-1 downto 0);
 
-  signal if_bubble  : std_ulogic;
-  signal id_bubble  : std_ulogic;
-  signal ex_bubble  : std_ulogic;
-  signal mem_bubble : std_ulogic;
-  signal wb_bubble  : std_ulogic;
+  signal if_bubble  : std_logic;
+  signal id_bubble  : std_logic;
+  signal ex_bubble  : std_logic;
+  signal mem_bubble : std_logic;
+  signal wb_bubble  : std_logic;
 
-  signal bu_flush : std_ulogic;
-  signal st_flush : std_ulogic;
-  signal du_flush : std_ulogic;
+  signal bu_flush : std_logic;
+  signal st_flush : std_logic;
+  signal du_flush : std_logic;
 
-  signal id_stall     : std_ulogic;
-  signal ex_stall     : std_ulogic;
-  signal wb_stall     : std_ulogic;
-  signal du_stall     : std_ulogic;
-  signal du_stall_dly : std_ulogic;
+  signal id_stall     : std_logic;
+  signal ex_stall     : std_logic;
+  signal wb_stall     : std_logic;
+  signal du_stall     : std_logic;
+  signal du_stall_dly : std_logic;
 
   --Branch Prediction
-  signal bp_bp_predict : std_ulogic_vector(1 downto 0);
-  signal if_bp_predict : std_ulogic_vector(1 downto 0);
-  signal id_bp_predict : std_ulogic_vector(1 downto 0);
-  signal bu_bp_predict : std_ulogic_vector(1 downto 0);
+  signal bp_bp_predict : std_logic_vector(1 downto 0);
+  signal if_bp_predict : std_logic_vector(1 downto 0);
+  signal id_bp_predict : std_logic_vector(1 downto 0);
+  signal bu_bp_predict : std_logic_vector(1 downto 0);
 
-  signal bu_bp_history : std_ulogic_vector(BP_GLOBAL_BITS-1 downto 0);
-  signal bu_bp_btaken  : std_ulogic;
-  signal bu_bp_update  : std_ulogic;
+  signal bu_bp_history : std_logic_vector(BP_GLOBAL_BITS-1 downto 0);
+  signal bu_bp_btaken  : std_logic;
+  signal bu_bp_update  : std_logic;
 
   --Exceptions
-  signal if_exception  : std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-  signal id_exception  : std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-  signal ex_exception  : std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-  signal mem_exception : std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-  signal wb_exception  : std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
+  signal if_exception  : std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+  signal id_exception  : std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+  signal ex_exception  : std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+  signal mem_exception : std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+  signal wb_exception  : std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
   --RF access
   constant RDPORTS : integer := 1;
   constant WRPORTS : integer := 1;
   constant AR_BITS : integer := 5;
 
-  signal id_srcv2 : std_ulogic_vector(XLEN-1 downto 0);
+  signal id_srcv2 : std_logic_vector(XLEN-1 downto 0);
   signal rf_src1  : M_RDPORTS_AR_BITS;
   signal rf_src2  : M_RDPORTS_AR_BITS;
   signal rf_dst   : M_WRPORTS_AR_BITS;
   signal rf_srcv1 : M_RDPORTS_XLEN;
   signal rf_srcv2 : M_RDPORTS_XLEN;
   signal rf_dstv  : M_WRPORTS_XLEN;
-  signal rf_we    : std_ulogic_vector(WRPORTS-1 downto 0);
+  signal rf_we    : std_logic_vector(WRPORTS-1 downto 0);
 
   --ALU signals
-  signal id_opA     : std_ulogic_vector(XLEN-1 downto 0);
-  signal id_opB     : std_ulogic_vector(XLEN-1 downto 0);
-  signal ex_r       : std_ulogic_vector(XLEN-1 downto 0);
-  signal ex_memadr  : std_ulogic_vector(XLEN-1 downto 0);
-  signal mem_r      : std_ulogic_vector(XLEN-1 downto 0);
-  signal mem_memadr : std_ulogic_vector(XLEN-1 downto 0);
+  signal id_opA     : std_logic_vector(XLEN-1 downto 0);
+  signal id_opB     : std_logic_vector(XLEN-1 downto 0);
+  signal ex_r       : std_logic_vector(XLEN-1 downto 0);
+  signal ex_memadr  : std_logic_vector(XLEN-1 downto 0);
+  signal mem_r      : std_logic_vector(XLEN-1 downto 0);
+  signal mem_memadr : std_logic_vector(XLEN-1 downto 0);
 
-  signal id_userf_opA  : std_ulogic;
-  signal id_userf_opB  : std_ulogic;
-  signal id_bypex_opA  : std_ulogic;
-  signal id_bypex_opB  : std_ulogic;
-  signal id_bypmem_opA : std_ulogic;
-  signal id_bypmem_opB : std_ulogic;
-  signal id_bypwb_opA  : std_ulogic;
-  signal id_bypwb_opB  : std_ulogic;
+  signal id_userf_opA  : std_logic;
+  signal id_userf_opB  : std_logic;
+  signal id_bypex_opA  : std_logic;
+  signal id_bypex_opB  : std_logic;
+  signal id_bypmem_opA : std_logic;
+  signal id_bypmem_opB : std_logic;
+  signal id_bypwb_opA  : std_logic;
+  signal id_bypwb_opB  : std_logic;
 
   --CPU state
-  signal st_xlen       : std_ulogic_vector(1 downto 0);
-  signal st_tvm        : std_ulogic;
-  signal st_tw         : std_ulogic;
-  signal st_tsr        : std_ulogic;
-  signal st_mcounteren : std_ulogic_vector(XLEN-1 downto 0);
-  signal st_scounteren : std_ulogic_vector(XLEN-1 downto 0);
-  signal st_interrupt  : std_ulogic;
-  signal ex_csr_reg    : std_ulogic_vector(11 downto 0);
-  signal ex_csr_wval   : std_ulogic_vector(XLEN-1 downto 0);
-  signal st_csr_rval   : std_ulogic_vector(XLEN-1 downto 0);
-  signal ex_csr_we     : std_ulogic;
+  signal st_xlen       : std_logic_vector(1 downto 0);
+  signal st_tvm        : std_logic;
+  signal st_tw         : std_logic;
+  signal st_tsr        : std_logic;
+  signal st_mcounteren : std_logic_vector(XLEN-1 downto 0);
+  signal st_scounteren : std_logic_vector(XLEN-1 downto 0);
+  signal st_interrupt  : std_logic;
+  signal ex_csr_reg    : std_logic_vector(11 downto 0);
+  signal ex_csr_wval   : std_logic_vector(XLEN-1 downto 0);
+  signal st_csr_rval   : std_logic_vector(XLEN-1 downto 0);
+  signal ex_csr_we     : std_logic;
 
   --Write back
-  signal wb_dst     : std_ulogic_vector(4 downto 0);
-  signal wb_r       : std_ulogic_vector(XLEN-1 downto 0);
-  signal wb_we      : std_ulogic;
-  signal wb_badaddr : std_ulogic_vector(XLEN-1 downto 0);
+  signal wb_dst     : std_logic_vector(4 downto 0);
+  signal wb_r       : std_logic_vector(XLEN-1 downto 0);
+  signal wb_we      : std_logic;
+  signal wb_badaddr : std_logic_vector(XLEN-1 downto 0);
 
   --Debug
-  signal du_we_rf      : std_ulogic;
-  signal du_we_frf     : std_ulogic;
-  signal du_we_csr     : std_ulogic;
-  signal du_we_pc      : std_ulogic;
-  signal du_addr       : std_ulogic_vector(DU_ADDR_SIZE-1 downto 0);
-  signal du_dato       : std_ulogic_vector(XLEN-1 downto 0);
-  signal du_dati_rf    : std_ulogic_vector(XLEN-1 downto 0);
-  signal du_dati_frf   : std_ulogic_vector(XLEN-1 downto 0);
-  signal du_dati_csr   : std_ulogic_vector(XLEN-1 downto 0);
-  signal du_ie         : std_ulogic_vector(31 downto 0);
-  signal du_exceptions : std_ulogic_vector(31 downto 0);
+  signal du_we_rf      : std_logic;
+  signal du_we_frf     : std_logic;
+  signal du_we_csr     : std_logic;
+  signal du_we_pc      : std_logic;
+  signal du_addr       : std_logic_vector(DU_ADDR_SIZE-1 downto 0);
+  signal du_dato       : std_logic_vector(XLEN-1 downto 0);
+  signal du_dati_rf    : std_logic_vector(XLEN-1 downto 0);
+  signal du_dati_frf   : std_logic_vector(XLEN-1 downto 0);
+  signal du_dati_csr   : std_logic_vector(XLEN-1 downto 0);
+  signal du_ie         : std_logic_vector(31 downto 0);
+  signal du_exceptions : std_logic_vector(31 downto 0);
 
-  signal dmem_adr_sgn : std_ulogic_vector(XLEN-1 downto 0);
-  signal st_prv_sgn   : std_ulogic_vector(1 downto 0);
+  signal dmem_adr_sgn : std_logic_vector(XLEN-1 downto 0);
+  signal st_prv_sgn   : std_logic_vector(1 downto 0);
 
 begin
   --//////////////////////////////////////////////////////////////

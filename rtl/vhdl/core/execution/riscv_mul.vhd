@@ -55,26 +55,26 @@ entity riscv_mul is
     ILEN : integer := 64
   );
   port (
-    rstn : in std_ulogic;
-    clk  : in std_ulogic;
+    rstn : in std_logic;
+    clk  : in std_logic;
 
-    ex_stall  : in  std_ulogic;
-    mul_stall : out std_ulogic;
+    ex_stall  : in  std_logic;
+    mul_stall : out std_logic;
 
     --Instruction
-    id_bubble : in std_ulogic;
-    id_instr  : in std_ulogic_vector(ILEN-1 downto 0);
+    id_bubble : in std_logic;
+    id_instr  : in std_logic_vector(ILEN-1 downto 0);
 
     --Operands
-    opA : in std_ulogic_vector(XLEN-1 downto 0);
-    opB : in std_ulogic_vector(XLEN-1 downto 0);
+    opA : in std_logic_vector(XLEN-1 downto 0);
+    opB : in std_logic_vector(XLEN-1 downto 0);
 
     --from State
-    st_xlen : in std_ulogic_vector(1 downto 0);
+    st_xlen : in std_logic_vector(1 downto 0);
 
     --to WB
-    mul_bubble : out std_ulogic;
-    mul_r      : out std_ulogic_vector(XLEN-1 downto 0)
+    mul_bubble : out std_logic;
+    mul_r      : out std_logic_vector(XLEN-1 downto 0)
   );
 end riscv_mul;
 
@@ -93,11 +93,11 @@ architecture RTL of riscv_mul is
   -- functions
   --
   function sext32 (
-    operand : std_ulogic_vector(31 downto 0)
+    operand : std_logic_vector(31 downto 0)
 
-  ) return std_ulogic_vector is
-    variable sign          : std_ulogic;
-    variable sext32_return : std_ulogic_vector (XLEN-1 downto 0);
+  ) return std_logic_vector is
+    variable sign          : std_logic;
+    variable sext32_return : std_logic_vector (XLEN-1 downto 0);
   begin
     sign          := operand(31);
     sext32_return := ((XLEN-1 downto 31 => sign) & operand(30 downto 0));
@@ -105,27 +105,27 @@ architecture RTL of riscv_mul is
   end sext32;
 
   function twos (
-    a : std_ulogic_vector(XLEN-1 downto 0)
-    ) return std_ulogic_vector is
-    variable twos_return : std_ulogic_vector (XLEN-1 downto 0);
+    a : std_logic_vector(XLEN-1 downto 0)
+    ) return std_logic_vector is
+    variable twos_return : std_logic_vector (XLEN-1 downto 0);
   begin
-    twos_return := std_ulogic_vector(unsigned(not a)+X"0000000000000001");
+    twos_return := std_logic_vector(unsigned(not a)+X"0000000000000001");
     return twos_return;
   end twos;
 
   function twos_dxlen (
-    a : std_ulogic_vector(DXLEN-1 downto 0)
-    ) return std_ulogic_vector is
-    variable twos_dxlen_return : std_ulogic_vector (DXLEN-1 downto 0);
+    a : std_logic_vector(DXLEN-1 downto 0)
+    ) return std_logic_vector is
+    variable twos_dxlen_return : std_logic_vector (DXLEN-1 downto 0);
   begin
-    twos_dxlen_return := std_ulogic_vector(unsigned(not a)+X"00000000000000000000000000000001");
+    twos_dxlen_return := std_logic_vector(unsigned(not a)+X"00000000000000000000000000000001");
     return twos_dxlen_return;
   end twos_dxlen;
 
   function absolute (
-    a : std_ulogic_vector(XLEN-1 downto 0)
-    ) return std_ulogic_vector is
-    variable abs_return : std_ulogic_vector (XLEN-1 downto 0);
+    a : std_logic_vector(XLEN-1 downto 0)
+    ) return std_logic_vector is
+    variable abs_return : std_logic_vector (XLEN-1 downto 0);
   begin
     if (a(XLEN-1) = '1') then
       abs_return := twos(a);
@@ -137,9 +137,9 @@ architecture RTL of riscv_mul is
   end absolute;
 
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -149,7 +149,7 @@ architecture RTL of riscv_mul is
 
   function to_stdlogic (
     input : boolean
-  ) return std_ulogic is
+  ) return std_logic is
   begin
     if input then
       return('1');
@@ -162,42 +162,42 @@ architecture RTL of riscv_mul is
   --
   -- Constants
   --
-  constant ST_IDLE : std_ulogic := '0';
-  constant ST_WAIT : std_ulogic := '1';
+  constant ST_IDLE : std_logic := '0';
+  constant ST_WAIT : std_logic := '1';
 
   --//////////////////////////////////////////////////////////////
   --
   -- Variables
   --
-  signal xlen32    : std_ulogic;
-  signal mul_instr : std_ulogic_vector(ILEN-1 downto 0);
+  signal xlen32    : std_logic;
+  signal mul_instr : std_logic_vector(ILEN-1 downto 0);
 
-  signal opcode     : std_ulogic_vector(6 downto 2);
-  signal mul_opcode : std_ulogic_vector(6 downto 2);
-  signal func3      : std_ulogic_vector(2 downto 0);
-  signal mul_func3  : std_ulogic_vector(2 downto 0);
-  signal func7      : std_ulogic_vector(6 downto 0);
-  signal mul_func7  : std_ulogic_vector(6 downto 0);
+  signal opcode     : std_logic_vector(6 downto 2);
+  signal mul_opcode : std_logic_vector(6 downto 2);
+  signal func3      : std_logic_vector(2 downto 0);
+  signal mul_func3  : std_logic_vector(2 downto 0);
+  signal func7      : std_logic_vector(6 downto 0);
+  signal mul_func7  : std_logic_vector(6 downto 0);
 
   --Operand generation
-  signal opA32 : std_ulogic_vector(31 downto 0);
-  signal opB32 : std_ulogic_vector(31 downto 0);
+  signal opA32 : std_logic_vector(31 downto 0);
+  signal opB32 : std_logic_vector(31 downto 0);
 
-  signal mult_neg          : std_ulogic;
-  signal mult_neg_reg      : std_ulogic;
-  signal mult_opA          : std_ulogic_vector(XLEN-1 downto 0);
-  signal mult_opA_reg      : std_ulogic_vector(XLEN-1 downto 0);
-  signal mult_opB          : std_ulogic_vector(XLEN-1 downto 0);
-  signal mult_opB_reg      : std_ulogic_vector(XLEN-1 downto 0);
-  signal mult_r            : std_ulogic_vector(DXLEN-1 downto 0);
-  signal mult_r_reg        : std_ulogic_vector(DXLEN-1 downto 0);
-  signal mult_r_signed     : std_ulogic_vector(DXLEN-1 downto 0);
-  signal mult_r_signed_reg : std_ulogic_vector(DXLEN-1 downto 0);
+  signal mult_neg          : std_logic;
+  signal mult_neg_reg      : std_logic;
+  signal mult_opA          : std_logic_vector(XLEN-1 downto 0);
+  signal mult_opA_reg      : std_logic_vector(XLEN-1 downto 0);
+  signal mult_opB          : std_logic_vector(XLEN-1 downto 0);
+  signal mult_opB_reg      : std_logic_vector(XLEN-1 downto 0);
+  signal mult_r            : std_logic_vector(DXLEN-1 downto 0);
+  signal mult_r_reg        : std_logic_vector(DXLEN-1 downto 0);
+  signal mult_r_signed     : std_logic_vector(DXLEN-1 downto 0);
+  signal mult_r_signed_reg : std_logic_vector(DXLEN-1 downto 0);
 
   --FSM (bubble, stall generation)
-  signal is_mul : std_ulogic;
-  signal cnt    : std_ulogic_vector(1 downto 0);
-  signal state  : std_ulogic;
+  signal is_mul : std_logic;
+  signal cnt    : std_logic_vector(1 downto 0);
+  signal state  : std_logic;
 
 begin
   --//////////////////////////////////////////////////////////////
@@ -227,7 +227,7 @@ begin
   --   *   at the expense of potentially making the path slower
   --multiplier operand-A
   processing_0 : process (func3, func7, opA, opA32, opcode)
-    variable multiplier_a : std_ulogic_vector(15 downto 0);
+    variable multiplier_a : std_logic_vector(15 downto 0);
   begin
     multiplier_a := 'X' & func7 & func3 & opcode;
     case (multiplier_a) is
@@ -243,7 +243,7 @@ begin
 
   --multiplier operand-B
   processing_1 : process (func3, func7, opB, opB32, opcode)
-    variable multiplier_b : std_ulogic_vector(15 downto 0);
+    variable multiplier_b : std_logic_vector(15 downto 0);
   begin
     multiplier_b := 'X' & func7 & func3 & opcode;
     case (multiplier_b) is
@@ -261,7 +261,7 @@ begin
 
   --negate multiplier output?
   processing_2 : process (func3, func7, opA, opA32, opB, opB32, opcode)
-    variable multiplier_negate : std_ulogic_vector(15 downto 0);
+    variable multiplier_negate : std_logic_vector(15 downto 0);
   begin
     multiplier_negate := 'X' & func7 & func3 & opcode;
     case (multiplier_negate) is
@@ -282,7 +282,7 @@ begin
   end process;
 
   --Actual multiplier
-  mult_r <= std_ulogic_vector(unsigned(mult_opA_reg)*unsigned(mult_opB_reg));
+  mult_r <= std_logic_vector(unsigned(mult_opA_reg)*unsigned(mult_opB_reg));
 
   --Correct sign
   mult_r_signed <= twos_dxlen(mult_r_reg)
@@ -375,7 +375,7 @@ begin
 
   --Final output register
   processing_8 : process (clk)
-    variable output_register : std_ulogic_vector(15 downto 0);
+    variable output_register : std_logic_vector(15 downto 0);
   begin
     if (rising_edge(clk)) then
       output_register := 'X' & mul_func7 & mul_func3 & mul_opcode;
@@ -393,7 +393,7 @@ begin
 
   --Stall / Bubble generation
   processing_9 : process (mul_func3, mul_func7, mul_opcode, xlen32)
-    variable generation : std_ulogic_vector(15 downto 0);
+    variable generation : std_logic_vector(15 downto 0);
   begin
     generation := 'X' & mul_func7 & mul_func3 & mul_opcode;
     case (generation) is
@@ -430,7 +430,7 @@ begin
                 mul_stall  <= '0';
               else
                 state      <= ST_WAIT;
-                cnt        <= std_ulogic_vector(unsigned(cnt)-"01");
+                cnt        <= std_logic_vector(unsigned(cnt)-"01");
                 mul_bubble <= '1';
                 mul_stall  <= '1';
               end if;
@@ -438,7 +438,7 @@ begin
           end if;
         when ST_WAIT =>
           if (reduce_or(cnt) = '1') then
-            cnt <= std_ulogic_vector(unsigned(cnt)-"01");
+            cnt <= std_logic_vector(unsigned(cnt)-"01");
           else
             state      <= ST_IDLE;
             cnt        <= "11";  --LATENCY

@@ -54,14 +54,14 @@ entity riscv_ram_1rw is
     TECHNOLOGY : string := "GENERIC"
   );
   port (
-    rst_ni : in std_ulogic;
-    clk_i  : in std_ulogic;
+    rst_ni : in std_logic;
+    clk_i  : in std_logic;
 
-    addr_i : in  std_ulogic_vector(ABITS-1 downto 0);
-    we_i   : in  std_ulogic;
-    be_i   : in  std_ulogic_vector((DBITS+7)/8-1 downto 0);
-    din_i  : in  std_ulogic_vector(DBITS-1 downto 0);
-    dout_o : out std_ulogic_vector(DBITS-1 downto 0)
+    addr_i : in  std_logic_vector(ABITS-1 downto 0);
+    we_i   : in  std_logic;
+    be_i   : in  std_logic_vector((DBITS+7)/8-1 downto 0);
+    din_i  : in  std_logic_vector(DBITS-1 downto 0);
+    dout_o : out std_logic_vector(DBITS-1 downto 0)
   );
 end riscv_ram_1rw;
 
@@ -72,14 +72,14 @@ architecture RTL of riscv_ram_1rw is
       DBITS : integer := 32
     );
     port (
-      rst_ni : in std_ulogic;
-      clk_i  : in std_ulogic;
+      rst_ni : in std_logic;
+      clk_i  : in std_logic;
 
-      addr_i : in  std_ulogic_vector(ABITS-1 downto 0);
-      we_i   : in  std_ulogic;
-      be_i   : in  std_ulogic_vector((DBITS+7)/8-1 downto 0);
-      din_i  : in  std_ulogic_vector(DBITS-1 downto 0);
-      dout_o : out std_ulogic_vector(DBITS-1 downto 0)
+      addr_i : in  std_logic_vector(ABITS-1 downto 0);
+      we_i   : in  std_logic;
+      be_i   : in  std_logic_vector((DBITS+7)/8-1 downto 0);
+      din_i  : in  std_logic_vector(DBITS-1 downto 0);
+      dout_o : out std_logic_vector(DBITS-1 downto 0)
     );
   end component;
 

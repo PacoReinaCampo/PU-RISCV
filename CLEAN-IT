@@ -10,4 +10,5 @@ rm -rf synthesis
 
 rm -rf work-obj93.cf
 rm -rf system.vvp
+rm -rf obj_dir
 rm -rf riscv_pu_testbench.tree

@@ -55,35 +55,35 @@ entity riscv_mmu is
     PLEN : integer := 64
   );
   port (
-    rst_ni : in std_ulogic;
-    clk_i  : in std_ulogic;
-    clr_i  : in std_ulogic;  --clear pending request
+    rst_ni : in std_logic;
+    clk_i  : in std_logic;
+    clr_i  : in std_logic;  --clear pending request
 
     --Mode
     --input  logic [XLEN-1:0] st_satp;
 
     --CPU side
-    vreq_i  : in std_ulogic;  --Request from CPU
-    vadr_i  : in std_ulogic_vector(XLEN-1 downto 0);  --Virtual Memory Address
-    vsize_i : in std_ulogic_vector(2 downto 0);
-    vlock_i : in std_ulogic;
-    vprot_i : in std_ulogic_vector(2 downto 0);
-    vwe_i   : in std_ulogic;
-    vd_i    : in std_ulogic_vector(XLEN-1 downto 0);
+    vreq_i  : in std_logic;  --Request from CPU
+    vadr_i  : in std_logic_vector(XLEN-1 downto 0);  --Virtual Memory Address
+    vsize_i : in std_logic_vector(2 downto 0);
+    vlock_i : in std_logic;
+    vprot_i : in std_logic_vector(2 downto 0);
+    vwe_i   : in std_logic;
+    vd_i    : in std_logic_vector(XLEN-1 downto 0);
 
     --Memory system side
-    preq_o  : out std_ulogic;
-    padr_o  : out std_ulogic_vector(PLEN-1 downto 0);  --Physical Memory Address
-    psize_o : out std_ulogic_vector(2 downto 0);
-    plock_o : out std_ulogic;
-    pprot_o : out std_ulogic_vector(2 downto 0);
-    pwe_o   : out std_ulogic;
-    pd_o    : out std_ulogic_vector(XLEN-1 downto 0);
-    pq_i    : in  std_ulogic_vector(XLEN-1 downto 0);
-    pack_i  : in  std_ulogic;
+    preq_o  : out std_logic;
+    padr_o  : out std_logic_vector(PLEN-1 downto 0);  --Physical Memory Address
+    psize_o : out std_logic_vector(2 downto 0);
+    plock_o : out std_logic;
+    pprot_o : out std_logic_vector(2 downto 0);
+    pwe_o   : out std_logic;
+    pd_o    : out std_logic_vector(XLEN-1 downto 0);
+    pq_i    : in  std_logic_vector(XLEN-1 downto 0);
+    pack_i  : in  std_logic;
 
     --Exception
-    page_fault_o : out std_ulogic
+    page_fault_o : out std_logic
   );
 end riscv_mmu;
 

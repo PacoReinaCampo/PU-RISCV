@@ -59,17 +59,17 @@ entity riscv_pmpchk is
     --From State
     st_pmpcfg_i  : in M_PMP_CNT_7;
     st_pmpaddr_i : in M_PMP_CNT_PLEN;
-    st_prv_i     : in std_ulogic_vector(1 downto 0);
+    st_prv_i     : in std_logic_vector(1 downto 0);
 
     --Memory Access
-    instruction_i : in std_ulogic;                          --This is an instruction access
-    req_i         : in std_ulogic;                          --Memory access requested
-    adr_i         : in std_ulogic_vector(PLEN-1 downto 0);  --Physical Memory address (i.e. after translation)
-    size_i        : in std_ulogic_vector(2 downto 0);       --Transfer size
-    we_i          : in std_ulogic;                          --Read/Write enable
+    instruction_i : in std_logic;                          --This is an instruction access
+    req_i         : in std_logic;                          --Memory access requested
+    adr_i         : in std_logic_vector(PLEN-1 downto 0);  --Physical Memory address (i.e. after translation)
+    size_i        : in std_logic_vector(2 downto 0);       --Transfer size
+    we_i          : in std_logic;                          --Read/Write enable
 
     --Output
-    exception_o : out std_ulogic
+    exception_o : out std_logic
     );
 end riscv_pmpchk;
 
@@ -81,7 +81,7 @@ architecture RTL of riscv_pmpchk is
 
   --convert transfer size in number of bytes in transfer
   function size2bytes (
-    size : std_ulogic_vector(2 downto 0)
+    size : std_logic_vector(2 downto 0)
     ) return integer is
     variable size2bytes_return : integer;
   begin
@@ -104,13 +104,13 @@ architecture RTL of riscv_pmpchk is
 
   --Lower and Upper bounds for NA4/NAPOT
   function napot_lb (
-    na4    : std_ulogic;                 --special case na4
-    pmpddr : std_ulogic_vector(PLEN-1 downto 2)
-    ) return std_ulogic_vector is
+    na4    : std_logic;                 --special case na4
+    pmpddr : std_logic_vector(PLEN-1 downto 2)
+    ) return std_logic_vector is
     variable n               : integer;
-    variable truth           : std_ulogic;
-    variable mask            : std_ulogic_vector(PLEN-1 downto 2);
-    variable napot_lb_return : std_ulogic_vector (PLEN-1 downto 2);
+    variable truth           : std_logic;
+    variable mask            : std_logic_vector(PLEN-1 downto 2);
+    variable napot_lb_return : std_logic_vector (PLEN-1 downto 2);
   begin
     --find 'n' boundary = 2^(n+2) bytes
     n := 0;
@@ -129,7 +129,7 @@ architecture RTL of riscv_pmpchk is
     end if;
 
     --create mask
-    mask := std_ulogic_vector(to_unsigned(1, PLEN-2) sll n);
+    mask := std_logic_vector(to_unsigned(1, PLEN-2) sll n);
 
     --lower bound address
     napot_lb_return := pmpddr and mask;
@@ -137,14 +137,14 @@ architecture RTL of riscv_pmpchk is
   end napot_lb;
 
   function napot_ub (
-    na4    : std_ulogic;  --special case na4
-    pmpddr : std_ulogic_vector(PLEN-1 downto 2)
-    ) return std_ulogic_vector is
+    na4    : std_logic;  --special case na4
+    pmpddr : std_logic_vector(PLEN-1 downto 2)
+    ) return std_logic_vector is
     variable n               : integer;
-    variable truth           : std_ulogic;
-    variable mask            : std_ulogic_vector(PLEN-1 downto 2);
-    variable incr            : std_ulogic_vector(PLEN-1 downto 2);
-    variable napot_ub_return : std_ulogic_vector (PLEN-1 downto 2);
+    variable truth           : std_logic;
+    variable mask            : std_logic_vector(PLEN-1 downto 2);
+    variable incr            : std_logic_vector(PLEN-1 downto 2);
+    variable napot_ub_return : std_logic_vector (PLEN-1 downto 2);
   begin
     --find 'n' boundary = 2^(n+2) bytes
     n := 0;
@@ -163,23 +163,23 @@ architecture RTL of riscv_pmpchk is
     end if;
 
     --create mask and increment
-    mask := std_ulogic_vector(to_unsigned(1, PLEN-2) sll n);
-    incr := std_ulogic_vector(to_unsigned(1, PLEN-2) sll n);
+    mask := std_logic_vector(to_unsigned(1, PLEN-2) sll n);
+    incr := std_logic_vector(to_unsigned(1, PLEN-2) sll n);
 
     --upper bound address
-    napot_ub_return := std_ulogic_vector(unsigned(pmpddr)+unsigned(incr)) and mask;
+    napot_ub_return := std_logic_vector(unsigned(pmpddr)+unsigned(incr)) and mask;
     return napot_ub_return;
   end napot_ub;
 
   --Is ANY byte of 'access' in pmp range?
   function match_any (
-    access_lb : std_ulogic_vector(PLEN-1 downto 2);
-    access_ub : std_ulogic_vector(PLEN-1 downto 2);
-    pmp_lb    : std_ulogic_vector(PLEN-1 downto 2);
-    pmp_ub    : std_ulogic_vector(PLEN-1 downto 2)
+    access_lb : std_logic_vector(PLEN-1 downto 2);
+    access_ub : std_logic_vector(PLEN-1 downto 2);
+    pmp_lb    : std_logic_vector(PLEN-1 downto 2);
+    pmp_ub    : std_logic_vector(PLEN-1 downto 2)
 
-    ) return std_ulogic is
-    variable match_any_return : std_ulogic;
+    ) return std_logic is
+    variable match_any_return : std_logic;
   begin
     --    Check if ANY byte of the access lies within the PMP range
     --  *   pmp_lb <= range < pmp_ub
@@ -198,13 +198,13 @@ architecture RTL of riscv_pmpchk is
 
   --Are ALL bytes of 'access' in PMP range?
   function match_all (
-    access_lb : std_ulogic_vector(PLEN-1 downto 2);
-    access_ub : std_ulogic_vector(PLEN-1 downto 2);
-    pmp_lb    : std_ulogic_vector(PLEN-1 downto 2);
-    pmp_ub    : std_ulogic_vector(PLEN-1 downto 2)
+    access_lb : std_logic_vector(PLEN-1 downto 2);
+    access_ub : std_logic_vector(PLEN-1 downto 2);
+    pmp_lb    : std_logic_vector(PLEN-1 downto 2);
+    pmp_ub    : std_logic_vector(PLEN-1 downto 2)
 
-    ) return std_ulogic is
-    variable match_all_return : std_ulogic;
+    ) return std_logic is
+    variable match_all_return : std_logic;
   begin
     if (access_lb >= pmp_lb) or (access_ub < pmp_ub) then
       match_all_return := '0';
@@ -217,7 +217,7 @@ architecture RTL of riscv_pmpchk is
 
   --get highest priority (==lowest number) PMP that matches
   function highest_priority_match (
-    m : std_ulogic_vector(PMP_CNT-1 downto 0)
+    m : std_logic_vector(PMP_CNT-1 downto 0)
     ) return integer is
     variable n : integer;
     variable highest_priority_match_return : integer;
@@ -234,7 +234,7 @@ architecture RTL of riscv_pmpchk is
 
   function to_stdlogic (
     input : boolean
-  ) return std_ulogic is
+  ) return std_logic is
   begin
     if input then
       return('1');
@@ -244,9 +244,9 @@ architecture RTL of riscv_pmpchk is
   end function to_stdlogic;
 
   function reduce_nor (
-    reduce_nor_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_nor_out : std_ulogic := '0';
+    reduce_nor_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_nor_out : std_logic := '0';
   begin
     for i in reduce_nor_in'range loop
       reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
@@ -258,22 +258,22 @@ architecture RTL of riscv_pmpchk is
   --
   -- Types
   --
-  type M_PMP_CNT_PLEN2 is array (PMP_CNT-1 downto 0) of std_ulogic_vector(PLEN-1 downto 2);
+  type M_PMP_CNT_PLEN2 is array (PMP_CNT-1 downto 0) of std_logic_vector(PLEN-1 downto 2);
 
   --////////////////////////////////////////////////////////////////
   --
   -- Variables
   --
-  signal access_ub         : std_ulogic_vector(PLEN-1 downto 0);
-  signal access_lb         : std_ulogic_vector(PLEN-1 downto 0);
+  signal access_ub         : std_logic_vector(PLEN-1 downto 0);
+  signal access_lb         : std_logic_vector(PLEN-1 downto 0);
   signal pmp_ub            : M_PMP_CNT_PLEN2;
   signal pmp_lb            : M_PMP_CNT_PLEN2;
-  signal pmp_match         : std_ulogic_vector(15 downto 0);
-  signal pmp_match_all     : std_ulogic_vector(15 downto 0);
-  signal matched_pmp       : std_ulogic_vector(7 downto 0);
-  signal matched_pmpcfg    : std_ulogic_vector(7 downto 0);
-  signal exception_matched : std_ulogic;
-  signal exception_pmpcfg  : std_ulogic;
+  signal pmp_match         : std_logic_vector(15 downto 0);
+  signal pmp_match_all     : std_logic_vector(15 downto 0);
+  signal matched_pmp       : std_logic_vector(7 downto 0);
+  signal matched_pmpcfg    : std_logic_vector(7 downto 0);
+  signal exception_matched : std_logic;
+  signal exception_pmpcfg  : std_logic;
 
 begin
   --////////////////////////////////////////////////////////////////
@@ -286,7 +286,7 @@ begin
   --  * Cacheable
 
   access_lb <= adr_i;
-  access_ub <= std_ulogic_vector(unsigned(adr_i)+("0000000000000" & unsigned(size_i))-"0000000000000001");
+  access_ub <= std_logic_vector(unsigned(adr_i)+("0000000000000" & unsigned(size_i))-"0000000000000001");
 
   generating_0 : for i in 0 to PMP_CNT - 1 generate
     --lower bounds
@@ -340,7 +340,7 @@ begin
                                    pmp_ub(i));
   end generate;
 
-  matched_pmp <= std_ulogic_vector(to_unsigned(highest_priority_match(pmp_match), 8));
+  matched_pmp <= std_logic_vector(to_unsigned(highest_priority_match(pmp_match), 8));
 
   matched_pmpcfg <= st_pmpcfg_i(to_integer(unsigned(matched_pmp)));
 

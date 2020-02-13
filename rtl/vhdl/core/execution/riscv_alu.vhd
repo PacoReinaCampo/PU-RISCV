@@ -54,37 +54,37 @@ entity riscv_alu is
   generic (
     XLEN    : integer := 64;
     ILEN    : integer := 64;
-    HAS_RVC : std_ulogic := '1'
+    HAS_RVC : std_logic := '1'
   );
   port (
-    rstn : in std_ulogic;
-    clk  : in std_ulogic;
+    rstn : in std_logic;
+    clk  : in std_logic;
 
-    ex_stall : in std_ulogic;
+    ex_stall : in std_logic;
 
     --Program counter
-    id_pc : in std_ulogic_vector(XLEN-1 downto 0);
+    id_pc : in std_logic_vector(XLEN-1 downto 0);
 
     --Instruction
-    id_bubble : in std_ulogic;
-    id_instr  : in std_ulogic_vector(ILEN-1 downto 0);
+    id_bubble : in std_logic;
+    id_instr  : in std_logic_vector(ILEN-1 downto 0);
 
     --Operands
-    opA : in std_ulogic_vector(XLEN-1 downto 0);
-    opB : in std_ulogic_vector(XLEN-1 downto 0);
+    opA : in std_logic_vector(XLEN-1 downto 0);
+    opB : in std_logic_vector(XLEN-1 downto 0);
 
     --to WB
-    alu_bubble : out std_ulogic;
-    alu_r      : out std_ulogic_vector(XLEN-1 downto 0);
+    alu_bubble : out std_logic;
+    alu_r      : out std_logic_vector(XLEN-1 downto 0);
 
     --To State
-    ex_csr_reg  : out std_ulogic_vector(11 downto 0);
-    ex_csr_wval : out std_ulogic_vector(XLEN-1 downto 0);
-    ex_csr_we   : out std_ulogic;
+    ex_csr_reg  : out std_logic_vector(11 downto 0);
+    ex_csr_wval : out std_logic_vector(XLEN-1 downto 0);
+    ex_csr_we   : out std_logic;
 
     --From State
-    st_csr_rval : in std_ulogic_vector(XLEN-1 downto 0);
-    st_xlen     : in std_ulogic_vector(1 downto 0)
+    st_csr_rval : in std_logic_vector(XLEN-1 downto 0);
+    st_xlen     : in std_logic_vector(1 downto 0)
   );
 end riscv_alu;
 
@@ -94,11 +94,11 @@ architecture RTL of riscv_alu is
   -- functions
   --
   function sext32 (
-    operand : std_ulogic_vector(31 downto 0)
+    operand : std_logic_vector(31 downto 0)
 
-  ) return std_ulogic_vector is
-    variable sign          : std_ulogic;
-    variable sext32_return : std_ulogic_vector (XLEN-1 downto 0);
+  ) return std_logic_vector is
+    variable sign          : std_logic;
+    variable sext32_return : std_logic_vector (XLEN-1 downto 0);
   begin
     sign          := operand(31);
     sext32_return := ((XLEN-1 downto 31 => sign) & operand(30 downto 0));
@@ -106,9 +106,9 @@ architecture RTL of riscv_alu is
   end sext32;
 
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -118,7 +118,7 @@ architecture RTL of riscv_alu is
 
   function to_stdlogic (
     input : boolean
-  ) return std_ulogic is
+  ) return std_logic is
   begin
     if input then
       return('1');
@@ -137,19 +137,19 @@ architecture RTL of riscv_alu is
   --
   -- Variables
   --
-  signal opcode    : std_ulogic_vector(6 downto 2);
-  signal func3     : std_ulogic_vector(2 downto 0);
-  signal func7     : std_ulogic_vector(6 downto 0);
-  signal rs1       : std_ulogic_vector(4 downto 0);
-  signal xlen32    : std_ulogic;
-  signal has_rvc_s : std_ulogic;
+  signal opcode    : std_logic_vector(6 downto 2);
+  signal func3     : std_logic_vector(2 downto 0);
+  signal func7     : std_logic_vector(6 downto 0);
+  signal rs1       : std_logic_vector(4 downto 0);
+  signal xlen32    : std_logic;
+  signal has_rvc_s : std_logic;
 
   --Operand generation
-  signal opA32   : std_ulogic_vector(31 downto 0);
-  signal opB32   : std_ulogic_vector(31 downto 0);
-  signal shamt   : std_ulogic_vector(SBITS-1 downto 0);
-  signal shamt32 : std_ulogic_vector(4 downto 0);
-  signal csri    : std_ulogic_vector(XLEN-1 downto 0);
+  signal opA32   : std_logic_vector(31 downto 0);
+  signal opB32   : std_logic_vector(31 downto 0);
+  signal shamt   : std_logic_vector(SBITS-1 downto 0);
+  signal shamt32 : std_logic_vector(4 downto 0);
+  signal csri    : std_logic_vector(XLEN-1 downto 0);
 
 begin
   --//////////////////////////////////////////////////////////////
@@ -172,7 +172,7 @@ begin
 
   --ALU operations
   processing_0 : process (clk, rstn)
-    variable operations : std_ulogic_vector(15 downto 0);
+    variable operations : std_logic_vector(15 downto 0);
   begin
     if (rstn = '0') then
       alu_r <= (others => '0');
@@ -182,29 +182,29 @@ begin
         case (operations) is
           when (LUI) =>
             --actually just opB, but simplify encoding
-            alu_r <= std_ulogic_vector(unsigned(opA)+unsigned(opB));
+            alu_r <= std_logic_vector(unsigned(opA)+unsigned(opB));
           when (AUIPC) =>
-            alu_r <= std_ulogic_vector(unsigned(opA)+unsigned(opB));
+            alu_r <= std_logic_vector(unsigned(opA)+unsigned(opB));
           when (JAL) =>
-            alu_r <= std_ulogic_vector(unsigned(id_pc)+X"0000000000000004");
+            alu_r <= std_logic_vector(unsigned(id_pc)+X"0000000000000004");
           when (JALR) =>
-            alu_r <= std_ulogic_vector(unsigned(id_pc)+X"0000000000000004");
+            alu_r <= std_logic_vector(unsigned(id_pc)+X"0000000000000004");
           --logical operators
           when (ADDI) =>
-            alu_r <= std_ulogic_vector(unsigned(opA)+unsigned(opB));
+            alu_r <= std_logic_vector(unsigned(opA)+unsigned(opB));
           when (ADDX) =>
-            alu_r <= std_ulogic_vector(unsigned(opA)+unsigned(opB));
+            alu_r <= std_logic_vector(unsigned(opA)+unsigned(opB));
           when (ADDIW) =>
             --RV64
-            alu_r <= sext32(std_ulogic_vector(unsigned(opA32)+unsigned(opB32)));
+            alu_r <= sext32(std_logic_vector(unsigned(opA32)+unsigned(opB32)));
           when (ADDW) =>
             --RV64
-            alu_r <= sext32(std_ulogic_vector(unsigned(opA32)+unsigned(opB32)));
+            alu_r <= sext32(std_logic_vector(unsigned(opA32)+unsigned(opB32)));
           when (SUBX) =>
-            alu_r <= std_ulogic_vector(unsigned(opA)+unsigned(opB));
+            alu_r <= std_logic_vector(unsigned(opA)+unsigned(opB));
           when (SUBW) =>
             --RV64
-            alu_r <= sext32(std_ulogic_vector(unsigned(opA32)-unsigned(opB32)));
+            alu_r <= sext32(std_logic_vector(unsigned(opA32)-unsigned(opB32)));
           when (XORI) =>
             alu_r <= opA xor opB;
           when (XORX) =>
@@ -218,15 +218,15 @@ begin
           when (ANDX) =>
             alu_r <= opA and opB;
           when (SLLI) =>
-            alu_r <= std_ulogic_vector(unsigned(opA) sll to_integer(unsigned(shamt)));
+            alu_r <= std_logic_vector(unsigned(opA) sll to_integer(unsigned(shamt)));
           when (SLLX) =>
-            alu_r <= std_ulogic_vector(unsigned(opA) sll to_integer(unsigned(shamt)));
+            alu_r <= std_logic_vector(unsigned(opA) sll to_integer(unsigned(shamt)));
           when (SLLIW) =>
             --RV64
-            alu_r <= sext32(std_ulogic_vector(unsigned(opA32) sll to_integer(unsigned(shamt32))));
+            alu_r <= sext32(std_logic_vector(unsigned(opA32) sll to_integer(unsigned(shamt32))));
           when (SLLW) =>
             --RV64
-            alu_r <= sext32(std_ulogic_vector(unsigned(opA32) sll to_integer(unsigned(shamt32))));
+            alu_r <= sext32(std_logic_vector(unsigned(opA32) sll to_integer(unsigned(shamt32))));
           when (SLTI) =>
             if (not opA(XLEN-1) & opA(XLEN-2 downto 0)) < (not opB(XLEN-1) & opB(XLEN-2 downto 0)) then
               alu_r <= (others => '1');
@@ -252,23 +252,23 @@ begin
               alu_r <= (others => '0');
             end if;
           when (SRLI) =>
-            alu_r <= std_ulogic_vector(unsigned(opA) srl to_integer(unsigned(shamt)));
+            alu_r <= std_logic_vector(unsigned(opA) srl to_integer(unsigned(shamt)));
           when (SRLX) =>
-            alu_r <= std_ulogic_vector(unsigned(opA) srl to_integer(unsigned(shamt)));
+            alu_r <= std_logic_vector(unsigned(opA) srl to_integer(unsigned(shamt)));
           when (SRLIW) =>
             --RV64
-            alu_r <= sext32(std_ulogic_vector(unsigned(opA32) srl to_integer(unsigned(shamt32))));
+            alu_r <= sext32(std_logic_vector(unsigned(opA32) srl to_integer(unsigned(shamt32))));
           when (SRLW) =>
             --RV64
-            alu_r <= sext32(std_ulogic_vector(unsigned(opA32) srl to_integer(unsigned(shamt32))));
+            alu_r <= sext32(std_logic_vector(unsigned(opA32) srl to_integer(unsigned(shamt32))));
           when (SRAI) =>
-            alu_r <= std_ulogic_vector(signed(opA) srl to_integer(unsigned(shamt)));
+            alu_r <= std_logic_vector(signed(opA) srl to_integer(unsigned(shamt)));
           when (SRAX) =>
-            alu_r <= std_ulogic_vector(signed(opA) srl to_integer(unsigned(shamt)));
+            alu_r <= std_logic_vector(signed(opA) srl to_integer(unsigned(shamt)));
           when (SRAIW) =>
-            alu_r <= std_ulogic_vector(signed(sext32(opA32)) srl to_integer(unsigned(shamt32)));
+            alu_r <= std_logic_vector(signed(sext32(opA32)) srl to_integer(unsigned(shamt32)));
           when (SRAW) =>
-            alu_r <= std_ulogic_vector(signed(sext32(opA32)) srl to_integer(unsigned(shamt32)));
+            alu_r <= std_logic_vector(signed(sext32(opA32)) srl to_integer(unsigned(shamt32)));
           --CSR access
           when (CSRRW) =>
             alu_r <= (alu_r'range => '0') or st_csr_rval;
@@ -290,7 +290,7 @@ begin
   end process;
 
   processing_1 : process (clk, rstn)
-    variable bubble : std_ulogic_vector(15 downto 0);
+    variable bubble : std_logic_vector(15 downto 0);
   begin
     if (rstn = '0') then
       alu_bubble <= '1';
@@ -388,7 +388,7 @@ begin
   csri       <= ((XLEN-1 downto 5 => '0') & opB(4 downto 0));
 
   processing_2 : process (opA, csri, func3, func7, id_bubble, opcode, st_csr_rval)
-    variable csr : std_ulogic_vector(15 downto 0);
+    variable csr : std_logic_vector(15 downto 0);
   begin
     csr := id_bubble & func7 & func3 & opcode;
     case (csr) is

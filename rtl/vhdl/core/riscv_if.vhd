@@ -56,39 +56,39 @@ entity riscv_if is
     PARCEL_SIZE    : integer := 64;
     EXCEPTION_SIZE : integer := 16;
 
-    PC_INIT : std_ulogic_vector(63 downto 0) := X"0000000080000000"
+    PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
   );
   port (
-    rstn     : in std_ulogic;  --Reset
-    clk      : in std_ulogic;  --Clock
-    id_stall : in std_ulogic;
+    rstn     : in std_logic;  --Reset
+    clk      : in std_logic;  --Clock
+    id_stall : in std_logic;
 
-    if_stall_nxt_pc      : in std_ulogic;
-    if_parcel            : in std_ulogic_vector(PARCEL_SIZE-1 downto 0);
-    if_parcel_pc         : in std_ulogic_vector(XLEN-1 downto 0);
-    if_parcel_valid      : in std_ulogic_vector(PARCEL_SIZE/16-1 downto 0);
-    if_parcel_misaligned : in std_ulogic;
-    if_parcel_page_fault : in std_ulogic;
+    if_stall_nxt_pc      : in std_logic;
+    if_parcel            : in std_logic_vector(PARCEL_SIZE-1 downto 0);
+    if_parcel_pc         : in std_logic_vector(XLEN-1 downto 0);
+    if_parcel_valid      : in std_logic_vector(PARCEL_SIZE/16-1 downto 0);
+    if_parcel_misaligned : in std_logic;
+    if_parcel_page_fault : in std_logic;
 
-    if_instr     : out std_ulogic_vector(ILEN-1 downto 0);  --Instruction out
-    if_bubble    : out std_ulogic;  --Insert bubble in the pipe (NOP instruction)
-    if_exception : out std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);  --Exceptions
+    if_instr     : out std_logic_vector(ILEN-1 downto 0);  --Instruction out
+    if_bubble    : out std_logic;  --Insert bubble in the pipe (NOP instruction)
+    if_exception : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);  --Exceptions
 
 
-    bp_bp_predict : in  std_ulogic_vector(1 downto 0);  --Branch Prediction bits
-    if_bp_predict : out std_ulogic_vector(1 downto 0);  --push down the pipe
+    bp_bp_predict : in  std_logic_vector(1 downto 0);  --Branch Prediction bits
+    if_bp_predict : out std_logic_vector(1 downto 0);  --push down the pipe
 
-    bu_flush : in std_ulogic;  --flush pipe & load new program counter
-    st_flush : in std_ulogic;
-    du_flush : in std_ulogic;  --flush pipe after debug exit
+    bu_flush : in std_logic;  --flush pipe & load new program counter
+    st_flush : in std_logic;
+    du_flush : in std_logic;  --flush pipe after debug exit
 
-    bu_nxt_pc : in std_ulogic_vector(XLEN-1 downto 0);  --Branch Unit Next Program Counter
-    st_nxt_pc : in std_ulogic_vector(XLEN-1 downto 0);  --State Next Program Counter
+    bu_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  --Branch Unit Next Program Counter
+    st_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  --State Next Program Counter
 
-    if_nxt_pc : out std_ulogic_vector(XLEN-1 downto 0);  --next Program Counter
-    if_stall  : out std_ulogic;  --stall instruction fetch BIU (cache/bus-interface)
-    if_flush  : out std_ulogic;  --flush instruction fetch BIU (cache/bus-interface)
-    if_pc     : out std_ulogic_vector(XLEN-1 downto 0)   --Program Counter
+    if_nxt_pc : out std_logic_vector(XLEN-1 downto 0);  --next Program Counter
+    if_stall  : out std_logic;  --stall instruction fetch BIU (cache/bus-interface)
+    if_flush  : out std_logic;  --flush instruction fetch BIU (cache/bus-interface)
+    if_pc     : out std_logic_vector(XLEN-1 downto 0)   --Program Counter
     );
 end riscv_if;
 
@@ -98,9 +98,9 @@ architecture RTL of riscv_if is
   -- Functions
   --
   function reduce_and (
-    reduce_and_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_and_out : std_ulogic := '0';
+    reduce_and_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_and_out : std_logic := '0';
   begin
     for i in reduce_and_in'range loop
       reduce_and_out := reduce_and_out and reduce_and_in(i);
@@ -109,9 +109,9 @@ architecture RTL of riscv_if is
   end reduce_and;
 
   function reduce_nand (
-    reduce_nand_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_nand_out : std_ulogic := '0';
+    reduce_nand_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_nand_out : std_logic := '0';
   begin
     for i in reduce_nand_in'range loop
       reduce_nand_out := reduce_nand_out nand reduce_nand_in(i);
@@ -125,37 +125,37 @@ architecture RTL of riscv_if is
   --
 
   --Instruction size
-  signal is_16bit_instruction : std_ulogic;
-  signal is_32bit_instruction : std_ulogic;
+  signal is_16bit_instruction : std_logic;
+  signal is_32bit_instruction : std_logic;
   --logic is_48bit_instruction;
   --logic is_64bit_instruction;
 
-  signal flushes : std_ulogic;  --OR all flush signals
+  signal flushes : std_logic;  --OR all flush signals
 
-  signal parcel_shift_register : std_ulogic_vector(2*ILEN-1 downto 0);
-  signal new_parcel            : std_ulogic_vector(ILEN-1 downto 0);
-  signal active_parcel         : std_ulogic_vector(63 downto 0);
-  signal converted_instruction : std_ulogic_vector(ILEN-1 downto 0);
-  signal pd_instr              : std_ulogic_vector(ILEN-1 downto 0);
-  signal pd_bubble             : std_ulogic;
+  signal parcel_shift_register : std_logic_vector(2*ILEN-1 downto 0);
+  signal new_parcel            : std_logic_vector(ILEN-1 downto 0);
+  signal active_parcel         : std_logic_vector(63 downto 0);
+  signal converted_instruction : std_logic_vector(ILEN-1 downto 0);
+  signal pd_instr              : std_logic_vector(ILEN-1 downto 0);
+  signal pd_bubble             : std_logic;
 
-  signal pd_pc            : std_ulogic_vector(XLEN-1 downto 0);
-  signal parcel_valid     : std_ulogic_vector(PARCEL_SIZE/16-1 downto 0);
-  signal parcel_sr_valid  : std_ulogic_vector(2 downto 0);
-  signal parcel_sr_bubble : std_ulogic_vector(2 downto 0);
+  signal pd_pc            : std_logic_vector(XLEN-1 downto 0);
+  signal parcel_valid     : std_logic_vector(PARCEL_SIZE/16-1 downto 0);
+  signal parcel_sr_valid  : std_logic_vector(2 downto 0);
+  signal parcel_sr_bubble : std_logic_vector(2 downto 0);
 
-  signal opcode : std_ulogic_vector(6 downto 2);
+  signal opcode : std_logic_vector(6 downto 2);
 
-  signal parcel_exception : std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-  signal pd_exception     : std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
+  signal parcel_exception : std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+  signal pd_exception     : std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
-  signal branch_pc    : std_ulogic_vector(XLEN-1 downto 0);
-  signal branch_taken : std_ulogic;
+  signal branch_pc    : std_logic_vector(XLEN-1 downto 0);
+  signal branch_taken : std_logic;
 
-  signal immB : std_ulogic_vector(XLEN-1 downto 0);
-  signal immJ : std_ulogic_vector(XLEN-1 downto 0);
+  signal immB : std_logic_vector(XLEN-1 downto 0);
+  signal immJ : std_logic_vector(XLEN-1 downto 0);
 
-  signal if_nxt_pc_o : std_ulogic_vector(XLEN-1 downto 0);
+  signal if_nxt_pc_o : std_logic_vector(XLEN-1 downto 0);
 
 begin
   --//////////////////////////////////////////////////////////////
@@ -196,7 +196,7 @@ begin
       elsif (branch_taken = '1') then
         if_nxt_pc_o <= branch_pc;
       elsif (if_stall_nxt_pc = '0') then   --if_stall_nxt_pc
-        if_nxt_pc_o <= std_ulogic_vector(unsigned(if_nxt_pc_o)+X"0000000000000004");
+        if_nxt_pc_o <= std_logic_vector(unsigned(if_nxt_pc_o)+X"0000000000000004");
       end if;
     end if;
   end process;
@@ -348,7 +348,7 @@ begin
         if (is_32bit_instruction = '1') then
           pd_instr <= active_parcel;
         else  --Illegal
-          pd_instr <= std_ulogic_vector(to_signed(-1, ILEN));
+          pd_instr <= std_logic_vector(to_signed(-1, ILEN));
         end if;
     end case;
   end process;
@@ -387,13 +387,13 @@ begin
 
   -- Branch and Jump prediction
   processing_9 : process (bp_bp_predict(1), immB, immJ, opcode, pd_bubble, pd_pc)
-    variable prediction : std_ulogic_vector(5 downto 0);
+    variable prediction : std_logic_vector(5 downto 0);
   begin
     prediction := pd_bubble & opcode;
     case (prediction) is
       when (OPC0_JAL) =>
         branch_taken <= '1';
-        branch_pc    <= std_ulogic_vector(unsigned(pd_pc)+unsigned(immJ));
+        branch_pc    <= std_logic_vector(unsigned(pd_pc)+unsigned(immJ));
       when (OPC0_BRANCH) =>
         --if this CPU has a Branch Predict Unit, then use it's prediction
         --otherwise assume backwards jumps taken, forward jumps not taken
@@ -402,7 +402,7 @@ begin
         else
           branch_taken <= immB(31);
         end if;
-        branch_pc <= std_ulogic_vector(unsigned(pd_pc)+unsigned(immB));
+        branch_pc <= std_logic_vector(unsigned(pd_pc)+unsigned(immB));
       when others =>
         branch_taken <= '0';
         branch_pc    <= (others => 'X');

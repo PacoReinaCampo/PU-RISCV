@@ -57,47 +57,47 @@ entity riscv_bu is
     EXCEPTION_SIZE : integer := 16;
     BP_GLOBAL_BITS : integer := 2;
 
-    HAS_RVC : std_ulogic := '1';
-    PC_INIT : std_ulogic_vector(63 downto 0) := X"0000000080000000"
+    HAS_RVC : std_logic := '1';
+    PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
   );
   port (
-    rstn : in std_ulogic;
-    clk  : in std_ulogic;
+    rstn : in std_logic;
+    clk  : in std_logic;
 
-    ex_stall : in std_ulogic;
-    st_flush : in std_ulogic;
+    ex_stall : in std_logic;
+    st_flush : in std_logic;
 
     --Program counter
-    id_pc         : in  std_ulogic_vector(XLEN-1 downto 0);
-    bu_nxt_pc     : out std_ulogic_vector(XLEN-1 downto 0);
-    bu_flush      : out std_ulogic;
-    bu_cacheflush : out std_ulogic;
-    id_bp_predict : in  std_ulogic_vector(1 downto 0);
-    bu_bp_predict : out std_ulogic_vector(1 downto 0);
-    bu_bp_history : out std_ulogic_vector(BP_GLOBAL_BITS-1 downto 0);
-    bu_bp_btaken  : out std_ulogic;
-    bu_bp_update  : out std_ulogic;
+    id_pc         : in  std_logic_vector(XLEN-1 downto 0);
+    bu_nxt_pc     : out std_logic_vector(XLEN-1 downto 0);
+    bu_flush      : out std_logic;
+    bu_cacheflush : out std_logic;
+    id_bp_predict : in  std_logic_vector(1 downto 0);
+    bu_bp_predict : out std_logic_vector(1 downto 0);
+    bu_bp_history : out std_logic_vector(BP_GLOBAL_BITS-1 downto 0);
+    bu_bp_btaken  : out std_logic;
+    bu_bp_update  : out std_logic;
 
     --Instruction
-    id_bubble : in std_ulogic;
-    id_instr  : in std_ulogic_vector(63 downto 0);
+    id_bubble : in std_logic;
+    id_instr  : in std_logic_vector(63 downto 0);
 
-    id_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    ex_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    mem_exception : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    wb_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    bu_exception  : out std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
+    id_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    ex_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    mem_exception : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    wb_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    bu_exception  : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
     --from ID
-    opA : in std_ulogic_vector(XLEN-1 downto 0);
-    opB : in std_ulogic_vector(XLEN-1 downto 0);
+    opA : in std_logic_vector(XLEN-1 downto 0);
+    opB : in std_logic_vector(XLEN-1 downto 0);
 
     --Debug Unit
-    du_stall : in std_ulogic;
-    du_flush : in std_ulogic;
-    du_we_pc : in std_ulogic;
-    du_dato  : in std_ulogic_vector(XLEN-1 downto 0);
-    du_ie    : in std_ulogic_vector(31 downto 0)
+    du_stall : in std_logic;
+    du_flush : in std_logic;
+    du_we_pc : in std_logic;
+    du_dato  : in std_logic_vector(XLEN-1 downto 0);
+    du_ie    : in std_logic_vector(31 downto 0)
     );
 end riscv_bu;
 
@@ -107,9 +107,9 @@ architecture RTL of riscv_bu is
   -- Functions
   --
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -119,7 +119,7 @@ architecture RTL of riscv_bu is
 
   function to_stdlogic (
     input : boolean
-  ) return std_ulogic is
+  ) return std_logic is
   begin
     if input then
       return('1');
@@ -138,27 +138,27 @@ architecture RTL of riscv_bu is
   --
   -- Variables
   --
-  signal opcode    : std_ulogic_vector(6 downto 2);
-  signal func3     : std_ulogic_vector(2 downto 0);
-  signal func7     : std_ulogic_vector(6 downto 0);
-  signal has_rvc_s : std_ulogic;
+  signal opcode    : std_logic_vector(6 downto 2);
+  signal func3     : std_logic_vector(2 downto 0);
+  signal func7     : std_logic_vector(6 downto 0);
+  signal has_rvc_s : std_logic;
 
   --Operand generation
-  signal immJ : std_ulogic_vector(XLEN-1 downto 0);
-  signal immB : std_ulogic_vector(XLEN-1 downto 0);
+  signal immJ : std_logic_vector(XLEN-1 downto 0);
+  signal immB : std_logic_vector(XLEN-1 downto 0);
 
   --Branch controls
-  signal pipeflush    : std_ulogic;
-  signal cacheflush   : std_ulogic;
-  signal btaken       : std_ulogic;
-  signal bp_update    : std_ulogic;
-  signal bp_history   : std_ulogic_vector(BP_GLOBAL_BITS downto 0);
-  signal nxt_pc       : std_ulogic_vector(XLEN-1 downto 0);
-  signal du_nxt_pc    : std_ulogic_vector(XLEN-1 downto 0);
-  signal du_we_pc_dly : std_ulogic;
-  signal du_wrote_pc  : std_ulogic;
+  signal pipeflush    : std_logic;
+  signal cacheflush   : std_logic;
+  signal btaken       : std_logic;
+  signal bp_update    : std_logic;
+  signal bp_history   : std_logic_vector(BP_GLOBAL_BITS downto 0);
+  signal nxt_pc       : std_logic_vector(XLEN-1 downto 0);
+  signal du_nxt_pc    : std_logic_vector(XLEN-1 downto 0);
+  signal du_we_pc_dly : std_logic;
+  signal du_wrote_pc  : std_logic;
 
-  signal bu_flush_o : std_ulogic;
+  signal bu_flush_o : std_logic;
 
 begin
   --//////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ begin
 
   --Exceptions
   processing_0 : process (clk, rstn)
-    variable exceptions : std_ulogic_vector(5 downto 0);
+    variable exceptions : std_logic_vector(5 downto 0);
   begin
     if (rstn = '0') then
       bu_exception <= (others => '0');
@@ -246,7 +246,7 @@ begin
   end process;
 
   processing_4 : process (btaken, func3, func7, id_bp_predict, id_bubble, id_instr, id_pc, immB, immJ, opA, opB, opcode)
-    variable debug : std_ulogic_vector(15 downto 0);
+    variable debug : std_logic_vector(15 downto 0);
   begin
     debug := id_bubble & func7 & func3 & opcode;
     case (debug) is
@@ -256,22 +256,22 @@ begin
         bp_update  <= '0';
         pipeflush  <= '0';  --Handled in IF, do NOT flush here!!
         cacheflush <= '0';
-        nxt_pc     <= std_ulogic_vector(unsigned(id_pc)+unsigned(immJ));
+        nxt_pc     <= std_logic_vector(unsigned(id_pc)+unsigned(immJ));
       when (JALR) =>
         btaken     <= '1';
         bp_update  <= '0';
         pipeflush  <= '1';
         cacheflush <= '0';
-        nxt_pc     <= std_ulogic_vector(unsigned(opA)+unsigned(opB)) and X"1111111111111110";
+        nxt_pc     <= std_logic_vector(unsigned(opA)+unsigned(opB)) and X"1111111111111110";
       when (BEQ) =>
         btaken     <= to_stdlogic(opA = opB);
         bp_update  <= '1';
         pipeflush  <= btaken xor id_bp_predict(1);
         cacheflush <= '0';
         if (btaken = '1') then
-          nxt_pc <= std_ulogic_vector(unsigned(id_pc)+unsigned(immB));
+          nxt_pc <= std_logic_vector(unsigned(id_pc)+unsigned(immB));
         else
-          nxt_pc <= std_ulogic_vector(unsigned(id_pc)+X"0000000000000004");
+          nxt_pc <= std_logic_vector(unsigned(id_pc)+X"0000000000000004");
         end if;
       when (BNE) =>
         btaken     <= to_stdlogic(opA /= opB);
@@ -279,9 +279,9 @@ begin
         pipeflush  <= btaken xor id_bp_predict(1);
         cacheflush <= '0';
         if (btaken = '1') then
-          nxt_pc <= std_ulogic_vector(unsigned(id_pc)+unsigned(immB));
+          nxt_pc <= std_logic_vector(unsigned(id_pc)+unsigned(immB));
         else
-          nxt_pc <= std_ulogic_vector(unsigned(id_pc)+X"0000000000000004");
+          nxt_pc <= std_logic_vector(unsigned(id_pc)+X"0000000000000004");
         end if;
       when (BLTU) =>
         btaken     <= to_stdlogic(opA < opB);
@@ -289,9 +289,9 @@ begin
         pipeflush  <= btaken xor id_bp_predict(1);
         cacheflush <= '0';
         if (btaken = '1') then
-          nxt_pc <= std_ulogic_vector(unsigned(id_pc)+unsigned(immB));
+          nxt_pc <= std_logic_vector(unsigned(id_pc)+unsigned(immB));
         else
-          nxt_pc <= std_ulogic_vector(unsigned(id_pc)+X"0000000000000004");
+          nxt_pc <= std_logic_vector(unsigned(id_pc)+X"0000000000000004");
         end if;
       when (BGEU) =>
         btaken     <= to_stdlogic(opA >= opB);
@@ -299,9 +299,9 @@ begin
         pipeflush  <= btaken xor id_bp_predict(1);
         cacheflush <= '0';
         if (btaken = '1') then
-          nxt_pc <= std_ulogic_vector(unsigned(id_pc)+unsigned(immB));
+          nxt_pc <= std_logic_vector(unsigned(id_pc)+unsigned(immB));
         else
-          nxt_pc <= std_ulogic_vector(unsigned(id_pc)+X"0000000000000004");
+          nxt_pc <= std_logic_vector(unsigned(id_pc)+X"0000000000000004");
         end if;
       when (BLT) =>
         btaken     <= to_stdlogic(signed(opA) < signed(opB));
@@ -309,9 +309,9 @@ begin
         pipeflush  <= btaken xor id_bp_predict(1);
         cacheflush <= '0';
         if (btaken = '1') then
-          nxt_pc <= std_ulogic_vector(unsigned(id_pc)+unsigned(immB));
+          nxt_pc <= std_logic_vector(unsigned(id_pc)+unsigned(immB));
         else
-          nxt_pc <= std_ulogic_vector(unsigned(id_pc)+X"0000000000000004");
+          nxt_pc <= std_logic_vector(unsigned(id_pc)+X"0000000000000004");
         end if;
       when (BGE) =>
         btaken     <= to_stdlogic(signed(opA) >= signed(opB));
@@ -319,9 +319,9 @@ begin
         pipeflush  <= btaken xor id_bp_predict(1);
         cacheflush <= '0';
         if (btaken = '1') then
-          nxt_pc <= std_ulogic_vector(unsigned(id_pc)+unsigned(immB));
+          nxt_pc <= std_logic_vector(unsigned(id_pc)+unsigned(immB));
         else
-          nxt_pc <= std_ulogic_vector(unsigned(id_pc)+X"0000000000000004");
+          nxt_pc <= std_logic_vector(unsigned(id_pc)+X"0000000000000004");
         end if;
       when (MISCMEM) =>
         case (id_instr) is
@@ -330,20 +330,20 @@ begin
             bp_update  <= '0';
             pipeflush  <= '1';
             cacheflush <= '1';
-            nxt_pc     <= std_ulogic_vector(unsigned(id_pc)+X"0000000000000004");
+            nxt_pc     <= std_logic_vector(unsigned(id_pc)+X"0000000000000004");
           when others =>
             btaken     <= '0';
             bp_update  <= '0';
             pipeflush  <= '0';
             cacheflush <= '0';
-            nxt_pc     <= std_ulogic_vector(unsigned(id_pc)+X"0000000000000004");
+            nxt_pc     <= std_logic_vector(unsigned(id_pc)+X"0000000000000004");
         end case;
       when others =>
         btaken     <= '0';
         bp_update  <= '0';
         pipeflush  <= '0';
         cacheflush <= '0';
-        nxt_pc     <= std_ulogic_vector(unsigned(id_pc)+X"0000000000000004");  --TODO: handle 16bit instructions
+        nxt_pc     <= std_logic_vector(unsigned(id_pc)+X"0000000000000004");  --TODO: handle 16bit instructions
     end case;
   end process;
 

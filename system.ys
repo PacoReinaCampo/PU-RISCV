@@ -1,38 +1,36 @@
-#read_verilog -sv rtl/verilog/core/cache/riscv_dcache_core.sv
-#read_verilog -sv rtl/verilog/core/cache/riscv_dext.sv
-#read_verilog -sv rtl/verilog/core/cache/riscv_icache_core.sv
-#read_verilog -sv rtl/verilog/core/cache/riscv_noicache_core.sv
-read_verilog -sv rtl/verilog/core/execution/riscv_alu.sv
-#read_verilog -sv rtl/verilog/core/execution/riscv_bu.sv
-#read_verilog -sv rtl/verilog/core/execution/riscv_div.sv
-#read_verilog -sv rtl/verilog/core/execution/riscv_lsu.sv
-#read_verilog -sv rtl/verilog/core/execution/riscv_mul.sv
-#read_verilog -sv rtl/verilog/core/memory/riscv_dmem_ctrl.sv
-#read_verilog -sv rtl/verilog/core/memory/riscv_imem_ctrl.sv
-#read_verilog -sv rtl/verilog/core/memory/riscv_membuf.sv
-#read_verilog -sv rtl/verilog/core/memory/riscv_memmisaligned.sv
-#read_verilog -sv rtl/verilog/core/memory/riscv_mmu.sv
-#read_verilog -sv rtl/verilog/core/memory/riscv_mux.sv
-#read_verilog -sv rtl/verilog/core/memory/riscv_pmachk.sv
-#read_verilog -sv rtl/verilog/core/memory/riscv_pmpchk.sv
-#read_verilog -sv rtl/verilog/core/riscv_bp.sv
-#read_verilog -sv rtl/verilog/core/riscv_core.sv
-#read_verilog -sv rtl/verilog/core/riscv_du.sv
-#read_verilog -sv rtl/verilog/core/riscv_execution.sv
-#read_verilog -sv rtl/verilog/core/riscv_id.sv
-#read_verilog -sv rtl/verilog/core/riscv_if.sv
-#read_verilog -sv rtl/verilog/core/riscv_memory.sv
-#read_verilog -sv rtl/verilog/core/riscv_rf.sv
-#read_verilog -sv rtl/verilog/core/riscv_state.sv
-#read_verilog -sv rtl/verilog/core/riscv_wb.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/cache/riscv_dcache_core.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/cache/riscv_dext.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/cache/riscv_icache_core.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/cache/riscv_noicache_core.sv
+read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/execution/riscv_alu.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/execution/riscv_bu.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/execution/riscv_div.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/execution/riscv_lsu.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/execution/riscv_mul.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/memory/riscv_dmem_ctrl.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/memory/riscv_imem_ctrl.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/memory/riscv_membuf.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/memory/riscv_memmisaligned.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/memory/riscv_mmu.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/memory/riscv_mux.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/memory/riscv_pmachk.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/memory/riscv_pmpchk.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/riscv_bp.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/riscv_core.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/riscv_du.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/riscv_execution.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/riscv_id.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/riscv_if.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/riscv_memory.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/riscv_rf.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/riscv_state.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/core/riscv_wb.sv
 
-#read_verilog -sv rtl/verilog/memory/riscv_ram_1r1w.sv
-#read_verilog -sv rtl/verilog/memory/riscv_ram_1r1w_generic.sv
-#read_verilog -sv rtl/verilog/memory/riscv_ram_1rw.sv
-#read_verilog -sv rtl/verilog/memory/riscv_ram_1rw_generic.sv
-#read_verilog -sv rtl/verilog/memory/riscv_ram_queue.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/memory/riscv_ram_1r1w.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/memory/riscv_ram_1r1w_generic.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/memory/riscv_ram_1rw.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/memory/riscv_ram_1rw_generic.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/memory/riscv_ram_queue.sv
 
-#read_verilog -sv rtl/verilog/pu/riscv_biu.sv
-#read_verilog -sv rtl/verilog/pu/riscv_pu.sv
-
-#read_verilog -sv rtl/verilog/mpsoc/riscv_mpsoc.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/pu/riscv_biu.sv
+#read_verilog -I rtl/verilog/pkg -sv rtl/verilog/pu/riscv_pu.sv

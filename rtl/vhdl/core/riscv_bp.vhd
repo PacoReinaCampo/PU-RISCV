@@ -53,7 +53,7 @@ entity riscv_bp is
   generic (
     XLEN : integer := 64;
 
-    HAS_BPU : std_ulogic := '1';
+    HAS_BPU : std_logic := '1';
 
     BP_GLOBAL_BITS : integer := 2;
     BP_LOCAL_BITS : integer := 10;
@@ -61,25 +61,25 @@ entity riscv_bp is
 
     TECHNOLOGY : string := "GENERIC";
 
-    AVOID_X : std_ulogic := '0';
+    AVOID_X : std_logic := '0';
 
-    PC_INIT : std_ulogic_vector(63 downto 0) := X"0000000080000000"
+    PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
   );
   port (
-    rst_ni : in std_ulogic;
-    clk_i  : in std_ulogic;
+    rst_ni : in std_logic;
+    clk_i  : in std_logic;
 
     --Read side
-    id_stall_i      : in  std_ulogic;
-    if_parcel_pc_i  : in  std_ulogic_vector(XLEN-1 downto 0);
-    bp_bp_predict_o : out std_ulogic_vector(1 downto 0);
+    id_stall_i      : in  std_logic;
+    if_parcel_pc_i  : in  std_logic_vector(XLEN-1 downto 0);
+    bp_bp_predict_o : out std_logic_vector(1 downto 0);
 
     --Write side
-    ex_pc_i         : in std_ulogic_vector(XLEN-1 downto 0);
-    bu_bp_history_i : in std_ulogic_vector(BP_GLOBAL_BITS-1 downto 0);  --branch history
-    bu_bp_predict_i : in std_ulogic_vector(1 downto 0);  --prediction bits for branch
-    bu_bp_btaken_i  : in std_ulogic;
-    bu_bp_update_i  : in std_ulogic
+    ex_pc_i         : in std_logic_vector(XLEN-1 downto 0);
+    bu_bp_history_i : in std_logic_vector(BP_GLOBAL_BITS-1 downto 0);  --branch history
+    bu_bp_predict_i : in std_logic_vector(1 downto 0);  --prediction bits for branch
+    bu_bp_btaken_i  : in std_logic;
+    bu_bp_update_i  : in std_logic
   );
 end riscv_bp;
 
@@ -91,17 +91,17 @@ architecture RTL of riscv_bp is
       TECHNOLOGY : string := "GENERIC"
     );
     port (
-      rst_ni : in std_ulogic;
-      clk_i  : in std_ulogic;
+      rst_ni : in std_logic;
+      clk_i  : in std_logic;
 
-      waddr_i : in std_ulogic_vector(ABITS-1 downto 0);
-      din_i   : in std_ulogic_vector(DBITS-1 downto 0);
-      we_i    : in std_ulogic;
-      be_i    : in std_ulogic_vector((DBITS+7)/8-1 downto 0);
+      waddr_i : in std_logic_vector(ABITS-1 downto 0);
+      din_i   : in std_logic_vector(DBITS-1 downto 0);
+      we_i    : in std_logic;
+      be_i    : in std_logic_vector((DBITS+7)/8-1 downto 0);
 
-      raddr_i : in  std_ulogic_vector(ABITS-1 downto 0);
-      re_i    : in  std_ulogic;
-      dout_o  : out std_ulogic_vector(DBITS-1 downto 0)
+      raddr_i : in  std_logic_vector(ABITS-1 downto 0);
+      re_i    : in  std_logic;
+      dout_o  : out std_logic_vector(DBITS-1 downto 0)
     );
   end component;
 
@@ -116,13 +116,13 @@ architecture RTL of riscv_bp is
   --
   -- Variables
   --
-  signal radr : std_ulogic_vector(ADR_BITS-1 downto 0);
-  signal wadr : std_ulogic_vector(ADR_BITS-1 downto 0);
+  signal radr : std_logic_vector(ADR_BITS-1 downto 0);
+  signal wadr : std_logic_vector(ADR_BITS-1 downto 0);
 
-  signal if_parcel_pc_dly : std_ulogic_vector(XLEN-1 downto 0);
+  signal if_parcel_pc_dly : std_logic_vector(XLEN-1 downto 0);
 
-  signal new_prediction : std_ulogic_vector(1 downto 0);
-  signal old_prediction : std_ulogic_vector(1 downto 0);
+  signal new_prediction : std_logic_vector(1 downto 0);
+  signal old_prediction : std_logic_vector(1 downto 0);
 
 begin
   --////////////////////////////////////////////////////////////////
@@ -166,7 +166,7 @@ begin
       waddr_i => wadr,
       din_i   => new_prediction,
       we_i    => bu_bp_update_i,
-      be_i    => std_ulogic_vector(to_unsigned(1, (2+7)/8)),
+      be_i    => std_logic_vector(to_unsigned(1, (2+7)/8)),
 
       --Read side
       raddr_i => radr,

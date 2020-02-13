@@ -54,19 +54,19 @@ entity riscv_ram_1r1w is
     TECHNOLOGY : string := "GENERIC"
   );
   port (
-    rst_ni : in std_ulogic;
-    clk_i  : in std_ulogic;
+    rst_ni : in std_logic;
+    clk_i  : in std_logic;
 
     --Write side
-    waddr_i : in std_ulogic_vector(ABITS-1 downto 0);
-    din_i   : in std_ulogic_vector(DBITS-1 downto 0);
-    we_i    : in std_ulogic;
-    be_i    : in std_ulogic_vector((DBITS+7)/8-1 downto 0);
+    waddr_i : in std_logic_vector(ABITS-1 downto 0);
+    din_i   : in std_logic_vector(DBITS-1 downto 0);
+    we_i    : in std_logic;
+    be_i    : in std_logic_vector((DBITS+7)/8-1 downto 0);
 
     --Read side
-    raddr_i : in  std_ulogic_vector(ABITS-1 downto 0);
-    re_i    : in  std_ulogic;
-    dout_o  : out std_ulogic_vector(DBITS-1 downto 0)
+    raddr_i : in  std_logic_vector(ABITS-1 downto 0);
+    re_i    : in  std_logic;
+    dout_o  : out std_logic_vector(DBITS-1 downto 0)
   );
 end riscv_ram_1r1w;
 
@@ -77,16 +77,16 @@ architecture RTL of riscv_ram_1r1w is
       DBITS : integer := 32
     );
     port (
-      rst_ni : in std_ulogic;
-      clk_i  : in std_ulogic;
+      rst_ni : in std_logic;
+      clk_i  : in std_logic;
 
-      waddr_i : in std_ulogic_vector(ABITS-1 downto 0);
-      din_i   : in std_ulogic_vector(DBITS-1 downto 0);
-      we_i    : in std_ulogic;
-      be_i    : in std_ulogic_vector((DBITS+7)/8-1 downto 0);
+      waddr_i : in std_logic_vector(ABITS-1 downto 0);
+      din_i   : in std_logic_vector(DBITS-1 downto 0);
+      we_i    : in std_logic;
+      be_i    : in std_logic_vector((DBITS+7)/8-1 downto 0);
 
-      raddr_i : in  std_ulogic_vector(ABITS-1 downto 0);
-      dout_o  : out std_ulogic_vector(DBITS-1 downto 0)
+      raddr_i : in  std_logic_vector(ABITS-1 downto 0);
+      dout_o  : out std_logic_vector(DBITS-1 downto 0)
     );
   end component;
 
@@ -94,10 +94,10 @@ architecture RTL of riscv_ram_1r1w is
   --
   -- Variables
   --
-  signal contention     : std_ulogic;
-  signal contention_reg : std_ulogic;
-  signal mem_dout       : std_ulogic_vector(DBITS-1 downto 0);
-  signal din_dly        : std_ulogic_vector(DBITS-1 downto 0);
+  signal contention     : std_logic;
+  signal contention_reg : std_logic;
+  signal mem_dout       : std_logic_vector(DBITS-1 downto 0);
+  signal din_dly        : std_logic_vector(DBITS-1 downto 0);
 
 begin
 --////////////////////////////////////////////////////////////////

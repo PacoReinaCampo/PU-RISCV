@@ -52,39 +52,39 @@ use work.riscv_mpsoc_pkg.all;
 
 entity riscv_noicache_core is
   port (
-    rstn : in std_ulogic;
-    clk  : in std_ulogic;
+    rstn : in std_logic;
+    clk  : in std_logic;
 
     --CPU side
-    if_stall_nxt_pc      : out std_ulogic;
-    if_stall             : in  std_ulogic;
-    if_flush             : in  std_ulogic;
-    if_nxt_pc            : in  std_ulogic_vector(XLEN-1 downto 0);
-    if_parcel_pc         : out std_ulogic_vector(XLEN-1 downto 0);
-    if_parcel            : out std_ulogic_vector(PARCEL_SIZE-1 downto 0);
-    if_parcel_valid      : out std_ulogic;
-    if_parcel_misaligned : out std_ulogic;
-    bu_cacheflush        : in  std_ulogic;
-    dcflush_rdy          : in  std_ulogic;
-    st_prv               : in  std_ulogic_vector(1 downto 0);
+    if_stall_nxt_pc      : out std_logic;
+    if_stall             : in  std_logic;
+    if_flush             : in  std_logic;
+    if_nxt_pc            : in  std_logic_vector(XLEN-1 downto 0);
+    if_parcel_pc         : out std_logic_vector(XLEN-1 downto 0);
+    if_parcel            : out std_logic_vector(PARCEL_SIZE-1 downto 0);
+    if_parcel_valid      : out std_logic;
+    if_parcel_misaligned : out std_logic;
+    bu_cacheflush        : in  std_logic;
+    dcflush_rdy          : in  std_logic;
+    st_prv               : in  std_logic_vector(1 downto 0);
 
     --To BIU
-    biu_stb     : out std_ulogic;
-    biu_stb_ack : in  std_ulogic;
-    biu_adri    : out std_ulogic_vector(PLEN-1 downto 0);
-    biu_adro    : in  std_ulogic_vector(PLEN-1 downto 0);
-    biu_size    : out std_ulogic_vector(2 downto 0);  --transfer size
-    biu_type    : out std_ulogic_vector(2 downto 0);  --burst type -AHB style
-    biu_lock    : out std_ulogic;
-    biu_we      : out std_ulogic;
-    biu_di      : out std_ulogic_vector(XLEN-1 downto 0);
-    biu_do      : in  std_ulogic_vector(XLEN-1 downto 0);
-    biu_ack     : in  std_ulogic;  --data acknowledge, 1 per data
-    biu_err     : in  std_ulogic;  --data error
+    biu_stb     : out std_logic;
+    biu_stb_ack : in  std_logic;
+    biu_adri    : out std_logic_vector(PLEN-1 downto 0);
+    biu_adro    : in  std_logic_vector(PLEN-1 downto 0);
+    biu_size    : out std_logic_vector(2 downto 0);  --transfer size
+    biu_type    : out std_logic_vector(2 downto 0);  --burst type -AHB style
+    biu_lock    : out std_logic;
+    biu_we      : out std_logic;
+    biu_di      : out std_logic_vector(XLEN-1 downto 0);
+    biu_do      : in  std_logic_vector(XLEN-1 downto 0);
+    biu_ack     : in  std_logic;  --data acknowledge, 1 per data
+    biu_err     : in  std_logic;  --data error
 
-    biu_is_cacheable   : out std_ulogic;
-    biu_is_instruction : out std_ulogic;
-    biu_prv            : out std_ulogic_vector(1 downto 0)
+    biu_is_cacheable   : out std_logic;
+    biu_is_instruction : out std_logic;
+    biu_prv            : out std_logic_vector(1 downto 0)
   );
 end riscv_noicache_core;
 
@@ -94,9 +94,9 @@ architecture RTL of riscv_noicache_core is
   -- Functions
   --
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -108,26 +108,26 @@ architecture RTL of riscv_noicache_core is
   --
   -- Types
   --
-  type M_2_XLEN is array (2 downto 0) of std_ulogic_vector (XLEN-1 downto 0);
-  type M_2_PLEN is array (2 downto 0) of std_ulogic_vector (PLEN-1 downto 0);
+  type M_2_XLEN is array (2 downto 0) of std_logic_vector (XLEN-1 downto 0);
+  type M_2_PLEN is array (2 downto 0) of std_logic_vector (PLEN-1 downto 0);
 
   --////////////////////////////////////////////////////////////////
   --
   -- Variables
   --
-  signal is_cacheable : std_ulogic;
+  signal is_cacheable : std_logic;
 
-  signal biu_stb_cnt : std_ulogic_vector(1 downto 0);
+  signal biu_stb_cnt : std_logic_vector(1 downto 0);
 
-  signal biu_fifo_valid : std_ulogic_vector(2 downto 0);
+  signal biu_fifo_valid : std_logic_vector(2 downto 0);
   signal biu_fifo_dat   : M_2_XLEN;
   signal biu_fifo_adr   : M_2_PLEN;
 
-  signal if_flush_dly : std_ulogic;
+  signal if_flush_dly : std_logic;
 
-  signal if_parcel_signal : std_ulogic;
+  signal if_parcel_signal : std_logic;
 
-  signal if_parcel_pc_o : std_ulogic_vector(XLEN-1 downto 0);
+  signal if_parcel_pc_o : std_logic_vector(XLEN-1 downto 0);
 
 begin
   --////////////////////////////////////////////////////////////////
@@ -191,8 +191,8 @@ begin
 
   --valid bits
   processing_2 : process (clk, rstn)
-    variable if_parcel_biu : std_ulogic_vector(1 downto 0);
-    variable biu_fifo2     : std_ulogic_vector(1 downto 0);
+    variable if_parcel_biu : std_logic_vector(1 downto 0);
+    variable biu_fifo2     : std_logic_vector(1 downto 0);
   begin
     if (rstn = '0') then
       biu_fifo_valid(0) <= '0';
@@ -244,9 +244,9 @@ begin
 
   --Address & Data
   processing_3 : process (clk)
-    variable if_parcel_biu : std_ulogic_vector(1 downto 0);
-    variable biu_fifo2     : std_ulogic_vector(1 downto 0);
-    variable biu_fifo3     : std_ulogic_vector(2 downto 0);
+    variable if_parcel_biu : std_logic_vector(1 downto 0);
+    variable biu_fifo2     : std_logic_vector(1 downto 0);
+    variable biu_fifo3     : std_logic_vector(2 downto 0);
   begin
     if (rising_edge(clk)) then
       if_parcel_biu := biu_ack & if_parcel_signal;

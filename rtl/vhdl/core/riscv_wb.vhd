@@ -56,40 +56,40 @@ entity riscv_wb is
 
     EXCEPTION_SIZE : integer := 16;
 
-    PC_INIT : std_ulogic_vector(63 downto 0) := X"0000000080000000"
+    PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
   );
   port (
-    rst_ni : in std_ulogic;  --Reset
-    clk_i  : in std_ulogic;  --Clock
+    rst_ni : in std_logic;  --Reset
+    clk_i  : in std_logic;  --Clock
 
-    wb_stall_o : out std_ulogic;  --Stall on memory-wait
+    wb_stall_o : out std_logic;  --Stall on memory-wait
 
-    mem_pc_i : in  std_ulogic_vector(XLEN-1 downto 0);
-    wb_pc_o  : out std_ulogic_vector(XLEN-1 downto 0);
+    mem_pc_i : in  std_logic_vector(XLEN-1 downto 0);
+    wb_pc_o  : out std_logic_vector(XLEN-1 downto 0);
 
-    mem_instr_i  : in  std_ulogic_vector(ILEN-1 downto 0);
-    mem_bubble_i : in  std_ulogic;
-    wb_instr_o   : out std_ulogic_vector(ILEN-1 downto 0);
-    wb_bubble_o  : out std_ulogic;
+    mem_instr_i  : in  std_logic_vector(ILEN-1 downto 0);
+    mem_bubble_i : in  std_logic;
+    wb_instr_o   : out std_logic_vector(ILEN-1 downto 0);
+    wb_bubble_o  : out std_logic;
 
-    mem_exception_i : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    wb_exception_o  : out std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    wb_badaddr_o    : out std_ulogic_vector(XLEN-1 downto 0);
+    mem_exception_i : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    wb_exception_o  : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    wb_badaddr_o    : out std_logic_vector(XLEN-1 downto 0);
 
-    mem_r_i      : in std_ulogic_vector(XLEN-1 downto 0);
-    mem_memadr_i : in std_ulogic_vector(XLEN-1 downto 0);
+    mem_r_i      : in std_logic_vector(XLEN-1 downto 0);
+    mem_memadr_i : in std_logic_vector(XLEN-1 downto 0);
 
     --From Memory System
-    dmem_ack_i        : in std_ulogic;
-    dmem_err_i        : in std_ulogic;
-    dmem_q_i          : in std_ulogic_vector(XLEN-1 downto 0);
-    dmem_misaligned_i : in std_ulogic;
-    dmem_page_fault_i : in std_ulogic;
+    dmem_ack_i        : in std_logic;
+    dmem_err_i        : in std_logic;
+    dmem_q_i          : in std_logic_vector(XLEN-1 downto 0);
+    dmem_misaligned_i : in std_logic;
+    dmem_page_fault_i : in std_logic;
 
     --To Register File
-    wb_dst_o : out std_ulogic_vector(4 downto 0);
-    wb_r_o   : out std_ulogic_vector(XLEN-1 downto 0);
-    wb_we_o  : out std_ulogic
+    wb_dst_o : out std_logic_vector(4 downto 0);
+    wb_r_o   : out std_logic_vector(XLEN-1 downto 0);
+    wb_we_o  : out std_logic
   );
 end riscv_wb;
 
@@ -99,9 +99,9 @@ architecture RTL of riscv_wb is
   -- Functions
   --
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -113,21 +113,21 @@ architecture RTL of riscv_wb is
   --
   -- Variables
   --
-  signal opcode : std_ulogic_vector(6 downto 2);
-  signal func3  : std_ulogic_vector(2 downto 0);
-  signal func7  : std_ulogic_vector(6 downto 0);
-  signal dst    : std_ulogic_vector(4 downto 0);
+  signal opcode : std_logic_vector(6 downto 2);
+  signal func3  : std_logic_vector(2 downto 0);
+  signal func7  : std_logic_vector(6 downto 0);
+  signal dst    : std_logic_vector(4 downto 0);
 
-  signal exception : std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
+  signal exception : std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
-  signal m_data : std_ulogic_vector(XLEN-1 downto 0);
-  signal m_qb   : std_ulogic_vector(7 downto 0);
-  signal m_qh   : std_ulogic_vector(15 downto 0);
-  signal m_qw   : std_ulogic_vector(XLEN-1 downto 0);
+  signal m_data : std_logic_vector(XLEN-1 downto 0);
+  signal m_qb   : std_logic_vector(7 downto 0);
+  signal m_qh   : std_logic_vector(15 downto 0);
+  signal m_qw   : std_logic_vector(XLEN-1 downto 0);
 
-  signal m_qd : std_ulogic_vector(XLEN-1 downto 0);
+  signal m_qd : std_logic_vector(XLEN-1 downto 0);
 
-  signal wb_stall : std_ulogic;
+  signal wb_stall : std_logic;
 
 begin
   --//////////////////////////////////////////////////////////////
@@ -225,7 +225,7 @@ begin
 
   --From Memory
   processing_5 : process (dmem_ack_i, dmem_err_i, dmem_misaligned_i, dmem_page_fault_i, mem_bubble_i, mem_exception_i, opcode)
-    variable from_memory : std_ulogic_vector(6 downto 0);
+    variable from_memory : std_logic_vector(6 downto 0);
   begin
     from_memory := mem_bubble_i & reduce_or(mem_exception_i) & opcode;
     case (from_memory) is
@@ -242,13 +242,13 @@ begin
 
   -- data from memory
   generating_0 : if (XLEN = 64) generate
-    m_qb <= std_ulogic_vector(unsigned(dmem_q_i(7 downto 0)) srl (8*to_integer(unsigned(mem_memadr_i(1 downto 0)))));
-    m_qh <= std_ulogic_vector(unsigned(dmem_q_i(15 downto 0)) srl (8*to_integer(unsigned(mem_memadr_i(1 downto 0)))));
-    m_qw <= std_ulogic_vector(unsigned(dmem_q_i) srl (8*to_integer(unsigned(mem_memadr_i(1 downto 0)))));
+    m_qb <= std_logic_vector(unsigned(dmem_q_i(7 downto 0)) srl (8*to_integer(unsigned(mem_memadr_i(1 downto 0)))));
+    m_qh <= std_logic_vector(unsigned(dmem_q_i(15 downto 0)) srl (8*to_integer(unsigned(mem_memadr_i(1 downto 0)))));
+    m_qw <= std_logic_vector(unsigned(dmem_q_i) srl (8*to_integer(unsigned(mem_memadr_i(1 downto 0)))));
     m_qd <= dmem_q_i;
 
     processing_6 : process (func3, func7, m_qb, m_qd, m_qh, m_qw, opcode)
-      variable data_from_memory : std_ulogic_vector(15 downto 0);
+      variable data_from_memory : std_logic_vector(15 downto 0);
     begin
       data_from_memory := 'X' & func7 & func3 & opcode;
       case (data_from_memory) is
@@ -271,12 +271,12 @@ begin
       end case;
     end process;
   elsif (XLEN /= 64) generate
-    m_qb <= std_ulogic_vector(unsigned(dmem_q_i) srl (8*to_integer(unsigned(mem_memadr_i(1 downto 0)))));
-    m_qh <= std_ulogic_vector(unsigned(dmem_q_i) srl (8*to_integer(unsigned(mem_memadr_i(1 downto 0)))));
+    m_qb <= std_logic_vector(unsigned(dmem_q_i) srl (8*to_integer(unsigned(mem_memadr_i(1 downto 0)))));
+    m_qh <= std_logic_vector(unsigned(dmem_q_i) srl (8*to_integer(unsigned(mem_memadr_i(1 downto 0)))));
     m_qw <= dmem_q_i;
 
     processing_7 : process (func3, func7, m_qb, m_qh, m_qw, opcode)
-      variable data_from_memory : std_ulogic_vector(15 downto 0);
+      variable data_from_memory : std_logic_vector(15 downto 0);
     begin
       data_from_memory := 'X' & func7 & func3 & opcode;
       case (data_from_memory) is

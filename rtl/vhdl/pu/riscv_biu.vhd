@@ -55,38 +55,38 @@ entity riscv_biu is
     PLEN : integer := 64
   );
   port (
-    HRESETn : in std_ulogic;
-    HCLK    : in std_ulogic;
+    HRESETn : in std_logic;
+    HCLK    : in std_logic;
 
     --AHB3 Lite Bus
-    HSEL      : out std_ulogic;
-    HADDR     : out std_ulogic_vector(PLEN-1 downto 0);
-    HRDATA    : in  std_ulogic_vector(XLEN-1 downto 0);
-    HWDATA    : out std_ulogic_vector(XLEN-1 downto 0);
-    HWRITE    : out std_ulogic;
-    HSIZE     : out std_ulogic_vector(2 downto 0);
-    HBURST    : out std_ulogic_vector(2 downto 0);
-    HPROT     : out std_ulogic_vector(3 downto 0);
-    HTRANS    : out std_ulogic_vector(1 downto 0);
-    HMASTLOCK : out std_ulogic;
-    HREADY    : in  std_ulogic;
-    HRESP     : in  std_ulogic;
+    HSEL      : out std_logic;
+    HADDR     : out std_logic_vector(PLEN-1 downto 0);
+    HRDATA    : in  std_logic_vector(XLEN-1 downto 0);
+    HWDATA    : out std_logic_vector(XLEN-1 downto 0);
+    HWRITE    : out std_logic;
+    HSIZE     : out std_logic_vector(2 downto 0);
+    HBURST    : out std_logic_vector(2 downto 0);
+    HPROT     : out std_logic_vector(3 downto 0);
+    HTRANS    : out std_logic_vector(1 downto 0);
+    HMASTLOCK : out std_logic;
+    HREADY    : in  std_logic;
+    HRESP     : in  std_logic;
 
     --BIU Bus (Core ports)
-    biu_stb_i     : in  std_ulogic;  --strobe
-    biu_stb_ack_o : out std_ulogic;  --strobe acknowledge; can send new strobe
-    biu_d_ack_o   : out std_ulogic;  --data acknowledge (send new biu_d_i); for pipelined buses
-    biu_adri_i    : in  std_ulogic_vector(PLEN-1 downto 0);
-    biu_adro_o    : out std_ulogic_vector(PLEN-1 downto 0);
-    biu_size_i    : in  std_ulogic_vector(2 downto 0);  --transfer size
-    biu_type_i    : in  std_ulogic_vector(2 downto 0);  --burst type
-    biu_prot_i    : in  std_ulogic_vector(2 downto 0);  --protection
-    biu_lock_i    : in  std_ulogic;
-    biu_we_i      : in  std_ulogic;
-    biu_d_i       : in  std_ulogic_vector(XLEN-1 downto 0);
-    biu_q_o       : out std_ulogic_vector(XLEN-1 downto 0);
-    biu_ack_o     : out std_ulogic;  --transfer acknowledge
-    biu_err_o     : out std_ulogic  --transfer error
+    biu_stb_i     : in  std_logic;  --strobe
+    biu_stb_ack_o : out std_logic;  --strobe acknowledge; can send new strobe
+    biu_d_ack_o   : out std_logic;  --data acknowledge (send new biu_d_i); for pipelined buses
+    biu_adri_i    : in  std_logic_vector(PLEN-1 downto 0);
+    biu_adro_o    : out std_logic_vector(PLEN-1 downto 0);
+    biu_size_i    : in  std_logic_vector(2 downto 0);  --transfer size
+    biu_type_i    : in  std_logic_vector(2 downto 0);  --burst type
+    biu_prot_i    : in  std_logic_vector(2 downto 0);  --protection
+    biu_lock_i    : in  std_logic;
+    biu_we_i      : in  std_logic;
+    biu_d_i       : in  std_logic_vector(XLEN-1 downto 0);
+    biu_q_o       : out std_logic_vector(XLEN-1 downto 0);
+    biu_ack_o     : out std_logic;  --transfer acknowledge
+    biu_err_o     : out std_logic  --transfer error
     );
 end riscv_biu;
 
@@ -96,9 +96,9 @@ architecture RTL of riscv_biu is
   -- Functions
   --
   function biu_size2hsize (
-    size : std_ulogic_vector(2 downto 0)
-  ) return std_ulogic_vector is
-    variable biu_size2hsize_return : std_ulogic_vector (2 downto 0);
+    size : std_logic_vector(2 downto 0)
+  ) return std_logic_vector is
+    variable biu_size2hsize_return : std_logic_vector (2 downto 0);
   begin
     case ((size)) is
       when "000" =>
@@ -118,9 +118,9 @@ architecture RTL of riscv_biu is
 
   --convert burst type to counter length (actually length -1)
   function biu_type2cnt (
-    biu_type : std_ulogic_vector(2 downto 0)
-  ) return std_ulogic_vector is
-    variable biu_type2cnt_return : std_ulogic_vector (3 downto 0);
+    biu_type : std_logic_vector(2 downto 0)
+  ) return std_logic_vector is
+    variable biu_type2cnt_return : std_logic_vector (3 downto 0);
   begin
     case ((biu_type)) is
       when SINGLE =>
@@ -148,9 +148,9 @@ architecture RTL of riscv_biu is
 
   --convert burst type to counter length (actually length -1)
   function biu_type2hburst (
-    biu_type : std_ulogic_vector(2 downto 0)
-  ) return std_ulogic_vector is
-    variable biu_type2hburst_return : std_ulogic_vector (2 downto 0);
+    biu_type : std_logic_vector(2 downto 0)
+  ) return std_logic_vector is
+    variable biu_type2hburst_return : std_logic_vector (2 downto 0);
   begin
     case ((biu_type)) is
       when SINGLE =>
@@ -178,11 +178,11 @@ architecture RTL of riscv_biu is
 
   --convert burst type to counter length (actually length -1)
   function biu_prot2hprot (
-    biu_prot : std_ulogic_vector(2 downto 0)
-  ) return std_ulogic_vector is
-    variable biu_prot2hprot_return     : std_ulogic_vector (3 downto 0);
-    variable biu_prot2hprot_privileged : std_ulogic_vector (3 downto 0);
-    variable biu_prot2hprot_cacheable  : std_ulogic_vector (3 downto 0);
+    biu_prot : std_logic_vector(2 downto 0)
+  ) return std_logic_vector is
+    variable biu_prot2hprot_return     : std_logic_vector (3 downto 0);
+    variable biu_prot2hprot_privileged : std_logic_vector (3 downto 0);
+    variable biu_prot2hprot_cacheable  : std_logic_vector (3 downto 0);
   begin
     if ((biu_prot and PROT_DATA) = "111") then
       biu_prot2hprot_return := HPROT_DATA;
@@ -211,16 +211,16 @@ architecture RTL of riscv_biu is
 
   --convert burst type to counter length (actually length -1)
   function nxt_addr (
-    addr   : std_ulogic_vector(PLEN-1 downto 0);  --current address
-    hburst : std_ulogic_vector(2 downto 0)  --AHB HBURST
-  ) return std_ulogic_vector is
-    variable nxt_addr_return : std_ulogic_vector (PLEN-1 downto 0);
+    addr   : std_logic_vector(PLEN-1 downto 0);  --current address
+    hburst : std_logic_vector(2 downto 0)  --AHB HBURST
+  ) return std_logic_vector is
+    variable nxt_addr_return : std_logic_vector (PLEN-1 downto 0);
   begin
     --next linear address
     if (XLEN = 32) then
-      nxt_addr_return := std_ulogic_vector(unsigned(addr)+to_unsigned(4, PLEN)) and not std_ulogic_vector(to_unsigned(3, PLEN));
+      nxt_addr_return := std_logic_vector(unsigned(addr)+to_unsigned(4, PLEN)) and not std_logic_vector(to_unsigned(3, PLEN));
     else
-      nxt_addr_return := std_ulogic_vector(unsigned(addr)+to_unsigned(8, PLEN)) and not std_ulogic_vector(to_unsigned(7, PLEN));
+      nxt_addr_return := std_logic_vector(unsigned(addr)+to_unsigned(8, PLEN)) and not std_logic_vector(to_unsigned(7, PLEN));
     end if;
     --wrap?
     case (hburst) is
@@ -249,9 +249,9 @@ architecture RTL of riscv_biu is
   end nxt_addr;
 
   function reduce_nor (
-    reduce_nor_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_nor_out : std_ulogic := '0';
+    reduce_nor_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_nor_out : std_logic := '0';
   begin
     for i in reduce_nor_in'range loop
       reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
@@ -261,7 +261,7 @@ architecture RTL of riscv_biu is
 
   function to_stdlogic (
     input : boolean
-  ) return std_ulogic is
+  ) return std_logic is
   begin
     if input then
       return('1');
@@ -274,16 +274,16 @@ architecture RTL of riscv_biu is
   --
   -- Variables
   --
-  signal burst_cnt  : std_ulogic_vector(3 downto 0);
-  signal data_ena   : std_ulogic;
-  signal data_ena_d : std_ulogic;
-  signal biu_di_dly : std_ulogic_vector(XLEN-1 downto 0);
+  signal burst_cnt  : std_logic_vector(3 downto 0);
+  signal data_ena   : std_logic;
+  signal data_ena_d : std_logic;
+  signal biu_di_dly : std_logic_vector(XLEN-1 downto 0);
 
-  signal biu_err : std_ulogic;
+  signal biu_err : std_logic;
 
 
-  signal HADDR_O  : std_ulogic_vector(PLEN-1 downto 0);
-  signal HBURST_O : std_ulogic_vector(2 downto 0);
+  signal HADDR_O  : std_logic_vector(PLEN-1 downto 0);
+  signal HBURST_O : std_logic_vector(2 downto 0);
 
 begin
   --////////////////////////////////////////////////////////////////
@@ -333,7 +333,7 @@ begin
           end if;
         else  --continue burst
           data_ena  <= '1';
-          burst_cnt <= std_ulogic_vector(unsigned(burst_cnt)-to_unsigned(1, 4));
+          burst_cnt <= std_logic_vector(unsigned(burst_cnt)-to_unsigned(1, 4));
 
           HTRANS  <= HTRANS_SEQ;  --continue burst
           HADDR_O <= nxt_addr(HADDR_O, HBURST_O);  --next address

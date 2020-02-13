@@ -57,8 +57,8 @@ entity riscv_rf is
     WRPORTS : integer := 1
   );
   port (
-    rstn : in std_ulogic;
-    clk  : in std_ulogic;
+    rstn : in std_logic;
+    clk  : in std_logic;
 
     --Register File read
     rf_src1  : in  M_RDPORTS_AR_BITS;
@@ -69,14 +69,14 @@ entity riscv_rf is
     --Register File write
     rf_dst  : in M_WRPORTS_AR_BITS;
     rf_dstv : in M_WRPORTS_XLEN;
-    rf_we   : in std_ulogic_vector(WRPORTS-1 downto 0);
+    rf_we   : in std_logic_vector(WRPORTS-1 downto 0);
 
     --Debug Interface
-    du_stall   : in  std_ulogic;
-    du_we_rf   : in  std_ulogic;
-    du_dato    : in  std_ulogic_vector(XLEN-1 downto 0);  --output from debug unit
-    du_dati_rf : out std_ulogic_vector(XLEN-1 downto 0);
-    du_addr    : in  std_ulogic_vector(11 downto 0)
+    du_stall   : in  std_logic;
+    du_we_rf   : in  std_logic;
+    du_dato    : in  std_logic_vector(XLEN-1 downto 0);  --output from debug unit
+    du_dati_rf : out std_logic_vector(XLEN-1 downto 0);
+    du_addr    : in  std_logic_vector(11 downto 0)
   );
 end riscv_rf;
 
@@ -86,9 +86,9 @@ architecture RTL of riscv_rf is
   -- Functions
   --
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -97,9 +97,9 @@ architecture RTL of riscv_rf is
   end reduce_or;
 
   function reduce_nor (
-    reduce_nor_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_nor_out : std_ulogic := '0';
+    reduce_nor_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_nor_out : std_logic := '0';
   begin
     for i in reduce_nor_in'range loop
       reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
@@ -111,7 +111,7 @@ architecture RTL of riscv_rf is
   --
   -- Types
   --
-  type M_XLEN_XLEN is array (XLEN-1 downto 0) of std_ulogic_vector (XLEN-1 downto 0);
+  type M_XLEN_XLEN is array (XLEN-1 downto 0) of std_logic_vector (XLEN-1 downto 0);
 
   --///////////////////////////////////////////////////////////////
   --
@@ -122,8 +122,8 @@ architecture RTL of riscv_rf is
   signal rf : M_XLEN_XLEN;
 
   --read data from register file
-  signal src1_is_x0 : std_ulogic_vector(RDPORTS-1 downto 0);
-  signal src2_is_x0 : std_ulogic_vector(RDPORTS-1 downto 0);
+  signal src1_is_x0 : std_logic_vector(RDPORTS-1 downto 0);
+  signal src2_is_x0 : std_logic_vector(RDPORTS-1 downto 0);
   signal dout1      : M_RDPORTS_XLEN;
   signal dout2      : M_RDPORTS_XLEN;
 

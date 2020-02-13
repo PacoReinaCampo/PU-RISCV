@@ -56,87 +56,87 @@ entity riscv_state is
     ILEN            : integer := 64;
     EXCEPTION_SIZE  : integer := 16;
 
-    IS_RV32E        : std_ulogic := '0';
-    HAS_RVN         : std_ulogic := '1';
-    HAS_RVC         : std_ulogic := '1';
-    HAS_FPU         : std_ulogic := '1';
-    HAS_MMU         : std_ulogic := '1';
-    HAS_RVM         : std_ulogic := '1';
-    HAS_RVA         : std_ulogic := '1';
-    HAS_RVB         : std_ulogic := '1';
-    HAS_RVT         : std_ulogic := '1';
-    HAS_RVP         : std_ulogic := '1';
-    HAS_EXT         : std_ulogic := '1';
+    IS_RV32E        : std_logic := '0';
+    HAS_RVN         : std_logic := '1';
+    HAS_RVC         : std_logic := '1';
+    HAS_FPU         : std_logic := '1';
+    HAS_MMU         : std_logic := '1';
+    HAS_RVM         : std_logic := '1';
+    HAS_RVA         : std_logic := '1';
+    HAS_RVB         : std_logic := '1';
+    HAS_RVT         : std_logic := '1';
+    HAS_RVP         : std_logic := '1';
+    HAS_EXT         : std_logic := '1';
 
-    HAS_USER        : std_ulogic := '1';
-    HAS_SUPER       : std_ulogic := '1';
-    HAS_HYPER       : std_ulogic := '1';
+    HAS_USER        : std_logic := '1';
+    HAS_SUPER       : std_logic := '1';
+    HAS_HYPER       : std_logic := '1';
 
-    PC_INIT         : std_ulogic_vector(63 downto 0) := X"0000000080000000";
+    PC_INIT         : std_logic_vector(63 downto 0) := X"0000000080000000";
 
-    MNMIVEC_DEFAULT : std_ulogic_vector(63 downto 0) := X"0000000000000004";
-    MTVEC_DEFAULT   : std_ulogic_vector(63 downto 0) := X"0000000000000040";
-    HTVEC_DEFAULT   : std_ulogic_vector(63 downto 0) := X"0000000000000080";
-    STVEC_DEFAULT   : std_ulogic_vector(63 downto 0) := X"00000000000000C0";
-    UTVEC_DEFAULT   : std_ulogic_vector(63 downto 0) := X"0000000000000100";
+    MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
+    MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
+    HTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000080";
+    STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
+    UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
 
     JEDEC_BANK            : integer := 10;
-    JEDEC_MANUFACTURER_ID : std_ulogic_vector(7 downto 0) := X"6E";
+    JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
 
     PMP_CNT               : integer := 16;
     HARTID                : integer := 0
   );
   port (
-    rstn : in std_ulogic;
-    clk  : in std_ulogic;
+    rstn : in std_logic;
+    clk  : in std_logic;
 
-    id_pc     : in std_ulogic_vector(XLEN-1 downto 0);
-    id_bubble : in std_ulogic;
-    id_instr  : in std_ulogic_vector(63 downto 0);
-    id_stall  : in std_ulogic;
+    id_pc     : in std_logic_vector(XLEN-1 downto 0);
+    id_bubble : in std_logic;
+    id_instr  : in std_logic_vector(63 downto 0);
+    id_stall  : in std_logic;
 
-    bu_flush  : in  std_ulogic;
-    bu_nxt_pc : in  std_ulogic_vector(XLEN-1 downto 0);
-    st_flush  : out std_ulogic;
-    st_nxt_pc : out std_ulogic_vector(XLEN-1 downto 0);
+    bu_flush  : in  std_logic;
+    bu_nxt_pc : in  std_logic_vector(XLEN-1 downto 0);
+    st_flush  : out std_logic;
+    st_nxt_pc : out std_logic_vector(XLEN-1 downto 0);
 
-    wb_pc        : in std_ulogic_vector(XLEN-1 downto 0);
-    wb_bubble    : in std_ulogic;
-    wb_instr     : in std_ulogic_vector(ILEN-1 downto 0);
-    wb_exception : in std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    wb_badaddr   : in std_ulogic_vector(XLEN-1 downto 0);
+    wb_pc        : in std_logic_vector(XLEN-1 downto 0);
+    wb_bubble    : in std_logic;
+    wb_instr     : in std_logic_vector(ILEN-1 downto 0);
+    wb_exception : in std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    wb_badaddr   : in std_logic_vector(XLEN-1 downto 0);
 
-    st_interrupt  : out std_ulogic;
-    st_prv        : out std_ulogic_vector(1 downto 0);  --Privilege level
-    st_xlen       : out std_ulogic_vector(1 downto 0);  --Active Architecture
-    st_tvm        : out std_ulogic;      --trap on satp access or SFENCE.VMA
-    st_tw         : out std_ulogic;      --trap on WFI (after time >=0)
-    st_tsr        : out std_ulogic;      --trap SRET
-    st_mcounteren : out std_ulogic_vector(XLEN-1 downto 0);
-    st_scounteren : out std_ulogic_vector(XLEN-1 downto 0);
+    st_interrupt  : out std_logic;
+    st_prv        : out std_logic_vector(1 downto 0);  --Privilege level
+    st_xlen       : out std_logic_vector(1 downto 0);  --Active Architecture
+    st_tvm        : out std_logic;      --trap on satp access or SFENCE.VMA
+    st_tw         : out std_logic;      --trap on WFI (after time >=0)
+    st_tsr        : out std_logic;      --trap SRET
+    st_mcounteren : out std_logic_vector(XLEN-1 downto 0);
+    st_scounteren : out std_logic_vector(XLEN-1 downto 0);
     st_pmpcfg     : out M_PMP_CNT_7;
     st_pmpaddr    : out M_PMP_CNT_PLEN;
 
     --interrupts (3=M-mode, 0=U-mode)
-    ext_int  : in std_ulogic_vector(3 downto 0);  --external interrupt (per privilege mode; determined by PIC)
-    ext_tint : in std_ulogic;            --machine timer interrupt
-    ext_sint : in std_ulogic;            --machine software interrupt (for ipi)
-    ext_nmi  : in std_ulogic;            --non-maskable interrupt
+    ext_int  : in std_logic_vector(3 downto 0);  --external interrupt (per privilege mode; determined by PIC)
+    ext_tint : in std_logic;            --machine timer interrupt
+    ext_sint : in std_logic;            --machine software interrupt (for ipi)
+    ext_nmi  : in std_logic;            --non-maskable interrupt
 
     --CSR interface
-    ex_csr_reg  : in  std_ulogic_vector(11 downto 0);
-    ex_csr_we   : in  std_ulogic;
-    ex_csr_wval : in  std_ulogic_vector(XLEN-1 downto 0);
-    st_csr_rval : out std_ulogic_vector(XLEN-1 downto 0);
+    ex_csr_reg  : in  std_logic_vector(11 downto 0);
+    ex_csr_we   : in  std_logic;
+    ex_csr_wval : in  std_logic_vector(XLEN-1 downto 0);
+    st_csr_rval : out std_logic_vector(XLEN-1 downto 0);
 
     --Debug interface
-    du_stall      : in  std_ulogic;
-    du_flush      : in  std_ulogic;
-    du_we_csr     : in  std_ulogic;
-    du_dato       : in  std_ulogic_vector(XLEN-1 downto 0);  --output from debug unit
-    du_addr       : in  std_ulogic_vector(11 downto 0);
-    du_ie         : in  std_ulogic_vector(31 downto 0);
-    du_exceptions : out std_ulogic_vector(31 downto 0)
+    du_stall      : in  std_logic;
+    du_flush      : in  std_logic;
+    du_we_csr     : in  std_logic;
+    du_dato       : in  std_logic_vector(XLEN-1 downto 0);  --output from debug unit
+    du_addr       : in  std_logic_vector(11 downto 0);
+    du_ie         : in  std_logic_vector(31 downto 0);
+    du_exceptions : out std_logic_vector(31 downto 0)
     );
 end riscv_state;
 
@@ -152,24 +152,24 @@ architecture RTL of riscv_state is
   -- Functions
   --
   function get_trap_cause (
-    exception : std_ulogic_vector(EXCEPTION_SIZE-1 downto 0)
-    ) return std_ulogic_vector is
-    variable get_trap_cause_return : std_ulogic_vector(3 downto 0);
+    exception : std_logic_vector(EXCEPTION_SIZE-1 downto 0)
+    ) return std_logic_vector is
+    variable get_trap_cause_return : std_logic_vector(3 downto 0);
   begin
     get_trap_cause_return := "0000";
 
     for n in 0 to EXCEPTION_SIZE - 1 loop
       if (exception(n) = '1') then
-        get_trap_cause_return := std_ulogic_vector(to_unsigned(n, 4));
+        get_trap_cause_return := std_logic_vector(to_unsigned(n, 4));
       end if;
     end loop;
     return get_trap_cause_return;
   end get_trap_cause;
 
   function reduce_and (
-    reduce_and_in : std_ulogic_vector
-    ) return std_ulogic is
-    variable reduce_and_out : std_ulogic := '0';
+    reduce_and_in : std_logic_vector
+    ) return std_logic is
+    variable reduce_and_out : std_logic := '0';
   begin
     for i in reduce_and_in'range loop
       reduce_and_out := reduce_and_out and reduce_and_in(i);
@@ -178,9 +178,9 @@ architecture RTL of riscv_state is
   end reduce_and;
 
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-    ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+    ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -190,7 +190,7 @@ architecture RTL of riscv_state is
 
   function to_stdlogic (
     input : boolean
-    ) return std_ulogic is
+    ) return std_logic is
   begin
     if input then
       return('1');
@@ -204,39 +204,39 @@ architecture RTL of riscv_state is
   -- Variables
   --
   --Floating point registers
-  signal csr_fcsr_rm    : std_ulogic_vector(2 downto 0);
-  signal csr_fcsr_flags : std_ulogic_vector(4 downto 0);
+  signal csr_fcsr_rm    : std_logic_vector(2 downto 0);
+  signal csr_fcsr_flags : std_logic_vector(4 downto 0);
 
-  signal csr_fcsr : std_ulogic_vector(7 downto 0);
+  signal csr_fcsr : std_logic_vector(7 downto 0);
 
   --User trap setup
-  signal csr_utvec : std_ulogic_vector(XLEN-1 downto 0);
+  signal csr_utvec : std_logic_vector(XLEN-1 downto 0);
 
-  signal csr_utvec_we : std_ulogic_vector(XLEN-1 downto 0);
+  signal csr_utvec_we : std_logic_vector(XLEN-1 downto 0);
 
   --User trap handler
-  signal csr_uscratch : std_ulogic_vector(XLEN-1 downto 0);  --scratch register
-  signal csr_uepc     : std_ulogic_vector(XLEN-1 downto 0);  --exception program counter
-  signal csr_ucause   : std_ulogic_vector(XLEN-1 downto 0);  --trap cause
-  signal csr_utval    : std_ulogic_vector(XLEN-1 downto 0);  --bad address
+  signal csr_uscratch : std_logic_vector(XLEN-1 downto 0);  --scratch register
+  signal csr_uepc     : std_logic_vector(XLEN-1 downto 0);  --exception program counter
+  signal csr_ucause   : std_logic_vector(XLEN-1 downto 0);  --trap cause
+  signal csr_utval    : std_logic_vector(XLEN-1 downto 0);  --bad address
 
   --Supervisor
 
   --Supervisor trap setup
-  signal csr_stvec      : std_ulogic_vector(XLEN-1 downto 0);  --trap handler base address
-  signal csr_scounteren : std_ulogic_vector(XLEN-1 downto 0);  --Enable performance counters for lower privilege level
-  signal csr_sedeleg    : std_ulogic_vector(XLEN-1 downto 0);  --trap delegation register
+  signal csr_stvec      : std_logic_vector(XLEN-1 downto 0);  --trap handler base address
+  signal csr_scounteren : std_logic_vector(XLEN-1 downto 0);  --Enable performance counters for lower privilege level
+  signal csr_sedeleg    : std_logic_vector(XLEN-1 downto 0);  --trap delegation register
 
-  signal csr_stvec_we : std_ulogic_vector(XLEN-1 downto 0);
+  signal csr_stvec_we : std_logic_vector(XLEN-1 downto 0);
 
   --Supervisor trap handler
-  signal csr_sscratch : std_ulogic_vector(XLEN-1 downto 0);  --scratch register
-  signal csr_sepc     : std_ulogic_vector(XLEN-1 downto 0);  --exception program counter
-  signal csr_scause   : std_ulogic_vector(XLEN-1 downto 0);  --trap cause
-  signal csr_stval    : std_ulogic_vector(XLEN-1 downto 0);  --bad address
+  signal csr_sscratch : std_logic_vector(XLEN-1 downto 0);  --scratch register
+  signal csr_sepc     : std_logic_vector(XLEN-1 downto 0);  --exception program counter
+  signal csr_scause   : std_logic_vector(XLEN-1 downto 0);  --trap cause
+  signal csr_stval    : std_logic_vector(XLEN-1 downto 0);  --bad address
 
   --Supervisor protection and Translation
-  signal csr_satp : std_ulogic_vector(XLEN-1 downto 0);  --Address translation & protection
+  signal csr_satp : std_logic_vector(XLEN-1 downto 0);  --Address translation & protection
 
 --  //Hypervisor
 --  //Hypervisor Trap Setup
@@ -253,143 +253,143 @@ architecture RTL of riscv_state is
 --  //TBD per spec v1.7, somewhat defined in 1.9, removed in 1.10
 
   -- Machine
-  signal csr_mvendorid_bank   : std_ulogic_vector(7 downto 0);  --Vendor-ID
-  signal csr_mvendorid_offset : std_ulogic_vector(6 downto 0);  --Vendor-ID
+  signal csr_mvendorid_bank   : std_logic_vector(7 downto 0);  --Vendor-ID
+  signal csr_mvendorid_offset : std_logic_vector(6 downto 0);  --Vendor-ID
 
-  signal csr_mvendorid : std_ulogic_vector(14 downto 0);
+  signal csr_mvendorid : std_logic_vector(14 downto 0);
 
-  signal csr_marchid : std_ulogic_vector(XLEN-1 downto 0);  --Architecture ID
-  signal csr_mimpid  : std_ulogic_vector(XLEN-1 downto 0);  --Revision number
-  signal csr_mhartid : std_ulogic_vector(XLEN-1 downto 0);  --Hardware Thread ID
+  signal csr_marchid : std_logic_vector(XLEN-1 downto 0);  --Architecture ID
+  signal csr_mimpid  : std_logic_vector(XLEN-1 downto 0);  --Revision number
+  signal csr_mhartid : std_logic_vector(XLEN-1 downto 0);  --Hardware Thread ID
 
   --Machine Trap Setup
-  signal csr_mstatus_sd   : std_ulogic;
-  signal csr_mstatus_sxl  : std_ulogic_vector(1 downto 0);  --S-Mode XLEN
-  signal csr_mstatus_uxl  : std_ulogic_vector(1 downto 0);  --U-Mode XLEN
+  signal csr_mstatus_sd   : std_logic;
+  signal csr_mstatus_sxl  : std_logic_vector(1 downto 0);  --S-Mode XLEN
+  signal csr_mstatus_uxl  : std_logic_vector(1 downto 0);  --U-Mode XLEN
   --logic  [4      :0] csr_mstatus_vm;   //virtualisation management
-  signal csr_mstatus_tsr  : std_ulogic;
-  signal csr_mstatus_tw   : std_ulogic;
-  signal csr_mstatus_tvm  : std_ulogic;
-  signal csr_mstatus_mxr  : std_ulogic;
-  signal csr_mstatus_sum  : std_ulogic;
-  signal csr_mstatus_mprv : std_ulogic;                     --memory privilege
+  signal csr_mstatus_tsr  : std_logic;
+  signal csr_mstatus_tw   : std_logic;
+  signal csr_mstatus_tvm  : std_logic;
+  signal csr_mstatus_mxr  : std_logic;
+  signal csr_mstatus_sum  : std_logic;
+  signal csr_mstatus_mprv : std_logic;                     --memory privilege
 
-  signal csr_mstatus_xs : std_ulogic_vector(1 downto 0);  --user extension status
-  signal csr_mstatus_fs : std_ulogic_vector(1 downto 0);  --floating point status
+  signal csr_mstatus_xs : std_logic_vector(1 downto 0);  --user extension status
+  signal csr_mstatus_fs : std_logic_vector(1 downto 0);  --floating point status
 
-  signal csr_mstatus_mpp  : std_ulogic_vector(1 downto 0);
-  signal csr_mstatus_hpp  : std_ulogic_vector(1 downto 0);  --previous privilege levels
-  signal csr_mstatus_spp  : std_ulogic;  --supervisor previous privilege level
-  signal csr_mstatus_mpie : std_ulogic;
-  signal csr_mstatus_hpie : std_ulogic;
-  signal csr_mstatus_spie : std_ulogic;
-  signal csr_mstatus_upie : std_ulogic;  --previous interrupt enable bits
-  signal csr_mstatus_mie  : std_ulogic;
-  signal csr_mstatus_hie  : std_ulogic;
-  signal csr_mstatus_sie  : std_ulogic;
-  signal csr_mstatus_uie  : std_ulogic;  --interrupt enable bits (per privilege level) 
+  signal csr_mstatus_mpp  : std_logic_vector(1 downto 0);
+  signal csr_mstatus_hpp  : std_logic_vector(1 downto 0);  --previous privilege levels
+  signal csr_mstatus_spp  : std_logic;  --supervisor previous privilege level
+  signal csr_mstatus_mpie : std_logic;
+  signal csr_mstatus_hpie : std_logic;
+  signal csr_mstatus_spie : std_logic;
+  signal csr_mstatus_upie : std_logic;  --previous interrupt enable bits
+  signal csr_mstatus_mie  : std_logic;
+  signal csr_mstatus_hie  : std_logic;
+  signal csr_mstatus_sie  : std_logic;
+  signal csr_mstatus_uie  : std_logic;  --interrupt enable bits (per privilege level) 
 
-  signal csr_misa_base       : std_ulogic_vector(1 downto 0);  --Machine ISA
-  signal csr_misa_extensions : std_ulogic_vector(25 downto 0);
+  signal csr_misa_base       : std_logic_vector(1 downto 0);  --Machine ISA
+  signal csr_misa_extensions : std_logic_vector(25 downto 0);
 
-  signal csr_mnmivec    : std_ulogic_vector(XLEN-1 downto 0);  --ROALOGIC NMI handler base address
-  signal csr_mtvec      : std_ulogic_vector(XLEN-1 downto 0);  --trap handler base address
-  signal csr_mcounteren : std_ulogic_vector(XLEN-1 downto 0);  --Enable performance counters for lower level
-  signal csr_medeleg    : std_ulogic_vector(XLEN-1 downto 0);  --Exception delegation
-  signal csr_mideleg    : std_ulogic_vector(XLEN-1 downto 0);  --Interrupt delegation
+  signal csr_mnmivec    : std_logic_vector(XLEN-1 downto 0);  --ROALOGIC NMI handler base address
+  signal csr_mtvec      : std_logic_vector(XLEN-1 downto 0);  --trap handler base address
+  signal csr_mcounteren : std_logic_vector(XLEN-1 downto 0);  --Enable performance counters for lower level
+  signal csr_medeleg    : std_logic_vector(XLEN-1 downto 0);  --Exception delegation
+  signal csr_mideleg    : std_logic_vector(XLEN-1 downto 0);  --Interrupt delegation
 
-  signal csr_mtvec_we : std_ulogic_vector(XLEN-1 downto 0);
+  signal csr_mtvec_we : std_logic_vector(XLEN-1 downto 0);
 
-  signal csr_mie_meie : std_ulogic;
-  signal csr_mie_heie : std_ulogic;
-  signal csr_mie_seie : std_ulogic;
-  signal csr_mie_ueie : std_ulogic;
-  signal csr_mie_mtie : std_ulogic;
-  signal csr_mie_htie : std_ulogic;
-  signal csr_mie_stie : std_ulogic;
-  signal csr_mie_utie : std_ulogic;
-  signal csr_mie_msie : std_ulogic;
-  signal csr_mie_hsie : std_ulogic;
-  signal csr_mie_ssie : std_ulogic;
-  signal csr_mie_usie : std_ulogic;
+  signal csr_mie_meie : std_logic;
+  signal csr_mie_heie : std_logic;
+  signal csr_mie_seie : std_logic;
+  signal csr_mie_ueie : std_logic;
+  signal csr_mie_mtie : std_logic;
+  signal csr_mie_htie : std_logic;
+  signal csr_mie_stie : std_logic;
+  signal csr_mie_utie : std_logic;
+  signal csr_mie_msie : std_logic;
+  signal csr_mie_hsie : std_logic;
+  signal csr_mie_ssie : std_logic;
+  signal csr_mie_usie : std_logic;
 
   --interrupt enable
-  signal csr_mie      : std_ulogic_vector(11 downto 0);
+  signal csr_mie      : std_logic_vector(11 downto 0);
   --Machine trap handler
-  signal csr_mscratch : std_ulogic_vector(XLEN-1 downto 0);  --scratch register
-  signal csr_mepc     : std_ulogic_vector(XLEN-1 downto 0);  --exception program counter
-  signal csr_mcause   : std_ulogic_vector(XLEN-1 downto 0);  --trap cause
-  signal csr_mtval    : std_ulogic_vector(XLEN-1 downto 0);  --bad address
+  signal csr_mscratch : std_logic_vector(XLEN-1 downto 0);  --scratch register
+  signal csr_mepc     : std_logic_vector(XLEN-1 downto 0);  --exception program counter
+  signal csr_mcause   : std_logic_vector(XLEN-1 downto 0);  --trap cause
+  signal csr_mtval    : std_logic_vector(XLEN-1 downto 0);  --bad address
 
-  signal csr_mip_meip : std_ulogic;
-  signal csr_mip_heip : std_ulogic;
-  signal csr_mip_seip : std_ulogic;
-  signal csr_mip_ueip : std_ulogic;
-  signal csr_mip_mtip : std_ulogic;
-  signal csr_mip_htip : std_ulogic;
-  signal csr_mip_stip : std_ulogic;
-  signal csr_mip_utip : std_ulogic;
-  signal csr_mip_msip : std_ulogic;
-  signal csr_mip_hsip : std_ulogic;
-  signal csr_mip_ssip : std_ulogic;
-  signal csr_mip_usip : std_ulogic;
+  signal csr_mip_meip : std_logic;
+  signal csr_mip_heip : std_logic;
+  signal csr_mip_seip : std_logic;
+  signal csr_mip_ueip : std_logic;
+  signal csr_mip_mtip : std_logic;
+  signal csr_mip_htip : std_logic;
+  signal csr_mip_stip : std_logic;
+  signal csr_mip_utip : std_logic;
+  signal csr_mip_msip : std_logic;
+  signal csr_mip_hsip : std_logic;
+  signal csr_mip_ssip : std_logic;
+  signal csr_mip_usip : std_logic;
 
   --interrupt pending
-  signal csr_mip     : std_ulogic_vector(11 downto 0);
+  signal csr_mip     : std_logic_vector(11 downto 0);
   --Machine protection and Translation
   signal csr_pmpcfg  : M_PMP_CNT_7;
   signal csr_pmpaddr : M_PMP_CNT_PLEN;
 
   --Machine counters/Timers
-  signal csr_mcycle_h : std_ulogic_vector(31 downto 0);  --timer for MCYCLE
-  signal csr_mcycle_l : std_ulogic_vector(31 downto 0);  --timer for MCYCLE
+  signal csr_mcycle_h : std_logic_vector(31 downto 0);  --timer for MCYCLE
+  signal csr_mcycle_l : std_logic_vector(31 downto 0);  --timer for MCYCLE
 
-  signal csr_mcycle : std_ulogic_vector(63 downto 0);
+  signal csr_mcycle : std_logic_vector(63 downto 0);
 
-  signal csr_minstret_h : std_ulogic_vector(31 downto 0);  --instruction retire count for MINSTRET
-  signal csr_minstret_l : std_ulogic_vector(31 downto 0);  --instruction retire count for MINSTRET
+  signal csr_minstret_h : std_logic_vector(31 downto 0);  --instruction retire count for MINSTRET
+  signal csr_minstret_l : std_logic_vector(31 downto 0);  --instruction retire count for MINSTRET
 
-  signal csr_minstret : std_ulogic_vector(63 downto 0);
+  signal csr_minstret : std_logic_vector(63 downto 0);
 
-  signal is_rv32    : std_ulogic;
-  signal is_rv32e_s : std_ulogic;
-  signal is_rv64    : std_ulogic;
-  signal is_rv128   : std_ulogic;
-  signal has_rvc_s  : std_ulogic;
-  signal has_fpu_s  : std_ulogic;
-  signal has_fpud   : std_ulogic;
-  signal has_fpuq   : std_ulogic;
-  signal has_decfpu : std_ulogic;
-  signal has_mmu_s  : std_ulogic;
-  signal has_muldiv : std_ulogic;
-  signal has_amo    : std_ulogic;
-  signal has_bm     : std_ulogic;
-  signal has_tmem   : std_ulogic;
-  signal has_simd   : std_ulogic;
-  signal has_n      : std_ulogic;
-  signal has_u      : std_ulogic;
-  signal has_s      : std_ulogic;
-  signal has_h      : std_ulogic;
-  signal has_ext_s  : std_ulogic;
+  signal is_rv32    : std_logic;
+  signal is_rv32e_s : std_logic;
+  signal is_rv64    : std_logic;
+  signal is_rv128   : std_logic;
+  signal has_rvc_s  : std_logic;
+  signal has_fpu_s  : std_logic;
+  signal has_fpud   : std_logic;
+  signal has_fpuq   : std_logic;
+  signal has_decfpu : std_logic;
+  signal has_mmu_s  : std_logic;
+  signal has_muldiv : std_logic;
+  signal has_amo    : std_logic;
+  signal has_bm     : std_logic;
+  signal has_tmem   : std_logic;
+  signal has_simd   : std_logic;
+  signal has_n      : std_logic;
+  signal has_u      : std_logic;
+  signal has_s      : std_logic;
+  signal has_h      : std_logic;
+  signal has_ext_s  : std_logic;
 
-  signal mstatus_s  : std_ulogic_vector(127 downto 0);  --mstatus_s is special (can be larger than 32bits)
-  signal uxl_wval : std_ulogic_vector(1 downto 0);  --u/sxl are taken from bits 35:32
-  signal sxl_wval : std_ulogic_vector(1 downto 0);  --and can only have limited values
+  signal mstatus_s  : std_logic_vector(127 downto 0);  --mstatus_s is special (can be larger than 32bits)
+  signal uxl_wval : std_logic_vector(1 downto 0);  --u/sxl are taken from bits 35:32
+  signal sxl_wval : std_logic_vector(1 downto 0);  --and can only have limited values
 
-  signal soft_seip : std_ulogic;  --software supervisor-external-interrupt
-  signal soft_ueip : std_ulogic;         --software user-external-interrupt
+  signal soft_seip : std_logic;  --software supervisor-external-interrupt
+  signal soft_ueip : std_logic;         --software user-external-interrupt
 
-  signal take_interrupt : std_ulogic;
+  signal take_interrupt : std_logic;
 
-  signal st_int          : std_ulogic_vector(11 downto 0);
-  signal interrupt_cause : std_ulogic_vector(3 downto 0);
-  signal trap_cause      : std_ulogic_vector(3 downto 0);
+  signal st_int          : std_logic_vector(11 downto 0);
+  signal interrupt_cause : std_logic_vector(3 downto 0);
+  signal trap_cause      : std_logic_vector(3 downto 0);
 
   --Mux for debug-unit
-  signal csr_raddr : std_ulogic_vector(11 downto 0);      --CSR read address
-  signal csr_wval  : std_ulogic_vector(XLEN-1 downto 0);  --CSR write value
+  signal csr_raddr : std_logic_vector(11 downto 0);      --CSR read address
+  signal csr_wval  : std_logic_vector(XLEN-1 downto 0);  --CSR write value
 
-  signal st_prv_sgn : std_ulogic_vector(1 downto 0);  --Privilege level
+  signal st_prv_sgn : std_logic_vector(1 downto 0);  --Privilege level
 
 begin
   --//////////////////////////////////////////////////////////////
@@ -520,7 +520,7 @@ begin
         end if;
       --Supervisor
       when SSTATUS =>
-        st_csr_rval <= (mstatus_s(127) & mstatus_s(XLEN-2 downto 0)) and (std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or std_ulogic_vector(to_unsigned(1, XLEN) sll 32) or X"00000000000DE133");
+        st_csr_rval <= (mstatus_s(127) & mstatus_s(XLEN-2 downto 0)) and (std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or std_logic_vector(to_unsigned(1, XLEN) sll 32) or X"00000000000DE133");
       when STVEC =>
         if (has_s = '1') then
           st_csr_rval <= csr_stvec;
@@ -732,14 +732,14 @@ begin
   --additional extensions
   csr_misa_extensions <= ('0' & '0' & has_ext_s & '0' & '0' & has_u & has_tmem & has_s & '0' & has_fpuq & has_simd & '0' & has_n & has_muldiv & has_decfpu & '0' & '0' & not is_rv32e_s & '0' & '0' & has_fpu_s & is_rv32e_s & has_fpud & has_rvc_s & has_bm & has_amo);
 
-  csr_mvendorid_bank       <= std_ulogic_vector(to_unsigned(JEDEC_BANK-1, 8));
+  csr_mvendorid_bank       <= std_logic_vector(to_unsigned(JEDEC_BANK-1, 8));
   csr_mvendorid_offset     <= JEDEC_MANUFACTURER_ID(6 downto 0);
-  csr_marchid              <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or std_ulogic_vector(to_unsigned(ARCHID, XLEN));
-  csr_mimpid(31 downto 24) <= std_ulogic_vector(to_unsigned(REVPRV_MAJOR, 8));
-  csr_mimpid(23 downto 16) <= std_ulogic_vector(to_unsigned(REVPRV_MINOR, 8));
-  csr_mimpid(15 downto 8)  <= std_ulogic_vector(to_unsigned(REVUSR_MAJOR, 8));
-  csr_mimpid(7 downto 0)   <= std_ulogic_vector(to_unsigned(REVUSR_MINOR, 8));
-  csr_mhartid              <= std_ulogic_vector(to_unsigned(HARTID, XLEN));
+  csr_marchid              <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or std_logic_vector(to_unsigned(ARCHID, XLEN));
+  csr_mimpid(31 downto 24) <= std_logic_vector(to_unsigned(REVPRV_MAJOR, 8));
+  csr_mimpid(23 downto 16) <= std_logic_vector(to_unsigned(REVPRV_MINOR, 8));
+  csr_mimpid(15 downto 8)  <= std_logic_vector(to_unsigned(REVUSR_MAJOR, 8));
+  csr_mimpid(7 downto 0)   <= std_logic_vector(to_unsigned(REVUSR_MINOR, 8));
+  csr_mhartid              <= std_logic_vector(to_unsigned(HARTID, XLEN));
 
   --mstatus_s
   csr_mstatus_sd <= reduce_and(csr_mstatus_fs) or reduce_and(csr_mstatus_xs);
@@ -1026,10 +1026,10 @@ begin
         --Check if interrupts are delegated
         if (has_n = '1' and st_prv_sgn = PRV_U and (st_int and csr_mideleg(11 downto 0) and X"111") = X"111") then
           st_prv_sgn <= PRV_U;
-          st_nxt_pc <= std_ulogic_vector(unsigned(csr_utvec and not std_ulogic_vector(to_unsigned(3, XLEN))) + unsigned(csr_utvec_we));
+          st_nxt_pc <= std_logic_vector(unsigned(csr_utvec and not std_logic_vector(to_unsigned(3, XLEN))) + unsigned(csr_utvec_we));
 
           if (csr_utvec(0) = '1') then
-            csr_utvec_we <= (XLEN-1 downto 4 => '0') & std_ulogic_vector(unsigned(interrupt_cause) sll 2);
+            csr_utvec_we <= (XLEN-1 downto 4 => '0') & std_logic_vector(unsigned(interrupt_cause) sll 2);
           else
             csr_utvec_we <= (others => '0');
           end if;
@@ -1038,10 +1038,10 @@ begin
           csr_mstatus_uie  <= '0';
         elsif (has_s = '1' and st_prv_sgn >= PRV_S and (st_int and csr_mideleg(11 downto 0) and X"333") = X"111") then
           st_prv_sgn <= PRV_S;
-          st_nxt_pc <= std_ulogic_vector(unsigned(csr_stvec and not std_ulogic_vector(to_unsigned(3, XLEN))) + unsigned(csr_stvec_we));
+          st_nxt_pc <= std_logic_vector(unsigned(csr_stvec and not std_logic_vector(to_unsigned(3, XLEN))) + unsigned(csr_stvec_we));
 
           if (csr_stvec(0) = '1') then
-            csr_stvec_we <= (XLEN-1 downto 4 => '0') & std_ulogic_vector(unsigned(interrupt_cause) sll 2);
+            csr_stvec_we <= (XLEN-1 downto 4 => '0') & std_logic_vector(unsigned(interrupt_cause) sll 2);
           else
             csr_stvec_we <= (others => '0');
           end if;
@@ -1059,10 +1059,10 @@ begin
 --          csr_mstatus_hpp  <= st_prv_sgn;
 --        end
           st_prv_sgn <= PRV_M;
-          st_nxt_pc <= std_ulogic_vector(unsigned(csr_mtvec and not std_ulogic_vector(to_unsigned(3, XLEN))) + unsigned(csr_mtvec_we));
+          st_nxt_pc <= std_logic_vector(unsigned(csr_mtvec and not std_logic_vector(to_unsigned(3, XLEN))) + unsigned(csr_mtvec_we));
 
           if (csr_mtvec(0) = '1') then
-            csr_mtvec_we <=  (XLEN-1 downto 4 => '0') & std_ulogic_vector(unsigned(interrupt_cause) sll 2);
+            csr_mtvec_we <=  (XLEN-1 downto 4 => '0') & std_logic_vector(unsigned(interrupt_cause) sll 2);
           else
             csr_mtvec_we <= (others => '0');
           end if;
@@ -1121,7 +1121,7 @@ begin
         elsif ((ex_csr_we = '1' and ex_csr_reg = MCYCLEH and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MCYCLEH)) then
           csr_mcycle_h <= csr_wval(31 downto 0);
         else
-          csr_mcycle <= std_ulogic_vector(unsigned(csr_mcycle)+X"0000000000000001");
+          csr_mcycle <= std_logic_vector(unsigned(csr_mcycle)+X"0000000000000001");
         end if;
         --instruction retire counter
         if ((ex_csr_we = '1' and ex_csr_reg = MINSTRET and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MINSTRET)) then
@@ -1129,7 +1129,7 @@ begin
         elsif ((ex_csr_we = '1' and ex_csr_reg = MINSTRETH and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MINSTRETH)) then
           csr_minstret_h <= csr_wval(31 downto 0);
         elsif (wb_bubble = '0') then
-          csr_minstret <= std_ulogic_vector(unsigned(csr_minstret)+X"0000000000000001");
+          csr_minstret <= std_logic_vector(unsigned(csr_minstret)+X"0000000000000001");
         end if;
       end if;
     end process;
@@ -1144,13 +1144,13 @@ begin
           if ((ex_csr_we = '1' and ex_csr_reg = MCYCLE and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MCYCLE)) then
             csr_mcycle <= csr_wval(63 downto 0);
           else
-            csr_mcycle <= std_ulogic_vector(unsigned(csr_mcycle)+X"0000000000000001");
+            csr_mcycle <= std_logic_vector(unsigned(csr_mcycle)+X"0000000000000001");
           end if;
           --instruction retire counter
           if ((ex_csr_we = '1' and ex_csr_reg = MINSTRET and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MINSTRET)) then
             csr_minstret <= csr_wval(63 downto 0);
           elsif (wb_bubble = '0') then
-            csr_minstret <= std_ulogic_vector(unsigned(csr_minstret)+X"0000000000000001");
+            csr_minstret <= std_logic_vector(unsigned(csr_minstret)+X"0000000000000001");
           end if;
         end if;
       end process;
@@ -1380,35 +1380,35 @@ begin
 
   --interrupt cause priority
   processing_13 : process (du_ie, st_int)
-    variable state : std_ulogic_vector(11 downto 0);
+    variable state : std_logic_vector(11 downto 0);
   begin
     case (state) is
       when X"001" =>
-        interrupt_cause <= std_ulogic_vector(to_unsigned(00, 4));
+        interrupt_cause <= std_logic_vector(to_unsigned(00, 4));
       when X"002" =>
-        interrupt_cause <= std_ulogic_vector(to_unsigned(01, 4));
+        interrupt_cause <= std_logic_vector(to_unsigned(01, 4));
       when X"004" =>
-        interrupt_cause <= std_ulogic_vector(to_unsigned(02, 4));
+        interrupt_cause <= std_logic_vector(to_unsigned(02, 4));
       when X"008" =>
-        interrupt_cause <= std_ulogic_vector(to_unsigned(03, 4));
+        interrupt_cause <= std_logic_vector(to_unsigned(03, 4));
       when X"010" =>
-        interrupt_cause <= std_ulogic_vector(to_unsigned(04, 4));
+        interrupt_cause <= std_logic_vector(to_unsigned(04, 4));
       when X"020" =>
-        interrupt_cause <= std_ulogic_vector(to_unsigned(05, 4));
+        interrupt_cause <= std_logic_vector(to_unsigned(05, 4));
       when X"040" =>
-        interrupt_cause <= std_ulogic_vector(to_unsigned(06, 4));
+        interrupt_cause <= std_logic_vector(to_unsigned(06, 4));
       when X"080" =>
-        interrupt_cause <= std_ulogic_vector(to_unsigned(07, 4));
+        interrupt_cause <= std_logic_vector(to_unsigned(07, 4));
       when X"100" =>
-        interrupt_cause <= std_ulogic_vector(to_unsigned(08, 4));
+        interrupt_cause <= std_logic_vector(to_unsigned(08, 4));
       when X"200" =>
-        interrupt_cause <= std_ulogic_vector(to_unsigned(09, 4));
+        interrupt_cause <= std_logic_vector(to_unsigned(09, 4));
       when X"400" =>
-        interrupt_cause <= std_ulogic_vector(to_unsigned(10, 4));
+        interrupt_cause <= std_logic_vector(to_unsigned(10, 4));
       when X"800" =>
-        interrupt_cause <= std_ulogic_vector(to_unsigned(11, 4));
+        interrupt_cause <= std_logic_vector(to_unsigned(11, 4));
       when others =>
-        interrupt_cause <= std_ulogic_vector(to_unsigned(00, 4));
+        interrupt_cause <= std_logic_vector(to_unsigned(00, 4));
     end case;
     state := st_int and not du_ie(31 downto 20);
   end process;
@@ -1496,22 +1496,22 @@ begin
           csr_mepc <= id_pc;
         end if;
 
-        csr_mcause <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or (csr_mcause'range => '0');  --Implementation dependent. '0' indicates 'unknown cause'
+        csr_mcause <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or (csr_mcause'range => '0');  --Implementation dependent. '0' indicates 'unknown cause'
       elsif (take_interrupt = '1') then
         st_interrupt <= '1';
         --Check if interrupts are delegated
         if (has_n = '1' and st_prv_sgn = PRV_U and (st_int and csr_mideleg(11 downto 0) and X"111") = X"111") then
-          csr_ucause <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or ((XLEN-1 downto 4 => '0') & interrupt_cause);
+          csr_ucause <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or ((XLEN-1 downto 4 => '0') & interrupt_cause);
           csr_uepc   <= id_pc;
         elsif (has_s = '1' and st_prv_sgn >= PRV_S and (st_int and csr_mideleg(11 downto 0) and X"333") = X"111") then
-          csr_scause <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or ((XLEN-1 downto 4 => '0') & interrupt_cause);
+          csr_scause <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or ((XLEN-1 downto 4 => '0') & interrupt_cause);
           csr_sepc   <= id_pc;
         else                            --
 --        else if (has_h && st_prv_sgn >= PRV_H && (st_int & csr_mideleg & 12'h777) ) begin
 --          csr_hcause <= (1 << (XLEN-1)) | interrupt_cause;
 --          csr_hepc   <= id_pc;
 --        end
-          csr_mcause <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or ((XLEN-1 downto 4 => '0') & interrupt_cause);
+          csr_mcause <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or ((XLEN-1 downto 4 => '0') & interrupt_cause);
           csr_mepc   <= id_pc;
         end if;
       elsif (reduce_or(wb_exception and not du_ie(15 downto 0)) = '1') then
@@ -1635,7 +1635,7 @@ begin
             if (rstn = '0') then
               csr_pmpaddr(idx) <= (others => '0');
             elsif (rising_edge(clk)) then
-              if ((ex_csr_we = '1' and ex_csr_reg = std_ulogic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)) and st_prv_sgn = PRV_M and csr_pmpcfg(idx)(7) = '0') or (du_we_csr = '1' and du_addr = std_ulogic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)))) then
+              if ((ex_csr_we = '1' and ex_csr_reg = std_logic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)) and st_prv_sgn = PRV_M and csr_pmpcfg(idx)(7) = '0') or (du_we_csr = '1' and du_addr = std_logic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)))) then
                 csr_pmpaddr(idx) <= ((XLEN-1 downto 54 => '0') & csr_wval(53 downto 0));
               end if;
             end if;
@@ -1646,7 +1646,7 @@ begin
             if (rstn = '0') then
               csr_pmpaddr(idx) <= (others => '0');
             elsif (rising_edge(clk)) then
-              if ((ex_csr_we = '1' and ex_csr_reg = std_ulogic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)) and st_prv_sgn = PRV_M and csr_pmpcfg(idx)(7) = '0' and (csr_pmpcfg(idx+1)(4 downto 3) /= TOR and csr_pmpcfg(idx+1)(7) = '1')) or (du_we_csr = '1' and du_addr = std_ulogic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)))) then
+              if ((ex_csr_we = '1' and ex_csr_reg = std_logic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)) and st_prv_sgn = PRV_M and csr_pmpcfg(idx)(7) = '0' and (csr_pmpcfg(idx+1)(4 downto 3) /= TOR and csr_pmpcfg(idx+1)(7) = '1')) or (du_we_csr = '1' and du_addr = std_logic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)))) then
                 csr_pmpaddr(idx) <= ((XLEN-1 downto 54 => '0') & csr_wval(53 downto 0));
               end if;
             end if;
@@ -1731,7 +1731,7 @@ begin
             if (rstn = '0') then
               csr_pmpaddr(idx) <= (others => '0');
             elsif (rising_edge(clk)) then
-              if ((ex_csr_we = '1' and ex_csr_reg = std_ulogic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)) and st_prv_sgn = PRV_M and csr_pmpcfg(idx)(7) = '0') or (du_we_csr = '1' and du_addr = std_ulogic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)))) then
+              if ((ex_csr_we = '1' and ex_csr_reg = std_logic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)) and st_prv_sgn = PRV_M and csr_pmpcfg(idx)(7) = '0') or (du_we_csr = '1' and du_addr = std_logic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)))) then
                 csr_pmpaddr(idx) <= csr_wval;
               end if;
             end if;
@@ -1742,7 +1742,7 @@ begin
             if (rstn = '0') then
               csr_pmpaddr(idx) <= (others => '0');
             elsif (rising_edge(clk)) then
-              if ((ex_csr_we = '1' and ex_csr_reg = std_ulogic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)) and st_prv_sgn = PRV_M and csr_pmpcfg(idx)(7) = '0' and (csr_pmpcfg(idx+1)(4 downto 3) /= TOR and csr_pmpcfg(idx+1)(7) = '1')) or (du_we_csr = '1' and du_addr = std_ulogic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)))) then
+              if ((ex_csr_we = '1' and ex_csr_reg = std_logic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)) and st_prv_sgn = PRV_M and csr_pmpcfg(idx)(7) = '0' and (csr_pmpcfg(idx+1)(4 downto 3) /= TOR and csr_pmpcfg(idx+1)(7) = '1')) or (du_we_csr = '1' and du_addr = std_logic_vector(unsigned(PMPADDR0)+to_unsigned(idx, 12)))) then
                 csr_pmpaddr(idx) <= csr_wval;
               end if;
             end if;
@@ -1794,7 +1794,7 @@ begin
         csr_sedeleg <= (others => '0');
       elsif (rising_edge(clk)) then
         if ((ex_csr_we = '1' and ex_csr_reg = SEDELEG and st_prv_sgn >= PRV_S) or (du_we_csr = '1' and du_addr = SEDELEG)) then
-          csr_sedeleg <= csr_wval and (std_ulogic_vector(to_unsigned(2**CAUSE_UMODE_ECALL, XLEN)) or std_ulogic_vector(to_unsigned(2**CAUSE_SMODE_ECALL, XLEN)));
+          csr_sedeleg <= csr_wval and (std_logic_vector(to_unsigned(2**CAUSE_UMODE_ECALL, XLEN)) or std_logic_vector(to_unsigned(2**CAUSE_SMODE_ECALL, XLEN)));
         end if;
       end if;
     end process;

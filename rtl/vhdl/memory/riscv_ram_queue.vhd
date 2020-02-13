@@ -56,25 +56,25 @@ entity riscv_ram_queue is
     ALMOST_EMPTY_THRESHOLD : integer := 0
   );
   port (
-    rst_ni : in std_ulogic;  --asynchronous, active low reset
-    clk_i  : in std_ulogic;  --rising edge triggered clock
+    rst_ni : in std_logic;  --asynchronous, active low reset
+    clk_i  : in std_logic;  --rising edge triggered clock
 
-    clr_i : in std_ulogic;  --clear all queue entries (synchronous reset)
-    ena_i : in std_ulogic;  --clock enable
+    clr_i : in std_logic;  --clear all queue entries (synchronous reset)
+    ena_i : in std_logic;  --clock enable
 
     --Queue Write
-    we_i : in std_ulogic;                           --Queue write enable
-    d_i  : in std_ulogic_vector(DBITS-1 downto 0);  --Queue write data
+    we_i : in std_logic;                           --Queue write enable
+    d_i  : in std_logic_vector(DBITS-1 downto 0);  --Queue write data
 
     --Queue Read
-    re_i : in  std_ulogic;                           --Queue read enable
-    q_o  : out std_ulogic_vector(DBITS-1 downto 0);  --Queue read data
+    re_i : in  std_logic;                           --Queue read enable
+    q_o  : out std_logic_vector(DBITS-1 downto 0);  --Queue read data
 
     --Status signals
-    empty_o        : out std_ulogic;  --Queue is empty
-    full_o         : out std_ulogic;  --Queue is full
-    almost_empty_o : out std_ulogic;  --Programmable almost empty
-    almost_full_o  : out std_ulogic   --Programmable almost full
+    empty_o        : out std_logic;  --Queue is empty
+    full_o         : out std_logic;  --Queue is full
+    almost_empty_o : out std_logic;  --Programmable almost empty
+    almost_full_o  : out std_logic   --Programmable almost full
   );
 end riscv_ram_queue;
 
@@ -85,7 +85,7 @@ architecture RTL of riscv_ram_queue is
   --
   function to_stdlogic (
     input : boolean
-  ) return std_ulogic is
+  ) return std_logic is
   begin
     if input then
       return('1');
@@ -98,7 +98,7 @@ architecture RTL of riscv_ram_queue is
   --
   -- Constants
   --
-  type M_DEPTH_DBITS is array (DEPTH-1 downto 0) of std_ulogic_vector(DBITS-1 downto 0);
+  type M_DEPTH_DBITS is array (DEPTH-1 downto 0) of std_logic_vector(DBITS-1 downto 0);
 
   --////////////////////////////////////////////////////////////////
   --
@@ -114,8 +114,8 @@ architecture RTL of riscv_ram_queue is
   -- Variables
   --
   signal queue_data : M_DEPTH_DBITS;
-  signal queue_xadr : std_ulogic_vector(integer(log2(real(DEPTH)))-1 downto 0);
-  signal queue_wadr : std_ulogic_vector(integer(log2(real(DEPTH)))-1 downto 0);
+  signal queue_xadr : std_logic_vector(integer(log2(real(DEPTH)))-1 downto 0);
+  signal queue_wadr : std_logic_vector(integer(log2(real(DEPTH)))-1 downto 0);
 
 begin
   --////////////////////////////////////////////////////////////////
@@ -125,7 +125,7 @@ begin
 
   --Write Address
   processing_0 : process (clk_i, rst_ni)
-    variable were : std_ulogic_vector(1 downto 0);
+    variable were : std_logic_vector(1 downto 0);
   begin
     if (rst_ni = '0') then
       queue_wadr <= X"0";
@@ -136,9 +136,9 @@ begin
         were := we_i & re_i;
         case (were) is
           when "01" =>
-            queue_wadr <= std_ulogic_vector(unsigned(queue_wadr)-(queue_wadr'range => '1'));
+            queue_wadr <= std_logic_vector(unsigned(queue_wadr)-(queue_wadr'range => '1'));
           when "10" =>
-            queue_wadr <= std_ulogic_vector(unsigned(queue_wadr)+(queue_wadr'range => '1'));
+            queue_wadr <= std_logic_vector(unsigned(queue_wadr)+(queue_wadr'range => '1'));
           when others =>
             null;
         end case;
@@ -146,12 +146,12 @@ begin
     end if;
   end process;
 
-  queue_xadr <= std_ulogic_vector(to_unsigned(DEPTH-1, integer(log2(real(DEPTH)))))
-                when (queue_wadr = (queue_wadr'range => '0')) else std_ulogic_vector(unsigned(queue_wadr)-(queue_wadr'range => '1'));
+  queue_xadr <= std_logic_vector(to_unsigned(DEPTH-1, integer(log2(real(DEPTH)))))
+                when (queue_wadr = (queue_wadr'range => '0')) else std_logic_vector(unsigned(queue_wadr)-(queue_wadr'range => '1'));
 
   --Queue Data
   processing_1 : process (clk_i, rst_ni)
-    variable were : std_ulogic_vector(1 downto 0);
+    variable were : std_logic_vector(1 downto 0);
   begin
     if (rising_edge(clk_i) or falling_edge(rst_ni)) then
       if (rst_ni = '0' or clr_i = '1') then
@@ -182,7 +182,7 @@ begin
 
   --Queue Almost Empty
   processing_2 : process (clk_i, rst_ni)
-    variable were : std_ulogic_vector(1 downto 0);
+    variable were : std_logic_vector(1 downto 0);
   begin
     if (rst_ni = '0') then
       almost_empty_o <= '1';
@@ -193,9 +193,9 @@ begin
         were := we_i & re_i;
         case (were) is
           when "01" =>
-            almost_empty_o <= to_stdlogic(queue_wadr <= std_ulogic_vector(to_unsigned(ALMOST_EMPTY_THRESHOLD_CHECK, integer(log2(real(DEPTH))))));
+            almost_empty_o <= to_stdlogic(queue_wadr <= std_logic_vector(to_unsigned(ALMOST_EMPTY_THRESHOLD_CHECK, integer(log2(real(DEPTH))))));
           when "10" =>
-            almost_empty_o <= not to_stdlogic(queue_wadr > std_ulogic_vector(to_unsigned(ALMOST_EMPTY_THRESHOLD_CHECK, integer(log2(real(DEPTH))))));
+            almost_empty_o <= not to_stdlogic(queue_wadr > std_logic_vector(to_unsigned(ALMOST_EMPTY_THRESHOLD_CHECK, integer(log2(real(DEPTH))))));
           when others =>
             null;
         end case;
@@ -205,7 +205,7 @@ begin
 
   --Queue Empty
   processing_3 : process (clk_i, rst_ni)
-    variable were : std_ulogic_vector(1 downto 0);
+    variable were : std_logic_vector(1 downto 0);
   begin
     if (rst_ni = '0') then
       empty_o <= '1';
@@ -216,7 +216,7 @@ begin
         were := we_i & re_i;
         case (were) is
           when "01" =>
-            empty_o <= to_stdlogic(queue_wadr = std_ulogic_vector(to_unsigned(EMPTY_THRESHOLD, integer(log2(real(DEPTH))))));
+            empty_o <= to_stdlogic(queue_wadr = std_logic_vector(to_unsigned(EMPTY_THRESHOLD, integer(log2(real(DEPTH))))));
           when "10" =>
             empty_o <= '0';
           when others =>
@@ -228,7 +228,7 @@ begin
 
   --Queue Almost Full
   processing_4 : process (clk_i, rst_ni)
-    variable were : std_ulogic_vector(1 downto 0);
+    variable were : std_logic_vector(1 downto 0);
   begin
     if (rst_ni = '0') then
       almost_full_o <= '0';
@@ -239,9 +239,9 @@ begin
         were := we_i & re_i;
         case (were) is
           when "01" =>
-            almost_full_o <= not to_stdlogic(queue_wadr < std_ulogic_vector(to_unsigned(ALMOST_FULL_THRESHOLD_CHECK, integer(log2(real(DEPTH))))));
+            almost_full_o <= not to_stdlogic(queue_wadr < std_logic_vector(to_unsigned(ALMOST_FULL_THRESHOLD_CHECK, integer(log2(real(DEPTH))))));
           when "10" =>
-            almost_full_o <= to_stdlogic(queue_wadr >= std_ulogic_vector(to_unsigned(ALMOST_FULL_THRESHOLD_CHECK, integer(log2(real(DEPTH))))));
+            almost_full_o <= to_stdlogic(queue_wadr >= std_logic_vector(to_unsigned(ALMOST_FULL_THRESHOLD_CHECK, integer(log2(real(DEPTH))))));
           when others =>
             null;
         end case;
@@ -251,7 +251,7 @@ begin
 
   --Queue Full
   processing_5 : process (clk_i, rst_ni)
-    variable were : std_ulogic_vector(1 downto 0);
+    variable were : std_logic_vector(1 downto 0);
   begin
     if (rst_ni = '0') then
       full_o <= '0';
@@ -264,7 +264,7 @@ begin
           when "01" =>
             full_o <= '0';
           when "10" =>
-            full_o <= to_stdlogic(queue_wadr = std_ulogic_vector(to_unsigned(FULL_THRESHOLD, integer(log2(real(DEPTH))))));
+            full_o <= to_stdlogic(queue_wadr = std_logic_vector(to_unsigned(FULL_THRESHOLD, integer(log2(real(DEPTH))))));
           when others =>
             null;
         end case;

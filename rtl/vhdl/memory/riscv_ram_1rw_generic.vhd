@@ -53,14 +53,14 @@ entity riscv_ram_1rw_generic is
     DBITS : integer := 32
   );
   port (
-    rst_ni : in std_ulogic;
-    clk_i  : in std_ulogic;
+    rst_ni : in std_logic;
+    clk_i  : in std_logic;
 
-    addr_i : in  std_ulogic_vector(ABITS-1 downto 0);
-    we_i   : in  std_ulogic;
-    be_i   : in  std_ulogic_vector((DBITS+7)/8-1 downto 0);
-    din_i  : in  std_ulogic_vector(DBITS-1 downto 0);
-    dout_o : out std_ulogic_vector(DBITS-1 downto 0)
+    addr_i : in  std_logic_vector(ABITS-1 downto 0);
+    we_i   : in  std_logic;
+    be_i   : in  std_logic_vector((DBITS+7)/8-1 downto 0);
+    din_i  : in  std_logic_vector(DBITS-1 downto 0);
+    dout_o : out std_logic_vector(DBITS-1 downto 0)
   );
 end riscv_ram_1rw_generic;
 
@@ -69,14 +69,14 @@ architecture RTL of riscv_ram_1rw_generic is
   --
   -- Types
   --
-  type type_mem_array is array (2**ABITS-1 downto 0) of std_ulogic_vector(DBITS-1 downto 0);  --memory array
+  type type_mem_array is array (2**ABITS-1 downto 0) of std_logic_vector(DBITS-1 downto 0);  --memory array
 
   --////////////////////////////////////////////////////////////////
   --
   -- Variables
   --
   signal mem_array : type_mem_array;  --memory array
-  signal addr_reg  : std_ulogic_vector(ABITS-1 downto 0);  --latched read address
+  signal addr_reg  : std_logic_vector(ABITS-1 downto 0);  --latched read address
 
 begin
   --////////////////////////////////////////////////////////////////

@@ -63,39 +63,39 @@ entity riscv_icache_core is
     TECHNOLOGY : string := "GENERIC"
   );
   port (
-    rst_ni : in std_ulogic;
-    clk_i  : in std_ulogic;
-    clr_i  : in std_ulogic;  --clear any pending request
+    rst_ni : in std_logic;
+    clk_i  : in std_logic;
+    clr_i  : in std_logic;  --clear any pending request
 
     --CPU side
-    mem_vreq_i : in  std_ulogic;
-    mem_preq_i : in  std_ulogic;
-    mem_vadr_i : in  std_ulogic_vector(XLEN-1 downto 0);
-    mem_padr_i : in  std_ulogic_vector(PLEN-1 downto 0);
-    mem_size_i : in  std_ulogic_vector(2 downto 0);
-    mem_lock_i : in  std_ulogic;
-    mem_prot_i : in  std_ulogic_vector(2 downto 0);
-    mem_q_o    : out std_ulogic_vector(PARCEL_SIZE-1 downto 0);
-    mem_ack_o  : out std_ulogic;
-    mem_err_o  : out std_ulogic;
-    flush_i    : in  std_ulogic;
-    flushrdy_i : in  std_ulogic;
+    mem_vreq_i : in  std_logic;
+    mem_preq_i : in  std_logic;
+    mem_vadr_i : in  std_logic_vector(XLEN-1 downto 0);
+    mem_padr_i : in  std_logic_vector(PLEN-1 downto 0);
+    mem_size_i : in  std_logic_vector(2 downto 0);
+    mem_lock_i : in  std_logic;
+    mem_prot_i : in  std_logic_vector(2 downto 0);
+    mem_q_o    : out std_logic_vector(PARCEL_SIZE-1 downto 0);
+    mem_ack_o  : out std_logic;
+    mem_err_o  : out std_logic;
+    flush_i    : in  std_logic;
+    flushrdy_i : in  std_logic;
 
     --To BIU
-    biu_stb_o     : out std_ulogic;  --access request
-    biu_stb_ack_i : in  std_ulogic;  --access acknowledge
-    biu_d_ack_i   : in  std_ulogic;  --BIU needs new data (biu_d_o)
-    biu_adri_o    : out std_ulogic_vector(PLEN-1 downto 0);  --access start address
-    biu_adro_i    : in  std_ulogic_vector(PLEN-1 downto 0);
-    biu_size_o    : out std_ulogic_vector(2 downto 0);  --transfer size
-    biu_type_o    : out std_ulogic_vector(2 downto 0);  --burst type
-    biu_lock_o    : out std_ulogic;  --locked transfer
-    biu_prot_o    : out std_ulogic_vector(2 downto 0);  --protection bits
-    biu_we_o      : out std_ulogic;  --write enable
-    biu_d_o       : out std_ulogic_vector(XLEN-1 downto 0);  --write data
-    biu_q_i       : in  std_ulogic_vector(XLEN-1 downto 0);  --read data
-    biu_ack_i     : in  std_ulogic;  --transfer acknowledge
-    biu_err_i     : in  std_ulogic  --transfer error
+    biu_stb_o     : out std_logic;  --access request
+    biu_stb_ack_i : in  std_logic;  --access acknowledge
+    biu_d_ack_i   : in  std_logic;  --BIU needs new data (biu_d_o)
+    biu_adri_o    : out std_logic_vector(PLEN-1 downto 0);  --access start address
+    biu_adro_i    : in  std_logic_vector(PLEN-1 downto 0);
+    biu_size_o    : out std_logic_vector(2 downto 0);  --transfer size
+    biu_type_o    : out std_logic_vector(2 downto 0);  --burst type
+    biu_lock_o    : out std_logic;  --locked transfer
+    biu_prot_o    : out std_logic_vector(2 downto 0);  --protection bits
+    biu_we_o      : out std_logic;  --write enable
+    biu_d_o       : out std_logic_vector(XLEN-1 downto 0);  --write data
+    biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --read data
+    biu_ack_i     : in  std_logic;  --transfer acknowledge
+    biu_err_i     : in  std_logic  --transfer error
   );
 end riscv_icache_core;
 
@@ -107,14 +107,14 @@ architecture RTL of riscv_icache_core is
       TECHNOLOGY : string := "GENERIC"
     );
     port (
-      rst_ni : in std_ulogic;
-      clk_i  : in std_ulogic;
+      rst_ni : in std_logic;
+      clk_i  : in std_logic;
 
-      addr_i : in  std_ulogic_vector(ABITS-1 downto 0);
-      we_i   : in  std_ulogic;
-      be_i   : in  std_ulogic_vector((DBITS+7)/8-1 downto 0);
-      din_i  : in  std_ulogic_vector(DBITS-1 downto 0);
-      dout_o : out std_ulogic_vector(DBITS-1 downto 0)
+      addr_i : in  std_logic_vector(ABITS-1 downto 0);
+      we_i   : in  std_logic;
+      be_i   : in  std_logic_vector((DBITS+7)/8-1 downto 0);
+      din_i  : in  std_logic_vector(DBITS-1 downto 0);
+      dout_o : out std_logic_vector(DBITS-1 downto 0)
     );
   end component;
 
@@ -147,50 +147,50 @@ architecture RTL of riscv_icache_core is
   --
   -- Constants
   --
-  constant ARMED        : std_ulogic_vector(2 downto 0) := "000";
-  constant FLUSH        : std_ulogic_vector(2 downto 0) := "001";
-  constant WAIT4BIUCMD0 : std_ulogic_vector(2 downto 0) := "010";
-  constant RECOVER      : std_ulogic_vector(2 downto 0) := "100";
+  constant ARMED        : std_logic_vector(2 downto 0) := "000";
+  constant FLUSH        : std_logic_vector(2 downto 0) := "001";
+  constant WAIT4BIUCMD0 : std_logic_vector(2 downto 0) := "010";
+  constant RECOVER      : std_logic_vector(2 downto 0) := "100";
 
-  constant IDLE     : std_ulogic_vector(1 downto 0) := "00";
-  constant WAIT4BIU : std_ulogic_vector(1 downto 0) := "01";
-  constant BURST    : std_ulogic_vector(1 downto 0) := "10";
+  constant IDLE     : std_logic_vector(1 downto 0) := "00";
+  constant WAIT4BIU : std_logic_vector(1 downto 0) := "01";
+  constant BURST    : std_logic_vector(1 downto 0) := "10";
 
-  constant NOP       : std_ulogic_vector(1 downto 0) := "00";
-  constant WRITE_WAY : std_ulogic_vector(1 downto 0) := "01";
-  constant READ_WAY  : std_ulogic_vector(1 downto 0) := "10";
+  constant NOP       : std_logic_vector(1 downto 0) := "00";
+  constant WRITE_WAY : std_logic_vector(1 downto 0) := "01";
+  constant READ_WAY  : std_logic_vector(1 downto 0) := "10";
 
   --////////////////////////////////////////////////////////////////
   --
   -- Types
   --
-  type M_ICACHE_WAYS_IDX_BITS is array (DCACHE_WAYS-1 downto 0) of std_ulogic_vector(IDX_BITS-1 downto 0);
-  type M_ICACHE_WAYS_TAG_BITS is array (DCACHE_WAYS-1 downto 0) of std_ulogic_vector(TAG_BITS-1 downto 0);
-  type M_ICACHE_WAYS_BLK_BITS is array (DCACHE_WAYS-1 downto 0) of std_ulogic_vector(BLK_BITS-1 downto 0);
-  type M_ICACHE_WAYS_SETS is array (DCACHE_WAYS-1 downto 0) of std_ulogic_vector(SETS-1 downto 0);
+  type M_ICACHE_WAYS_IDX_BITS is array (DCACHE_WAYS-1 downto 0) of std_logic_vector(IDX_BITS-1 downto 0);
+  type M_ICACHE_WAYS_TAG_BITS is array (DCACHE_WAYS-1 downto 0) of std_logic_vector(TAG_BITS-1 downto 0);
+  type M_ICACHE_WAYS_BLK_BITS is array (DCACHE_WAYS-1 downto 0) of std_logic_vector(BLK_BITS-1 downto 0);
+  type M_ICACHE_WAYS_SETS is array (DCACHE_WAYS-1 downto 0) of std_logic_vector(SETS-1 downto 0);
 
   --////////////////////////////////////////////////////////////////
   --
   -- Functions
   --
   function size2be (
-    size : std_ulogic_vector(2 downto 0);
-    adr  : std_ulogic_vector(XLEN-1 downto 0)
-    ) return std_ulogic_vector is
-    variable adr_lsbs       : std_ulogic_vector(integer(log2(real(XLEN/8)))-1 downto 0);
-    variable size2be_return : std_ulogic_vector (XLEN/8-1 downto 0);
+    size : std_logic_vector(2 downto 0);
+    adr  : std_logic_vector(XLEN-1 downto 0)
+    ) return std_logic_vector is
+    variable adr_lsbs       : std_logic_vector(integer(log2(real(XLEN/8)))-1 downto 0);
+    variable size2be_return : std_logic_vector (XLEN/8-1 downto 0);
   begin
     adr_lsbs := adr(integer(log2(real(XLEN/8)))-1 downto 0);
 
     case (size) is
       when BYTE =>
-        size2be_return := std_ulogic_vector(to_unsigned(1, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
+        size2be_return := std_logic_vector(to_unsigned(1, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
       when HWORD =>
-        size2be_return := std_ulogic_vector(to_unsigned(3, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
+        size2be_return := std_logic_vector(to_unsigned(3, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
       when WORD =>
-        size2be_return := std_ulogic_vector(to_unsigned(15, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
+        size2be_return := std_logic_vector(to_unsigned(15, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
       when DWORD =>
-        size2be_return := std_ulogic_vector(to_unsigned(255, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
+        size2be_return := std_logic_vector(to_unsigned(255, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
       when others =>
         null;
     end case;
@@ -199,9 +199,9 @@ architecture RTL of riscv_icache_core is
   end size2be;
 
   function reduce_nor (
-    reduce_nor_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_nor_out : std_ulogic := '0';
+    reduce_nor_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_nor_out : std_logic := '0';
   begin
     for i in reduce_nor_in'range loop
       reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
@@ -210,9 +210,9 @@ architecture RTL of riscv_icache_core is
   end reduce_nor;
 
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -222,8 +222,8 @@ architecture RTL of riscv_icache_core is
 
   function reduce_mor (
     reduce_mor_in : M_ICACHE_WAYS_SETS
-  ) return std_ulogic is
-    variable reduce_mor_out : std_ulogic := '0';
+  ) return std_logic is
+    variable reduce_mor_out : std_logic := '0';
   begin
     for i in ICACHE_WAYS-1 downto 0 loop
     for j in SETS-1 downto 0 loop
@@ -235,7 +235,7 @@ architecture RTL of riscv_icache_core is
 
   function to_stdlogic (
     input : boolean
-  ) return std_ulogic is
+  ) return std_logic is
   begin
     if input then
       return('1');
@@ -250,92 +250,92 @@ architecture RTL of riscv_icache_core is
   --
 
   --Memory Interface State Machine Section
-  signal mem_vreq_dly : std_ulogic;
-  signal mem_preq_dly : std_ulogic;
-  signal mem_vadr_dly : std_ulogic_vector(XLEN-1 downto 0);
-  signal mem_padr_dly : std_ulogic_vector(PLEN-1 downto 0);
-  signal mem_be       : std_ulogic_vector(XLEN/8-1 downto 0);
-  signal mem_be_dly   : std_ulogic_vector(XLEN/8-1 downto 0);
+  signal mem_vreq_dly : std_logic;
+  signal mem_preq_dly : std_logic;
+  signal mem_vadr_dly : std_logic_vector(XLEN-1 downto 0);
+  signal mem_padr_dly : std_logic_vector(PLEN-1 downto 0);
+  signal mem_be       : std_logic_vector(XLEN/8-1 downto 0);
+  signal mem_be_dly   : std_logic_vector(XLEN/8-1 downto 0);
 
-  signal core_tag      : std_ulogic_vector(TAG_BITS-1 downto 0);
-  signal core_tag_hold : std_ulogic_vector(TAG_BITS-1 downto 0);
+  signal core_tag      : std_logic_vector(TAG_BITS-1 downto 0);
+  signal core_tag_hold : std_logic_vector(TAG_BITS-1 downto 0);
 
-  signal hold_flush : std_ulogic;  --stretch flush_i until FSM is ready to serve
+  signal hold_flush : std_logic;  --stretch flush_i until FSM is ready to serve
 
-  signal memfsm_state : std_ulogic_vector(2 downto 0);
+  signal memfsm_state : std_logic_vector(2 downto 0);
 
   --Cache Section
-  signal tag_idx      : std_ulogic_vector(IDX_BITS-1 downto 0);
-  signal tag_idx_dly  : std_ulogic_vector(IDX_BITS-1 downto 0);  --delayed version for writing valid/dirty
-  signal tag_idx_hold : std_ulogic_vector(IDX_BITS-1 downto 0);  --stretched version for writing TAG during fill
-  signal vadr_idx     : std_ulogic_vector(IDX_BITS-1 downto 0);  --index bits extracted from vadr_i
-  signal vadr_dly_idx : std_ulogic_vector(IDX_BITS-1 downto 0);  --index bits extracted from vadr_dly
-  signal padr_idx     : std_ulogic_vector(IDX_BITS-1 downto 0);
-  signal padr_dly_idx : std_ulogic_vector(IDX_BITS-1 downto 0);
+  signal tag_idx      : std_logic_vector(IDX_BITS-1 downto 0);
+  signal tag_idx_dly  : std_logic_vector(IDX_BITS-1 downto 0);  --delayed version for writing valid/dirty
+  signal tag_idx_hold : std_logic_vector(IDX_BITS-1 downto 0);  --stretched version for writing TAG during fill
+  signal vadr_idx     : std_logic_vector(IDX_BITS-1 downto 0);  --index bits extracted from vadr_i
+  signal vadr_dly_idx : std_logic_vector(IDX_BITS-1 downto 0);  --index bits extracted from vadr_dly
+  signal padr_idx     : std_logic_vector(IDX_BITS-1 downto 0);
+  signal padr_dly_idx : std_logic_vector(IDX_BITS-1 downto 0);
 
-  signal tag_we : std_ulogic_vector(ICACHE_WAYS-1 downto 0);
+  signal tag_we : std_logic_vector(ICACHE_WAYS-1 downto 0);
 
-  signal tag_in_valid : std_ulogic_vector(ICACHE_WAYS-1 downto 0);
+  signal tag_in_valid : std_logic_vector(ICACHE_WAYS-1 downto 0);
   signal tag_in_tag   : M_ICACHE_WAYS_TAG_BITS;
 
-  signal tag_out_valid : std_ulogic_vector(ICACHE_WAYS-1 downto 0);
+  signal tag_out_valid : std_logic_vector(ICACHE_WAYS-1 downto 0);
   signal tag_out_tag   : M_ICACHE_WAYS_TAG_BITS;
 
   signal tag_byp_idx : M_ICACHE_WAYS_IDX_BITS;
   signal tag_byp_tag : M_ICACHE_WAYS_TAG_BITS;
   signal tag_valid   : M_ICACHE_WAYS_SETS;
 
-  signal dat_idx     : std_ulogic_vector(IDX_BITS-1 downto 0);
-  signal dat_idx_dly : std_ulogic_vector(IDX_BITS-1 downto 0);
-  signal dat_we      : std_ulogic_vector(ICACHE_WAYS-1 downto 0);
-  signal dat_be      : std_ulogic_vector(BLK_BITS/8-1 downto 0);
-  signal dat_in      : std_ulogic_vector(BLK_BITS-1 downto 0);
+  signal dat_idx     : std_logic_vector(IDX_BITS-1 downto 0);
+  signal dat_idx_dly : std_logic_vector(IDX_BITS-1 downto 0);
+  signal dat_we      : std_logic_vector(ICACHE_WAYS-1 downto 0);
+  signal dat_be      : std_logic_vector(BLK_BITS/8-1 downto 0);
+  signal dat_in      : std_logic_vector(BLK_BITS-1 downto 0);
   signal dat_out     : M_ICACHE_WAYS_BLK_BITS;
 
   signal way_q_mux   : M_ICACHE_WAYS_BLK_BITS;
-  signal way_hit     : std_ulogic_vector(ICACHE_WAYS-1 downto 0);
+  signal way_hit     : std_logic_vector(ICACHE_WAYS-1 downto 0);
   signal way_compare : M_ICACHE_WAYS_TAG_BITS;
 
-  signal dat_offset    : std_ulogic_vector(DAT_OFF_BITS-1 downto 0);
-  signal parcel_offset : std_ulogic_vector(PARCEL_OFF_BITS downto 0);
+  signal dat_offset    : std_logic_vector(DAT_OFF_BITS-1 downto 0);
+  signal parcel_offset : std_logic_vector(PARCEL_OFF_BITS downto 0);
 
-  signal cache_hit : std_ulogic;
-  signal cache_q   : std_ulogic_vector(XLEN-1 downto 0);
+  signal cache_hit : std_logic;
+  signal cache_q   : std_logic_vector(XLEN-1 downto 0);
 
-  signal way_random           : std_ulogic_vector(19 downto 0);
-  signal fill_way_select      : std_ulogic_vector(ICACHE_WAYS-1 downto 0);
-  signal fill_way_select_hold : std_ulogic_vector(ICACHE_WAYS-1 downto 0);
+  signal way_random           : std_logic_vector(19 downto 0);
+  signal fill_way_select      : std_logic_vector(ICACHE_WAYS-1 downto 0);
+  signal fill_way_select_hold : std_logic_vector(ICACHE_WAYS-1 downto 0);
 
-  signal biu_adro_eq_cache_adr_dly : std_ulogic;
-  signal flushing                  : std_ulogic;
-  signal filling                   : std_ulogic;
-  signal flush_idx                 : std_ulogic_vector(IDX_BITS-1 downto 0);
+  signal biu_adro_eq_cache_adr_dly : std_logic;
+  signal flushing                  : std_logic;
+  signal filling                   : std_logic;
+  signal flush_idx                 : std_logic_vector(IDX_BITS-1 downto 0);
 
   --Bus Interface State Machine Section
-  signal biufsm_state : std_ulogic_vector(1 downto 0);
+  signal biufsm_state : std_logic_vector(1 downto 0);
 
-  signal biucmd : std_ulogic_vector(1 downto 0);
+  signal biucmd : std_logic_vector(1 downto 0);
 
-  signal biufsm_ack           : std_ulogic;
-  signal biufsm_err           : std_ulogic;
-  signal biufsm_ack_write_way : std_ulogic;  --BIU FSM should generate biufsm_ack on WRITE_WAY
-  signal biu_buffer           : std_ulogic_vector(BLK_BITS-1 downto 0);
-  signal biu_buffer_valid     : std_ulogic_vector(BURST_SIZE-1 downto 0);
-  signal in_biubuffer         : std_ulogic;
+  signal biufsm_ack           : std_logic;
+  signal biufsm_err           : std_logic;
+  signal biufsm_ack_write_way : std_logic;  --BIU FSM should generate biufsm_ack on WRITE_WAY
+  signal biu_buffer           : std_logic_vector(BLK_BITS-1 downto 0);
+  signal biu_buffer_valid     : std_logic_vector(BURST_SIZE-1 downto 0);
+  signal in_biubuffer         : std_logic;
 
-  signal biu_adri_hold : std_ulogic_vector(PLEN-1 downto 0);
-  signal biu_d_hold    : std_ulogic_vector(XLEN-1 downto 0);
+  signal biu_adri_hold : std_logic_vector(PLEN-1 downto 0);
+  signal biu_d_hold    : std_logic_vector(XLEN-1 downto 0);
 
-  signal cache_biu : std_ulogic_vector(BLK_BITS-1 downto 0);
+  signal cache_biu : std_logic_vector(BLK_BITS-1 downto 0);
 
-  signal burst_cnt : std_ulogic_vector(BURST_BITS-1 downto 0);
+  signal burst_cnt : std_logic_vector(BURST_BITS-1 downto 0);
 
   --CPU side
-  signal mem_ack : std_ulogic;
+  signal mem_ack : std_logic;
 
   --To BIU
-  signal biu_adri : std_ulogic_vector(PLEN-1 downto 0);  --access start address
-  signal biu_d    : std_ulogic_vector(XLEN-1 downto 0);  --write data
+  signal biu_adri : std_logic_vector(PLEN-1 downto 0);  --access start address
+  signal biu_d    : std_logic_vector(XLEN-1 downto 0);  --write data
 
 begin
   --////////////////////////////////////////////////////////////////
@@ -511,9 +511,9 @@ begin
   begin
     case (memfsm_state) is
       when WAIT4BIUCMD0 =>
-        mem_q_o <= std_ulogic_vector(unsigned(biu_q_i) srl (to_integer(unsigned(parcel_offset))*16));
+        mem_q_o <= std_logic_vector(unsigned(biu_q_i) srl (to_integer(unsigned(parcel_offset))*16));
       when others =>
-        mem_q_o <= std_ulogic_vector(unsigned(cache_q) srl (to_integer(unsigned(parcel_offset))*16));
+        mem_q_o <= std_logic_vector(unsigned(cache_q) srl (to_integer(unsigned(parcel_offset))*16));
     end case;
   end process;
 
@@ -609,12 +609,12 @@ begin
   end generate generating_1;
 
 --get requested data (XLEN-size) from way_q_mux(BLK_BITS-size)
-  --in_biubuffer <= to_stdlogic(biu_adri_hold(PLEN-1 downto BLK_OFF_BITS) = (mem_padr_dly(PLEN-1 downto BLK_OFF_BITS) and std_ulogic_vector(unsigned(biu_buffer_valid(PLEN+BLK_OFF_BITS-1 downto 0)) srl to_integer(unsigned(dat_offset)))))
-                  --when mem_preq_dly = '1' else to_stdlogic(biu_adri_hold(PLEN-1 downto BLK_OFF_BITS) = (mem_padr_i(PLEN-1 downto BLK_OFF_BITS) and std_ulogic_vector(unsigned(biu_buffer_valid(PLEN+BLK_OFF_BITS-1 downto 0)) srl to_integer(unsigned(dat_offset)))));
+  --in_biubuffer <= to_stdlogic(biu_adri_hold(PLEN-1 downto BLK_OFF_BITS) = (mem_padr_dly(PLEN-1 downto BLK_OFF_BITS) and std_logic_vector(unsigned(biu_buffer_valid(PLEN+BLK_OFF_BITS-1 downto 0)) srl to_integer(unsigned(dat_offset)))))
+                  --when mem_preq_dly = '1' else to_stdlogic(biu_adri_hold(PLEN-1 downto BLK_OFF_BITS) = (mem_padr_i(PLEN-1 downto BLK_OFF_BITS) and std_logic_vector(unsigned(biu_buffer_valid(PLEN+BLK_OFF_BITS-1 downto 0)) srl to_integer(unsigned(dat_offset)))));
 
   cache_biu <= biu_buffer
                when in_biubuffer = '1' else way_q_mux(ICACHE_WAYS-1);
-  cache_q <= std_ulogic_vector((unsigned(cache_biu(XLEN-1 downto 0))) srl (to_integer(unsigned(dat_offset)*XLEN)));
+  cache_q <= std_logic_vector((unsigned(cache_biu(XLEN-1 downto 0))) srl (to_integer(unsigned(dat_offset)*XLEN)));
 
   ------------------------------------------------------------------
   -- END TAG and Data memory
@@ -637,8 +637,8 @@ begin
   end process;
 
   --select which way to fill
-  fill_way_select <= std_ulogic_vector(to_unsigned(1, ICACHE_WAYS))
-                     when (ICACHE_WAYS = 1) else std_ulogic_vector(to_unsigned(2**to_integer(unsigned(way_random(integer(log2(real(ICACHE_WAYS)))-1 downto 0))), ICACHE_WAYS));
+  fill_way_select <= std_logic_vector(to_unsigned(1, ICACHE_WAYS))
+                     when (ICACHE_WAYS = 1) else std_logic_vector(to_unsigned(2**to_integer(unsigned(way_random(integer(log2(real(ICACHE_WAYS)))-1 downto 0))), ICACHE_WAYS));
 
   --FILL / WRITE_WAYS use fill_way_select 1 cycle later
   --processing_12 : process (clk_i)
@@ -883,7 +883,7 @@ begin
           end case;
         when BURST =>
           if (biu_ack_i = '1') then
-            burst_cnt <= std_ulogic_vector(unsigned(burst_cnt)-to_unsigned(1, BURST_BITS));
+            burst_cnt <= std_logic_vector(unsigned(burst_cnt)-to_unsigned(1, BURST_BITS));
           end if;
         when others =>
           null;

@@ -63,51 +63,51 @@ entity riscv_du is
     BREAKPOINTS : integer := 3
   );
   port (
-    rstn : in std_ulogic;
-    clk  : in std_ulogic;
+    rstn : in std_logic;
+    clk  : in std_logic;
 
     --Debug Port interface
-    dbg_stall : in  std_ulogic;
-    dbg_strb  : in  std_ulogic;
-    dbg_we    : in  std_ulogic;
-    dbg_addr  : in  std_ulogic_vector(63 downto 0);
-    dbg_dati  : in  std_ulogic_vector(XLEN-1 downto 0);
-    dbg_dato  : out std_ulogic_vector(XLEN-1 downto 0);
-    dbg_ack   : out std_ulogic;
-    dbg_bp    : out std_ulogic;
+    dbg_stall : in  std_logic;
+    dbg_strb  : in  std_logic;
+    dbg_we    : in  std_logic;
+    dbg_addr  : in  std_logic_vector(63 downto 0);
+    dbg_dati  : in  std_logic_vector(XLEN-1 downto 0);
+    dbg_dato  : out std_logic_vector(XLEN-1 downto 0);
+    dbg_ack   : out std_logic;
+    dbg_bp    : out std_logic;
 
     --CPU signals
-    du_stall     : out std_ulogic;
-    du_stall_dly : out std_ulogic;
-    du_flush     : out std_ulogic;
-    du_we_rf     : out std_ulogic;
-    du_we_frf    : out std_ulogic;
-    du_we_csr    : out std_ulogic;
-    du_we_pc     : out std_ulogic;
-    du_addr      : out std_ulogic_vector(DU_ADDR_SIZE-1 downto 0);
-    du_dato      : out std_ulogic_vector(XLEN-1 downto 0);
-    du_ie        : out std_ulogic_vector(31 downto 0);
-    du_dati_rf   : in  std_ulogic_vector(XLEN-1 downto 0);
-    du_dati_frf  : in  std_ulogic_vector(XLEN-1 downto 0);
-    st_csr_rval  : in  std_ulogic_vector(XLEN-1 downto 0);
-    if_pc        : in  std_ulogic_vector(XLEN-1 downto 0);
-    id_pc        : in  std_ulogic_vector(XLEN-1 downto 0);
-    ex_pc        : in  std_ulogic_vector(XLEN-1 downto 0);
-    bu_nxt_pc    : in  std_ulogic_vector(XLEN-1 downto 0);
-    bu_flush     : in  std_ulogic;
-    st_flush     : in  std_ulogic;
+    du_stall     : out std_logic;
+    du_stall_dly : out std_logic;
+    du_flush     : out std_logic;
+    du_we_rf     : out std_logic;
+    du_we_frf    : out std_logic;
+    du_we_csr    : out std_logic;
+    du_we_pc     : out std_logic;
+    du_addr      : out std_logic_vector(DU_ADDR_SIZE-1 downto 0);
+    du_dato      : out std_logic_vector(XLEN-1 downto 0);
+    du_ie        : out std_logic_vector(31 downto 0);
+    du_dati_rf   : in  std_logic_vector(XLEN-1 downto 0);
+    du_dati_frf  : in  std_logic_vector(XLEN-1 downto 0);
+    st_csr_rval  : in  std_logic_vector(XLEN-1 downto 0);
+    if_pc        : in  std_logic_vector(XLEN-1 downto 0);
+    id_pc        : in  std_logic_vector(XLEN-1 downto 0);
+    ex_pc        : in  std_logic_vector(XLEN-1 downto 0);
+    bu_nxt_pc    : in  std_logic_vector(XLEN-1 downto 0);
+    bu_flush     : in  std_logic;
+    st_flush     : in  std_logic;
 
-    if_instr      : in std_ulogic_vector(ILEN-1 downto 0);
-    mem_instr     : in std_ulogic_vector(ILEN-1 downto 0);
-    if_bubble     : in std_ulogic;
-    mem_bubble    : in std_ulogic;
-    mem_exception : in std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    mem_memadr    : in std_ulogic_vector(XLEN-1 downto 0);
-    dmem_ack      : in std_ulogic;
-    ex_stall      : in std_ulogic;
+    if_instr      : in std_logic_vector(ILEN-1 downto 0);
+    mem_instr     : in std_logic_vector(ILEN-1 downto 0);
+    if_bubble     : in std_logic;
+    mem_bubble    : in std_logic;
+    mem_exception : in std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    mem_memadr    : in std_logic_vector(XLEN-1 downto 0);
+    dmem_ack      : in std_logic;
+    ex_stall      : in std_logic;
 
     --From state
-    du_exceptions : in std_ulogic_vector(31 downto 0)
+    du_exceptions : in std_logic_vector(31 downto 0)
     );
 end riscv_du;
 
@@ -116,28 +116,28 @@ architecture RTL of riscv_du is
   --
   -- Constants
   --
-  constant DBG_ADDR_INTERNAL : std_ulogic_vector(63 downto 0) := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0000XXXXXXXXXXXX";
-  constant DBG_ADDR_GPR      : std_ulogic_vector(63 downto 0) := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX00010000000XXXXX";
-  constant DBG_ADDR_FPR      : std_ulogic_vector(63 downto 0) := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX00010001000XXXXX";
-  constant DBG_ADDR_NPC      : std_ulogic_vector(63 downto 0) := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0001001000000000";
-  constant DBG_ADDR_PPC      : std_ulogic_vector(63 downto 0) := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0001001000000001";
-  constant DBG_ADDR_CSRS     : std_ulogic_vector(63 downto 0) := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0010XXXXXXXXXXXX";
+  constant DBG_ADDR_INTERNAL : std_logic_vector(63 downto 0) := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0000XXXXXXXXXXXX";
+  constant DBG_ADDR_GPR      : std_logic_vector(63 downto 0) := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX00010000000XXXXX";
+  constant DBG_ADDR_FPR      : std_logic_vector(63 downto 0) := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX00010001000XXXXX";
+  constant DBG_ADDR_NPC      : std_logic_vector(63 downto 0) := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0001001000000000";
+  constant DBG_ADDR_PPC      : std_logic_vector(63 downto 0) := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0001001000000001";
+  constant DBG_ADDR_CSRS     : std_logic_vector(63 downto 0) := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0010XXXXXXXXXXXX";
 
   --//////////////////////////////////////////////////////////////
   --
   -- Types
   --
-  type M_MAX_BREAKPOINTS_2    is array (7 downto 0) of std_ulogic_vector(2      downto 0);
-  type M_MAX_BREAKPOINTS_XLEN is array (7 downto 0) of std_ulogic_vector(XLEN-1 downto 0);
+  type M_MAX_BREAKPOINTS_2    is array (7 downto 0) of std_logic_vector(2      downto 0);
+  type M_MAX_BREAKPOINTS_XLEN is array (7 downto 0) of std_logic_vector(XLEN-1 downto 0);
 
   --//////////////////////////////////////////////////////////////
   --
   -- Functions
   --
   function reduce_nor (
-    reduce_nor_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_nor_out : std_ulogic := '0';
+    reduce_nor_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_nor_out : std_logic := '0';
   begin
     for i in reduce_nor_in'range loop
       reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
@@ -146,9 +146,9 @@ architecture RTL of riscv_du is
   end reduce_nor;
 
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -158,7 +158,7 @@ architecture RTL of riscv_du is
 
   function to_stdlogic (
     input : boolean
-  ) return std_ulogic is
+  ) return std_logic is
   begin
     if input then
       return('1');
@@ -171,41 +171,41 @@ architecture RTL of riscv_du is
   --
   -- Variables
   --
-  signal dbg_strb_dly    : std_ulogic;
-  signal du_bank_addr    : std_ulogic_vector(PLEN-1 downto DU_ADDR_SIZE);
-  signal du_sel_internal : std_ulogic;
-  signal du_sel_gprs     : std_ulogic;
-  signal du_sel_csrs     : std_ulogic;
-  signal du_access       : std_ulogic;
-  signal du_we           : std_ulogic;
-  signal du_ack          : std_ulogic_vector(2 downto 0);
+  signal dbg_strb_dly    : std_logic;
+  signal du_bank_addr    : std_logic_vector(PLEN-1 downto DU_ADDR_SIZE);
+  signal du_sel_internal : std_logic;
+  signal du_sel_gprs     : std_logic;
+  signal du_sel_csrs     : std_logic;
+  signal du_access       : std_logic;
+  signal du_we           : std_logic;
+  signal du_ack          : std_logic_vector(2 downto 0);
 
-  signal du_we_internal   : std_ulogic;
-  signal du_internal_regs : std_ulogic_vector(XLEN-1 downto 0);
+  signal du_we_internal   : std_logic;
+  signal du_internal_regs : std_logic_vector(XLEN-1 downto 0);
 
-  signal dbg_branch_break_ena : std_ulogic;
-  signal dbg_instr_break_ena  : std_ulogic;
-  signal dbg_ies              : std_ulogic_vector(31 downto 0);
-  signal dbg_causes           : std_ulogic_vector(XLEN-1 downto 0);
-  signal dbg_bp_hit           : std_ulogic_vector(MAX_BREAKPOINTS-1 downto 0);
-  signal dbg_branch_break_hit : std_ulogic;
-  signal dbg_instr_break_hit  : std_ulogic;
+  signal dbg_branch_break_ena : std_logic;
+  signal dbg_instr_break_ena  : std_logic;
+  signal dbg_ies              : std_logic_vector(31 downto 0);
+  signal dbg_causes           : std_logic_vector(XLEN-1 downto 0);
+  signal dbg_bp_hit           : std_logic_vector(MAX_BREAKPOINTS-1 downto 0);
+  signal dbg_branch_break_hit : std_logic;
+  signal dbg_instr_break_hit  : std_logic;
   signal dbg_cc               : M_MAX_BREAKPOINTS_2;
-  signal dbg_enabled          : std_ulogic_vector(MAX_BREAKPOINTS-1 downto 0);
-  signal dbg_implemented      : std_ulogic_vector(MAX_BREAKPOINTS-1 downto 0);
+  signal dbg_enabled          : std_logic_vector(MAX_BREAKPOINTS-1 downto 0);
+  signal dbg_implemented      : std_logic_vector(MAX_BREAKPOINTS-1 downto 0);
   signal dbg_data             : M_MAX_BREAKPOINTS_XLEN;
 
-  signal bp_instr_hit  : std_ulogic;
-  signal bp_branch_hit : std_ulogic;
-  signal bp_hit        : std_ulogic_vector(MAX_BREAKPOINTS-1 downto 0);
+  signal bp_instr_hit  : std_logic;
+  signal bp_branch_hit : std_logic;
+  signal bp_hit        : std_logic_vector(MAX_BREAKPOINTS-1 downto 0);
 
-  signal mem_read  : std_ulogic;
-  signal mem_write : std_ulogic;
+  signal mem_read  : std_logic;
+  signal mem_write : std_logic;
 
-  signal du_stall_dly_sgn : std_ulogic;
-  signal du_flush_sgn     : std_ulogic;
-  signal du_addr_sgn      : std_ulogic_vector(11 downto 0);
-  signal du_dato_sgn      : std_ulogic_vector(XLEN-1 downto 0);
+  signal du_stall_dly_sgn : std_logic;
+  signal du_flush_sgn     : std_logic;
+  signal du_addr_sgn      : std_logic_vector(11 downto 0);
+  signal du_dato_sgn      : std_logic_vector(XLEN-1 downto 0);
 
 begin
   --////////////////////////////////////////////////////////////////
@@ -487,39 +487,39 @@ begin
       elsif (reduce_or(du_exceptions(31 downto 16)) = '1') then  --Interrupts
         case ((du_exceptions(31 downto 16))) is
           when X"0001" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000000";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000000";
           when X"0002" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000001";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000001";
           when X"0004" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000002";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000002";
           when X"0008" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000003";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000003";
           when X"0010" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000004";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000004";
           when X"0020" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000005";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000005";
           when X"0040" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000006";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000006";
           when X"0080" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000007";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000007";
           when X"0100" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000008";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000008";
           when X"0200" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000009";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000009";
           when X"0400" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000010";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000010";
           when X"0800" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000011";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000011";
           when X"1000" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000012";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000012";
           when X"2000" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000013";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000013";
           when X"4000" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000014";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000014";
           when X"8000" =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000015";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000015";
           when others =>
-            dbg_causes <= std_ulogic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000000";
+            dbg_causes <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or X"0000000000000000";
         end case;
       end if;
     end if;

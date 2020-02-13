@@ -57,40 +57,40 @@ entity riscv_mux is
     PORTS : integer := 2
   );
   port (
-    rst_ni : in std_ulogic;
-    clk_i  : in std_ulogic;
+    rst_ni : in std_logic;
+    clk_i  : in std_logic;
 
     --Input Ports
-    biu_req_i     : in  std_ulogic_vector(PORTS-1 downto 0);  --access request
-    biu_req_ack_o : out std_ulogic_vector(PORTS-1 downto 0);  --biu access acknowledge
-    biu_d_ack_o   : out std_ulogic_vector(PORTS-1 downto 0);  --biu early data acknowledge
+    biu_req_i     : in  std_logic_vector(PORTS-1 downto 0);  --access request
+    biu_req_ack_o : out std_logic_vector(PORTS-1 downto 0);  --biu access acknowledge
+    biu_d_ack_o   : out std_logic_vector(PORTS-1 downto 0);  --biu early data acknowledge
     biu_adri_i    : in  M_MUX_PORTS_PLEN;  --access start address
     biu_adro_o    : out M_MUX_PORTS_PLEN;  --biu response address
     biu_size_i    : in  M_MUX_PORTS_2;  --access data size
     biu_type_i    : in  M_MUX_PORTS_2;  --access burst type
-    biu_lock_i    : in  std_ulogic_vector(PORTS-1 downto 0);  --access locked access
+    biu_lock_i    : in  std_logic_vector(PORTS-1 downto 0);  --access locked access
     biu_prot_i    : in  M_MUX_PORTS_2;  --access protection
-    biu_we_i      : in  std_ulogic_vector(PORTS-1 downto 0);  --access write enable
+    biu_we_i      : in  std_logic_vector(PORTS-1 downto 0);  --access write enable
     biu_d_i       : in  M_MUX_PORTS_XLEN;  --access write data
     biu_q_o       : out M_MUX_PORTS_XLEN;  --access read data
-    biu_ack_o     : out std_ulogic_vector(PORTS-1 downto 0);  --access acknowledge
-    biu_err_o     : out std_ulogic_vector(PORTS-1 downto 0);  --access error
+    biu_ack_o     : out std_logic_vector(PORTS-1 downto 0);  --access acknowledge
+    biu_err_o     : out std_logic_vector(PORTS-1 downto 0);  --access error
 
     --Output (to BIU)
-    biu_req_o     : out std_ulogic;  --BIU access request
-    biu_req_ack_i : in  std_ulogic;  --BIU ackowledge
-    biu_d_ack_i   : in  std_ulogic;  --BIU early data acknowledge
-    biu_adri_o    : out std_ulogic_vector(PLEN-1 downto 0);  --address into BIU
-    biu_adro_i    : in  std_ulogic_vector(PLEN-1 downto 0);  --address from BIU
-    biu_size_o    : out std_ulogic_vector(2 downto 0);  --transfer size
-    biu_type_o    : out std_ulogic_vector(2 downto 0);  --burst type
-    biu_lock_o    : out std_ulogic;
-    biu_prot_o    : out std_ulogic_vector(2 downto 0);
-    biu_we_o      : out std_ulogic;
-    biu_d_o       : out std_ulogic_vector(XLEN-1 downto 0);  --data into BIU
-    biu_q_i       : in  std_ulogic_vector(XLEN-1 downto 0);  --data from BIU
-    biu_ack_i     : in  std_ulogic;  --data acknowledge, 1 per data
-    biu_err_i     : in  std_ulogic  --data error
+    biu_req_o     : out std_logic;  --BIU access request
+    biu_req_ack_i : in  std_logic;  --BIU ackowledge
+    biu_d_ack_i   : in  std_logic;  --BIU early data acknowledge
+    biu_adri_o    : out std_logic_vector(PLEN-1 downto 0);  --address into BIU
+    biu_adro_i    : in  std_logic_vector(PLEN-1 downto 0);  --address from BIU
+    biu_size_o    : out std_logic_vector(2 downto 0);  --transfer size
+    biu_type_o    : out std_logic_vector(2 downto 0);  --burst type
+    biu_lock_o    : out std_logic;
+    biu_prot_o    : out std_logic_vector(2 downto 0);
+    biu_we_o      : out std_logic;
+    biu_d_o       : out std_logic_vector(XLEN-1 downto 0);  --data into BIU
+    biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --data from BIU
+    biu_ack_i     : in  std_logic;  --data acknowledge, 1 per data
+    biu_err_i     : in  std_logic  --data error
   );
 end riscv_mux;
 
@@ -102,27 +102,27 @@ architecture RTL of riscv_mux is
 
   --convert burst type to counter length (actually length -1)
   function biu_type2cnt (
-    biu_type : std_ulogic_vector(2 downto 0)
-    ) return std_ulogic_vector is
-    variable biu_type2cnt_return : std_ulogic_vector(3 downto 0);
+    biu_type : std_logic_vector(2 downto 0)
+    ) return std_logic_vector is
+    variable biu_type2cnt_return : std_logic_vector(3 downto 0);
   begin
     case (biu_type) is
       when SINGLE =>
-        biu_type2cnt_return := std_ulogic_vector(to_unsigned(0, 4));
+        biu_type2cnt_return := std_logic_vector(to_unsigned(0, 4));
       when INCR =>
-        biu_type2cnt_return := std_ulogic_vector(to_unsigned(0, 4));
+        biu_type2cnt_return := std_logic_vector(to_unsigned(0, 4));
       when WRAP4 =>
-        biu_type2cnt_return := std_ulogic_vector(to_unsigned(3, 4));
+        biu_type2cnt_return := std_logic_vector(to_unsigned(3, 4));
       when INCR4 =>
-        biu_type2cnt_return := std_ulogic_vector(to_unsigned(3, 4));
+        biu_type2cnt_return := std_logic_vector(to_unsigned(3, 4));
       when WRAP8 =>
-        biu_type2cnt_return := std_ulogic_vector(to_unsigned(7, 4));
+        biu_type2cnt_return := std_logic_vector(to_unsigned(7, 4));
       when INCR8 =>
-        biu_type2cnt_return := std_ulogic_vector(to_unsigned(7, 4));
+        biu_type2cnt_return := std_logic_vector(to_unsigned(7, 4));
       when WRAP16 =>
-        biu_type2cnt_return := std_ulogic_vector(to_unsigned(15, 4));
+        biu_type2cnt_return := std_logic_vector(to_unsigned(15, 4));
       when INCR16 =>
-        biu_type2cnt_return := std_ulogic_vector(to_unsigned(15, 4));
+        biu_type2cnt_return := std_logic_vector(to_unsigned(15, 4));
       when others =>
         null;
     end case;
@@ -130,9 +130,9 @@ architecture RTL of riscv_mux is
   end biu_type2cnt;
 
   function busor (
-    req : std_ulogic_vector(PORTS-1 downto 0)
-    ) return std_ulogic is
-    variable busor_return : std_ulogic;
+    req : std_logic_vector(PORTS-1 downto 0)
+    ) return std_logic is
+    variable busor_return : std_logic;
   begin
     --default port
     busor_return := '0';
@@ -146,9 +146,9 @@ architecture RTL of riscv_mux is
   end busor;
 
   function port_select (
-    req : std_ulogic_vector(PORTS-1 downto 0)
-    ) return std_ulogic_vector is
-    variable port_select_return : std_ulogic_vector(integer(log2(real(PORTS)))-1 downto 0);
+    req : std_logic_vector(PORTS-1 downto 0)
+    ) return std_logic_vector is
+    variable port_select_return : std_logic_vector(integer(log2(real(PORTS)))-1 downto 0);
   begin
     --default port
     port_select_return := (others => '0');
@@ -156,16 +156,16 @@ architecture RTL of riscv_mux is
     --check other ports
     for n in PORTS-1 downto 0 loop
       if (req(n) = '1') then
-        port_select_return := std_ulogic_vector(to_unsigned(n, integer(log2(real(PORTS)))));
+        port_select_return := std_logic_vector(to_unsigned(n, integer(log2(real(PORTS)))));
       end if;
     end loop;
     return port_select_return;
   end port_select;
 
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -174,9 +174,9 @@ architecture RTL of riscv_mux is
   end reduce_or;
 
   function reduce_nor (
-    reduce_nor_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_nor_out : std_ulogic := '0';
+    reduce_nor_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_nor_out : std_logic := '0';
   begin
     for i in reduce_nor_in'range loop
       reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
@@ -188,21 +188,21 @@ architecture RTL of riscv_mux is
   --
   -- Constants
   --
-  constant IDLE  : std_ulogic := '0';
-  constant BURST : std_ulogic := '1';
+  constant IDLE  : std_logic := '0';
+  constant BURST : std_logic := '1';
 
   --////////////////////////////////////////////////////////////////
   --
   -- Variables
   --
-  signal fsm_state     : std_ulogic;
-  signal pending_req   : std_ulogic;
-  signal pending_port  : std_ulogic_vector(integer(log2(real(PORTS)))-1 downto 0);
-  signal selected_port : std_ulogic_vector(integer(log2(real(PORTS)))-1 downto 0);
-  signal pending_size  : std_ulogic_vector(2 downto 0);
+  signal fsm_state     : std_logic;
+  signal pending_req   : std_logic;
+  signal pending_port  : std_logic_vector(integer(log2(real(PORTS)))-1 downto 0);
+  signal selected_port : std_logic_vector(integer(log2(real(PORTS)))-1 downto 0);
+  signal pending_size  : std_logic_vector(2 downto 0);
 
-  signal pending_burst_cnt : std_ulogic_vector(3 downto 0);
-  signal burst_cnt         : std_ulogic_vector(3 downto 0);
+  signal pending_burst_cnt : std_logic_vector(3 downto 0);
+  signal burst_cnt         : std_logic_vector(3 downto 0);
 
 begin
   --////////////////////////////////////////////////////////////////
@@ -233,7 +233,7 @@ begin
           end if;
         when BURST =>
           if (biu_ack_i = '1') then
-            burst_cnt <= std_ulogic_vector(unsigned(burst_cnt)-"0001");
+            burst_cnt <= std_logic_vector(unsigned(burst_cnt)-"0001");
             if (reduce_nor(burst_cnt) = '1') then  --Burst done
               if (pending_req = '1' and reduce_or(pending_burst_cnt) = '1') then
                 burst_cnt     <= pending_burst_cnt;

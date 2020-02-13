@@ -56,26 +56,26 @@ entity riscv_div is
     ILEN : integer := 64
   );
   port (
-    rstn : in std_ulogic;
-    clk  : in std_ulogic;
+    rstn : in std_logic;
+    clk  : in std_logic;
 
-    ex_stall  : in  std_ulogic;
-    div_stall : out std_ulogic;
+    ex_stall  : in  std_logic;
+    div_stall : out std_logic;
 
     --Instruction
-    id_bubble : in std_ulogic;
-    id_instr  : in std_ulogic_vector(ILEN-1 downto 0);
+    id_bubble : in std_logic;
+    id_instr  : in std_logic_vector(ILEN-1 downto 0);
 
     --Operands
-    opA : in std_ulogic_vector(XLEN-1 downto 0);
-    opB : in std_ulogic_vector(XLEN-1 downto 0);
+    opA : in std_logic_vector(XLEN-1 downto 0);
+    opB : in std_logic_vector(XLEN-1 downto 0);
 
     --From State
-    st_xlen : in std_ulogic_vector(1 downto 0);
+    st_xlen : in std_logic_vector(1 downto 0);
 
     --To WB
-    div_bubble : out std_ulogic;
-    div_r      : out std_ulogic_vector(XLEN-1 downto 0)
+    div_bubble : out std_logic;
+    div_r      : out std_logic_vector(XLEN-1 downto 0)
   );
 end riscv_div;
 
@@ -85,11 +85,11 @@ architecture RTL of riscv_div is
   -- functions
   --
   function sext32 (
-    operand : std_ulogic_vector(31 downto 0)
+    operand : std_logic_vector(31 downto 0)
 
-  ) return std_ulogic_vector is
-    variable sign          : std_ulogic;
-    variable sext32_return : std_ulogic_vector (XLEN-1 downto 0);
+  ) return std_logic_vector is
+    variable sign          : std_logic;
+    variable sext32_return : std_logic_vector (XLEN-1 downto 0);
   begin
     sign          := operand(31);
     sext32_return := ((XLEN-1 downto 31 => sign) & operand(30 downto 0));
@@ -97,18 +97,18 @@ architecture RTL of riscv_div is
   end sext32;
 
   function twos (
-    a : std_ulogic_vector(XLEN-1 downto 0)
-  ) return std_ulogic_vector is
-    variable twos_return : std_ulogic_vector (XLEN-1 downto 0);
+    a : std_logic_vector(XLEN-1 downto 0)
+  ) return std_logic_vector is
+    variable twos_return : std_logic_vector (XLEN-1 downto 0);
   begin
-    twos_return := std_ulogic_vector(unsigned(not a)+X"0000000000000001");
+    twos_return := std_logic_vector(unsigned(not a)+X"0000000000000001");
     return twos_return;
   end twos;
 
   function absolute (
-    a : std_ulogic_vector(XLEN-1 downto 0)
-  ) return std_ulogic_vector is
-    variable abs_return : std_ulogic_vector (XLEN-1 downto 0);
+    a : std_logic_vector(XLEN-1 downto 0)
+  ) return std_logic_vector is
+    variable abs_return : std_logic_vector (XLEN-1 downto 0);
   begin
     if (a(XLEN-1) = '1') then
       abs_return := twos(a);
@@ -120,9 +120,9 @@ architecture RTL of riscv_div is
   end absolute;
 
   function reduce_nor (
-    reduce_nor_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_nor_out : std_ulogic := '0';
+    reduce_nor_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_nor_out : std_logic := '0';
   begin
     for i in reduce_nor_in'range loop
       reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
@@ -131,9 +131,9 @@ architecture RTL of riscv_div is
   end reduce_nor;
 
   function reduce_and (
-    reduce_and_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_and_out : std_ulogic := '0';
+    reduce_and_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_and_out : std_logic := '0';
   begin
     for i in reduce_and_in'range loop
       reduce_and_out := reduce_and_out and reduce_and_in(i);
@@ -143,7 +143,7 @@ architecture RTL of riscv_div is
 
   function to_stdlogic (
     input : boolean
-  ) return std_ulogic is
+  ) return std_logic is
   begin
     if input then
       return('1');
@@ -156,9 +156,9 @@ architecture RTL of riscv_div is
   --
   -- Constants
   --
-  constant ST_CHK : std_ulogic_vector(1 downto 0) := "00";
-  constant ST_DIV : std_ulogic_vector(1 downto 0) := "01";
-  constant ST_RES : std_ulogic_vector(1 downto 0) := "10";
+  constant ST_CHK : std_logic_vector(1 downto 0) := "00";
+  constant ST_DIV : std_logic_vector(1 downto 0) := "01";
+  constant ST_RES : std_logic_vector(1 downto 0) := "10";
 
   constant CNT_SIZE : integer := integer(log2(real(XLEN)));
 
@@ -166,35 +166,35 @@ architecture RTL of riscv_div is
   --
   -- Variables
   --
-  signal xlen32    : std_ulogic;
-  signal div_instr : std_ulogic_vector(ILEN-1 downto 0);
+  signal xlen32    : std_logic;
+  signal div_instr : std_logic_vector(ILEN-1 downto 0);
 
-  signal opcode     : std_ulogic_vector(6 downto 2);
-  signal div_opcode : std_ulogic_vector(6 downto 2);
-  signal func3      : std_ulogic_vector(2 downto 0);
-  signal div_func3  : std_ulogic_vector(2 downto 0);
-  signal func7      : std_ulogic_vector(6 downto 0);
-  signal div_func7  : std_ulogic_vector(6 downto 0);
+  signal opcode     : std_logic_vector(6 downto 2);
+  signal div_opcode : std_logic_vector(6 downto 2);
+  signal func3      : std_logic_vector(2 downto 0);
+  signal div_func3  : std_logic_vector(2 downto 0);
+  signal func7      : std_logic_vector(6 downto 0);
+  signal div_func7  : std_logic_vector(6 downto 0);
 
   --Operand generation
-  signal opA32 : std_ulogic_vector(31 downto 0);
-  signal opB32 : std_ulogic_vector(31 downto 0);
+  signal opA32 : std_logic_vector(31 downto 0);
+  signal opB32 : std_logic_vector(31 downto 0);
 
-  signal cnt   : std_ulogic_vector(CNT_SIZE-1 downto 0);
-  signal neg_q : std_ulogic;  --negate quotient
-  signal neg_s : std_ulogic;  --negate remainder
+  signal cnt   : std_logic_vector(CNT_SIZE-1 downto 0);
+  signal neg_q : std_logic;  --negate quotient
+  signal neg_s : std_logic;  --negate remainder
 
   --divider internals
-  signal pa_p         : std_ulogic_vector(XLEN-1 downto 0);
-  signal pa_a         : std_ulogic_vector(XLEN-1 downto 0);
-  signal pa_shifted_p : std_ulogic_vector(XLEN-1 downto 0);
-  signal pa_shifted_a : std_ulogic_vector(XLEN-1 downto 0);
+  signal pa_p         : std_logic_vector(XLEN-1 downto 0);
+  signal pa_a         : std_logic_vector(XLEN-1 downto 0);
+  signal pa_shifted_p : std_logic_vector(XLEN-1 downto 0);
+  signal pa_shifted_a : std_logic_vector(XLEN-1 downto 0);
 
-  signal p_minus_b : std_ulogic_vector(XLEN downto 0);
-  signal b         : std_ulogic_vector(XLEN-1 downto 0);
+  signal p_minus_b : std_logic_vector(XLEN downto 0);
+  signal b         : std_logic_vector(XLEN-1 downto 0);
 
   --FSM
-  signal state : std_ulogic_vector(1 downto 0);
+  signal state : std_logic_vector(1 downto 0);
 
 begin
   --//////////////////////////////////////////////////////////////
@@ -228,9 +228,9 @@ begin
   opB32 <= opB(31 downto 0);
 
   --Divide operations
-  pa_shifted_p <= std_ulogic_vector(unsigned(pa_p) sll 1);
-  pa_shifted_a <= std_ulogic_vector(unsigned(pa_a) sll 1);
-  p_minus_b    <= std_ulogic_vector(('0' & unsigned(pa_shifted_p))-('0' & unsigned(b)));
+  pa_shifted_p <= std_logic_vector(unsigned(pa_p) sll 1);
+  pa_shifted_a <= std_logic_vector(unsigned(pa_a) sll 1);
+  p_minus_b    <= std_logic_vector(('0' & unsigned(pa_shifted_p))-('0' & unsigned(b)));
 
   --Division: bit-serial. Max XLEN cycles
   -- q = z/d + s
@@ -239,8 +239,8 @@ begin
   -- q: Quotient
   -- s: Remainder
   processing_1 : process (clk, rstn)
-    variable dividor_register : std_ulogic_vector(15 downto 0);
-    variable result_st        : std_ulogic_vector(15 downto 0);
+    variable dividor_register : std_logic_vector(15 downto 0);
+    variable result_st        : std_logic_vector(15 downto 0);
   begin
     if (rstn = '0') then
       state      <= ST_CHK;
@@ -416,7 +416,7 @@ begin
           end if;
         --actual division loop
         when ST_DIV =>
-          cnt <= std_ulogic_vector(unsigned(cnt) - "01");
+          cnt <= std_logic_vector(unsigned(cnt) - "01");
           if (reduce_nor(cnt) = '1') then
             state <= ST_RES;
           end if;

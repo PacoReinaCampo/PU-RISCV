@@ -56,74 +56,74 @@ entity riscv_id is
     EXCEPTION_SIZE : integer := 16
   );
   port (
-    rstn : in std_ulogic;
-    clk  : in std_ulogic;
+    rstn : in std_logic;
+    clk  : in std_logic;
 
-    id_stall : out std_ulogic;
-    ex_stall : in  std_ulogic;
-    du_stall : in  std_ulogic;
+    id_stall : out std_logic;
+    ex_stall : in  std_logic;
+    du_stall : in  std_logic;
 
-    bu_flush : in std_ulogic;
-    st_flush : in std_ulogic;
-    du_flush : in std_ulogic;
+    bu_flush : in std_logic;
+    st_flush : in std_logic;
+    du_flush : in std_logic;
 
-    bu_nxt_pc : in std_ulogic_vector(XLEN-1 downto 0);
-    st_nxt_pc : in std_ulogic_vector(XLEN-1 downto 0);
+    bu_nxt_pc : in std_logic_vector(XLEN-1 downto 0);
+    st_nxt_pc : in std_logic_vector(XLEN-1 downto 0);
 
     --Program counter
-    if_pc         : in  std_ulogic_vector(XLEN-1 downto 0);
-    id_pc         : out std_ulogic_vector(XLEN-1 downto 0);
-    if_bp_predict : in  std_ulogic_vector(1 downto 0);
-    id_bp_predict : out std_ulogic_vector(1 downto 0);
+    if_pc         : in  std_logic_vector(XLEN-1 downto 0);
+    id_pc         : out std_logic_vector(XLEN-1 downto 0);
+    if_bp_predict : in  std_logic_vector(1 downto 0);
+    id_bp_predict : out std_logic_vector(1 downto 0);
 
     --Instruction
-    if_instr   : in  std_ulogic_vector(63 downto 0);
-    if_bubble  : in  std_ulogic;
-    id_instr   : out std_ulogic_vector(ILEN-1 downto 0);
-    id_bubble  : out std_ulogic;
-    ex_instr   : in  std_ulogic_vector(ILEN-1 downto 0);
-    ex_bubble  : in  std_ulogic;
-    mem_instr  : in  std_ulogic_vector(ILEN-1 downto 0);
-    mem_bubble : in  std_ulogic;
-    wb_instr   : in  std_ulogic_vector(ILEN-1 downto 0);
-    wb_bubble  : in  std_ulogic;
+    if_instr   : in  std_logic_vector(63 downto 0);
+    if_bubble  : in  std_logic;
+    id_instr   : out std_logic_vector(ILEN-1 downto 0);
+    id_bubble  : out std_logic;
+    ex_instr   : in  std_logic_vector(ILEN-1 downto 0);
+    ex_bubble  : in  std_logic;
+    mem_instr  : in  std_logic_vector(ILEN-1 downto 0);
+    mem_bubble : in  std_logic;
+    wb_instr   : in  std_logic_vector(ILEN-1 downto 0);
+    wb_bubble  : in  std_logic;
 
     --Exceptions
-    if_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    ex_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    mem_exception : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    wb_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    id_exception  : out std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
+    if_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    ex_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    mem_exception : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    wb_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    id_exception  : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
     --From State
-    st_prv        : in std_ulogic_vector(1 downto 0);
-    st_xlen       : in std_ulogic_vector(1 downto 0);
-    st_tvm        : in std_ulogic;
-    st_tw         : in std_ulogic;
-    st_tsr        : in std_ulogic;
-    st_mcounteren : in std_ulogic_vector(XLEN-1 downto 0);
-    st_scounteren : in std_ulogic_vector(XLEN-1 downto 0);
+    st_prv        : in std_logic_vector(1 downto 0);
+    st_xlen       : in std_logic_vector(1 downto 0);
+    st_tvm        : in std_logic;
+    st_tw         : in std_logic;
+    st_tsr        : in std_logic;
+    st_mcounteren : in std_logic_vector(XLEN-1 downto 0);
+    st_scounteren : in std_logic_vector(XLEN-1 downto 0);
 
     --To RF
-    id_src1 : out std_ulogic_vector(4 downto 0);
-    id_src2 : out std_ulogic_vector(4 downto 0);
+    id_src1 : out std_logic_vector(4 downto 0);
+    id_src2 : out std_logic_vector(4 downto 0);
 
     --To execution units
-    id_opA : out std_ulogic_vector(XLEN-1 downto 0);
-    id_opB : out std_ulogic_vector(XLEN-1 downto 0);
+    id_opA : out std_logic_vector(XLEN-1 downto 0);
+    id_opB : out std_logic_vector(XLEN-1 downto 0);
 
-    id_userf_opA  : out std_ulogic;
-    id_userf_opB  : out std_ulogic;
-    id_bypex_opA  : out std_ulogic;
-    id_bypex_opB  : out std_ulogic;
-    id_bypmem_opA : out std_ulogic;
-    id_bypmem_opB : out std_ulogic;
-    id_bypwb_opA  : out std_ulogic;
-    id_bypwb_opB  : out std_ulogic;
+    id_userf_opA  : out std_logic;
+    id_userf_opB  : out std_logic;
+    id_bypex_opA  : out std_logic;
+    id_bypex_opB  : out std_logic;
+    id_bypmem_opA : out std_logic;
+    id_bypmem_opB : out std_logic;
+    id_bypwb_opA  : out std_logic;
+    id_bypwb_opB  : out std_logic;
 
     --from MEM/WB
-    mem_r : in std_ulogic_vector(XLEN-1 downto 0);
-    wb_r  : in std_ulogic_vector(XLEN-1 downto 0)
+    mem_r : in std_logic_vector(XLEN-1 downto 0);
+    wb_r  : in std_logic_vector(XLEN-1 downto 0)
     );
 end riscv_id;
 
@@ -132,66 +132,66 @@ architecture RTL of riscv_id is
   --
   -- Variables
   --
-  signal id_bubble_r             : std_ulogic;
-  signal multi_cycle_instruction : std_ulogic;
-  signal stall                   : std_ulogic;
+  signal id_bubble_r             : std_logic;
+  signal multi_cycle_instruction : std_logic;
+  signal stall                   : std_logic;
 
   --Immediates
-  signal immI : std_ulogic_vector(XLEN-1 downto 0);
-  signal immU : std_ulogic_vector(XLEN-1 downto 0);
+  signal immI : std_logic_vector(XLEN-1 downto 0);
+  signal immU : std_logic_vector(XLEN-1 downto 0);
 
   --Opcodes
-  signal if_opcode  : std_ulogic_vector(6 downto 2);
-  signal id_opcode  : std_ulogic_vector(6 downto 2);
-  signal ex_opcode  : std_ulogic_vector(6 downto 2);
-  signal mem_opcode : std_ulogic_vector(6 downto 2);
-  signal wb_opcode  : std_ulogic_vector(6 downto 2);
+  signal if_opcode  : std_logic_vector(6 downto 2);
+  signal id_opcode  : std_logic_vector(6 downto 2);
+  signal ex_opcode  : std_logic_vector(6 downto 2);
+  signal mem_opcode : std_logic_vector(6 downto 2);
+  signal wb_opcode  : std_logic_vector(6 downto 2);
 
-  signal if_func3 : std_ulogic_vector(2 downto 0);
-  signal if_func7 : std_ulogic_vector(6 downto 0);
+  signal if_func3 : std_logic_vector(2 downto 0);
+  signal if_func7 : std_logic_vector(6 downto 0);
 
-  signal xlen_s     : std_ulogic;  --Current CPU state XLEN
-  signal xlen64     : std_ulogic;  --Is the CPU state set to RV64?
-  signal xlen32     : std_ulogic;  --Is the CPU state set to RV32?
-  signal has_fpu_s  : std_ulogic;
-  signal has_muldiv : std_ulogic;
-  signal has_amo    : std_ulogic;
-  signal has_u      : std_ulogic;
-  signal has_s      : std_ulogic;
-  signal has_h      : std_ulogic;
+  signal xlen_s     : std_logic;  --Current CPU state XLEN
+  signal xlen64     : std_logic;  --Is the CPU state set to RV64?
+  signal xlen32     : std_logic;  --Is the CPU state set to RV32?
+  signal has_fpu_s  : std_logic;
+  signal has_muldiv : std_logic;
+  signal has_amo    : std_logic;
+  signal has_u      : std_logic;
+  signal has_s      : std_logic;
+  signal has_h      : std_logic;
 
-  signal if_src1 : std_ulogic_vector(4 downto 0);
-  signal if_src2 : std_ulogic_vector(4 downto 0);
-  signal id_dst  : std_ulogic_vector(4 downto 0);
-  signal ex_dst  : std_ulogic_vector(4 downto 0);
-  signal mem_dst : std_ulogic_vector(4 downto 0);
-  signal wb_dst  : std_ulogic_vector(4 downto 0);
+  signal if_src1 : std_logic_vector(4 downto 0);
+  signal if_src2 : std_logic_vector(4 downto 0);
+  signal id_dst  : std_logic_vector(4 downto 0);
+  signal ex_dst  : std_logic_vector(4 downto 0);
+  signal mem_dst : std_logic_vector(4 downto 0);
+  signal wb_dst  : std_logic_vector(4 downto 0);
 
-  signal can_bypex  : std_ulogic;
-  signal can_bypmem : std_ulogic;
-  signal can_bypwb  : std_ulogic;
-  signal can_ldwb   : std_ulogic;
+  signal can_bypex  : std_logic;
+  signal can_bypmem : std_logic;
+  signal can_bypwb  : std_logic;
+  signal can_ldwb   : std_logic;
 
-  signal illegal_instr        : std_ulogic;
-  signal illegal_alu_instr    : std_ulogic;
-  signal illegal_alu_cond     : std_ulogic;
-  signal illegal_lsu_instr    : std_ulogic;
-  signal illegal_muldiv_instr : std_ulogic;
-  signal illegal_csr_rd       : std_ulogic;
-  signal illegal_csr_wr       : std_ulogic;
+  signal illegal_instr        : std_logic;
+  signal illegal_alu_instr    : std_logic;
+  signal illegal_alu_cond     : std_logic;
+  signal illegal_lsu_instr    : std_logic;
+  signal illegal_muldiv_instr : std_logic;
+  signal illegal_csr_rd       : std_logic;
+  signal illegal_csr_wr       : std_logic;
 
-  signal id_stall_sgn  : std_ulogic;
-  signal id_instr_sgn  : std_ulogic_vector(ILEN-1 downto 0);
-  signal id_bubble_sgn : std_ulogic;
+  signal id_stall_sgn  : std_logic;
+  signal id_instr_sgn  : std_logic_vector(ILEN-1 downto 0);
+  signal id_bubble_sgn : std_logic;
 
   --//////////////////////////////////////////////////////////////
   --
   -- Functions
   --
   function reduce_nor (
-    reduce_nor_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_nor_out : std_ulogic := '0';
+    reduce_nor_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_nor_out : std_logic := '0';
   begin
     for i in reduce_nor_in'range loop
       reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
@@ -200,9 +200,9 @@ architecture RTL of riscv_id is
   end reduce_nor;
 
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -212,7 +212,7 @@ architecture RTL of riscv_id is
 
   function to_stdlogic (
     input : boolean
-  ) return std_ulogic is
+  ) return std_logic is
   begin
     if input then
       return('1');
@@ -519,7 +519,7 @@ begin
 
   --Bypasses
   processing_8 : process (clk, rstn, if_func3, if_func7, if_opcode, xlen32)
-    variable state : std_ulogic_vector(15 downto 0);
+    variable state : std_logic_vector(15 downto 0);
   begin
     if (rstn = '0') then
       multi_cycle_instruction <= '0';
@@ -857,7 +857,7 @@ begin
 
   --ALU
   processing_15 : process (if_instr, has_s, has_u, if_func3, if_func7, if_opcode, if_src1, illegal_csr_rd, illegal_csr_wr, st_prv, st_tsr, xlen32)
-    variable state : std_ulogic_vector(15 downto 0);
+    variable state : std_logic_vector(15 downto 0);
   begin
     case (if_instr) is
       when FENCE =>
@@ -984,7 +984,7 @@ begin
 
   --LSU
   processing_16 : process (has_amo, if_func3, if_func7, if_opcode, xlen32)
-    variable state : std_ulogic_vector(15 downto 0);
+    variable state : std_logic_vector(15 downto 0);
   begin
     case (state) is
       when (LB) =>
@@ -1021,7 +1021,7 @@ begin
 
   --MULDIV
   processing_17 : process (if_func3, if_func7, if_opcode, xlen32)
-    variable state : std_ulogic_vector(15 downto 0);
+    variable state : std_logic_vector(15 downto 0);
   begin
     case (state) is
       when (MUL) =>

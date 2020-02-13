@@ -56,44 +56,44 @@ entity riscv_lsu is
     EXCEPTION_SIZE : integer := 16
   );
   port (
-    rstn : in std_ulogic;
-    clk  : in std_ulogic;
+    rstn : in std_logic;
+    clk  : in std_logic;
 
-    ex_stall  : in  std_ulogic;
-    lsu_stall : out std_ulogic;
+    ex_stall  : in  std_logic;
+    lsu_stall : out std_logic;
 
     --Instruction
-    id_bubble : in std_ulogic;
-    id_instr  : in std_ulogic_vector(ILEN-1 downto 0);
+    id_bubble : in std_logic;
+    id_instr  : in std_logic_vector(ILEN-1 downto 0);
 
-    lsu_bubble : out std_ulogic;
-    lsu_r      : out std_ulogic_vector(XLEN-1 downto 0);
+    lsu_bubble : out std_logic;
+    lsu_r      : out std_logic_vector(XLEN-1 downto 0);
 
-    id_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    ex_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    mem_exception : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    wb_exception  : in  std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
-    lsu_exception : out std_ulogic_vector(EXCEPTION_SIZE-1 downto 0);
+    id_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    ex_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    mem_exception : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    wb_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+    lsu_exception : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
     --Operands
-    opA : in std_ulogic_vector(XLEN-1 downto 0);
-    opB : in std_ulogic_vector(XLEN-1 downto 0);
+    opA : in std_logic_vector(XLEN-1 downto 0);
+    opB : in std_logic_vector(XLEN-1 downto 0);
 
     --From State
-    st_xlen : in std_ulogic_vector(1 downto 0);
+    st_xlen : in std_logic_vector(1 downto 0);
 
     --To Memory
-    dmem_adr  : out std_ulogic_vector(XLEN-1 downto 0);
-    dmem_d    : out std_ulogic_vector(XLEN-1 downto 0);
-    dmem_req  : out std_ulogic;
-    dmem_we   : out std_ulogic;
-    dmem_size : out std_ulogic_vector(2 downto 0);
+    dmem_adr  : out std_logic_vector(XLEN-1 downto 0);
+    dmem_d    : out std_logic_vector(XLEN-1 downto 0);
+    dmem_req  : out std_logic;
+    dmem_we   : out std_logic;
+    dmem_size : out std_logic_vector(2 downto 0);
 
     --From Memory (for AMO)
-    dmem_ack        : in std_ulogic;
-    dmem_q          : in std_ulogic_vector(XLEN-1 downto 0);
-    dmem_misaligned : in std_ulogic;
-    dmem_page_fault : in std_ulogic
+    dmem_ack        : in std_logic;
+    dmem_q          : in std_logic_vector(XLEN-1 downto 0);
+    dmem_misaligned : in std_logic;
+    dmem_page_fault : in std_logic
   );
 end riscv_lsu;
 
@@ -103,9 +103,9 @@ architecture RTL of riscv_lsu is
   -- Functions
   --
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -115,7 +115,7 @@ architecture RTL of riscv_lsu is
 
   function to_stdlogic (
     input : boolean
-  ) return std_ulogic is
+  ) return std_logic is
   begin
     if input then
       return('1');
@@ -128,28 +128,28 @@ architecture RTL of riscv_lsu is
   --
   -- Constants
   --
-  constant IDLE : std_ulogic_vector(1 downto 0) := "00";
+  constant IDLE : std_logic_vector(1 downto 0) := "00";
 
   --//////////////////////////////////////////////////////////////
   --
   -- Variables
   --
-  signal opcode : std_ulogic_vector(6 downto 2);
-  signal func3  : std_ulogic_vector(2 downto 0);
-  signal func7  : std_ulogic_vector(6 downto 0);
-  signal xlen32 : std_ulogic;
+  signal opcode : std_logic_vector(6 downto 2);
+  signal func3  : std_logic_vector(2 downto 0);
+  signal func7  : std_logic_vector(6 downto 0);
+  signal xlen32 : std_logic;
 
   --Operand generation
-  signal immS : std_ulogic_vector(XLEN-1 downto 0);
+  signal immS : std_logic_vector(XLEN-1 downto 0);
 
   --FSM
-  signal state : std_ulogic_vector(1 downto 0);
+  signal state : std_logic_vector(1 downto 0);
 
-  signal adr  : std_ulogic_vector(XLEN-1 downto 0);
-  signal d    : std_ulogic_vector(XLEN-1 downto 0);
-  signal size : std_ulogic_vector(2 downto 0);
+  signal adr  : std_logic_vector(XLEN-1 downto 0);
+  signal d    : std_logic_vector(XLEN-1 downto 0);
+  signal size : std_logic_vector(2 downto 0);
 
-  signal lsu_stall_o : std_ulogic;
+  signal lsu_stall_o : std_logic;
 
 begin
   --//////////////////////////////////////////////////////////////
@@ -252,45 +252,45 @@ begin
 
   --memory address
   processing_2 : process (func3, func7, immS, opA, opB, opcode, xlen32)
-    variable memory_address : std_ulogic_vector(15 downto 0);
+    variable memory_address : std_logic_vector(15 downto 0);
   begin
     memory_address := xlen32 & func7 & func3 & opcode;
     case (memory_address) is
       when (LB) =>
-        adr <= std_ulogic_vector(unsigned(opA)+unsigned(opB));
+        adr <= std_logic_vector(unsigned(opA)+unsigned(opB));
       when (LH) =>
-        adr <= std_ulogic_vector(unsigned(opA)+unsigned(opB));
+        adr <= std_logic_vector(unsigned(opA)+unsigned(opB));
       when (LW) =>
-        adr <= std_ulogic_vector(unsigned(opA)+unsigned(opB));
+        adr <= std_logic_vector(unsigned(opA)+unsigned(opB));
       when (LD) =>
         --RV64
-        adr <= std_ulogic_vector(unsigned(opA)+unsigned(opB));
+        adr <= std_logic_vector(unsigned(opA)+unsigned(opB));
       when (LBU) =>
-        adr <= std_ulogic_vector(unsigned(opA)+unsigned(opB));
+        adr <= std_logic_vector(unsigned(opA)+unsigned(opB));
       when (LHU) =>
-        adr <= std_ulogic_vector(unsigned(opA)+unsigned(opB));
+        adr <= std_logic_vector(unsigned(opA)+unsigned(opB));
       when (LWU) =>
         --RV64
-        adr <= std_ulogic_vector(unsigned(opA)+unsigned(opB));
+        adr <= std_logic_vector(unsigned(opA)+unsigned(opB));
       when (SB) =>
-        adr <= std_ulogic_vector(unsigned(opA)+unsigned(immS));
+        adr <= std_logic_vector(unsigned(opA)+unsigned(immS));
       when (SH) =>
-        adr <= std_ulogic_vector(unsigned(opA)+unsigned(immS));
+        adr <= std_logic_vector(unsigned(opA)+unsigned(immS));
       when (SW) =>
-        adr <= std_ulogic_vector(unsigned(opA)+unsigned(immS));
+        adr <= std_logic_vector(unsigned(opA)+unsigned(immS));
       when (SD) =>
         --RV64
-        adr <= std_ulogic_vector(unsigned(opA)+unsigned(immS));
+        adr <= std_logic_vector(unsigned(opA)+unsigned(immS));
       when others =>
         --'hx;
-        adr <= std_ulogic_vector(unsigned(opA)+unsigned(opB));
+        adr <= std_logic_vector(unsigned(opA)+unsigned(opB));
     end case;
   end process;
 
   --memory byte enable
   generating_0 : if (XLEN = 64) generate  --RV64
     processing_3 : process (func3, func7, opcode)
-      variable memory_byte_enable : std_ulogic_vector(15 downto 0);
+      variable memory_byte_enable : std_logic_vector(15 downto 0);
     begin
       memory_byte_enable := 'X' & func7 & func3 & opcode;
       case (memory_byte_enable) is  --func7 is don't care
@@ -323,16 +323,16 @@ begin
 
     --memory write data
     processing_4 : process (adr, func3, func7, opB,  opcode)
-      variable memory_write_data : std_ulogic_vector(15 downto 0);
+      variable memory_write_data : std_logic_vector(15 downto 0);
     begin
       memory_write_data := 'X' & func7 & func3 & opcode;
       case (memory_write_data) is  --func7 is don't care
         when SB =>
-          d <= std_ulogic_vector(((XLEN-1 downto 8 => '0') & unsigned(opB(7 downto 0))) sll (8*to_integer(unsigned(adr(2 downto 0)))));
+          d <= std_logic_vector(((XLEN-1 downto 8 => '0') & unsigned(opB(7 downto 0))) sll (8*to_integer(unsigned(adr(2 downto 0)))));
         when SH =>
-          d <= std_ulogic_vector(((XLEN-1 downto 16 => '0') & unsigned(opB(15 downto 0))) sll (8*to_integer(unsigned(adr(2 downto 0)))));
+          d <= std_logic_vector(((XLEN-1 downto 16 => '0') & unsigned(opB(15 downto 0))) sll (8*to_integer(unsigned(adr(2 downto 0)))));
         when SW =>
-          d <= std_ulogic_vector(((XLEN-1 downto 32 => '0') & unsigned(opB(31 downto 0))) sll (8*to_integer(unsigned(adr(2 downto 0)))));
+          d <= std_logic_vector(((XLEN-1 downto 32 => '0') & unsigned(opB(31 downto 0))) sll (8*to_integer(unsigned(adr(2 downto 0)))));
         when SD =>
           d <= opB;
         when others =>
@@ -341,7 +341,7 @@ begin
     end process;
   elsif (XLEN = 32) generate  --RV32
     processing_5 : process (func3, func7, opcode)
-      variable memory_write_data : std_ulogic_vector(15 downto 0);
+      variable memory_write_data : std_logic_vector(15 downto 0);
     begin
       memory_write_data := 'X' & func7 & func3 & opcode;
       case (memory_write_data) is  --func7 is don't care
@@ -368,14 +368,14 @@ begin
 
     --memory write data
     processing_6 : process (adr, func3, func7, opB, opcode)
-      variable memory_write_data : std_ulogic_vector(15 downto 0);
+      variable memory_write_data : std_logic_vector(15 downto 0);
     begin
       memory_write_data := 'X' & func7 & func3 & opcode;
       case (memory_write_data) is  --func7 is don't care
         when SB =>
-          d <= std_ulogic_vector(unsigned(opB(7 downto 0)) sll (8*to_integer(unsigned(adr(1 downto 0)))));
+          d <= std_logic_vector(unsigned(opB(7 downto 0)) sll (8*to_integer(unsigned(adr(1 downto 0)))));
         when SH =>
-          d <= std_ulogic_vector(unsigned(opB(15 downto 0)) sll (8*to_integer(unsigned(adr(1 downto 0)))));
+          d <= std_logic_vector(unsigned(opB(15 downto 0)) sll (8*to_integer(unsigned(adr(1 downto 0)))));
         when SW =>
           d <= opB;
         when others =>

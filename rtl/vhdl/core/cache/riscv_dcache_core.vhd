@@ -63,40 +63,40 @@ entity riscv_dcache_core is
     TECHNOLOGY : string := "GENERIC"
   );
   port (
-    rst_ni : in std_ulogic;
-    clk_i  : in std_ulogic;
+    rst_ni : in std_logic;
+    clk_i  : in std_logic;
 
     --CPU side
-    mem_vreq_i : in  std_ulogic;
-    mem_preq_i : in  std_ulogic;
-    mem_vadr_i : in  std_ulogic_vector(XLEN-1 downto 0);
-    mem_padr_i : in  std_ulogic_vector(PLEN-1 downto 0);
-    mem_size_i : in  std_ulogic_vector(2 downto 0);
-    mem_lock_i : in  std_ulogic;
-    mem_prot_i : in  std_ulogic_vector(2 downto 0);
-    mem_d_i    : in  std_ulogic_vector(XLEN-1 downto 0);
-    mem_we_i   : in  std_ulogic;
-    mem_q_o    : out std_ulogic_vector(XLEN-1 downto 0);
-    mem_ack_o  : out std_ulogic;
-    mem_err_o  : out std_ulogic;
-    flush_i    : in  std_ulogic;
-    flushrdy_o : out std_ulogic;
+    mem_vreq_i : in  std_logic;
+    mem_preq_i : in  std_logic;
+    mem_vadr_i : in  std_logic_vector(XLEN-1 downto 0);
+    mem_padr_i : in  std_logic_vector(PLEN-1 downto 0);
+    mem_size_i : in  std_logic_vector(2 downto 0);
+    mem_lock_i : in  std_logic;
+    mem_prot_i : in  std_logic_vector(2 downto 0);
+    mem_d_i    : in  std_logic_vector(XLEN-1 downto 0);
+    mem_we_i   : in  std_logic;
+    mem_q_o    : out std_logic_vector(XLEN-1 downto 0);
+    mem_ack_o  : out std_logic;
+    mem_err_o  : out std_logic;
+    flush_i    : in  std_logic;
+    flushrdy_o : out std_logic;
 
     --To BIU
-    biu_stb_o     : out std_ulogic;  --access request
-    biu_stb_ack_i : in  std_ulogic;  --access acknowledge
-    biu_d_ack_i   : in  std_ulogic;  --BIU needs new data (biu_d_o)
-    biu_adri_o    : out std_ulogic_vector(PLEN-1 downto 0);  --access start address
-    biu_adro_i    : in  std_ulogic_vector(PLEN-1 downto 0);
-    biu_size_o    : out std_ulogic_vector(2 downto 0);  --transfer size
-    biu_type_o    : out std_ulogic_vector(2 downto 0);  --burst type
-    biu_lock_o    : out std_ulogic;  --locked transfer
-    biu_prot_o    : out std_ulogic_vector(2 downto 0);  --protection bits
-    biu_we_o      : out std_ulogic;  --write enable
-    biu_d_o       : out std_ulogic_vector(XLEN-1 downto 0);  --write data
-    biu_q_i       : in  std_ulogic_vector(XLEN-1 downto 0);  --read data
-    biu_ack_i     : in  std_ulogic;  --transfer acknowledge
-    biu_err_i     : in  std_ulogic  --transfer error
+    biu_stb_o     : out std_logic;  --access request
+    biu_stb_ack_i : in  std_logic;  --access acknowledge
+    biu_d_ack_i   : in  std_logic;  --BIU needs new data (biu_d_o)
+    biu_adri_o    : out std_logic_vector(PLEN-1 downto 0);  --access start address
+    biu_adro_i    : in  std_logic_vector(PLEN-1 downto 0);
+    biu_size_o    : out std_logic_vector(2 downto 0);  --transfer size
+    biu_type_o    : out std_logic_vector(2 downto 0);  --burst type
+    biu_lock_o    : out std_logic;  --locked transfer
+    biu_prot_o    : out std_logic_vector(2 downto 0);  --protection bits
+    biu_we_o      : out std_logic;  --write enable
+    biu_d_o       : out std_logic_vector(XLEN-1 downto 0);  --write data
+    biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --read data
+    biu_ack_i     : in  std_logic;  --transfer acknowledge
+    biu_err_i     : in  std_logic  --transfer error
   );
 end riscv_dcache_core;
 
@@ -108,14 +108,14 @@ architecture RTL of riscv_dcache_core is
       TECHNOLOGY : string := "GENERIC"
     );
     port (
-      rst_ni : in std_ulogic;
-      clk_i  : in std_ulogic;
+      rst_ni : in std_logic;
+      clk_i  : in std_logic;
 
-      addr_i : in  std_ulogic_vector(ABITS-1 downto 0);
-      we_i   : in  std_ulogic;
-      be_i   : in  std_ulogic_vector((DBITS+7)/8-1 downto 0);
-      din_i  : in  std_ulogic_vector(DBITS-1 downto 0);
-      dout_o : out std_ulogic_vector(DBITS-1 downto 0)
+      addr_i : in  std_logic_vector(ABITS-1 downto 0);
+      we_i   : in  std_logic;
+      be_i   : in  std_logic_vector((DBITS+7)/8-1 downto 0);
+      din_i  : in  std_logic_vector(DBITS-1 downto 0);
+      dout_o : out std_logic_vector(DBITS-1 downto 0)
     );
   end component;
 
@@ -150,37 +150,37 @@ architecture RTL of riscv_dcache_core is
   --
   -- Constants
   --
-  constant ARMED        : std_ulogic_vector(4 downto 0) := "00000";
-  constant FLUSH        : std_ulogic_vector(4 downto 0) := "00001";
-  constant FLUSHWAYS    : std_ulogic_vector(4 downto 0) := "00010";
-  constant WAIT4BIUCMD1 : std_ulogic_vector(4 downto 0) := "00100";
-  constant WAIT4BIUCMD0 : std_ulogic_vector(4 downto 0) := "01000";
-  constant RECOVER      : std_ulogic_vector(4 downto 0) := "10000";
+  constant ARMED        : std_logic_vector(4 downto 0) := "00000";
+  constant FLUSH        : std_logic_vector(4 downto 0) := "00001";
+  constant FLUSHWAYS    : std_logic_vector(4 downto 0) := "00010";
+  constant WAIT4BIUCMD1 : std_logic_vector(4 downto 0) := "00100";
+  constant WAIT4BIUCMD0 : std_logic_vector(4 downto 0) := "01000";
+  constant RECOVER      : std_logic_vector(4 downto 0) := "10000";
 
-  constant IDLE     : std_ulogic_vector(1 downto 0) := "10";
-  constant WAIT4BIU : std_ulogic_vector(1 downto 0) := "01";
-  constant BURST    : std_ulogic_vector(1 downto 0) := "00";
+  constant IDLE     : std_logic_vector(1 downto 0) := "10";
+  constant WAIT4BIU : std_logic_vector(1 downto 0) := "01";
+  constant BURST    : std_logic_vector(1 downto 0) := "00";
 
-  constant NOP       : std_ulogic_vector(1 downto 0) := "00";
-  constant WRITE_WAY : std_ulogic_vector(1 downto 0) := "01";
-  constant READ_WAY  : std_ulogic_vector(1 downto 0) := "10";
+  constant NOP       : std_logic_vector(1 downto 0) := "00";
+  constant WRITE_WAY : std_logic_vector(1 downto 0) := "01";
+  constant READ_WAY  : std_logic_vector(1 downto 0) := "10";
 
   --////////////////////////////////////////////////////////////////
   --
   -- Types
   --
-  type M_DCACHE_WAYS_LOG2_DCACHE_WAYS is array (DCACHE_WAYS-1 downto 0) of std_ulogic_vector(integer(log2(real(DCACHE_WAYS)))-1 downto 0);
-  type M_DCACHE_WAYS_TAG_BITS is array (DCACHE_WAYS-1 downto 0) of std_ulogic_vector(TAG_BITS-1 downto 0);
-  type M_DCACHE_WAYS_BLK_BITS is array (DCACHE_WAYS-1 downto 0) of std_ulogic_vector(BLK_BITS-1 downto 0);
-  type M_DCACHE_WAYS_IDX_BITS is array (DCACHE_WAYS-1 downto 0) of std_ulogic_vector(IDX_BITS-1 downto 0);
-  type M_DCACHE_WAYS_SETS is array (DCACHE_WAYS-1 downto 0) of std_ulogic_vector(SETS-1 downto 0);
+  type M_DCACHE_WAYS_LOG2_DCACHE_WAYS is array (DCACHE_WAYS-1 downto 0) of std_logic_vector(integer(log2(real(DCACHE_WAYS)))-1 downto 0);
+  type M_DCACHE_WAYS_TAG_BITS is array (DCACHE_WAYS-1 downto 0) of std_logic_vector(TAG_BITS-1 downto 0);
+  type M_DCACHE_WAYS_BLK_BITS is array (DCACHE_WAYS-1 downto 0) of std_logic_vector(BLK_BITS-1 downto 0);
+  type M_DCACHE_WAYS_IDX_BITS is array (DCACHE_WAYS-1 downto 0) of std_logic_vector(IDX_BITS-1 downto 0);
+  type M_DCACHE_WAYS_SETS is array (DCACHE_WAYS-1 downto 0) of std_logic_vector(SETS-1 downto 0);
 
   --////////////////////////////////////////////////////////////////
   --
   -- Functions
   --
   function onehot2int (
-    a : std_ulogic_vector(DCACHE_WAYS-1 downto 0)
+    a : std_logic_vector(DCACHE_WAYS-1 downto 0)
     ) return integer is
     variable onehot2int_return : integer;
   begin
@@ -195,23 +195,23 @@ architecture RTL of riscv_dcache_core is
   end onehot2int;
 
   function size2be (
-    size : std_ulogic_vector(2 downto 0);
-    adr  : std_ulogic_vector(XLEN-1 downto 0)
-    ) return std_ulogic_vector is
-    variable adr_lsbs       : std_ulogic_vector(integer(log2(real(XLEN/8)))-1 downto 0);
-    variable size2be_return : std_ulogic_vector (XLEN/8-1 downto 0);
+    size : std_logic_vector(2 downto 0);
+    adr  : std_logic_vector(XLEN-1 downto 0)
+    ) return std_logic_vector is
+    variable adr_lsbs       : std_logic_vector(integer(log2(real(XLEN/8)))-1 downto 0);
+    variable size2be_return : std_logic_vector (XLEN/8-1 downto 0);
   begin
     adr_lsbs := adr(integer(log2(real(XLEN/8)))-1 downto 0);
 
     case (size) is
       when BYTE =>
-        size2be_return := std_ulogic_vector(to_unsigned(1, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
+        size2be_return := std_logic_vector(to_unsigned(1, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
       when HWORD =>
-        size2be_return := std_ulogic_vector(to_unsigned(3, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
+        size2be_return := std_logic_vector(to_unsigned(3, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
       when WORD =>
-        size2be_return := std_ulogic_vector(to_unsigned(15, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
+        size2be_return := std_logic_vector(to_unsigned(15, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
       when DWORD =>
-        size2be_return := std_ulogic_vector(to_unsigned(255, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
+        size2be_return := std_logic_vector(to_unsigned(255, XLEN/8) sll to_integer(unsigned(adr_lsbs)));
       when others =>
         null;
     end case;
@@ -220,11 +220,11 @@ architecture RTL of riscv_dcache_core is
   end size2be;
 
   function be_mux (
-    be : std_ulogic_vector(XLEN/8-1 downto 0);
-    o  : std_ulogic_vector(XLEN-1 downto 0);  --old data
-    n  : std_ulogic_vector(XLEN-1 downto 0)   --new data
-    ) return std_ulogic_vector is
-    variable be_mux_return : std_ulogic_vector (XLEN-1 downto 0);
+    be : std_logic_vector(XLEN/8-1 downto 0);
+    o  : std_logic_vector(XLEN-1 downto 0);  --old data
+    n  : std_logic_vector(XLEN-1 downto 0)   --new data
+    ) return std_logic_vector is
+    variable be_mux_return : std_logic_vector (XLEN-1 downto 0);
   begin
     if (be(0) = '1') then
       be_mux_return(7 downto 0) := n(7 downto 0);
@@ -254,9 +254,9 @@ architecture RTL of riscv_dcache_core is
   end be_mux;
 
   function reduce_nor (
-    reduce_nor_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_nor_out : std_ulogic := '0';
+    reduce_nor_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_nor_out : std_logic := '0';
   begin
     for i in reduce_nor_in'range loop
       reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
@@ -265,9 +265,9 @@ architecture RTL of riscv_dcache_core is
   end reduce_nor;
 
   function reduce_or (
-    reduce_or_in : std_ulogic_vector
-  ) return std_ulogic is
-    variable reduce_or_out : std_ulogic := '0';
+    reduce_or_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
   begin
     for i in reduce_or_in'range loop
       reduce_or_out := reduce_or_out or reduce_or_in(i);
@@ -277,8 +277,8 @@ architecture RTL of riscv_dcache_core is
 
   function reduce_mor (
     reduce_mor_in : M_DCACHE_WAYS_SETS
-  ) return std_ulogic is
-    variable reduce_mor_out : std_ulogic := '0';
+  ) return std_logic is
+    variable reduce_mor_out : std_logic := '0';
   begin
     for i in DCACHE_WAYS-1 downto 0 loop
     for j in SETS-1 downto 0 loop
@@ -290,7 +290,7 @@ architecture RTL of riscv_dcache_core is
 
   function to_stdlogic (
     input : boolean
-  ) return std_ulogic is
+  ) return std_logic is
   begin
     if input then
       return('1');
@@ -305,42 +305,42 @@ architecture RTL of riscv_dcache_core is
   --
 
   --Memory Interface State Machine Section
-  signal mem_vreq_dly : std_ulogic;
-  signal mem_preq_dly : std_ulogic;
-  signal mem_vadr_dly : std_ulogic_vector(XLEN-1 downto 0);
-  signal mem_padr_dly : std_ulogic_vector(PLEN-1 downto 0);
-  signal mem_be       : std_ulogic_vector(XLEN/8-1 downto 0);
-  signal mem_be_dly   : std_ulogic_vector(XLEN/8-1 downto 0);
-  signal mem_we_dly   : std_ulogic;
-  signal mem_d_dly    : std_ulogic_vector(XLEN-1 downto 0);
+  signal mem_vreq_dly : std_logic;
+  signal mem_preq_dly : std_logic;
+  signal mem_vadr_dly : std_logic_vector(XLEN-1 downto 0);
+  signal mem_padr_dly : std_logic_vector(PLEN-1 downto 0);
+  signal mem_be       : std_logic_vector(XLEN/8-1 downto 0);
+  signal mem_be_dly   : std_logic_vector(XLEN/8-1 downto 0);
+  signal mem_we_dly   : std_logic;
+  signal mem_d_dly    : std_logic_vector(XLEN-1 downto 0);
 
-  signal core_tag      : std_ulogic_vector(TAG_BITS-1 downto 0);
-  signal core_tag_hold : std_ulogic_vector(TAG_BITS-1 downto 0);
+  signal core_tag      : std_logic_vector(TAG_BITS-1 downto 0);
+  signal core_tag_hold : std_logic_vector(TAG_BITS-1 downto 0);
 
-  signal hold_flush : std_ulogic;  --stretch flush_i until FSM is ready to serve
+  signal hold_flush : std_logic;  --stretch flush_i until FSM is ready to serve
 
-  signal memfsm_state : std_ulogic_vector(4 downto 0);
+  signal memfsm_state : std_logic_vector(4 downto 0);
 
   --Cache Section
-  signal idx                 : std_ulogic_vector(IDX_BITS-1 downto 0);
-  signal tag_idx             : std_ulogic_vector(IDX_BITS-1 downto 0);
-  signal tag_idx_dly         : std_ulogic_vector(IDX_BITS-1 downto 0);  --delayed version for writing valid/dirty
-  signal tag_idx_hold        : std_ulogic_vector(IDX_BITS-1 downto 0);  --stretched version for writing TAG during fill
-  signal tag_dirty_write_idx : std_ulogic_vector(IDX_BITS-1 downto 0);  --index for writing tag.dirty
-  signal vadr_idx            : std_ulogic_vector(IDX_BITS-1 downto 0);  --index bits extracted from vadr_i
-  signal vadr_dly_idx        : std_ulogic_vector(IDX_BITS-1 downto 0);  --index bits extracted from vadr_dly
-  signal padr_idx            : std_ulogic_vector(IDX_BITS-1 downto 0);
-  signal padr_dly_idx        : std_ulogic_vector(IDX_BITS-1 downto 0);
+  signal idx                 : std_logic_vector(IDX_BITS-1 downto 0);
+  signal tag_idx             : std_logic_vector(IDX_BITS-1 downto 0);
+  signal tag_idx_dly         : std_logic_vector(IDX_BITS-1 downto 0);  --delayed version for writing valid/dirty
+  signal tag_idx_hold        : std_logic_vector(IDX_BITS-1 downto 0);  --stretched version for writing TAG during fill
+  signal tag_dirty_write_idx : std_logic_vector(IDX_BITS-1 downto 0);  --index for writing tag.dirty
+  signal vadr_idx            : std_logic_vector(IDX_BITS-1 downto 0);  --index bits extracted from vadr_i
+  signal vadr_dly_idx        : std_logic_vector(IDX_BITS-1 downto 0);  --index bits extracted from vadr_dly
+  signal padr_idx            : std_logic_vector(IDX_BITS-1 downto 0);
+  signal padr_dly_idx        : std_logic_vector(IDX_BITS-1 downto 0);
 
-  signal tag_we       : std_ulogic_vector(DCACHE_WAYS-1 downto 0);
-  signal tag_we_dirty : std_ulogic_vector(DCACHE_WAYS-1 downto 0);
+  signal tag_we       : std_logic_vector(DCACHE_WAYS-1 downto 0);
+  signal tag_we_dirty : std_logic_vector(DCACHE_WAYS-1 downto 0);
 
-  signal tag_in_valid : std_ulogic_vector(DCACHE_WAYS-1 downto 0);
-  signal tag_in_dirty : std_ulogic_vector(DCACHE_WAYS-1 downto 0);
+  signal tag_in_valid : std_logic_vector(DCACHE_WAYS-1 downto 0);
+  signal tag_in_dirty : std_logic_vector(DCACHE_WAYS-1 downto 0);
   signal tag_in_tag   : M_DCACHE_WAYS_TAG_BITS;
 
-  signal tag_out_valid : std_ulogic_vector(DCACHE_WAYS-1 downto 0);
-  signal tag_out_dirty : std_ulogic_vector(DCACHE_WAYS-1 downto 0);
+  signal tag_out_valid : std_logic_vector(DCACHE_WAYS-1 downto 0);
+  signal tag_out_dirty : std_logic_vector(DCACHE_WAYS-1 downto 0);
   signal tag_out_tag   : M_DCACHE_WAYS_TAG_BITS;
 
   signal tag_byp_idx : M_DCACHE_WAYS_IDX_BITS;
@@ -348,87 +348,87 @@ architecture RTL of riscv_dcache_core is
   signal tag_valid   : M_DCACHE_WAYS_SETS;
   signal tag_dirty   : M_DCACHE_WAYS_SETS;
 
-  signal write_buffer_idx       : std_ulogic_vector(IDX_BITS-1 downto 0);
-  signal write_buffer_adr       : std_ulogic_vector(PLEN-1 downto 0);  --physical address
-  signal write_buffer_be        : std_ulogic_vector(XLEN/8-1 downto 0);
-  signal write_buffer_data      : std_ulogic_vector(XLEN-1 downto 0);
-  signal write_buffer_hit       : std_ulogic_vector(DCACHE_WAYS-1 downto 0);
-  signal write_buffer_was_write : std_ulogic;
-  signal write_buffer_dly       : std_ulogic_vector(DCACHE_WAYS-1 downto 0);
+  signal write_buffer_idx       : std_logic_vector(IDX_BITS-1 downto 0);
+  signal write_buffer_adr       : std_logic_vector(PLEN-1 downto 0);  --physical address
+  signal write_buffer_be        : std_logic_vector(XLEN/8-1 downto 0);
+  signal write_buffer_data      : std_logic_vector(XLEN-1 downto 0);
+  signal write_buffer_hit       : std_logic_vector(DCACHE_WAYS-1 downto 0);
+  signal write_buffer_was_write : std_logic;
+  signal write_buffer_dly       : std_logic_vector(DCACHE_WAYS-1 downto 0);
 
-  signal in_writebuffer : std_ulogic;
+  signal in_writebuffer : std_logic;
 
-  signal dat_idx       : std_ulogic_vector(IDX_BITS-1 downto 0);
-  signal dat_idx_dly   : std_ulogic_vector(IDX_BITS-1 downto 0);
-  signal dat_we        : std_ulogic_vector(DCACHE_WAYS-1 downto 0);
-  signal dat_we_enable : std_ulogic;
-  signal dat_be        : std_ulogic_vector(BLK_BITS/8-1 downto 0);
-  signal dat_in        : std_ulogic_vector(BLK_BITS-1 downto 0);
+  signal dat_idx       : std_logic_vector(IDX_BITS-1 downto 0);
+  signal dat_idx_dly   : std_logic_vector(IDX_BITS-1 downto 0);
+  signal dat_we        : std_logic_vector(DCACHE_WAYS-1 downto 0);
+  signal dat_we_enable : std_logic;
+  signal dat_be        : std_logic_vector(BLK_BITS/8-1 downto 0);
+  signal dat_in        : std_logic_vector(BLK_BITS-1 downto 0);
   signal dat_out       : M_DCACHE_WAYS_BLK_BITS;
 
   signal way_q_mux   : M_DCACHE_WAYS_BLK_BITS;
-  signal way_q       : std_ulogic_vector(XLEN-1 downto 0);  --Only use XLEN bits from way_q
-  signal way_hit     : std_ulogic_vector(DCACHE_WAYS-1 downto 0);
-  signal way_dirty   : std_ulogic_vector(DCACHE_WAYS-1 downto 0);
+  signal way_q       : std_logic_vector(XLEN-1 downto 0);  --Only use XLEN bits from way_q
+  signal way_hit     : std_logic_vector(DCACHE_WAYS-1 downto 0);
+  signal way_dirty   : std_logic_vector(DCACHE_WAYS-1 downto 0);
   signal way_compare : M_DCACHE_WAYS_TAG_BITS;
 
-  signal dat_offset : std_ulogic_vector(DAT_OFF_BITS-1 downto 0);
+  signal dat_offset : std_logic_vector(DAT_OFF_BITS-1 downto 0);
 
-  signal cache_hit : std_ulogic;
-  signal cache_q   : std_ulogic_vector(XLEN-1 downto 0);
+  signal cache_hit : std_logic;
+  signal cache_q   : std_logic_vector(XLEN-1 downto 0);
 
-  signal way_random           : std_ulogic_vector(19 downto 0);
-  signal fill_way_select      : std_ulogic_vector(DCACHE_WAYS-1 downto 0);
-  signal fill_way_select_hold : std_ulogic_vector(DCACHE_WAYS-1 downto 0);
+  signal way_random           : std_logic_vector(19 downto 0);
+  signal fill_way_select      : std_logic_vector(DCACHE_WAYS-1 downto 0);
+  signal fill_way_select_hold : std_logic_vector(DCACHE_WAYS-1 downto 0);
 
-  signal biu_adro_eq_cache_adr_dly : std_ulogic;
-  signal flushing                  : std_ulogic;
-  signal filling                   : std_ulogic;
-  signal flush_idx                 : std_ulogic_vector(IDX_BITS-1 downto 0);
+  signal biu_adro_eq_cache_adr_dly : std_logic;
+  signal flushing                  : std_logic;
+  signal filling                   : std_logic;
+  signal flush_idx                 : std_logic_vector(IDX_BITS-1 downto 0);
 
   --Bus Interface State Machine Section
-  signal biufsm_state : std_ulogic_vector(1 downto 0);
+  signal biufsm_state : std_logic_vector(1 downto 0);
 
-  signal biucmd : std_ulogic_vector(1 downto 0);
+  signal biucmd : std_logic_vector(1 downto 0);
 
-  signal biufsm_ack           : std_ulogic;
-  signal biufsm_err           : std_ulogic;
-  signal biufsm_ack_write_way : std_ulogic;  --BIU FSM should generate biufsm_ack on WRITE_WAY
-  signal biu_q                : std_ulogic_vector(XLEN-1 downto 0);
-  signal biu_buffer           : std_ulogic_vector(BLK_BITS-1 downto 0);
-  signal biu_buffer_valid     : std_ulogic_vector(BURST_SIZE-1 downto 0);
-  signal biu_buffer_dirty     : std_ulogic;
-  signal in_biubuffer         : std_ulogic;
+  signal biufsm_ack           : std_logic;
+  signal biufsm_err           : std_logic;
+  signal biufsm_ack_write_way : std_logic;  --BIU FSM should generate biufsm_ack on WRITE_WAY
+  signal biu_q                : std_logic_vector(XLEN-1 downto 0);
+  signal biu_buffer           : std_logic_vector(BLK_BITS-1 downto 0);
+  signal biu_buffer_valid     : std_logic_vector(BURST_SIZE-1 downto 0);
+  signal biu_buffer_dirty     : std_logic;
+  signal in_biubuffer         : std_logic;
 
-  signal biu_we_hold   : std_ulogic;
-  signal biu_adri_hold : std_ulogic_vector(PLEN-1 downto 0);
-  signal biu_d_hold    : std_ulogic_vector(XLEN-1 downto 0);
+  signal biu_we_hold   : std_logic;
+  signal biu_adri_hold : std_logic_vector(PLEN-1 downto 0);
+  signal biu_d_hold    : std_logic_vector(XLEN-1 downto 0);
 
-  signal evict_buffer_adr  : std_ulogic_vector(PLEN-1 downto 0);
-  signal evict_buffer_data : std_ulogic_vector(BLK_BITS-1 downto 0);
+  signal evict_buffer_adr  : std_logic_vector(PLEN-1 downto 0);
+  signal evict_buffer_data : std_logic_vector(BLK_BITS-1 downto 0);
 
-  signal is_read_way        : std_ulogic;
-  signal is_read_way_dly    : std_ulogic;
-  signal write_evict_buffer : std_ulogic;
+  signal is_read_way        : std_logic;
+  signal is_read_way_dly    : std_logic;
+  signal write_evict_buffer : std_logic;
 
-  signal burst_cnt : std_ulogic_vector(BURST_BITS-1 downto 0);
+  signal burst_cnt : std_logic_vector(BURST_BITS-1 downto 0);
 
   signal get_dirty_way_idx : M_DCACHE_WAYS_LOG2_DCACHE_WAYS;
   signal get_dirty_set_idx : M_DCACHE_WAYS_IDX_BITS;
 
-  signal dirty_sets : std_ulogic_vector(SETS-1 downto 0);
+  signal dirty_sets : std_logic_vector(SETS-1 downto 0);
 
   --Riviera bug workaround
-  signal pwb_adr        : std_ulogic_vector(PLEN-1 downto 0);
-  signal pwb_dat_offset : std_ulogic_vector(DAT_OFF_BITS-1 downto 0);
+  signal pwb_adr        : std_logic_vector(PLEN-1 downto 0);
+  signal pwb_dat_offset : std_logic_vector(DAT_OFF_BITS-1 downto 0);
 
   --CPU side
-  signal mem_ack : std_ulogic;
+  signal mem_ack : std_logic;
 
   --To BIU
-  signal biu_we   : std_ulogic;  --write enable
-  signal biu_adri : std_ulogic_vector(PLEN-1 downto 0);  --access start address
-  signal biu_d    : std_ulogic_vector(XLEN-1 downto 0);  --write data
+  signal biu_we   : std_logic;  --write enable
+  signal biu_adri : std_logic_vector(PLEN-1 downto 0);  --access start address
+  signal biu_d    : std_logic_vector(XLEN-1 downto 0);  --write data
 
 begin
   --////////////////////////////////////////////////////////////////
@@ -654,9 +654,9 @@ begin
     --processing_7 : process (dirty_sets)
     --begin
       --if (dirty_sets(set) = '1') then
-        --get_dirty_set_idx(set) <= std_ulogic_vector(to_unsigned(set, IDX_BITS));
+        --get_dirty_set_idx(set) <= std_logic_vector(to_unsigned(set, IDX_BITS));
       --else
-        --get_dirty_set_idx(set) <= std_ulogic_vector(to_unsigned(0, IDX_BITS));
+        --get_dirty_set_idx(set) <= std_logic_vector(to_unsigned(0, IDX_BITS));
       --end if;
     --end process;
   --end generate;
@@ -846,14 +846,14 @@ begin
   end generate generating_3;
 
   --get requested data (XLEN-size) from way_q_mux(BLK_BITS-size)
-  way_q <= std_ulogic_vector(unsigned(way_q_mux(DCACHE_WAYS-1)(XLEN-1 downto 0)) srl (to_integer(unsigned(dat_offset)*XLEN)));
+  way_q <= std_logic_vector(unsigned(way_q_mux(DCACHE_WAYS-1)(XLEN-1 downto 0)) srl (to_integer(unsigned(dat_offset)*XLEN)));
 
-  --in_biubuffer <= to_stdlogic(biu_adri_hold(PLEN-1 downto BLK_OFF_BITS) = (mem_padr_dly(PLEN-1 downto BLK_OFF_BITS) and std_ulogic_vector(unsigned(biu_buffer_valid(PLEN+BLK_OFF_BITS-1 downto 0)) srl to_integer(unsigned(dat_offset)))))
-                  --when mem_preq_dly = '1' else to_stdlogic(biu_adri_hold(PLEN-1 downto BLK_OFF_BITS) = (mem_padr_i(PLEN-1 downto BLK_OFF_BITS) and std_ulogic_vector(unsigned(biu_buffer_valid(PLEN+BLK_OFF_BITS-1 downto 0)) srl to_integer(unsigned(dat_offset)))));
+  --in_biubuffer <= to_stdlogic(biu_adri_hold(PLEN-1 downto BLK_OFF_BITS) = (mem_padr_dly(PLEN-1 downto BLK_OFF_BITS) and std_logic_vector(unsigned(biu_buffer_valid(PLEN+BLK_OFF_BITS-1 downto 0)) srl to_integer(unsigned(dat_offset)))))
+                  --when mem_preq_dly = '1' else to_stdlogic(biu_adri_hold(PLEN-1 downto BLK_OFF_BITS) = (mem_padr_i(PLEN-1 downto BLK_OFF_BITS) and std_logic_vector(unsigned(biu_buffer_valid(PLEN+BLK_OFF_BITS-1 downto 0)) srl to_integer(unsigned(dat_offset)))));
 
   in_writebuffer <= to_stdlogic(mem_padr_i = write_buffer_adr) and reduce_or(write_buffer_hit);
 
-  cache_q <= std_ulogic_vector(unsigned(biu_buffer(XLEN-1 downto 0)) srl (to_integer(unsigned(dat_offset)*XLEN)))
+  cache_q <= std_logic_vector(unsigned(biu_buffer(XLEN-1 downto 0)) srl (to_integer(unsigned(dat_offset)*XLEN)))
              when in_biubuffer = '1'   else be_mux(write_buffer_be, way_q, write_buffer_data)
              when in_writebuffer = '1' else way_q;
 
@@ -878,8 +878,8 @@ begin
   end process;
 
   --select which way to fill
-  fill_way_select <= std_ulogic_vector(to_unsigned(1, DCACHE_WAYS))
-                     when (DCACHE_WAYS = 1) else std_ulogic_vector(to_unsigned(2**to_integer(unsigned(way_random(integer(log2(real(DCACHE_WAYS)))-1 downto 0))), DCACHE_WAYS));
+  fill_way_select <= std_logic_vector(to_unsigned(1, DCACHE_WAYS))
+                     when (DCACHE_WAYS = 1) else std_logic_vector(to_unsigned(2**to_integer(unsigned(way_random(integer(log2(real(DCACHE_WAYS)))-1 downto 0))), DCACHE_WAYS));
 
   --FILL / WRITE_WAYS use fill_way_select 1 cycle later
   processing_18 : process (clk_i)
@@ -1030,7 +1030,7 @@ begin
 
   --DAT Byte Enable
   dat_be <= (dat_be'range => '1')
-            when biufsm_ack = '1' else std_ulogic_vector(X"00000000000000" & (unsigned(write_buffer_be)) sll (to_integer(unsigned(pwb_dat_offset))*XLEN/8));
+            when biufsm_ack = '1' else std_logic_vector(X"00000000000000" & (unsigned(write_buffer_be)) sll (to_integer(unsigned(pwb_dat_offset))*XLEN/8));
 
   --DAT Index
   processing_26 : process (dat_we_enable, flush_idx, mem_vreq_dly, memfsm_state, tag_idx_hold, vadr_dly_idx, vadr_idx, write_buffer_idx)
@@ -1178,7 +1178,7 @@ begin
         when IDLE =>
           --first XLEN bits went out already
           if (biucmd = WRITE_WAY) then
-            biu_buffer <= std_ulogic_vector(unsigned(evict_buffer_data) srl XLEN);
+            biu_buffer <= std_logic_vector(unsigned(evict_buffer_data) srl XLEN);
           end if;
           biu_buffer_valid <= (others => '0');
           biu_buffer_dirty <= '0';
@@ -1190,7 +1190,7 @@ begin
               biu_buffer_dirty <= biu_buffer_dirty or (mem_we_dly and biu_adro_eq_cache_adr_dly);
             end if;
           elsif (biu_d_ack_i = '1') then  --present new data when previous transfer acknowledged
-            biu_buffer       <= std_ulogic_vector(unsigned(biu_buffer) srl XLEN);
+            biu_buffer       <= std_logic_vector(unsigned(biu_buffer) srl XLEN);
             biu_buffer_valid <= (others => '0');
             biu_buffer_dirty <= '0';
           end if;
@@ -1241,7 +1241,7 @@ begin
     processing_35 : process (flush_idx, tag_dirty)
     begin
       if (tag_dirty(way)(to_integer(unsigned(flush_idx))) = '1') then
-        get_dirty_way_idx(way) <= std_ulogic_vector(to_unsigned(way, integer(log2(real(DCACHE_WAYS)))));
+        get_dirty_way_idx(way) <= std_logic_vector(to_unsigned(way, integer(log2(real(DCACHE_WAYS)))));
       else
         get_dirty_way_idx(way) <= (others => '0');
       end if;
@@ -1274,7 +1274,7 @@ begin
           end case;
         when BURST =>
           if (biu_ack_i = '1') then
-            burst_cnt <= std_ulogic_vector(unsigned(burst_cnt)-to_unsigned(1, BURST_BITS));
+            burst_cnt <= std_logic_vector(unsigned(burst_cnt)-to_unsigned(1, BURST_BITS));
           end if;
         when others =>
           null;
