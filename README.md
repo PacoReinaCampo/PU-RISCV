@@ -1,6 +1,6 @@
 **Implementation in VHDL & (System)Verilog of a Processing Unit compatible with RISC-V and simulation in GHDL & Icarus Verilog**
 
-Processing Unit (PU) is an electronic system within a computer that carries out instructions of a program by performing the basic arithmetic, logic, controlling, and I/O operations specified by instructions. Instruction-level parallelism is a measure of how many instructions in a computer can be executed simultaneously. The PU is contained on a Single Metal Oxide Semiconductor (MOS) Integrated Circuit (IC).
+A Processing Unit (PU) is an electronic system within a computer that carries out instructions of a program by performing the basic arithmetic, logic, controlling, and I/O operations specified by instructions. Instruction-level parallelism is a measure of how many instructions in a computer can be executed simultaneously. The PU is contained on a Single Metal Oxide Semiconductor (MOS) Integrated Circuit (IC).
 
 
 **MIT License**
