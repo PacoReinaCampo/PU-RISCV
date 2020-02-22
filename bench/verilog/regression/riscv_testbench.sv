@@ -330,8 +330,8 @@ module riscv_testbench;
               HAS_MMU, HAS_FPU, HAS_RVA, HAS_RVM, MULLAT);
     $display ("------------------------------------------------------------------------------");
     $display ("  CORES | NODES | X | Y | Z | CORES_PER_TILE | CORES_PER_MISD | CORES_PER_SIMD");
-    $display ("  %5d | %5d | %1d | %1d | %1d | %14d | %14d | %14d   ", 
-              `CORES, `NODES, `X, `Y, `Z, `CORES_PER_TILE, `CORES_PER_MISD, `CORES_PER_SIMD);
+    $display ("    1   | %5d | %1d | %1d | %1d |       --       |       --       |       --       ", 
+              `NODES, `X, `Y, `Z);
     $display ("------------------------------------------------------------------------------");
     $display ("  Test   = %s", INIT_FILE);
     $display ("  ICache = %0dkB", ICACHE_SIZE);

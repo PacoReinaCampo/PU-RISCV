@@ -144,15 +144,15 @@ package riscv_mpsoc_pkg is
   constant AR_BITS                : integer := 5;
 
   --mpsoc parameters
-  constant CORES_PER_SIMD         : integer := 4;
-  constant CORES_PER_MISD         : integer := 4;
+  constant CORES_PER_SIMD         : integer := 1;
+  constant CORES_PER_MISD         : integer := 1;
 
   constant CORES_PER_TILE         : integer := CORES_PER_SIMD + CORES_PER_MISD;
 
   --soc parameters
-  constant X                      : integer := 2;
-  constant Y                      : integer := 2;
-  constant Z                      : integer := 2;
+  constant X                      : integer := 1;
+  constant Y                      : integer := 1;
+  constant Z                      : integer := 1;
 
   constant NODES                  : integer := X*Y*Z;
   constant CORES                  : integer := NODES*CORES_PER_TILE;
