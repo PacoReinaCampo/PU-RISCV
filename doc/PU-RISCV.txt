@@ -1,6 +1,8 @@
 # PU-RISCV WIKI
 
-A Processing Unit (PU) is an electronic system within a computer that carries out instructions of a program by performing the basic arithmetic, logic, controlling, and I/O operations specified by instructions. Instruction-level parallelism is a measure of how many instructions in a computer can be executed simultaneously. The PU is contained on a Single Metal Oxide Semiconductor (MOS) Integrated Circuit (IC).
+A Processing Unit (PU) is an electronic system within a computer that carries out instructions of a program by performing the basic arithmetic, logic, controlling, and I/O operations specified by instructions. Instruction-level parallelism is a measure of how many instructions in a computer can be executed simultaneously. The PU is contained on a single Metal Oxide semiconductor (MOS) Integrated Circuit (IC).
+
+The RISC-V implementation has a 32/64/128 bit Microarchitecture, 6 stages data pipeline and an Instruction Set Architecture based on Reduced Instruction Set Computer. Compatible with AMBA and Wishbone Buses. For Researching and Developing.
 
 | Processing Unit              | Module description               |
 | ---------------------------- | -------------------------------- |
@@ -44,7 +46,7 @@ In a Harvard architecture, there is no need to make the two memories share chara
 ### Instruction INPUTS/OUTPUTS Bus
 
 | Port          |  Size  | Direction | Description        |
-| --------------| ------ | --------- | ------------------ |
+| ------------- | ------ | --------- | ------------------ |
 | `ins_stb`     |    1   |   Input   | Strobe             |
 | `ins_stb_ack` |    1   |   Output  | Strobe acknowledge |
 | `ins_d_ack`   |    1   |   Output  | Data acknowledge   |
@@ -63,7 +65,7 @@ In a Harvard architecture, there is no need to make the two memories share chara
 ### Data INPUTS/OUTPUTS Bus
 
 | Port          |  Size  | Direction | Description        |
-| --------------| ------ | --------- | ------------------ |
+| ------------- | ------ | --------- | ------------------ |
 | `dat_stb`     |    1   |   Input   | Strobe             |
 | `dat_stb_ack` |    1   |   Output  | Strobe acknowledge |
 | `dat_d_ack`   |    1   |   Output  | Data acknowledge   |
@@ -131,7 +133,7 @@ A PU cache is a hardware cache used by the PU to reduce the average cost (time o
 ### Instruction INPUTS/OUTPUTS AMBA3 AHB-Lite Bus
 
 | Port         |  Size  | Direction | Description                                           |
-| -------------| ------ | --------- | ----------------------------------------------------- |
+| ------------ | ------ | --------- | ----------------------------------------------------- |
 | `HRESETn`    |    1   |   Input   | Asynchronous active low reset                         |
 | `HCLK`       |    1   |   Input   | System clock input                                    |
 |              |        |           |                                                       |
@@ -152,7 +154,7 @@ A PU cache is a hardware cache used by the PU to reduce the average cost (time o
 ### Instruction INPUTS/OUTPUTS Wishbone Bus
 
 | Port    |  Size  | Direction | Description                     |
-| --------| ------ | --------- | ------------------------------- |
+| ------- | ------ | --------- | ------------------------------- |
 | `rst`   |    1   |   Input   | Synchronous, active high        |
 | `clk`   |    1   |   Input   | Master clock                    |
 |         |        |           |                                 |
@@ -190,7 +192,7 @@ A PU cache is a hardware cache used by the PU to reduce the average cost (time o
 ### Data INPUTS/OUTPUTS AMBA3 AHB-Lite Bus
 
 | Port         |  Size  | Direction | Description                                           |
-| -------------| ------ | --------- | ----------------------------------------------------- |
+| ------------ | ------ | --------- | ----------------------------------------------------- |
 | `HRESETn`    |    1   |   Input   | Asynchronous active low reset                         |
 | `HCLK`       |    1   |   Input   | System clock input                                    |
 |              |        |           |                                                       |
@@ -211,7 +213,7 @@ A PU cache is a hardware cache used by the PU to reduce the average cost (time o
 ### Data INPUTS/OUTPUTS Wishbone Bus
 
 | Port    |  Size  | Direction | Description                     |
-| --------| ------ | --------- | ------------------------------- |
+| ------- | ------ | --------- | ------------------------------- |
 | `rst`   |    1   |   Input   | Synchronous, active high        |
 | `clk`   |    1   |   Input   | Master clock                    |
 |         |        |           |                                 |
@@ -227,272 +229,41 @@ A PU cache is a hardware cache used by the PU to reduce the average cost (time o
 | `dint`  |    1   |   Output  | Interrupt signal output         |
 
 
-  ---------------------------------------------------------------------------------------------------------------
-  Parameter             |Type    |Default       |Description
-  ---------------------------------------------------------------------------------------------------------------
-  JEDEC_BANK            |Integer |0x0A          |JEDEC Bank
-  ---------------------------------------------------------------------------------------------------------------
-  JEDEC_MANUFACTURER_ID |Integer |0x6E          |JEDEC Manufacturer ID
-  ---------------------------------------------------------------------------------------------------------------
-  XLEN                  |Integer |64            |Data Path Width
-  ---------------------------------------------------------------------------------------------------------------
-  PLEN                  |Integer |64            |Physical Memory Address Size
-  ---------------------------------------------------------------------------------------------------------------
-  PMP_CNT               |Integer |16            |Number of Physical Memory Protection Entries
-  ---------------------------------------------------------------------------------------------------------------
-  PMA_CNT               |Integer |16            |Number of Physical Menory Attribute Entries
-  ---------------------------------------------------------------------------------------------------------------
-  HAS_USER              |Integer |1             |User Mode Enable
-  ---------------------------------------------------------------------------------------------------------------
-  HAS_SUPER             |Integer |1             |Supervisor Mode Enable
-  ---------------------------------------------------------------------------------------------------------------
-  HAS_HYPER             |Integer |1             |Hypervisor Mode Enable
-  ---------------------------------------------------------------------------------------------------------------
-  HAS_RVM               |Integer |1             |"M" Extension Enable
-  ---------------------------------------------------------------------------------------------------------------
-  HAS_RVA               |Integer |1             |"A" Extension Enable
-  ---------------------------------------------------------------------------------------------------------------
-  HAS_RVC               |Integer |1             |"C" Extension Enable
-  ---------------------------------------------------------------------------------------------------------------
-  HAS_BPU               |Integer |1             |Branch Prediction Unit Control Enable
-  ---------------------------------------------------------------------------------------------------------------
-  IS_RV32E              |Integer |0             |RV32E Base Integer Instruction Set Enable
-  ---------------------------------------------------------------------------------------------------------------
-  MULT_LATENCY          |Integer |1             |Hardware Multiplier Latency (if "M" Extension enabled)
-  ---------------------------------------------------------------------------------------------------------------
-  ICACHE_SIZE           |Integer |16            |Instruction Cache size in Kbytes
-  ---------------------------------------------------------------------------------------------------------------
-  ICACHE_BLOCK_SIZE     |Integer |64            |Instruction Cache block length in bytes
-  ---------------------------------------------------------------------------------------------------------------
-  ICACHE_WAYS           |Integer |2             |Instruction Cache associativity
-  ---------------------------------------------------------------------------------------------------------------
-  ICACHE_REPLACE_ALG    |Integer |0             |Instruction Cache replacement algorithm 0: Random 1: FIFO 2: LRU
-  ---------------------------------------------------------------------------------------------------------------
-  DCACHE_SIZE           |Integer |16            |Data Cache size in Kbytes
-  ---------------------------------------------------------------------------------------------------------------
-  DCACHE_BLOCK_SIZE     |Integer |64            |Data Cache block length in bytes
-  ---------------------------------------------------------------------------------------------------------------
-  DCACHE_WAYS           |Integer |2             |Data Cache associativity
-  ---------------------------------------------------------------------------------------------------------------
-  DCACHE_REPLACE_ALG    |Integer |0             |Data Cache replacement algorithm 0: Random 1: FIFO 2: LRU
-  ---------------------------------------------------------------------------------------------------------------
-  HARTID                |Integer |0             |Hart Identifier
-  ---------------------------------------------------------------------------------------------------------------
-  PC_INIT               |Address |h200          |Program Counter Initialisation Vector
-  ---------------------------------------------------------------------------------------------------------------
-  MNMIVEC_DEFAULT       |Address |PC_INIT-'h004 |Machine Mode Non-Maskable Interrupt vector address
-  ---------------------------------------------------------------------------------------------------------------
-  MTVEC_DEFAULT         |Address |PC_INIT-'h040 |Machine Mode Interrupt vector address
-  ---------------------------------------------------------------------------------------------------------------
-  HTVEC_DEFAULT         |Address |PC_INIT-'h080 |Hypervisor Mode Interrupt vector address
-  ---------------------------------------------------------------------------------------------------------------
-  STVEC_DEFAULT         |Address |PC_INIT-'h0C0 |Supervisor Mode Interrupt vector address
-  ---------------------------------------------------------------------------------------------------------------
-  UTVEC_DEFAULT         |Address |PC_INIT-'h100 |User Mode Interrupt vector address
-  ---------------------------------------------------------------------------------------------------------------
-  BP_LOCAL_BITS         |Integer |10            |Number of local predictor bits
-  ---------------------------------------------------------------------------------------------------------------
-  BP_GLOBAL_BITS        |Integer |2             |Number of global predictor bits
-  ---------------------------------------------------------------------------------------------------------------
-  BREAKPOINTS           |Integer |3             |Number of hardware breakpoints
-  ---------------------------------------------------------------------------------------------------------------
-  TECHNOLOGY            |String  |GENERIC       |Target Silicon Technology
-  ---------------------------------------------------------------------------------------------------------------
+### Parameters
 
-
-  -----------------------------------------------------------------------------------
-  Language                         files          blank        comment           code
-  -----------------------------------------------------------------------------------
-  VHDL                                36           1825           3359          12405
-  Verilog-SystemVerilog               38           1664           3245           8780
-  make                                 4             32             79            129
-  Go                                   2             16             99             88
-  C                                    1              3             40              5
-  Markdown                             1              4              0             18
-  -----------------------------------------------------------------------------------
-  SUM:                                82           3544           6822          21425
-  -----------------------------------------------------------------------------------
-
-
-/PU-RISCV
-├── bench
-│   ├── tests
-│   │   └── regression
-│   │       ├── rv32mi-p-breakpoint.hex
-│   │       ├── ...
-│   │       └── rv64um-v-remw.hex
-│   ├── verilog
-│   │   └── regression
-│   │       ├── riscv_dbg_bfm.sv
-│   │       ├── riscv_memory_model.sv
-│   │       └── riscv_testbench.sv
-│   └── vhdl
-│       └── regression
-│   │       ├── riscv_dbg_bfm.vhd
-│   │       ├── riscv_memory_model.vhd
-│   │       └── riscv_testbench.vhd
-├── doc
-│   └── MPSoC-RISCV.txt
-├── rtl
-│   ├── verilog
-│   │   ├── core
-│   │   │   ├── cache
-│   │   │   │   ├── riscv_dcache_core.sv
-│   │   │   │   ├── riscv_dext.sv
-│   │   │   │   ├── riscv_icache_core.sv
-│   │   │   │   └── riscv_noicache_core.sv
-│   │   │   ├── execution
-│   │   │   │   ├── riscv_alu.sv
-│   │   │   │   ├── riscv_bu.sv
-│   │   │   │   ├── riscv_div.sv
-│   │   │   │   ├── riscv_lsu.sv
-│   │   │   │   └── riscv_mul.sv
-│   │   │   ├── memory
-│   │   │   │   ├── riscv_dmem_ctrl.sv
-│   │   │   │   ├── riscv_imem_ctrl.sv
-│   │   │   │   ├── riscv_membuf.sv
-│   │   │   │   ├── riscv_memmisaligned.sv
-│   │   │   │   ├── riscv_mmu.sv
-│   │   │   │   ├── riscv_mux.sv
-│   │   │   │   ├── riscv_pmachk.sv
-│   │   │   │   └── riscv_pmpchk.sv
-│   │   │   ├── riscv_bp.sv
-│   │   │   ├── riscv_core.sv
-│   │   │   ├── riscv_du.sv
-│   │   │   ├── riscv_execution.sv
-│   │   │   ├── riscv_id.sv
-│   │   │   ├── riscv_if.sv
-│   │   │   ├── riscv_memory.sv
-│   │   │   ├── riscv_rf.sv
-│   │   │   ├── riscv_state.sv
-│   │   │   └── riscv_wb.sv
-│   │   ├── memory
-│   │   │   ├── riscv_ram_1r1w_generic.sv
-│   │   │   ├── riscv_ram_1r1w.sv
-│   │   │   ├── riscv_ram_1rw_generic.sv
-│   │   │   ├── riscv_ram_1rw.sv
-│   │   │   └── riscv_ram_queue.sv
-│   │   ├── pkg
-│   │   │   └── riscv_mpsoc_pkg.sv
-│   │   └── pu
-│   │       ├── riscv_biu.sv
-│   │       └── riscv_pu.sv
-│   └── vhdl
-│       ├── core
-│       │   ├── cache
-│       │   │   ├── riscv_dcache_core.vhd
-│       │   │   ├── riscv_dext.vhd
-│       │   │   ├── riscv_icache_core.vhd
-│       │   │   └── riscv_noicache_core.vhd
-│       │   ├── execution
-│       │   │   ├── riscv_alu.vhd
-│       │   │   ├── riscv_bu.vhd
-│       │   │   ├── riscv_div.vhd
-│       │   │   ├── riscv_lsu.vhd
-│       │   │   └── riscv_mul.vhd
-│       │   ├── memory
-│       │   │   ├── riscv_dmem_ctrl.vhd
-│       │   │   ├── riscv_imem_ctrl.vhd
-│       │   │   ├── riscv_membuf.vhd
-│       │   │   ├── riscv_memmisaligned.vhd
-│       │   │   ├── riscv_mmu.vhd
-│       │   │   ├── riscv_mux.vhd
-│       │   │   ├── riscv_pmachk.vhd
-│       │   │   └── riscv_pmpchk.vhd
-│       │   ├── riscv_bp.vhd
-│       │   ├── riscv_core.vhd
-│       │   ├── riscv_du.vhd
-│       │   ├── riscv_execution.vhd
-│       │   ├── riscv_id.vhd
-│       │   ├── riscv_if.vhd
-│       │   ├── riscv_memory.vhd
-│       │   ├── riscv_rf.vhd
-│       │   ├── riscv_state.vhd
-│       │   └── riscv_wb.vhd
-│       ├── memory
-│       │   ├── riscv_ram_1r1w_generic.vhd
-│       │   ├── riscv_ram_1r1w.vhd
-│       │   ├── riscv_ram_1rw_generic.vhd
-│       │   ├── riscv_ram_1rw.vhd
-│       │   └── riscv_ram_queue.vhd
-│       ├── pkg
-│       │   └── riscv_mpsoc_pkg.vhd
-│       └── pu
-│           ├── riscv_biu.vhd
-│           └── riscv_pu.vhd
-├── sim
-│   ├── mixed
-│   │   └── regression
-│   │       └── bin
-│   │           ├── Makefile
-│   │           ├── Makefile.include
-│   │           └── sims
-│   │               └── Makefile.msim
-│   ├── mixed_pu
-│   │   └── regression
-│   │       └── bin
-│   │           ├── Makefile
-│   │           ├── pu_verilog.vc
-│   │           ├── pu_vhdl.vc
-│   │           ├── run.do
-│   │           └── transcript
-│   ├── verilog
-│   │   └── regression
-│   │       └── bin
-│   │           ├── Makefile
-│   │           ├── Makefile.include
-│   │           └── sims
-│   │               └── Makefile.msim
-│   ├── verilog_pu
-│   │   └── regression
-│   │       └── bin
-│   │           ├── Makefile
-│   │           ├── pu.vc
-│   │           ├── run.do
-│   │           └── transcript
-│   ├── vhdl
-│   │   └── regression
-│   │       └── bin
-│   │           ├── Makefile
-│   │           ├── Makefile.include
-│   │           └── sims
-│   │               └── Makefile.msim
-│   └── vhdl_pu
-│       └── regression
-│           └── bin
-│               ├── Makefile
-│               ├── pu.vc
-│               ├── run.do
-│               └── transcript
-├── software
-│   ├── c2elf2hex
-│   ├── go2bin
-│   ├── hello
-│   ├── hello.c
-│   ├── hello.elf
-│   ├── hello.go
-│   ├── hello.hex
-│   ├── INSTALL-IT
-│   ├── life
-│   └── life.go
-├── README.md
-├── icon.jpg
-├── CLEAN-IT
-├── EXECUTE-IT
-├── SIMULATE-MIXED-MS-IT
-├── SIMULATE-MIXED-MS-PU-IT
-├── SIMULATE-VHDL-GHDL-IT
-├── SIMULATE-VHDL-GHDL-PU-IT
-├── SIMULATE-VHDL-MS-IT
-├── SIMULATE-VHDL-MS-PU-IT
-├── SIMULATE-VLOG-IV-IT
-├── SIMULATE-VLOG-IV-PU-IT
-├── SIMULATE-VLOG-MS-IT
-├── SIMULATE-VLOG-MS-PU-IT
-├── SIMULATE-VLOG-YS-IT
-├── SYNTHESIZE-VLOG-YS-IT
-├── FLOW-VLOG-QF-IT
-├── system.iv
-├── system.qf
-├── system.ys
-└── UPLOAD-IT
+| Parameter               | Type     | Default        | Description                                                     |
+| ----------------------- | -------- | -------------- | --------------------------------------------------------------- |
+| `JEDEC_BANK`            |`Integer` |0x0A            |JEDEC Bank                                                       |
+| `JEDEC_MANUFACTURER_ID` |`Integer` |0x6E            |JEDEC Manufacturer ID                                            |
+| `XLEN`                  |`Integer` |64              |Data Path Width                                                  |
+| `PLEN`                  |`Integer` |64              |Physical Memory Address Size                                     |
+| `PMP_CNT`               |`Integer` |16              |Number of Physical Memory Protection Entries                     |
+| `PMA_CNT`               |`Integer` |16              |Number of Physical Menory Attribute Entries                      |
+| `HAS_USER`              |`Integer` |1               |User Mode Enable                                                 |
+| `HAS_SUPER`             |`Integer` |1               |Supervisor Mode Enable                                           |
+| `HAS_HYPER`             |`Integer` |1               |Hypervisor Mode Enable                                           |
+| `HAS_RVM`               |`Integer` |1               |"M" Extension Enable                                             |
+| `HAS_RVA`               |`Integer` |1               |"A" Extension Enable                                             |
+| `HAS_RVC`               |`Integer` |1               |"C" Extension Enable                                             |
+| `HAS_BPU`               |`Integer` |1               |Branch Prediction Unit Control Enable                            |
+| `IS_RV32E`              |`Integer` |0               |RV32E Base Integer Instruction Set Enable                        |
+| `MULT_LATENCY`          |`Integer` |1               |Hardware Multiplier Latency (if "M" Extension enabled)           |
+| `ICACHE_SIZE`           |`Integer` |16              |Instruction Cache size in Kbytes                                 |
+| `ICACHE_BLOCK_SIZE`     |`Integer` |64              |Instruction Cache block length in bytes                          |
+| `ICACHE_WAYS`           |`Integer` |2               |Instruction Cache associativity                                  |
+| `ICACHE_REPLACE_ALG`    |`Integer` |0               |Instruction Cache replacement algorithm 0: Random 1: FIFO 2: LRU |
+| `DCACHE_SIZE`           |`Integer` |16              |Data Cache size in Kbytes                                        |
+| `DCACHE_BLOCK_SIZE`     |`Integer` |64              |Data Cache block length in bytes                                 |
+| `DCACHE_WAYS`           |`Integer` |2               |Data Cache associativity                                         |
+| `DCACHE_REPLACE_ALG`    |`Integer` |0               |Data Cache replacement algorithm 0: Random 1: FIFO 2: LRU        |
+| `HARTID`                |`Integer` |0               |Hart Identifier                                                  |
+| `PC_INIT`               |`Address` |`'h200`         |Program Counter Initialisation Vector                            |
+| `MNMIVEC_DEFAULT`       |`Address` |`PC_INIT-'h004` |Machine Mode Non-Maskable Interrupt vector address               |
+| `MTVEC_DEFAULT`         |`Address` |`PC_INIT-'h040` |Machine Mode Interrupt vector address                            |
+| `HTVEC_DEFAULT`         |`Address` |`PC_INIT-'h080` |Hypervisor Mode Interrupt vector address                         |
+| `STVEC_DEFAULT`         |`Address` |`PC_INIT-'h0C0` |Supervisor Mode Interrupt vector address                         |
+| `UTVEC_DEFAULT`         |`Address` |`PC_INIT-'h100` |User Mode Interrupt vector address                               |
+| `BP_LOCAL_BITS`         |`Integer` |10              |Number of local predictor bits                                   |
+| `BP_GLOBAL_BITS`        |`Integer` |2               |Number of global predictor bits                                  |
+| `BREAKPOINTS`           |`Integer` |3               |Number of hardware breakpoints                                   |
+| `TECHNOLOGY`            |`String`  |`GENERIC`       |Target Silicon Technology                                        |
