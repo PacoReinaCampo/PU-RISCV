@@ -1,5 +1,5 @@
 # vsim -c -do "run.do" work.riscv_pu 
-# Start time: 00:44:56 on Feb 22,2020
+# Start time: 01:32:58 on Mar 24,2020
 # Loading sv_std.std
 # Loading work.riscv_pu
 # Loading work.riscv_core
@@ -39,5 +39,5 @@
 # Loading work.riscv_dext(rtl)
 # Loading work.riscv_biu(rtl)
 # do run.do
-# End time: 00:44:56 on Feb 22,2020, Elapsed time: 0:00:00
+# End time: 01:32:59 on Mar 24,2020, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 0

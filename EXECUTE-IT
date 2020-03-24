@@ -6,10 +6,3 @@ ln -s $PWD/sim/mixed/regression/bin/Makefile.include $PWD/sim/mixed/regression/r
 
 ln -s $PWD/sim/verilog/regression/bin/Makefile         $PWD/sim/verilog/regression/run
 ln -s $PWD/sim/verilog/regression/bin/Makefile.include $PWD/sim/verilog/regression/run
-
-
-rm -rf rtl/verilog/pkg/riscv_mpsoc_pkg.sv
-rm -rf rtl/vhdl/pkg/riscv_mpsoc_pkg.vhd
-
-cp ../rtl/verilog/pkg/riscv_mpsoc_pkg.sv rtl/verilog/pkg
-cp ../rtl/vhdl/pkg/riscv_mpsoc_pkg.vhd   rtl/vhdl/pkg

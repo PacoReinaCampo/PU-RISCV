@@ -9,13 +9,13 @@
 //                  |_|                                                       //
 //                                                                            //
 //                                                                            //
-//              MPSoC-RV64 CPU                                                //
-//              Network on Chip Makefile                                      //
-//              Mesh Topology                                                 //
+//              MPSoC-RISCV CPU                                               //
+//              Debug Controller Simulation Model                             //
+//              AMBA3 AHB-Lite Bus Interface                                  //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Copyright (c) 2019-2020 by the author(s)
+/* Copyright (c) 2017-2018 by the author(s)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,34 +40,68 @@
  *   Francisco Javier Reina Campo <frareicam@gmail.com>
  */
 
-../../../../rtl/vhdl/pkg/riscv_mpsoc_pkg.vhd
+`include "riscv_mpsoc_pkg.sv"
 
-../../../../rtl/vhdl/core/cache/riscv_dext.vhd
-../../../../rtl/vhdl/core/execution/riscv_alu.vhd
-../../../../rtl/vhdl/core/execution/riscv_bu.vhd
-../../../../rtl/vhdl/core/execution/riscv_div.vhd
-../../../../rtl/vhdl/core/execution/riscv_lsu.vhd
-../../../../rtl/vhdl/core/execution/riscv_mul.vhd
-../../../../rtl/vhdl/core/memory/riscv_membuf.vhd
-../../../../rtl/vhdl/core/memory/riscv_memmisaligned.vhd
-../../../../rtl/vhdl/core/memory/riscv_mmu.vhd
-../../../../rtl/vhdl/core/memory/riscv_pmachk.vhd
-../../../../rtl/vhdl/core/memory/riscv_pmpchk.vhd
-../../../../rtl/vhdl/core/riscv_bp.vhd
-../../../../rtl/vhdl/core/riscv_du.vhd
-../../../../rtl/vhdl/core/riscv_execution.vhd
-../../../../rtl/vhdl/core/riscv_id.vhd
-../../../../rtl/vhdl/core/riscv_memory.vhd
-../../../../rtl/vhdl/core/riscv_state.vhd
-../../../../rtl/vhdl/core/riscv_wb.vhd
+module riscv_htif #(
+  parameter XLEN=32
+)
+  (
+    input             rstn,
+    input             clk,
 
-../../../../rtl/vhdl/memory/riscv_ram_1r1w.vhd
-../../../../rtl/vhdl/memory/riscv_ram_1r1w_generic.vhd
-../../../../rtl/vhdl/memory/riscv_ram_1rw_generic.vhd
-../../../../rtl/vhdl/memory/riscv_ram_1rw.vhd
-../../../../rtl/vhdl/memory/riscv_ram_queue.vhd
+    output            host_csr_req,
+    input             host_csr_ack,
+    output            host_csr_we,
+    input  [XLEN-1:0] host_csr_tohost,
+    output [XLEN-1:0] host_csr_fromhost
+  );
 
-../../../../rtl/vhdl/pu/riscv_biu.vhd
+  ////////////////////////////////////////////////////////////////
+  //
+  // Variables
+  //
+  integer watchdog_cnt;
 
-../../../../bench/vhdl/regression/riscv_htif.vhd
-../../../../bench/vhdl/regression/riscv_mmio_if.vhd
+  ////////////////////////////////////////////////////////////////
+  //
+  // Functions
+  //
+  function string hostcode_to_string;
+    input integer hostcode;
+
+    case (hostcode)
+      1337: hostcode_to_string = "OTHER EXCEPTION";
+    endcase
+  endfunction
+
+  ////////////////////////////////////////////////////////////////
+  //
+  // Module body
+  //
+
+  //Generate watchdog counter
+  always @(posedge clk,negedge rstn) begin
+    if (!rstn) watchdog_cnt <= 0;
+    else       watchdog_cnt <= watchdog_cnt + 1;
+  end
+
+  always @(posedge clk) begin
+    if (watchdog_cnt > 200_000 || host_csr_tohost[0] == 1'b1) begin
+      $display("\n");
+      $display("*****************************************************");
+      $display("* RISC-V test bench finished");
+      if (host_csr_tohost[0] == 1'b1) begin
+        if (~|host_csr_tohost[XLEN-1:1])
+          $display("* PASSED %0d", host_csr_tohost);
+        else
+          $display ("* FAILED: code: 0x%h (%0d: %s)", host_csr_tohost >> 1, host_csr_tohost >> 1, hostcode_to_string(host_csr_tohost >> 1) );
+      end
+      else
+        $display ("* FAILED: watchdog count reached (%0d) @%0t", watchdog_cnt, $time);
+      $display("*****************************************************");
+      $display("\n");
+
+      $finish();
+    end
+  end
+endmodule

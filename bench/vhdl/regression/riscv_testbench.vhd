@@ -1,0 +1,756 @@
+-- Converted from riscv_testbench.sv
+-- by verilog2vhdl - QueenField
+
+--//////////////////////////////////////////////////////////////////////////////
+--                                            __ _      _     _               //
+--                                           / _(_)    | |   | |              //
+--                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
+--               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
+--              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
+--               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
+--                  | |                                                       //
+--                  |_|                                                       //
+--                                                                            //
+--                                                                            //
+--              MPSoC-RISCV CPU                                               //
+--              TestBench                                                     //
+--              AMBA3 AHB-Lite Bus Interface                                  //
+--                                                                            //
+--//////////////////////////////////////////////////////////////////////////////
+
+-- Copyright (c) 2017-2018 by the author(s)
+-- *
+-- * Permission is hereby granted, free of charge, to any person obtaining a copy
+-- * of this software and associated documentation files (the "Software"), to deal
+-- * in the Software without restriction, including without limitation the rights
+-- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- * copies of the Software, and to permit persons to whom the Software is
+-- * furnished to do so, subject to the following conditions:
+-- *
+-- * The above copyright notice and this permission notice shall be included in
+-- * all copies or substantial portions of the Software.
+-- *
+-- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+-- * THE SOFTWARE.
+-- *
+-- * =============================================================================
+-- * Author(s):
+-- *   Francisco Javier Reina Campo <frareicam@gmail.com>
+-- */
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+use work.riscv_mpsoc_pkg.all;
+
+entity riscv_testbench is
+end riscv_testbench;
+
+architecture RTL of riscv_testbench is
+  --////////////////////////////////////////////////////////////////
+  --
+  -- Constants
+  --
+  constant MULLAT : integer := MULT_LATENCY;
+
+  --core parameters
+  constant XLEN : integer := 64;
+  constant PLEN : integer := 64;
+
+  constant HAS_USER  : std_logic := '1';
+  constant HAS_SUPER : std_logic := '1';
+  constant HAS_HYPER : std_logic := '1';
+  constant HAS_BPU   : std_logic := '1';
+  constant HAS_FPU   : std_logic := '1';
+  constant HAS_MMU   : std_logic := '1';
+  constant HAS_RVM   : std_logic := '1';
+  constant HAS_RVA   : std_logic := '1';
+  constant HAS_RVC   : std_logic := '1';
+  constant IS_RV32E  : std_logic := '1';
+
+  constant MULT_LATENCY : std_logic := '1';
+
+  constant BREAKPOINTS : integer := 8;  --Number of hardware breakpoints
+
+  constant PMA_CNT : integer := 4;
+  constant PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
+
+  constant BP_GLOBAL_BITS    : integer := 2;
+  constant BP_LOCAL_BITS     : integer := 10;
+  constant BP_LOCAL_BITS_LSB : integer := 2;
+
+  constant ICACHE_SIZE        : integer := 64;  --in KBytes
+  constant ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+  constant ICACHE_WAYS        : integer := 2;   --'n'-way set associative
+  constant ICACHE_REPLACE_ALG : integer := 0;
+  constant ITCM_SIZE          : integer := 0;
+
+  constant DCACHE_SIZE        : integer := 64;  --in KBytes
+  constant DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+  constant DCACHE_WAYS        : integer := 2;   --'n'-way set associative
+  constant DCACHE_REPLACE_ALG : integer := 0;
+  constant DTCM_SIZE          : integer := 0;
+  constant WRITEBUFFER_SIZE   : integer := 8;
+
+  constant TECHNOLOGY : string := "GENERIC";
+
+  constant PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000";
+
+  constant MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
+  constant MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
+  constant HTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000080";
+  constant STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
+  constant UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
+
+  constant JEDEC_BANK : integer := 10;
+
+  constant JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
+
+  constant HARTID : integer := 0;
+
+  constant PARCEL_SIZE : integer := 64;
+
+  --Host-interface
+  constant HTIF : std_logic := '0';
+
+  constant TOHOST  : std_logic_vector(63 downto 0) := X"0000000080001000";
+  constant UART_TX : std_logic_vector(63 downto 0) := X"0000000080001080";
+
+  constant BASE : std_logic_vector(PLEN-1 downto 0) := (others => '0');
+
+  constant MEM_LATENCY : integer := 1;
+
+  constant LATENCY : integer := 1;
+  constant BURST   : integer := 8;
+
+  --////////////////////////////////////////////////////////////////
+  --
+  -- Types
+  --
+  type M_1_1 is array (1 downto 0) of std_logic_vector(1 downto 0);
+  type M_1_2 is array (1 downto 0) of std_logic_vector(2 downto 0);
+  type M_1_PLEN is array (1 downto 0) of std_logic_vector(PLEN-1 downto 0);
+  type M_1_XLEN is array (1 downto 0) of std_logic_vector(XLEN-1 downto 0);
+
+  --////////////////////////////////////////////////////////////////
+  --
+  -- Components
+  --
+  component riscv_pu
+    generic (
+      XLEN : integer := 64;
+      PLEN : integer := 64;
+
+      HAS_USER  : std_logic := '1';
+      HAS_SUPER : std_logic := '1';
+      HAS_HYPER : std_logic := '1';
+      HAS_BPU   : std_logic := '1';
+      HAS_FPU   : std_logic := '1';
+      HAS_MMU   : std_logic := '1';
+      HAS_RVM   : std_logic := '1';
+      HAS_RVA   : std_logic := '1';
+      HAS_RVC   : std_logic := '1';
+      IS_RV32E  : std_logic := '1';
+
+      MULT_LATENCY : std_logic := '1';
+
+      BREAKPOINTS : integer := 8;       --Number of hardware breakpoints
+
+      PMA_CNT : integer := 4;
+      PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
+
+      BP_GLOBAL_BITS    : integer := 2;
+      BP_LOCAL_BITS     : integer := 10;
+      BP_LOCAL_BITS_LSB : integer := 2;
+
+      ICACHE_SIZE        : integer := 64;  --in KBytes
+      ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+      ICACHE_WAYS        : integer := 2;   --'n'-way set associative
+      ICACHE_REPLACE_ALG : integer := 0;
+      ITCM_SIZE          : integer := 0;
+
+      DCACHE_SIZE        : integer := 64;  --in KBytes
+      DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+      DCACHE_WAYS        : integer := 2;   --'n'-way set associative
+      DCACHE_REPLACE_ALG : integer := 0;
+      DTCM_SIZE          : integer := 0;
+      WRITEBUFFER_SIZE   : integer := 8;
+
+      TECHNOLOGY : string := "GENERIC";
+
+      PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000";
+
+      MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
+      MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
+      HTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000080";
+      STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
+      UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
+
+      JEDEC_BANK : integer := 10;
+
+      JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
+
+      HARTID : integer := 0;
+
+      PARCEL_SIZE : integer := 64
+      );
+    port (
+      --AHB interfaces
+      HRESETn : in std_logic;
+      HCLK    : in std_logic;
+
+      pma_cfg_i : M_PMA_CNT_13;
+      pma_adr_i : M_PMA_CNT_PLEN;
+
+      ins_HSEL      : out std_logic;
+      ins_HADDR     : out std_logic_vector(PLEN-1 downto 0);
+      ins_HWDATA    : out std_logic_vector(XLEN-1 downto 0);
+      ins_HRDATA    : in  std_logic_vector(XLEN-1 downto 0);
+      ins_HWRITE    : out std_logic;
+      ins_HSIZE     : out std_logic_vector(2 downto 0);
+      ins_HBURST    : out std_logic_vector(2 downto 0);
+      ins_HPROT     : out std_logic_vector(3 downto 0);
+      ins_HTRANS    : out std_logic_vector(1 downto 0);
+      ins_HMASTLOCK : out std_logic;
+      ins_HREADY    : in  std_logic;
+      ins_HRESP     : in  std_logic;
+
+      dat_HSEL      : out std_logic;
+      dat_HADDR     : out std_logic_vector(PLEN-1 downto 0);
+      dat_HWDATA    : out std_logic_vector(XLEN-1 downto 0);
+      dat_HRDATA    : in  std_logic_vector(XLEN-1 downto 0);
+      dat_HWRITE    : out std_logic;
+      dat_HSIZE     : out std_logic_vector(2 downto 0);
+      dat_HBURST    : out std_logic_vector(2 downto 0);
+      dat_HPROT     : out std_logic_vector(3 downto 0);
+      dat_HTRANS    : out std_logic_vector(1 downto 0);
+      dat_HMASTLOCK : out std_logic;
+      dat_HREADY    : in  std_logic;
+      dat_HRESP     : in  std_logic;
+
+      --Interrupts
+      ext_nmi  : in std_logic;
+      ext_tint : in std_logic;
+      ext_sint : in std_logic;
+      ext_int  : in std_logic_vector(3 downto 0);
+
+      --Debug Interface
+      dbg_stall : in  std_logic;
+      dbg_strb  : in  std_logic;
+      dbg_we    : in  std_logic;
+      dbg_addr  : in  std_logic_vector(PLEN-1 downto 0);
+      dbg_dati  : in  std_logic_vector(XLEN-1 downto 0);
+      dbg_dato  : out std_logic_vector(XLEN-1 downto 0);
+      dbg_ack   : out std_logic;
+      dbg_bp    : out std_logic
+      );
+  end component;
+
+  component riscv_dbg_bfm
+    generic (
+      XLEN : integer := 64;
+      PLEN : integer := 64
+      );
+    port (
+      rstn : std_logic;
+      clk  : std_logic;
+
+      cpu_bp_i : std_logic;
+
+      cpu_stall_o : std_logic;
+      cpu_stb_o   : std_logic;
+      cpu_we_o    : std_logic;
+      cpu_adr_o   : std_logic_vector(PLEN-1 downto 0);
+      cpu_dat_o   : std_logic_vector(XLEN-1 downto 0);
+      cpu_dat_i   : std_logic_vector(XLEN-1 downto 0);
+      cpu_ack_i   : std_logic
+      );
+  end component;
+
+  component riscv_memory_model
+    generic (
+      XLEN : integer := 64;
+      PLEN : integer := 64;
+
+      BASE : std_logic_vector(PLEN-1 downto 0) := (others => '0');
+
+      MEM_LATENCY : integer := 1;
+
+      LATENCY : integer := 1;
+      BURST   : integer := 8;
+
+      INIT_FILE : string := "test.hex"
+      );
+    port (
+      HRESETn : std_logic;
+      HCLK    : std_logic;
+
+      HTRANS : M_1_1;
+      HREADY : std_logic_vector(1 downto 0);
+      HRESP  : std_logic_vector(1 downto 0);
+
+      HADDR  : M_1_PLEN;
+      HWRITE : std_logic_vector(1 downto 0);
+      HSIZE  : M_1_2;
+      HBURST : M_1_2;
+      HWDATA : M_1_XLEN;
+      HRDATA : M_1_XLEN
+      );
+  end component;
+
+  --HTIF Interface
+  component riscv_htif
+    generic (
+      XLEN : integer := 32
+      );
+    port (
+      rstn : in std_logic;
+      clk  : in std_logic;
+
+      host_csr_req      : out std_logic;
+      host_csr_ack      : in  std_logic;
+      host_csr_we       : out std_logic;
+      host_csr_tohost   : in  std_logic_vector(XLEN-1 downto 0);
+      host_csr_fromhost : out std_logic_vector(XLEN-1 downto 0)
+      );
+  end component;
+
+  --MMIO Interface
+  component riscv_mmio_if
+    generic (
+    XLEN    : integer := 32;
+    PLEN    : integer := 32;
+
+    TOHOST  : std_logic_vector(63 downto 0) := X"0000000080001000";
+    UART_TX : std_logic_vector(63 downto 0) := X"0000000080001080"
+      );
+    port (
+      HRESETn : in std_logic;
+      HCLK    : in std_logic;
+
+      HTRANS : in  std_logic_vector(1 downto 0);
+      HADDR  : in  std_logic_vector(HADDR_SIZE-1 downto 0);
+      HWRITE : in  std_logic;
+      HSIZE  : in  std_logic_vector(2 downto 0);
+      HBURST : in  std_logic_vector(2 downto 0);
+      HWDATA : in  std_logic_vector(HDATA_SIZE-1 downto 0);
+      HRDATA : out std_logic_vector(HDATA_SIZE-1 downto 0);
+
+      HREADYOUT : out std_logic;
+      HRESP     : out std_logic
+      );
+  end component;
+
+  --////////////////////////////////////////////////////////////////
+  --
+  -- Variables
+  --
+  signal HCLK    : std_logic;
+  signal HRESETn : std_logic;
+
+  --PMA configuration
+  signal pma_cfg : M_PMA_CNT_13;
+  signal pma_adr : M_PMA_CNT_PLEN;
+
+  --Instruction interface
+  signal ins_HSEL      : std_logic;
+  signal ins_HADDR     : std_logic_vector(PLEN-1 downto 0);
+  signal ins_HRDATA    : std_logic_vector(XLEN-1 downto 0);
+  signal ins_HWDATA    : std_logic_vector(XLEN-1 downto 0);
+  signal ins_HWRITE    : std_logic;
+  signal ins_HSIZE     : std_logic_vector(2 downto 0);
+  signal ins_HBURST    : std_logic_vector(2 downto 0);
+  signal ins_HPROT     : std_logic_vector(3 downto 0);
+  signal ins_HTRANS    : std_logic_vector(1 downto 0);
+  signal ins_HMASTLOCK : std_logic;
+  signal ins_HREADY    : std_logic;
+  signal ins_HRESP     : std_logic;
+
+  --Data interface
+  signal dat_HSEL      : std_logic;
+  signal dat_HADDR     : std_logic_vector(PLEN-1 downto 0);
+  signal dat_HWDATA    : std_logic_vector(XLEN-1 downto 0);
+  signal dat_HRDATA    : std_logic_vector(XLEN-1 downto 0);
+  signal dat_HWRITE    : std_logic;
+  signal dat_HSIZE     : std_logic_vector(2 downto 0);
+  signal dat_HBURST    : std_logic_vector(2 downto 0);
+  signal dat_HPROT     : std_logic_vector(3 downto 0);
+  signal dat_HTRANS    : std_logic_vector(1 downto 0);
+  signal dat_HMASTLOCK : std_logic;
+  signal dat_HREADY    : std_logic;
+  signal dat_HRESP     : std_logic;
+
+  --Debug Interface
+  signal dbg_bp    : std_logic;
+  signal dbg_stall : std_logic;
+  signal dbg_strb  : std_logic;
+  signal dbg_ack   : std_logic;
+  signal dbg_we    : std_logic;
+  signal dbg_addr  : std_logic_vector(PLEN-1 downto 0);
+  signal dbg_dati  : std_logic_vector(XLEN-1 downto 0);
+  signal dbg_dato  : std_logic_vector(XLEN-1 downto 0);
+
+  --Host Interface
+  signal host_csr_req      : std_logic;
+  signal host_csr_ack      : std_logic;
+  signal host_csr_we       : std_logic;
+  signal host_csr_tohost   : std_logic_vector(XLEN-1 downto 0);
+  signal host_csr_fromhost : std_logic_vector(XLEN-1 downto 0);
+
+  --Unified memory interface
+  signal mem_htrans : M_1_1;
+  signal mem_hburst : M_1_2;
+  signal mem_hready : std_logic_vector(1 downto 0);
+  signal mem_hresp  : std_logic_vector(1 downto 0);
+  signal mem_haddr  : M_1_PLEN;
+  signal mem_hwdata : M_1_XLEN;
+  signal mem_hrdata : M_1_XLEN;
+  signal mem_hsize  : M_1_2;
+  signal mem_hwrite : std_logic_vector(1 downto 0);
+
+begin
+  --//////////////////////////////////////////////////////////////
+  --
+  -- Module Body
+  --
+
+  --Define PMA regions
+
+  --crt.0 (ROM) region
+  pma_adr(0) <= TOHOST srl 2;
+  pma_cfg(0) <= (MEM_TYPE_MAIN & "11111000" & AMO_TYPE_NONE & TOR);
+
+  --TOHOST region
+  pma_adr(1) <= ((TOHOST srl 2) and not X"000000000000000f") or X"0000000000000007";
+  pma_cfg(1) <= (MEM_TYPE_IO & "01000000" & AMO_TYPE_NONE & NAPOT);
+
+  --UART-Tx region
+  pma_adr(2) <= UART_TX srl 2;
+  pma_cfg(2) <= (MEM_TYPE_IO & "01000000" & AMO_TYPE_NONE & NA4);
+
+  --RAM region
+  pma_adr(3) <= X"0000000000000001" sll 63;
+  pma_cfg(3) <= (MEM_TYPE_MAIN & "11110000" & AMO_TYPE_NONE & TOR);
+
+  --Hookup Device Under Test
+  dut : riscv_pu
+    generic map (
+      XLEN => XLEN,
+      PLEN => PLEN,
+
+      HAS_USER  => HAS_USER,
+      HAS_SUPER => HAS_SUPER,
+      HAS_HYPER => HAS_HYPER,
+      HAS_BPU   => HAS_BPU,
+      HAS_FPU   => HAS_FPU,
+      HAS_MMU   => HAS_MMU,
+      HAS_RVM   => HAS_RVM,
+      HAS_RVA   => HAS_RVA,
+      HAS_RVC   => HAS_RVC,
+      IS_RV32E  => IS_RV32E,
+
+      MULT_LATENCY => MULT_LATENCY,
+
+      BREAKPOINTS => BREAKPOINTS,
+
+      PMA_CNT => PMA_CNT,
+      PMP_CNT => PMP_CNT,
+
+      BP_GLOBAL_BITS    => BP_GLOBAL_BITS,
+      BP_LOCAL_BITS     => BP_LOCAL_BITS,
+      BP_LOCAL_BITS_LSB => BP_LOCAL_BITS_LSB,
+
+      ICACHE_SIZE        => ICACHE_SIZE,
+      ICACHE_BLOCK_SIZE  => ICACHE_BLOCK_SIZE,
+      ICACHE_WAYS        => ICACHE_WAYS,
+      ICACHE_REPLACE_ALG => ICACHE_REPLACE_ALG,
+      ITCM_SIZE          => ITCM_SIZE,
+
+      DCACHE_SIZE        => DCACHE_SIZE,
+      DCACHE_BLOCK_SIZE  => DCACHE_BLOCK_SIZE,
+      DCACHE_WAYS        => DCACHE_WAYS,
+      DCACHE_REPLACE_ALG => DCACHE_REPLACE_ALG,
+      DTCM_SIZE          => DTCM_SIZE,
+      WRITEBUFFER_SIZE   => WRITEBUFFER_SIZE,
+
+      TECHNOLOGY => TECHNOLOGY,
+
+      PC_INIT => PC_INIT,
+
+      MNMIVEC_DEFAULT => MNMIVEC_DEFAULT,
+      MTVEC_DEFAULT   => MTVEC_DEFAULT,
+      HTVEC_DEFAULT   => HTVEC_DEFAULT,
+      STVEC_DEFAULT   => STVEC_DEFAULT,
+      UTVEC_DEFAULT   => UTVEC_DEFAULT,
+
+      JEDEC_BANK            => JEDEC_BANK,
+      JEDEC_MANUFACTURER_ID => JEDEC_MANUFACTURER_ID,
+
+      HARTID => HARTID,
+
+      PARCEL_SIZE => PARCEL_SIZE
+      )
+    port map (
+      HRESETn => HRESETn,
+      HCLK    => HCLK,
+
+      pma_cfg_i => pma_cfg,
+      pma_adr_i => pma_adr,
+
+      ins_HSEL      => ins_HSEL,
+      ins_HADDR     => ins_HADDR,
+      ins_HWDATA    => ins_HWDATA,
+      ins_HRDATA    => ins_HRDATA,
+      ins_HWRITE    => ins_HWRITE,
+      ins_HSIZE     => ins_HSIZE,
+      ins_HBURST    => ins_HBURST,
+      ins_HPROT     => ins_HPROT,
+      ins_HTRANS    => ins_HTRANS,
+      ins_HMASTLOCK => ins_HMASTLOCK,
+      ins_HREADY    => ins_HREADY,
+      ins_HRESP     => ins_HRESP,
+
+      dat_HSEL      => dat_HSEL,
+      dat_HADDR     => dat_HADDR,
+      dat_HWDATA    => dat_HWDATA,
+      dat_HRDATA    => dat_HRDATA,
+      dat_HWRITE    => dat_HWRITE,
+      dat_HSIZE     => dat_HSIZE,
+      dat_HBURST    => dat_HBURST,
+      dat_HPROT     => dat_HPROT,
+      dat_HTRANS    => dat_HTRANS,
+      dat_HMASTLOCK => dat_HMASTLOCK,
+      dat_HREADY    => dat_HREADY,
+      dat_HRESP     => dat_HRESP,
+
+      --Interrupts
+      ext_nmi  => '0',
+      ext_tint => '0',
+      ext_sint => '0',
+      ext_int  => X"0",
+
+      --Debug Interface
+      dbg_stall => dbg_stall,
+      dbg_strb  => dbg_strb,
+      dbg_we    => dbg_we,
+      dbg_addr  => dbg_addr,
+      dbg_dati  => dbg_dati,
+      dbg_dato  => dbg_dato,
+      dbg_ack   => dbg_ack,
+      dbg_bp    => dbg_bp
+      );
+
+  --Hookup Debug Unit
+  dbg_ctrl : riscv_dbg_bfm
+    generic map (
+      XLEN => XLEN,
+      PLEN => PLEN
+      )
+    port map (
+      rstn => HRESETn,
+      clk  => HCLK,
+
+      cpu_bp_i    => dbg_bp,
+      cpu_stall_o => dbg_stall,
+      cpu_stb_o   => dbg_strb,
+      cpu_we_o    => dbg_we,
+      cpu_adr_o   => dbg_addr,
+      cpu_dat_o   => dbg_dati,
+      cpu_dat_i   => dbg_dato,
+      cpu_ack_i   => dbg_ack
+      );
+
+  --bus <-> memory model connections
+  mem_htrans(0) <= ins_HTRANS;
+  mem_hburst(0) <= ins_HBURST;
+  mem_haddr(0)  <= ins_HADDR;
+  mem_hwrite(0) <= ins_HWRITE;
+  mem_hsize(0)  <= X"0";
+  mem_hwdata(0) <= (others => '0');
+  ins_HRDATA    <= mem_hrdata(0);
+  ins_HREADY    <= mem_hready(0);
+  ins_HRESP     <= mem_hresp(0);
+
+  mem_htrans(1) <= dat_HTRANS;
+  mem_hburst(1) <= dat_HBURST;
+  mem_haddr(1)  <= dat_HADDR;
+  mem_hwrite(1) <= dat_HWRITE;
+  mem_hsize(1)  <= dat_HSIZE;
+  mem_hwdata(1) <= dat_HWDATA;
+  dat_HRDATA    <= mem_hrdata(1);
+  dat_HREADY    <= mem_hready(1);
+  dat_HRESP     <= mem_hresp(1);
+
+  --hookup memory model
+  memory_model : riscv_memory_model
+    generic map (
+      XLEN => XLEN,
+      PLEN => PLEN,
+
+      BASE => BASE,
+
+      MEM_LATENCY => MEM_LATENCY,
+
+      LATENCY => LATENCY,
+      BURST   => BURST,
+
+      INIT_FILE => INIT_FILE
+      )
+    port map (
+      HRESETn => HRESETn,
+      HCLK    => HCLK,
+      HTRANS  => mem_htrans,
+      HREADY  => mem_hready,
+      HRESP   => mem_hresp,
+      HADDR   => mem_haddr,
+      HWRITE  => mem_hwrite,
+      HSIZE   => mem_hsize,
+      HBURST  => mem_hburst,
+      HWDATA  => mem_hwdata,
+      HRDATA  => mem_hrdata
+      );
+
+  --Front-End Server
+  generating_0 : if (HTIF = '1') generate
+    --Old HTIF interface
+    htif_frontend : riscv_htif
+      generic map (
+        XLEN => XLEN
+        )
+      port map (
+        rstn              => HRESETn,
+        clk               => HCLK,
+
+        host_csr_req      => host_csr_req,
+        host_csr_ack      => host_csr_ack,
+        host_csr_we       => host_csr_we,
+        host_csr_tohost   => host_csr_tohost,
+        host_csr_fromhost => host_csr_fromhost
+        );
+  elsif (HTIF = '0') generate
+    mmio_if : riscv_mmio_if
+      generic map (
+        XLEN    => XLEN,
+        PLEN    => PLEN,
+        TOHOST  => TOHOST,
+        UART_TX => UART_TX
+        )
+      port map (
+        HRESETn   => HRESETn,
+        HCLK      => HCLK,
+        HTRANS    => dat_HTRANS,
+        HWRITE    => dat_HWRITE,
+        HSIZE     => dat_HSIZE,
+        HBURST    => dat_HBURST,
+        HADDR     => dat_HADDR,
+        HWDATA    => dat_HWDATA,
+        HRDATA    => open,
+        HREADYOUT => open,
+        HRESP     => open
+        );
+  end generate;
+
+  --Generate clock
+  -- always #1 HCLK = ~HCLK;
+
+  processing_0 : process
+  begin
+    report "\n";
+    report "                                                                                                         ";
+    report "                                                                                                         ";
+    report "                                                              ***                     ***          **    ";
+    report "                                                            ** ***    *                ***          **   ";
+    report "                                                           **   ***  ***                **          **   ";
+    report "                                                           **         *                 **          **   ";
+    report "    ****    **   ****                                      **                           **          **   ";
+    report "   * ***  *  **    ***  *    ***       ***    ***  ****    ******   ***        ***      **      *** **   ";
+    report "  *   ****   **     ****    * ***     * ***    **** **** * *****     ***      * ***     **     ********* ";
+    report " **    **    **      **    *   ***   *   ***    **   ****  **         **     *   ***    **    **   ****  ";
+    report " **    **    **      **   **    *** **    ***   **    **   **         **    **    ***   **    **    **   ";
+    report " **    **    **      **   ********  ********    **    **   **         **    ********    **    **    **   ";
+    report " **    **    **      **   *******   *******     **    **   **         **    *******     **    **    **   ";
+    report " **    **    **      **   **        **          **    **   **         **    **          **    **    **   ";
+    report "  *******     ******* **  ****    * ****    *   **    **   **         **    ****    *   **    **    **   ";
+    report "   ******      *****   **  *******   *******    ***   ***  **         *** *  *******    *** *  *****     ";
+    report "       **                   *****     *****      ***   ***  **         ***    *****      ***    ***      ";
+    report "       **                                                                                                ";
+    report "       **                                                                                                ";
+    report "        **                                                                                               ";
+    report "- RISC-V Regression TestBench ---------------------------------------------------------------------------";
+    report "  XLEN | PRIV | MMU | FPU | RVA | RVM | MULLAT";
+    --  $display ("  %4d | M%C%C%C | %3d | %3d | %3d | %3d | %6d", 
+    --   XLEN, HAS_H > 0 ? "H" : " ", HAS_S > 0 ? "S" : " ", HAS_U > 0 ? "U" : " ",
+    --  HAS_MMU, HAS_FPU, HAS_RVA, HAS_RVM, MULLAT);
+    report "------------------------------------------------------------------------------";
+    report "  CORES | NODES | X | Y | Z | CORES_PER_TILE | CORES_PER_MISD | CORES_PER_SIMD";
+    report "    1   | " & integer'image(NODES) & " | " & integer'image(X) & " | " & integer'image(Y) & " | " & integer'image(Z) & " |";
+    report "------------------------------------------------------------------------------";
+    report "  Test   = " & string'image(INIT_FILE);
+    report "  ICache = %0dkB", ICACHE_SIZE);
+    report "  DCache = %0dkB", DCACHE_SIZE);
+    report "------------------------------------------------------------------------------";
+  end process;
+
+  processing_1 : process
+  begin
+    WAVES_GENERATING_0 : if (WAVES = '1') generate
+      report "waves";
+      report "AS", riscv_testbench, "AS";
+      report "INFO: Signal dump enabled ...\n";
+    end generate;
+
+    --memory_model.read_elf2hex;
+    memory_model.read_ihex;
+    --memory_model.dump;
+
+    HCLK <= '0';
+
+    HRESETn <= '1';
+    for repeat in 1 to 5 loop
+      wait until falling_edge(HCLK);
+    end loop;
+    HRESETn <= '0';
+    for repeat in 1 to 5 loop
+      wait until falling_edge(HCLK);
+    end loop;
+    HRESETn <= '1';
+
+    wait for 112 ns;
+    --stall CPU
+    dbg_ctrl.stall;
+
+    --Enable BREAKPOINT to call external debugger
+    --dbg_ctrl.write('h0004,'h0008);
+
+    --Enable Single Stepping
+    (null)(X"0000", X"0001";
+
+    --single step through 10 instructions
+    for repeat in 1 to 100 loop
+      while (not dbg_ctrl.stall_cpu) loop
+        wait until rising_edge(HCLK);
+      end loop;
+      for repeat in 1 to 15 loop
+        wait until rising_edge(HCLK);
+      end loop;
+      (null)(X"0001", X"0000";         --clear single-step-hit
+      dbg_ctrl.unstall;
+    end loop;
+
+    --last time ...
+    wait until rising_edge(HCLK);
+    while (not dbg_ctrl.stall_cpu) loop
+      wait until rising_edge(HCLK);
+    end loop;
+    --disable Single Stepping
+    (null)(X"0000", X"0000";
+    (null)(X"0001", X"0000";
+    dbg_ctrl.unstall;
+  end process;
+end RTL;
