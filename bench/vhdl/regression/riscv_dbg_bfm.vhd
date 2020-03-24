@@ -1,4 +1,4 @@
--- Converted from riscv_testbench.sv
+-- Converted from riscv_dbg_bfm.sv
 -- by verilog2vhdl - QueenField
 
 --//////////////////////////////////////////////////////////////////////////////
@@ -13,7 +13,7 @@
 --                                                                            //
 --                                                                            //
 --              MPSoC-RISCV CPU                                               //
---              TestBench                                                     //
+--              Debug Controller Simulation Model                             //
 --              AMBA3 AHB-Lite Bus Interface                                  //
 --                                                                            //
 --//////////////////////////////////////////////////////////////////////////////
@@ -43,88 +43,152 @@
 -- *   Francisco Javier Reina Campo <frareicam@gmail.com>
 -- */
 
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 use work.riscv_mpsoc_pkg.all;
 
-entity riscv_htif is
+entity riscv_dbg_bfm is
   generic (
-    XLEN : integer := 32
+    XLEN : integer := 64;
+    PLEN : integer := 64
     );
   port (
     rstn : in std_logic;
     clk  : in std_logic;
 
-    host_csr_req      : out std_logic;
-    host_csr_ack      : in  std_logic;
-    host_csr_we       : out std_logic;
-    host_csr_tohost   : in  std_logic_vector(XLEN-1 downto 0);
-    host_csr_fromhost : out std_logic_vector(XLEN-1 downto 0)
-    );
-end riscv_htif;
+    cpu_bp_i : in std_logic;
 
-architecture RTL of riscv_htif is
-  --////////////////////////////////////////////////////////////////
+    cpu_stall_o : out std_logic;
+    cpu_stb_o   : out std_logic;
+    cpu_we_o    : out std_logic;
+    cpu_adr_o   : out std_logic_vector(PLEN-1 downto 0);
+    cpu_dat_o   : out std_logic_vector(XLEN-1 downto 0);
+    cpu_dat_i   : in  std_logic_vector(XLEN-1 downto 0);
+    cpu_ack_i   : in  std_logic
+    );
+end riscv_dbg_bfm;
+
+architecture RTL of riscv_dbg_bfm is
+
+
+  --//////////////////////////////////////////////////////////////
   --
   -- Variables
   --
-  integer watchdog_cnt : integer;
+  signal stall_cpu : std_logic;
 
-  --////////////////////////////////////////////////////////////////
+  --//////////////////////////////////////////////////////////////
   --
-  -- Functions
+  -- Procedures
   --
-  function hostcode_to_string (
-    hostcode : std_logic
 
-    ) return std_logic is
-    variable hostcode_to_string_return : std_logic;
+  --Stall CPU
+  procedure stall (
+    signal clk : in std_logic;
+
+    signal stall_cpu : out std_logic
+    ) is
   begin
-    case ((hostcode)) is
-      when 1337 =>
-        hostcode_to_string_return <= "OTHER EXCEPTION";
-    end case;
-    return hostcode_to_string_return;
-  end hostcode_to_string;
+    wait until rising_edge(clk);
+    stall_cpu <= '1';
+  end stall;
+
+  --Unstall CPU
+  procedure unstall (
+    signal clk : in std_logic;
+
+    signal stall_cpu : out std_logic
+    ) is
+  begin
+    wait until rising_edge(clk);
+      stall_cpu <= '0';
+  end unstall;
+
+  --Write to CPU (via DBG interface)
+  procedure write (
+    signal clk : in std_logic;
+
+    signal cpu_ack_i : in std_logic;
+
+    signal data : in std_logic_vector(XLEN-1 downto 0);
+    signal addr : in std_logic_vector(PLEN-1 downto 0);
+
+    signal cpu_stb_o : out std_logic;
+    signal cpu_we_o  : out std_logic;
+    signal cpu_dat_o : out std_logic_vector(XLEN-1 downto 0);
+    signal cpu_adr_o : out std_logic_vector(PLEN-1 downto 0)
+    ) is
+  begin
+
+    --setup DBG bus
+    wait until rising_edge(clk);
+    cpu_stb_o <= '1';
+    cpu_we_o  <= '1';
+    cpu_dat_o <= data;
+    cpu_adr_o <= addr;
+
+    --wait for ack
+    while (cpu_ack_i = '0') loop
+      wait until rising_edge(clk);
+    end loop;
+
+    --clear DBG bus
+    cpu_stb_o <= '0';
+    cpu_we_o  <= '0';
+  end write;
+
+  --Read from CPU (via DBG interface)
+  procedure read (
+    signal clk : in std_logic;
+
+    signal cpu_ack_i : in std_logic;
+    signal cpu_dat_i : in std_logic_vector(XLEN-1 downto 0);
+
+    signal data : out std_logic_vector(XLEN-1 downto 0);
+    signal addr : in  std_logic_vector(PLEN-1 downto 0);
+
+    signal cpu_stb_o : out std_logic;
+    signal cpu_we_o  : out std_logic;
+    signal cpu_adr_o : out std_logic_vector(PLEN-1 downto 0)
+    ) is
+  begin
+
+    --setup DBG bus
+    wait until rising_edge(clk);
+    cpu_stb_o <= '1';
+    cpu_we_o  <= '0';
+    cpu_adr_o <= addr;
+
+    --wait for ack
+    while (cpu_ack_i = '0') loop
+      wait until rising_edge(clk);
+    end loop;
+
+    data <= cpu_dat_i;
+
+    --clear DBG bus
+    cpu_stb_o <= '0';
+    cpu_we_o  <= '0';
+  end read;
 
 begin
   --//////////////////////////////////////////////////////////////
   --
-  -- Module Body
+  -- Module body
   --
+  cpu_stb_o   <= '0';
+  cpu_stall_o <= cpu_bp_i or stall_cpu;
 
-  --Generate watchdog counter
-  processing_8 : process (clk, rstn)
+  processing_0 : process (clk, rstn)
   begin
-    if (not rstn) then
-      watchdog_cnt <= 0;
+    if (rstn = '0') then
+      stall_cpu <= '0';
     elsif (rising_edge(clk)) then
-      watchdog_cnt <= watchdog_cnt+1;
-    end if;
-  end process;
-
-  processing_9 : process (clk)
-  begin
-    if (rising_edge(clk)) then
-      if (watchdog_cnt > 200000) then
-        (null)("\n");
-        (null)("*****************************************************");
-        (null)("* RISC-V test bench finished");
-        if (host_csr_tohost(0) = '1') then
-          if (nor host_csr_tohost(XLEN-1 downto 1)) then
-            (null)("* PASSED %0d", host_csr_tohost);
-          else
-            (null)("* FAILED: code: 0x%h (%0d: %s)", host_csr_tohost srl 1, host_csr_tohost srl 1, (null)(host_csr_tohost srl 1));
-          end if;
-        else
-          (null)("* FAILED: watchdog count reached (%0d) @%0t", watchdog_cnt, timing());
-        end if;
-        (null)("*****************************************************");
-        (null)("\n");
-
-        (null)();
+      if (cpu_bp_i = '1') then  --gets cleared by task unstall_cpu
+        stall_cpu <= '1';
       end if;
     end if;
   end process;

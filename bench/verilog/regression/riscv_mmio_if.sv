@@ -64,7 +64,10 @@ module riscv_mmio_if #(
     output                      HRESP    
   );
 
+  ////////////////////////////////////////////////////////////////
+  //
   // Variables
+  //
   logic [HDATA_SIZE-1:0] data_reg;
   logic                  catch_test,
                          catch_uart_tx;
@@ -75,7 +78,10 @@ module riscv_mmio_if #(
 
   integer watchdog_cnt;
 
+  ////////////////////////////////////////////////////////////////
+  //
   // Functions
+  //
   function string hostcode_to_string;
     input integer hostcode;
 
@@ -84,7 +90,10 @@ module riscv_mmio_if #(
     endcase
   endfunction
 
+  ////////////////////////////////////////////////////////////////
+  //
   // Module body
+  //
 
   //Generate watchdog counter
   always @(posedge HCLK,negedge HRESETn) begin

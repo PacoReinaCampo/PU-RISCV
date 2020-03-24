@@ -69,5 +69,6 @@
 
 ../../../../rtl/vhdl/pu/riscv_biu.vhd
 
+../../../../bench/vhdl/regression/riscv_dbg_bfm.vhd
 ../../../../bench/vhdl/regression/riscv_htif.vhd
 ../../../../bench/vhdl/regression/riscv_mmio_if.vhd
