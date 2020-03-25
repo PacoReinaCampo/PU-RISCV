@@ -691,7 +691,7 @@ begin
     report "  CORES | NODES | X | Y | Z | CORES_PER_TILE | CORES_PER_MISD | CORES_PER_SIMD";
     report "    1   | " & integer'image(NODES) & " | " & integer'image(X) & " | " & integer'image(Y) & " | " & integer'image(Z) & " |";
     report "------------------------------------------------------------------------------";
-    report "  Test   = " & string'image(INIT_FILE);
+    report "  Test   = " & to_string(INIT_FILE);
     report "  ICache = %0dkB", ICACHE_SIZE);
     report "  DCache = %0dkB", DCACHE_SIZE);
     report "------------------------------------------------------------------------------";
@@ -739,7 +739,7 @@ begin
       for repeat in 1 to 15 loop
         wait until rising_edge(HCLK);
       end loop;
-      (null)(X"0001", X"0000";         --clear single-step-hit
+      (null)(X"0001", X"0000";  --clear single-step-hit
       dbg_ctrl.unstall;
     end loop;
 

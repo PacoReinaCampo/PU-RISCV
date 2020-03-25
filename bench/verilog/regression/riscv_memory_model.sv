@@ -249,7 +249,7 @@ module riscv_memory_model #(
 
       if (MEM_LATENCY > 0) begin
         always @(posedge HCLK,negedge HRESETn) begin
-          if      (!HRESETn             )          ack_latency[u] <= {MEM_LATENCY{1'b1}};
+          if      (!HRESETn                      ) ack_latency[u] <= {MEM_LATENCY{1'b1}};
           else if (HREADY[u]) begin
             if      ( HTRANS[u] == `HTRANS_IDLE  ) ack_latency[u] <= {MEM_LATENCY{1'b1}};
             else if ( HTRANS[u] == `HTRANS_NONSEQ) ack_latency[u] <= 'h0;

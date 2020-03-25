@@ -964,4 +964,10 @@ package riscv_mpsoc_pkg is
 
   type M_CHANNELS_CHANNELS_XLEN is array (CHANNELS-1 downto 0) of M_CHANNELS_XLEN;
   type M_CHANNELS_NODES_XLEN is array (CHANNELS-1 downto 0) of N_NODES_XLEN;
+
+
+  type M_1_1    is array (1 downto 0) of std_logic_vector(1 downto 0);
+  type M_1_2    is array (1 downto 0) of std_logic_vector(2 downto 0);
+  type M_1_PLEN is array (1 downto 0) of std_logic_vector(PLEN-1 downto 0);
+  type M_1_XLEN is array (1 downto 0) of std_logic_vector(PLEN-1 downto 0);
 end riscv_mpsoc_pkg;
