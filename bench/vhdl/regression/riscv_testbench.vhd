@@ -46,6 +46,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use std.textio.all;
 
 use work.riscv_mpsoc_pkg.all;
 
@@ -137,6 +138,11 @@ architecture RTL of riscv_testbench is
   type M_1_2 is array (1 downto 0) of std_logic_vector(2 downto 0);
   type M_1_PLEN is array (1 downto 0) of std_logic_vector(PLEN-1 downto 0);
   type M_1_XLEN is array (1 downto 0) of std_logic_vector(XLEN-1 downto 0);
+
+  type M_1_7 is array (1 downto 0) of std_logic_vector(7 downto 0);
+  type M_255_7 is array (255 downto 0) of std_logic_vector(7 downto 0);
+
+  type M_PLEN_XLEN is array (PLEN-1 downto 0) of std_logic_vector(XLEN-1 downto 0);
 
   --////////////////////////////////////////////////////////////////
   --
@@ -324,11 +330,11 @@ architecture RTL of riscv_testbench is
   --MMIO Interface
   component riscv_mmio_if
     generic (
-    XLEN    : integer := 32;
-    PLEN    : integer := 32;
+      XLEN : integer := 32;
+      PLEN : integer := 32;
 
-    TOHOST  : std_logic_vector(63 downto 0) := X"0000000080001000";
-    UART_TX : std_logic_vector(63 downto 0) := X"0000000080001080"
+      TOHOST  : std_logic_vector(63 downto 0) := X"0000000080001000";
+      UART_TX : std_logic_vector(63 downto 0) := X"0000000080001080"
       );
     port (
       HRESETn : in std_logic;
@@ -414,6 +420,8 @@ architecture RTL of riscv_testbench is
   signal mem_hsize  : M_1_2;
   signal mem_hwrite : std_logic_vector(1 downto 0);
 
+  signal mem_array : M_PLEN_XLEN;
+
   --//////////////////////////////////////////////////////////////
   --
   -- Procedures
@@ -438,17 +446,17 @@ architecture RTL of riscv_testbench is
     ) is
   begin
     wait until rising_edge(clk);
-      stall_cpu <= '0';
+    stall_cpu <= '0';
   end unstall;
 
   --Write to CPU (via DBG interface)
   procedure write (
+    constant DATA : in std_logic_vector(XLEN-1 downto 0);
+    constant ADDR : in std_logic_vector(PLEN-1 downto 0);
+
     signal clk : in std_logic;
 
     signal cpu_ack_i : in std_logic;
-
-    signal data : in std_logic_vector(XLEN-1 downto 0);
-    signal addr : in std_logic_vector(PLEN-1 downto 0);
 
     signal cpu_stb_o : out std_logic;
     signal cpu_we_o  : out std_logic;
@@ -461,8 +469,8 @@ architecture RTL of riscv_testbench is
     wait until rising_edge(clk);
     cpu_stb_o <= '1';
     cpu_we_o  <= '1';
-    cpu_dat_o <= data;
-    cpu_adr_o <= addr;
+    cpu_dat_o <= DATA;
+    cpu_adr_o <= ADDR;
 
     --wait for ack
     while (cpu_ack_i = '0') loop
@@ -780,7 +788,7 @@ begin
   mem_hburst(0) <= ins_HBURST;
   mem_haddr(0)  <= ins_HADDR;
   mem_hwrite(0) <= ins_HWRITE;
-  mem_hsize(0)  <= X"0";
+  mem_hsize(0)  <= (others => '0');
   mem_hwdata(0) <= (others => '0');
   ins_HRDATA    <= mem_hrdata(0);
   ins_HREADY    <= mem_hready(0);
@@ -833,8 +841,8 @@ begin
         XLEN => XLEN
         )
       port map (
-        rstn              => HRESETn,
-        clk               => HCLK,
+        rstn => HRESETn,
+        clk  => HCLK,
 
         host_csr_req      => host_csr_req,
         host_csr_ack      => host_csr_ack,
@@ -893,73 +901,136 @@ begin
     report "        **                                                                                               ";
     report "- RISC-V Regression TestBench ---------------------------------------------------------------------------";
     report "  XLEN | PRIV | MMU | FPU | RVA | RVM | MULLAT";
-    --  $display ("  %4d | M%C%C%C | %3d | %3d | %3d | %3d | %6d", 
-    --   XLEN, HAS_H > 0 ? "H" : " ", HAS_S > 0 ? "S" : " ", HAS_U > 0 ? "U" : " ",
-    --  HAS_MMU, HAS_FPU, HAS_RVA, HAS_RVM, MULLAT);
+
     report "------------------------------------------------------------------------------";
     report "  CORES | NODES | X | Y | Z | CORES_PER_TILE | CORES_PER_MISD | CORES_PER_SIMD";
     report "    1   | " & integer'image(NODES) & " | " & integer'image(X) & " | " & integer'image(Y) & " | " & integer'image(Z) & " |";
     report "------------------------------------------------------------------------------";
-    report "  Test   = " & to_string(INIT_FILE);
-    report "  ICache = %0dkB", ICACHE_SIZE);
-    report "  DCache = %0dkB", DCACHE_SIZE);
+    report "  Test   = " & INIT_FILE;
+    report "  ICache = %0dkB" & integer'image(ICACHE_SIZE);
+    report "  DCache = %0dkB" & integer'image(DCACHE_SIZE);
     report "------------------------------------------------------------------------------";
+
+    wait;
   end process;
 
   processing_1 : process
   begin
-    WAVES_GENERATING_0 : if (WAVES = '1') generate
-      report "waves";
-      report "AS", riscv_testbench, "AS";
-      report "INFO: Signal dump enabled ...\n";
-    end generate;
+    read_ihex (
+      mem_array => mem_array
+      );
 
-    --memory_model.read_elf2hex;
-    memory_model.read_ihex;
-    --memory_model.dump;
-
-    HCLK <= '0';
-
+    HCLK    <= '0';
     HRESETn <= '1';
+
     for repeat in 1 to 5 loop
       wait until falling_edge(HCLK);
     end loop;
+
     HRESETn <= '0';
+
     for repeat in 1 to 5 loop
       wait until falling_edge(HCLK);
     end loop;
+
     HRESETn <= '1';
 
     wait for 112 ns;
+
     --stall CPU
-    dbg_ctrl.stall;
+    stall (
+      clk       => HCLK,
+      stall_cpu => dbg_stall
+      );
 
     --Enable BREAKPOINT to call external debugger
-    --dbg_ctrl.write('h0004,'h0008);
+    --write(X"0000000000000004", X"00000000000000008");
 
     --Enable Single Stepping
-    (null)(X"0000", X"0001";
+    write (
+      clk => HCLK,
+
+      cpu_ack_i => dbg_ack,
+
+      data => X"0000000000000000",
+      addr => X"0000000000000001",
+
+      cpu_stb_o => dbg_strb,
+      cpu_we_o  => dbg_we,
+      cpu_dat_o => dbg_dato,
+      cpu_adr_o => dbg_addr
+      );
 
     --single step through 10 instructions
     for repeat in 1 to 100 loop
-      while (not dbg_ctrl.stall_cpu) loop
+      while (dbg_stall = '0') loop
         wait until rising_edge(HCLK);
       end loop;
+
       for repeat in 1 to 15 loop
         wait until rising_edge(HCLK);
       end loop;
-      (null)(X"0001", X"0000";  --clear single-step-hit
-      dbg_ctrl.unstall;
+
+      --clear single-step-hit
+      write (
+        clk => HCLK,
+
+        cpu_ack_i => dbg_ack,
+
+        data => X"0000000000000001",
+        addr => X"0000000000000000",
+
+        cpu_stb_o => dbg_strb,
+        cpu_we_o  => dbg_we,
+        cpu_dat_o => dbg_dato,
+        cpu_adr_o => dbg_addr
+        );
+
+      unstall (
+        clk       => HCLK,
+        stall_cpu => dbg_stall
+        );
     end loop;
 
     --last time ...
     wait until rising_edge(HCLK);
-    while (not dbg_ctrl.stall_cpu) loop
+
+    while (dbg_stall = '0') loop
       wait until rising_edge(HCLK);
     end loop;
+
     --disable Single Stepping
-    (null)(X"0000", X"0000";
-    (null)(X"0001", X"0000";
-    dbg_ctrl.unstall;
+    write (
+      clk => HCLK,
+
+      cpu_ack_i => dbg_ack,
+
+      data => X"0000000000000000",
+      addr => X"0000000000000000",
+
+      cpu_stb_o => dbg_strb,
+      cpu_we_o  => dbg_we,
+      cpu_dat_o => dbg_dato,
+      cpu_adr_o => dbg_addr
+      );
+
+    write (
+      clk => HCLK,
+
+      cpu_ack_i => dbg_ack,
+
+      data => X"0000000000000001",
+      addr => X"0000000000000000",
+
+      cpu_stb_o => dbg_strb,
+      cpu_we_o  => dbg_we,
+      cpu_dat_o => dbg_dato,
+      cpu_adr_o => dbg_addr
+      );
+
+    unstall (
+      clk       => HCLK,
+      stall_cpu => dbg_stall
+      );
   end process;
 end RTL;

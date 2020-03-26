@@ -676,15 +676,15 @@ package riscv_mpsoc_pkg is
   constant CAUSE_HEINT : integer := 10;
   constant CAUSE_MEINT : integer := 11;
 
-  constant MEM_TYPE_EMPTY : std_logic_vector(3 downto 0) := X"0";
-  constant MEM_TYPE_MAIN  : std_logic_vector(3 downto 0) := X"1";
-  constant MEM_TYPE_IO    : std_logic_vector(3 downto 0) := X"2";
-  constant MEM_TYPE_TCM   : std_logic_vector(3 downto 0) := X"3";
+  constant MEM_TYPE_EMPTY : std_logic_vector(1 downto 0) := "00";
+  constant MEM_TYPE_MAIN  : std_logic_vector(1 downto 0) := "01";
+  constant MEM_TYPE_IO    : std_logic_vector(1 downto 0) := "10";
+  constant MEM_TYPE_TCM   : std_logic_vector(1 downto 0) := "11";
 
-  constant AMO_TYPE_NONE       : std_logic_vector(3 downto 0) := X"0";
-  constant AMO_TYPE_SWAP       : std_logic_vector(3 downto 0) := X"1";
-  constant AMO_TYPE_LOGICAL    : std_logic_vector(3 downto 0) := X"2";
-  constant AMO_TYPE_ARITHMETIC : std_logic_vector(3 downto 0) := X"3";
+  constant AMO_TYPE_NONE       : std_logic_vector(1 downto 0) := "00";
+  constant AMO_TYPE_SWAP       : std_logic_vector(1 downto 0) := "01";
+  constant AMO_TYPE_LOGICAL    : std_logic_vector(1 downto 0) := "10";
+  constant AMO_TYPE_ARITHMETIC : std_logic_vector(1 downto 0) := "11";
 
   --AHB3 Lite Package
 
