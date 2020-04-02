@@ -126,8 +126,8 @@ entity riscv_core is
 
     --cpu state
     st_prv     : out std_logic_vector(1 downto 0);
-    st_pmpcfg  : out M_PMP_CNT_7;
-    st_pmpaddr : out M_PMP_CNT_PLEN;
+    st_pmpcfg  : out std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
+    st_pmpaddr : out std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
 
     bu_cacheflush : out std_logic;
 
@@ -517,8 +517,8 @@ architecture RTL of riscv_core is
     st_tsr        : out std_logic;      --trap SRET
     st_mcounteren : out std_logic_vector(XLEN-1 downto 0);
     st_scounteren : out std_logic_vector(XLEN-1 downto 0);
-    st_pmpcfg     : out M_PMP_CNT_7;
-    st_pmpaddr    : out M_PMP_CNT_PLEN;
+    st_pmpcfg     : out std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
+    st_pmpaddr    : out std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
 
 
     --interrupts (3=M-mode, 0=U-mode)
@@ -556,14 +556,14 @@ architecture RTL of riscv_core is
       clk  : in std_logic;
 
       --Register File read
-      rf_src1  : in  M_RDPORTS_AR_BITS;
-      rf_src2  : in  M_RDPORTS_AR_BITS;
-      rf_srcv1 : out M_RDPORTS_XLEN;
-      rf_srcv2 : out M_RDPORTS_XLEN;
+      rf_src1  : in  std_logic_matrix(RDPORTS-1 downto 0)(AR_BITS-1 downto 0);
+      rf_src2  : in  std_logic_matrix(RDPORTS-1 downto 0)(AR_BITS-1 downto 0);
+      rf_srcv1 : out std_logic_matrix(RDPORTS-1 downto 0)(XLEN-1 downto 0);
+      rf_srcv2 : out std_logic_matrix(RDPORTS-1 downto 0)(XLEN-1 downto 0);
 
       --Register File write
-      rf_dst  : in M_WRPORTS_AR_BITS;
-      rf_dstv : in M_WRPORTS_XLEN;
+      rf_dst  : in std_logic_matrix(WRPORTS-1 downto 0)(AR_BITS-1 downto 0);
+      rf_dstv : in std_logic_matrix(WRPORTS-1 downto 0)(XLEN-1 downto 0);
       rf_we   : in std_logic_vector(WRPORTS-1 downto 0);
 
       --Debug Interface
@@ -728,12 +728,12 @@ architecture RTL of riscv_core is
   constant AR_BITS : integer := 5;
 
   signal id_srcv2 : std_logic_vector(XLEN-1 downto 0);
-  signal rf_src1  : M_RDPORTS_AR_BITS;
-  signal rf_src2  : M_RDPORTS_AR_BITS;
-  signal rf_dst   : M_WRPORTS_AR_BITS;
-  signal rf_srcv1 : M_RDPORTS_XLEN;
-  signal rf_srcv2 : M_RDPORTS_XLEN;
-  signal rf_dstv  : M_WRPORTS_XLEN;
+  signal rf_src1  : std_logic_matrix(RDPORTS-1 downto 0)(AR_BITS-1 downto 0);
+  signal rf_src2  : std_logic_matrix(RDPORTS-1 downto 0)(AR_BITS-1 downto 0);
+  signal rf_dst   : std_logic_matrix(WRPORTS-1 downto 0)(AR_BITS-1 downto 0);
+  signal rf_srcv1 : std_logic_matrix(RDPORTS-1 downto 0)(XLEN-1 downto 0);
+  signal rf_srcv2 : std_logic_matrix(RDPORTS-1 downto 0)(XLEN-1 downto 0);
+  signal rf_dstv  : std_logic_matrix(WRPORTS-1 downto 0)(XLEN-1 downto 0);
   signal rf_we    : std_logic_vector(WRPORTS-1 downto 0);
 
   --ALU signals

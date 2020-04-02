@@ -61,14 +61,14 @@ entity riscv_rf is
     clk  : in std_logic;
 
     --Register File read
-    rf_src1  : in  M_RDPORTS_AR_BITS;
-    rf_src2  : in  M_RDPORTS_AR_BITS;
-    rf_srcv1 : out M_RDPORTS_XLEN;
-    rf_srcv2 : out M_RDPORTS_XLEN;
+    rf_src1  : in  std_logic_matrix(RDPORTS-1 downto 0)(AR_BITS-1 downto 0);
+    rf_src2  : in  std_logic_matrix(RDPORTS-1 downto 0)(AR_BITS-1 downto 0);
+    rf_srcv1 : out std_logic_matrix(RDPORTS-1 downto 0)(XLEN-1 downto 0);
+    rf_srcv2 : out std_logic_matrix(RDPORTS-1 downto 0)(XLEN-1 downto 0);
 
     --Register File write
-    rf_dst  : in M_WRPORTS_AR_BITS;
-    rf_dstv : in M_WRPORTS_XLEN;
+    rf_dst  : in std_logic_matrix(WRPORTS-1 downto 0)(AR_BITS-1 downto 0);
+    rf_dstv : in std_logic_matrix(WRPORTS-1 downto 0)(XLEN-1 downto 0);
     rf_we   : in std_logic_vector(WRPORTS-1 downto 0);
 
     --Debug Interface
@@ -81,51 +81,19 @@ entity riscv_rf is
 end riscv_rf;
 
 architecture RTL of riscv_rf is
-  --////////////////////////////////////////////////////////////////
-  --
-  -- Functions
-  --
-  function reduce_or (
-    reduce_or_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_or_out : std_logic := '0';
-  begin
-    for i in reduce_or_in'range loop
-      reduce_or_out := reduce_or_out or reduce_or_in(i);
-    end loop;
-    return reduce_or_out;
-  end reduce_or;
-
-  function reduce_nor (
-    reduce_nor_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_nor_out : std_logic := '0';
-  begin
-    for i in reduce_nor_in'range loop
-      reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
-    end loop;
-    return reduce_nor_out;
-  end reduce_nor;
-
-  --///////////////////////////////////////////////////////////////
-  --
-  -- Types
-  --
-  type M_XLEN_XLEN is array (XLEN-1 downto 0) of std_logic_vector (XLEN-1 downto 0);
-
   --///////////////////////////////////////////////////////////////
   --
   -- Variables
   --
 
   --Actual register file
-  signal rf : M_XLEN_XLEN;
+  signal rf : std_logic_matrix(XLEN-1 downto 0)(XLEN-1 downto 0);
 
   --read data from register file
   signal src1_is_x0 : std_logic_vector(RDPORTS-1 downto 0);
   signal src2_is_x0 : std_logic_vector(RDPORTS-1 downto 0);
-  signal dout1      : M_RDPORTS_XLEN;
-  signal dout2      : M_RDPORTS_XLEN;
+  signal dout1      : std_logic_matrix(RDPORTS-1 downto 0)(XLEN-1 downto 0);
+  signal dout2      : std_logic_matrix(RDPORTS-1 downto 0)(XLEN-1 downto 0);
 
 begin
   --///////////////////////////////////////////////////////////////

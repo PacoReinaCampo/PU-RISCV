@@ -48,6 +48,8 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
+use work.riscv_mpsoc_pkg.all;
+
 entity riscv_ram_queue is
   generic (
     DEPTH                  : integer := 8;
@@ -81,27 +83,6 @@ end riscv_ram_queue;
 architecture RTL of riscv_ram_queue is
   --////////////////////////////////////////////////////////////////
   --
-  -- Functions
-  --
-  function to_stdlogic (
-    input : boolean
-  ) return std_logic is
-  begin
-    if input then
-      return('1');
-    else
-      return('0');
-    end if;
-  end function to_stdlogic;
-
-  --////////////////////////////////////////////////////////////////
-  --
-  -- Constants
-  --
-  type M_DEPTH_DBITS is array (DEPTH-1 downto 0) of std_logic_vector(DBITS-1 downto 0);
-
-  --////////////////////////////////////////////////////////////////
-  --
   -- Constants
   --
   constant EMPTY_THRESHOLD              : integer := 1;
@@ -113,7 +94,7 @@ architecture RTL of riscv_ram_queue is
   --
   -- Variables
   --
-  signal queue_data : M_DEPTH_DBITS;
+  signal queue_data : std_logic_matrix(DEPTH-1 downto 0)(DBITS-1 downto 0);
   signal queue_xadr : std_logic_vector(integer(log2(real(DEPTH)))-1 downto 0);
   signal queue_wadr : std_logic_vector(integer(log2(real(DEPTH)))-1 downto 0);
 

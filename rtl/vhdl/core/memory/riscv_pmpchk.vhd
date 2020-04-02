@@ -57,8 +57,8 @@ entity riscv_pmpchk is
   );
   port (
     --From State
-    st_pmpcfg_i  : in M_PMP_CNT_7;
-    st_pmpaddr_i : in M_PMP_CNT_PLEN;
+    st_pmpcfg_i  : in std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
+    st_pmpaddr_i : in std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
     st_prv_i     : in std_logic_vector(1 downto 0);
 
     --Memory Access
@@ -232,42 +232,14 @@ architecture RTL of riscv_pmpchk is
     return highest_priority_match_return;
   end highest_priority_match;
 
-  function to_stdlogic (
-    input : boolean
-  ) return std_logic is
-  begin
-    if input then
-      return('1');
-    else
-      return('0');
-    end if;
-  end function to_stdlogic;
-
-  function reduce_nor (
-    reduce_nor_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_nor_out : std_logic := '0';
-  begin
-    for i in reduce_nor_in'range loop
-      reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
-    end loop;
-    return reduce_nor_out;
-  end reduce_nor;
-
-  --////////////////////////////////////////////////////////////////
-  --
-  -- Types
-  --
-  type M_PMP_CNT_PLEN2 is array (PMP_CNT-1 downto 0) of std_logic_vector(PLEN-1 downto 2);
-
   --////////////////////////////////////////////////////////////////
   --
   -- Variables
   --
   signal access_ub         : std_logic_vector(PLEN-1 downto 0);
   signal access_lb         : std_logic_vector(PLEN-1 downto 0);
-  signal pmp_ub            : M_PMP_CNT_PLEN2;
-  signal pmp_lb            : M_PMP_CNT_PLEN2;
+  signal pmp_ub            : std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 2);
+  signal pmp_lb            : std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 2);
   signal pmp_match         : std_logic_vector(15 downto 0);
   signal pmp_match_all     : std_logic_vector(15 downto 0);
   signal matched_pmp       : std_logic_vector(7 downto 0);

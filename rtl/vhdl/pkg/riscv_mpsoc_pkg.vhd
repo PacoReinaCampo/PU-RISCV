@@ -181,8 +181,6 @@ package riscv_mpsoc_pkg is
 
   constant TABLE_ENTRIES_PTRWIDTH : integer := integer(log2(real(TABLE_ENTRIES)));
 
-  constant MUX_PORTS : integer := 2;
-
   constant ADDR_WIDTH             : integer := 64;
   constant DATA_WIDTH             : integer := 64;
 
@@ -732,242 +730,119 @@ package riscv_mpsoc_pkg is
   constant HRESP_OKAY  : std_logic := '0';
   constant HRESP_ERROR : std_logic := '1';
 
-
   --////////////////////////////////////////////////////////////////
   --
   -- Types
   --
-  type M_PMA_CNT_13 is array (PMA_CNT-1 downto 0) of std_logic_vector(13 downto 0);
-  type M_PMA_CNT_PLEN is array (PMA_CNT-1 downto 0) of std_logic_vector(PLEN-1 downto 0);
+  type std_logic_matrix is array (natural range <>) of std_logic_vector;
+  type std_logic_3array is array (natural range <>) of std_logic_matrix;
+  type std_logic_4array is array (natural range <>) of std_logic_3array;
+  type std_logic_5array is array (natural range <>) of std_logic_4array;
+  type std_logic_6array is array (natural range <>) of std_logic_5array;
+  type std_logic_7array is array (natural range <>) of std_logic_6array;
+  type std_logic_8array is array (natural range <>) of std_logic_7array;
+  type std_logic_9array is array (natural range <>) of std_logic_8array;
 
-  type M_PMP_CNT_7 is array (PMP_CNT-1 downto 0) of std_logic_vector(7 downto 0);
-  type M_PMP_CNT_PLEN is array (PMP_CNT-1 downto 0) of std_logic_vector(PLEN-1 downto 0);
+  type xy_std_logic        is array (natural range <>, natural range <>) of std_logic;
+  type xy_std_logic_vector is array (natural range <>, natural range <>) of std_logic_vector;
+  type xy_std_logic_matrix is array (natural range <>, natural range <>) of std_logic_matrix;
+  type xy_std_logic_3array is array (natural range <>, natural range <>) of std_logic_3array;
+  type xy_std_logic_4array is array (natural range <>, natural range <>) of std_logic_4array;
+  type xy_std_logic_5array is array (natural range <>, natural range <>) of std_logic_5array;
+  type xy_std_logic_6array is array (natural range <>, natural range <>) of std_logic_6array;
+  type xy_std_logic_7array is array (natural range <>, natural range <>) of std_logic_7array;
+  type xy_std_logic_8array is array (natural range <>, natural range <>) of std_logic_8array;
+  type xy_std_logic_9array is array (natural range <>, natural range <>) of std_logic_9array;
 
-  type M_MUX_PORTS_PLEN is array (MUX_PORTS-1 downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_MUX_PORTS_XLEN is array (MUX_PORTS-1 downto 0) of std_logic_vector(XLEN-1 downto 0);
-  type M_MUX_PORTS_2 is array (MUX_PORTS-1 downto 0) of std_logic_vector(2 downto 0);
+  type xyz_std_logic        is array (natural range <>, natural range <>, natural range <>) of std_logic;
+  type xyz_std_logic_vector is array (natural range <>, natural range <>, natural range <>) of std_logic_vector;
+  type xyz_std_logic_matrix is array (natural range <>, natural range <>, natural range <>) of std_logic_matrix;
+  type xyz_std_logic_3array is array (natural range <>, natural range <>, natural range <>) of std_logic_3array;
+  type xyz_std_logic_4array is array (natural range <>, natural range <>, natural range <>) of std_logic_4array;
+  type xyz_std_logic_5array is array (natural range <>, natural range <>, natural range <>) of std_logic_5array;
+  type xyz_std_logic_6array is array (natural range <>, natural range <>, natural range <>) of std_logic_6array;
+  type xyz_std_logic_7array is array (natural range <>, natural range <>, natural range <>) of std_logic_7array;
+  type xyz_std_logic_8array is array (natural range <>, natural range <>, natural range <>) of std_logic_8array;
+  type xyz_std_logic_9array is array (natural range <>, natural range <>, natural range <>) of std_logic_9array;
 
-  type M_2_CORES_PER_MISD1 is array (2 downto 0) of std_logic_vector(CORES_PER_MISD downto 0);
-  type M_2_CORES_PER_SIMD1 is array (2 downto 0) of std_logic_vector(CORES_PER_SIMD downto 0);
-  type M_2_CORES_PER_MISD is array (2 downto 0) of std_logic_vector(CORES_PER_MISD-1 downto 0);
-  type M_2_CORES_PER_SIMD is array (2 downto 0) of std_logic_vector(CORES_PER_SIMD-1 downto 0);
-  type M_2_PLEN is array (2 downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_2_XLEN is array (2 downto 0) of std_logic_vector(XLEN-1 downto 0);
-  type M_2_3 is array (2 downto 0) of std_logic_vector(3 downto 0);
-  type M_2_2 is array (2 downto 0) of std_logic_vector(2 downto 0);
-  type M_2_1 is array (2 downto 0) of std_logic_vector(1 downto 0);
+  function to_stdlogic (input : boolean) return std_logic;
+  function reduce_and (reduce_and_in : std_logic_vector) return std_logic;
+  function reduce_nand (reduce_nand_in : std_logic_vector) return std_logic;
+  function reduce_nor (reduce_nor_in : std_logic_vector) return std_logic;
+  function reduce_or (reduce_or_in : std_logic_vector) return std_logic;
+  function reduce_xor (reduce_xor_in : std_logic_vector) return std_logic;
 
-  type M_CORES_PER_MISD1_2_PLEN is array (CORES_PER_MISD downto 0) of M_2_PLEN;
-  type M_CORES_PER_MISD1_2_XLEN is array (CORES_PER_MISD downto 0) of M_2_XLEN;
-  type M_CORES_PER_MISD1_2_3 is array (CORES_PER_MISD downto 0) of M_2_3;
-  type M_CORES_PER_MISD1_2_2 is array (CORES_PER_MISD downto 0) of M_2_2;
-  type M_CORES_PER_MISD1_2_1 is array (CORES_PER_MISD downto 0) of M_2_1;
+end riscv_mpsoc_pkg;
 
-  type M_CORES_PER_SIMD1_2_PLEN is array (CORES_PER_SIMD downto 0) of M_2_PLEN;
-  type M_CORES_PER_SIMD1_2_XLEN is array (CORES_PER_SIMD downto 0) of M_2_XLEN;
-  type M_CORES_PER_SIMD1_2_3 is array (CORES_PER_SIMD downto 0) of M_2_3;
-  type M_CORES_PER_SIMD1_2_2 is array (CORES_PER_SIMD downto 0) of M_2_2;
-  type M_CORES_PER_SIMD1_2_1 is array (CORES_PER_SIMD downto 0) of M_2_1;
+package body riscv_mpsoc_pkg is
+  --////////////////////////////////////////////////////////////////
+  --
+  -- Functions
+  --
+  function to_stdlogic (
+    input : boolean
+    ) return std_logic is
+  begin
+    if input then
+      return('1');
+    else
+      return('0');
+    end if;
+  end function to_stdlogic;
 
-  type M_CORES_PER_TILE_PLEN is array (CORES_PER_TILE-1 downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_CORES_PER_TILE_XLEN is array (CORES_PER_TILE-1 downto 0) of std_logic_vector(XLEN-1 downto 0);
-  type M_CORES_PER_TILE_3 is array (CORES_PER_TILE-1 downto 0) of std_logic_vector(3 downto 0);
-  type M_CORES_PER_TILE_2 is array (CORES_PER_TILE-1 downto 0) of std_logic_vector(2 downto 0);
-  type M_CORES_PER_TILE_1 is array (CORES_PER_TILE-1 downto 0) of std_logic_vector(1 downto 0);
+  function reduce_and (
+    reduce_and_in : std_logic_vector
+    ) return std_logic is
+    variable reduce_and_out : std_logic := '0';
+  begin
+    for i in reduce_and_in'range loop
+      reduce_and_out := reduce_and_out and reduce_and_in(i);
+    end loop;
+    return reduce_and_out;
+  end reduce_and;
 
-  type M_2CORES_PER_MISD_PLEN is array (2*CORES_PER_MISD-1 downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_2CORES_PER_MISD_XLEN is array (2*CORES_PER_MISD-1 downto 0) of std_logic_vector(XLEN-1 downto 0);
-  type M_2CORES_PER_MISD_3 is array (2*CORES_PER_MISD-1 downto 0) of std_logic_vector(3 downto 0);
-  type M_2CORES_PER_MISD_2 is array (2*CORES_PER_MISD-1 downto 0) of std_logic_vector(2 downto 0);
-  type M_2CORES_PER_MISD_1 is array (2*CORES_PER_MISD-1 downto 0) of std_logic_vector(1 downto 0);
+  function reduce_nand (
+    reduce_nand_in : std_logic_vector
+  ) return std_logic is
+    variable reduce_nand_out : std_logic := '0';
+  begin
+    for i in reduce_nand_in'range loop
+      reduce_nand_out := reduce_nand_out nand reduce_nand_in(i);
+    end loop;
+    return reduce_nand_out;
+  end reduce_nand;
 
-  type M_CORES_PER_MISD_CORES_PER_MISD is array (CORES_PER_MISD-1 downto 0) of std_logic_vector(CORES_PER_MISD-1 downto 0);
-  type M_CORES_PER_MISD_PLEN is array (CORES_PER_MISD-1 downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_CORES_PER_MISD_XLEN is array (CORES_PER_MISD-1 downto 0) of std_logic_vector(XLEN-1 downto 0);
-  type M_CORES_PER_MISD_3 is array (CORES_PER_MISD-1 downto 0) of std_logic_vector(3 downto 0);
-  type M_CORES_PER_MISD_2 is array (CORES_PER_MISD-1 downto 0) of std_logic_vector(2 downto 0);
-  type M_CORES_PER_MISD_1 is array (CORES_PER_MISD-1 downto 0) of std_logic_vector(1 downto 0);
+  function reduce_nor (
+    reduce_nor_in : std_logic_vector
+    ) return std_logic is
+    variable reduce_nor_out : std_logic := '0';
+  begin
+    for i in reduce_nor_in'range loop
+      reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
+    end loop;
+    return reduce_nor_out;
+  end reduce_nor;
 
-  type M_CORES_PER_MISD1_PLEN is array (CORES_PER_MISD downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_CORES_PER_MISD1_XLEN is array (CORES_PER_MISD downto 0) of std_logic_vector(XLEN-1 downto 0);
-  type M_CORES_PER_MISD1_3 is array (CORES_PER_MISD downto 0) of std_logic_vector(3 downto 0);
-  type M_CORES_PER_MISD1_2 is array (CORES_PER_MISD downto 0) of std_logic_vector(2 downto 0);
-  type M_CORES_PER_MISD1_1 is array (CORES_PER_MISD downto 0) of std_logic_vector(1 downto 0);
+  function reduce_or (
+    reduce_or_in : std_logic_vector
+    ) return std_logic is
+    variable reduce_or_out : std_logic := '0';
+  begin
+    for i in reduce_or_in'range loop
+      reduce_or_out := reduce_or_out or reduce_or_in(i);
+    end loop;
+    return reduce_or_out;
+  end reduce_or;
 
-  type M_2CORES_PER_SIMD_PLEN is array (2*CORES_PER_SIMD-1 downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_2CORES_PER_SIMD_XLEN is array (2*CORES_PER_SIMD-1 downto 0) of std_logic_vector(XLEN-1 downto 0);
-  type M_2CORES_PER_SIMD_3 is array (2*CORES_PER_SIMD-1 downto 0) of std_logic_vector(3 downto 0);
-  type M_2CORES_PER_SIMD_2 is array (2*CORES_PER_SIMD-1 downto 0) of std_logic_vector(2 downto 0);
-  type M_2CORES_PER_SIMD_1 is array (2*CORES_PER_SIMD-1 downto 0) of std_logic_vector(1 downto 0);
+  function reduce_xor (
+    reduce_xor_in : std_logic_vector
+    ) return std_logic is
+    variable reduce_xor_out : std_logic := '0';
+  begin
+    for i in reduce_xor_in'range loop
+      reduce_xor_out := reduce_xor_out xor reduce_xor_in(i);
+    end loop;
+    return reduce_xor_out;
+  end reduce_xor;
 
-  type M_CORES_PER_SIMD_CORES_PER_SIMD is array (CORES_PER_SIMD-1 downto 0) of std_logic_vector(CORES_PER_SIMD-1 downto 0);
-  type M_CORES_PER_SIMD_PLEN is array (CORES_PER_SIMD-1 downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_CORES_PER_SIMD_XLEN is array (CORES_PER_SIMD-1 downto 0) of std_logic_vector(XLEN-1 downto 0);
-  type M_CORES_PER_SIMD_3 is array (CORES_PER_SIMD-1 downto 0) of std_logic_vector(3 downto 0);
-  type M_CORES_PER_SIMD_2 is array (CORES_PER_SIMD-1 downto 0) of std_logic_vector(2 downto 0);
-  type M_CORES_PER_SIMD_1 is array (CORES_PER_SIMD-1 downto 0) of std_logic_vector(1 downto 0);
-
-  type M_CORES_PER_SIMD1_PLEN is array (CORES_PER_SIMD downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_CORES_PER_SIMD1_XLEN is array (CORES_PER_SIMD downto 0) of std_logic_vector(XLEN-1 downto 0);
-  type M_CORES_PER_SIMD1_3 is array (CORES_PER_SIMD downto 0) of std_logic_vector(3 downto 0);
-  type M_CORES_PER_SIMD1_2 is array (CORES_PER_SIMD downto 0) of std_logic_vector(2 downto 0);
-  type M_CORES_PER_SIMD1_1 is array (CORES_PER_SIMD downto 0) of std_logic_vector(1 downto 0);
-
-  type M_2_CORES_PER_MISD1_XLEN is array (CORES_PER_SIMD downto 0) of M_CORES_PER_MISD1_XLEN;
-  type M_2_CORES_PER_SIMD1_XLEN is array (CORES_PER_SIMD downto 0) of M_CORES_PER_SIMD1_XLEN;
-
-  type M_CORES_PER_MISD_VALWIDTH is array (CORES_PER_MISD-1 downto 0) of std_logic_vector(VALWIDTH-1 downto 0);
-  type M_CORES_PER_SIMD_VALWIDTH is array (CORES_PER_SIMD-1 downto 0) of std_logic_vector(VALWIDTH-1 downto 0);
-
-  type M_CORES_PER_MISD_PDATA_SIZE is array (CORES_PER_MISD-1 downto 0) of std_logic_vector(PDATA_SIZE-1 downto 0);
-  type M_CORES_PER_SIMD_PDATA_SIZE is array (CORES_PER_SIMD-1 downto 0) of std_logic_vector(PDATA_SIZE-1 downto 0);
-
-  type M_CORES_PER_MISD_FLIT_WIDTH is array (CORES_PER_MISD-1 downto 0) of std_logic_vector(FLIT_WIDTH-1 downto 0);
-  type M_CORES_PER_SIMD_FLIT_WIDTH is array (CORES_PER_SIMD-1 downto 0) of std_logic_vector(FLIT_WIDTH-1 downto 0);
-
-  type M_CORES_PER_MISD_ADDR_WIDTH is array (CORES_PER_MISD-1 downto 0) of std_logic_vector(ADDR_WIDTH-1 downto 0);
-  type M_CORES_PER_MISD_DATA_WIDTH is array (CORES_PER_MISD-1 downto 0) of std_logic_vector(DATA_WIDTH-1 downto 0);
-
-  type M_CORES_PER_SIMD_ADDR_WIDTH is array (CORES_PER_SIMD-1 downto 0) of std_logic_vector(ADDR_WIDTH-1 downto 0);
-  type M_CORES_PER_SIMD_DATA_WIDTH is array (CORES_PER_SIMD-1 downto 0) of std_logic_vector(DATA_WIDTH-1 downto 0);
-
-  type M_CORES_PER_MISD_CHANNELS is array (CORES_PER_MISD-1 downto 0) of std_logic_vector(CHANNELS-1 downto 0);
-  type M_CORES_PER_SIMD_CHANNELS is array (CORES_PER_SIMD-1 downto 0) of std_logic_vector(CHANNELS-1 downto 0);
-
-  type M_CORES_PER_MISD_TABLE_ENTRIES is array (CORES_PER_MISD-1 downto 0) of std_logic_vector(TABLE_ENTRIES-1 downto 0);
-  type M_CORES_PER_SIMD_TABLE_ENTRIES is array (CORES_PER_SIMD-1 downto 0) of std_logic_vector(TABLE_ENTRIES-1 downto 0);
-
-  type M_CORES_PER_MISD_PADDR_SIZE is array (CORES_PER_MISD-1 downto 0) of std_logic_vector(PADDR_SIZE-1 downto 0);
-  type M_CORES_PER_SIMD_PADDR_SIZE is array (CORES_PER_SIMD-1 downto 0) of std_logic_vector(PADDR_SIZE-1 downto 0);
-
-  type M_2_CHANNELS is array (2 downto 0) of std_logic_vector(CHANNELS-1 downto 0);
-
-  type M_3_CORES_PER_MISD is array (3 downto 0) of std_logic_vector(CORES_PER_MISD-1 downto 0);
-  type M_3_CORES_PER_SIMD is array (3 downto 0) of std_logic_vector(CORES_PER_SIMD-1 downto 0);
-
-  type M_CHANNELS_3 is array (CHANNELS-1 downto 0) of std_logic_vector(3 downto 0);
-  type M_CHANNELS_2 is array (CHANNELS-1 downto 0) of std_logic_vector(2 downto 0);
-  type M_CHANNELS_1 is array (CHANNELS-1 downto 0) of std_logic_vector(1 downto 0);
-
-  type M_CHANNELS_PLEN is array (CHANNELS-1 downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_CHANNELS_XLEN is array (CHANNELS-1 downto 0) of std_logic_vector(XLEN-1 downto 0);
-  type M_CHANNELS_FLIT_WIDTH is array (CHANNELS-1 downto 0) of std_logic_vector(FLIT_WIDTH-1 downto 0);
-  type M_INPUTS_CHANNELS is array (INPUTS-1 downto 0) of std_logic_vector(CHANNELS -1 downto 0);
-  type M_INPUTS_PCHANNELS is array (INPUTS-1 downto 0) of std_logic_vector(PCHANNELS -1 downto 0);
-  type M_INPUTS_PLEN is array (INPUTS-1 downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_INPUTS_VCHANNELS is array (INPUTS-1 downto 0) of std_logic_vector(VCHANNELS -1 downto 0);
-  type M_NODES_CHANNELS is array (NODES-1 downto 0) of std_logic_vector(CHANNELS-1 downto 0);
-  type M_NODES_INPUTS is array (NODES-1 downto 0) of std_logic_vector(INPUTS-1 downto 0);
-  type M_NODES_NODES_INPUTS is array (NODES-1 downto 0) of std_logic_vector(INPUTS-1 downto 0);
-  type M_NODES_NODES_OUTPUTS is array (NODES-1 downto 0) of std_logic_vector(OUTPUTS-1 downto 0);
-  type M_NODES_OUTPUTS is array (NODES-1 downto 0) of std_logic_vector(OUTPUTS-1 downto 0);
-  type M_NODES_VCHANNELS is array (NODES-1 downto 0) of std_logic_vector(VCHANNELS-1 downto 0);
-  type M_OUTPUTS_CHANNELS is array (OUTPUTS-1 downto 0) of std_logic_vector(CHANNELS -1 downto 0);
-  type M_OUTPUTS_PCHANNELS is array (OUTPUTS-1 downto 0) of std_logic_vector(PCHANNELS -1 downto 0);
-  type M_OUTPUTS_PLEN is array (OUTPUTS-1 downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_OUTPUTS_VCHANNELS is array (OUTPUTS-1 downto 0) of std_logic_vector(VCHANNELS -1 downto 0);
-  type M_PCHANNELS_PLEN is array (PCHANNELS-1 downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_VCHANNELS_INPUTS is array (VCHANNELS-1 downto 0) of std_logic_vector(INPUTS-1 downto 0);
-  type M_VCHANNELS_OUTPUTS is array (VCHANNELS-1 downto 0) of std_logic_vector(OUTPUTS-1 downto 0);
-  type M_VCHANNELS_PLEN is array (VCHANNELS-1 downto 0) of std_logic_vector(PLEN-1 downto 0);
-
-  type M_INPUTS_VCHANNELS_INPUTS is array (INPUTS-1 downto 0) of M_VCHANNELS_INPUTS;
-  type M_INPUTS_VCHANNELS_OUTPUTS is array (INPUTS-1 downto 0) of M_VCHANNELS_OUTPUTS;
-  type M_INPUTS_VCHANNELS_PLEN is array (INPUTS-1 downto 0) of M_VCHANNELS_PLEN;
-  type M_INPUTS_PCHANNELS_PLEN is array (INPUTS-1 downto 0) of M_PCHANNELS_PLEN;
-  type M_NODES_CHANNELS_PLEN is array (NODES-1 downto 0) of M_CHANNELS_PLEN;
-  type M_NODES_INPUTS_CHANNELS is array (NODES-1 downto 0) of M_INPUTS_CHANNELS;
-  type M_NODES_INPUTS_PCHANNELS is array (NODES-1 downto 0) of M_INPUTS_PCHANNELS;
-  type M_NODES_INPUTS_PLEN is array (NODES-1 downto 0) of M_INPUTS_PLEN;
-  type M_NODES_INPUTS_VCHANNELS is array (NODES-1 downto 0) of M_INPUTS_VCHANNELS;
-  type M_NODES_OUTPUTS_CHANNELS is array (NODES-1 downto 0) of M_OUTPUTS_CHANNELS;
-  type M_NODES_OUTPUTS_PCHANNELS is array (NODES-1 downto 0) of M_OUTPUTS_PCHANNELS;
-  type M_NODES_OUTPUTS_PLEN is array (NODES-1 downto 0) of M_OUTPUTS_PLEN;
-  type M_NODES_OUTPUTS_VCHANNELS is array (NODES-1 downto 0) of M_OUTPUTS_VCHANNELS;
-  type M_NODES_VCHANNELS_PLEN is array (NODES-1 downto 0) of M_VCHANNELS_PLEN;
-  type M_OUTPUTS_PCHANNELS_PLEN is array (OUTPUTS-1 downto 0) of M_PCHANNELS_PLEN;
-  type M_OUTPUTS_VCHANNELS_INPUTS is array (OUTPUTS-1 downto 0) of M_VCHANNELS_INPUTS;
-  type M_OUTPUTS_VCHANNELS_OUTPUTS is array (OUTPUTS-1 downto 0) of M_VCHANNELS_OUTPUTS;
-  type M_OUTPUTS_VCHANNELS_PLEN is array (OUTPUTS-1 downto 0) of M_VCHANNELS_PLEN;
-  type M_VCHANNELS_INPUTS_PLEN is array (VCHANNELS-1 downto 0) of M_INPUTS_PLEN;
-  type M_VCHANNELS_OUTPUTS_PLEN is array (VCHANNELS-1 downto 0) of M_OUTPUTS_PLEN;
-
-  type M_CORES_PER_MISD_CORES_PER_MISD_PLEN is array (CORES_PER_MISD-1 downto 0) of M_CORES_PER_MISD_PLEN;
-  type M_CORES_PER_MISD_CORES_PER_MISD_XLEN is array (CORES_PER_MISD-1 downto 0) of M_CORES_PER_MISD_XLEN;
-  type M_CORES_PER_MISD_CORES_PER_MISD_3 is array (CORES_PER_MISD-1 downto 0) of M_CORES_PER_MISD_3;
-  type M_CORES_PER_MISD_CORES_PER_MISD_2 is array (CORES_PER_MISD-1 downto 0) of M_CORES_PER_MISD_2;
-  type M_CORES_PER_MISD_CORES_PER_MISD_1 is array (CORES_PER_MISD-1 downto 0) of M_CORES_PER_MISD_1;
-
-  type M_CORES_PER_SIMD_CORES_PER_SIMD_PLEN is array (CORES_PER_SIMD-1 downto 0) of M_CORES_PER_SIMD_PLEN;
-  type M_CORES_PER_SIMD_CORES_PER_SIMD_XLEN is array (CORES_PER_SIMD-1 downto 0) of M_CORES_PER_SIMD_XLEN;
-  type M_CORES_PER_SIMD_CORES_PER_SIMD_3 is array (CORES_PER_SIMD-1 downto 0) of M_CORES_PER_SIMD_3;
-  type M_CORES_PER_SIMD_CORES_PER_SIMD_2 is array (CORES_PER_SIMD-1 downto 0) of M_CORES_PER_SIMD_2;
-  type M_CORES_PER_SIMD_CORES_PER_SIMD_1 is array (CORES_PER_SIMD-1 downto 0) of M_CORES_PER_SIMD_1;
-
-  type M_CORES_PER_MISD_CHANNELS_FLIT_WIDTH is array (CORES_PER_MISD-1 downto 0) of M_CHANNELS_FLIT_WIDTH;
-  type M_CORES_PER_SIMD_CHANNELS_FLIT_WIDTH is array (CORES_PER_SIMD-1 downto 0) of M_CHANNELS_FLIT_WIDTH;
-
-  type M_NODES_CHANNELS_FLIT_WIDTH is array (NODES-1 downto 0) of M_CHANNELS_FLIT_WIDTH;
-
-  type M_INPUTS_VCHANNELS_INPUTS_PLEN is array (INPUTS-1 downto 0) of M_VCHANNELS_INPUTS_PLEN;
-  type M_OUTPUTS_VCHANNELS_INPUTS_PLEN is array (OUTPUTS-1 downto 0) of M_VCHANNELS_INPUTS_PLEN;
-
-  type M_NODES_INPUTS_PCHANNELS_PLEN is array (NODES-1 downto 0) of M_INPUTS_PCHANNELS_PLEN;
-  type M_NODES_OUTPUTS_PCHANNELS_PLEN is array (NODES-1 downto 0) of M_OUTPUTS_PCHANNELS_PLEN;
-
-  type M_XYZ is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of std_logic;
-
-  type M_XYZ_CORES_PER_MISD1 is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of std_logic_vector(CORES_PER_MISD downto 0);
-  type M_XYZ_CORES_PER_SIMD1 is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of std_logic_vector(CORES_PER_SIMD downto 0);
-  type M_XYZ_CORES_PER_MISD is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of std_logic_vector(CORES_PER_MISD-1 downto 0);
-  type M_XYZ_CORES_PER_SIMD is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of std_logic_vector(CORES_PER_SIMD-1 downto 0);
-  type M_XYZ_PLEN is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_XYZ_XLEN is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of std_logic_vector(XLEN-1 downto 0);
-  type M_XYZ_3 is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of std_logic_vector(3 downto 0);
-  type M_XYZ_2 is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of std_logic_vector(2 downto 0);
-  type M_XYZ_1 is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of std_logic_vector(1 downto 0);
-
-  type M_XYZ_PDATA_SIZE is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of std_logic_vector(PDATA_SIZE-1 downto 0);
-  type M_XYZ_CHANNELS_XLEN is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of M_CHANNELS_XLEN;
-  type M_XYZ_CHANNELS is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of std_logic_vector(CHANNELS-1 downto 0);
-
-  type M_XYZ_CORES_PER_MISD_PLEN is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of M_CORES_PER_MISD_PLEN;
-  type M_XYZ_CORES_PER_MISD_XLEN is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of M_CORES_PER_MISD_XLEN;
-  type M_XYZ_CORES_PER_MISD_3 is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of M_CORES_PER_MISD_3;
-  type M_XYZ_CORES_PER_MISD_2 is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of M_CORES_PER_MISD_2;
-  type M_XYZ_CORES_PER_MISD_1 is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of M_CORES_PER_MISD_1;
-
-  type M_XYZ_CORES_PER_SIMD_PLEN is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of M_CORES_PER_SIMD_PLEN;
-  type M_XYZ_CORES_PER_SIMD_XLEN is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of M_CORES_PER_SIMD_XLEN;
-  type M_XYZ_CORES_PER_SIMD_3 is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of M_CORES_PER_SIMD_3;
-  type M_XYZ_CORES_PER_SIMD_2 is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of M_CORES_PER_SIMD_2;
-  type M_XYZ_CORES_PER_SIMD_1 is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of M_CORES_PER_SIMD_1;
-
-  type M_XYZ_CORES_PER_MISD_PDATA_SIZE is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of M_CORES_PER_MISD_PDATA_SIZE;
-  type M_XYZ_CORES_PER_SIMD_PDATA_SIZE is array (X-1 downto 0, Y-1 downto 0, Z-1 downto 0) of M_CORES_PER_SIMD_PDATA_SIZE;
-
-  type M_PMA_CNT_XLEN is array (PMA_CNT-1 downto 0) of std_logic_vector(XLEN-1 downto 0);
-
-  type M_RDPORTS_AR_BITS is array (RDPORTS-1 downto 0) of std_logic_vector (AR_BITS-1 downto 0);
-  type M_RDPORTS_XLEN    is array (RDPORTS-1 downto 0) of std_logic_vector (XLEN   -1 downto 0);
-  type M_WRPORTS_AR_BITS is array (WRPORTS-1 downto 0) of std_logic_vector (AR_BITS-1 downto 0);
-  type M_WRPORTS_XLEN    is array (WRPORTS-1 downto 0) of std_logic_vector (XLEN   -1 downto 0);
-
-  type M_CHANNELS_CHANNELS is array (CHANNELS-1 downto 0) of std_logic_vector(CHANNELS-1 downto 0);
-  type M_CHANNELS_NODES is array (CHANNELS-1 downto 0) of std_logic_vector(NODES-1 downto 0);
-  type M_NODES_15 is array (NODES-1 downto 0) of std_logic_vector(15 downto 0);
-  type M_NODES_HDATA_SIZE is array (NODES-1 downto 0) of std_logic_vector(HDATA_SIZE-1 downto 0);
-  type M_NODES_XLEN is array (NODES-1 downto 0) of std_logic_vector(XLEN-1 downto 0);
-
-  type N_CHANNELS_NODES is array (CHANNELS-1 downto 0) of std_logic_vector(NODES downto 0);
-  type N_NODES_XLEN is array (NODES downto 0) of std_logic_vector(XLEN-1 downto 0);
-
-  type M_CHANNELS_CHANNELS_XLEN is array (CHANNELS-1 downto 0) of M_CHANNELS_XLEN;
-  type M_CHANNELS_NODES_XLEN is array (CHANNELS-1 downto 0) of N_NODES_XLEN;
-
-
-  type M_1_1    is array (1 downto 0) of std_logic_vector(1 downto 0);
-  type M_1_2    is array (1 downto 0) of std_logic_vector(2 downto 0);
-  type M_1_PLEN is array (1 downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_1_XLEN is array (1 downto 0) of std_logic_vector(PLEN-1 downto 0);
 end riscv_mpsoc_pkg;

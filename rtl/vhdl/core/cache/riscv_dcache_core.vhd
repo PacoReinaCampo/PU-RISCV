@@ -167,16 +167,6 @@ architecture RTL of riscv_dcache_core is
 
   --////////////////////////////////////////////////////////////////
   --
-  -- Types
-  --
-  type M_DCACHE_WAYS_LOG2_DCACHE_WAYS is array (DCACHE_WAYS-1 downto 0) of std_logic_vector(integer(log2(real(DCACHE_WAYS)))-1 downto 0);
-  type M_DCACHE_WAYS_TAG_BITS is array (DCACHE_WAYS-1 downto 0) of std_logic_vector(TAG_BITS-1 downto 0);
-  type M_DCACHE_WAYS_BLK_BITS is array (DCACHE_WAYS-1 downto 0) of std_logic_vector(BLK_BITS-1 downto 0);
-  type M_DCACHE_WAYS_IDX_BITS is array (DCACHE_WAYS-1 downto 0) of std_logic_vector(IDX_BITS-1 downto 0);
-  type M_DCACHE_WAYS_SETS is array (DCACHE_WAYS-1 downto 0) of std_logic_vector(SETS-1 downto 0);
-
-  --////////////////////////////////////////////////////////////////
-  --
   -- Functions
   --
   function onehot2int (
@@ -253,30 +243,8 @@ architecture RTL of riscv_dcache_core is
     return be_mux_return;
   end be_mux;
 
-  function reduce_nor (
-    reduce_nor_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_nor_out : std_logic := '0';
-  begin
-    for i in reduce_nor_in'range loop
-      reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
-    end loop;
-    return reduce_nor_out;
-  end reduce_nor;
-
-  function reduce_or (
-    reduce_or_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_or_out : std_logic := '0';
-  begin
-    for i in reduce_or_in'range loop
-      reduce_or_out := reduce_or_out or reduce_or_in(i);
-    end loop;
-    return reduce_or_out;
-  end reduce_or;
-
   function reduce_mor (
-    reduce_mor_in : M_DCACHE_WAYS_SETS
+    reduce_mor_in : std_logic_matrix(DCACHE_WAYS-1 downto 0)(XLEN-1 downto 0)
   ) return std_logic is
     variable reduce_mor_out : std_logic := '0';
   begin
@@ -287,17 +255,6 @@ architecture RTL of riscv_dcache_core is
     end loop;
     return reduce_mor_out;
   end reduce_mor;
-
-  function to_stdlogic (
-    input : boolean
-  ) return std_logic is
-  begin
-    if input then
-      return('1');
-    else
-      return('0');
-    end if;
-  end function to_stdlogic;
 
   --////////////////////////////////////////////////////////////////
   --
@@ -337,16 +294,16 @@ architecture RTL of riscv_dcache_core is
 
   signal tag_in_valid : std_logic_vector(DCACHE_WAYS-1 downto 0);
   signal tag_in_dirty : std_logic_vector(DCACHE_WAYS-1 downto 0);
-  signal tag_in_tag   : M_DCACHE_WAYS_TAG_BITS;
+  signal tag_in_tag   : std_logic_matrix(DCACHE_WAYS-1 downto 0)(TAG_BITS-1 downto 0);
 
   signal tag_out_valid : std_logic_vector(DCACHE_WAYS-1 downto 0);
   signal tag_out_dirty : std_logic_vector(DCACHE_WAYS-1 downto 0);
-  signal tag_out_tag   : M_DCACHE_WAYS_TAG_BITS;
+  signal tag_out_tag   : std_logic_matrix(DCACHE_WAYS-1 downto 0)(TAG_BITS-1 downto 0);
 
-  signal tag_byp_idx : M_DCACHE_WAYS_IDX_BITS;
-  signal tag_byp_tag : M_DCACHE_WAYS_SETS;
-  signal tag_valid   : M_DCACHE_WAYS_SETS;
-  signal tag_dirty   : M_DCACHE_WAYS_SETS;
+  signal tag_byp_idx : std_logic_matrix(DCACHE_WAYS-1 downto 0)(IDX_BITS-1 downto 0);
+  signal tag_byp_tag : std_logic_matrix(DCACHE_WAYS-1 downto 0)(SETS-1 downto 0);
+  signal tag_valid   : std_logic_matrix(DCACHE_WAYS-1 downto 0)(SETS-1 downto 0);
+  signal tag_dirty   : std_logic_matrix(DCACHE_WAYS-1 downto 0)(SETS-1 downto 0);
 
   signal write_buffer_idx       : std_logic_vector(IDX_BITS-1 downto 0);
   signal write_buffer_adr       : std_logic_vector(PLEN-1 downto 0);  --physical address
@@ -364,13 +321,13 @@ architecture RTL of riscv_dcache_core is
   signal dat_we_enable : std_logic;
   signal dat_be        : std_logic_vector(BLK_BITS/8-1 downto 0);
   signal dat_in        : std_logic_vector(BLK_BITS-1 downto 0);
-  signal dat_out       : M_DCACHE_WAYS_BLK_BITS;
+  signal dat_out       : std_logic_matrix(DCACHE_WAYS-1 downto 0)(BLK_BITS-1 downto 0);
 
-  signal way_q_mux   : M_DCACHE_WAYS_BLK_BITS;
+  signal way_q_mux   : std_logic_matrix(DCACHE_WAYS-1 downto 0)(BLK_BITS-1 downto 0);
   signal way_q       : std_logic_vector(XLEN-1 downto 0);  --Only use XLEN bits from way_q
   signal way_hit     : std_logic_vector(DCACHE_WAYS-1 downto 0);
   signal way_dirty   : std_logic_vector(DCACHE_WAYS-1 downto 0);
-  signal way_compare : M_DCACHE_WAYS_TAG_BITS;
+  signal way_compare : std_logic_matrix(DCACHE_WAYS-1 downto 0)(TAG_BITS-1 downto 0);
 
   signal dat_offset : std_logic_vector(DAT_OFF_BITS-1 downto 0);
 
@@ -413,8 +370,8 @@ architecture RTL of riscv_dcache_core is
 
   signal burst_cnt : std_logic_vector(BURST_BITS-1 downto 0);
 
-  signal get_dirty_way_idx : M_DCACHE_WAYS_LOG2_DCACHE_WAYS;
-  signal get_dirty_set_idx : M_DCACHE_WAYS_IDX_BITS;
+  signal get_dirty_way_idx : std_logic_matrix(DCACHE_WAYS-1 downto 0)(integer(log2(real(DCACHE_WAYS)))-1 downto 0);
+  signal get_dirty_set_idx : std_logic_matrix(DCACHE_WAYS-1 downto 0)(IDX_BITS-1 downto 0);
 
   signal dirty_sets : std_logic_vector(SETS-1 downto 0);
 

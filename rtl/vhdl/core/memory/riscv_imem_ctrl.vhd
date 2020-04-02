@@ -75,8 +75,8 @@ entity riscv_imem_ctrl is
     clk_i  : in std_logic;
 
     --Configuration
-    pma_cfg_i : M_PMA_CNT_13;
-    pma_adr_i : M_PMA_CNT_PLEN;
+    pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
+    pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
     --CPU side
     nxt_pc_i       : in  std_logic_vector(XLEN-1 downto 0);
@@ -92,8 +92,8 @@ entity riscv_imem_ctrl is
     cache_flush_i  : in  std_logic;
     dcflush_rdy_i  : in  std_logic;
 
-    st_pmpcfg_i  : in M_PMP_CNT_7;
-    st_pmpaddr_i : in M_PMP_CNT_PLEN;
+    st_pmpcfg_i  : in std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
+    st_pmpaddr_i : in std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
     st_prv_i     : in std_logic_vector(1 downto 0);
 
     --BIU ports
@@ -206,8 +206,8 @@ architecture RTL of riscv_imem_ctrl is
     );
     port (
       --PMA  configuration
-      pma_cfg_i : M_PMA_CNT_13;
-      pma_adr_i : M_PMA_CNT_PLEN;
+      pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
+      pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
       --Memory Access
       instruction_i : in std_logic;    --This is an instruction access
@@ -237,8 +237,8 @@ architecture RTL of riscv_imem_ctrl is
     );
     port (
       --From State
-      st_pmpcfg_i  : in M_PMP_CNT_7;
-      st_pmpaddr_i : in M_PMP_CNT_PLEN;
+      st_pmpcfg_i  : in std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
+      st_pmpaddr_i : in std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
       st_prv_i     : in std_logic_vector(1 downto 0);
 
       --Memory Access
@@ -389,15 +389,15 @@ architecture RTL of riscv_imem_ctrl is
       biu_req_i     : in  std_logic_vector(PORTS-1 downto 0);  --access request
       biu_req_ack_o : out std_logic_vector(PORTS-1 downto 0);  --biu access acknowledge
       biu_d_ack_o   : out std_logic_vector(PORTS-1 downto 0);  --biu early data acknowledge
-      biu_adri_i    : in  M_MUX_PORTS_PLEN;  --access start address
-      biu_adro_o    : out M_MUX_PORTS_PLEN;  --biu response address
-      biu_size_i    : in  M_MUX_PORTS_2;  --access data size
-      biu_type_i    : in  M_MUX_PORTS_2;  --access burst type
+      biu_adri_i    : in  std_logic_matrix(PORTS-1 downto 0)(PLEN-1 downto 0);  --access start address
+      biu_adro_o    : out std_logic_matrix(PORTS-1 downto 0)(PLEN-1 downto 0);  --biu response address
+      biu_size_i    : in  std_logic_matrix(PORTS-1 downto 0)(2 downto 0);  --access data size
+      biu_type_i    : in  std_logic_matrix(PORTS-1 downto 0)(2 downto 0);  --access burst type
       biu_lock_i    : in  std_logic_vector(PORTS-1 downto 0);  --access locked access
-      biu_prot_i    : in  M_MUX_PORTS_2;  --access protection
+      biu_prot_i    : in  std_logic_matrix(PORTS-1 downto 0)(2 downto 0);  --access protection
       biu_we_i      : in  std_logic_vector(PORTS-1 downto 0);  --access write enable
-      biu_d_i       : in  M_MUX_PORTS_XLEN;  --access write data
-      biu_q_o       : out M_MUX_PORTS_XLEN;  --access read data
+      biu_d_i       : in  std_logic_matrix(PORTS-1 downto 0)(XLEN-1 downto 0);  --access write data
+      biu_q_o       : out std_logic_matrix(PORTS-1 downto 0)(XLEN-1 downto 0);  --access read data
       biu_ack_o     : out std_logic_vector(PORTS-1 downto 0);  --access acknowledge
       biu_err_o     : out std_logic_vector(PORTS-1 downto 0);  --access error
 
@@ -433,21 +433,6 @@ architecture RTL of riscv_imem_ctrl is
   constant SEL_EXT   : integer := 2**EXT;
   constant SEL_CACHE : integer := 2**CACHE;
   constant SEL_TCM   : integer := 2**TCM;
-
-  --////////////////////////////////////////////////////////////////
-  --
-  -- Functions
-  --
-  function reduce_or (
-    reduce_or_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_or_out : std_logic := '0';
-  begin
-    for i in reduce_or_in'range loop
-      reduce_or_out := reduce_or_out or reduce_or_in(i);
-    end loop;
-    return reduce_or_out;
-  end reduce_or;
 
   --////////////////////////////////////////////////////////////////
   --
@@ -511,15 +496,15 @@ architecture RTL of riscv_imem_ctrl is
   signal biu_stb     : std_logic_vector(MUX_PORTS-1 downto 0);
   signal biu_stb_ack : std_logic_vector(MUX_PORTS-1 downto 0);
   signal biu_d_ack   : std_logic_vector(MUX_PORTS-1 downto 0);
-  signal biu_adro    : M_MUX_PORTS_PLEN;
-  signal biu_adri    : M_MUX_PORTS_PLEN;
-  signal biu_size    : M_MUX_PORTS_2;
-  signal biu_type    : M_MUX_PORTS_2;
+  signal biu_adro    : std_logic_matrix(MUX_PORTS-1 downto 0)(PLEN-1 downto 0);
+  signal biu_adri    : std_logic_matrix(MUX_PORTS-1 downto 0)(PLEN-1 downto 0);
+  signal biu_size    : std_logic_matrix(MUX_PORTS-1 downto 0)(2 downto 0);
+  signal biu_type    : std_logic_matrix(MUX_PORTS-1 downto 0)(2 downto 0);
   signal biu_we      : std_logic_vector(MUX_PORTS-1 downto 0);
   signal biu_lock    : std_logic_vector(MUX_PORTS-1 downto 0);
-  signal biu_prot    : M_MUX_PORTS_2;
-  signal biu_d       : M_MUX_PORTS_XLEN;
-  signal biu_q       : M_MUX_PORTS_XLEN;
+  signal biu_prot    : std_logic_matrix(MUX_PORTS-1 downto 0)(2 downto 0);
+  signal biu_d       : std_logic_matrix(MUX_PORTS-1 downto 0)(XLEN-1 downto 0);
+  signal biu_q       : std_logic_matrix(MUX_PORTS-1 downto 0)(XLEN-1 downto 0);
   signal biu_ack     : std_logic_vector(MUX_PORTS-1 downto 0);
   signal biu_err     : std_logic_vector(MUX_PORTS-1 downto 0);
 

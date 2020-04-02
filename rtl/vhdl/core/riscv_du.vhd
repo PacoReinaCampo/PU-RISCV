@@ -123,50 +123,6 @@ architecture RTL of riscv_du is
   constant DBG_ADDR_PPC      : std_logic_vector(63 downto 0) := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0001001000000001";
   constant DBG_ADDR_CSRS     : std_logic_vector(63 downto 0) := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0010XXXXXXXXXXXX";
 
-  --//////////////////////////////////////////////////////////////
-  --
-  -- Types
-  --
-  type M_MAX_BREAKPOINTS_2    is array (7 downto 0) of std_logic_vector(2      downto 0);
-  type M_MAX_BREAKPOINTS_XLEN is array (7 downto 0) of std_logic_vector(XLEN-1 downto 0);
-
-  --//////////////////////////////////////////////////////////////
-  --
-  -- Functions
-  --
-  function reduce_nor (
-    reduce_nor_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_nor_out : std_logic := '0';
-  begin
-    for i in reduce_nor_in'range loop
-      reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
-    end loop;
-    return reduce_nor_out;
-  end reduce_nor;
-
-  function reduce_or (
-    reduce_or_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_or_out : std_logic := '0';
-  begin
-    for i in reduce_or_in'range loop
-      reduce_or_out := reduce_or_out or reduce_or_in(i);
-    end loop;
-    return reduce_or_out;
-  end reduce_or;
-
-  function to_stdlogic (
-    input : boolean
-  ) return std_logic is
-  begin
-    if input then
-      return('1');
-    else
-      return('0');
-    end if;
-  end function to_stdlogic;
-
   --////////////////////////////////////////////////////////////////
   --
   -- Variables
@@ -190,10 +146,10 @@ architecture RTL of riscv_du is
   signal dbg_bp_hit           : std_logic_vector(MAX_BREAKPOINTS-1 downto 0);
   signal dbg_branch_break_hit : std_logic;
   signal dbg_instr_break_hit  : std_logic;
-  signal dbg_cc               : M_MAX_BREAKPOINTS_2;
+  signal dbg_cc               : std_logic_matrix(7 downto 0)(2 downto 0);
   signal dbg_enabled          : std_logic_vector(MAX_BREAKPOINTS-1 downto 0);
   signal dbg_implemented      : std_logic_vector(MAX_BREAKPOINTS-1 downto 0);
-  signal dbg_data             : M_MAX_BREAKPOINTS_XLEN;
+  signal dbg_data             : std_logic_matrix(7 downto 0)(XLEN-1 downto 0);
 
   signal bp_instr_hit  : std_logic;
   signal bp_branch_hit : std_logic;

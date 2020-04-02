@@ -132,20 +132,6 @@ architecture RTL of riscv_testbench is
 
   --////////////////////////////////////////////////////////////////
   --
-  -- Types
-  --
-  type M_1_1 is array (1 downto 0) of std_logic_vector(1 downto 0);
-  type M_1_2 is array (1 downto 0) of std_logic_vector(2 downto 0);
-  type M_1_PLEN is array (1 downto 0) of std_logic_vector(PLEN-1 downto 0);
-  type M_1_XLEN is array (1 downto 0) of std_logic_vector(XLEN-1 downto 0);
-
-  type M_1_7 is array (1 downto 0) of std_logic_vector(7 downto 0);
-  type M_255_7 is array (255 downto 0) of std_logic_vector(7 downto 0);
-
-  type M_PLEN_XLEN is array (PLEN-1 downto 0) of std_logic_vector(XLEN-1 downto 0);
-
-  --////////////////////////////////////////////////////////////////
-  --
   -- Components
   --
   component riscv_pu
@@ -211,8 +197,8 @@ architecture RTL of riscv_testbench is
       HRESETn : in std_logic;
       HCLK    : in std_logic;
 
-      pma_cfg_i : M_PMA_CNT_13;
-      pma_adr_i : M_PMA_CNT_PLEN;
+      pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
+      pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
       ins_HSEL      : out std_logic;
       ins_HADDR     : out std_logic_vector(PLEN-1 downto 0);
@@ -264,18 +250,18 @@ architecture RTL of riscv_testbench is
       PLEN : integer := 64
       );
     port (
-      rstn : std_logic;
-      clk  : std_logic;
+      rstn : in std_logic;
+      clk  : in std_logic;
 
-      cpu_bp_i : std_logic;
+      cpu_bp_i : in std_logic;
 
-      cpu_stall_o : std_logic;
-      cpu_stb_o   : std_logic;
-      cpu_we_o    : std_logic;
-      cpu_adr_o   : std_logic_vector(PLEN-1 downto 0);
-      cpu_dat_o   : std_logic_vector(XLEN-1 downto 0);
-      cpu_dat_i   : std_logic_vector(XLEN-1 downto 0);
-      cpu_ack_i   : std_logic
+      cpu_stall_o : out std_logic;
+      cpu_stb_o   : out std_logic;
+      cpu_we_o    : out std_logic;
+      cpu_adr_o   : out std_logic_vector(PLEN-1 downto 0);
+      cpu_dat_o   : out std_logic_vector(XLEN-1 downto 0);
+      cpu_dat_i   : in  std_logic_vector(XLEN-1 downto 0);
+      cpu_ack_i   : in  std_logic
       );
   end component;
 
@@ -294,19 +280,19 @@ architecture RTL of riscv_testbench is
       INIT_FILE : string := "test.hex"
       );
     port (
-      HRESETn : std_logic;
-      HCLK    : std_logic;
+      HCLK    : in std_logic;
+      HRESETn : in std_logic;
 
-      HTRANS : M_1_1;
-      HREADY : std_logic_vector(1 downto 0);
-      HRESP  : std_logic_vector(1 downto 0);
+      HTRANS : in  std_logic_matrix(1 downto 0)(1 downto 0);
+      HREADY : out std_logic_vector(1 downto 0);
+      HRESP  : out std_logic_vector(1 downto 0);
 
-      HADDR  : M_1_PLEN;
-      HWRITE : std_logic_vector(1 downto 0);
-      HSIZE  : M_1_2;
-      HBURST : M_1_2;
-      HWDATA : M_1_XLEN;
-      HRDATA : M_1_XLEN
+      HADDR  : in  std_logic_matrix(1 downto 0)(PLEN-1 downto 0);
+      HWRITE : in  std_logic_vector(1 downto 0);
+      HSIZE  : in  std_logic_matrix(1 downto 0)(2 downto 0);
+      HBURST : in  std_logic_matrix(1 downto 0)(2 downto 0);
+      HWDATA : in  std_logic_matrix(1 downto 0)(XLEN-1 downto 0);
+      HRDATA : out std_logic_matrix(1 downto 0)(XLEN-1 downto 0)
       );
   end component;
 
@@ -361,8 +347,8 @@ architecture RTL of riscv_testbench is
   signal HRESETn : std_logic;
 
   --PMA configuration
-  signal pma_cfg : M_PMA_CNT_13;
-  signal pma_adr : M_PMA_CNT_PLEN;
+  signal pma_cfg : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
+  signal pma_adr : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
   --Instruction interface
   signal ins_HSEL      : std_logic;
@@ -410,17 +396,17 @@ architecture RTL of riscv_testbench is
   signal host_csr_fromhost : std_logic_vector(XLEN-1 downto 0);
 
   --Unified memory interface
-  signal mem_htrans : M_1_1;
-  signal mem_hburst : M_1_2;
+  signal mem_htrans : std_logic_matrix(1 downto 0)(1 downto 0);
+  signal mem_hburst : std_logic_matrix(1 downto 0)(2 downto 0);
   signal mem_hready : std_logic_vector(1 downto 0);
   signal mem_hresp  : std_logic_vector(1 downto 0);
-  signal mem_haddr  : M_1_PLEN;
-  signal mem_hwdata : M_1_XLEN;
-  signal mem_hrdata : M_1_XLEN;
-  signal mem_hsize  : M_1_2;
+  signal mem_haddr  : std_logic_matrix(1 downto 0)(PLEN-1 downto 0);
+  signal mem_hwdata : std_logic_matrix(1 downto 0)(XLEN-1 downto 0);
+  signal mem_hrdata : std_logic_matrix(1 downto 0)(XLEN-1 downto 0);
+  signal mem_hsize  : std_logic_matrix(1 downto 0)(2 downto 0);
   signal mem_hwrite : std_logic_vector(1 downto 0);
 
-  signal mem_array : M_PLEN_XLEN;
+  signal mem_array : std_logic_matrix(PLEN-1 downto 1)(XLEN-1 downto 1);
 
   --//////////////////////////////////////////////////////////////
   --
@@ -484,7 +470,7 @@ architecture RTL of riscv_testbench is
 
   --Read Intel HEX
   procedure read_ihex (
-    signal mem_array : out M_PLEN_XLEN
+    signal mem_array : out std_logic_matrix(PLEN-1 downto 1)(XLEN-1 downto 1)
     ) is
 
     file fd : text open read_mode is INIT_FILE;  --open file
@@ -502,9 +488,9 @@ architecture RTL of riscv_testbench is
     variable tmp : std_logic_vector(31 downto 0);
 
     variable byte_cnt    : std_logic_vector(7 downto 0);
-    variable address     : M_1_7;
+    variable address     : std_logic_matrix(1 downto 0)(7 downto 0);
     variable record_type : std_logic_vector(7 downto 0);
-    variable data        : M_255_7;
+    variable data        : std_logic_matrix(255 downto 0)(7 downto 0);
     variable checksum    : std_logic_vector(7 downto 0);
     variable crc         : std_logic_vector(7 downto 0);
 
@@ -584,7 +570,7 @@ architecture RTL of riscv_testbench is
 
   --Read HEX generated by RISC-V elf2hex
   procedure read_elf2hex (
-    signal mem_array : out M_PLEN_XLEN
+    signal mem_array : out std_logic_matrix(PLEN-1 downto 1)(XLEN-1 downto 1)
     ) is
 
     file fd : text open read_mode is INIT_FILE;  --open file
@@ -626,7 +612,7 @@ architecture RTL of riscv_testbench is
 
   --Dump memory
   procedure dump (
-    signal mem_array : in M_PLEN_XLEN
+    signal mem_array : in std_logic_matrix(PLEN-1 downto 1)(XLEN-1 downto 1)
     ) is
   begin
   end dump;

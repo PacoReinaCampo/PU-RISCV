@@ -64,15 +64,15 @@ entity riscv_mux is
     biu_req_i     : in  std_logic_vector(PORTS-1 downto 0);  --access request
     biu_req_ack_o : out std_logic_vector(PORTS-1 downto 0);  --biu access acknowledge
     biu_d_ack_o   : out std_logic_vector(PORTS-1 downto 0);  --biu early data acknowledge
-    biu_adri_i    : in  M_MUX_PORTS_PLEN;  --access start address
-    biu_adro_o    : out M_MUX_PORTS_PLEN;  --biu response address
-    biu_size_i    : in  M_MUX_PORTS_2;  --access data size
-    biu_type_i    : in  M_MUX_PORTS_2;  --access burst type
+    biu_adri_i    : in  std_logic_matrix(PORTS-1 downto 0)(PLEN-1 downto 0);  --access start address
+    biu_adro_o    : out std_logic_matrix(PORTS-1 downto 0)(PLEN-1 downto 0);  --biu response address
+    biu_size_i    : in  std_logic_matrix(PORTS-1 downto 0)(2 downto 0);  --access data size
+    biu_type_i    : in  std_logic_matrix(PORTS-1 downto 0)(2 downto 0);  --access burst type
     biu_lock_i    : in  std_logic_vector(PORTS-1 downto 0);  --access locked access
-    biu_prot_i    : in  M_MUX_PORTS_2;  --access protection
+    biu_prot_i    : in  std_logic_matrix(PORTS-1 downto 0)(2 downto 0);  --access protection
     biu_we_i      : in  std_logic_vector(PORTS-1 downto 0);  --access write enable
-    biu_d_i       : in  M_MUX_PORTS_XLEN;  --access write data
-    biu_q_o       : out M_MUX_PORTS_XLEN;  --access read data
+    biu_d_i       : in  std_logic_matrix(PORTS-1 downto 0)(XLEN-1 downto 0);  --access write data
+    biu_q_o       : out std_logic_matrix(PORTS-1 downto 0)(XLEN-1 downto 0);  --access read data
     biu_ack_o     : out std_logic_vector(PORTS-1 downto 0);  --access acknowledge
     biu_err_o     : out std_logic_vector(PORTS-1 downto 0);  --access error
 
@@ -161,28 +161,6 @@ architecture RTL of riscv_mux is
     end loop;
     return port_select_return;
   end port_select;
-
-  function reduce_or (
-    reduce_or_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_or_out : std_logic := '0';
-  begin
-    for i in reduce_or_in'range loop
-      reduce_or_out := reduce_or_out or reduce_or_in(i);
-    end loop;
-    return reduce_or_out;
-  end reduce_or;
-
-  function reduce_nor (
-    reduce_nor_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_nor_out : std_logic := '0';
-  begin
-    for i in reduce_nor_in'range loop
-      reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
-    end loop;
-    return reduce_nor_out;
-  end reduce_nor;
 
   --////////////////////////////////////////////////////////////////
   --

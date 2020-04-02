@@ -93,31 +93,6 @@ entity riscv_if is
 end riscv_if;
 
 architecture RTL of riscv_if is
-  --////////////////////////////////////////////////////////////////
-  --
-  -- Functions
-  --
-  function reduce_and (
-    reduce_and_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_and_out : std_logic := '0';
-  begin
-    for i in reduce_and_in'range loop
-      reduce_and_out := reduce_and_out and reduce_and_in(i);
-    end loop;
-    return reduce_and_out;
-  end reduce_and;
-
-  function reduce_nand (
-    reduce_nand_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_nand_out : std_logic := '0';
-  begin
-    for i in reduce_nand_in'range loop
-      reduce_nand_out := reduce_nand_out nand reduce_nand_in(i);
-    end loop;
-    return reduce_nand_out;
-  end reduce_nand;
 
   --//////////////////////////////////////////////////////////////
   --

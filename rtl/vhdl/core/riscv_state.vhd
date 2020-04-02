@@ -114,8 +114,8 @@ entity riscv_state is
     st_tsr        : out std_logic;      --trap SRET
     st_mcounteren : out std_logic_vector(XLEN-1 downto 0);
     st_scounteren : out std_logic_vector(XLEN-1 downto 0);
-    st_pmpcfg     : out M_PMP_CNT_7;
-    st_pmpaddr    : out M_PMP_CNT_PLEN;
+    st_pmpcfg     : out std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
+    st_pmpaddr    : out std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
 
     --interrupts (3=M-mode, 0=U-mode)
     ext_int  : in std_logic_vector(3 downto 0);  --external interrupt (per privilege mode; determined by PIC)
@@ -165,39 +165,6 @@ architecture RTL of riscv_state is
     end loop;
     return get_trap_cause_return;
   end get_trap_cause;
-
-  function reduce_and (
-    reduce_and_in : std_logic_vector
-    ) return std_logic is
-    variable reduce_and_out : std_logic := '0';
-  begin
-    for i in reduce_and_in'range loop
-      reduce_and_out := reduce_and_out and reduce_and_in(i);
-    end loop;
-    return reduce_and_out;
-  end reduce_and;
-
-  function reduce_or (
-    reduce_or_in : std_logic_vector
-    ) return std_logic is
-    variable reduce_or_out : std_logic := '0';
-  begin
-    for i in reduce_or_in'range loop
-      reduce_or_out := reduce_or_out or reduce_or_in(i);
-    end loop;
-    return reduce_or_out;
-  end reduce_or;
-
-  function to_stdlogic (
-    input : boolean
-    ) return std_logic is
-  begin
-    if input then
-      return('1');
-    else
-      return('0');
-    end if;
-  end function to_stdlogic;
 
   --//////////////////////////////////////////////////////////////
   --
@@ -337,8 +304,8 @@ architecture RTL of riscv_state is
   --interrupt pending
   signal csr_mip     : std_logic_vector(11 downto 0);
   --Machine protection and Translation
-  signal csr_pmpcfg  : M_PMP_CNT_7;
-  signal csr_pmpaddr : M_PMP_CNT_PLEN;
+  signal csr_pmpcfg  : std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
+  signal csr_pmpaddr : std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
 
   --Machine counters/Timers
   signal csr_mcycle_h : std_logic_vector(31 downto 0);  --timer for MCYCLE

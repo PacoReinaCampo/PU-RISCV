@@ -119,39 +119,6 @@ architecture RTL of riscv_div is
     return abs_return;
   end absolute;
 
-  function reduce_nor (
-    reduce_nor_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_nor_out : std_logic := '0';
-  begin
-    for i in reduce_nor_in'range loop
-      reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
-    end loop;
-    return reduce_nor_out;
-  end reduce_nor;
-
-  function reduce_and (
-    reduce_and_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_and_out : std_logic := '0';
-  begin
-    for i in reduce_and_in'range loop
-      reduce_and_out := reduce_and_out and reduce_and_in(i);
-    end loop;
-    return reduce_and_out;
-  end reduce_and;
-
-  function to_stdlogic (
-    input : boolean
-  ) return std_logic is
-  begin
-    if input then
-      return('1');
-    else
-      return('0');
-    end if;
-  end function to_stdlogic;
-
   --//////////////////////////////////////////////////////////////
   --
   -- Constants

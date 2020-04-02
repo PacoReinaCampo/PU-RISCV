@@ -47,6 +47,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.riscv_mpsoc_pkg.all;
+
 entity riscv_ram_1r1w_generic is
   generic (
     ABITS : integer := 10;
@@ -71,15 +73,9 @@ end riscv_ram_1r1w_generic;
 architecture RTL of riscv_ram_1r1w_generic is
   --////////////////////////////////////////////////////////////////
   --
-  -- Types
-  --
-  type type_mem_array is array (2**ABITS-1 downto 0) of std_logic_vector(DBITS-1 downto 0);  --memory array
-
-  --////////////////////////////////////////////////////////////////
-  --
   -- Variables
   --
-  signal mem_array : type_mem_array;  --memory array
+  signal mem_array : std_logic_matrix(2**ABITS-1 downto 0)(DBITS-1 downto 0);  --memory array
 
 begin
   --////////////////////////////////////////////////////////////////

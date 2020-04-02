@@ -72,21 +72,6 @@ end riscv_memmisaligned;
 architecture RTL of riscv_memmisaligned is
   --////////////////////////////////////////////////////////////////
   --
-  -- Functions
-  --
-  function reduce_or (
-    reduce_or_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_or_out : std_logic := '0';
-  begin
-    for i in reduce_or_in'range loop
-      reduce_or_out := reduce_or_out or reduce_or_in(i);
-    end loop;
-    return reduce_or_out;
-  end reduce_or;
-
-  --////////////////////////////////////////////////////////////////
-  --
   -- Variables
   --
   signal misaligned : std_logic;

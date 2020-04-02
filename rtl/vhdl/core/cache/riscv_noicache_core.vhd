@@ -91,28 +91,6 @@ end riscv_noicache_core;
 architecture RTL of riscv_noicache_core is
   --////////////////////////////////////////////////////////////////
   --
-  -- Functions
-  --
-  function reduce_or (
-    reduce_or_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_or_out : std_logic := '0';
-  begin
-    for i in reduce_or_in'range loop
-      reduce_or_out := reduce_or_out or reduce_or_in(i);
-    end loop;
-    return reduce_or_out;
-  end reduce_or;
-
-  --///////////////////////////////////////////////////////////////
-  --
-  -- Types
-  --
-  type M_2_XLEN is array (2 downto 0) of std_logic_vector (XLEN-1 downto 0);
-  type M_2_PLEN is array (2 downto 0) of std_logic_vector (PLEN-1 downto 0);
-
-  --////////////////////////////////////////////////////////////////
-  --
   -- Variables
   --
   signal is_cacheable : std_logic;
@@ -120,8 +98,8 @@ architecture RTL of riscv_noicache_core is
   signal biu_stb_cnt : std_logic_vector(1 downto 0);
 
   signal biu_fifo_valid : std_logic_vector(2 downto 0);
-  signal biu_fifo_dat   : M_2_XLEN;
-  signal biu_fifo_adr   : M_2_PLEN;
+  signal biu_fifo_dat   : std_logic_matrix(2 downto 0)(XLEN-1 downto 0);
+  signal biu_fifo_adr   : std_logic_matrix(2 downto 0)(PLEN-1 downto 0);
 
   signal if_flush_dly : std_logic;
 

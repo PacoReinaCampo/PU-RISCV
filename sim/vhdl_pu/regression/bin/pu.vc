@@ -78,3 +78,9 @@
 
 ../../../../rtl/vhdl/pu/riscv_biu.vhd
 ../../../../rtl/vhdl/pu/riscv_pu.vhd
+
+../../../../bench/vhdl/regression/riscv_dbg_bfm.vhd
+../../../../bench/vhdl/regression/riscv_htif.vhd
+../../../../bench/vhdl/regression/riscv_memory_model.vhd
+../../../../bench/vhdl/regression/riscv_mmio_if.vhd
+../../../../bench/vhdl/regression/riscv_testbench.vhd

@@ -98,32 +98,6 @@ entity riscv_lsu is
 end riscv_lsu;
 
 architecture RTL of riscv_lsu is
-  --////////////////////////////////////////////////////////////////
-  --
-  -- Functions
-  --
-  function reduce_or (
-    reduce_or_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_or_out : std_logic := '0';
-  begin
-    for i in reduce_or_in'range loop
-      reduce_or_out := reduce_or_out or reduce_or_in(i);
-    end loop;
-    return reduce_or_out;
-  end reduce_or;
-
-  function to_stdlogic (
-    input : boolean
-  ) return std_logic is
-  begin
-    if input then
-      return('1');
-    else
-      return('0');
-    end if;
-  end function to_stdlogic;
-
   --//////////////////////////////////////////////////////////////
   --
   -- Constants

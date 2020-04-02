@@ -68,16 +68,16 @@ entity riscv_memory_model is
     HCLK    : in std_logic;
     HRESETn : in std_logic;
 
-    HTRANS : in  M_1_1;
+    HTRANS : in  std_logic_matrix(1 downto 0)(1 downto 0);
     HREADY : out std_logic_vector(1 downto 0);
     HRESP  : out std_logic_vector(1 downto 0);
 
-    HADDR  : in  M_1_PLEN;
+    HADDR  : in  std_logic_matrix(1 downto 0)(PLEN-1 downto 0);
     HWRITE : in  std_logic_vector(1 downto 0);
-    HSIZE  : in  M_1_2;
-    HBURST : in  M_1_2;
-    HWDATA : in  M_1_XLEN;
-    HRDATA : out M_1_XLEN
+    HSIZE  : in  std_logic_matrix(1 downto 0)(2 downto 0);
+    HBURST : in  std_logic_matrix(1 downto 0)(2 downto 0);
+    HWDATA : in  std_logic_matrix(1 downto 0)(XLEN-1 downto 0);
+    HRDATA : out std_logic_matrix(1 downto 0)(XLEN-1 downto 0)
     );
 end riscv_memory_model;
 
@@ -90,53 +90,25 @@ architecture RTL of riscv_memory_model is
 
   --//////////////////////////////////////////////////////////////
   --
-  -- Typedefs
-  --
-  type M_PLEN_XLEN is array (PLEN-1 downto 0) of std_logic_vector(XLEN-1 downto 1);
-
-  type M_1_RADRCNT_MSB is array (1 downto 0) of std_logic_vector(RADRCNT_MSB downto 0);
-  type M_1_XLEN8 is array (1 downto 0) of std_logic_vector(XLEN/8 downto 0);
-  type M_1_MEM_LATENCY is array (1 downto 0) of std_logic_vector(MEM_LATENCY downto 1);
-
-  type M_1_7 is array (1 downto 0) of std_logic_vector(7 downto 0);
-  type M_255_7 is array (255 downto 0) of std_logic_vector(7 downto 0);
-
-  --//////////////////////////////////////////////////////////////
-  --
   -- Variables
   --
-  signal mem_array : M_PLEN_XLEN;
+  signal mem_array : std_logic_matrix(PLEN-1 downto 1)(XLEN-1 downto 1);
 
-  signal iaddr : M_1_PLEN;
-  signal raddr : M_1_PLEN;
-  signal waddr : M_1_PLEN;
+  signal iaddr : std_logic_matrix(1 downto 0)(PLEN-1 downto 0);
+  signal raddr : std_logic_matrix(1 downto 0)(PLEN-1 downto 0);
+  signal waddr : std_logic_matrix(1 downto 0)(PLEN-1 downto 0);
 
-  signal radrcnt : M_1_RADRCNT_MSB;
+  signal radrcnt : std_logic_matrix(1 downto 0)(RADRCNT_MSB downto 0);
 
   signal wreq : std_logic_vector(1 downto 0);
-  signal dbe  : M_1_XLEN8;
+  signal dbe  : std_logic_matrix(1 downto 0)(XLEN/8-1 downto 0);
 
-  signal ack_latency : M_1_MEM_LATENCY;
+  signal ack_latency : std_logic_matrix(1 downto 0)(MEM_LATENCY downto 1);
 
-  signal dHTRANS : M_1_1;
+  signal dHTRANS : std_logic_matrix(1 downto 0)(1 downto 0);
   signal dHWRITE : std_logic_vector(1 downto 0);
-  signal dHSIZE  : M_1_2;
-  signal dHBURST : M_1_2;
-
-  --//////////////////////////////////////////////////////////////
-  --
-  -- Functions
-  --
-  function to_stdlogic (
-    input : boolean
-    ) return std_logic is
-  begin
-    if input then
-      return('1');
-    else
-      return('0');
-    end if;
-  end function to_stdlogic;
+  signal dHSIZE  : std_logic_matrix(1 downto 0)(2 downto 0);
+  signal dHBURST : std_logic_matrix(1 downto 0)(2 downto 0);
 
 begin
   --//////////////////////////////////////////////////////////////

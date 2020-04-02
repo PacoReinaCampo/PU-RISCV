@@ -57,8 +57,8 @@ entity riscv_pmachk is
   );
   port (
     --PMA  configuration
-    pma_cfg_i : M_PMA_CNT_13;
-    pma_adr_i : M_PMA_CNT_PLEN;
+    pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
+    pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
     --Memory Access
     instruction_i : in std_logic;  --This is an instruction access
@@ -239,46 +239,18 @@ architecture RTL of riscv_pmachk is
     return highest_priority_match_return;
   end highest_priority_match;
 
-  function to_stdlogic (
-    input : boolean
-  ) return std_logic is
-  begin
-    if input then
-      return('1');
-    else
-      return('0');
-    end if;
-  end function to_stdlogic;
-
-  function reduce_nor (
-    reduce_nor_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_nor_out : std_logic := '0';
-  begin
-    for i in reduce_nor_in'range loop
-      reduce_nor_out := reduce_nor_out nor reduce_nor_in(i);
-    end loop;
-    return reduce_nor_out;
-  end reduce_nor;
-
-  --////////////////////////////////////////////////////////////////
-  --
-  -- Types
-  --
-  type M_PMA_CNT_PLEN2 is array (PMA_CNT-1 downto 0) of std_logic_vector(PLEN-1 downto 2);
-
   --////////////////////////////////////////////////////////////////
   --
   -- Variables
   --
   signal access_ub         : std_logic_vector(PLEN-1 downto 0);
   signal access_lb         : std_logic_vector(PLEN-1 downto 0);
-  signal pma_ub            : M_PMA_CNT_PLEN2;
-  signal pma_lb            : M_PMA_CNT_PLEN2;
+  signal pma_ub            : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 2);
+  signal pma_lb            : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 2);
   signal pma_match         : std_logic_vector(PMA_CNT-1 downto 0);
   signal pma_match_all     : std_logic_vector(PMA_CNT-1 downto 0);
   signal matched_pma_idx   : std_logic_vector(PLEN-1 downto 0);
-  signal pmacfg            : M_PMA_CNT_13;
+  signal pmacfg            : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
   signal matched_pma       : std_logic_vector(13 downto 0);
 
   --Outputto 0);

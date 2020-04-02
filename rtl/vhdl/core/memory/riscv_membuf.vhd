@@ -48,6 +48,8 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
+use work.riscv_mpsoc_pkg.all;
+
 entity riscv_membuf is
   generic (
     DEPTH : integer := 2;
@@ -101,32 +103,6 @@ architecture RTL of riscv_membuf is
       almost_full_o  : out std_logic    --Programmable almost full
     );
   end component;
-
-  --////////////////////////////////////////////////////////////////
-  --
-  -- Functions
-  --
-  function reduce_or (
-    reduce_or_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_or_out : std_logic := '0';
-  begin
-    for i in reduce_or_in'range loop
-      reduce_or_out := reduce_or_out or reduce_or_in(i);
-    end loop;
-    return reduce_or_out;
-  end reduce_or;
-
-  function reduce_nor (
-    reduce_or_in : std_logic_vector
-  ) return std_logic is
-    variable reduce_or_out : std_logic := '0';
-  begin
-    for i in reduce_or_in'range loop
-      reduce_or_out := reduce_or_out or reduce_or_in(i);
-    end loop;
-    return reduce_or_out;
-  end reduce_nor;
 
   --////////////////////////////////////////////////////////////////
   --

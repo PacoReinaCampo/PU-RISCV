@@ -111,8 +111,8 @@ entity riscv_pu is
     HRESETn : in std_logic;
     HCLK    : in std_logic;
 
-    pma_cfg_i : M_PMA_CNT_13;
-    pma_adr_i : M_PMA_CNT_PLEN;
+    pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
+    pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
     ins_HSEL      : out std_logic;
     ins_HADDR     : out std_logic_vector(PLEN-1 downto 0);
@@ -236,8 +236,8 @@ architecture RTL of riscv_pu is
 
       --cpu state
       st_prv     : out std_logic_vector(1 downto 0);
-      st_pmpcfg  : out M_PMP_CNT_7;
-      st_pmpaddr : out M_PMP_CNT_PLEN;
+      st_pmpcfg  : out std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
+      st_pmpaddr : out std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
 
       bu_cacheflush : out std_logic;
 
@@ -284,8 +284,8 @@ architecture RTL of riscv_pu is
       clk_i  : in std_logic;
 
       --Configuration
-      pma_cfg_i : M_PMA_CNT_13;
-      pma_adr_i : M_PMA_CNT_PLEN;
+      pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
+      pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
       --CPU side
       nxt_pc_i       : in  std_logic_vector(XLEN-1 downto 0);
@@ -301,8 +301,8 @@ architecture RTL of riscv_pu is
       cache_flush_i  : in  std_logic;
       dcflush_rdy_i  : in  std_logic;
 
-      st_pmpcfg_i  : in M_PMP_CNT_7;
-      st_pmpaddr_i : in M_PMP_CNT_PLEN;
+      st_pmpcfg_i  : in std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
+      st_pmpaddr_i : in std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
       st_prv_i     : in std_logic_vector(1 downto 0);
 
       --BIU ports
@@ -346,8 +346,8 @@ architecture RTL of riscv_pu is
       clk_i  : in std_logic;
 
       --Configuration
-      pma_cfg_i : M_PMA_CNT_13;
-      pma_adr_i : M_PMA_CNT_PLEN;
+      pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
+      pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
       --CPU side
       mem_req_i        : in  std_logic;
@@ -364,8 +364,8 @@ architecture RTL of riscv_pu is
       cache_flush_i    : in  std_logic;
       dcflush_rdy_o    : out std_logic;
 
-      st_pmpcfg_i  : in M_PMP_CNT_7;
-      st_pmpaddr_i : in M_PMP_CNT_PLEN;
+      st_pmpcfg_i  : in std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
+      st_pmpaddr_i : in std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
       st_prv_i     : in std_logic_vector(1 downto 0);
 
       --BIU ports
@@ -450,8 +450,8 @@ architecture RTL of riscv_pu is
   signal dmem_page_fault    : std_logic;
 
   signal st_prv     : std_logic_vector(1 downto 0);
-  signal st_pmpcfg  : M_PMP_CNT_7;
-  signal st_pmpaddr : M_PMP_CNT_PLEN;
+  signal st_pmpcfg  : std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
+  signal st_pmpaddr : std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
 
   signal cacheflush  : std_logic;
   signal dcflush_rdy : std_logic;
