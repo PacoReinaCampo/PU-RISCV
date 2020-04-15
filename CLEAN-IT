@@ -1,14 +1,15 @@
-rm -rf sim/mixed/regression/run
-rm -rf sim/verilog/regression/run
-rm -rf sim/vhdl/regression/run
+rm -rf sim/mixed/regression/multi/run
+rm -rf sim/verilog/regression/multi/run
+rm -rf sim/vhdl/regression/multi/run
 
-rm -rf sim/mixed_pu/regression/bin/work
-rm -rf sim/verilog_pu/regression/bin/work
-rm -rf sim/vhdl_pu/regression/bin/work
+rm -rf sim/mixed/regression/msim/work
+rm -rf sim/verilog/regression/msim/work
+rm -rf sim/vhdl/regression/msim/work
 
-rm -rf synthesis
+rm -rf sim/mixed/regression/msim/transcript
+rm -rf sim/verilog/regression/msim/transcript
+rm -rf sim/vhdl/regression/msim/transcript
 
-rm -rf work-obj93.cf
-rm -rf system.vvp
-rm -rf obj_dir
-rm -rf riscv_pu_testbench.tree
+rm -rf sim/verilog/regression/iverilog/system.vvp
+
+rm -rf sim/verilog/regression/vtor/obj_dir
