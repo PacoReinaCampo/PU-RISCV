@@ -1,0 +1,10 @@
+export PATH=$PATH:/opt/riscv/bin
+
+git clone https://github.com/riscv/riscv-tests
+cd riscv-tests
+
+autoconf
+./configure --prefix=/opt/riscv/bin
+make clean
+make
+make install
