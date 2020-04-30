@@ -43,8 +43,8 @@
 `include "riscv_mpsoc_pkg.sv"
 
 module riscv_pu #(
-  parameter            XLEN               = 32,
-  parameter            PLEN               = 32,
+  parameter            XLEN               = 64,
+  parameter            PLEN               = 64,
   parameter [XLEN-1:0] PC_INIT            = 'h8000_0000,
   parameter            HAS_USER           = 1,
   parameter            HAS_SUPER          = 1,
@@ -68,14 +68,14 @@ module riscv_pu #(
   parameter            BP_LOCAL_BITS      = 10,
   parameter            BP_LOCAL_BITS_LSB  = 2,
 
-  parameter            ICACHE_SIZE        = 32,  //in KBytes
-  parameter            ICACHE_BLOCK_SIZE  = 32,  //in Bytes
+  parameter            ICACHE_SIZE        = 64,  //in KBytes
+  parameter            ICACHE_BLOCK_SIZE  = 64,  //in Bytes
   parameter            ICACHE_WAYS        = 2,   //'n'-way set associative
   parameter            ICACHE_REPLACE_ALG = 0,
   parameter            ITCM_SIZE          = 0,
 
-  parameter            DCACHE_SIZE        = 32,  //in KBytes
-  parameter            DCACHE_BLOCK_SIZE  = 32,  //in Bytes
+  parameter            DCACHE_SIZE        = 64,  //in KBytes
+  parameter            DCACHE_BLOCK_SIZE  = 64,  //in Bytes
   parameter            DCACHE_WAYS        = 2,   //'n'-way set associative
   parameter            DCACHE_REPLACE_ALG = 0,
   parameter            DTCM_SIZE          = 0,
@@ -94,7 +94,7 @@ module riscv_pu #(
 
   parameter            HARTID             = 0,
 
-  parameter            PARCEL_SIZE        = 32
+  parameter            PARCEL_SIZE        = 64
 )
   (
     //AHB interfaces
