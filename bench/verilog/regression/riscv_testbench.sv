@@ -46,7 +46,7 @@ module riscv_testbench;
 
   //core parameters
   parameter XLEN             = 64;
-  parameter PLEN             = 64  ;        //64bit address bus
+  parameter PLEN             = 64;          //64bit address bus
   parameter PC_INIT          = 'h8000_0000; //Start here after reset
   parameter BASE             = PC_INIT;     //offset where to load program in memory
   parameter INIT_FILE        = "test.hex";

@@ -1,0 +1,26 @@
+export PATH=$PATH:/opt/riscv/bin
+
+rm -rf tests
+rm -rf riscv-tests
+
+mkdir tests
+mkdir tests/dump
+mkdir tests/hex
+
+git clone --recursive https://github.com/riscv/riscv-tests
+cd riscv-tests
+
+autoconf
+./configure --prefix=/opt/riscv/bin
+make
+
+cd isa
+
+source ../../elf2hex.sh
+
+mv *.dump ../../tests/dump
+mv *.hex ../../tests/hex
+
+cd ..
+
+make clean
