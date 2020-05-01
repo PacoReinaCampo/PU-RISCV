@@ -130,6 +130,13 @@ architecture RTL of riscv_testbench is
   constant LATENCY : integer := 1;
   constant BURST   : integer := 8;
 
+  --mpsoc parameters
+  constant X                      : integer := 1;
+  constant Y                      : integer := 1;
+  constant Z                      : integer := 1;
+
+  constant NODES                  : integer := X*Y*Z;
+
   --////////////////////////////////////////////////////////////////
   --
   -- Components

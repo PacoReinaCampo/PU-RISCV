@@ -118,6 +118,8 @@ U_MUL_TESTS  =	mul mulh mulhu mulhsu					\
 	$(if $(filter 64, $(XLEN)), mulw )
 U_DIV_TESTS  =	div divu rem remu					\
 	 $(if $(filter 64,$(XLEN)), divw divuw remw remuw )
+U_NEW_TESTS   =	fadd fclass fcmp fcvt fcvt_w fdiv fmadd fmin ldst	\
+		recoding 						\
 
 #machine mode tests
 M_TESTS      =	breakpoint csr illegal ma_addr ma_fetch mcsr sbreak	\
@@ -132,6 +134,7 @@ S_TESTS      =	csr dirty illegal ma_fetch sbreak scall wfi
 uitst_lst  =                      $(foreach t, $(U_INT_TESTS),rv$(XLEN)ui-p-$t)
 uitst_lst += $(if $(HAS_RVM) > 0, $(foreach t, $(U_MUL_TESTS),rv$(XLEN)um-p-$t))
 uitst_lst += $(if $(HAS_DIV) > 0, $(foreach t, $(U_DIV_TESTS),rv$(XLEN)um-p-$t))
+uitst_lst += $(if $(HAS_DIV) > 0, $(foreach t, $(U_NEW_TESTS),rv$(XLEN)ud-p-$t))
 uitests    = $(if $(HAS_U)   > 0, $(uitst_lst))
 
 #User Mode RVC Tests

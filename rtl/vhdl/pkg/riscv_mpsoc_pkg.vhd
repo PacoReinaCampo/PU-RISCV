@@ -132,8 +132,6 @@ package riscv_mpsoc_pkg is
   constant PADDR_SIZE             : integer := PLEN;
   constant PDATA_SIZE             : integer := XLEN;
 
-  constant FLIT_WIDTH             : integer := 34;
-
   constant SYNC_DEPTH             : integer := 3;
 
   constant BUFFER_DEPTH           : integer := 4;
@@ -142,56 +140,6 @@ package riscv_mpsoc_pkg is
   constant RDPORTS                : integer := 2;
   constant WRPORTS                : integer := 1;
   constant AR_BITS                : integer := 5;
-
-  --mpsoc parameters
-  constant CORES_PER_SIMD         : integer := 1;
-  constant CORES_PER_MISD         : integer := 1;
-
-  constant CORES_PER_TILE         : integer := CORES_PER_SIMD + CORES_PER_MISD;
-
-  --soc parameters
-  constant X                      : integer := 1;
-  constant Y                      : integer := 1;
-  constant Z                      : integer := 1;
-
-  constant NODES                  : integer := X*Y*Z;
-  constant CORES                  : integer := NODES*CORES_PER_TILE;
-
-  --noc parameters
-  constant CHANNELS               : integer := 7;
-  constant PCHANNELS              : integer := 1;
-  constant VCHANNELS              : integer := 7;
-
-  constant INPUTS                 : integer := 7;
-  constant OUTPUTS                : integer := 7;
-
-  constant ENABLE_VCHANNELS       : integer := 1;
-
-  constant ROUTER_BUFFER_SIZE     : integer := 2;
-  constant REG_ADDR_WIDTH         : integer := 2;
-  constant VALWIDTH               : integer := 2;
-  constant MAX_PKT_LEN            : integer := 2;
-
-  constant TILE_ID : integer := 0;
-
-  constant GENERATE_INTERRUPT     : std_logic := '1';
-
-  constant TABLE_ENTRIES          : integer := 4;
-  constant NOC_PACKET_SIZE        : integer := 16;
-
-  constant TABLE_ENTRIES_PTRWIDTH : integer := integer(log2(real(TABLE_ENTRIES)));
-
-  constant ADDR_WIDTH             : integer := 64;
-  constant DATA_WIDTH             : integer := 64;
-
-  --debug parameters
-  constant STDOUT_FILENAME        : integer := 4;
-  constant TRACEFILE_FILENAME     : integer := 4;
-  constant ENABLE_TRACE           : integer := 4;
-  constant GLIP_PORT              : integer := 23000;
-  constant TERM_CROSS_NUM         : integer := NODES;
-
-  constant GLIP_UART_LIKE         : std_logic := '0';
 
   --RV12 Definitions Package
   constant ARCHID       : integer := 12;
