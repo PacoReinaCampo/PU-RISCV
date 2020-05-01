@@ -117,15 +117,15 @@ module riscv_du #(
   logic                                du_sel_csrs;
   logic                                du_access;
   logic                                du_we;
-  logic [                         2:0] du_ack;
+  logic                     [     2:0] du_ack;
 
   logic                                du_we_internal;
-  logic [XLEN                    -1:0] du_internal_regs;
+  logic                     [XLEN-1:0] du_internal_regs;
 
   logic                                dbg_branch_break_ena;
   logic                                dbg_instr_break_ena;
-  logic [                        31:0] dbg_ie;
-  logic [XLEN                    -1:0] dbg_cause;
+  logic                     [    31:0] dbg_ie;
+  logic                     [XLEN-1:0] dbg_cause;
 
   logic [MAX_BREAKPOINTS-1:0]           dbg_bp_hit;
   logic                                 dbg_branch_break_hit;
@@ -137,7 +137,7 @@ module riscv_du #(
 
   logic                                bp_instr_hit;
   logic                                bp_branch_hit;
-  logic [MAX_BREAKPOINTS         -1:0] bp_hit;
+  logic [MAX_BREAKPOINTS-1:0]          bp_hit;
 
   logic                                mem_read;
   logic                                mem_write;

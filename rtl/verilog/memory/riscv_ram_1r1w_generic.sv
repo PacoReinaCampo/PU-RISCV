@@ -75,7 +75,7 @@ module riscv_ram_1r1w_generic #(
   //write side
   generate
     for (i=0; i<(DBITS+7)/8; i=i+1) begin: write
-      if (i*8 +8 > DBITS) begin
+      if (i*8 + 8 > DBITS) begin
         always @(posedge clk_i) begin
           if (we_i && be_i[i])
             mem_array[ waddr_i ] [DBITS-1:i*8] <= din_i[DBITS-1:i*8];
