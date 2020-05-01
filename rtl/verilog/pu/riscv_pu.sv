@@ -94,7 +94,7 @@ module riscv_pu #(
 
   parameter            HARTID             = 0,
 
-  parameter            PARCEL_SIZE        = 64
+  parameter            PARCEL_SIZE        = 32
 )
   (
     //AHB interfaces

@@ -46,6 +46,8 @@ module riscv_icache_core #(
   parameter XLEN = 64,
   parameter PLEN = 64,
 
+  parameter PARCEL_SIZE = 64,
+
   parameter ICACHE_SIZE        = 64,
   parameter ICACHE_BLOCK_SIZE  = 64,
   parameter ICACHE_WAYS        = 2,
@@ -66,7 +68,7 @@ module riscv_icache_core #(
     input  logic [            2:0] mem_size_i,
     input                          mem_lock_i,
     input  logic [            2:0] mem_prot_i,
-    output logic [XLEN       -1:0] mem_q_o,
+    output logic [PARCEL_SIZE-1:0] mem_q_o,
     output logic                   mem_ack_o,
     output logic                   mem_err_o,
     input  logic                   flush_i,

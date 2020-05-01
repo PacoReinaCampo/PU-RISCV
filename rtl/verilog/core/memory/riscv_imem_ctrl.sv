@@ -398,6 +398,8 @@ module riscv_imem_ctrl #(
         .XLEN (XLEN),
         .PLEN (XLEN),
 
+        .PARCEL_SIZE (PARCEL_SIZE),
+
         .ICACHE_SIZE         (ICACHE_SIZE),
         .ICACHE_BLOCK_SIZE   (ICACHE_BLOCK_SIZE),
         .ICACHE_WAYS         (ICACHE_WAYS),
