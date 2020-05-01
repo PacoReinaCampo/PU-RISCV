@@ -123,49 +123,6 @@
   `define WRPORTS            1
   `define AR_BITS            5
 
-  //mpsoc parameters
-  `define CORES_PER_SIMD     1
-  `define CORES_PER_MISD     1
-
-  `define CORES_PER_TILE     `CORES_PER_SIMD + `CORES_PER_MISD
-
-  //soc parameters
-  `define X                  1
-  `define Y                  1
-  `define Z                  1
-
-  `define NODES              `X*`Y*`Z
-  `define CORES              `NODES*`CORES_PER_TILE
-
-  //noc parameters
-  `define CHANNELS           7
-  `define PCHANNELS          1
-  `define VCHANNELS          7
-
-  `define ENABLE_VCHANNELS   1
-
-  `define ROUTER_BUFFER_SIZE 2
-  `define REG_ADDR_WIDTH     2
-  `define VALWIDTH           2
-  `define MAX_PKT_LEN        2
-
-  `define TILE_ID            0
-  `define GENERATE_INTERRUPT 1
-  `define TABLE_ENTRIES      4
-  `define NOC_PACKET_SIZE    16
-
-  `define TABLE_ENTRIES_PTRWIDTH $clog2(TABLE_ENTRIES)
-
-  //debug parameters
-  `define STDOUT_FILENAME    "stdout"
-  `define TRACEFILE_FILENAME "trace"
-
-  `define ENABLE_TRACE       4
-  `define TERM_CROSS_NUM     NODES
-
-  `define GLIP_PORT          23000
-  `define GLIP_UART_LIKE     0
-
   //RV12 Definitions Package
   `define ARCHID       12
   `define REVPRV_MAJOR 1
@@ -331,7 +288,7 @@
 
   //RV32/RV64 Base instructions
 
-  //                           f7       f3 opcode
+  //f7 f3 opcode
   `define LUI    15'b???????_???_01101
   `define AUIPC  15'b???????_???_00101
   `define JAL    15'b???????_???_11011
@@ -382,7 +339,7 @@
   `define SRAX   15'b0100000_101_01100
   `define SRAW   15'b0100000_101_01110
 
-                   //pseudo instructions
+  //pseudo instructions
   `define SYSTEM  15'b???????_000_11100  //excludes RDxxx instructions
   `define MISCMEM 15'b???????_???_00011
 
@@ -401,7 +358,7 @@
 //`define HRTS       32'b001000000101_00000_000_00000_1110011
   `define WFI        32'b000100000101_00000_000_00000_1110011
 
-  //                               f7      f3  opcode
+  //f7 f3 opcode
   `define CSRRW      15'b???????_001_11100
   `define CSRRS      15'b???????_010_11100
   `define CSRRC      15'b???????_011_11100
@@ -411,7 +368,7 @@
 
   //RV32/RV64 A-Extensions instructions
 
-  //                             f7       f3 opcode
+  //f7 f3 opcode
   `define LRW      15'b00010??_010_01011
   `define SCW      15'b00011??_010_01011
   `define AMOSWAPW 15'b00001??_010_01011
@@ -438,7 +395,7 @@
 
   //RV32/RV64 M-Extensions instructions
 
-  //                            f7       f3 opcode
+  //f7 f3 opcode
   `define MUL    15'b0000001_000_01100
   `define MULH   15'b0000001_001_01100
   `define MULW   15'b0000001_000_01110
@@ -464,23 +421,23 @@
   `define PMPCFG_MASK 8'h9F
 
   //CSR mapping
-                   //User
-                   //User Trap Setup
+  //User
+  //User Trap Setup
   `define USTATUS       'h000
   `define UIE           'h004
   `define UTVEC         'h005
-                   //User Trap Handling
+  //User Trap Handling
   `define USCRATCH      'h040
   `define UEPC          'h041
   `define UCAUSE        'h042
   `define UBADADDR      'h043
   `define UTVAL         'h043
   `define UIP           'h044
-                   //User Floating-Point CSRs
+  //User Floating-Point CSRs
   `define FFLAGS        'h001
   `define FRM           'h002
   `define FCSR          'h003
-                   //User Counters/Timers
+  //User Counters/Timers
   `define CYCLE         'hC00
   `define TIMEX         'hC01
   `define INSTRET       'hC02
@@ -490,26 +447,26 @@
   `define INSTRETH      'hC82
   `define HPMCOUNTER3H  'hC83  //until HPMCONTER31='hC9F
 
-                   //Supervisor
-                   //Supervisor Trap Setup
+  //Supervisor
+  //Supervisor Trap Setup
   `define SSTATUS       'h100
   `define SEDELEG       'h102
   `define SIDELEG       'h103
   `define SIE           'h104
   `define STVEC         'h105
   `define SCOUNTEREN    'h106
-                   //Supervisor Trap Handling
+  //Supervisor Trap Handling
   `define SSCRATCH      'h140
   `define SEPC          'h141
   `define SCAUSE        'h142
   `define STVAL         'h143
   `define SIP           'h144
-                   //Supervisor Protection and Translation
+  //Supervisor Protection and Translation
   `define SATP          'h180
 
 /*
-                   //Hypervisor
-                   //Hypervisor trap setup
+  //Hypervisor
+  //Hypervisor trap setup
   `define HSTATUS       'h200
   `define HEDELEG       'h202
   `define HIDELEG       'h203
@@ -523,28 +480,28 @@
   `define HIP           'h244
 */
 
-                   //Machine
-                   //Machine Information
+  //Machine
+  //Machine Information
   `define MVENDORID     'hF11
   `define MARCHID       'hF12
   `define MIMPID        'hF13
   `define MHARTID       'hF14
-                   //Machine Trap Setup
+  //Machine Trap Setup
   `define MSTATUS       'h300
   `define MISA          'h301
   `define MEDELEG       'h302
   `define MIDELEG       'h303
   `define MIE           'h304
-  `define MNMIVEC       'h7C0  //ROALOGIC NMI Vector
+  `define MNMIVEC       'h7C0  //NMI Vector
   `define MTVEC         'h305
   `define MCOUNTEREN    'h306
-                   //Machine Trap Handling
+  //Machine Trap Handling
   `define MSCRATCH      'h340
   `define MEPC          'h341
   `define MCAUSE        'h342
   `define MTVAL         'h343
   `define MIP           'h344
-                   //Machine Protection and Translation
+  //Machine Protection and Translation
   `define PMPCFG0       'h3A0
   `define PMPCFG1       'h3A1  //RV32 only
   `define PMPCFG2       'h3A2
@@ -566,17 +523,17 @@
   `define PMPADDR14     'h3BE
   `define PMPADDR15     'h3BF
 
-                   //Machine Counters/Timers
+  //Machine Counters/Timers
   `define MCYCLE        'hB00
   `define MINSTRET      'hB02
   `define MHPMCOUNTER3  'hB03  //until MHPMCOUNTER31='hB1F
   `define MCYCLEH       'hB80
   `define MINSTRETH     'hB82
   `define MHPMCOUNTER3H 'hB83  //until MHPMCOUNTER31H='hB9F
-                   //Machine Counter Setup
+  //Machine Counter Setup
   `define MHPEVENT3     'h323  //until MHPEVENT31 'h33f
 
-                   //Debug
+  //Debug
   `define TSELECT       'h7A0
   `define TDATA1        'h7A1
   `define TDATA2        'h7A2

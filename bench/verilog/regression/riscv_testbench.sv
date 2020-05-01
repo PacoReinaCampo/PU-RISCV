@@ -72,6 +72,13 @@ module riscv_testbench;
 
   parameter PMA_CNT          = 4;
 
+  //MPSoC
+  parameter X                = 1;
+  parameter Y                = 1;
+  parameter Z                = 1;
+
+  parameter NODES            = X*Y*Z;
+
   //////////////////////////////////////////////////////////////////
   //
   // Constants
@@ -331,7 +338,7 @@ module riscv_testbench;
     $display ("------------------------------------------------------------------------------");
     $display ("  CORES | NODES | X | Y | Z | CORES_PER_TILE | CORES_PER_MISD | CORES_PER_SIMD");
     $display ("    1   | %5d | %1d | %1d | %1d |       --       |       --       |       --       ", 
-              `NODES, `X, `Y, `Z);
+              NODES, X, Y, Z);
     $display ("------------------------------------------------------------------------------");
     $display ("  Test   = %s", INIT_FILE);
     $display ("  ICache = %0dkB", ICACHE_SIZE);
