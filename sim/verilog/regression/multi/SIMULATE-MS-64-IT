@@ -8,4 +8,4 @@ cd run
 
 export PATH=$PATH:/opt/intelFPGA_pro/19.2/modelsim_ase/linuxaloem/
 
-make SIM=msim
+make XLEN=64 SIM=msim

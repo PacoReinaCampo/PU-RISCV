@@ -6,4 +6,6 @@ ln -s $PWD/bin/Makefile.include $PWD/run
 
 cd run
 
-make SIM=iverilog
+export PATH=$PATH:/opt/intelFPGA_pro/19.2/modelsim_ase/linuxaloem/
+
+make XLEN=32 SIM=msim

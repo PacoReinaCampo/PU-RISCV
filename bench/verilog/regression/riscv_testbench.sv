@@ -180,7 +180,7 @@ module riscv_testbench;
   //Hookup Device Under Test
   riscv_pu #(
     .XLEN             ( XLEN             ),
-    .PLEN             ( PLEN             ), //31bit address bus
+    .PLEN             ( PLEN             ),
     .PC_INIT          ( PC_INIT          ),
     .HAS_USER         ( HAS_U            ),
     .HAS_SUPER        ( HAS_S            ),

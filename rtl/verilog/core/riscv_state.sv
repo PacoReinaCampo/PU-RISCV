@@ -953,7 +953,6 @@ module riscv_state #(
         csr_mip_utip <= csr_wval[`UTI] & has_n;
       end
 
-
       //software interrupts
       csr_mip_msip <= ext_sint;
       //Machine Mode write
@@ -1064,17 +1063,17 @@ module riscv_state #(
   assign st_int[`CAUSE_MEINT] = ( ((st_prv < `PRV_M) | (st_prv == `PRV_M & csr_mstatus_mie)) & (csr_mip_meip & csr_mie_meie) );
   assign st_int[`CAUSE_HEINT] = ( ((st_prv < `PRV_H) | (st_prv == `PRV_H & csr_mstatus_hie)) & (csr_mip_heip & csr_mie_heie) );
   assign st_int[`CAUSE_SEINT] = ( ((st_prv < `PRV_S) | (st_prv == `PRV_S & csr_mstatus_sie)) & (csr_mip_seip & csr_mie_seie) );
-  assign st_int[`CAUSE_UEINT] = (                     (st_prv == `PRV_U & csr_mstatus_uie)  & (csr_mip_ueip & csr_mie_ueie) );
+  assign st_int[`CAUSE_UEINT] = (                      (st_prv == `PRV_U & csr_mstatus_uie)  & (csr_mip_ueip & csr_mie_ueie) );
 
   assign st_int[`CAUSE_MSINT] = ( ((st_prv < `PRV_M) | (st_prv == `PRV_M & csr_mstatus_mie)) & (csr_mip_msip & csr_mie_msie) ) & ~st_int[`CAUSE_MEINT];
   assign st_int[`CAUSE_HSINT] = ( ((st_prv < `PRV_H) | (st_prv == `PRV_H & csr_mstatus_hie)) & (csr_mip_hsip & csr_mie_hsie) ) & ~st_int[`CAUSE_HEINT];
   assign st_int[`CAUSE_SSINT] = ( ((st_prv < `PRV_S) | (st_prv == `PRV_S & csr_mstatus_sie)) & (csr_mip_ssip & csr_mie_ssie) ) & ~st_int[`CAUSE_SEINT];
-  assign st_int[`CAUSE_USINT] = (                     (st_prv == `PRV_U & csr_mstatus_uie)  & (csr_mip_usip & csr_mie_usie) ) & ~st_int[`CAUSE_UEINT];
+  assign st_int[`CAUSE_USINT] = (                      (st_prv == `PRV_U & csr_mstatus_uie)  & (csr_mip_usip & csr_mie_usie) ) & ~st_int[`CAUSE_UEINT];
 
   assign st_int[`CAUSE_MTINT] = ( ((st_prv < `PRV_M) | (st_prv == `PRV_M & csr_mstatus_mie)) & (csr_mip_mtip & csr_mie_mtie) ) & ~(st_int[`CAUSE_MEINT] | st_int[`CAUSE_MSINT]);
   assign st_int[`CAUSE_HTINT] = ( ((st_prv < `PRV_H) | (st_prv == `PRV_H & csr_mstatus_hie)) & (csr_mip_htip & csr_mie_htie) ) & ~(st_int[`CAUSE_HEINT] | st_int[`CAUSE_HSINT]);
   assign st_int[`CAUSE_STINT] = ( ((st_prv < `PRV_S) | (st_prv == `PRV_S & csr_mstatus_sie)) & (csr_mip_stip & csr_mie_stie) ) & ~(st_int[`CAUSE_SEINT] | st_int[`CAUSE_SSINT]);
-  assign st_int[`CAUSE_UTINT] = (                     (st_prv == `PRV_U & csr_mstatus_uie)  & (csr_mip_utip & csr_mie_utie) ) & ~(st_int[`CAUSE_UEINT] | st_int[`CAUSE_USINT]);
+  assign st_int[`CAUSE_UTINT] = (                      (st_prv == `PRV_U & csr_mstatus_uie)  & (csr_mip_utip & csr_mie_utie) ) & ~(st_int[`CAUSE_UEINT] | st_int[`CAUSE_USINT]);
 
   //interrupt cause priority
   always @(*) begin
@@ -1290,7 +1289,6 @@ module riscv_state #(
               csr_pmpcfg[idx] <= csr_wval[(idx-8)*8 +:8] & `PMPCFG_MASK;
         end
       end //next idx
-
 
       for (idx=0; idx < 16; idx=idx+1) begin: gen_pmpaddr
         if (idx < PMP_CNT) begin
