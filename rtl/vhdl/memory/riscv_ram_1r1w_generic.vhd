@@ -89,18 +89,19 @@ begin
       processing_0 : process (clk_i)
       begin
         if (rising_edge(clk_i)) then
-          if (we_i = '1' and be_i(i) = '1' and to_unsigned(i, ABITS) = unsigned(waddr_i)) then
-            mem_array(i)(DBITS-1 downto i*8) <= din_i(DBITS-1 downto i*8);
+          if (we_i = '1' and be_i(i) = '1') then
+            mem_array(to_integer(unsigned(waddr_i)))(DBITS-1 downto i*8) <= din_i(DBITS-1 downto i*8);
           end if;
         end if;
       end process;
     end generate;
+
     generating_2 : if (i*8+8 <= DBITS) generate
       processing_1 : process (clk_i)
       begin
         if (rising_edge(clk_i)) then
-          if (we_i = '1' and be_i(i) = '1' and to_unsigned(i, ABITS) = unsigned(waddr_i)) then
-            mem_array(i)(i*8 downto i) <= din_i(i*8 downto i);
+          if (we_i = '1' and be_i(i) = '1') then
+            mem_array(to_integer(unsigned(waddr_i)))((i+1)*8-1 downto i*8) <= din_i((i+1)*8-1 downto i*8);
           end if;
         end if;
       end process;
