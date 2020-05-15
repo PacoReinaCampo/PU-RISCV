@@ -14,7 +14,7 @@
 --                                                                            //
 --              MPSoC-RISCV CPU                                               //
 --              Core - Data Memory Access (Write Back)                        //
---              AMBA3 AHB-Lite Bus Interface                                  //
+--              Wishbone Bus Interface                                        //
 --                                                                            //
 --//////////////////////////////////////////////////////////////////////////////
 
