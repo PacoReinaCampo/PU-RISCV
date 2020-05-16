@@ -52,16 +52,19 @@ module riscv_mmio_if_wb #(
     input                       HRESETn,
     input                       HCLK,
 
-    input      [           1:0] HTRANS,
-    input      [HADDR_SIZE-1:0] HADDR,
-    input                       HWRITE,
-    input      [           2:0] HSIZE,
-    input      [           2:0] HBURST,
-    input      [HDATA_SIZE-1:0] HWDATA,
-    output reg [HDATA_SIZE-1:0] HRDATA,
+    input      [HADDR_SIZE-1:0] wb_adr_i,
+    input      [HDATA_SIZE-1:0] wb_dat_i,
+    input      [           3:0] wb_sel_i;
+    input                       wb_we_i,
+    input                       wb_cyc_i;
+    input                       wb_stb_i;
+    input      [           2:0] wb_cti_i,
+    input      [           1:0] wb_bte_i,
 
-    output reg                  HREADYOUT,
-    output                      HRESP    
+    output reg [HDATA_SIZE-1:0] wb_dat_o,
+    output reg                  wb_ack_o,
+    output                      wb_err_o,
+    output     [           2:0] wb_rty_o
   );
 
   ////////////////////////////////////////////////////////////////
@@ -96,29 +99,29 @@ module riscv_mmio_if_wb #(
   //
 
   //Generate watchdog counter
-  always @(posedge HCLK,negedge HRESETn) begin
+  always @(posedge HCLK, negedge HRESETn) begin
     if (!HRESETn) watchdog_cnt <= 0;
     else          watchdog_cnt <= watchdog_cnt + 1;
   end
 
   //Catch write to host address
-  assign HRESP = `HRESP_OKAY;
+  assign wb_err_o = `HRESP_OKAY;
 
   always @(posedge HCLK) begin
-    dHTRANS <= HTRANS;
-    dHADDR  <= HADDR;
-    dHWRITE <= HWRITE;
+    dHTRANS <= wb_bte_i;
+    dHADDR  <= wb_adr_i;
+    dHWRITE <= wb_we_i;
   end
 
-  always @(posedge HCLK,negedge HRESETn) begin
+  always @(posedge HCLK, negedge HRESETn) begin
     if (!HRESETn) begin
-      HREADYOUT <= 1'b1;
+      wb_ack_o <= 1'b1;
     end
-    else if (HTRANS == `HTRANS_IDLE) begin
+    else if (wb_bte_i == `HTRANS_IDLE) begin
     end
   end
 
-  always @(posedge HCLK,negedge HRESETn) begin
+  always @(posedge HCLK, negedge HRESETn) begin
     if (!HRESETn) begin
       catch_test    <= 1'b0;
       catch_uart_tx <= 1'b0;
@@ -126,7 +129,7 @@ module riscv_mmio_if_wb #(
     else begin
       catch_test    <= dHTRANS == `HTRANS_NONSEQ && dHWRITE && dHADDR == CATCH_TEST;
       catch_uart_tx <= dHTRANS == `HTRANS_NONSEQ && dHWRITE && dHADDR == CATCH_UART_TX;
-      data_reg      <= HWDATA;
+      data_reg      <= wb_dat_i;
     end
   end
   //Generate output

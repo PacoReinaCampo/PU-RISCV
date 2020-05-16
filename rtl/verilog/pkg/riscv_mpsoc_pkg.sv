@@ -623,7 +623,7 @@
   `define AMO_TYPE_LOGICAL    2'h2
   `define AMO_TYPE_ARITHMETIC 2'h3
 
-  //AHB3 Lite Package
+  //AHB3 Package
 
   //HTRANS
   `define HTRANS_IDLE   2'b00
@@ -668,3 +668,20 @@
   //HRESP
   `define       HRESP_OKAY  1'b0
   `define       HRESP_ERROR 1'b1
+
+  //WB Package
+  `define CLASSIC_CYCLE 1'b0
+  `define BURST_CYCLE   1'b1
+
+  `define READ  1'b0
+  `define WRITE 1'b1
+
+  `define CTI_CLASSIC      3'b000
+  `define CTI_CONST_BURST  3'b001
+  `define CTI_INC_BURST    3'b010
+  `define CTI_END_OF_BURST 3'b111
+
+  `define BTE_LINEAR  2'd0
+  `define BTE_WRAP_4  2'd1
+  `define BTE_WRAP_8  2'd2
+  `define BTE_WRAP_16 2'd3

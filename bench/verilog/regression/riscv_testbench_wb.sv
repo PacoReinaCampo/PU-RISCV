@@ -236,25 +236,33 @@ module riscv_testbench_wb;
   );
 
   //bus <-> memory model connections
-  assign mem_htrans[0] = ins_HTRANS;
-  assign mem_hburst[0] = ins_HBURST;
-  assign mem_haddr[0]  = ins_HADDR;
-  assign mem_hwrite[0] = ins_HWRITE;
-  assign mem_hsize[0]  = 4'h0;
-  assign mem_hwdata[0] = {XLEN{1'b0}};
-  assign ins_HRDATA    = mem_hrdata[0];
-  assign ins_HREADY    = mem_hready[0];
-  assign ins_HRESP     = mem_hresp[0];
+  assign wb_mem_adr_i[0] = wb_ins_adr_i;
+  assign wb_mem_dat_i[0] = wb_ins_dat_i;
+  assign wb_mem_sel_i[0] = wb_ins_sel_i;
+  assign wb_mem_we_i [0] = wb_ins_we_i;
+  assign wb_mem_cyc_i[0] = wb_ins_cyc_i;
+  assign wb_mem_stb_i[0] = wb_ins_stb_i;
+  assign wb_mem_cti_i[0] = wb_ins_cti_i;
+  assign wb_mem_bte_i[0] = wb_ins_bte_i;
 
-  assign mem_htrans[1] = dat_HTRANS;
-  assign mem_hburst[1] = dat_HBURST;
-  assign mem_haddr[1]  = dat_HADDR;
-  assign mem_hwrite[1] = dat_HWRITE;
-  assign mem_hsize[1]  = dat_HSIZE;
-  assign mem_hwdata[1] = dat_HWDATA;
-  assign dat_HRDATA    = mem_hrdata[1];
-  assign dat_HREADY    = mem_hready[1];
-  assign dat_HRESP     = mem_hresp[1];
+  assign wb_ins_dat_o = wb_mem_dat_o[0];
+  assign wb_ins_ack_o = wb_mem_ack_o[0];
+  assign wb_ins_err_o = wb_mem_err_o[0];
+  assign wb_ins_rty_o = wb_mem_rty_o[0];
+
+  assign wb_mem_adr_i[1] = wb_dat_adr_i;
+  assign wb_mem_dat_i[1] = wb_dat_dat_i;
+  assign wb_mem_sel_i[1] = wb_dat_sel_i;
+  assign wb_mem_we_i [1] = wb_dat_we_i;
+  assign wb_mem_cyc_i[1] = wb_dat_cyc_i;
+  assign wb_mem_stb_i[1] = wb_dat_stb_i;
+  assign wb_mem_cti_i[1] = wb_dat_cti_i;
+  assign wb_mem_bte_i[1] = wb_dat_bte_i;
+
+  assign wb_dat_dat_o = wb_mem_dat_o[1];
+  assign wb_dat_ack_o = wb_mem_ack_o[1];
+  assign wb_dat_err_o = wb_mem_err_o[1];
+  assign wb_dat_rty_o = wb_mem_rty_o[1];
 
   //hookup memory model
   riscv_memory_model_wb #(

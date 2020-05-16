@@ -59,15 +59,19 @@ module riscv_memory_model_wb #(
     input                         HCLK,
     input                         HRESETn,
 
-    input      [1:0][PLEN   -1:0] wb_mem_adr_i,
-    input      [1:0][XLEN   -1:0] wb_mem_dat_i,
-    input      [1:0]              wb_mem_we_i,
-    input      [1:0][        2:0] wb_mem_cti_i,
-    input      [1:0][        1:0] wb_mem_bte_i,
-    output reg [1:0][XLEN   -1:0] wb_mem_dat_o,
-    output     [1:0]              wb_mem_ack_o,
-    output     [1:0]              wb_mem_err_o,
-    input      [1:0][        2:0] wb_mem_rty_i
+    input      [1:0][PLEN   -1:0] wb_adr_i,
+    input      [1:0][XLEN   -1:0] wb_dat_i,
+    input      [1:0][        3:0] wb_sel_i,
+    input      [1:0]              wb_we_i,
+    input      [1:0]              wb_cyc_i,
+    input      [1:0]              wb_stb_i,
+    input      [1:0][        2:0] wb_cti_i,
+    input      [1:0][        1:0] wb_bte_i,
+
+    output reg [1:0][XLEN   -1:0] wb_dat_o,
+    output reg [1:0]              wb_ack_o,
+    output     [1:0]              wb_err_o,
+    output     [1:0][        2:0] wb_rty_o
   );
 
   ////////////////////////////////////////////////////////////////
@@ -251,11 +255,11 @@ module riscv_memory_model_wb #(
           if (!HRESETn) begin
             ack_latency[u] <= {MEM_LATENCY{1'b1}};
           end
-          else if (wb_mem_ack_o[u]) begin
-            if      ( wb_mem_bte_i[u] == `HTRANS_IDLE  ) begin
+          else if (wb_ack_o[u]) begin
+            if      ( wb_bte_i[u] == `HTRANS_IDLE  ) begin
               ack_latency[u] <= {MEM_LATENCY{1'b1}};
             end
-            else if ( wb_mem_bte_i[u] == `HTRANS_NONSEQ) begin
+            else if ( wb_bte_i[u] == `HTRANS_NONSEQ) begin
               ack_latency[u] <= 'h0;
             end
           end
@@ -263,68 +267,68 @@ module riscv_memory_model_wb #(
             ack_latency[u] <= {ack_latency[u],1'b1};
           end
         end
-        assign wb_mem_ack_o[u] = ack_latency[u][MEM_LATENCY];
+        assign wb_ack_o[u] = ack_latency[u][MEM_LATENCY];
       end
       else begin
-        assign wb_mem_ack_o[u] = 1'b1;
+        assign wb_ack_o[u] = 1'b1;
       end
 
-      assign wb_mem_err_o[u] = `HRESP_OKAY;
+      assign wb_err_o[u] = `HRESP_OKAY;
 
       //Write Section
 
       //delay control signals
       always @(posedge HCLK) begin
-        if (wb_mem_ack_o[u]) begin
-          dHTRANS[u] <= wb_mem_bte_i [u];
-          dHWRITE[u] <= wb_mem_we_i  [u];
-          dHSIZE [u] <= wb_mem_rty_i [u];
-          dHBURST[u] <= wb_mem_cti_i [u];
+        if (wb_ack_o[u]) begin
+          dHTRANS[u] <= wb_bte_i [u];
+          dHWRITE[u] <= wb_we_i  [u];
+          dHSIZE [u] <= wb_rty_i [u];
+          dHBURST[u] <= wb_cti_i [u];
         end
       end
 
       always @(posedge HCLK) begin
-        if (wb_mem_ack_o[u] && wb_mem_bte_i[u] != `HTRANS_BUSY) begin
-          waddr[u] <= wb_mem_adr_i[u] & ( {XLEN{1'b1}} << $clog2(XLEN/8) );
+        if (wb_ack_o[u] && wb_bte_i[u] != `HTRANS_BUSY) begin
+          waddr[u] <= wb_adr_i[u] & ( {XLEN{1'b1}} << $clog2(XLEN/8) );
 
-          case (wb_mem_rty_i[u])
-            `HSIZE_BYTE : dbe[u] <= 1'h1  << wb_mem_adr_i[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_HWORD: dbe[u] <= 2'h3  << wb_mem_adr_i[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_WORD : dbe[u] <= 4'hf  << wb_mem_adr_i[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_DWORD: dbe[u] <= 8'hff << wb_mem_adr_i[u][$clog2(XLEN/8)-1:0];
+          case (wb_rty_i[u])
+            `HSIZE_BYTE : dbe[u] <= 1'h1  << wb_adr_i[u][$clog2(XLEN/8)-1:0];
+            `HSIZE_HWORD: dbe[u] <= 2'h3  << wb_adr_i[u][$clog2(XLEN/8)-1:0];
+            `HSIZE_WORD : dbe[u] <= 4'hf  << wb_adr_i[u][$clog2(XLEN/8)-1:0];
+            `HSIZE_DWORD: dbe[u] <= 8'hff << wb_adr_i[u][$clog2(XLEN/8)-1:0];
           endcase
         end
       end
 
       always @(posedge HCLK) begin
-        if (wb_mem_ack_o[u]) begin
-          wreq[u] <= (wb_mem_bte_i[u] != `HTRANS_IDLE & wb_mem_bte_i[u] != `HTRANS_BUSY) & wb_mem_we_i[u];
+        if (wb_ack_o[u]) begin
+          wreq[u] <= (wb_bte_i[u] != `HTRANS_IDLE & wb_bte_i[u] != `HTRANS_BUSY) & wb_we_i[u];
         end
       end
 
       always @(posedge HCLK) begin
-        if (wb_mem_ack_o[u] && wreq[u]) begin
+        if (wb_ack_o[u] && wreq[u]) begin
           for (m=0; m<XLEN/8; m=m+1) begin
             if (dbe[u][m]) begin
-              mem_array[waddr[u]][m*8+:8] = wb_mem_dat_i[u][m*8+:8];
+              mem_array[waddr[u]][m*8+:8] = wb_dat_i[u][m*8+:8];
             end
           end
         end
       end
 
       //Read Section
-      assign iaddr[u] = wb_mem_adr_i[u] & ( {XLEN{1'b1}} << $clog2(XLEN/8) );
+      assign iaddr[u] = wb_adr_i[u] & ( {XLEN{1'b1}} << $clog2(XLEN/8) );
 
       always @(posedge HCLK) begin
-        if (wb_mem_ack_o[u] && (wb_mem_bte_i[u] != `HTRANS_IDLE) && (wb_mem_bte_i[u] != `HTRANS_BUSY) && !wb_mem_we_i[u])
+        if (wb_ack_o[u] && (wb_bte_i[u] != `HTRANS_IDLE) && (wb_bte_i[u] != `HTRANS_BUSY) && !wb_we_i[u])
           if (iaddr[u] == waddr[u] && wreq[u]) begin
             for (n=0; n<XLEN/8; n++) begin
-              if (dbe[u]) wb_mem_dat_o[u][n*8+:8] <= wb_mem_dat_i[u][n*8+:8];
-              else        wb_mem_dat_o[u][n*8+:8] <= mem_array[ iaddr[u] ][n*8+:8];
+              if (dbe[u]) wb_dat_o[u][n*8+:8] <= wb_dat_i[u][n*8+:8];
+              else        wb_dat_o[u][n*8+:8] <= mem_array[ iaddr[u] ][n*8+:8];
             end
           end
         else begin
-          wb_mem_dat_o[u] <= mem_array[ iaddr[u] ];
+          wb_dat_o[u] <= mem_array[ iaddr[u] ];
         end
       end
     end

@@ -104,31 +104,31 @@ module riscv_pu_wb #(
     input logic [PMA_CNT-1:0][XLEN-1:0] pma_adr_i,
 
     //WB interfaces
-    output          [PLEN         -1:0] ins_adr_o,
-    output          [XLEN         -1:0] ins_dat_o,
-    output          [              3:0] ins_sel_o,
-    output                              ins_we_o,
-    output                              ins_cyc_o,
-    output                              ins_stb_o,
-    output          [              2:0] ins_cti_o,
-    output          [              1:0] ins_bte_o,
-    input           [XLEN         -1:0] ins_dat_i,
-    input                               ins_ack_i,
-    input                               ins_err_i,
-    input           [              2:0] ins_rty_i,
+    output          [PLEN         -1:0] wb_ins_adr_o,
+    output          [XLEN         -1:0] wb_ins_dat_o,
+    output          [              3:0] wb_ins_sel_o,
+    output                              wb_ins_we_o,
+    output                              wb_ins_cyc_o,
+    output                              wb_ins_stb_o,
+    output          [              2:0] wb_ins_cti_o,
+    output          [              1:0] wb_ins_bte_o,
+    input           [XLEN         -1:0] wb_ins_dat_i,
+    input                               wb_ins_ack_i,
+    input                               wb_ins_err_i,
+    input           [              2:0] wb_ins_rty_i,
 
-    output          [PLEN         -1:0] dat_adr_o,
-    output          [XLEN         -1:0] dat_dat_o,
-    output          [              3:0] dat_sel_o,
-    output                              dat_we_o,
-    output                              dat_stb_o,
-    output                              dat_cyc_o,
-    output          [              2:0] dat_cti_o,
-    output          [              1:0] dat_bte_o,
-    input           [XLEN         -1:0] dat_dat_i,
-    input                               dat_ack_i,
-    input                               dat_err_i,
-    input           [              2:0] dat_rty_i,
+    output          [PLEN         -1:0] wb_dat_adr_o,
+    output          [XLEN         -1:0] wb_dat_dat_o,
+    output          [              3:0] wb_dat_sel_o,
+    output                              wb_dat_we_o,
+    output                              wb_dat_stb_o,
+    output                              wb_dat_cyc_o,
+    output          [              2:0] wb_dat_cti_o,
+    output          [              1:0] wb_dat_bte_o,
+    input           [XLEN         -1:0] wb_dat_dat_i,
+    input                               wb_dat_ack_i,
+    input                               wb_dat_err_i,
+    input           [              2:0] wb_dat_rty_i,
 
     //Interrupts
     input                               ext_nmi,
@@ -163,7 +163,7 @@ module riscv_pu_wb #(
 
   logic                               dmem_req;
   logic          [XLEN          -1:0] dmem_adr;
-  logic                         [2:0] dmem_size;
+  logic          [               2:0] dmem_size;
   logic                               dmem_we;
   logic          [XLEN          -1:0] dmem_d,
                                       dmem_q;
