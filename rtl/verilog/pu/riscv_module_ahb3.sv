@@ -103,7 +103,7 @@ module riscv_module_ahb3 #(
     input logic [PMA_CNT-1:0][    13:0] pma_cfg_i,
     input logic [PMA_CNT-1:0][XLEN-1:0] pma_adr_i,
 
-    //AHB3 interfaces
+    //AHB3 instruction
     output                              ins_HSEL,
     output          [PLEN         -1:0] ins_HADDR,
     output          [XLEN         -1:0] ins_HWDATA,
@@ -117,6 +117,7 @@ module riscv_module_ahb3 #(
     input                               ins_HREADY,
     input                               ins_HRESP,
 
+    //AHB3 data
     output                              dat_HSEL,
     output          [PLEN         -1:0] dat_HADDR,
     output          [XLEN         -1:0] dat_HWDATA,
@@ -214,7 +215,7 @@ module riscv_module_ahb3 #(
     .pma_cfg_i (pma_cfg_i),
     .pma_adr_i (pma_adr_i),
 
-    //AHB3 interfaces
+    //AHB3 instruction
     .ins_HSEL      (ins_HSEL),
     .ins_HADDR     (ins_HADDR),
     .ins_HWDATA    (ins_HWDATA),
@@ -228,6 +229,7 @@ module riscv_module_ahb3 #(
     .ins_HREADY    (ins_HREADY),
     .ins_HRESP     (ins_HRESP),
 
+    //AHB3 data
     .dat_HSEL      (dat_HSEL),
     .dat_HADDR     (dat_HADDR),
     .dat_HWDATA    (dat_HWDATA),

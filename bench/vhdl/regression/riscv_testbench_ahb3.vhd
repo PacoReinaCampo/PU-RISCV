@@ -200,13 +200,13 @@ architecture RTL of riscv_testbench_ahb3 is
       PARCEL_SIZE : integer := 64
       );
     port (
-      --AHB interfaces
       HRESETn : in std_logic;
       HCLK    : in std_logic;
 
       pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
       pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
+      --AHB3 instruction
       ins_HSEL      : out std_logic;
       ins_HADDR     : out std_logic_vector(PLEN-1 downto 0);
       ins_HWDATA    : out std_logic_vector(XLEN-1 downto 0);
@@ -220,6 +220,7 @@ architecture RTL of riscv_testbench_ahb3 is
       ins_HREADY    : in  std_logic;
       ins_HRESP     : in  std_logic;
 
+      --AHB3 data
       dat_HSEL      : out std_logic;
       dat_HADDR     : out std_logic_vector(PLEN-1 downto 0);
       dat_HWDATA    : out std_logic_vector(XLEN-1 downto 0);
