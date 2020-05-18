@@ -50,19 +50,55 @@ module riscv_biu2ahb3 #(
     input  logic             HRESETn,
     input  logic             HCLK,
 
-    //AHB3 Lite Bus
-    output logic             HSEL,
-    output logic [PLEN -1:0] HADDR,
-    input  logic [XLEN -1:0] HRDATA,
-    output logic [XLEN -1:0] HWDATA,
-    output logic             HWRITE,
-    output logic [      2:0] HSIZE,
-    output logic [      2:0] HBURST,
-    output logic [      3:0] HPROT,
-    output logic [      1:0] HTRANS,
-    output logic             HMASTLOCK,
-    input  logic             HREADY,
-    input  logic             HRESP,
+    //AXI4 instruction
+    output logic [AXI_ID_WIDTH    -1:0] axi4_aw_id,
+    output logic [AXI_ADDR_WIDTH  -1:0] axi4_aw_addr,
+    output logic [                 7:0] axi4_aw_len,
+    output logic [                 2:0] axi4_aw_size,
+    output logic [                 1:0] axi4_aw_burst,
+    output logic                        axi4_aw_lock,
+    output logic [                 3:0] axi4_aw_cache,
+    output logic [                 2:0] axi4_aw_prot,
+    output logic [                 3:0] axi4_aw_qos,
+    output logic [                 3:0] axi4_aw_region,
+    output logic [AXI_USER_WIDTH  -1:0] axi4_aw_user,
+    output logic                        axi4_aw_valid,
+    input  logic                        axi4_aw_ready,
+
+    output logic [AXI_ID_WIDTH    -1:0] axi4_ar_id,
+    output logic [AXI_ADDR_WIDTH  -1:0] axi4_ar_addr,
+    output logic [                 7:0] axi4_ar_len,
+    output logic [                 2:0] axi4_ar_size,
+    output logic [                 1:0] axi4_ar_burst,
+    output logic                        axi4_ar_lock,
+    output logic [                 3:0] axi4_ar_cache,
+    output logic [                 2:0] axi4_ar_prot,
+    output logic [                 3:0] axi4_ar_qos,
+    output logic [                 3:0] axi4_ar_region,
+    output logic [AXI_USER_WIDTH  -1:0] axi4_ar_user,
+    output logic                        axi4_ar_valid,
+    input  logic                        axi4_ar_ready,
+
+    output logic [AXI_DATA_WIDTH  -1:0] axi4_w_data,
+    output logic [AXI_STRB_WIDTH  -1:0] axi4_w_strb,
+    output logic                        axi4_w_last,
+    output logic [AXI_USER_WIDTH  -1:0] axi4_w_user,
+    output logic                        axi4_w_valid,
+    input  logic                        axi4_w_ready,
+
+    input  logic [AXI_ID_WIDTH    -1:0] axi4_r_id,
+    input  logic [AXI_DATA_WIDTH  -1:0] axi4_r_data,
+    input  logic [                 1:0] axi4_r_resp,
+    input  logic                        axi4_r_last,
+    input  logic [AXI_USER_WIDTH  -1:0] axi4_r_user,
+    input  logic                        axi4_r_valid,
+    output logic                        axi4_r_ready,
+
+    input  logic [AXI_ID_WIDTH    -1:0] axi4_b_id,
+    input  logic [                 1:0] axi4_b_resp,
+    input  logic [AXI_USER_WIDTH  -1:0] axi4_b_user,
+    input  logic                        axi4_b_valid,
+    output logic                        axi4_b_ready,
 
     //BIU Bus (Core ports)
     input  logic             biu_stb_i,      //strobe
@@ -144,7 +180,7 @@ module riscv_biu2ahb3 #(
   //convert burst type to counter length (actually length -1)
   function automatic [PLEN-1:0] nxt_addr;
     input [PLEN -1:0] addr;   //current address
-    input [      2:0] hburst; //AHB HBURST
+    input [      2:0] hburst; //AHB hburst
 
     //next linear address
     if (XLEN==32) nxt_addr = (addr + 'h4) & ~'h3;
@@ -169,6 +205,19 @@ module riscv_biu2ahb3 #(
                     data_ena_d;
   logic [XLEN -1:0] biu_di_dly;
 
+  logic             hsel;
+  logic [PLEN -1:0] haddr;
+  logic [XLEN -1:0] hrdata;
+  logic [XLEN -1:0] hwdata;
+  logic             hwrite;
+  logic [      2:0] hsize;
+  logic [      2:0] hburst;
+  logic [      3:0] hprot;
+  logic [      1:0] htrans;
+  logic             hmastlock;
+  logic             hready;
+  logic             hresp;
+
   //////////////////////////////////////////////////////////////////
   //
   // Module Body
@@ -181,57 +230,57 @@ module riscv_biu2ahb3 #(
       biu_err_o   <= 1'b0;
       burst_cnt   <= 'h0;
 
-      HSEL        <= 1'b0;
-      HADDR       <= 'h0;
-      HWRITE      <= 1'b0;
-      HSIZE       <= 'h0; //dont care
-      HBURST      <= 'h0; //dont care
-      HPROT       <= `HPROT_DATA | `HPROT_PRIVILEGED | `HPROT_NON_BUFFERABLE | `HPROT_NON_CACHEABLE;
-      HTRANS      <= `HTRANS_IDLE;
-      HMASTLOCK   <= 1'b0;
+      hsel        <= 1'b0;
+      haddr       <= 'h0;
+      hwrite      <= 1'b0;
+      hsize       <= 'h0; //dont care
+      hburst      <= 'h0; //dont care
+      hprot       <= `HPROT_DATA | `HPROT_PRIVILEGED | `HPROT_NON_BUFFERABLE | `HPROT_NON_CACHEABLE;
+      htrans      <= `HTRANS_IDLE;
+      hmastlock   <= 1'b0;
     end
   else begin
     //strobe/ack signals
     biu_err_o   <= 1'b0;
 
-    if (HREADY) begin
+    if (hready) begin
       if (~|burst_cnt) begin //burst complete
         if (biu_stb_i && !biu_err_o) begin
           data_ena    <= 1'b1;
           burst_cnt   <= biu_type2cnt(biu_type_i);
 
-          HSEL        <= 1'b1;
-          HTRANS      <= `HTRANS_NONSEQ; //start of burst
-          HADDR       <= biu_adri_i;
-          HWRITE      <= biu_we_i;
-          HSIZE       <= biu_size2hsize (biu_size_i);
-          HBURST      <= biu_type2hburst(biu_type_i);
-          HPROT       <= biu_prot2hprot (biu_prot_i);
-          HMASTLOCK   <= biu_lock_i;
+          hsel        <= 1'b1;
+          htrans      <= `HTRANS_NONSEQ; //start of burst
+          haddr       <= biu_adri_i;
+          hwrite      <= biu_we_i;
+          hsize       <= biu_size2hsize (biu_size_i);
+          hburst      <= biu_type2hburst(biu_type_i);
+          hprot       <= biu_prot2hprot (biu_prot_i);
+          hmastlock   <= biu_lock_i;
         end
         else begin
           data_ena  <= 1'b0;
 
-          HSEL      <= 1'b0;
-          HTRANS    <= `HTRANS_IDLE; //no new transfer
-          HMASTLOCK <= biu_lock_i;
+          hsel      <= 1'b0;
+          htrans    <= `HTRANS_IDLE; //no new transfer
+          hmastlock <= biu_lock_i;
         end
       end
       else begin //continue burst
         data_ena  <= 1'b1;
         burst_cnt <= burst_cnt - 1;
 
-        HTRANS    <= `HTRANS_SEQ; //continue burst
-        HADDR     <= nxt_addr(HADDR,HBURST); //next address
+        htrans    <= `HTRANS_SEQ; //continue burst
+        haddr     <= nxt_addr(haddr,hburst); //next address
       end
     end
     else begin
       //error response
-      if (HRESP == `HRESP_ERROR) begin
+      if (hresp == `HRESP_ERROR) begin
         burst_cnt <= 'h0; //burst done (interrupted)
 
-        HSEL      <= 1'b0;
-        HTRANS    <= `HTRANS_IDLE;
+        hsel      <= 1'b0;
+        htrans    <= `HTRANS_IDLE;
 
         data_ena  <= 1'b0;
         biu_err_o <= 1'b1;
@@ -241,23 +290,23 @@ module riscv_biu2ahb3 #(
 
   //Data section
   always @(posedge HCLK) begin
-    if (HREADY) biu_di_dly <= biu_d_i;
+    if (hready) biu_di_dly <= biu_d_i;
   end
 
   always @(posedge HCLK) begin
-    if (HREADY) begin
-      HWDATA     <= biu_di_dly;
-      biu_adro_o <= HADDR;
+    if (hready) begin
+      hwdata     <= biu_di_dly;
+      biu_adro_o <= haddr;
     end
   end
 
   always @(posedge HCLK, negedge HRESETn) begin
     if      (!HRESETn) data_ena_d <= 1'b0;
-    else if ( HREADY ) data_ena_d <= data_ena;
+    else if ( hready ) data_ena_d <= data_ena;
   end
 
-  assign biu_q_o        = HRDATA;
-  assign biu_ack_o      = HREADY & data_ena_d;
-  assign biu_d_ack_o    = HREADY & data_ena;
-  assign biu_stb_ack_o  = HREADY & ~|burst_cnt & biu_stb_i & ~biu_err_o;
+  assign biu_q_o        = hrdata;
+  assign biu_ack_o      = hready & data_ena_d;
+  assign biu_d_ack_o    = hready & data_ena;
+  assign biu_stb_ack_o  = hready & ~|burst_cnt & biu_stb_i & ~biu_err_o;
 endmodule

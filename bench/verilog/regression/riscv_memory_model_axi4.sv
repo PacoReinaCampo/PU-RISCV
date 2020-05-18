@@ -56,19 +56,59 @@ module riscv_memory_model_ahb3 #(
   parameter INIT_FILE = "test.hex"
 )
   (
-    input                         HCLK,
-    input                         HRESETn,
 
-    input      [1:0][        1:0] HTRANS,
-    output     [1:0]              HREADY,
-    output     [1:0]              HRESP,
+    input                                    HRESETn,
+    input                                    HCLK,
 
-    input      [1:0][PLEN   -1:0] HADDR,
-    input      [1:0]              HWRITE,
-    input      [1:0][        2:0] HSIZE,
-    input      [1:0][        2:0] HBURST,
-    input      [1:0][XLEN   -1:0] HWDATA,
-    output reg [1:0][XLEN   -1:0] HRDATA
+    //AXI4 instruction
+    output logic [1:0][AXI_ID_WIDTH    -1:0] axi4_aw_id,
+    output logic [1:0][AXI_ADDR_WIDTH  -1:0] axi4_aw_addr,
+    output logic [1:0][                 7:0] axi4_aw_len,
+    output logic [1:0][                 2:0] axi4_aw_size,
+    output logic [1:0][                 1:0] axi4_aw_burst,
+    output logic [1:0]                       axi4_aw_lock,
+    output logic [1:0][                 3:0] axi4_aw_cache,
+    output logic [1:0][                 2:0] axi4_aw_prot,
+    output logic [1:0][                 3:0] axi4_aw_qos,
+    output logic [1:0][                 3:0] axi4_aw_region,
+    output logic [1:0][AXI_USER_WIDTH  -1:0] axi4_aw_user,
+    output logic [1:0]                       axi4_aw_valid,
+    input  logic [1:0]                       axi4_aw_ready,
+
+    output logic [1:0][AXI_ID_WIDTH    -1:0] axi4_ar_id,
+    output logic [1:0][AXI_ADDR_WIDTH  -1:0] axi4_ar_addr,
+    output logic [1:0][                 7:0] axi4_ar_len,
+    output logic [1:0][                 2:0] axi4_ar_size,
+    output logic [1:0][                 1:0] axi4_ar_burst,
+    output logic [1:0]                       axi4_ar_lock,
+    output logic [1:0][                 3:0] axi4_ar_cache,
+    output logic [1:0][                 2:0] axi4_ar_prot,
+    output logic [1:0][                 3:0] axi4_ar_qos,
+    output logic [1:0][                 3:0] axi4_ar_region,
+    output logic [1:0][AXI_USER_WIDTH  -1:0] axi4_ar_user,
+    output logic [1:0]                       axi4_ar_valid,
+    input  logic [1:0]                       axi4_ar_ready,
+
+    output logic [1:0][AXI_DATA_WIDTH  -1:0] axi4_w_data,
+    output logic [1:0][AXI_STRB_WIDTH  -1:0] axi4_w_strb,
+    output logic [1:0]                       axi4_w_last,
+    output logic [1:0][AXI_USER_WIDTH  -1:0] axi4_w_user,
+    output logic [1:0]                       axi4_w_valid,
+    input  logic [1:0]                       axi4_w_ready,
+
+    input  logic [1:0][AXI_ID_WIDTH    -1:0] axi4_r_id,
+    input  logic [1:0][AXI_DATA_WIDTH  -1:0] axi4_r_data,
+    input  logic [1:0][                 1:0] axi4_r_resp,
+    input  logic [1:0]                       axi4_r_last,
+    input  logic [1:0][AXI_USER_WIDTH  -1:0] axi4_r_user,
+    input  logic [1:0]                       axi4_r_valid,
+    output logic [1:0]                       axi4_r_ready,
+
+    input  logic [1:0][AXI_ID_WIDTH    -1:0] axi4_b_id,
+    input  logic [1:0][                 1:0] axi4_b_resp,
+    input  logic [1:0][AXI_USER_WIDTH  -1:0] axi4_b_user,
+    input  logic [1:0]                       axi4_b_valid,
+    output logic [1:0]                       axi4_b_ready
   );
 
   ////////////////////////////////////////////////////////////////
@@ -109,6 +149,19 @@ module riscv_memory_model_ahb3 #(
   logic                     dHWRITE     [2];
   logic [              2:0] dHSIZE      [2];
   logic [              2:0] dHBURST     [2];
+
+  logic [1:0]            hsel;
+  logic [1:0][PLEN -1:0] haddr;
+  logic [1:0][XLEN -1:0] hrdata;
+  logic [1:0][XLEN -1:0] hwdata;
+  logic [1:0]            hwrite;
+  logic [1:0][      2:0] hsize;
+  logic [1:0][      2:0] hburst;
+  logic [1:0][      3:0] hprot;
+  logic [1:0][      1:0] htrans;
+  logic [1:0]            hmastlock;
+  logic [1:0]            hready;
+  logic [1:0]            hresp;
 
   ////////////////////////////////////////////////////////////////
   //

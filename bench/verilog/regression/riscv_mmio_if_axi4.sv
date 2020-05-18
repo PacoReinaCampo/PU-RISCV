@@ -49,19 +49,58 @@ module riscv_mmio_if_ahb3 #(
   parameter CATCH_UART_TX = 80001080
 )
   (
-    input                       HRESETn,
-    input                       HCLK,
+    input                               HRESETn,
+    input                               HCLK,
 
-    input      [           1:0] HTRANS,
-    input      [HADDR_SIZE-1:0] HADDR,
-    input                       HWRITE,
-    input      [           2:0] HSIZE,
-    input      [           2:0] HBURST,
-    input      [HDATA_SIZE-1:0] HWDATA,
-    output reg [HDATA_SIZE-1:0] HRDATA,
+    //AXI4 instruction
+    output logic [AXI_ID_WIDTH    -1:0] axi4_aw_id,
+    output logic [AXI_ADDR_WIDTH  -1:0] axi4_aw_addr,
+    output logic [                 7:0] axi4_aw_len,
+    output logic [                 2:0] axi4_aw_size,
+    output logic [                 1:0] axi4_aw_burst,
+    output logic                        axi4_aw_lock,
+    output logic [                 3:0] axi4_aw_cache,
+    output logic [                 2:0] axi4_aw_prot,
+    output logic [                 3:0] axi4_aw_qos,
+    output logic [                 3:0] axi4_aw_region,
+    output logic [AXI_USER_WIDTH  -1:0] axi4_aw_user,
+    output logic                        axi4_aw_valid,
+    input  logic                        axi4_aw_ready,
 
-    output reg                  HREADYOUT,
-    output                      HRESP    
+    output logic [AXI_ID_WIDTH    -1:0] axi4_ar_id,
+    output logic [AXI_ADDR_WIDTH  -1:0] axi4_ar_addr,
+    output logic [                 7:0] axi4_ar_len,
+    output logic [                 2:0] axi4_ar_size,
+    output logic [                 1:0] axi4_ar_burst,
+    output logic                        axi4_ar_lock,
+    output logic [                 3:0] axi4_ar_cache,
+    output logic [                 2:0] axi4_ar_prot,
+    output logic [                 3:0] axi4_ar_qos,
+    output logic [                 3:0] axi4_ar_region,
+    output logic [AXI_USER_WIDTH  -1:0] axi4_ar_user,
+    output logic                        axi4_ar_valid,
+    input  logic                        axi4_ar_ready,
+
+    output logic [AXI_DATA_WIDTH  -1:0] axi4_w_data,
+    output logic [AXI_STRB_WIDTH  -1:0] axi4_w_strb,
+    output logic                        axi4_w_last,
+    output logic [AXI_USER_WIDTH  -1:0] axi4_w_user,
+    output logic                        axi4_w_valid,
+    input  logic                        axi4_w_ready,
+
+    input  logic [AXI_ID_WIDTH    -1:0] axi4_r_id,
+    input  logic [AXI_DATA_WIDTH  -1:0] axi4_r_data,
+    input  logic [                 1:0] axi4_r_resp,
+    input  logic                        axi4_r_last,
+    input  logic [AXI_USER_WIDTH  -1:0] axi4_r_user,
+    input  logic                        axi4_r_valid,
+    output logic                        axi4_r_ready,
+
+    input  logic [AXI_ID_WIDTH    -1:0] axi4_b_id,
+    input  logic [                 1:0] axi4_b_resp,
+    input  logic [AXI_USER_WIDTH  -1:0] axi4_b_user,
+    input  logic                        axi4_b_valid,
+    output logic                        axi4_b_ready
   );
 
   ////////////////////////////////////////////////////////////////
@@ -77,6 +116,19 @@ module riscv_mmio_if_ahb3 #(
   logic                  dHWRITE;
 
   integer watchdog_cnt;
+
+  logic             hsel;
+  logic [PLEN -1:0] haddr;
+  logic [XLEN -1:0] hrdata;
+  logic [XLEN -1:0] hwdata;
+  logic             hwrite;
+  logic [      2:0] hsize;
+  logic [      2:0] hburst;
+  logic [      3:0] hprot;
+  logic [      1:0] htrans;
+  logic             hmastlock;
+  logic             hready;
+  logic             hresp;
 
   ////////////////////////////////////////////////////////////////
   //

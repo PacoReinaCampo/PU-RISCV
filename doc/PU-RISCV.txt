@@ -316,6 +316,50 @@ A PU cache is a hardware cache used by the PU to reduce the average cost (time o
 | riscv_biu                   | Bus Interface Unit                 |
 
 
+## Data INPUTS/OUTPUTS AMBA4 AXI-Lite Bus
+
+### Signals of the Read and Write Address channels
+
+| Write Port | Read Port  |  Size            | Direction       | Description                                                                         |
+| ---------- | ---------- | ---------------- | --------------- | ----------------------------------------------------------------------------------- |
+| `AWID`     | `ARID`     | `AXI_ID_WIDTH`   | Output / Output | Address ID, to identify multiple streams over a single channel                      |
+| `AWADDR`   | `ARADDR`   | `AXI_ADDR_WIDTH` | Output / Output | Address of the first beat of the burst                                              |
+| `AWLEN`    | `ARLEN`    |         8        | Output / Output | Number of beats inside the burst                                                    |
+| `AWSIZE`   | `ARSIZE`   |         3        | Output / Output | Size of each beat                                                                   |
+| `AWBURST`  | `ARBURST`  |         2        | Output / Output | Type of the burst                                                                   |
+| `AWLOCK`   | `ARLOCK`   |         1        | Output / Output | Lock type, to provide atomic operations                                             |
+| `AWCACHE`  | `ARCACHE`  |         4        | Output / Output | Memory type, how the transaction has to progress through the system                 |
+| `AWPROT`   | `ARPROT`   |         3        | Output / Output | Protection type: privilege, security level and data/instruction access              |
+| `AWQOS`    | `ARQOS`    |         4        | Output / Output | Quality of Service of the transaction                                               |
+| `AWREGION` | `ARREGION` |         4        | Output / Output | Region identifier, to access multiple logical interfaces from a single physical one |
+| `AWUSER`   | `ARUSER`   | `AXI_USER_WIDTH` | Output / Output | User-defined data                                                                   |
+| `AWVALID`  | `ARVALID`  |         1        | Output / Output | xVALID handshake signal                                                             |
+| `AWREADY`  | `ARREADY`  |         1        | Input  / Input  | xREADY handshake signal                                                             |
+
+### Signals of the Read and Write Data channels
+
+| Write Port | Read Port  |  Size            | Direction       | Description                                                                         |
+| ---------- | ---------- | ---------------- | --------------- | ----------------------------------------------------------------------------------- |
+| `WID`      | `RID`      | `AXI_ID_WIDTH`   | Output / Input  | Data ID, to identify multiple streams over a single channel                         |
+| `WDATA`    | `RDATA`    | `AXI_DATA_WIDTH` | Output / Input  | Read/Write data                                                                     |
+|    `--`    | `RRESP`    |        2         | Output / Input  | Read response, to specify the status of the current RDATA signal                    |
+| `WSTRB`    |    `--`    | `AXI_STRB_WIDTH` | Output / Input  | Byte strobe, to indicate which bytes of the WDATA signal are valid                  |
+| `WLAST`    | `RLAST`    |        1         | Output / Input  | Last beat identifier                                                                |
+| `WUSER`    | `RUSER`    | `AXI_USER_WIDTH` | Output / Input  | User-defined data                                                                   |
+| `WVALID`   | `RVALID`   |        1         | Output / Input  | xVALID handshake signal                                                             |
+| `WREADY`   | `RREADY`   |        1         | Input  / Output | xREADY handshake signal                                                             |
+
+### Signals of the Write Response channel
+
+| Write Port | Size             | Direction | Description                                                           |
+| ---------- | ---------------- | --------- | --------------------------------------------------------------------- |
+| `BID`      | `AXI_ID_WIDTH`   |   Input   | Write response ID, to identify multiple streams over a single channel |
+| `BRESP`    |         2        |   Input   | Write response, to specify the status of the burst                    |
+| `BUSER`    | `AXI_USER_WIDTH` |   Input   | User-defined data                                                     |
+| `BVALID`   |         1        |   Input   | xVALID handshake signal                                               |
+| `BREADY`   |         1        |   Output  | xREADY handshake signal                                               |
+
+
 ## Data INPUTS/OUTPUTS AMBA3 AHB-Lite Bus
 
 | Port         |  Size  | Direction | Description                    |
