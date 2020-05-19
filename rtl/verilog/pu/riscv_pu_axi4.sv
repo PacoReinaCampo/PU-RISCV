@@ -236,7 +236,7 @@ module riscv_pu_ahb3 #(
 
   logic                               dmem_req;
   logic          [XLEN          -1:0] dmem_adr;
-  logic                         [2:0] dmem_size;
+  logic          [               2:0] dmem_size;
   logic                               dmem_we;
   logic          [XLEN          -1:0] dmem_d,
                                       dmem_q;

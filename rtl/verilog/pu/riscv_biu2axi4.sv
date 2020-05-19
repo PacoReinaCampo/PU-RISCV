@@ -309,4 +309,85 @@ module riscv_biu2ahb3 #(
   assign biu_ack_o      = hready & data_ena_d;
   assign biu_d_ack_o    = hready & data_ena;
   assign biu_stb_ack_o  = hready & ~|burst_cnt & biu_stb_i & ~biu_err_o;
+
+  riscv_ahb2axi #(
+    .AXI_ID_WIDTH   ( AXI_ID_WIDTH   ),
+    .AXI_ADDR_WIDTH ( AXI_ADDR_WIDTH ),
+    .AXI_DATA_WIDTH ( AXI_DATA_WIDTH ),
+    .AXI_STRB_WIDTH ( AXI_STRB_WIDTH ),
+
+    .AHB_ADDR_WIDTH ( AHB_ADDR_WIDTH ),
+    .AHB_DATA_WIDTH ( AHB_DATA_WIDTH )
+  )
+  ahb2axi (
+    .clk   ( HCLK    ),
+    .rst_l ( HRESETn ),
+
+    .bus_clk_en (1'b1),
+
+    // AXI4 signals
+    .axi4_aw_id     (axi4_aw_id),
+    .axi4_aw_addr   (axi4_aw_addr),
+    .axi4_aw_len    (axi4_aw_len),
+    .axi4_aw_size   (axi4_aw_size),
+    .axi4_aw_burst  (axi4_aw_burst),
+    .axi4_aw_lock   (axi4_aw_lock),
+    .axi4_aw_cache  (axi4_aw_cache),
+    .axi4_aw_prot   (axi4_aw_prot),
+    .axi4_aw_qos    (axi4_aw_qos),
+    .axi4_aw_region (axi4_aw_region),
+    .axi4_aw_user   (axi4_aw_user),
+    .axi4_aw_valid  (axi4_aw_valid),
+    .axi4_aw_ready  (axi4_aw_ready),
+ 
+    .axi4_ar_id     (axi4_ar_id),
+    .axi4_ar_addr   (axi4_ar_addr),
+    .axi4_ar_len    (axi4_ar_len),
+    .axi4_ar_size   (axi4_ar_size),
+    .axi4_ar_burst  (axi4_ar_burst),
+    .axi4_ar_lock   (axi4_ar_lock),
+    .axi4_ar_cache  (axi4_ar_cache),
+    .axi4_ar_prot   (axi4_ar_prot),
+    .axi4_ar_qos    (axi4_ar_qos),
+    .axi4_ar_region (axi4_ar_region),
+    .axi4_ar_user   (axi4_ar_user),
+    .axi4_ar_valid  (axi4_ar_valid),
+    .axi4_ar_ready  (axi4_ar_ready),
+ 
+    .axi4_w_data    (axi4_w_data),
+    .axi4_w_strb    (axi4_w_strb),
+    .axi4_w_last    (axi4_w_last),
+    .axi4_w_user    (axi4_w_user),
+    .axi4_w_valid   (axi4_w_valid),
+    .axi4_w_ready   (axi4_w_ready),
+ 
+    .axi4_r_id      (axi4_r_id),
+    .axi4_r_data    (axi4_r_data),
+    .axi4_r_resp    (axi4_r_resp),
+    .axi4_r_last    (axi4_r_last),
+    .axi4_r_user    (axi4_r_user),
+    .axi4_r_valid   (axi4_r_valid),
+    .axi4_r_ready   (axi4_r_ready),
+ 
+    .axi4_b_id      (axi4_b_id),
+    .axi4_b_resp    (axi4_b_resp),
+    .axi4_b_user    (axi4_b_user),
+    .axi4_b_valid   (axi4_b_valid),
+    .axi4_b_ready   (axi4_b_ready),
+
+    // AHB3 signals
+    .ahb3_hsel      (hsel),
+    .ahb3_haddr     (haddr),
+    .ahb3_hwdata    (hwdata),
+    .ahb3_hrdata    (hrdata),
+    .ahb3_hwrite    (hwrite),
+    .ahb3_hsize     (hsize),
+    .ahb3_hburst    (hburst),
+    .ahb3_hprot     (hprot),
+    .ahb3_htrans    (htrans),
+    .ahb3_hmastlock (hmastlock),
+    .ahb3_hreadyin  (hreadyin),
+    .ahb3_hreadyout (hreadyout),
+    .ahb3_hresp     (hresp)
+  );
 endmodule
