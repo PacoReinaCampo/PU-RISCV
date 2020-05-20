@@ -42,9 +42,16 @@
 
 `include "riscv_mpsoc_pkg.sv"
 
-module riscv_mmio_if_ahb3 #(
-  parameter HDATA_SIZE    = 32,
-  parameter HADDR_SIZE    = 32,
+module riscv_mmio_if_axi4 #(
+  parameter AXI_ID_WIDTH   = 10,
+  parameter AXI_ADDR_WIDTH = 64,
+  parameter AXI_DATA_WIDTH = 64,
+  parameter AXI_STRB_WIDTH = 10,
+  parameter AXI_USER_WIDTH = 10,
+
+  parameter AHB_ADDR_WIDTH = 64,
+  parameter AHB_DATA_WIDTH = 64,
+
   parameter CATCH_TEST    = 80001000,
   parameter CATCH_UART_TX = 80001080
 )
@@ -107,28 +114,28 @@ module riscv_mmio_if_ahb3 #(
   //
   // Variables
   //
-  logic [HDATA_SIZE-1:0] data_reg;
-  logic                  catch_test,
-                         catch_uart_tx;
+  logic [AHB_DATA_WIDTH-1:0] data_reg;
+  logic                      catch_test,
+                             catch_uart_tx;
 
-  logic [           1:0] dHTRANS;
-  logic [HADDR_SIZE-1:0] dHADDR;
-  logic                  dHWRITE;
+  logic [               1:0] dHTRANS;
+  logic [AHB_ADDR_WIDTH-1:0] dHADDR;
+  logic                      dHWRITE;
 
   integer watchdog_cnt;
 
-  logic             hsel;
-  logic [PLEN -1:0] haddr;
-  logic [XLEN -1:0] hrdata;
-  logic [XLEN -1:0] hwdata;
-  logic             hwrite;
-  logic [      2:0] hsize;
-  logic [      2:0] hburst;
-  logic [      3:0] hprot;
-  logic [      1:0] htrans;
-  logic             hmastlock;
-  logic             hready;
-  logic             hresp;
+  logic                      hsel;
+  logic [AHB_ADDR_WIDTH-1:0] haddr;
+  logic [AHB_DATA_WIDTH-1:0] hrdata;
+  logic [AHB_DATA_WIDTH-1:0] hwdata;
+  logic                      hwrite;
+  logic [               2:0] hsize;
+  logic [               2:0] hburst;
+  logic [               3:0] hprot;
+  logic [               1:0] htrans;
+  logic                      hmastlock;
+  logic                      hreadyout;
+  logic                      hresp;
 
   ////////////////////////////////////////////////////////////////
   //
@@ -157,16 +164,16 @@ module riscv_mmio_if_ahb3 #(
   assign HRESP = `HRESP_OKAY;
 
   always @(posedge HCLK) begin
-    dHTRANS <= HTRANS;
-    dHADDR  <= HADDR;
-    dHWRITE <= HWRITE;
+    dHTRANS <= htrans;
+    dHADDR  <= haddr;
+    dHWRITE <= hwrite;
   end
 
   always @(posedge HCLK,negedge HRESETn) begin
     if (!HRESETn) begin
-      HREADYOUT <= 1'b1;
+      hreadyout <= 1'b1;
     end
-    else if (HTRANS == `HTRANS_IDLE) begin
+    else if (htrans == `HTRANS_IDLE) begin
     end
   end
 
@@ -178,7 +185,7 @@ module riscv_mmio_if_ahb3 #(
     else begin
       catch_test    <= dHTRANS == `HTRANS_NONSEQ && dHWRITE && dHADDR == CATCH_TEST;
       catch_uart_tx <= dHTRANS == `HTRANS_NONSEQ && dHWRITE && dHADDR == CATCH_UART_TX;
-      data_reg      <= HWDATA;
+      data_reg      <= hwdata;
     end
   end
   //Generate output
@@ -194,7 +201,7 @@ module riscv_mmio_if_ahb3 #(
       $display("-------------------------------------------------------------");
       $display("* RISC-V test bench finished");
       if (data_reg[0] == 1'b1) begin
-        if (~|data_reg[HDATA_SIZE-1:1])
+        if (~|data_reg[AHB_DATA_WIDTH-1:1])
           $display("* PASSED %0d", data_reg);
         else
           $display ("* FAILED: code: 0x%h (%0d: %s)", data_reg >> 1, data_reg >> 1, hostcode_to_string(data_reg >> 1) );
@@ -213,6 +220,7 @@ module riscv_mmio_if_ahb3 #(
     .AXI_ADDR_WIDTH ( AXI_ADDR_WIDTH ),
     .AXI_DATA_WIDTH ( AXI_DATA_WIDTH ),
     .AXI_STRB_WIDTH ( AXI_STRB_WIDTH ),
+    .AXI_USER_WIDTH ( AXI_USER_WIDTH ),
 
     .AHB_ADDR_WIDTH ( AHB_ADDR_WIDTH ),
     .AHB_DATA_WIDTH ( AHB_DATA_WIDTH )

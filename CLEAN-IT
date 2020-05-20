@@ -1,3 +1,20 @@
+rm -rf sim/mixed/regression/axi4/multi/run
+rm -rf sim/verilog/regression/axi4/multi/run
+rm -rf sim/vhdl/regression/axi4/multi/run
+
+rm -rf sim/mixed/regression/axi4/msim/work
+rm -rf sim/verilog/regression/axi4/msim/work
+rm -rf sim/vhdl/regression/axi4/msim/work
+
+rm -rf sim/mixed/regression/axi4/msim/transcript
+rm -rf sim/verilog/regression/axi4/msim/transcript
+rm -rf sim/vhdl/regression/axi4/msim/transcript
+
+rm -rf sim/verilog/regression/axi4/iverilog/system.vvp
+
+rm -rf sim/verilog/regression/axi4/vtor/obj_dir
+
+
 rm -rf sim/mixed/regression/ahb3/multi/run
 rm -rf sim/verilog/regression/ahb3/multi/run
 rm -rf sim/vhdl/regression/ahb3/multi/run

@@ -42,7 +42,16 @@
 
 `include "riscv_mpsoc_pkg.sv"
 
-module riscv_memory_model_ahb3 #(
+module riscv_memory_model_axi4 #(
+  parameter AXI_ID_WIDTH   = 10,
+  parameter AXI_ADDR_WIDTH = 64,
+  parameter AXI_DATA_WIDTH = 64,
+  parameter AXI_STRB_WIDTH = 10,
+  parameter AXI_USER_WIDTH = 10,
+
+  parameter AHB_ADDR_WIDTH = 64,
+  parameter AHB_DATA_WIDTH = 64,
+
   parameter XLEN = 64,
   parameter PLEN = 64,
 
@@ -160,7 +169,8 @@ module riscv_memory_model_ahb3 #(
   logic [1:0][      3:0] hprot;
   logic [1:0][      1:0] htrans;
   logic [1:0]            hmastlock;
-  logic [1:0]            hready;
+  logic [1:0]            hreadyin;
+  logic [1:0]            hreadyout;
   logic [1:0]            hresp;
 
   ////////////////////////////////////////////////////////////////
@@ -307,11 +317,11 @@ module riscv_memory_model_ahb3 #(
           if (!HRESETn) begin
             ack_latency[u] <= {MEM_LATENCY{1'b1}};
           end
-          else if (HREADY[u]) begin
-            if      ( HTRANS[u] == `HTRANS_IDLE  ) begin
+          else if (hreadyout[u]) begin
+            if      ( htrans[u] == `HTRANS_IDLE  ) begin
               ack_latency[u] <= {MEM_LATENCY{1'b1}};
             end
-            else if ( HTRANS[u] == `HTRANS_NONSEQ) begin
+            else if ( htrans[u] == `HTRANS_NONSEQ) begin
               ack_latency[u] <= 'h0;
             end
           end
@@ -319,151 +329,152 @@ module riscv_memory_model_ahb3 #(
             ack_latency[u] <= {ack_latency[u],1'b1};
           end
         end
-        assign HREADY[u] = ack_latency[u][MEM_LATENCY];
+        assign hreadyout[u] = ack_latency[u][MEM_LATENCY];
       end
       else begin
-        assign HREADY[u] = 1'b1;
+        assign hreadyout[u] = 1'b1;
       end
 
-      assign HRESP[u] = `HRESP_OKAY;
+      assign hresp[u] = `HRESP_OKAY;
 
       //Write Section
 
       //delay control signals
       always @(posedge HCLK) begin
-        if (HREADY[u]) begin
-          dHTRANS[u] <= HTRANS[u];
-          dHWRITE[u] <= HWRITE[u];
-          dHSIZE [u] <= HSIZE [u];
-          dHBURST[u] <= HBURST[u];
+        if (hreadyout[u]) begin
+          dHTRANS[u] <= htrans[u];
+          dHWRITE[u] <= hwrite[u];
+          dHSIZE [u] <= hsize [u];
+          dHBURST[u] <= hburst[u];
         end
       end
 
       always @(posedge HCLK) begin
-        if (HREADY[u] && HTRANS[u] != `HTRANS_BUSY) begin
-          waddr[u] <= HADDR[u] & ( {XLEN{1'b1}} << $clog2(XLEN/8) );
+        if (hreadyout[u] && htrans[u] != `HTRANS_BUSY) begin
+          waddr[u] <= haddr[u] & ( {XLEN{1'b1}} << $clog2(XLEN/8) );
 
-          case (HSIZE[u])
-            `HSIZE_BYTE : dbe[u] <= 1'h1  << HADDR[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_HWORD: dbe[u] <= 2'h3  << HADDR[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_WORD : dbe[u] <= 4'hf  << HADDR[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_DWORD: dbe[u] <= 8'hff << HADDR[u][$clog2(XLEN/8)-1:0];
+          case (hsize[u])
+            `HSIZE_BYTE : dbe[u] <= 1'h1  << haddr[u][$clog2(XLEN/8)-1:0];
+            `HSIZE_HWORD: dbe[u] <= 2'h3  << haddr[u][$clog2(XLEN/8)-1:0];
+            `HSIZE_WORD : dbe[u] <= 4'hf  << haddr[u][$clog2(XLEN/8)-1:0];
+            `HSIZE_DWORD: dbe[u] <= 8'hff << haddr[u][$clog2(XLEN/8)-1:0];
           endcase
         end
       end
 
       always @(posedge HCLK) begin
-        if (HREADY[u]) begin
-          wreq[u] <= (HTRANS[u] != `HTRANS_IDLE & HTRANS[u] != `HTRANS_BUSY) & HWRITE[u];
+        if (hreadyout[u]) begin
+          wreq[u] <= (htrans[u] != `HTRANS_IDLE & htrans[u] != `HTRANS_BUSY) & hwrite[u];
         end
       end
 
       always @(posedge HCLK) begin
-        if (HREADY[u] && wreq[u]) begin
+        if (hreadyout[u] && wreq[u]) begin
           for (m=0; m<XLEN/8; m=m+1) begin
             if (dbe[u][m]) begin
-              mem_array[waddr[u]][m*8+:8] = HWDATA[u][m*8+:8];
+              mem_array[waddr[u]][m*8+:8] = hwdata[u][m*8+:8];
             end
           end
         end
       end
 
       //Read Section
-      assign iaddr[u] = HADDR[u] & ( {XLEN{1'b1}} << $clog2(XLEN/8) );
+      assign iaddr[u] = haddr[u] & ( {XLEN{1'b1}} << $clog2(XLEN/8) );
 
       always @(posedge HCLK) begin
-        if (HREADY[u] && (HTRANS[u] != `HTRANS_IDLE) && (HTRANS[u] != `HTRANS_BUSY) && !HWRITE[u])
+        if (hreadyout[u] && (htrans[u] != `HTRANS_IDLE) && (htrans[u] != `HTRANS_BUSY) && !hwrite[u])
           if (iaddr[u] == waddr[u] && wreq[u]) begin
             for (n=0; n<XLEN/8; n++) begin
-              if (dbe[u]) HRDATA[u][n*8+:8] <= HWDATA[u][n*8+:8];
-              else        HRDATA[u][n*8+:8] <= mem_array[ iaddr[u] ][n*8+:8];
+              if (dbe[u]) hrdata[u][n*8+:8] <= hwdata[u][n*8+:8];
+              else        hrdata[u][n*8+:8] <= mem_array[ iaddr[u] ][n*8+:8];
             end
           end
         else begin
-          HRDATA[u] <= mem_array[ iaddr[u] ];
+          hrdata[u] <= mem_array[ iaddr[u] ];
         end
       end
+
+      riscv_ahb2axi #(
+        .AXI_ID_WIDTH   ( AXI_ID_WIDTH   ),
+        .AXI_ADDR_WIDTH ( AXI_ADDR_WIDTH ),
+        .AXI_DATA_WIDTH ( AXI_DATA_WIDTH ),
+        .AXI_STRB_WIDTH ( AXI_STRB_WIDTH ),
+
+        .AHB_ADDR_WIDTH ( AHB_ADDR_WIDTH ),
+        .AHB_DATA_WIDTH ( AHB_DATA_WIDTH )
+      )
+      ahb2axi (
+        .clk   ( HCLK    ),
+        .rst_l ( HRESETn ),
+
+        .scan_mode  (1'b1),
+        .bus_clk_en (1'b1),
+
+        // AXI4 signals
+        .axi4_aw_id     (axi4_aw_id     [u]),
+        .axi4_aw_addr   (axi4_aw_addr   [u]),
+        .axi4_aw_len    (axi4_aw_len    [u]),
+        .axi4_aw_size   (axi4_aw_size   [u]),
+        .axi4_aw_burst  (axi4_aw_burst  [u]),
+        .axi4_aw_lock   (axi4_aw_lock   [u]),
+        .axi4_aw_cache  (axi4_aw_cache  [u]),
+        .axi4_aw_prot   (axi4_aw_prot   [u]),
+        .axi4_aw_qos    (axi4_aw_qos    [u]),
+        .axi4_aw_region (axi4_aw_region [u]),
+        .axi4_aw_user   (axi4_aw_user   [u]),
+        .axi4_aw_valid  (axi4_aw_valid  [u]),
+        .axi4_aw_ready  (axi4_aw_ready  [u]),
+ 
+        .axi4_ar_id     (axi4_ar_id     [u]),
+        .axi4_ar_addr   (axi4_ar_addr   [u]),
+        .axi4_ar_len    (axi4_ar_len    [u]),
+        .axi4_ar_size   (axi4_ar_size   [u]),
+        .axi4_ar_burst  (axi4_ar_burst  [u]),
+        .axi4_ar_lock   (axi4_ar_lock   [u]),
+        .axi4_ar_cache  (axi4_ar_cache  [u]),
+        .axi4_ar_prot   (axi4_ar_prot   [u]),
+        .axi4_ar_qos    (axi4_ar_qos    [u]),
+        .axi4_ar_region (axi4_ar_region [u]),
+        .axi4_ar_user   (axi4_ar_user   [u]),
+        .axi4_ar_valid  (axi4_ar_valid  [u]),
+        .axi4_ar_ready  (axi4_ar_ready  [u]),
+ 
+        .axi4_w_data    (axi4_w_data  [u]),
+        .axi4_w_strb    (axi4_w_strb  [u]),
+        .axi4_w_last    (axi4_w_last  [u]),
+        .axi4_w_user    (axi4_w_user  [u]),
+        .axi4_w_valid   (axi4_w_valid [u]),
+        .axi4_w_ready   (axi4_w_ready [u]),
+ 
+        .axi4_r_id      (axi4_r_id    [u]),
+        .axi4_r_data    (axi4_r_data  [u]),
+        .axi4_r_resp    (axi4_r_resp  [u]),
+        .axi4_r_last    (axi4_r_last  [u]),
+        .axi4_r_user    (axi4_r_user  [u]),
+        .axi4_r_valid   (axi4_r_valid [u]),
+        .axi4_r_ready   (axi4_r_ready [u]),
+ 
+        .axi4_b_id      (axi4_b_id    [u]),
+        .axi4_b_resp    (axi4_b_resp  [u]),
+        .axi4_b_user    (axi4_b_user  [u]),
+        .axi4_b_valid   (axi4_b_valid [u]),
+        .axi4_b_ready   (axi4_b_ready [u]),
+
+        // AHB3 signals
+        .ahb3_hsel      (hsel      [u]),
+        .ahb3_haddr     (haddr     [u]),
+        .ahb3_hwdata    (hwdata    [u]),
+        .ahb3_hrdata    (hrdata    [u]),
+        .ahb3_hwrite    (hwrite    [u]),
+        .ahb3_hsize     (hsize     [u]),
+        .ahb3_hburst    (hburst    [u]),
+        .ahb3_hprot     (hprot     [u]),
+        .ahb3_htrans    (htrans    [u]),
+        .ahb3_hmastlock (hmastlock [u]),
+        .ahb3_hreadyin  (hreadyin  [u]),
+        .ahb3_hreadyout (hreadyout [u]),
+        .ahb3_hresp     (hresp     [u])
+      );
     end
   endgenerate
-
-  riscv_ahb2axi #(
-    .AXI_ID_WIDTH   ( AXI_ID_WIDTH   ),
-    .AXI_ADDR_WIDTH ( AXI_ADDR_WIDTH ),
-    .AXI_DATA_WIDTH ( AXI_DATA_WIDTH ),
-    .AXI_STRB_WIDTH ( AXI_STRB_WIDTH ),
-
-    .AHB_ADDR_WIDTH ( AHB_ADDR_WIDTH ),
-    .AHB_DATA_WIDTH ( AHB_DATA_WIDTH )
-  )
-  ahb2axi (
-    .clk   ( HCLK    ),
-    .rst_l ( HRESETn ),
-
-    .bus_clk_en (1'b1),
-
-    // AXI4 signals
-    .axi4_aw_id     (axi4_aw_id),
-    .axi4_aw_addr   (axi4_aw_addr),
-    .axi4_aw_len    (axi4_aw_len),
-    .axi4_aw_size   (axi4_aw_size),
-    .axi4_aw_burst  (axi4_aw_burst),
-    .axi4_aw_lock   (axi4_aw_lock),
-    .axi4_aw_cache  (axi4_aw_cache),
-    .axi4_aw_prot   (axi4_aw_prot),
-    .axi4_aw_qos    (axi4_aw_qos),
-    .axi4_aw_region (axi4_aw_region),
-    .axi4_aw_user   (axi4_aw_user),
-    .axi4_aw_valid  (axi4_aw_valid),
-    .axi4_aw_ready  (axi4_aw_ready),
- 
-    .axi4_ar_id     (axi4_ar_id),
-    .axi4_ar_addr   (axi4_ar_addr),
-    .axi4_ar_len    (axi4_ar_len),
-    .axi4_ar_size   (axi4_ar_size),
-    .axi4_ar_burst  (axi4_ar_burst),
-    .axi4_ar_lock   (axi4_ar_lock),
-    .axi4_ar_cache  (axi4_ar_cache),
-    .axi4_ar_prot   (axi4_ar_prot),
-    .axi4_ar_qos    (axi4_ar_qos),
-    .axi4_ar_region (axi4_ar_region),
-    .axi4_ar_user   (axi4_ar_user),
-    .axi4_ar_valid  (axi4_ar_valid),
-    .axi4_ar_ready  (axi4_ar_ready),
- 
-    .axi4_w_data    (axi4_w_data),
-    .axi4_w_strb    (axi4_w_strb),
-    .axi4_w_last    (axi4_w_last),
-    .axi4_w_user    (axi4_w_user),
-    .axi4_w_valid   (axi4_w_valid),
-    .axi4_w_ready   (axi4_w_ready),
- 
-    .axi4_r_id      (axi4_r_id),
-    .axi4_r_data    (axi4_r_data),
-    .axi4_r_resp    (axi4_r_resp),
-    .axi4_r_last    (axi4_r_last),
-    .axi4_r_user    (axi4_r_user),
-    .axi4_r_valid   (axi4_r_valid),
-    .axi4_r_ready   (axi4_r_ready),
- 
-    .axi4_b_id      (axi4_b_id),
-    .axi4_b_resp    (axi4_b_resp),
-    .axi4_b_user    (axi4_b_user),
-    .axi4_b_valid   (axi4_b_valid),
-    .axi4_b_ready   (axi4_b_ready),
-
-    // AHB3 signals
-    .ahb3_hsel      (hsel),
-    .ahb3_haddr     (haddr),
-    .ahb3_hwdata    (hwdata),
-    .ahb3_hrdata    (hrdata),
-    .ahb3_hwrite    (hwrite),
-    .ahb3_hsize     (hsize),
-    .ahb3_hburst    (hburst),
-    .ahb3_hprot     (hprot),
-    .ahb3_htrans    (htrans),
-    .ahb3_hmastlock (hmastlock),
-    .ahb3_hreadyin  (hreadyin),
-    .ahb3_hreadyout (hreadyout),
-    .ahb3_hresp     (hresp)
-  );
 endmodule

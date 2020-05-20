@@ -43,6 +43,15 @@
 `include "riscv_mpsoc_pkg.sv"
 
 module riscv_module_ahb3 #(
+  parameter            AXI_ID_WIDTH       = 10,
+  parameter            AXI_ADDR_WIDTH     = 64,
+  parameter            AXI_DATA_WIDTH     = 64,
+  parameter            AXI_STRB_WIDTH     = 10,
+  parameter            AXI_USER_WIDTH     = 10,
+
+  parameter            AHB_ADDR_WIDTH     = 64,
+  parameter            AHB_DATA_WIDTH     = 64,
+
   parameter            XLEN               = 32,
   parameter            PLEN               = 32,
   parameter [XLEN-1:0] PC_INIT            = 'h8000_0000,

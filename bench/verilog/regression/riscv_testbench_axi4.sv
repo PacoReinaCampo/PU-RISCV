@@ -42,7 +42,7 @@
 
 `include "riscv_mpsoc_pkg.sv"
 
-module riscv_testbench_ahb3; 
+module riscv_testbench_axi4; 
 
   //core parameters
   parameter XLEN             = 64;
@@ -84,6 +84,15 @@ module riscv_testbench_ahb3;
   // Constants
   //
   localparam MULLAT = MULT_LATENCY > 4 ? 4 : MULT_LATENCY;
+
+  localparam AXI_ID_WIDTH   = 10;
+  localparam AXI_ADDR_WIDTH = 64;
+  localparam AXI_DATA_WIDTH = 64;
+  localparam AXI_STRB_WIDTH = 10;
+  localparam AXI_USER_WIDTH = 10;
+
+  localparam AHB_ADDR_WIDTH = 64;
+  localparam AHB_DATA_WIDTH = 64;
 
   //////////////////////////////////////////////////////////////////
   //
@@ -289,7 +298,16 @@ module riscv_testbench_ahb3;
   assign pma_cfg[3] = {`MEM_TYPE_MAIN, 8'b1111_0000, `AMO_TYPE_NONE, `TOR};
 
   //Hookup Device Under Test
-  riscv_pu_ahb3 #(
+  riscv_pu_axi4 #(
+    .AXI_ID_WIDTH     ( 10               ),
+    .AXI_ADDR_WIDTH   ( PLEN             ),
+    .AXI_DATA_WIDTH   ( XLEN             ),
+    .AXI_STRB_WIDTH   ( 10               ),
+    .AXI_USER_WIDTH   ( 10               ),
+
+    .AHB_ADDR_WIDTH   ( PLEN             ),
+    .AHB_DATA_WIDTH   ( XLEN             ),
+
     .XLEN             ( XLEN             ),
     .PLEN             ( PLEN             ),
     .PC_INIT          ( PC_INIT          ),
@@ -456,7 +474,7 @@ module riscv_testbench_ahb3;
   assign axi4_dat_b_ready  = mem_b_ready [1];
 
   //hookup memory model
-  riscv_memory_model_ahb3 #(
+  riscv_memory_model_axi4 #(
     .INIT_FILE ( INIT_FILE )
   )
   memory_model (
@@ -530,9 +548,16 @@ module riscv_testbench_ahb3;
     end
     else begin
       //New MMIO interface
-      riscv_mmio_if_ahb3 #(
-        .HDATA_SIZE    ( XLEN    ),
-        .HADDR_SIZE    ( PLEN    ),
+      riscv_mmio_if_axi4 #(
+        .AXI_ID_WIDTH   ( 10   ),
+        .AXI_ADDR_WIDTH ( PLEN ),
+        .AXI_DATA_WIDTH ( XLEN ),
+        .AXI_STRB_WIDTH ( 10   ),
+        .AXI_USER_WIDTH ( 10   ),
+
+        .AHB_ADDR_WIDTH ( PLEN ),
+        .AHB_DATA_WIDTH ( XLEN ),
+
         .CATCH_TEST    ( TOHOST  ),
         .CATCH_UART_TX ( UART_TX )
       )
