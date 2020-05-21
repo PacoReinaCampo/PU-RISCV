@@ -33,5 +33,12 @@
 ../../../../../rtl/verilog/memory/riscv_ram_queue.sv
 
 ../../../../../rtl/verilog/pu/riscv_ahb2axi.sv
+../../../../../rtl/verilog/pu/riscv_axi2ahb.sv
 ../../../../../rtl/verilog/pu/riscv_biu2axi4.sv
 ../../../../../rtl/verilog/pu/riscv_pu_axi4.sv
+
+../../../../../bench/verilog/regression/riscv_dbg_bfm.sv
+../../../../../bench/verilog/regression/riscv_htif.sv
+../../../../../bench/verilog/regression/riscv_memory_model_axi4.sv
+../../../../../bench/verilog/regression/riscv_mmio_if_axi4.sv
+../../../../../bench/verilog/regression/riscv_testbench_axi4.sv

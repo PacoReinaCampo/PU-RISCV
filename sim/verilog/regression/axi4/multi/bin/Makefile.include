@@ -79,6 +79,7 @@ RTL_VLOG = $(DUT_SRC_DIR)/core/cache/riscv_dcache_core.sv \
            $(DUT_SRC_DIR)/memory/riscv_ram_1rw.sv \
            $(DUT_SRC_DIR)/memory/riscv_ram_queue.sv \
            $(DUT_SRC_DIR)/pu/riscv_ahb2axi.sv \
+           $(DUT_SRC_DIR)/pu/riscv_axi2ahb.sv \
            $(DUT_SRC_DIR)/pu/riscv_biu2axi4.sv \
            $(DUT_SRC_DIR)/pu/riscv_pu_axi4.sv
 RTL_VHDL =

@@ -60,54 +60,54 @@ module riscv_mmio_if_axi4 #(
     input                               HCLK,
 
     //AXI4 instruction
-    output logic [AXI_ID_WIDTH    -1:0] axi4_aw_id,
-    output logic [AXI_ADDR_WIDTH  -1:0] axi4_aw_addr,
-    output logic [                 7:0] axi4_aw_len,
-    output logic [                 2:0] axi4_aw_size,
-    output logic [                 1:0] axi4_aw_burst,
-    output logic                        axi4_aw_lock,
-    output logic [                 3:0] axi4_aw_cache,
-    output logic [                 2:0] axi4_aw_prot,
-    output logic [                 3:0] axi4_aw_qos,
-    output logic [                 3:0] axi4_aw_region,
-    output logic [AXI_USER_WIDTH  -1:0] axi4_aw_user,
-    output logic                        axi4_aw_valid,
-    input  logic                        axi4_aw_ready,
+    input  logic [1:0][AXI_ID_WIDTH    -1:0] axi4_aw_id,
+    input  logic [1:0][AXI_ADDR_WIDTH  -1:0] axi4_aw_addr,
+    input  logic [1:0][                 7:0] axi4_aw_len,
+    input  logic [1:0][                 2:0] axi4_aw_size,
+    input  logic [1:0][                 1:0] axi4_aw_burst,
+    input  logic [1:0]                       axi4_aw_lock,
+    input  logic [1:0][                 3:0] axi4_aw_cache,
+    input  logic [1:0][                 2:0] axi4_aw_prot,
+    input  logic [1:0][                 3:0] axi4_aw_qos,
+    input  logic [1:0][                 3:0] axi4_aw_region,
+    input  logic [1:0][AXI_USER_WIDTH  -1:0] axi4_aw_user,
+    input  logic [1:0]                       axi4_aw_valid,
+    output logic [1:0]                       axi4_aw_ready,
 
-    output logic [AXI_ID_WIDTH    -1:0] axi4_ar_id,
-    output logic [AXI_ADDR_WIDTH  -1:0] axi4_ar_addr,
-    output logic [                 7:0] axi4_ar_len,
-    output logic [                 2:0] axi4_ar_size,
-    output logic [                 1:0] axi4_ar_burst,
-    output logic                        axi4_ar_lock,
-    output logic [                 3:0] axi4_ar_cache,
-    output logic [                 2:0] axi4_ar_prot,
-    output logic [                 3:0] axi4_ar_qos,
-    output logic [                 3:0] axi4_ar_region,
-    output logic [AXI_USER_WIDTH  -1:0] axi4_ar_user,
-    output logic                        axi4_ar_valid,
-    input  logic                        axi4_ar_ready,
+    input  logic [1:0][AXI_ID_WIDTH    -1:0] axi4_ar_id,
+    input  logic [1:0][AXI_ADDR_WIDTH  -1:0] axi4_ar_addr,
+    input  logic [1:0][                 7:0] axi4_ar_len,
+    input  logic [1:0][                 2:0] axi4_ar_size,
+    input  logic [1:0][                 1:0] axi4_ar_burst,
+    input  logic [1:0]                       axi4_ar_lock,
+    input  logic [1:0][                 3:0] axi4_ar_cache,
+    input  logic [1:0][                 2:0] axi4_ar_prot,
+    input  logic [1:0][                 3:0] axi4_ar_qos,
+    input  logic [1:0][                 3:0] axi4_ar_region,
+    input  logic [1:0][AXI_USER_WIDTH  -1:0] axi4_ar_user,
+    input  logic [1:0]                       axi4_ar_valid,
+    output logic [1:0]                       axi4_ar_ready,
 
-    output logic [AXI_DATA_WIDTH  -1:0] axi4_w_data,
-    output logic [AXI_STRB_WIDTH  -1:0] axi4_w_strb,
-    output logic                        axi4_w_last,
-    output logic [AXI_USER_WIDTH  -1:0] axi4_w_user,
-    output logic                        axi4_w_valid,
-    input  logic                        axi4_w_ready,
+    input  logic [1:0][AXI_DATA_WIDTH  -1:0] axi4_w_data,
+    input  logic [1:0][AXI_STRB_WIDTH  -1:0] axi4_w_strb,
+    input  logic [1:0]                       axi4_w_last,
+    input  logic [1:0][AXI_USER_WIDTH  -1:0] axi4_w_user,
+    input  logic [1:0]                       axi4_w_valid,
+    output logic [1:0]                       axi4_w_ready,
 
-    input  logic [AXI_ID_WIDTH    -1:0] axi4_r_id,
-    input  logic [AXI_DATA_WIDTH  -1:0] axi4_r_data,
-    input  logic [                 1:0] axi4_r_resp,
-    input  logic                        axi4_r_last,
-    input  logic [AXI_USER_WIDTH  -1:0] axi4_r_user,
-    input  logic                        axi4_r_valid,
-    output logic                        axi4_r_ready,
+    output logic [1:0][AXI_ID_WIDTH    -1:0] axi4_r_id,
+    output logic [1:0][AXI_DATA_WIDTH  -1:0] axi4_r_data,
+    output logic [1:0][                 1:0] axi4_r_resp,
+    output logic [1:0]                       axi4_r_last,
+    output logic [1:0][AXI_USER_WIDTH  -1:0] axi4_r_user,
+    output logic [1:0]                       axi4_r_valid,
+    input  logic [1:0]                       axi4_r_ready,
 
-    input  logic [AXI_ID_WIDTH    -1:0] axi4_b_id,
-    input  logic [                 1:0] axi4_b_resp,
-    input  logic [AXI_USER_WIDTH  -1:0] axi4_b_user,
-    input  logic                        axi4_b_valid,
-    output logic                        axi4_b_ready
+    output logic [1:0][AXI_ID_WIDTH    -1:0] axi4_b_id,
+    output logic [1:0][                 1:0] axi4_b_resp,
+    output logic [1:0][AXI_USER_WIDTH  -1:0] axi4_b_user,
+    output logic [1:0]                       axi4_b_valid,
+    input  logic [1:0]                       axi4_b_ready
   );
 
   ////////////////////////////////////////////////////////////////
@@ -215,7 +215,7 @@ module riscv_mmio_if_axi4 #(
     end
   end
 
-  riscv_ahb2axi #(
+  riscv_axi2ahb #(
     .AXI_ID_WIDTH   ( AXI_ID_WIDTH   ),
     .AXI_ADDR_WIDTH ( AXI_ADDR_WIDTH ),
     .AXI_DATA_WIDTH ( AXI_DATA_WIDTH ),
@@ -225,11 +225,13 @@ module riscv_mmio_if_axi4 #(
     .AHB_ADDR_WIDTH ( AHB_ADDR_WIDTH ),
     .AHB_DATA_WIDTH ( AHB_DATA_WIDTH )
   )
-  ahb2axi (
+  axi2ahb (
     .clk   ( HCLK    ),
     .rst_l ( HRESETn ),
 
-    .bus_clk_en (1'b1),
+    .scan_mode    (1'b1),
+    .bus_clk_en   (1'b1),
+    .clk_override (1'b1),
 
     // AXI4 signals
     .axi4_aw_id     (axi4_aw_id),

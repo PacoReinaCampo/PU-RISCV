@@ -128,11 +128,11 @@ module riscv_ahb2axi #(
   // Constants
   //
 
-  localparam [AHB_ADDR_WIDTH-1:0] RV_PIC_BASE_ADDR = {AHB_ADDR_WIDTH{1'h0}};
-  localparam [AHB_ADDR_WIDTH-1:0] RV_ICCM_SADR     = {AHB_ADDR_WIDTH{1'h0}};
-  localparam [AHB_ADDR_WIDTH-1:0] RV_DCCM_SADR     = {AHB_ADDR_WIDTH{1'h0}};
+  localparam [AHB_ADDR_WIDTH-1:0] RV_PIC_BASE_ADDR = 64'h00000000f00c0000;
+  localparam [AHB_ADDR_WIDTH-1:0] RV_ICCM_SADR     = 64'h00000000ee000000;
+  localparam [AHB_ADDR_WIDTH-1:0] RV_DCCM_SADR     = 64'h00000000f0040000;
 
-  localparam RV_ICCM_SIZE = 64;
+  localparam RV_ICCM_SIZE = 1024;
   localparam RV_DCCM_SIZE = 64;
 
   localparam RV_PIC_SIZE = 64;
@@ -422,37 +422,48 @@ module riscv_ahb2axi #(
   end
 
   // AXI Write Command Channel
-  assign axi4_aw_valid = cmdbuf_vld & cmdbuf_write;
-  assign axi4_aw_id    = '0;
-  assign axi4_aw_addr  = cmdbuf_addr;
-  assign axi4_aw_size  = {1'b0, cmdbuf_size[1:0]};
-  assign axi4_aw_prot  = 3'b0;
-  assign axi4_aw_len   = '0;
-  assign axi4_aw_burst = 2'b01;
+  assign axi4_aw_id     = '0;
+  assign axi4_aw_addr   = cmdbuf_addr;
+  assign axi4_aw_len    = 8'b0000_0000;
+  assign axi4_aw_size   = {1'b0, cmdbuf_size[1:0]};
+  assign axi4_aw_burst  = 2'b01;
+  assign axi4_aw_lock   = 1'b0;
+  assign axi4_aw_cache  = 4'b0000;
+  assign axi4_aw_prot   = 3'b000;
+  assign axi4_aw_qos    = 4'b0000;
+  assign axi4_aw_region = 4'b0000;
+  assign axi4_aw_user   = '0;
+  assign axi4_aw_valid  = cmdbuf_vld & cmdbuf_write;
 
   // AXI Write Data Channel
   // This is tied to the command channel as we only write the command buffer once we have the data.
-  assign axi4_w_valid  = cmdbuf_vld & cmdbuf_write;
-  assign axi4_w_data   = cmdbuf_wdata;
-  assign axi4_w_strb   = cmdbuf_wstrb;
-  assign axi4_w_last   = 1'b1;
+  assign axi4_w_data    = cmdbuf_wdata;
+  assign axi4_w_strb    = cmdbuf_wstrb;
+  assign axi4_w_last    = 1'b1;
+  assign axi4_w_user    = 1'b0;
+  assign axi4_w_valid   = cmdbuf_vld & cmdbuf_write;
 
   // AXI Write Response
   // Always ready. AHB does not require a write response.
-  assign axi4_b_ready  = 1'b1;
+  assign axi4_b_ready   = 1'b1;
 
   // AXI Read Channels
-  assign axi4_ar_valid = cmdbuf_vld & ~cmdbuf_write;
-  assign axi4_ar_id    = '0;
-  assign axi4_ar_addr  = cmdbuf_addr;
-  assign axi4_ar_size  = {1'b0, cmdbuf_size};
-  assign axi4_ar_prot  = 3'b0;
-  assign axi4_ar_len   = 8'b0;
-  assign axi4_ar_burst = 2'b01;
+  assign axi4_ar_id     = '0;
+  assign axi4_ar_addr   = cmdbuf_addr;
+  assign axi4_ar_len    = 8'b0000_0000;
+  assign axi4_ar_size   = {1'b0, cmdbuf_size};
+  assign axi4_ar_burst  = 2'b01;
+  assign axi4_ar_lock   = 1'b0;
+  assign axi4_ar_cache  = 4'b0000;
+  assign axi4_ar_prot   = 3'b000;
+  assign axi4_ar_qos    = 4'b0000;
+  assign axi4_ar_region = 4'b0000;
+  assign axi4_ar_user   = '0;
+  assign axi4_ar_valid  = cmdbuf_vld & ~cmdbuf_write;
 
   // AXI Read Response Channel
   // Always ready as AHB reads are blocking and the the buffer is available for the read coming back always.
-  assign axi4_r_ready  = 1'b1;
+  assign axi4_r_ready   = 1'b1;
 
   // Clock header logic
   always @(negedge clk) begin
