@@ -411,12 +411,12 @@ module riscv_testbench_axi4;
 
   assign mem_r_ready   [0] = axi4_ins_r_ready;
  
-  assign mem_b_id      [0] = axi4_ins_b_id;
-  assign mem_b_resp    [0] = axi4_ins_b_resp;
-  assign mem_b_user    [0] = axi4_ins_b_user;
-  assign mem_b_valid   [0] = axi4_ins_b_valid;
+  assign axi4_ins_b_id     = mem_b_id    [0];
+  assign axi4_ins_b_resp   = mem_b_resp  [0];
+  assign axi4_ins_b_user   = mem_b_user  [0];
+  assign axi4_ins_b_valid  = mem_b_valid [0];
 
-  assign axi4_ins_b_ready  = mem_b_ready [0];
+  assign mem_b_ready  [0]  = axi4_ins_b_ready;
 
   //Data interface
   assign mem_aw_id     [1] = axi4_dat_aw_id;
@@ -466,12 +466,12 @@ module riscv_testbench_axi4;
 
   assign mem_r_ready   [1] = axi4_dat_r_ready;
  
-  assign mem_b_id      [1] = axi4_dat_b_id;
-  assign mem_b_resp    [1] = axi4_dat_b_resp;
-  assign mem_b_user    [1] = axi4_dat_b_user;
-  assign mem_b_valid   [1] = axi4_dat_b_valid;
+  assign axi4_dat_b_id     = mem_b_id    [1];
+  assign axi4_dat_b_resp   = mem_b_resp  [1];
+  assign axi4_dat_b_user   = mem_b_user  [1];
+  assign axi4_dat_b_valid  = mem_b_valid [1];
 
-  assign axi4_dat_b_ready  = mem_b_ready [1];
+  assign mem_b_ready  [1]  = axi4_dat_b_ready;
 
   //hookup memory model
   riscv_memory_model_axi4 #(
@@ -577,7 +577,7 @@ module riscv_testbench_axi4;
         .axi4_aw_region (axi4_dat_aw_region),
         .axi4_aw_user   (axi4_dat_aw_user),
         .axi4_aw_valid  (axi4_dat_aw_valid),
-        .axi4_aw_ready  (axi4_dat_aw_ready),
+        .axi4_aw_ready  (),
  
         .axi4_ar_id     (axi4_dat_ar_id),
         .axi4_ar_addr   (axi4_dat_ar_addr),
@@ -591,27 +591,27 @@ module riscv_testbench_axi4;
         .axi4_ar_region (axi4_dat_ar_region),
         .axi4_ar_user   (axi4_dat_ar_user),
         .axi4_ar_valid  (axi4_dat_ar_valid),
-        .axi4_ar_ready  (axi4_dat_ar_ready),
+        .axi4_ar_ready  (),
  
         .axi4_w_data    (axi4_dat_w_data),
         .axi4_w_strb    (axi4_dat_w_strb),
         .axi4_w_last    (axi4_dat_w_last),
         .axi4_w_user    (axi4_dat_w_user),
         .axi4_w_valid   (axi4_dat_w_valid),
-        .axi4_w_ready   (axi4_dat_w_ready),
+        .axi4_w_ready   (),
  
-        .axi4_r_id      (axi4_dat_r_id),
-        .axi4_r_data    (axi4_dat_r_data),
-        .axi4_r_resp    (axi4_dat_r_resp),
-        .axi4_r_last    (axi4_dat_r_last),
-        .axi4_r_user    (axi4_dat_r_user),
-        .axi4_r_valid   (axi4_dat_r_valid),
+        .axi4_r_id      (),
+        .axi4_r_data    (),
+        .axi4_r_resp    (),
+        .axi4_r_last    (),
+        .axi4_r_user    (),
+        .axi4_r_valid   (),
         .axi4_r_ready   (axi4_dat_r_ready),
  
-        .axi4_b_id      (axi4_dat_b_id),
-        .axi4_b_resp    (axi4_dat_b_resp),
-        .axi4_b_user    (axi4_dat_b_user),
-        .axi4_b_valid   (axi4_dat_b_valid),
+        .axi4_b_id      (),
+        .axi4_b_resp    (),
+        .axi4_b_user    (),
+        .axi4_b_valid   (),
         .axi4_b_ready   (axi4_dat_b_ready)
       );
     end
