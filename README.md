@@ -217,44 +217,44 @@ A PU cache is a hardware cache used by the PU to reduce the average cost (time o
 
 ### Signals of the Read and Write Address channels
 
-| Write Port | Read Port  |  Size            | Direction       | Description                                                                         |
-| ---------- | ---------- | ---------------- | --------------- | ----------------------------------------------------------------------------------- |
-| `AWID`     | `ARID`     | `AXI_ID_WIDTH`   | Output / Output | Address ID, to identify multiple streams over a single channel                      |
-| `AWADDR`   | `ARADDR`   | `AXI_ADDR_WIDTH` | Output / Output | Address of the first beat of the burst                                              |
-| `AWLEN`    | `ARLEN`    |         8        | Output / Output | Number of beats inside the burst                                                    |
-| `AWSIZE`   | `ARSIZE`   |         3        | Output / Output | Size of each beat                                                                   |
-| `AWBURST`  | `ARBURST`  |         2        | Output / Output | Type of the burst                                                                   |
-| `AWLOCK`   | `ARLOCK`   |         1        | Output / Output | Lock type, to provide atomic operations                                             |
-| `AWCACHE`  | `ARCACHE`  |         4        | Output / Output | Memory type, how the transaction has to progress through the system                 |
-| `AWPROT`   | `ARPROT`   |         3        | Output / Output | Protection type: privilege, security level and data/instruction access              |
-| `AWQOS`    | `ARQOS`    |         4        | Output / Output | Quality of Service of the transaction                                               |
-| `AWREGION` | `ARREGION` |         4        | Output / Output | Region identifier, to access multiple logical interfaces from a single physical one |
-| `AWUSER`   | `ARUSER`   | `AXI_USER_WIDTH` | Output / Output | User-defined data                                                                   |
-| `AWVALID`  | `ARVALID`  |         1        | Output / Output | xVALID handshake signal                                                             |
-| `AWREADY`  | `ARREADY`  |         1        | Input  / Input  | xREADY handshake signal                                                             |
+| Write Port | Read Port  |  Size            | Direction | Description                              |
+| ---------- | ---------- | ---------------- | --------- | ---------------------------------------- |
+| `AWID`     | `ARID`     | `AXI_ID_WIDTH`   | Output    | Address ID, to identify multiple streams |
+| `AWADDR`   | `ARADDR`   | `AXI_ADDR_WIDTH` | Output    | Address of the first beat of the burst   |
+| `AWLEN`    | `ARLEN`    |         8        | Output    | Number of beats inside the burst         |
+| `AWSIZE`   | `ARSIZE`   |         3        | Output    | Size of each beat                        |
+| `AWBURST`  | `ARBURST`  |         2        | Output    | Type of the burst                        |
+| `AWLOCK`   | `ARLOCK`   |         1        | Output    | Lock type, to provide atomic operations  |
+| `AWCACHE`  | `ARCACHE`  |         4        | Output    | Memory type, progress through the system |
+| `AWPROT`   | `ARPROT`   |         3        | Output    | Protection type                          |
+| `AWQOS`    | `ARQOS`    |         4        | Output    | Quality of Service of the transaction    |
+| `AWREGION` | `ARREGION` |         4        | Output    | Region identifier, physical to logical   |
+| `AWUSER`   | `ARUSER`   | `AXI_USER_WIDTH` | Output    | User-defined data                        |
+| `AWVALID`  | `ARVALID`  |         1        | Output    | xVALID handshake signal                  |
+| `AWREADY`  | `ARREADY`  |         1        | Input     | xREADY handshake signal                  |
 
 ### Signals of the Read and Write Data channels
 
-| Write Port | Read Port  |  Size            | Direction       | Description                                                                         |
-| ---------- | ---------- | ---------------- | --------------- | ----------------------------------------------------------------------------------- |
-| `WID`      | `RID`      | `AXI_ID_WIDTH`   | Output / Input  | Data ID, to identify multiple streams over a single channel                         |
-| `WDATA`    | `RDATA`    | `AXI_DATA_WIDTH` | Output / Input  | Read/Write data                                                                     |
-|    `--`    | `RRESP`    |        2         | Output / Input  | Read response, to specify the status of the current RDATA signal                    |
-| `WSTRB`    |    `--`    | `AXI_STRB_WIDTH` | Output / Input  | Byte strobe, to indicate which bytes of the WDATA signal are valid                  |
-| `WLAST`    | `RLAST`    |        1         | Output / Input  | Last beat identifier                                                                |
-| `WUSER`    | `RUSER`    | `AXI_USER_WIDTH` | Output / Input  | User-defined data                                                                   |
-| `WVALID`   | `RVALID`   |        1         | Output / Input  | xVALID handshake signal                                                             |
-| `WREADY`   | `RREADY`   |        1         | Input  / Output | xREADY handshake signal                                                             |
+| Write Port | Read Port  |  Size            | Direction | Description                              |
+| ---------- | ---------- | ---------------- | --------- | ---------------------------------------- |
+| `WID`      | `RID`      | `AXI_ID_WIDTH`   | Output    | Data ID, to identify multiple streams    |
+| `WDATA`    | `RDATA`    | `AXI_DATA_WIDTH` | Output    | Read/Write data                          |
+|    `--`    | `RRESP`    |        2         | Output    | Read response, current RDATA status      |
+| `WSTRB`    |    `--`    | `AXI_STRB_WIDTH` | Output    | Byte strobe, WDATA signal                |
+| `WLAST`    | `RLAST`    |        1         | Output    | Last beat identifier                     |
+| `WUSER`    | `RUSER`    | `AXI_USER_WIDTH` | Output    | User-defined data                        |
+| `WVALID`   | `RVALID`   |        1         | Output    | xVALID handshake signal                  |
+| `WREADY`   | `RREADY`   |        1         | Input     | xREADY handshake signal                  |
 
 ### Signals of the Write Response channel
 
-| Write Port | Size             | Direction | Description                                                           |
-| ---------- | ---------------- | --------- | --------------------------------------------------------------------- |
-| `BID`      | `AXI_ID_WIDTH`   |   Input   | Write response ID, to identify multiple streams over a single channel |
-| `BRESP`    |         2        |   Input   | Write response, to specify the status of the burst                    |
-| `BUSER`    | `AXI_USER_WIDTH` |   Input   | User-defined data                                                     |
-| `BVALID`   |         1        |   Input   | xVALID handshake signal                                               |
-| `BREADY`   |         1        |   Output  | xREADY handshake signal                                               |
+| Write Port | Size             | Direction | Description                                     |
+| ---------- | ---------------- | --------- | ----------------------------------------------- |
+| `BID`      | `AXI_ID_WIDTH`   |   Input   | Write response ID, to identify multiple streams |
+| `BRESP`    |         2        |   Input   | Write response, to specify the burst status     |
+| `BUSER`    | `AXI_USER_WIDTH` |   Input   | User-defined data                               |
+| `BVALID`   |         1        |   Input   | xVALID handshake signal                         |
+| `BREADY`   |         1        |   Output  | xREADY handshake signal                         |
 
 
 ## Instruction INPUTS/OUTPUTS AMBA3 AHB-Lite Bus
@@ -320,44 +320,44 @@ A PU cache is a hardware cache used by the PU to reduce the average cost (time o
 
 ### Signals of the Read and Write Address channels
 
-| Write Port | Read Port  |  Size            | Direction       | Description                                                                         |
-| ---------- | ---------- | ---------------- | --------------- | ----------------------------------------------------------------------------------- |
-| `AWID`     | `ARID`     | `AXI_ID_WIDTH`   | Output / Output | Address ID, to identify multiple streams over a single channel                      |
-| `AWADDR`   | `ARADDR`   | `AXI_ADDR_WIDTH` | Output / Output | Address of the first beat of the burst                                              |
-| `AWLEN`    | `ARLEN`    |         8        | Output / Output | Number of beats inside the burst                                                    |
-| `AWSIZE`   | `ARSIZE`   |         3        | Output / Output | Size of each beat                                                                   |
-| `AWBURST`  | `ARBURST`  |         2        | Output / Output | Type of the burst                                                                   |
-| `AWLOCK`   | `ARLOCK`   |         1        | Output / Output | Lock type, to provide atomic operations                                             |
-| `AWCACHE`  | `ARCACHE`  |         4        | Output / Output | Memory type, how the transaction has to progress through the system                 |
-| `AWPROT`   | `ARPROT`   |         3        | Output / Output | Protection type: privilege, security level and data/instruction access              |
-| `AWQOS`    | `ARQOS`    |         4        | Output / Output | Quality of Service of the transaction                                               |
-| `AWREGION` | `ARREGION` |         4        | Output / Output | Region identifier, to access multiple logical interfaces from a single physical one |
-| `AWUSER`   | `ARUSER`   | `AXI_USER_WIDTH` | Output / Output | User-defined data                                                                   |
-| `AWVALID`  | `ARVALID`  |         1        | Output / Output | xVALID handshake signal                                                             |
-| `AWREADY`  | `ARREADY`  |         1        | Input  / Input  | xREADY handshake signal                                                             |
+| Write Port | Read Port  |  Size            | Direction | Description                              |
+| ---------- | ---------- | ---------------- | --------- | ---------------------------------------- |
+| `AWID`     | `ARID`     | `AXI_ID_WIDTH`   | Output    | Address ID, to identify multiple streams |
+| `AWADDR`   | `ARADDR`   | `AXI_ADDR_WIDTH` | Output    | Address of the first beat of the burst   |
+| `AWLEN`    | `ARLEN`    |         8        | Output    | Number of beats inside the burst         |
+| `AWSIZE`   | `ARSIZE`   |         3        | Output    | Size of each beat                        |
+| `AWBURST`  | `ARBURST`  |         2        | Output    | Type of the burst                        |
+| `AWLOCK`   | `ARLOCK`   |         1        | Output    | Lock type, to provide atomic operations  |
+| `AWCACHE`  | `ARCACHE`  |         4        | Output    | Memory type, progress through the system |
+| `AWPROT`   | `ARPROT`   |         3        | Output    | Protection type                          |
+| `AWQOS`    | `ARQOS`    |         4        | Output    | Quality of Service of the transaction    |
+| `AWREGION` | `ARREGION` |         4        | Output    | Region identifier, physical to logical   |
+| `AWUSER`   | `ARUSER`   | `AXI_USER_WIDTH` | Output    | User-defined data                        |
+| `AWVALID`  | `ARVALID`  |         1        | Output    | xVALID handshake signal                  |
+| `AWREADY`  | `ARREADY`  |         1        | Input     | xREADY handshake signal                  |
 
 ### Signals of the Read and Write Data channels
 
-| Write Port | Read Port  |  Size            | Direction       | Description                                                                         |
-| ---------- | ---------- | ---------------- | --------------- | ----------------------------------------------------------------------------------- |
-| `WID`      | `RID`      | `AXI_ID_WIDTH`   | Output / Input  | Data ID, to identify multiple streams over a single channel                         |
-| `WDATA`    | `RDATA`    | `AXI_DATA_WIDTH` | Output / Input  | Read/Write data                                                                     |
-|    `--`    | `RRESP`    |        2         | Output / Input  | Read response, to specify the status of the current RDATA signal                    |
-| `WSTRB`    |    `--`    | `AXI_STRB_WIDTH` | Output / Input  | Byte strobe, to indicate which bytes of the WDATA signal are valid                  |
-| `WLAST`    | `RLAST`    |        1         | Output / Input  | Last beat identifier                                                                |
-| `WUSER`    | `RUSER`    | `AXI_USER_WIDTH` | Output / Input  | User-defined data                                                                   |
-| `WVALID`   | `RVALID`   |        1         | Output / Input  | xVALID handshake signal                                                             |
-| `WREADY`   | `RREADY`   |        1         | Input  / Output | xREADY handshake signal                                                             |
+| Write Port | Read Port  |  Size            | Direction | Description                              |
+| ---------- | ---------- | ---------------- | --------- | ---------------------------------------- |
+| `WID`      | `RID`      | `AXI_ID_WIDTH`   | Output    | Data ID, to identify multiple streams    |
+| `WDATA`    | `RDATA`    | `AXI_DATA_WIDTH` | Output    | Read/Write data                          |
+|    `--`    | `RRESP`    |        2         | Output    | Read response, current RDATA status      |
+| `WSTRB`    |    `--`    | `AXI_STRB_WIDTH` | Output    | Byte strobe, WDATA signal                |
+| `WLAST`    | `RLAST`    |        1         | Output    | Last beat identifier                     |
+| `WUSER`    | `RUSER`    | `AXI_USER_WIDTH` | Output    | User-defined data                        |
+| `WVALID`   | `RVALID`   |        1         | Output    | xVALID handshake signal                  |
+| `WREADY`   | `RREADY`   |        1         | Input     | xREADY handshake signal                  |
 
 ### Signals of the Write Response channel
 
-| Write Port | Size             | Direction | Description                                                           |
-| ---------- | ---------------- | --------- | --------------------------------------------------------------------- |
-| `BID`      | `AXI_ID_WIDTH`   |   Input   | Write response ID, to identify multiple streams over a single channel |
-| `BRESP`    |         2        |   Input   | Write response, to specify the status of the burst                    |
-| `BUSER`    | `AXI_USER_WIDTH` |   Input   | User-defined data                                                     |
-| `BVALID`   |         1        |   Input   | xVALID handshake signal                                               |
-| `BREADY`   |         1        |   Output  | xREADY handshake signal                                               |
+| Write Port | Size             | Direction | Description                                     |
+| ---------- | ---------------- | --------- | ----------------------------------------------- |
+| `BID`      | `AXI_ID_WIDTH`   |   Input   | Write response ID, to identify multiple streams |
+| `BRESP`    |         2        |   Input   | Write response, to specify the burst status     |
+| `BUSER`    | `AXI_USER_WIDTH` |   Input   | User-defined data                               |
+| `BVALID`   |         1        |   Input   | xVALID handshake signal                         |
+| `BREADY`   |         1        |   Output  | xREADY handshake signal                         |
 
 
 ## Data INPUTS/OUTPUTS AMBA3 AHB-Lite Bus
@@ -402,39 +402,39 @@ A PU cache is a hardware cache used by the PU to reduce the average cost (time o
 
 ### Parameters
 
-| Parameter               | Type     | Default        | Description                                                     |
-| ----------------------- | -------- | -------------- | --------------------------------------------------------------- |
-| `JEDEC_BANK`            |`Integer` |0x0A            |JEDEC Bank                                                       |
-| `JEDEC_MANUFACTURER_ID` |`Integer` |0x6E            |JEDEC Manufacturer ID                                            |
-| `XLEN`                  |`Integer` |64              |Data Path Width                                                  |
-| `PLEN`                  |`Integer` |64              |Physical Memory Address Size                                     |
-| `PMP_CNT`               |`Integer` |16              |Number of Physical Memory Protection Entries                     |
-| `PMA_CNT`               |`Integer` |16              |Number of Physical Menory Attribute Entries                      |
-| `HAS_USER`              |`Integer` |1               |User Mode Enable                                                 |
-| `HAS_SUPER`             |`Integer` |1               |Supervisor Mode Enable                                           |
-| `HAS_HYPER`             |`Integer` |1               |Hypervisor Mode Enable                                           |
-| `HAS_RVM`               |`Integer` |1               |"M" Extension Enable                                             |
-| `HAS_RVA`               |`Integer` |1               |"A" Extension Enable                                             |
-| `HAS_RVC`               |`Integer` |1               |"C" Extension Enable                                             |
-| `HAS_BPU`               |`Integer` |1               |Branch Prediction Unit Control Enable                            |
-| `IS_RV32E`              |`Integer` |0               |RV32E Base Integer Instruction Set Enable                        |
-| `MULT_LATENCY`          |`Integer` |1               |Hardware Multiplier Latency (if "M" Extension enabled)           |
-| `ICACHE_SIZE`           |`Integer` |16              |Instruction Cache size in Kbytes                                 |
-| `ICACHE_BLOCK_SIZE`     |`Integer` |64              |Instruction Cache block length in bytes                          |
-| `ICACHE_WAYS`           |`Integer` |2               |Instruction Cache associativity                                  |
-| `ICACHE_REPLACE_ALG`    |`Integer` |0               |Instruction Cache replacement algorithm 0: Random 1: FIFO 2: LRU |
-| `DCACHE_SIZE`           |`Integer` |16              |Data Cache size in Kbytes                                        |
-| `DCACHE_BLOCK_SIZE`     |`Integer` |64              |Data Cache block length in bytes                                 |
-| `DCACHE_WAYS`           |`Integer` |2               |Data Cache associativity                                         |
-| `DCACHE_REPLACE_ALG`    |`Integer` |0               |Data Cache replacement algorithm 0: Random 1: FIFO 2: LRU        |
-| `HARTID`                |`Integer` |0               |Hart Identifier                                                  |
-| `PC_INIT`               |`Address` |`'h200`         |Program Counter Initialisation Vector                            |
-| `MNMIVEC_DEFAULT`       |`Address` |`PC_INIT-'h004` |Machine Mode Non-Maskable Interrupt vector address               |
-| `MTVEC_DEFAULT`         |`Address` |`PC_INIT-'h040` |Machine Mode Interrupt vector address                            |
-| `HTVEC_DEFAULT`         |`Address` |`PC_INIT-'h080` |Hypervisor Mode Interrupt vector address                         |
-| `STVEC_DEFAULT`         |`Address` |`PC_INIT-'h0C0` |Supervisor Mode Interrupt vector address                         |
-| `UTVEC_DEFAULT`         |`Address` |`PC_INIT-'h100` |User Mode Interrupt vector address                               |
-| `BP_LOCAL_BITS`         |`Integer` |10              |Number of local predictor bits                                   |
-| `BP_GLOBAL_BITS`        |`Integer` |2               |Number of global predictor bits                                  |
-| `BREAKPOINTS`           |`Integer` |3               |Number of hardware breakpoints                                   |
-| `TECHNOLOGY`            |`String`  |`GENERIC`       |Target Silicon Technology                                        |
+| Parameter               | Type      | Default         | Description                           |
+| ----------------------- | --------- | --------------- | ------------------------------------- |
+| `JEDEC_BANK`            | `Integer` | 0x0A            | JEDEC Bank                            |
+| `JEDEC_MANUFACTURER_ID` | `Integer` | 0x6E            | JEDEC Manufacturer ID                 |
+| `XLEN`                  | `Integer` | 64              | Data Path Width                       |
+| `PLEN`                  | `Integer` | 64              | Physical Memory Address Size          |
+| `PMP_CNT`               | `Integer` | 16              | Physical Memory Protection Entries    |
+| `PMA_CNT`               | `Integer` | 16              | Physical Menory Attribute Entries     |
+| `HAS_USER`              | `Integer` | 1               | User Mode Enable                      |
+| `HAS_SUPER`             | `Integer` | 1               | Supervisor Mode Enable                |
+| `HAS_HYPER`             | `Integer` | 1               | Hypervisor Mode Enable                |
+| `HAS_RVM`               | `Integer` | 1               | "M" Extension Enable                  |
+| `HAS_RVA`               | `Integer` | 1               | "A" Extension Enable                  |
+| `HAS_RVC`               | `Integer` | 1               | "C" Extension Enable                  |
+| `HAS_BPU`               | `Integer` | 1               | Branch Prediction Unit Control Enable |
+| `IS_RV32E`              | `Integer` | 0               | Base Integer Instruction Set Enable   |
+| `MULT_LATENCY`          | `Integer` | 1               | Hardware Multiplier Latency           |
+| `ICACHE_SIZE`           | `Integer` | 16              | Instruction Cache size                |
+| `ICACHE_BLOCK_SIZE`     | `Integer` | 64              | Instruction Cache block length        |
+| `ICACHE_WAYS`           | `Integer` | 2               | Instruction Cache associativity       |
+| `ICACHE_REPLACE_ALG`    | `Integer` | 0               | Instruction Cache replacement         |
+| `DCACHE_SIZE`           | `Integer` | 16              | Data Cache size                       |
+| `DCACHE_BLOCK_SIZE`     | `Integer` | 64              | Data Cache block length               |
+| `DCACHE_WAYS`           | `Integer` | 2               | Data Cache associativity              |
+| `DCACHE_REPLACE_ALG`    | `Integer` | 0               | Data Cache replacement algorithm      |
+| `HARTID`                | `Integer` | 0               | Hart Identifier                       |
+| `PC_INIT`               | `Address` | `'h200`         | Program Counter Initialisation Vector |
+| `MNMIVEC_DEFAULT`       | `Address` | `PC_INIT-'h004` | Machine Mode Non-Maskable             |
+| `MTVEC_DEFAULT`         | `Address` | `PC_INIT-'h040` | Machine Mode Interrupt Address        |
+| `HTVEC_DEFAULT`         | `Address` | `PC_INIT-'h080` | Hypervisor Mode Interrupt Address     |
+| `STVEC_DEFAULT`         | `Address` | `PC_INIT-'h0C0` | Supervisor Mode Interrupt Address     |
+| `UTVEC_DEFAULT`         | `Address` | `PC_INIT-'h100` | User Mode Interrupt Address           |
+| `BP_LOCAL_BITS`         | `Integer` | 10              | Number of local predictor bits        |
+| `BP_GLOBAL_BITS`        | `Integer` | 2               | Number of global predictor bits       |
+| `BREAKPOINTS`           | `Integer` | 3               | Number of hardware breakpoints        |
+| `TECHNOLOGY`            | `String`  | `GENERIC`       | Target Silicon Technology             |
