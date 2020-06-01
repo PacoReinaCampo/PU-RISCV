@@ -251,6 +251,23 @@ sudo apt install yosys
 ```
 
 
+### BACK-END
+
+type:
+```
+mkdir qflow
+cd qflow
+
+git clone https://github.com/RTimothyEdwards/magic
+git clone https://github.com/rubund/graywolf
+git clone https://github.com/The-OpenROAD-Project/OpenSTA
+git clone https://github.com/RTimothyEdwards/qrouter
+git clone https://github.com/RTimothyEdwards/irsim
+git clone https://github.com/RTimothyEdwards/netgen
+git clone https://github.com/RTimothyEdwards/qflow
+```
+
+
 ## CORE-RISCV
 
 ### CORE-RISCV Organization
