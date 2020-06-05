@@ -34,3 +34,9 @@
 
 ../../../../../rtl/verilog/pu/riscv_biu2ahb3.sv
 ../../../../../rtl/verilog/pu/riscv_pu_ahb3.sv
+
+../../../../../bench/verilog/regression/riscv_dbg_bfm.sv
+../../../../../bench/verilog/regression/riscv_htif.sv
+../../../../../bench/verilog/regression/riscv_memory_model_ahb3.sv
+../../../../../bench/verilog/regression/riscv_mmio_if_ahb3.sv
+../../../../../bench/verilog/regression/riscv_testbench_ahb3.sv
