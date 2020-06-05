@@ -81,8 +81,6 @@ module riscv_memory_model_ahb3 #(
   //
   // Typedefs
   //
-  typedef bit   [     7:0] octet;
-  typedef bit   [XLEN-1:0] data_type;
   typedef logic [PLEN-1:0] addr_type;
 
   ////////////////////////////////////////////////////////////////
@@ -92,7 +90,7 @@ module riscv_memory_model_ahb3 #(
   integer m,n;
   genvar  u,i,j,k,p;
 
-  data_type mem_array[addr_type];
+  logic [XLEN         -1:0] mem_array   [addr_type];
 
   logic [PLEN         -1:0] iaddr       [2],
                             raddr       [2],
@@ -124,11 +122,11 @@ module riscv_memory_model_ahb3 #(
 
     reg [31:0] tmp;
 
-    bit [7:0]        byte_cnt;
-    octet    [  1:0] address;
-    bit [7:0]        record_type;
-    octet    [255:0] data;
-    bit [7:0]        checksum, crc;
+    bit        [7:0] byte_cnt;
+    bit [  1:0][7:0] address;
+    bit        [7:0] record_type;
+    bit [255:0][7:0] data;
+    bit        [7:0] checksum, crc;
 
     logic [PLEN-1:0] base_addr=BASE;
 
