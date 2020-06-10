@@ -21,6 +21,7 @@ SystemVerilog System Description Language Simulator
 
 *A System Description Language Simulator (translator) is a computer program that translates computer code written in a Programming Language (the source language) into a Hardware Design Language (the target language). The compiler is primarily used for programs that translate source code from a high-level programming language to a low-level language to create an executable program.*
 
+type:
 ```
 git clone http://git.veripool.org/git/verilator
 
@@ -46,13 +47,14 @@ Verilog Hardware Description Language Simulator
 
 *A Hardware Description Language Simulator uses mathematical models to replicate the behavior of an actual hardware device. Simulation software allows for modeling of circuit operation and is an invaluable analysis tool. Simulating a circuit’s behavior before actually building it can greatly improve design efficiency by making faulty designs known as such, and providing insight into the behavior of electronics circuit designs.*
 
+type:
 ```
 git clone https://github.com/steveicarus/iverilog
 
 cd iverilog
+sh autoconf.sh
 ./configure
 make
-sh autoconf.sh
 sudo make install
 ```
 
@@ -71,6 +73,7 @@ VHDL Hardware Description Language Simulator
 
 *A Hardware Description Language Simulator uses mathematical models to replicate the behavior of an actual hardware device. Simulation software allows for modeling of circuit operation and is an invaluable analysis tool. Simulating a circuit’s behavior before actually building it can greatly improve design efficiency by making faulty designs known as such, and providing insight into the behavior of electronics circuit designs.*
 
+type:
 ```
 git clone https://github.com/ghdl/ghdl
 
@@ -99,6 +102,7 @@ Hardware Description Language Optimizer
 
 *A Hardware Description Language Optimizer finds an equivalent representation of the specified logic circuit under specified constraints (minimum area, pre-specified delay). This tool combines scalable logic optimization based on And-Inverter Graphs (AIGs), optimal-delay DAG-based technology mapping for look-up tables and standard cells, and innovative algorithms for sequential synthesis and verification.*
 
+type:
 ```
 git clone https://github.com/YosysHQ/yosys
 
@@ -113,6 +117,16 @@ source SYNTHESIZE-IT
 ```
 
 ## BACK-END Open Source Tools
+
+### Library
+type:
+```
+sudo apt update
+sudo apt upgrade
+
+sudo apt install bison cmake flex freeglut3-dev libcairo2-dev libgsl-dev \
+libncurses-dev libx11-dev m4 python-tk python3-tk swig tcl tcl-dev tk-dev tcsh
+```
 
 ```
 mkdir qflow
@@ -132,6 +146,7 @@ Standard Cell Editor
 
 *A Standard Cell Editor allows to print a set of standard cells. The standard cell methodology is an abstraction, whereby a low-level VLSI layout is encapsulated into a logical representation. A standard cell is a group of transistor and interconnect structures that provides a boolean logic function (AND, OR, XOR, XNOR, inverters) or a storage function (flipflop or latch).*
 
+type:
 ```
 git clone https://github.com/RTimothyEdwards/magic
 
@@ -146,8 +161,10 @@ Standard Cell Placer
 
 *A Standard Cell Placer takes a given synthesized circuit netlist together with a technology library and produces a valid placement layout. The layout is optimized according to the aforementioned objectives and ready for cell resizing and buffering, a step essential for timing and signal integrity satisfaction. Physical design flow are iterated a number of times until design closure is achieved.*
 
+type:
 ```
 git clone https://github.com/rubund/graywolf
+
 cd graywolf
 mkdir build
 cd build
@@ -161,8 +178,10 @@ Standard Cell Timing-Analizer
 
 *A Standard Cell Timing-Analizer is a simulation method of computing the expected timing of a digital circuit without requiring a simulation of the full circuit. High-performance integrated circuits have traditionally been characterized by the clock frequency at which they operate. Measuring the ability of a circuit to operate at the specified speed requires an ability to measure, during the design process, its delay at numerous steps.*
 
+type:
 ```
 git clone https://github.com/The-OpenROAD-Project/OpenSTA
+
 cd OpenSTA
 mkdir build
 cd build
@@ -176,8 +195,10 @@ Standard Cell Router
 
 *A Standard Cell Router takes pre-existing polygons consisting of pins on cells, and pre-existing wiring called pre-routes. Each of these polygons are associated with a net. The primary task of the router is to create geometries such that all terminals assigned to the same net are connected, no terminals assigned to different nets are connected, and all design rules are obeyed.*
 
+type:
 ```
 git clone https://github.com/RTimothyEdwards/qrouter
+
 cd qrouter
 ./configure
 make
@@ -189,8 +210,10 @@ Standard Cell Simulator
 
 *A Standard Cell Simulator treats transistors as ideal switches. Extracted capacitance and lumped resistance values are used to make the switch a little bit more realistic than the ideal, using the RC time constants to predict the relative timing of events. This simulator represents a circuit in terms of its exact transistor structure but describes the electrical behavior in a highly idealized way.*
 
+type:
 ```
 git clone https://github.com/RTimothyEdwards/irsim
+
 cd irsim
 ./configure
 make
@@ -202,8 +225,10 @@ Standard Cell Verifier
 
 *A Standard Cell Verifier compares netlists, a process known as LVS (Layout vs. Schematic). This step ensures that the geometry that has been laid out matches the expected circuit. The greatest need for LVS is in large analog or mixed-signal circuits that cannot be simulated in reasonable time. LVS can be done faster than simulation, and provides feedback that makes it easier to find errors.*
 
+type:
 ```
 git clone https://github.com/RTimothyEdwards/netgen
+
 cd netgen
 ./configure
 make
@@ -211,9 +236,12 @@ sudo make install
 ```
 
 ### Qflow
-Back-End Workflow
+*Back-End Workflow*
+
+type:
 ```
 git clone https://github.com/RTimothyEdwards/qflow
+
 cd qflow
 ./configure
 make
@@ -230,6 +258,7 @@ source FLOW-IT
 
 open Microsoft Store and install Ubuntu
 
+### Library
 type:
 ```
 sudo apt update
@@ -247,7 +276,15 @@ sudo apt install verilator
 sudo apt install iverilog
 sudo apt install ghdl
 
+cd /mnt/c/../sim/verilog/regression/wb/iverilog
+source SIMULATE-IT
+```
+
+```
 sudo apt install yosys
+
+cd /mnt/c/../synthesis/yosys
+source SYNTHESIZE-IT
 ```
 
 
@@ -265,6 +302,80 @@ git clone https://github.com/RTimothyEdwards/qrouter
 git clone https://github.com/RTimothyEdwards/irsim
 git clone https://github.com/RTimothyEdwards/netgen
 git clone https://github.com/RTimothyEdwards/qflow
+```
+
+```
+cd /mnt/c/../synthesis/qflow
+source FLOW-IT
+```
+
+
+## RISC-V ARCHITECTURE
+
+### Library
+
+type:
+```
+sudo apt-get install autoconf automake autotools-dev curl python3 libmpc-dev \
+libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf \
+libtool patchutils bc zlib1g-dev libexpat-dev
+```
+
+### Toolchain
+
+type:
+```
+git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
+
+cd riscv-gnu-toolchain
+
+./configure --prefix=/opt/riscv
+sudo make
+
+./configure --prefix=/opt/riscv
+sudo make linux
+
+./configure --prefix=/opt/riscv --enable-multilib
+sudo make linux
+
+./configure --prefix=$RISCV
+sudo make linux
+sudo make report-linux
+```
+
+
+## SOFTWARE
+
+type:
+```
+export PATH=$PATH:/opt/riscv/bin
+
+cd software
+
+rm -rf tests
+rm -rf riscv-tests
+
+mkdir tests
+mkdir tests/dump
+mkdir tests/hex
+
+git clone --recursive https://github.com/riscv/riscv-tests
+cd riscv-tests
+
+autoconf
+./configure --prefix=/opt/riscv/bin
+make
+
+cd isa
+
+source ../../elf2hex.sh
+
+mv *.dump ../../tests/dump
+mv *.hex ../../tests/hex
+
+cd ..
+
+make clean
 ```
 
 
