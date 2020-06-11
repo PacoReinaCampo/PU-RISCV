@@ -1,6 +1,6 @@
 # PU-RISCV WIKI
 
-A Processing Unit (PU) is an electronic system within a computer that carries out instructions of a program by performing the basic arithmetic, logic, controlling, and I/O operations specified by instructions. Instruction-level parallelism is a measure of how many instructions in a computer can be executed simultaneously. The PU is contained on a single Metal Oxide semiconductor (MOS) Integrated Circuit (IC).
+A Processing Unit (PU) is an electronic system within a computer that carries out instructions of a program by performing the basic arithmetic, logic, controlling, and I/O operations specified by instructions. Instruction-level parallelism is a measure of how many instructions in a computer can be executed simultaneously. The PU is contained on a single Metal Oxide Semiconductor (MOS) Integrated Circuit (IC).
 
 The RISC-V implementation has a 32/64/128 bit Microarchitecture, 6 stages data pipeline and an Instruction Set Architecture based on Reduced Instruction Set Computer. Compatible with AMBA and Wishbone Buses. For Researching and Developing.
 
@@ -14,9 +14,9 @@ The RISC-V implementation has a 32/64/128 bit Microarchitecture, 6 stages data p
 |...riscv_biu - dmem           | Bus Interface Unit (Data)        |
 
 
-## FRONT-END Open Source Tools
+## 1. FRONT-END Open Source Tools
 
-### Verilator
+### 1.1. Verilator
 SystemVerilog System Description Language Simulator
 
 *A System Description Language Simulator (translator) is a computer program that translates computer code written in a Programming Language (the source language) into a Hardware Design Language (the target language). The compiler is primarily used for programs that translate source code from a high-level programming language to a low-level language to create an executable program.*
@@ -42,7 +42,7 @@ cd sim/verilog/regression/ahb3/vtor
 source SIMULATE-IT
 ```
 
-### Icarus Verilog
+### 1.2. Icarus Verilog
 Verilog Hardware Description Language Simulator
 
 *A Hardware Description Language Simulator uses mathematical models to replicate the behavior of an actual hardware device. Simulation software allows for modeling of circuit operation and is an invaluable analysis tool. Simulating a circuit’s behavior before actually building it can greatly improve design efficiency by making faulty designs known as such, and providing insight into the behavior of electronics circuit designs.*
@@ -68,7 +68,7 @@ cd sim/verilog/regression/ahb3/iverilog
 source SIMULATE-IT
 ```
 
-### GHDL
+### 1.3. GHDL
 VHDL Hardware Description Language Simulator
 
 *A Hardware Description Language Simulator uses mathematical models to replicate the behavior of an actual hardware device. Simulation software allows for modeling of circuit operation and is an invaluable analysis tool. Simulating a circuit’s behavior before actually building it can greatly improve design efficiency by making faulty designs known as such, and providing insight into the behavior of electronics circuit designs.*
@@ -93,7 +93,7 @@ cd sim/vhdl/regression/ahb3/ghdl
 source SIMULATE-IT
 ```
 
-### Yosys-ABC
+### 1.4. Yosys-ABC
 Verilog Hardware Description Language Synthesizer
 
 *A Hardware Description Language Synthesizer turns a RTL implementation into a Logical Gate Level implementation. Logical design is a step in the standard design cycle in which the functional design of an electronic circuit is converted into the representation which captures logic operations, arithmetic operations, control flow, etc. In EDA parts of the logical design is automated using synthesis tools based on the behavioral description of the circuit.*
@@ -116,9 +116,9 @@ cd synthesis/yosys
 source SYNTHESIZE-IT
 ```
 
-## BACK-END Open Source Tools
+## 2. BACK-END Open Source Tools
 
-### Library
+### 2.1. Library
 type:
 ```
 sudo apt update
@@ -133,7 +133,7 @@ mkdir qflow
 cd qflow
 ```
 
-### Magic
+### 2.2. Magic
 Floor-Planner
 
 *A Floor-Planner of an Integrated Circuit (IC) is a schematic representation of tentative placement of its major functional blocks. In modern electronic design process floor-plans are created during the floor-planning design stage, an early stage in the hierarchical approach to Integrated Circuit design. Depending on the design methodology being followed, the actual definition of a floor-plan may differ.*
@@ -156,7 +156,7 @@ make
 sudo make install
 ```
 
-### Graywolf
+### 2.2. Graywolf
 Standard Cell Placer
 
 *A Standard Cell Placer takes a given synthesized circuit netlist together with a technology library and produces a valid placement layout. The layout is optimized according to the aforementioned objectives and ready for cell resizing and buffering, a step essential for timing and signal integrity satisfaction. Physical design flow are iterated a number of times until design closure is achieved.*
@@ -173,7 +173,7 @@ make
 sudo make install
 ```
 
-### OpenSTA
+### 2.3. OpenSTA
 Standard Cell Timing-Analizer
 
 *A Standard Cell Timing-Analizer is a simulation method of computing the expected timing of a digital circuit without requiring a simulation of the full circuit. High-performance integrated circuits have traditionally been characterized by the clock frequency at which they operate. Measuring the ability of a circuit to operate at the specified speed requires an ability to measure, during the design process, its delay at numerous steps.*
@@ -190,7 +190,7 @@ make
 sudo make install
 ```
 
-### Qrouter
+### 2.4. Qrouter
 Standard Cell Router
 
 *A Standard Cell Router takes pre-existing polygons consisting of pins on cells, and pre-existing wiring called pre-routes. Each of these polygons are associated with a net. The primary task of the router is to create geometries such that all terminals assigned to the same net are connected, no terminals assigned to different nets are connected, and all design rules are obeyed.*
@@ -205,7 +205,7 @@ make
 sudo make install
 ```
 
-### Irsim
+### 2.5. Irsim
 Standard Cell Simulator
 
 *A Standard Cell Simulator treats transistors as ideal switches. Extracted capacitance and lumped resistance values are used to make the switch a little bit more realistic than the ideal, using the RC time constants to predict the relative timing of events. This simulator represents a circuit in terms of its exact transistor structure but describes the electrical behavior in a highly idealized way.*
@@ -220,7 +220,7 @@ make
 sudo make install
 ```
 
-### Netgen
+### 2.6. Netgen
 Standard Cell Verifier
 
 *A Standard Cell Verifier compares netlists, a process known as LVS (Layout vs. Schematic). This step ensures that the geometry that has been laid out matches the expected circuit. The greatest need for LVS is in large analog or mixed-signal circuits that cannot be simulated in reasonable time. LVS can be done faster than simulation, and provides feedback that makes it easier to find errors.*
@@ -235,8 +235,8 @@ make
 sudo make install
 ```
 
-### Qflow
-*Back-End Workflow*
+### 2.7. Qflow
+Back-End Workflow
 
 type:
 ```
@@ -254,11 +254,15 @@ source FLOW-IT
 ```
 
 
-## for WINDOWS users!
+## 3. for WINDOWS users!
 
-open Microsoft Store and install Ubuntu
+1. Settings → Apps → Apps & features → Related settings, Programs and
+Features → Turn Windows features on or off → Windows Subsystem for
+Linux
 
-### Library
+2. Microsoft Store → INSTALL UBUNTU
+
+### 3.1. Library
 type:
 ```
 sudo apt update
@@ -268,7 +272,7 @@ sudo apt install bison cmake flex freeglut3-dev libcairo2-dev libgsl-dev \
 libncurses-dev libx11-dev m4 python-tk python3-tk swig tcl tcl-dev tk-dev tcsh
 ```
 
-### FRONT-END
+### 3.2. FRONT-END
 
 type:
 ```
@@ -288,7 +292,7 @@ source SYNTHESIZE-IT
 ```
 
 
-### BACK-END
+### 3.3. BACK-END
 
 type:
 ```
@@ -310,18 +314,18 @@ source FLOW-IT
 ```
 
 
-## RISC-V ARCHITECTURE
+## 4. RISC-V ARCHITECTURE
 
-### Library
+### 4.1. Library
 
 type:
 ```
-sudo apt-get install autoconf automake autotools-dev curl python3 libmpc-dev \
+sudo apt install autoconf automake autotools-dev curl python3 libmpc-dev \
 libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf \
 libtool patchutils bc zlib1g-dev libexpat-dev
 ```
 
-### Toolchain
+### 4.2. Toolchain
 
 type:
 ```
@@ -344,7 +348,7 @@ sudo make report-linux
 ```
 
 
-## SOFTWARE
+## 5. SOFTWARE
 
 type:
 ```
@@ -379,9 +383,33 @@ make clean
 ```
 
 
-## CORE-RISCV
+## 6. CORE-RISCV
 
-### CORE-RISCV Organization
+
+### 6.1. RISC PIPELINE
+
+In computer science, instruction pipelining is a technique for implementing instruction-level parallelism within a PU. Pipelining attempts to keep every part of the processor busy with some instruction by dividing incoming instructions into a series of sequential steps performed by different PUs with different parts of instructions processed in parallel. It allows faster PU throughput than would otherwise be possible at a given clock rate.
+
+| Typical    | Modified   | Module          |
+| ---------- | ---------- | --------------- |
+| FETCH      | FETCH      | riscv_if        |
+| ...        | PRE-DECODE | riscv_id        |
+| DECODE     | DECODE     | riscv_id        |
+| EXECUTE    | EXECUTE    | riscv_execution |
+| MEMORY     | MEMORY     | riscv_memory    |
+| WRITE-BACK | WRITE-BACK | riscv_wb        |
+
+- IF – Instruction Fetch Unit : Send out the PC and fetch the instruction from memory into the Instruction Register (IR); increment the PC to address the next sequential instruction. The IR is used to hold the next instruction that will be needed on subsequent clock cycles; likewise the register NPC is used to hold the next sequential PC.
+
+- ID – Instruction Decode Unit : Decode the instruction and access the register file to read the registers. This unit gets instruction from IF, and extracts opcode and operand from that instruction. It also retrieves register values if requested by the operation.
+
+- EX – Execution Unit : The ALU operates on the operands prepared in prior cycle, performing one functions depending on instruction type.
+
+- MEM – Memory Access Unit: Instructions active in this unit are loads, stores and branches.
+
+- WB – WriteBack Unit : Write the result into the register file, whether it comes from the memory system or from the ALU.
+
+### 6.2. CORE-RISCV Organization
 
 The CORE-RISCV is based on the Harvard architecture, which is a computer architecture with separate storage and signal pathways for instructions and data. A Harvard architecture machine has distinct code and data address spaces: instruction address zero is not the same as data address zero. Instruction address zero might identify a twenty-four-bit value, while data address zero might indicate an eight-bit byte that is not part of that twenty-four-bit value.
 
@@ -408,281 +436,7 @@ The CORE-RISCV is based on the Harvard architecture, which is a computer archite
 In a Harvard architecture, there is no need to make the two memories share characteristics. In particular, the word width, timing, implementation technology, and memory address structure can differ. In some systems, instructions for pre-programmed tasks can be stored in read-only memory while data memory generally requires read-write memory. In some systems, there is much more instruction memory than data memory so instruction addresses are wider than data addresses.
 
 
-### Instruction INPUTS/OUTPUTS Bus
-
-| Port          |  Size  | Direction | Description        |
-| ------------- | ------ | --------- | ------------------ |
-| `ins_stb`     |    1   |   Input   | Strobe             |
-| `ins_stb_ack` |    1   |   Output  | Strobe acknowledge |
-| `ins_d_ack`   |    1   |   Output  | Data acknowledge   |
-| `ins_adri`    | `PLEN` |   Input   | Start address      |
-| `ins_adro`    | `PLEN` |   Output  | Response address   |
-| `ins_size`    |    3   |   Input   | Syze               |
-| `ins_type`    |    3   |   Input   | Type               |
-| `ins_prot`    |    3   |   Input   | Protection         |
-| `ins_lock`    |    1   |   Input   | Locked access      |
-| `ins_d`       | `XLEN` |   Input   | Write data         |
-| `ins_q`       | `XLEN` |   Output  | Read data          |
-| `ins_ack`     |    1   |   Output  | Acknowledge        |
-| `ins_err`     |    1   |   Output  | Error              |
-
-
-### Data INPUTS/OUTPUTS Bus
-
-| Port          |  Size  | Direction | Description        |
-| ------------- | ------ | --------- | ------------------ |
-| `dat_stb`     |    1   |   Input   | Strobe             |
-| `dat_stb_ack` |    1   |   Output  | Strobe acknowledge |
-| `dat_d_ack`   |    1   |   Output  | Data acknowledge   |
-| `dat_adri`    | `PLEN` |   Input   | Start address      |
-| `dat_adro`    | `PLEN` |   Output  | Response address   |
-| `dat_size`    |    3   |   Input   | Syze               |
-| `dat_type`    |    3   |   Input   | Type               |
-| `dat_prot`    |    3   |   Input   | Protection         |
-| `dat_lock`    |    1   |   Input   | Locked access      |
-| `dat_d`       | `XLEN` |   Input   | Write data         |
-| `dat_q`       | `XLEN` |   Output  | Read data          |
-| `dat_ack`     |    1   |   Output  | Acknowledge        |
-| `dat_err`     |    1   |   Output  | Error              |
-
-
-### RISC PIPELINE
-
-In computer science, instruction pipelining is a technique for implementing instruction-level parallelism within a PU. Pipelining attempts to keep every part of the processor busy with some instruction by dividing incoming instructions into a series of sequential steps performed by different PUs with different parts of instructions processed in parallel. It allows faster PU throughput than would otherwise be possible at a given clock rate.
-
-| Typical    | Modified   | Module          |
-| ---------- | ---------- | --------------- |
-| FETCH      | FETCH      | riscv_if        |
-| ...        | PRE-DECODE | riscv_id        |
-| DECODE     | DECODE     | riscv_id        |
-| EXECUTE    | EXECUTE    | riscv_execution |
-| MEMORY     | MEMORY     | riscv_memory    |
-| WRITE-BACK | WRITE-BACK | riscv_wb        |
-
-- IF – Instruction Fetch Unit : Send out the PC and fetch the instruction from memory into the Instruction Register (IR); increment the PC to address the next sequential instruction. The IR is used to hold the next instruction that will be needed on subsequent clock cycles; likewise the register NPC is used to hold the next sequential PC.
-
-- ID – Instruction Decode Unit : Decode the instruction and access the register file to read the registers. This unit gets instruction from IF, and extracts opcode and operand from that instruction. It also retrieves register values if requested by the operation.
-
-- EX – Execution Unit : The ALU operates on the operands prepared in prior cycle, performing one functions depending on instruction type.
-
-- MEM – Memory Access Unit: Instructions active in this unit are loads, stores and branches.
-
-- WB – WriteBack Unit : Write the result into the register file, whether it comes from the memory system or from the ALU.
-
-
-## INSTRUCTION & DATA CACHE
-
-A PU cache is a hardware cache used by the PU to reduce the average cost (time or energy) to access instruction/data from the main memory. A cache is a smaller, faster memory, closer to a core, which stores copies of the data from frequently used main memory locations. Most CPUs have different independent caches, including instruction and data caches.
-
-
-### Instruction Organization
-
-| Instruction Memory          | Module description                 |
-| --------------------------- | ---------------------------------- |
-| riscv_imem_ctrl             | Instruction Memory Access Block    |
-|...riscv_membuf              | Memory Access Buffer               |
-|.....riscv_ram_queue         | Fall-through Queue                 |
-|...riscv_memmisaligned       | Misalignment Check                 |
-|...riscv_mmu                 | Memory Management Unit             |
-|...riscv_pmachk              | Physical Memory Attributes Checker |
-|...riscv_pmpchk              | Physical Memory Protection Checker |
-|...riscv_icache_core         | Instruction Cache (Write Back)     |
-|.....riscv_ram_1rw           | RAM 1RW                            |
-|.......riscv_ram_1rw_generic | RAM 1RW Generic                    |
-|...riscv_dext                | Data External Access Logic         |
-|...riscv_ram_queue           | Fall-through Queue                 |
-|...riscv_mux                 | Bus-Interface-Unit Mux             |
-| riscv_biu                   | Bus Interface Unit                 |
-
-
-## Instruction INPUTS/OUTPUTS AMBA4 AXI-Lite Bus
-
-### Signals of the Read and Write Address channels
-
-| Write Port | Read Port  |  Size            | Direction | Description                              |
-| ---------- | ---------- | ---------------- | --------- | ---------------------------------------- |
-| `AWID`     | `ARID`     | `AXI_ID_WIDTH`   | Output    | Address ID, to identify multiple streams |
-| `AWADDR`   | `ARADDR`   | `AXI_ADDR_WIDTH` | Output    | Address of the first beat of the burst   |
-| `AWLEN`    | `ARLEN`    |         8        | Output    | Number of beats inside the burst         |
-| `AWSIZE`   | `ARSIZE`   |         3        | Output    | Size of each beat                        |
-| `AWBURST`  | `ARBURST`  |         2        | Output    | Type of the burst                        |
-| `AWLOCK`   | `ARLOCK`   |         1        | Output    | Lock type, to provide atomic operations  |
-| `AWCACHE`  | `ARCACHE`  |         4        | Output    | Memory type, progress through the system |
-| `AWPROT`   | `ARPROT`   |         3        | Output    | Protection type                          |
-| `AWQOS`    | `ARQOS`    |         4        | Output    | Quality of Service of the transaction    |
-| `AWREGION` | `ARREGION` |         4        | Output    | Region identifier, physical to logical   |
-| `AWUSER`   | `ARUSER`   | `AXI_USER_WIDTH` | Output    | User-defined data                        |
-| `AWVALID`  | `ARVALID`  |         1        | Output    | xVALID handshake signal                  |
-| `AWREADY`  | `ARREADY`  |         1        | Input     | xREADY handshake signal                  |
-
-### Signals of the Read and Write Data channels
-
-| Write Port | Read Port  |  Size            | Direction | Description                              |
-| ---------- | ---------- | ---------------- | --------- | ---------------------------------------- |
-| `WID`      | `RID`      | `AXI_ID_WIDTH`   | Output    | Data ID, to identify multiple streams    |
-| `WDATA`    | `RDATA`    | `AXI_DATA_WIDTH` | Output    | Read/Write data                          |
-|    `--`    | `RRESP`    |        2         | Output    | Read response, current RDATA status      |
-| `WSTRB`    |    `--`    | `AXI_STRB_WIDTH` | Output    | Byte strobe, WDATA signal                |
-| `WLAST`    | `RLAST`    |        1         | Output    | Last beat identifier                     |
-| `WUSER`    | `RUSER`    | `AXI_USER_WIDTH` | Output    | User-defined data                        |
-| `WVALID`   | `RVALID`   |        1         | Output    | xVALID handshake signal                  |
-| `WREADY`   | `RREADY`   |        1         | Input     | xREADY handshake signal                  |
-
-### Signals of the Write Response channel
-
-| Write Port | Size             | Direction | Description                                     |
-| ---------- | ---------------- | --------- | ----------------------------------------------- |
-| `BID`      | `AXI_ID_WIDTH`   |   Input   | Write response ID, to identify multiple streams |
-| `BRESP`    |         2        |   Input   | Write response, to specify the burst status     |
-| `BUSER`    | `AXI_USER_WIDTH` |   Input   | User-defined data                               |
-| `BVALID`   |         1        |   Input   | xVALID handshake signal                         |
-| `BREADY`   |         1        |   Output  | xREADY handshake signal                         |
-
-
-## Instruction INPUTS/OUTPUTS AMBA3 AHB-Lite Bus
-
-| Port         |  Size  | Direction | Description                           |
-| ------------ | ------ | --------- | ------------------------------------- |
-| `HRESETn`    |    1   |   Input   | Asynchronous Active Low Reset         |
-| `HCLK`       |    1   |   Input   | System Clock Input                    |
-|              |        |           |                                       |
-| `IHSEL`      |    1   |   Output  | Instruction Bus Select                |
-| `IHADDR`     | `PLEN` |   Output  | Instruction Address Bus               |
-| `IHRDATA`    | `XLEN` |   Input   | Instruction Read Data Bus             |
-| `IHWDATA`    | `XLEN` |   Output  | Instruction Write Data Bus            |
-| `IHWRITE`    |    1   |   Output  | Instruction Write Select              |
-| `IHSIZE`     |    3   |   Output  | Instruction Transfer Size             |
-| `IHBURST`    |    3   |   Output  | Instruction Transfer Burst Size       |
-| `IHPROT`     |    4   |   Output  | Instruction Transfer Protection Level |
-| `IHTRANS`    |    2   |   Output  | Instruction Transfer Type             |
-| `IHMASTLOCK` |    1   |   Output  | Instruction Transfer Master Lock      |
-| `IHREADY`    |    1   |   Input   | Instruction Slave Ready Indicator     |
-| `IHRESP`     |    1   |   Input   | Instruction Transfer Response         |
-
-
-## Instruction INPUTS/OUTPUTS Wishbone Bus
-
-| Port    |  Size  | Direction | Description                     |
-| ------- | ------ | --------- | ------------------------------- |
-| `rst`   |    1   |   Input   | Synchronous Active High Reset   |
-| `clk`   |    1   |   Input   | System Clock Input              |
-|         |        |           |                                 |
-| `iadr`  |  `AW`  |   Input   | Instruction Address Bus         |
-| `idati` |  `DW`  |   Input   | Instruction Input Bus           |
-| `idato` |  `DW`  |   Output  | Instruction Output Bus          |
-| `isel`  | `DW/8` |   Input   | Byte Select Signals             |
-| `iwe`   |    1   |   Input   | Write Enable Input              |
-| `istb`  |    1   |   Input   | Strobe Signal/Core Select Input |
-| `icyc`  |    1   |   Input   | Valid Bus Cycle Input           |
-| `iack`  |    1   |   Output  | Bus Cycle Acknowledge Output    |
-| `ierr`  |    1   |   Output  | Bus Cycle Error Output          |
-| `iint`  |    1   |   Output  | Interrupt Signal Output         |
-
-
-### Data Organization
-
-| Data Memory                 | Module description                 |
-| --------------------------- | ---------------------------------- |
-| riscv_dmem_ctrl             | Data Memory Access Block           |
-|...riscv_membuf              | Memory Access Buffer               |
-|.....riscv_ram_queue         | Fall-through Queue                 |
-|...riscv_memmisaligned       | Misalignment Check                 |
-|...riscv_mmu                 | Memory Management Unit             |
-|...riscv_pmachk              | Physical Memory Attributes Checker |
-|...riscv_pmpchk              | Physical Memory Protection Checker |
-|...riscv_dcache_core         | Data Cache (Write Back)            |
-|.....riscv_ram_1rw           | RAM 1RW                            |
-|.......riscv_ram_1rw_generic | RAM 1RW Generic                    |
-|...riscv_dext                | Data External Access Logic         |
-|...riscv_mux                 | Bus-Interface-Unit Mux             |
-| riscv_biu                   | Bus Interface Unit                 |
-
-
-## Data INPUTS/OUTPUTS AMBA4 AXI-Lite Bus
-
-### Signals of the Read and Write Address channels
-
-| Write Port | Read Port  |  Size            | Direction | Description                              |
-| ---------- | ---------- | ---------------- | --------- | ---------------------------------------- |
-| `AWID`     | `ARID`     | `AXI_ID_WIDTH`   | Output    | Address ID, to identify multiple streams |
-| `AWADDR`   | `ARADDR`   | `AXI_ADDR_WIDTH` | Output    | Address of the first beat of the burst   |
-| `AWLEN`    | `ARLEN`    |         8        | Output    | Number of beats inside the burst         |
-| `AWSIZE`   | `ARSIZE`   |         3        | Output    | Size of each beat                        |
-| `AWBURST`  | `ARBURST`  |         2        | Output    | Type of the burst                        |
-| `AWLOCK`   | `ARLOCK`   |         1        | Output    | Lock type, to provide atomic operations  |
-| `AWCACHE`  | `ARCACHE`  |         4        | Output    | Memory type, progress through the system |
-| `AWPROT`   | `ARPROT`   |         3        | Output    | Protection type                          |
-| `AWQOS`    | `ARQOS`    |         4        | Output    | Quality of Service of the transaction    |
-| `AWREGION` | `ARREGION` |         4        | Output    | Region identifier, physical to logical   |
-| `AWUSER`   | `ARUSER`   | `AXI_USER_WIDTH` | Output    | User-defined data                        |
-| `AWVALID`  | `ARVALID`  |         1        | Output    | xVALID handshake signal                  |
-| `AWREADY`  | `ARREADY`  |         1        | Input     | xREADY handshake signal                  |
-
-### Signals of the Read and Write Data channels
-
-| Write Port | Read Port  |  Size            | Direction | Description                              |
-| ---------- | ---------- | ---------------- | --------- | ---------------------------------------- |
-| `WID`      | `RID`      | `AXI_ID_WIDTH`   | Output    | Data ID, to identify multiple streams    |
-| `WDATA`    | `RDATA`    | `AXI_DATA_WIDTH` | Output    | Read/Write data                          |
-|    `--`    | `RRESP`    |        2         | Output    | Read response, current RDATA status      |
-| `WSTRB`    |    `--`    | `AXI_STRB_WIDTH` | Output    | Byte strobe, WDATA signal                |
-| `WLAST`    | `RLAST`    |        1         | Output    | Last beat identifier                     |
-| `WUSER`    | `RUSER`    | `AXI_USER_WIDTH` | Output    | User-defined data                        |
-| `WVALID`   | `RVALID`   |        1         | Output    | xVALID handshake signal                  |
-| `WREADY`   | `RREADY`   |        1         | Input     | xREADY handshake signal                  |
-
-### Signals of the Write Response channel
-
-| Write Port | Size             | Direction | Description                                     |
-| ---------- | ---------------- | --------- | ----------------------------------------------- |
-| `BID`      | `AXI_ID_WIDTH`   |   Input   | Write response ID, to identify multiple streams |
-| `BRESP`    |         2        |   Input   | Write response, to specify the burst status     |
-| `BUSER`    | `AXI_USER_WIDTH` |   Input   | User-defined data                               |
-| `BVALID`   |         1        |   Input   | xVALID handshake signal                         |
-| `BREADY`   |         1        |   Output  | xREADY handshake signal                         |
-
-
-## Data INPUTS/OUTPUTS AMBA3 AHB-Lite Bus
-
-| Port         |  Size  | Direction | Description                    |
-| ------------ | ------ | --------- | ------------------------------ |
-| `HRESETn`    |    1   |   Input   | Asynchronous Active Low Reset  |
-| `HCLK`       |    1   |   Input   | System Clock Input             |
-|              |        |           |                                |
-| `DHSEL`      |    1   |   Output  | Data Bus Select                |
-| `DHADDR`     | `PLEN` |   Output  | Data Address Bus               |
-| `DHRDATA`    | `XLEN` |   Input   | Data Read Data Bus             |
-| `DHWDATA`    | `XLEN` |   Output  | Data Write Data Bus            |
-| `DHWRITE`    |    1   |   Output  | Data Write Select              |
-| `DHSIZE`     |    3   |   Output  | Data Transfer Size             |
-| `DHBURST`    |    3   |   Output  | Data Transfer Burst Size       |
-| `DHPROT`     |    4   |   Output  | Data Transfer Protection Level |
-| `DHTRANS`    |    2   |   Output  | Data Transfer Type             |
-| `DHMASTLOCK` |    1   |   Output  | Data Transfer Master Lock      |
-| `DHREADY`    |    1   |   Input   | Data Slave Ready Indicator     |
-| `DHRESP`     |    1   |   Input   | Data Transfer Response         |
-
-
-## Data INPUTS/OUTPUTS Wishbone Bus
-
-| Port    |  Size  | Direction | Description                     |
-| ------- | ------ | --------- | ------------------------------- |
-| `rst`   |    1   |   Input   | Synchronous Active High Reset   |
-| `clk`   |    1   |   Input   | System Clock Input              |
-|         |        |           |                                 |
-| `dadr`  |  `AW`  |   Input   | Data Address Bus                |
-| `ddati` |  `DW`  |   Input   | Data Input Bus                  |
-| `ddato` |  `DW`  |   Output  | Data Output Bus                 |
-| `dsel`  | `DW/8` |   Input   | Byte Select Signals             |
-| `dwe`   |    1   |   Input   | Write Enable Input              |
-| `dstb`  |    1   |   Input   | Strobe Signal/Core Select Input |
-| `dcyc`  |    1   |   Input   | Valid Bus Cycle Input           |
-| `dack`  |    1   |   Output  | Bus Cycle Acknowledge Output    |
-| `derr`  |    1   |   Output  | Bus Cycle Error Output          |
-| `dint`  |    1   |   Output  | Interrupt Signal Output         |
-
-
-### Parameters
+### 6.3. Parameters
 
 | Parameter               | Type      | Default         | Description                           |
 | ----------------------- | --------- | --------------- | ------------------------------------- |
@@ -720,3 +474,253 @@ A PU cache is a hardware cache used by the PU to reduce the average cost (time o
 | `BP_GLOBAL_BITS`        | `Integer` | 2               | Number of global predictor bits       |
 | `BREAKPOINTS`           | `Integer` | 3               | Number of hardware breakpoints        |
 | `TECHNOLOGY`            | `String`  | `GENERIC`       | Target Silicon Technology             |
+
+
+### 6.4. Instruction INPUTS/OUTPUTS Bus
+
+| Port          |  Size  | Direction | Description        |
+| ------------- | ------ | --------- | ------------------ |
+| `ins_stb`     |    1   |   Input   | Strobe             |
+| `ins_stb_ack` |    1   |   Output  | Strobe acknowledge |
+| `ins_d_ack`   |    1   |   Output  | Data acknowledge   |
+| `ins_adri`    | `PLEN` |   Input   | Start address      |
+| `ins_adro`    | `PLEN` |   Output  | Response address   |
+| `ins_size`    |    3   |   Input   | Syze               |
+| `ins_type`    |    3   |   Input   | Type               |
+| `ins_prot`    |    3   |   Input   | Protection         |
+| `ins_lock`    |    1   |   Input   | Locked access      |
+| `ins_d`       | `XLEN` |   Input   | Write data         |
+| `ins_q`       | `XLEN` |   Output  | Read data          |
+| `ins_ack`     |    1   |   Output  | Acknowledge        |
+| `ins_err`     |    1   |   Output  | Error              |
+
+
+### 6.5. Data INPUTS/OUTPUTS Bus
+
+| Port          |  Size  | Direction | Description        |
+| ------------- | ------ | --------- | ------------------ |
+| `dat_stb`     |    1   |   Input   | Strobe             |
+| `dat_stb_ack` |    1   |   Output  | Strobe acknowledge |
+| `dat_d_ack`   |    1   |   Output  | Data acknowledge   |
+| `dat_adri`    | `PLEN` |   Input   | Start address      |
+| `dat_adro`    | `PLEN` |   Output  | Response address   |
+| `dat_size`    |    3   |   Input   | Syze               |
+| `dat_type`    |    3   |   Input   | Type               |
+| `dat_prot`    |    3   |   Input   | Protection         |
+| `dat_lock`    |    1   |   Input   | Locked access      |
+| `dat_d`       | `XLEN` |   Input   | Write data         |
+| `dat_q`       | `XLEN` |   Output  | Read data          |
+| `dat_ack`     |    1   |   Output  | Acknowledge        |
+| `dat_err`     |    1   |   Output  | Error              |
+
+
+## 7. INSTRUCTION & DATA CACHE
+
+A PU cache is a hardware cache used by the PU to reduce the average cost (time or energy) to access instruction/data from the main memory. A cache is a smaller, faster memory, closer to a core, which stores copies of the data from frequently used main memory locations. Most CPUs have different independent caches, including instruction and data caches.
+
+
+### 7.1. Instruction Organization
+
+| Instruction Memory          | Module description                 |
+| --------------------------- | ---------------------------------- |
+| riscv_imem_ctrl             | Instruction Memory Access Block    |
+|...riscv_membuf              | Memory Access Buffer               |
+|.....riscv_ram_queue         | Fall-through Queue                 |
+|...riscv_memmisaligned       | Misalignment Check                 |
+|...riscv_mmu                 | Memory Management Unit             |
+|...riscv_pmachk              | Physical Memory Attributes Checker |
+|...riscv_pmpchk              | Physical Memory Protection Checker |
+|...riscv_icache_core         | Instruction Cache (Write Back)     |
+|.....riscv_ram_1rw           | RAM 1RW                            |
+|.......riscv_ram_1rw_generic | RAM 1RW Generic                    |
+|...riscv_dext                | Data External Access Logic         |
+|...riscv_ram_queue           | Fall-through Queue                 |
+|...riscv_mux                 | Bus-Interface-Unit Mux             |
+| riscv_biu                   | Bus Interface Unit                 |
+
+
+### 7.2 Instruction INPUTS/OUTPUTS AMBA4 AXI-Lite Bus
+
+#### 7.2.1. Signals of the Read and Write Address channels
+
+| Write Port | Read Port  |  Size            | Direction | Description                              |
+| ---------- | ---------- | ---------------- | --------- | ---------------------------------------- |
+| `AWID`     | `ARID`     | `AXI_ID_WIDTH`   | Output    | Address ID, to identify multiple streams |
+| `AWADDR`   | `ARADDR`   | `AXI_ADDR_WIDTH` | Output    | Address of the first beat of the burst   |
+| `AWLEN`    | `ARLEN`    |         8        | Output    | Number of beats inside the burst         |
+| `AWSIZE`   | `ARSIZE`   |         3        | Output    | Size of each beat                        |
+| `AWBURST`  | `ARBURST`  |         2        | Output    | Type of the burst                        |
+| `AWLOCK`   | `ARLOCK`   |         1        | Output    | Lock type, to provide atomic operations  |
+| `AWCACHE`  | `ARCACHE`  |         4        | Output    | Memory type, progress through the system |
+| `AWPROT`   | `ARPROT`   |         3        | Output    | Protection type                          |
+| `AWQOS`    | `ARQOS`    |         4        | Output    | Quality of Service of the transaction    |
+| `AWREGION` | `ARREGION` |         4        | Output    | Region identifier, physical to logical   |
+| `AWUSER`   | `ARUSER`   | `AXI_USER_WIDTH` | Output    | User-defined data                        |
+| `AWVALID`  | `ARVALID`  |         1        | Output    | xVALID handshake signal                  |
+| `AWREADY`  | `ARREADY`  |         1        | Input     | xREADY handshake signal                  |
+
+#### 7.2.2. Signals of the Read and Write Data channels
+
+| Write Port | Read Port  |  Size            | Direction | Description                              |
+| ---------- | ---------- | ---------------- | --------- | ---------------------------------------- |
+| `WID`      | `RID`      | `AXI_ID_WIDTH`   | Output    | Data ID, to identify multiple streams    |
+| `WDATA`    | `RDATA`    | `AXI_DATA_WIDTH` | Output    | Read/Write data                          |
+|    `--`    | `RRESP`    |        2         | Output    | Read response, current RDATA status      |
+| `WSTRB`    |    `--`    | `AXI_STRB_WIDTH` | Output    | Byte strobe, WDATA signal                |
+| `WLAST`    | `RLAST`    |        1         | Output    | Last beat identifier                     |
+| `WUSER`    | `RUSER`    | `AXI_USER_WIDTH` | Output    | User-defined data                        |
+| `WVALID`   | `RVALID`   |        1         | Output    | xVALID handshake signal                  |
+| `WREADY`   | `RREADY`   |        1         | Input     | xREADY handshake signal                  |
+
+#### 7.2.3. Signals of the Write Response channel
+
+| Write Port | Size             | Direction | Description                                     |
+| ---------- | ---------------- | --------- | ----------------------------------------------- |
+| `BID`      | `AXI_ID_WIDTH`   |   Input   | Write response ID, to identify multiple streams |
+| `BRESP`    |         2        |   Input   | Write response, to specify the burst status     |
+| `BUSER`    | `AXI_USER_WIDTH` |   Input   | User-defined data                               |
+| `BVALID`   |         1        |   Input   | xVALID handshake signal                         |
+| `BREADY`   |         1        |   Output  | xREADY handshake signal                         |
+
+
+### 7.3. Instruction INPUTS/OUTPUTS AMBA3 AHB-Lite Bus
+
+| Port         |  Size  | Direction | Description                           |
+| ------------ | ------ | --------- | ------------------------------------- |
+| `HRESETn`    |    1   |   Input   | Asynchronous Active Low Reset         |
+| `HCLK`       |    1   |   Input   | System Clock Input                    |
+|              |        |           |                                       |
+| `IHSEL`      |    1   |   Output  | Instruction Bus Select                |
+| `IHADDR`     | `PLEN` |   Output  | Instruction Address Bus               |
+| `IHRDATA`    | `XLEN` |   Input   | Instruction Read Data Bus             |
+| `IHWDATA`    | `XLEN` |   Output  | Instruction Write Data Bus            |
+| `IHWRITE`    |    1   |   Output  | Instruction Write Select              |
+| `IHSIZE`     |    3   |   Output  | Instruction Transfer Size             |
+| `IHBURST`    |    3   |   Output  | Instruction Transfer Burst Size       |
+| `IHPROT`     |    4   |   Output  | Instruction Transfer Protection Level |
+| `IHTRANS`    |    2   |   Output  | Instruction Transfer Type             |
+| `IHMASTLOCK` |    1   |   Output  | Instruction Transfer Master Lock      |
+| `IHREADY`    |    1   |   Input   | Instruction Slave Ready Indicator     |
+| `IHRESP`     |    1   |   Input   | Instruction Transfer Response         |
+
+
+### 7.4. Instruction INPUTS/OUTPUTS Wishbone Bus
+
+| Port    |  Size  | Direction | Description                     |
+| ------- | ------ | --------- | ------------------------------- |
+| `rst`   |    1   |   Input   | Synchronous Active High Reset   |
+| `clk`   |    1   |   Input   | System Clock Input              |
+|         |        |           |                                 |
+| `iadr`  |  `AW`  |   Input   | Instruction Address Bus         |
+| `idati` |  `DW`  |   Input   | Instruction Input Bus           |
+| `idato` |  `DW`  |   Output  | Instruction Output Bus          |
+| `isel`  | `DW/8` |   Input   | Byte Select Signals             |
+| `iwe`   |    1   |   Input   | Write Enable Input              |
+| `istb`  |    1   |   Input   | Strobe Signal/Core Select Input |
+| `icyc`  |    1   |   Input   | Valid Bus Cycle Input           |
+| `iack`  |    1   |   Output  | Bus Cycle Acknowledge Output    |
+| `ierr`  |    1   |   Output  | Bus Cycle Error Output          |
+| `iint`  |    1   |   Output  | Interrupt Signal Output         |
+
+
+### 7.5. Data Organization
+
+| Data Memory                 | Module description                 |
+| --------------------------- | ---------------------------------- |
+| riscv_dmem_ctrl             | Data Memory Access Block           |
+|...riscv_membuf              | Memory Access Buffer               |
+|.....riscv_ram_queue         | Fall-through Queue                 |
+|...riscv_memmisaligned       | Misalignment Check                 |
+|...riscv_mmu                 | Memory Management Unit             |
+|...riscv_pmachk              | Physical Memory Attributes Checker |
+|...riscv_pmpchk              | Physical Memory Protection Checker |
+|...riscv_dcache_core         | Data Cache (Write Back)            |
+|.....riscv_ram_1rw           | RAM 1RW                            |
+|.......riscv_ram_1rw_generic | RAM 1RW Generic                    |
+|...riscv_dext                | Data External Access Logic         |
+|...riscv_mux                 | Bus-Interface-Unit Mux             |
+| riscv_biu                   | Bus Interface Unit                 |
+
+
+### 7.6. Data INPUTS/OUTPUTS AMBA4 AXI-Lite Bus
+
+#### 7.6.1. Signals of the Read and Write Address channels
+
+| Write Port | Read Port  |  Size            | Direction | Description                              |
+| ---------- | ---------- | ---------------- | --------- | ---------------------------------------- |
+| `AWID`     | `ARID`     | `AXI_ID_WIDTH`   | Output    | Address ID, to identify multiple streams |
+| `AWADDR`   | `ARADDR`   | `AXI_ADDR_WIDTH` | Output    | Address of the first beat of the burst   |
+| `AWLEN`    | `ARLEN`    |         8        | Output    | Number of beats inside the burst         |
+| `AWSIZE`   | `ARSIZE`   |         3        | Output    | Size of each beat                        |
+| `AWBURST`  | `ARBURST`  |         2        | Output    | Type of the burst                        |
+| `AWLOCK`   | `ARLOCK`   |         1        | Output    | Lock type, to provide atomic operations  |
+| `AWCACHE`  | `ARCACHE`  |         4        | Output    | Memory type, progress through the system |
+| `AWPROT`   | `ARPROT`   |         3        | Output    | Protection type                          |
+| `AWQOS`    | `ARQOS`    |         4        | Output    | Quality of Service of the transaction    |
+| `AWREGION` | `ARREGION` |         4        | Output    | Region identifier, physical to logical   |
+| `AWUSER`   | `ARUSER`   | `AXI_USER_WIDTH` | Output    | User-defined data                        |
+| `AWVALID`  | `ARVALID`  |         1        | Output    | xVALID handshake signal                  |
+| `AWREADY`  | `ARREADY`  |         1        | Input     | xREADY handshake signal                  |
+
+#### 7.6.2. Signals of the Read and Write Data channels
+
+| Write Port | Read Port  |  Size            | Direction | Description                              |
+| ---------- | ---------- | ---------------- | --------- | ---------------------------------------- |
+| `WID`      | `RID`      | `AXI_ID_WIDTH`   | Output    | Data ID, to identify multiple streams    |
+| `WDATA`    | `RDATA`    | `AXI_DATA_WIDTH` | Output    | Read/Write data                          |
+|    `--`    | `RRESP`    |        2         | Output    | Read response, current RDATA status      |
+| `WSTRB`    |    `--`    | `AXI_STRB_WIDTH` | Output    | Byte strobe, WDATA signal                |
+| `WLAST`    | `RLAST`    |        1         | Output    | Last beat identifier                     |
+| `WUSER`    | `RUSER`    | `AXI_USER_WIDTH` | Output    | User-defined data                        |
+| `WVALID`   | `RVALID`   |        1         | Output    | xVALID handshake signal                  |
+| `WREADY`   | `RREADY`   |        1         | Input     | xREADY handshake signal                  |
+
+#### 7.6.3. Signals of the Write Response channel
+
+| Write Port | Size             | Direction | Description                                     |
+| ---------- | ---------------- | --------- | ----------------------------------------------- |
+| `BID`      | `AXI_ID_WIDTH`   |   Input   | Write response ID, to identify multiple streams |
+| `BRESP`    |         2        |   Input   | Write response, to specify the burst status     |
+| `BUSER`    | `AXI_USER_WIDTH` |   Input   | User-defined data                               |
+| `BVALID`   |         1        |   Input   | xVALID handshake signal                         |
+| `BREADY`   |         1        |   Output  | xREADY handshake signal                         |
+
+
+### 7.7. Data INPUTS/OUTPUTS AMBA3 AHB-Lite Bus
+
+| Port         |  Size  | Direction | Description                    |
+| ------------ | ------ | --------- | ------------------------------ |
+| `HRESETn`    |    1   |   Input   | Asynchronous Active Low Reset  |
+| `HCLK`       |    1   |   Input   | System Clock Input             |
+|              |        |           |                                |
+| `DHSEL`      |    1   |   Output  | Data Bus Select                |
+| `DHADDR`     | `PLEN` |   Output  | Data Address Bus               |
+| `DHRDATA`    | `XLEN` |   Input   | Data Read Data Bus             |
+| `DHWDATA`    | `XLEN` |   Output  | Data Write Data Bus            |
+| `DHWRITE`    |    1   |   Output  | Data Write Select              |
+| `DHSIZE`     |    3   |   Output  | Data Transfer Size             |
+| `DHBURST`    |    3   |   Output  | Data Transfer Burst Size       |
+| `DHPROT`     |    4   |   Output  | Data Transfer Protection Level |
+| `DHTRANS`    |    2   |   Output  | Data Transfer Type             |
+| `DHMASTLOCK` |    1   |   Output  | Data Transfer Master Lock      |
+| `DHREADY`    |    1   |   Input   | Data Slave Ready Indicator     |
+| `DHRESP`     |    1   |   Input   | Data Transfer Response         |
+
+
+### 7.8. Data INPUTS/OUTPUTS Wishbone Bus
+
+| Port    |  Size  | Direction | Description                     |
+| ------- | ------ | --------- | ------------------------------- |
+| `rst`   |    1   |   Input   | Synchronous Active High Reset   |
+| `clk`   |    1   |   Input   | System Clock Input              |
+|         |        |           |                                 |
+| `dadr`  |  `AW`  |   Input   | Data Address Bus                |
+| `ddati` |  `DW`  |   Input   | Data Input Bus                  |
+| `ddato` |  `DW`  |   Output  | Data Output Bus                 |
+| `dsel`  | `DW/8` |   Input   | Byte Select Signals             |
+| `dwe`   |    1   |   Input   | Write Enable Input              |
+| `dstb`  |    1   |   Input   | Strobe Signal/Core Select Input |
+| `dcyc`  |    1   |   Input   | Valid Bus Cycle Input           |
+| `dack`  |    1   |   Output  | Bus Cycle Acknowledge Output    |
+| `derr`  |    1   |   Output  | Bus Cycle Error Output          |
+| `dint`  |    1   |   Output  | Interrupt Signal Output         |
