@@ -676,7 +676,7 @@ sudo apt install bison cmake flex freeglut3-dev libcairo2-dev libgsl-dev \
 libncurses-dev libx11-dev m4 python-tk python3-tk swig tcl tcl-dev tk-dev tcsh
 ```
 
-### 3.5.1. Front-End
+### 3.4.1. Front-End
 
 type:
 ```
@@ -695,7 +695,7 @@ cd /mnt/c/../synthesis/yosys
 source SYNTHESIZE-IT
 ```
 
-### 3.5.2. Back-End
+### 3.4.2. Back-End
 
 type:
 ```
