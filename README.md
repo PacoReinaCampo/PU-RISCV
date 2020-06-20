@@ -125,7 +125,6 @@ In a Harvard architecture, there is no need to make the two memories share chara
 | `ins_ack`     |    1   |   Output  | Acknowledge        |
 | `ins_err`     |    1   |   Output  | Error              |
 
-
 ### 2.1.6. Data INPUTS/OUTPUTS Bus
 
 | Port          |  Size  | Direction | Description        |
@@ -210,7 +209,6 @@ A PU cache is a hardware cache used by the PU to reduce the average cost (time o
 | `BVALID`   |         1        |   Input   | xVALID handshake signal                         |
 | `BREADY`   |         1        |   Output  | xREADY handshake signal                         |
 
-
 ### 2.2.3. Instruction INPUTS/OUTPUTS AMBA3 AHB-Lite Bus
 
 | Port         |  Size  | Direction | Description                           |
@@ -230,7 +228,6 @@ A PU cache is a hardware cache used by the PU to reduce the average cost (time o
 | `IHMASTLOCK` |    1   |   Output  | Instruction Transfer Master Lock      |
 | `IHREADY`    |    1   |   Input   | Instruction Slave Ready Indicator     |
 | `IHRESP`     |    1   |   Input   | Instruction Transfer Response         |
-
 
 ### 2.2.4. Instruction INPUTS/OUTPUTS Wishbone Bus
 
@@ -312,7 +309,6 @@ A PU cache is a hardware cache used by the PU to reduce the average cost (time o
 | `BUSER`    | `AXI_USER_WIDTH` |   Input   | User-defined data                               |
 | `BVALID`   |         1        |   Input   | xVALID handshake signal                         |
 | `BREADY`   |         1        |   Output  | xREADY handshake signal                         |
-
 
 ### 2.3.3. Data INPUTS/OUTPUTS AMBA3 AHB-Lite Bus
 
