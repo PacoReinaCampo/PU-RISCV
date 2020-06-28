@@ -60,47 +60,47 @@ module riscv_dmem_ctrl #(
   parameter TECHNOLOGY = "GENERIC"
 )
   (
-  input  logic                         rst_ni,
-  input  logic                         clk_i,
+  input  wire                          rst_ni,
+  input  wire                          clk_i,
 
   //Configuration
-  input  logic [PMA_CNT-1:0][    13:0] pma_cfg_i,
+  input  wire  [PMA_CNT-1:0][    13:0] pma_cfg_i,
   input        [PMA_CNT-1:0][XLEN-1:0] pma_adr_i,
 
   //CPU side
-  input  logic                         mem_req_i,
-  input  logic              [XLEN-1:0] mem_adr_i,
-  input  logic              [     2:0] mem_size_i,
-  input  logic                         mem_lock_i,
-  input  logic                         mem_we_i,
-  input  logic              [XLEN-1:0] mem_d_i,
-  output logic              [XLEN-1:0] mem_q_o,
-  output logic                         mem_ack_o,
-  output logic                         mem_err_o,
-  output logic                         mem_misaligned_o,
-  output logic                         mem_page_fault_o,
-  input  logic                         cache_flush_i,
-  output logic                         dcflush_rdy_o,
+  input  wire                          mem_req_i,
+  input  wire               [XLEN-1:0] mem_adr_i,
+  input  wire               [     2:0] mem_size_i,
+  input  wire                          mem_lock_i,
+  input  wire                          mem_we_i,
+  input  wire               [XLEN-1:0] mem_d_i,
+  output reg                [XLEN-1:0] mem_q_o,
+  output reg                           mem_ack_o,
+  output reg                           mem_err_o,
+  output reg                           mem_misaligned_o,
+  output reg                           mem_page_fault_o,
+  input  wire                          cache_flush_i,
+  output reg                           dcflush_rdy_o,
 
   input        [PMP_CNT-1:0][     7:0] st_pmpcfg_i,
-  input  logic [PMP_CNT-1:0][XLEN-1:0] st_pmpaddr_i,
-  input  logic              [     1:0] st_prv_i,
+  input  wire  [PMP_CNT-1:0][XLEN-1:0] st_pmpaddr_i,
+  input  wire               [     1:0] st_prv_i,
 
   //BIU ports
-  output logic                         biu_stb_o,
-  input  logic                         biu_stb_ack_i,
-  input  logic                         biu_d_ack_i,
-  output logic              [PLEN-1:0] biu_adri_o,
-  input  logic              [PLEN-1:0] biu_adro_i,
-  output logic              [     2:0] biu_size_o,
-  output logic              [     2:0] biu_type_o,
-  output logic                         biu_we_o,
-  output logic                         biu_lock_o,
-  output logic              [     2:0] biu_prot_o,
-  output logic              [XLEN-1:0] biu_d_o,
-  input  logic              [XLEN-1:0] biu_q_i,
-  input  logic                         biu_ack_i,
-  input  logic                         biu_err_i
+  output reg                           biu_stb_o,
+  input  wire                          biu_stb_ack_i,
+  input  wire                          biu_d_ack_i,
+  output reg                [PLEN-1:0] biu_adri_o,
+  input  wire               [PLEN-1:0] biu_adro_i,
+  output reg                [     2:0] biu_size_o,
+  output reg                [     2:0] biu_type_o,
+  output reg                           biu_we_o,
+  output reg                           biu_lock_o,
+  output reg                [     2:0] biu_prot_o,
+  output reg                [XLEN-1:0] biu_d_o,
+  input  wire               [XLEN-1:0] biu_q_i,
+  input  wire                          biu_ack_i,
+  input  wire                          biu_err_i
 );
 
   //////////////////////////////////////////////////////////////////

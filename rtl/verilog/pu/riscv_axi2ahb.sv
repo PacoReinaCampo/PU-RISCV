@@ -59,69 +59,69 @@ module riscv_axi2ahb #(
     input clk_override,
 
     //AXI4 instruction
-    input  logic [AXI_ID_WIDTH  -1:0] axi4_aw_id,
-    input  logic [AXI_ADDR_WIDTH-1:0] axi4_aw_addr,
-    input  logic [               7:0] axi4_aw_len,
-    input  logic [               2:0] axi4_aw_size,
-    input  logic [               1:0] axi4_aw_burst,
-    input  logic                      axi4_aw_lock,
-    input  logic [               3:0] axi4_aw_cache,
-    input  logic [               2:0] axi4_aw_prot,
-    input  logic [               3:0] axi4_aw_qos,
-    input  logic [               3:0] axi4_aw_region,
-    input  logic [AXI_USER_WIDTH-1:0] axi4_aw_user,
-    input  logic                      axi4_aw_valid,
-    output logic                      axi4_aw_ready,
+    input  wire  [AXI_ID_WIDTH  -1:0] axi4_aw_id,
+    input  wire  [AXI_ADDR_WIDTH-1:0] axi4_aw_addr,
+    input  wire  [               7:0] axi4_aw_len,
+    input  wire  [               2:0] axi4_aw_size,
+    input  wire  [               1:0] axi4_aw_burst,
+    input  wire                       axi4_aw_lock,
+    input  wire  [               3:0] axi4_aw_cache,
+    input  wire  [               2:0] axi4_aw_prot,
+    input  wire  [               3:0] axi4_aw_qos,
+    input  wire  [               3:0] axi4_aw_region,
+    input  wire  [AXI_USER_WIDTH-1:0] axi4_aw_user,
+    input  wire                       axi4_aw_valid,
+    output reg                        axi4_aw_ready,
 
-    input  logic [AXI_ID_WIDTH  -1:0] axi4_ar_id,
-    input  logic [AXI_ADDR_WIDTH-1:0] axi4_ar_addr,
-    input  logic [               7:0] axi4_ar_len,
-    input  logic [               2:0] axi4_ar_size,
-    input  logic [               1:0] axi4_ar_burst,
-    input  logic                      axi4_ar_lock,
-    input  logic [               3:0] axi4_ar_cache,
-    input  logic [               2:0] axi4_ar_prot,
-    input  logic [               3:0] axi4_ar_qos,
-    input  logic [               3:0] axi4_ar_region,
-    input  logic [AXI_USER_WIDTH-1:0] axi4_ar_user,
-    input  logic                      axi4_ar_valid,
-    output logic                      axi4_ar_ready,
+    input  wire  [AXI_ID_WIDTH  -1:0] axi4_ar_id,
+    input  wire  [AXI_ADDR_WIDTH-1:0] axi4_ar_addr,
+    input  wire  [               7:0] axi4_ar_len,
+    input  wire  [               2:0] axi4_ar_size,
+    input  wire  [               1:0] axi4_ar_burst,
+    input  wire                       axi4_ar_lock,
+    input  wire  [               3:0] axi4_ar_cache,
+    input  wire  [               2:0] axi4_ar_prot,
+    input  wire  [               3:0] axi4_ar_qos,
+    input  wire  [               3:0] axi4_ar_region,
+    input  wire  [AXI_USER_WIDTH-1:0] axi4_ar_user,
+    input  wire                       axi4_ar_valid,
+    output reg                        axi4_ar_ready,
 
-    input  logic [AXI_DATA_WIDTH-1:0] axi4_w_data,
-    input  logic [AXI_STRB_WIDTH-1:0] axi4_w_strb,
-    input  logic                      axi4_w_last,
-    input  logic [AXI_USER_WIDTH-1:0] axi4_w_user,
-    input  logic                      axi4_w_valid,
-    output logic                      axi4_w_ready,
+    input  wire  [AXI_DATA_WIDTH-1:0] axi4_w_data,
+    input  wire  [AXI_STRB_WIDTH-1:0] axi4_w_strb,
+    input  wire                       axi4_w_last,
+    input  wire  [AXI_USER_WIDTH-1:0] axi4_w_user,
+    input  wire                       axi4_w_valid,
+    output reg                        axi4_w_ready,
 
-    output logic [AXI_ID_WIDTH  -1:0] axi4_r_id,
-    output logic [AXI_DATA_WIDTH-1:0] axi4_r_data,
-    output logic [               1:0] axi4_r_resp,
-    output logic                      axi4_r_last,
-    output logic [AXI_USER_WIDTH-1:0] axi4_r_user,
-    output logic                      axi4_r_valid,
-    input  logic                      axi4_r_ready,
+    output reg   [AXI_ID_WIDTH  -1:0] axi4_r_id,
+    output reg   [AXI_DATA_WIDTH-1:0] axi4_r_data,
+    output reg   [               1:0] axi4_r_resp,
+    output reg                        axi4_r_last,
+    output reg   [AXI_USER_WIDTH-1:0] axi4_r_user,
+    output reg                        axi4_r_valid,
+    input  wire                       axi4_r_ready,
 
-    output logic [AXI_ID_WIDTH  -1:0] axi4_b_id,
-    output logic [               1:0] axi4_b_resp,
-    output logic [AXI_USER_WIDTH-1:0] axi4_b_user,
-    output logic                      axi4_b_valid,
-    input  logic                      axi4_b_ready,
+    output reg   [AXI_ID_WIDTH  -1:0] axi4_b_id,
+    output reg   [               1:0] axi4_b_resp,
+    output reg   [AXI_USER_WIDTH-1:0] axi4_b_user,
+    output reg                        axi4_b_valid,
+    input  wire                       axi4_b_ready,
 
     // AHB3 signals
-    output logic                      ahb3_hsel,
-    output logic [AHB_ADDR_WIDTH-1:0] ahb3_haddr,
-    output logic [AHB_DATA_WIDTH-1:0] ahb3_hwdata,
-    input  logic [AHB_DATA_WIDTH-1:0] ahb3_hrdata,
-    output logic                      ahb3_hwrite,
-    output logic [               2:0] ahb3_hsize,
-    output logic [               2:0] ahb3_hburst,
-    output logic [               3:0] ahb3_hprot,
-    output logic [               1:0] ahb3_htrans,
-    output logic                      ahb3_hmastlock,
-    output logic                      ahb3_hreadyin,
-    input  logic                      ahb3_hreadyout,
-    input  logic                      ahb3_hresp
+    output reg                        ahb3_hsel,
+    output reg   [AHB_ADDR_WIDTH-1:0] ahb3_haddr,
+    output reg   [AHB_DATA_WIDTH-1:0] ahb3_hwdata,
+    input  wire  [AHB_DATA_WIDTH-1:0] ahb3_hrdata,
+    output reg                        ahb3_hwrite,
+    output reg   [               2:0] ahb3_hsize,
+    output reg   [               2:0] ahb3_hburst,
+    output reg   [               3:0] ahb3_hprot,
+    output reg   [               1:0] ahb3_htrans,
+    output reg                        ahb3_hmastlock,
+    output reg                        ahb3_hreadyin,
+    input  wire                       ahb3_hreadyout,
+    input  wire                       ahb3_hresp
   );
 
   //////////////////////////////////////////////////////////////////
@@ -249,7 +249,7 @@ module riscv_axi2ahb #(
 
   // Function to get the length from byte enable
   function automatic logic [1:0] get_write_size;
-    input logic [7:0] byteen;
+    input wire  [7:0] byteen;
 
     logic [1:0] size;
 
@@ -262,7 +262,7 @@ module riscv_axi2ahb #(
 
   // Function to get the length from byte enable
   function automatic logic [2:0] get_write_addr;
-    input logic [7:0] byteen;
+    input wire  [7:0] byteen;
 
     logic [2:0] addr;
 

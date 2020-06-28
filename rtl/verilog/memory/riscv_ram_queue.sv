@@ -47,25 +47,25 @@ module riscv_ram_queue #(
   parameter ALMOST_EMPTY_THRESHOLD = 0
 )
   (
-    input  logic             rst_ni,         //asynchronous, active low reset
-    input  logic             clk_i,          //rising edge triggered clock
+    input  wire              rst_ni,         //asynchronous, active low reset
+    input  wire              clk_i,          //rising edge triggered clock
 
-    input  logic             clr_i,          //clear all queue entries (synchronous reset)
-    input  logic             ena_i,          //clock enable
+    input  wire              clr_i,          //clear all queue entries (synchronous reset)
+    input  wire              ena_i,          //clock enable
 
     //Queue Write
-    input  logic             we_i,           //Queue write enable
-    input  logic [DBITS-1:0] d_i,            //Queue write data
+    input  wire              we_i,           //Queue write enable
+    input  wire  [DBITS-1:0] d_i,            //Queue write data
 
     //Queue Read
-    input  logic             re_i,           //Queue read enable
-    output logic [DBITS-1:0] q_o,            //Queue read data
+    input  wire              re_i,           //Queue read enable
+    output reg   [DBITS-1:0] q_o,            //Queue read data
 
     //Status signals
-    output logic             empty_o,        //Queue is empty
-    output logic             full_o,         //Queue is full
-    output logic             almost_empty_o, //Programmable almost empty
-    output logic             almost_full_o   //Programmable almost full
+    output reg               empty_o,        //Queue is empty
+    output reg               full_o,         //Queue is full
+    output reg               almost_empty_o, //Programmable almost empty
+    output reg               almost_full_o   //Programmable almost full
   );
 
   //////////////////////////////////////////////////////////////////

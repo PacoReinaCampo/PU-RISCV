@@ -56,74 +56,74 @@ module riscv_biu2axi4 #(
   parameter AHB_DATA_WIDTH = 64
 )
   (
-    input  logic             HRESETn,
-    input  logic             HCLK,
+    input  wire              HRESETn,
+    input  wire              HCLK,
 
     //AXI4 instruction
-    output logic [AXI_ID_WIDTH    -1:0] axi4_aw_id,
-    output logic [AXI_ADDR_WIDTH  -1:0] axi4_aw_addr,
-    output logic [                 7:0] axi4_aw_len,
-    output logic [                 2:0] axi4_aw_size,
-    output logic [                 1:0] axi4_aw_burst,
-    output logic                        axi4_aw_lock,
-    output logic [                 3:0] axi4_aw_cache,
-    output logic [                 2:0] axi4_aw_prot,
-    output logic [                 3:0] axi4_aw_qos,
-    output logic [                 3:0] axi4_aw_region,
-    output logic [AXI_USER_WIDTH  -1:0] axi4_aw_user,
-    output logic                        axi4_aw_valid,
-    input  logic                        axi4_aw_ready,
+    output reg   [AXI_ID_WIDTH    -1:0] axi4_aw_id,
+    output reg   [AXI_ADDR_WIDTH  -1:0] axi4_aw_addr,
+    output reg   [                 7:0] axi4_aw_len,
+    output reg   [                 2:0] axi4_aw_size,
+    output reg   [                 1:0] axi4_aw_burst,
+    output reg                          axi4_aw_lock,
+    output reg   [                 3:0] axi4_aw_cache,
+    output reg   [                 2:0] axi4_aw_prot,
+    output reg   [                 3:0] axi4_aw_qos,
+    output reg   [                 3:0] axi4_aw_region,
+    output reg   [AXI_USER_WIDTH  -1:0] axi4_aw_user,
+    output reg                          axi4_aw_valid,
+    input  wire                         axi4_aw_ready,
 
-    output logic [AXI_ID_WIDTH    -1:0] axi4_ar_id,
-    output logic [AXI_ADDR_WIDTH  -1:0] axi4_ar_addr,
-    output logic [                 7:0] axi4_ar_len,
-    output logic [                 2:0] axi4_ar_size,
-    output logic [                 1:0] axi4_ar_burst,
-    output logic                        axi4_ar_lock,
-    output logic [                 3:0] axi4_ar_cache,
-    output logic [                 2:0] axi4_ar_prot,
-    output logic [                 3:0] axi4_ar_qos,
-    output logic [                 3:0] axi4_ar_region,
-    output logic [AXI_USER_WIDTH  -1:0] axi4_ar_user,
-    output logic                        axi4_ar_valid,
-    input  logic                        axi4_ar_ready,
+    output reg   [AXI_ID_WIDTH    -1:0] axi4_ar_id,
+    output reg   [AXI_ADDR_WIDTH  -1:0] axi4_ar_addr,
+    output reg   [                 7:0] axi4_ar_len,
+    output reg   [                 2:0] axi4_ar_size,
+    output reg   [                 1:0] axi4_ar_burst,
+    output reg                          axi4_ar_lock,
+    output reg   [                 3:0] axi4_ar_cache,
+    output reg   [                 2:0] axi4_ar_prot,
+    output reg   [                 3:0] axi4_ar_qos,
+    output reg   [                 3:0] axi4_ar_region,
+    output reg   [AXI_USER_WIDTH  -1:0] axi4_ar_user,
+    output reg                          axi4_ar_valid,
+    input  wire                         axi4_ar_ready,
 
-    output logic [AXI_DATA_WIDTH  -1:0] axi4_w_data,
-    output logic [AXI_STRB_WIDTH  -1:0] axi4_w_strb,
-    output logic                        axi4_w_last,
-    output logic [AXI_USER_WIDTH  -1:0] axi4_w_user,
-    output logic                        axi4_w_valid,
-    input  logic                        axi4_w_ready,
+    output reg   [AXI_DATA_WIDTH  -1:0] axi4_w_data,
+    output reg   [AXI_STRB_WIDTH  -1:0] axi4_w_strb,
+    output reg                          axi4_w_last,
+    output reg   [AXI_USER_WIDTH  -1:0] axi4_w_user,
+    output reg                          axi4_w_valid,
+    input  wire                         axi4_w_ready,
 
-    input  logic [AXI_ID_WIDTH    -1:0] axi4_r_id,
-    input  logic [AXI_DATA_WIDTH  -1:0] axi4_r_data,
-    input  logic [                 1:0] axi4_r_resp,
-    input  logic                        axi4_r_last,
-    input  logic [AXI_USER_WIDTH  -1:0] axi4_r_user,
-    input  logic                        axi4_r_valid,
-    output logic                        axi4_r_ready,
+    input  wire  [AXI_ID_WIDTH    -1:0] axi4_r_id,
+    input  wire  [AXI_DATA_WIDTH  -1:0] axi4_r_data,
+    input  wire  [                 1:0] axi4_r_resp,
+    input  wire                         axi4_r_last,
+    input  wire  [AXI_USER_WIDTH  -1:0] axi4_r_user,
+    input  wire                         axi4_r_valid,
+    output reg                          axi4_r_ready,
 
-    input  logic [AXI_ID_WIDTH    -1:0] axi4_b_id,
-    input  logic [                 1:0] axi4_b_resp,
-    input  logic [AXI_USER_WIDTH  -1:0] axi4_b_user,
-    input  logic                        axi4_b_valid,
-    output logic                        axi4_b_ready,
+    input  wire  [AXI_ID_WIDTH    -1:0] axi4_b_id,
+    input  wire  [                 1:0] axi4_b_resp,
+    input  wire  [AXI_USER_WIDTH  -1:0] axi4_b_user,
+    input  wire                         axi4_b_valid,
+    output reg                          axi4_b_ready,
 
     //BIU Bus (Core ports)
-    input  logic             biu_stb_i,      //strobe
-    output logic             biu_stb_ack_o,  //strobe acknowledge; can send new strobe
-    output logic             biu_d_ack_o,    //data acknowledge (send new biu_d_i); for pipelined buses
-    input  logic [PLEN -1:0] biu_adri_i,
-    output logic [PLEN -1:0] biu_adro_o,  
-    input  logic [      2:0] biu_size_i,     //transfer size
-    input  logic [      2:0] biu_type_i,     //burst type
-    input  logic [      2:0] biu_prot_i,     //protection
-    input  logic             biu_lock_i,
-    input  logic             biu_we_i,
-    input  logic [XLEN -1:0] biu_d_i,
-    output logic [XLEN -1:0] biu_q_o,
-    output logic             biu_ack_o,      //transfer acknowledge
-    output logic             biu_err_o       //transfer error
+    input  wire              biu_stb_i,      //strobe
+    output reg               biu_stb_ack_o,  //strobe acknowledge; can send new strobe
+    output reg               biu_d_ack_o,    //data acknowledge (send new biu_d_i); for pipelined buses
+    input  wire  [PLEN -1:0] biu_adri_i,
+    output reg   [PLEN -1:0] biu_adro_o,  
+    input  wire  [      2:0] biu_size_i,     //transfer size
+    input  wire  [      2:0] biu_type_i,     //burst type
+    input  wire  [      2:0] biu_prot_i,     //protection
+    input  wire              biu_lock_i,
+    input  wire              biu_we_i,
+    input  wire  [XLEN -1:0] biu_d_i,
+    output reg   [XLEN -1:0] biu_q_o,
+    output reg               biu_ack_o,      //transfer acknowledge
+    output reg               biu_err_o       //transfer error
 );
 
   //////////////////////////////////////////////////////////////////

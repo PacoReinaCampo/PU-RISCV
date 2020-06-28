@@ -62,46 +62,46 @@ module riscv_imem_ctrl #(
   parameter TECHNOLOGY = "GENERIC"
 )
   (
-    input  logic                                  rst_ni,
-    input  logic                                  clk_i,
+    input  wire                                   rst_ni,
+    input  wire                                   clk_i,
 
     //Configuration
-    input  logic [PMA_CNT-1:0][              13:0] pma_cfg_i,
+    input  wire  [PMA_CNT-1:0][              13:0] pma_cfg_i,
     input        [PMA_CNT-1:0][XLEN          -1:0] pma_adr_i,
 
     //CPU side
-    input  logic              [XLEN          -1:0] nxt_pc_i,
-    output logic                                   stall_nxt_pc_o,
-    input  logic                                   stall_i,
-    input  logic                                   flush_i,
-    output logic              [XLEN          -1:0] parcel_pc_o,
-    output logic              [PARCEL_SIZE   -1:0] parcel_o,
-    output logic              [PARCEL_SIZE/16-1:0] parcel_valid_o,
-    output logic                                   err_o,
-    output logic                                   misaligned_o,
-    output logic                                   page_fault_o,
-    input  logic                                   cache_flush_i,
-    input  logic                                   dcflush_rdy_i,
+    input  wire               [XLEN          -1:0] nxt_pc_i,
+    output reg                                     stall_nxt_pc_o,
+    input  wire                                    stall_i,
+    input  wire                                    flush_i,
+    output reg                [XLEN          -1:0] parcel_pc_o,
+    output reg                [PARCEL_SIZE   -1:0] parcel_o,
+    output reg                [PARCEL_SIZE/16-1:0] parcel_valid_o,
+    output reg                                     err_o,
+    output reg                                     misaligned_o,
+    output reg                                     page_fault_o,
+    input  wire                                    cache_flush_i,
+    input  wire                                    dcflush_rdy_i,
 
     input        [PMP_CNT-1:0][               7:0] st_pmpcfg_i,
-    input  logic [PMP_CNT-1:0][XLEN          -1:0] st_pmpaddr_i,
-    input  logic              [               1:0] st_prv_i,
+    input  wire  [PMP_CNT-1:0][XLEN          -1:0] st_pmpaddr_i,
+    input  wire               [               1:0] st_prv_i,
 
     //BIU ports
-    output logic                                   biu_stb_o,
-    input  logic                                   biu_stb_ack_i,
-    input  logic                                   biu_d_ack_i,
-    output logic              [PLEN          -1:0] biu_adri_o,
-    input  logic              [PLEN          -1:0] biu_adro_i,
-    output logic              [               2:0] biu_size_o,
-    output logic              [               2:0] biu_type_o,
-    output logic                                   biu_we_o,
-    output logic                                   biu_lock_o,
-    output logic              [               2:0] biu_prot_o,
-    output logic              [XLEN          -1:0] biu_d_o,
-    input  logic              [XLEN          -1:0] biu_q_i,
-    input  logic                                   biu_ack_i,
-    input  logic                                   biu_err_i
+    output reg                                     biu_stb_o,
+    input  wire                                    biu_stb_ack_i,
+    input  wire                                    biu_d_ack_i,
+    output reg                [PLEN          -1:0] biu_adri_o,
+    input  wire               [PLEN          -1:0] biu_adro_i,
+    output reg                [               2:0] biu_size_o,
+    output reg                [               2:0] biu_type_o,
+    output reg                                     biu_we_o,
+    output reg                                     biu_lock_o,
+    output reg                [               2:0] biu_prot_o,
+    output reg                [XLEN          -1:0] biu_d_o,
+    input  wire               [XLEN          -1:0] biu_q_i,
+    input  wire                                    biu_ack_i,
+    input  wire                                    biu_err_i
   );
 
   //////////////////////////////////////////////////////////////////

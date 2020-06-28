@@ -48,39 +48,39 @@ module riscv_dext #(
   parameter DEPTH = 2    //number of instructions in flight
 )
   (
-    input  logic                 rst_ni,
-    input  logic                 clk_i,
-    input  logic                 clr_i,
+    input  wire                  rst_ni,
+    input  wire                  clk_i,
+    input  wire                  clr_i,
 
   //CPU side
-    input  logic                 mem_req_i,
-    input  logic     [XLEN -1:0] mem_adr_i,
-    input  logic     [      2:0] mem_size_i,
-    input  logic     [      2:0] mem_type_i,
-    input  logic                 mem_lock_i,
-    input  logic     [      2:0] mem_prot_i,
-    input  logic                 mem_we_i,
-    input  logic     [XLEN -1:0] mem_d_i,
-    output logic                 mem_adr_ack_o, //acknowledge address phase
-    output logic     [PLEN -1:0] mem_adr_o,
-    output logic     [XLEN -1:0] mem_q_o,
-    output logic                 mem_ack_o,     //acknowledge data transfer
-    output logic                 mem_err_o,     //data transfer error
+    input  wire                  mem_req_i,
+    input  wire      [XLEN -1:0] mem_adr_i,
+    input  wire      [      2:0] mem_size_i,
+    input  wire      [      2:0] mem_type_i,
+    input  wire                  mem_lock_i,
+    input  wire      [      2:0] mem_prot_i,
+    input  wire                  mem_we_i,
+    input  wire      [XLEN -1:0] mem_d_i,
+    output reg                   mem_adr_ack_o, //acknowledge address phase
+    output reg       [PLEN -1:0] mem_adr_o,
+    output reg       [XLEN -1:0] mem_q_o,
+    output reg                   mem_ack_o,     //acknowledge data transfer
+    output reg                   mem_err_o,     //data transfer error
 
   //To BIU
-    output logic                 biu_stb_o,
-    input  logic                 biu_stb_ack_i,
-    output logic     [PLEN -1:0] biu_adri_o,
-    input  logic     [PLEN -1:0] biu_adro_i,
-    output logic     [      2:0] biu_size_o,     //transfer size
-    output logic     [      2:0] biu_type_o,     //burst type
-    output logic                 biu_lock_o,
-    output logic     [      2:0] biu_prot_o,
-    output logic                 biu_we_o,
-    output logic     [XLEN -1:0] biu_d_o,
-    input  logic     [XLEN -1:0] biu_q_i,
-    input  logic                 biu_ack_i,      //data acknowledge, 1 per data
-    input  logic                 biu_err_i       //data error
+    output reg                   biu_stb_o,
+    input  wire                  biu_stb_ack_i,
+    output reg       [PLEN -1:0] biu_adri_o,
+    input  wire      [PLEN -1:0] biu_adro_i,
+    output reg       [      2:0] biu_size_o,     //transfer size
+    output reg       [      2:0] biu_type_o,     //burst type
+    output reg                   biu_lock_o,
+    output reg       [      2:0] biu_prot_o,
+    output reg                   biu_we_o,
+    output reg       [XLEN -1:0] biu_d_o,
+    input  wire      [XLEN -1:0] biu_q_i,
+    input  wire                  biu_ack_i,      //data acknowledge, 1 per data
+    input  wire                  biu_err_i       //data error
   );
 
   //////////////////////////////////////////////////////////////////

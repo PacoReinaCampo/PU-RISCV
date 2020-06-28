@@ -47,16 +47,16 @@ module riscv_memmisaligned #(
   parameter HAS_RVC = 1
 )
   (
-    input  logic              clk_i,
+    input  wire               clk_i,
 
     //CPU side
-    input  logic              instruction_i,
-    input  logic              req_i,
-    input  logic [XLEN  -1:0] adr_i,
-    input  logic [       2:0] size_i,
+    input  wire               instruction_i,
+    input  wire               req_i,
+    input  wire  [XLEN  -1:0] adr_i,
+    input  wire  [       2:0] size_i,
 
     //To memory subsystem
-    output logic              misaligned_o
+    output reg                misaligned_o
   );
 
   //////////////////////////////////////////////////////////////////

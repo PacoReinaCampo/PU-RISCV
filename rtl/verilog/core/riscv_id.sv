@@ -72,7 +72,7 @@ module riscv_id #(
     input      [ILEN          -1:0] if_instr,
     input                           if_bubble,
     output reg [ILEN          -1:0] id_instr,
-    output logic                    id_bubble,
+    output reg                      id_bubble,
     input      [ILEN          -1:0] ex_instr,
     input                           ex_bubble,
     input      [ILEN          -1:0] mem_instr,

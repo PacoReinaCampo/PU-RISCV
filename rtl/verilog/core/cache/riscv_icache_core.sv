@@ -56,39 +56,39 @@ module riscv_icache_core #(
   parameter TECHNOLOGY = "GENERIC"
 )
  (
-    input  logic                   rst_ni,
-    input  logic                   clk_i,
-    input  logic                   clr_i,          //clear any pending request
+    input  wire                    rst_ni,
+    input  wire                    clk_i,
+    input  wire                    clr_i,          //clear any pending request
 
     //CPU side
-    input  logic                   mem_vreq_i,
-    input  logic                   mem_preq_i,
-    input  logic [XLEN       -1:0] mem_vadr_i,
-    input  logic [PLEN       -1:0] mem_padr_i,
-    input  logic [            2:0] mem_size_i,
+    input  wire                    mem_vreq_i,
+    input  wire                    mem_preq_i,
+    input  wire  [XLEN       -1:0] mem_vadr_i,
+    input  wire  [PLEN       -1:0] mem_padr_i,
+    input  wire  [            2:0] mem_size_i,
     input                          mem_lock_i,
-    input  logic [            2:0] mem_prot_i,
-    output logic [PARCEL_SIZE-1:0] mem_q_o,
-    output logic                   mem_ack_o,
-    output logic                   mem_err_o,
-    input  logic                   flush_i,
-    input  logic                   flushrdy_i,
+    input  wire  [            2:0] mem_prot_i,
+    output reg   [PARCEL_SIZE-1:0] mem_q_o,
+    output reg                     mem_ack_o,
+    output reg                     mem_err_o,
+    input  wire                    flush_i,
+    input  wire                    flushrdy_i,
 
     //To BIU
-    output logic                   biu_stb_o,      //access request
-    input  logic                   biu_stb_ack_i,  //access acknowledge
-    input  logic                   biu_d_ack_i,    //BIU needs new data (biu_d_o)
-    output logic [PLEN       -1:0] biu_adri_o,     //access start address
-    input  logic [PLEN       -1:0] biu_adro_i,
-    output logic [            2:0] biu_size_o,     //transfer size
-    output logic [            2:0] biu_type_o,     //burst type
-    output logic                   biu_lock_o,     //locked transfer
-    output logic [            2:0] biu_prot_o,     //protection bits
-    output logic                   biu_we_o,       //write enable
-    output logic [XLEN       -1:0] biu_d_o,        //write data
-    input  logic [XLEN       -1:0] biu_q_i,        //read data
-    input  logic                   biu_ack_i,      //transfer acknowledge
-    input  logic                   biu_err_i       //transfer error
+    output reg                     biu_stb_o,      //access request
+    input  wire                    biu_stb_ack_i,  //access acknowledge
+    input  wire                    biu_d_ack_i,    //BIU needs new data (biu_d_o)
+    output reg   [PLEN       -1:0] biu_adri_o,     //access start address
+    input  wire  [PLEN       -1:0] biu_adro_i,
+    output reg   [            2:0] biu_size_o,     //transfer size
+    output reg   [            2:0] biu_type_o,     //burst type
+    output reg                     biu_lock_o,     //locked transfer
+    output reg   [            2:0] biu_prot_o,     //protection bits
+    output reg                     biu_we_o,       //write enable
+    output reg   [XLEN       -1:0] biu_d_o,        //write data
+    input  wire  [XLEN       -1:0] biu_q_i,        //read data
+    input  wire                    biu_ack_i,      //transfer acknowledge
+    input  wire                    biu_err_i       //transfer error
   );
 
   //////////////////////////////////////////////////////////////////

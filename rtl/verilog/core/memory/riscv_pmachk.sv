@@ -49,26 +49,26 @@ module riscv_pmachk #(
 )
   (
     //PMA  configuration
-    input logic     [PMA_CNT-1:0][    13:0] pma_cfg_i,
-    input logic     [PMA_CNT-1:0][XLEN-1:0] pma_adr_i,
+    input wire      [PMA_CNT-1:0][    13:0] pma_cfg_i,
+    input wire      [PMA_CNT-1:0][XLEN-1:0] pma_adr_i,
 
     //Memory Access
-    input  logic               instruction_i, //This is an instruction access
-    input  logic               req_i,         //Memory access requested
-    input  logic    [PLEN-1:0] adr_i,         //Physical Memory address (i.e. after translation)
-    input  logic    [     2:0] size_i,        //Transfer size
-    input  logic               lock_i,        //AMO : TODO: specify AMO type
-    input  logic               we_i,
+    input  wire                instruction_i, //This is an instruction access
+    input  wire                req_i,         //Memory access requested
+    input  wire     [PLEN-1:0] adr_i,         //Physical Memory address (i.e. after translation)
+    input  wire     [     2:0] size_i,        //Transfer size
+    input  wire                lock_i,        //AMO : TODO: specify AMO type
+    input  wire                we_i,
 
-    input  logic               misaligned_i,  //Misaligned access
+    input  wire                misaligned_i,  //Misaligned access
 
     //Output
     output          [    13:0] pma_o,
-    output logic               exception_o,
-    output logic               misaligned_o,
-    output logic               is_cache_access_o,
-    output logic               is_ext_access_o,
-    output logic               is_tcm_access_o
+    output reg                 exception_o,
+    output reg                 misaligned_o,
+    output reg                 is_cache_access_o,
+    output reg                 is_ext_access_o,
+    output reg                 is_tcm_access_o
   );
 
   //////////////////////////////////////////////////////////////////

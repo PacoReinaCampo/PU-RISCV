@@ -51,37 +51,37 @@ module riscv_wb #(
   parameter [XLEN-1:0] PC_INIT = 'h8000_0000
 )
   (
-  input  logic                      rst_ni,        //Reset
-  input  logic                      clk_i,         //Clock
+  input  wire                       rst_ni,        //Reset
+  input  wire                       clk_i,         //Clock
 
-  output logic                      wb_stall_o,    //Stall on memory-wait
+  output reg                        wb_stall_o,    //Stall on memory-wait
 
-  input  logic [XLEN          -1:0] mem_pc_i,
-  output logic [XLEN          -1:0] wb_pc_o,
+  input  wire  [XLEN          -1:0] mem_pc_i,
+  output reg   [XLEN          -1:0] wb_pc_o,
 
-  input  logic [ILEN          -1:0] mem_instr_i,
-  input  logic                      mem_bubble_i,
-  output logic [ILEN          -1:0] wb_instr_o,
-  output logic                      wb_bubble_o,
+  input  wire  [ILEN          -1:0] mem_instr_i,
+  input  wire                       mem_bubble_i,
+  output reg   [ILEN          -1:0] wb_instr_o,
+  output reg                        wb_bubble_o,
 
-  input  logic [EXCEPTION_SIZE-1:0] mem_exception_i,
-  output logic [EXCEPTION_SIZE-1:0] wb_exception_o,
-  output logic [XLEN          -1:0] wb_badaddr_o,
+  input  wire  [EXCEPTION_SIZE-1:0] mem_exception_i,
+  output reg   [EXCEPTION_SIZE-1:0] wb_exception_o,
+  output reg   [XLEN          -1:0] wb_badaddr_o,
 
-  input  logic [XLEN          -1:0] mem_r_i,
-  input  logic [XLEN          -1:0] mem_memadr_i,
+  input  wire  [XLEN          -1:0] mem_r_i,
+  input  wire  [XLEN          -1:0] mem_memadr_i,
 
   //From Memory System
-  input  logic                      dmem_ack_i,
-  input  logic                      dmem_err_i,
-  input  logic [XLEN          -1:0] dmem_q_i,
-  input  logic                      dmem_misaligned_i,
-  input  logic                      dmem_page_fault_i,
+  input  wire                       dmem_ack_i,
+  input  wire                       dmem_err_i,
+  input  wire  [XLEN          -1:0] dmem_q_i,
+  input  wire                       dmem_misaligned_i,
+  input  wire                       dmem_page_fault_i,
 
   //To Register File
-  output logic [               4:0] wb_dst_o,
-  output logic [XLEN          -1:0] wb_r_o,
-  output logic                      wb_we_o
+  output reg   [               4:0] wb_dst_o,
+  output reg   [XLEN          -1:0] wb_r_o,
+  output reg                        wb_we_o
 );
 
   ////////////////////////////////////////////////////////////////

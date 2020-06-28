@@ -48,40 +48,40 @@ module riscv_mux #(
   parameter PORTS = 2
 )
   (
-    input  logic                       rst_ni,
-    input  logic                       clk_i,
+    input  wire                        rst_ni,
+    input  wire                        clk_i,
 
     //Input Ports
-    input  logic [PORTS-1:0]           biu_req_i,     //access request
-    output logic [PORTS-1:0]           biu_req_ack_o, //biu access acknowledge
-    output logic [PORTS-1:0]           biu_d_ack_o,   //biu early data acknowledge
-    input  logic [PORTS-1:0][PLEN-1:0] biu_adri_i,    //access start address
-    output logic [PORTS-1:0][PLEN-1:0] biu_adro_o,    //biu response address
-    input  logic [PORTS-1:0][     2:0] biu_size_i,    //access data size
-    input  logic [PORTS-1:0][     2:0] biu_type_i,    //access burst type
-    input  logic [PORTS-1:0]           biu_lock_i,    //access locked access
-    input  logic [PORTS-1:0][     2:0] biu_prot_i,    //access protection
-    input  logic [PORTS-1:0]           biu_we_i,      //access write enable
-    input  logic [PORTS-1:0][XLEN-1:0] biu_d_i,       //access write data
-    output logic [PORTS-1:0][XLEN-1:0] biu_q_o,       //access read data
-    output logic [PORTS-1:0]           biu_ack_o,     //access acknowledge
-    output logic [PORTS-1:0]           biu_err_o,     //access error
+    input  wire  [PORTS-1:0]           biu_req_i,     //access request
+    output reg   [PORTS-1:0]           biu_req_ack_o, //biu access acknowledge
+    output reg   [PORTS-1:0]           biu_d_ack_o,   //biu early data acknowledge
+    input  wire  [PORTS-1:0][PLEN-1:0] biu_adri_i,    //access start address
+    output reg   [PORTS-1:0][PLEN-1:0] biu_adro_o,    //biu response address
+    input  wire  [PORTS-1:0][     2:0] biu_size_i,    //access data size
+    input  wire  [PORTS-1:0][     2:0] biu_type_i,    //access burst type
+    input  wire  [PORTS-1:0]           biu_lock_i,    //access locked access
+    input  wire  [PORTS-1:0][     2:0] biu_prot_i,    //access protection
+    input  wire  [PORTS-1:0]           biu_we_i,      //access write enable
+    input  wire  [PORTS-1:0][XLEN-1:0] biu_d_i,       //access write data
+    output reg   [PORTS-1:0][XLEN-1:0] biu_q_o,       //access read data
+    output reg   [PORTS-1:0]           biu_ack_o,     //access acknowledge
+    output reg   [PORTS-1:0]           biu_err_o,     //access error
 
     //Output (to BIU)
-    output logic                       biu_req_o,             //BIU access request
-    input  logic                       biu_req_ack_i,         //BIU ackowledge
-    input  logic                       biu_d_ack_i,           //BIU early data acknowledge
-    output logic            [PLEN-1:0] biu_adri_o,            //address into BIU
-    input  logic            [PLEN-1:0] biu_adro_i,            //address from BIU
-    output logic            [     2:0] biu_size_o,            //transfer size
-    output logic            [     2:0] biu_type_o,            //burst type
-    output logic                       biu_lock_o,
-    output logic            [     2:0] biu_prot_o,
-    output logic                       biu_we_o,
-    output logic            [XLEN-1:0] biu_d_o,               //data into BIU
-    input  logic            [XLEN-1:0] biu_q_i,               //data from BIU
-    input  logic                       biu_ack_i,             //data acknowledge, 1 per data
-    input  logic                       biu_err_i              //data error
+    output reg                         biu_req_o,             //BIU access request
+    input  wire                        biu_req_ack_i,         //BIU ackowledge
+    input  wire                        biu_d_ack_i,           //BIU early data acknowledge
+    output reg              [PLEN-1:0] biu_adri_o,            //address into BIU
+    input  wire             [PLEN-1:0] biu_adro_i,            //address from BIU
+    output reg              [     2:0] biu_size_o,            //transfer size
+    output reg              [     2:0] biu_type_o,            //burst type
+    output reg                         biu_lock_o,
+    output reg              [     2:0] biu_prot_o,
+    output reg                         biu_we_o,
+    output reg              [XLEN-1:0] biu_d_o,               //data into BIU
+    input  wire             [XLEN-1:0] biu_q_i,               //data from BIU
+    input  wire                        biu_ack_i,             //data acknowledge, 1 per data
+    input  wire                        biu_err_i              //data error
 );
 
   //////////////////////////////////////////////////////////////////

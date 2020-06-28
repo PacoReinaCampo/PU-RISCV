@@ -64,7 +64,7 @@ module riscv_bu #(
     output reg                        bu_cacheflush,
     input        [               1:0] id_bp_predict,
     output reg   [               1:0] bu_bp_predict,
-    output logic [BP_GLOBAL_BITS-1:0] bu_bp_history,
+    output reg   [BP_GLOBAL_BITS-1:0] bu_bp_history,
     output reg                        bu_bp_btaken,
     output reg                        bu_bp_update,
 

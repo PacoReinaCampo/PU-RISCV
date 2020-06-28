@@ -100,8 +100,8 @@ module riscv_module_wb #(
     input                               HRESETn,
     input                               HCLK,
 
-    input logic [PMA_CNT-1:0][    13:0] pma_cfg_i,
-    input logic [PMA_CNT-1:0][XLEN-1:0] pma_adr_i,
+    input wire  [PMA_CNT-1:0][    13:0] pma_cfg_i,
+    input wire  [PMA_CNT-1:0][XLEN-1:0] pma_adr_i,
 
     //WB interfaces
     output          [PLEN         -1:0] wb_ins_adr_o,

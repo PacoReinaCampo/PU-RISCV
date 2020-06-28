@@ -47,39 +47,39 @@ module riscv_biu2wb #(
   parameter PLEN = 64
 )
   (
-    input  logic             HRESETn,
-    input  logic             HCLK,
+    input  wire              HRESETn,
+    input  wire              HCLK,
 
     //WB Bus
-    output logic [PLEN -1:0] wb_adr_o,
-    output logic [XLEN -1:0] wb_dat_o,
-    output logic [      3:0] wb_sel_o,
-    output logic             wb_we_o,
-    output logic             wb_cyc_o,
-    output logic             wb_stb_o,
-    output logic [      2:0] wb_cti_o,
-    output logic [      1:0] wb_bte_o,
+    output reg   [PLEN -1:0] wb_adr_o,
+    output reg   [XLEN -1:0] wb_dat_o,
+    output reg   [      3:0] wb_sel_o,
+    output reg               wb_we_o,
+    output reg               wb_cyc_o,
+    output reg               wb_stb_o,
+    output reg   [      2:0] wb_cti_o,
+    output reg   [      1:0] wb_bte_o,
 
-    input  logic [XLEN -1:0] wb_dat_i,
-    input  logic             wb_ack_i,
-    input  logic             wb_err_i,
-    input  logic [      2:0] wb_rty_i,
+    input  wire  [XLEN -1:0] wb_dat_i,
+    input  wire              wb_ack_i,
+    input  wire              wb_err_i,
+    input  wire  [      2:0] wb_rty_i,
 
     //BIU Bus (Core ports)
-    input  logic             biu_stb_i,      //strobe
-    output logic             biu_stb_ack_o,  //strobe acknowledge; can send new strobe
-    output logic             biu_d_ack_o,    //data acknowledge (send new biu_d_i); for pipelined buses
-    input  logic [PLEN -1:0] biu_adri_i,
-    output logic [PLEN -1:0] biu_adro_o,  
-    input  logic [      2:0] biu_size_i,     //transfer size
-    input  logic [      2:0] biu_type_i,     //burst type
-    input  logic [      2:0] biu_prot_i,     //protection
-    input  logic             biu_lock_i,
-    input  logic             biu_we_i,
-    input  logic [XLEN -1:0] biu_d_i,
-    output logic [XLEN -1:0] biu_q_o,
-    output logic             biu_ack_o,      //transfer acknowledge
-    output logic             biu_err_o       //transfer error
+    input  wire              biu_stb_i,      //strobe
+    output reg               biu_stb_ack_o,  //strobe acknowledge; can send new strobe
+    output reg               biu_d_ack_o,    //data acknowledge (send new biu_d_i); for pipelined buses
+    input  wire  [PLEN -1:0] biu_adri_i,
+    output reg   [PLEN -1:0] biu_adro_o,  
+    input  wire  [      2:0] biu_size_i,     //transfer size
+    input  wire  [      2:0] biu_type_i,     //burst type
+    input  wire  [      2:0] biu_prot_i,     //protection
+    input  wire              biu_lock_i,
+    input  wire              biu_we_i,
+    input  wire  [XLEN -1:0] biu_d_i,
+    output reg   [XLEN -1:0] biu_q_o,
+    output reg               biu_ack_o,      //transfer acknowledge
+    output reg               biu_err_o       //transfer error
 );
 
   //////////////////////////////////////////////////////////////////

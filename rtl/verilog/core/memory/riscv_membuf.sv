@@ -47,23 +47,23 @@ module riscv_membuf #(
   parameter DBITS = 64
 )
   (
-    input  logic             rst_ni,
-    input  logic             clk_i,
+    input  wire              rst_ni,
+    input  wire              clk_i,
 
-    input  logic             clr_i,  //clear pending requests
-    input  logic             ena_i,
+    input  wire              clr_i,  //clear pending requests
+    input  wire              ena_i,
 
     //CPU side
-    input  logic             req_i,
-    input  logic [DBITS-1:0] d_i,
+    input  wire              req_i,
+    input  wire  [DBITS-1:0] d_i,
 
     //Memory system side
-    output logic             req_o,
-    input  logic             ack_i,
-    output logic [DBITS-1:0] q_o,
+    output reg               req_o,
+    input  wire              ack_i,
+    output reg   [DBITS-1:0] q_o,
 
-    output logic             empty_o,
-    output logic             full_o
+    output reg               empty_o,
+    output reg               full_o
   );
 
   //////////////////////////////////////////////////////////////////

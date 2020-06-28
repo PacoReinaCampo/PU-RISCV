@@ -47,35 +47,35 @@ module riscv_mmu #(
   parameter PLEN  = 64
 )
   (
-    input  logic            rst_ni,
-    input  logic            clk_i,
-    input  logic            clr_i,   //clear pending request
+    input  wire             rst_ni,
+    input  wire             clk_i,
+    input  wire             clr_i,   //clear pending request
 
   //Mode
-//input  logic [XLEN-1:0] st_satp;
+//input  wire  [XLEN-1:0] st_satp;
 
   //CPU side
-    input  logic            vreq_i,  //Request from CPU
-    input  logic [XLEN-1:0] vadr_i,  //Virtual Memory Address
-    input  logic [     2:0] vsize_i,
-    input  logic            vlock_i,
-    input  logic [     2:0] vprot_i,
-    input  logic            vwe_i,
-    input  logic [XLEN-1:0] vd_i,
+    input  wire             vreq_i,  //Request from CPU
+    input  wire  [XLEN-1:0] vadr_i,  //Virtual Memory Address
+    input  wire  [     2:0] vsize_i,
+    input  wire             vlock_i,
+    input  wire  [     2:0] vprot_i,
+    input  wire             vwe_i,
+    input  wire  [XLEN-1:0] vd_i,
 
   //Memory system side
-    output logic            preq_o,
-    output logic [PLEN-1:0] padr_o,  //Physical Memory Address
-    output logic [     2:0] psize_o,
-    output logic            plock_o,
-    output logic [     2:0] pprot_o,
-    output logic            pwe_o,
-    output logic [XLEN-1:0] pd_o,
-    input  logic [XLEN-1:0] pq_i,
-    input  logic            pack_i,
+    output reg              preq_o,
+    output reg   [PLEN-1:0] padr_o,  //Physical Memory Address
+    output reg   [     2:0] psize_o,
+    output reg              plock_o,
+    output reg   [     2:0] pprot_o,
+    output reg              pwe_o,
+    output reg   [XLEN-1:0] pd_o,
+    input  wire  [XLEN-1:0] pq_i,
+    input  wire             pack_i,
 
   //Exception
-    output logic            page_fault_o
+    output reg              page_fault_o
   );
 
   //////////////////////////////////////////////////////////////////

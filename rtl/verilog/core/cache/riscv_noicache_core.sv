@@ -69,8 +69,8 @@ module riscv_noicache_core #(
     input                           biu_stb_ack,
     output       [PLEN        -1:0] biu_adri,
     input        [PLEN        -1:0] biu_adro,
-    output logic [             2:0] biu_size,     //transfer size
-    output logic [             2:0] biu_type,     //burst type -AHB style
+    output reg   [             2:0] biu_size,     //transfer size
+    output reg   [             2:0] biu_type,     //burst type -AHB style
     output                          biu_lock,
     output                          biu_we,
     output       [XLEN        -1:0] biu_di,
