@@ -4,11 +4,14 @@
 ../../../../../rtl/vhdl/core/cache/riscv_dext.vhd
 ../../../../../rtl/vhdl/core/cache/riscv_icache_core.vhd
 ../../../../../rtl/vhdl/core/cache/riscv_noicache_core.vhd
-../../../../../rtl/vhdl/core/execution/riscv_alu.vhd
-../../../../../rtl/vhdl/core/execution/riscv_bu.vhd
-../../../../../rtl/vhdl/core/execution/riscv_div.vhd
-../../../../../rtl/vhdl/core/execution/riscv_lsu.vhd
-../../../../../rtl/vhdl/core/execution/riscv_mul.vhd
+../../../../../rtl/vhdl/core/decode/riscv_id.vhd
+../../../../../rtl/vhdl/core/decode/riscv_if.vhd
+../../../../../rtl/vhdl/core/execute/riscv_alu.vhd
+../../../../../rtl/vhdl/core/execute/riscv_bu.vhd
+../../../../../rtl/vhdl/core/execute/riscv_div.vhd
+../../../../../rtl/vhdl/core/execute/riscv_execution.vhd
+../../../../../rtl/vhdl/core/execute/riscv_lsu.vhd
+../../../../../rtl/vhdl/core/execute/riscv_mul.vhd
 ../../../../../rtl/vhdl/core/memory/riscv_dmem_ctrl.vhd
 ../../../../../rtl/vhdl/core/memory/riscv_imem_ctrl.vhd
 ../../../../../rtl/vhdl/core/memory/riscv_membuf.vhd
@@ -20,9 +23,6 @@
 ../../../../../rtl/vhdl/core/riscv_bp.vhd
 ../../../../../rtl/vhdl/core/riscv_core.vhd
 ../../../../../rtl/vhdl/core/riscv_du.vhd
-../../../../../rtl/vhdl/core/riscv_execution.vhd
-../../../../../rtl/vhdl/core/riscv_id.vhd
-../../../../../rtl/vhdl/core/riscv_if.vhd
 ../../../../../rtl/vhdl/core/riscv_memory.vhd
 ../../../../../rtl/vhdl/core/riscv_rf.vhd
 ../../../../../rtl/vhdl/core/riscv_state.vhd
@@ -34,11 +34,11 @@
 ../../../../../rtl/vhdl/memory/riscv_ram_1rw_generic.vhd
 ../../../../../rtl/vhdl/memory/riscv_ram_queue.vhd
 
-../../../../../rtl/vhdl/pu/riscv_biu2ahb3.vhd
-../../../../../rtl/vhdl/pu/riscv_pu_ahb3.vhd
+../../../../../rtl/vhdl/pu/riscv_biu2axi4.vhd
+../../../../../rtl/vhdl/pu/riscv_pu_axi4.vhd
 
 ../../../../../bench/vhdl/regression/riscv_dbg_bfm.vhd
 ../../../../../bench/vhdl/regression/riscv_htif.vhd
-../../../../../bench/vhdl/regression/riscv_memory_model_ahb3.vhd
-../../../../../bench/vhdl/regression/riscv_mmio_if_ahb3.vhd
-../../../../../bench/vhdl/regression/riscv_testbench_ahb3.vhd
+../../../../../bench/vhdl/regression/riscv_memory_model_axi4.vhd
+../../../../../bench/vhdl/regression/riscv_mmio_if_axi4.vhd
+../../../../../bench/vhdl/regression/riscv_testbench_axi4.vhd

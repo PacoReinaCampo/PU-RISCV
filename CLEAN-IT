@@ -12,7 +12,7 @@ rm -rf sim/vhdl/regression/axi4/msim/transcript
 
 rm -rf sim/verilog/regression/axi4/iverilog/system.vvp
 
-rm -rf sim/verilog/regression/axi4/vtor/obj_dir
+rm -rf sim/verilog/regression/axi4/verilator/obj_dir
 
 
 rm -rf sim/mixed/regression/ahb3/multi/run
@@ -29,7 +29,7 @@ rm -rf sim/vhdl/regression/ahb3/msim/transcript
 
 rm -rf sim/verilog/regression/ahb3/iverilog/system.vvp
 
-rm -rf sim/verilog/regression/ahb3/vtor/obj_dir
+rm -rf sim/verilog/regression/ahb3/verilator/obj_dir
 
 
 rm -rf sim/mixed/regression/wb/multi/run
@@ -46,4 +46,4 @@ rm -rf sim/vhdl/regression/wb/msim/transcript
 
 rm -rf sim/verilog/regression/wb/iverilog/system.vvp
 
-rm -rf sim/verilog/regression/wb/vtor/obj_dir
+rm -rf sim/verilog/regression/wb/verilator/obj_dir

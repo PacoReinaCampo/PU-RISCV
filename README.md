@@ -570,10 +570,10 @@ git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
 
 cd riscv-gnu-toolchain
 
-./configure --prefix=/opt/riscv
+./configure --prefix=/opt/riscv-elf-gcc
 sudo make
 
-./configure --prefix=/opt/riscv
+./configure --prefix=/opt/riscv-elf-gcc
 sudo make linux
 
 ./configure --prefix=/opt/riscv --enable-multilib
@@ -588,7 +588,7 @@ sudo make report-linux
 
 type:
 ```
-export PATH=$PATH:/opt/riscv/bin
+export PATH=$PATH:/opt/riscv-elf-gcc/bin
 
 cd software
 
@@ -599,11 +599,11 @@ mkdir tests
 mkdir tests/dump
 mkdir tests/hex
 
-git clone --recursive https://github.com/riscv/riscv-tests
+git clone --recursive https://github.com/riscv-elf-gcc/riscv-tests
 cd riscv-tests
 
 autoconf
-./configure --prefix=/opt/riscv/bin
+./configure --prefix=/opt/riscv-elf-gcc/bin
 make
 
 cd isa

@@ -1,4 +1,4 @@
-export PATH=$PATH:/opt/riscv/bin
+export PATH=$PATH:/opt/riscv-elf-gcc/bin
 
 rm -rf tests
 rm -rf riscv-tests
@@ -11,7 +11,7 @@ git clone --recursive https://github.com/riscv/riscv-tests
 cd riscv-tests
 
 autoconf
-./configure --prefix=/opt/riscv/bin
+./configure --prefix=/opt/riscv-elf-gcc/bin
 make
 
 cd isa

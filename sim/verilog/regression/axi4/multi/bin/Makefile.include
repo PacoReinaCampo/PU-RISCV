@@ -50,11 +50,15 @@ DUT_SRC_DIR=$(ROOT_DIR)/rtl/verilog
 RTL_VLOG = $(DUT_SRC_DIR)/core/cache/riscv_dcache_core.sv \
            $(DUT_SRC_DIR)/core/cache/riscv_dext.sv \
            $(DUT_SRC_DIR)/core/cache/riscv_icache_core.sv \
-           $(DUT_SRC_DIR)/core/execution/riscv_alu.sv \
-           $(DUT_SRC_DIR)/core/execution/riscv_bu.sv \
-           $(DUT_SRC_DIR)/core/execution/riscv_div.sv \
-           $(DUT_SRC_DIR)/core/execution/riscv_lsu.sv \
-           $(DUT_SRC_DIR)/core/execution/riscv_mul.sv \
+           $(DUT_SRC_DIR)/core/cache/riscv_noicache_core.sv \
+           $(DUT_SRC_DIR)/core/decode/riscv_id.sv \
+           $(DUT_SRC_DIR)/core/execute/riscv_alu.sv \
+           $(DUT_SRC_DIR)/core/execute/riscv_bu.sv \
+           $(DUT_SRC_DIR)/core/execute/riscv_div.sv \
+           $(DUT_SRC_DIR)/core/execute/riscv_execution.sv \
+           $(DUT_SRC_DIR)/core/execute/riscv_lsu.sv \
+           $(DUT_SRC_DIR)/core/execute/riscv_mul.sv \
+           $(DUT_SRC_DIR)/core/fetch/riscv_if.sv \
            $(DUT_SRC_DIR)/core/memory/riscv_dmem_ctrl.sv \
            $(DUT_SRC_DIR)/core/memory/riscv_imem_ctrl.sv \
            $(DUT_SRC_DIR)/core/memory/riscv_membuf.sv \
@@ -66,9 +70,6 @@ RTL_VLOG = $(DUT_SRC_DIR)/core/cache/riscv_dcache_core.sv \
            $(DUT_SRC_DIR)/core/riscv_bp.sv \
            $(DUT_SRC_DIR)/core/riscv_core.sv \
            $(DUT_SRC_DIR)/core/riscv_du.sv \
-           $(DUT_SRC_DIR)/core/riscv_execution.sv \
-           $(DUT_SRC_DIR)/core/riscv_id.sv \
-           $(DUT_SRC_DIR)/core/riscv_if.sv \
            $(DUT_SRC_DIR)/core/riscv_memory.sv \
            $(DUT_SRC_DIR)/core/riscv_rf.sv \
            $(DUT_SRC_DIR)/core/riscv_state.sv \
