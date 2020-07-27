@@ -576,7 +576,7 @@ sudo make
 ./configure --prefix=/opt/riscv-elf-gcc
 sudo make linux
 
-./configure --prefix=/opt/riscv --enable-multilib
+./configure --prefix=/opt/riscv-elf-gcc --enable-multilib
 sudo make linux
 
 ./configure --prefix=$RISCV
