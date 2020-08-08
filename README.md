@@ -679,17 +679,17 @@ sudo make install
 ```
 
 ```
-cd sim/verilog/regression/wb/vtor
+cd sim/verilog/regression/wb/verilator
 source SIMULATE-IT
 ```
 
 ```
-cd sim/verilog/regression/ahb3/vtor
+cd sim/verilog/regression/ahb3/verilator
 source SIMULATE-IT
 ```
 
 ```
-cd sim/verilog/regression/axi4/vtor
+cd sim/verilog/regression/axi4/verilator
 source SIMULATE-IT
 ```
 
@@ -994,7 +994,9 @@ sudo make install
 
 # 4. CONCLUSION
 
-## 4.1. FOR WINDOWS USERS!
+## 4.1. OPEN SOURCE TOOLS FOR WINDOWS USERS!
+
+### 4.1.0. Install Prerequisites
 
 1. Settings → Apps → Apps & features → Related settings, Programs and
 Features → Turn Windows features on or off → Windows Subsystem for
@@ -1050,4 +1052,56 @@ git clone https://github.com/RTimothyEdwards/qflow
 ```
 cd /mnt/c/../synthesis/qflow
 source FLOW-IT
+```
+
+## 4.2. OPEN SOURCE SYNTHESIZER FOR WINDOWS USERS!
+
+### 4.2.0. Install Prerequisites
+
+#### 4.2.0.1. For WINDOWS Users!
+
+1. Settings → Apps → Apps & features → Related settings, Programs and Features → Turn Windows features on or off → Windows Subsystem for Linux
+
+2. Microsoft Store → INSTALL UBUNTU
+
+#### 4.2.0.2. For WINDOWS and LINUX Users
+
+```
+sudo apt update
+sudo apt upgrade
+```
+
+```
+sudo apt -y install build-essential clang bison flex \
+libreadline-dev gawk tcl-dev libffi-dev git make gnat \
+graphviz xdot pkg-config python3 libboost-system-dev \
+libboost-python-dev libboost-filesystem-dev zlib1g-dev
+```
+
+### 4.2.1. Install GHDL
+```
+git clone https://github.com/ghdl/ghdl
+
+cd ghdl
+./configure --prefix=/usr/local
+make
+sudo make install
+```
+
+### 4.2.2. Install Yosys
+```
+git clone https://github.com/YosysHQ/yosys
+
+cd yosys
+make
+sudo make install
+```
+
+### 4.2.3. Install Synthesizer Plugin
+```
+git clone https://github.com/ghdl/ghdl-yosys-plugin
+cd ghdl-yosys-plugin
+make GHDL=/usr/local
+sudo yosys-config --exec mkdir -p --datdir/plugins
+sudo yosys-config --exec cp "ghdl.so" --datdir/plugins/ghdl.so
 ```
