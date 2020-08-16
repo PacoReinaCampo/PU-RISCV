@@ -37,12 +37,12 @@
  *
  * =============================================================================
  * Author(s):
- *   Paco Reina Campo <frareicam@gmail.com>
+ *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
 #include <iostream>
 
 int main() {
-  std::cout << "Hello World!";
+  std::cout << "Hello World!\n";
   return 0;
 }
