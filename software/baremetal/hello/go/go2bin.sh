@@ -1,7 +1,5 @@
 rm -rf hello_go
-rm -rf life_go
 
 go build hello_go.go
-go build life_go.go
 
 ./hello_go
