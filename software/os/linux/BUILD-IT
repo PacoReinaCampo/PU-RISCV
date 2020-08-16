@@ -2,13 +2,13 @@ export CROSS_COMPILE=/opt/riscv-elf-gcc/bin/riscv64-unknown-linux-gnu-
 
 rm -rf vmlinux
 
-git clone https://github.com/QueenField/linux
+export CROSS_COMPILE=/opt/riscv-elf-gcc/bin/riscv64-unknown-linux-gnu-
 
 cd linux
 make ARCH=riscv mrproper defconfig
 make ARCH=riscv defconfig
 make ARCH=riscv all
 
-cp vmlinux ../
+cp vmlinux ..
 cd ..
 rm -rf linux

@@ -1,4 +1,4 @@
-export PATH=$PATH:/opt/riscv-elf-gcc/bin
+export PATH=/opt/riscv-elf-gcc/bin:${PATH}
 
 rm -rf tests
 rm -rf riscv-tests
