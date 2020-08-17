@@ -44,5 +44,5 @@ package main
 
 import "fmt"
 func main() {
-  fmt.Println("Hello QueenField!\n")
+  fmt.Println("Hello QueenField!")
 }
