@@ -42,7 +42,7 @@
 
 #include <stdio.h>
 
-int main(int argc, char const *argv[]) {
+int main() {
   printf("Hello QueenField!\n");
   return 0;
 }
