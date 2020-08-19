@@ -43,6 +43,6 @@
 #include <iostream>
 
 int main() {
-  std::cout << "Hello World!\n";
+  std::cout << "Hello QueenField!\n";
   return 0;
 }

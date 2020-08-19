@@ -7,7 +7,6 @@ sudo make
 
 ./configure --prefix=/opt/riscv-elf-gcc
 sudo make linux
-sudo make report-linux
 
 ./configure --prefix=/opt/riscv-elf-gcc --enable-multilib
 sudo make linux
