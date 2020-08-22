@@ -1,14 +1,12 @@
-export CROSS_COMPILE=/opt/riscv-elf-gcc/bin/riscv64-unknown-linux-gnu-
+export PATH=/opt/riscv-elf-gcc/bin:${PATH}
 
-rm -rf vmlinux
-
+git clone --recursive https://git.busybox.net/busybox
 git clone --recursive https://github.com/torvalds/linux
 
-cd linux
-make ARCH=riscv mrproper defconfig
-make ARCH=riscv defconfig
-make ARCH=riscv all
+cd busybox
+make CROSS_COMPILE=riscv64-unknown-linux-gnu- defconfig
+make CROSS_COMPILE=riscv64-unknown-linux-gnu-
 
-cp vmlinux ..
-cd ..
-rm -rf linux
+cd ../linux
+make ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- defconfig
+make ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu-
