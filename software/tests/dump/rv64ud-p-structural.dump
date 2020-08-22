@@ -5,295 +5,351 @@ rv64ud-p-structural:     formato del fichero elf64-littleriscv
 Desensamblado de la sección .text.init:
 
 0000000080000000 <_start>:
-    80000000:	04c0006f          	j	8000004c <reset_vector>
+    80000000:	0480006f          	j	80000048 <reset_vector>
 
 0000000080000004 <trap_vector>:
     80000004:	34202f73          	csrr	t5,mcause
     80000008:	00800f93          	li	t6,8
-    8000000c:	03ff0a63          	beq	t5,t6,80000040 <write_tohost>
+    8000000c:	03ff0863          	beq	t5,t6,8000003c <write_tohost>
     80000010:	00900f93          	li	t6,9
-    80000014:	03ff0663          	beq	t5,t6,80000040 <write_tohost>
+    80000014:	03ff0463          	beq	t5,t6,8000003c <write_tohost>
     80000018:	00b00f93          	li	t6,11
-    8000001c:	03ff0263          	beq	t5,t6,80000040 <write_tohost>
-    80000020:	80000f17          	auipc	t5,0x80000
-    80000024:	fe0f0f13          	addi	t5,t5,-32 # 0 <_start-0x80000000>
-    80000028:	000f0463          	beqz	t5,80000030 <trap_vector+0x2c>
-    8000002c:	000f0067          	jr	t5
-    80000030:	34202f73          	csrr	t5,mcause
-    80000034:	000f5463          	bgez	t5,8000003c <handle_exception>
-    80000038:	0040006f          	j	8000003c <handle_exception>
+    8000001c:	03ff0063          	beq	t5,t6,8000003c <write_tohost>
+    80000020:	00000f13          	li	t5,0
+    80000024:	000f0463          	beqz	t5,8000002c <trap_vector+0x28>
+    80000028:	000f0067          	jr	t5
+    8000002c:	34202f73          	csrr	t5,mcause
+    80000030:	000f5463          	bgez	t5,80000038 <handle_exception>
+    80000034:	0040006f          	j	80000038 <handle_exception>
 
-000000008000003c <handle_exception>:
-    8000003c:	5391e193          	ori	gp,gp,1337
+0000000080000038 <handle_exception>:
+    80000038:	5391e193          	ori	gp,gp,1337
 
-0000000080000040 <write_tohost>:
-    80000040:	00001f17          	auipc	t5,0x1
-    80000044:	fc3f2023          	sw	gp,-64(t5) # 80001000 <tohost>
-    80000048:	ff9ff06f          	j	80000040 <write_tohost>
+000000008000003c <write_tohost>:
+    8000003c:	00001f17          	auipc	t5,0x1
+    80000040:	fc3f2223          	sw	gp,-60(t5) # 80001000 <tohost>
+    80000044:	ff9ff06f          	j	8000003c <write_tohost>
 
-000000008000004c <reset_vector>:
-    8000004c:	f1402573          	csrr	a0,mhartid
-    80000050:	00051063          	bnez	a0,80000050 <reset_vector+0x4>
-    80000054:	00000297          	auipc	t0,0x0
-    80000058:	01028293          	addi	t0,t0,16 # 80000064 <reset_vector+0x18>
-    8000005c:	30529073          	csrw	mtvec,t0
-    80000060:	18005073          	csrwi	satp,0
-    80000064:	00000297          	auipc	t0,0x0
-    80000068:	01c28293          	addi	t0,t0,28 # 80000080 <reset_vector+0x34>
-    8000006c:	30529073          	csrw	mtvec,t0
-    80000070:	fff00293          	li	t0,-1
-    80000074:	3b029073          	csrw	pmpaddr0,t0
-    80000078:	01f00293          	li	t0,31
-    8000007c:	3a029073          	csrw	pmpcfg0,t0
-    80000080:	00000297          	auipc	t0,0x0
-    80000084:	01828293          	addi	t0,t0,24 # 80000098 <reset_vector+0x4c>
-    80000088:	30529073          	csrw	mtvec,t0
-    8000008c:	30205073          	csrwi	medeleg,0
-    80000090:	30305073          	csrwi	mideleg,0
-    80000094:	30405073          	csrwi	mie,0
-    80000098:	00000193          	li	gp,0
-    8000009c:	00000297          	auipc	t0,0x0
-    800000a0:	f6828293          	addi	t0,t0,-152 # 80000004 <trap_vector>
-    800000a4:	30529073          	csrw	mtvec,t0
-    800000a8:	00100513          	li	a0,1
-    800000ac:	01f51513          	slli	a0,a0,0x1f
-    800000b0:	00055863          	bgez	a0,800000c0 <reset_vector+0x74>
-    800000b4:	0ff0000f          	fence
-    800000b8:	00100193          	li	gp,1
-    800000bc:	00000073          	ecall
-    800000c0:	80000297          	auipc	t0,0x80000
-    800000c4:	f4028293          	addi	t0,t0,-192 # 0 <_start-0x80000000>
-    800000c8:	00028e63          	beqz	t0,800000e4 <reset_vector+0x98>
-    800000cc:	10529073          	csrw	stvec,t0
-    800000d0:	0000b2b7          	lui	t0,0xb
-    800000d4:	1092829b          	addiw	t0,t0,265
-    800000d8:	30229073          	csrw	medeleg,t0
-    800000dc:	30202373          	csrr	t1,medeleg
-    800000e0:	f4629ee3          	bne	t0,t1,8000003c <handle_exception>
-    800000e4:	30005073          	csrwi	mstatus,0
-    800000e8:	00002537          	lui	a0,0x2
-    800000ec:	30052073          	csrs	mstatus,a0
-    800000f0:	00305073          	csrwi	fcsr,0
-    800000f4:	00000297          	auipc	t0,0x0
-    800000f8:	01428293          	addi	t0,t0,20 # 80000108 <reset_vector+0xbc>
-    800000fc:	34129073          	csrw	mepc,t0
-    80000100:	f1402573          	csrr	a0,mhartid
-    80000104:	30200073          	mret
-    80000108:	00100613          	li	a2,1
-    8000010c:	3ff0011b          	addiw	sp,zero,1023
-    80000110:	03411113          	slli	sp,sp,0x34
-    80000114:	3f8000b7          	lui	ra,0x3f800
-    80000118:	f2000253          	fmv.d.x	ft4,zero
-    8000011c:	f00001d3          	fmv.w.x	ft3,zero
-    80000120:	f2010153          	fmv.d.x	ft2,sp
-    80000124:	f00080d3          	fmv.w.x	ft1,ra
-    80000128:	0180006f          	j	80000140 <reset_vector+0xf4>
-    8000012c:	00000013          	nop
-    80000130:	00000013          	nop
-    80000134:	00000013          	nop
-    80000138:	00000013          	nop
-    8000013c:	00000013          	nop
-    80000140:	12217253          	fmul.d	ft4,ft2,ft2
-    80000144:	201081d3          	fmv.s	ft3,ft1
-    80000148:	e2020253          	fmv.x.d	tp,ft4
-    8000014c:	e00182d3          	fmv.x.w	t0,ft3
-    80000150:	00508c63          	beq	ra,t0,80000168 <reset_vector+0x11c>
-    80000154:	0ff0000f          	fence
-    80000158:	00018063          	beqz	gp,80000158 <reset_vector+0x10c>
-    8000015c:	00119193          	slli	gp,gp,0x1
-    80000160:	0011e193          	ori	gp,gp,1
-    80000164:	00000073          	ecall
-    80000168:	00410c63          	beq	sp,tp,80000180 <reset_vector+0x134>
-    8000016c:	0ff0000f          	fence
-    80000170:	00018063          	beqz	gp,80000170 <reset_vector+0x124>
-    80000174:	00119193          	slli	gp,gp,0x1
-    80000178:	0011e193          	ori	gp,gp,1
-    8000017c:	00000073          	ecall
-    80000180:	f2000153          	fmv.d.x	ft2,zero
-    80000184:	f00000d3          	fmv.w.x	ft1,zero
-    80000188:	f2000253          	fmv.d.x	ft4,zero
-    8000018c:	f00001d3          	fmv.w.x	ft3,zero
-    80000190:	f2010153          	fmv.d.x	ft2,sp
-    80000194:	f00080d3          	fmv.w.x	ft1,ra
-    80000198:	0080006f          	j	800001a0 <reset_vector+0x154>
-    8000019c:	00000013          	nop
-    800001a0:	12217253          	fmul.d	ft4,ft2,ft2
-    800001a4:	00000013          	nop
-    800001a8:	201081d3          	fmv.s	ft3,ft1
-    800001ac:	e2020253          	fmv.x.d	tp,ft4
-    800001b0:	e00182d3          	fmv.x.w	t0,ft3
-    800001b4:	00508c63          	beq	ra,t0,800001cc <reset_vector+0x180>
-    800001b8:	0ff0000f          	fence
-    800001bc:	00018063          	beqz	gp,800001bc <reset_vector+0x170>
-    800001c0:	00119193          	slli	gp,gp,0x1
-    800001c4:	0011e193          	ori	gp,gp,1
-    800001c8:	00000073          	ecall
-    800001cc:	00410c63          	beq	sp,tp,800001e4 <reset_vector+0x198>
-    800001d0:	0ff0000f          	fence
-    800001d4:	00018063          	beqz	gp,800001d4 <reset_vector+0x188>
-    800001d8:	00119193          	slli	gp,gp,0x1
-    800001dc:	0011e193          	ori	gp,gp,1
-    800001e0:	00000073          	ecall
-    800001e4:	f2000153          	fmv.d.x	ft2,zero
-    800001e8:	f00000d3          	fmv.w.x	ft1,zero
-    800001ec:	f2000253          	fmv.d.x	ft4,zero
-    800001f0:	f00001d3          	fmv.w.x	ft3,zero
-    800001f4:	f2010153          	fmv.d.x	ft2,sp
-    800001f8:	f00080d3          	fmv.w.x	ft1,ra
-    800001fc:	0040006f          	j	80000200 <reset_vector+0x1b4>
-    80000200:	12217253          	fmul.d	ft4,ft2,ft2
-    80000204:	00000013          	nop
-    80000208:	00000013          	nop
-    8000020c:	201081d3          	fmv.s	ft3,ft1
-    80000210:	e2020253          	fmv.x.d	tp,ft4
-    80000214:	e00182d3          	fmv.x.w	t0,ft3
-    80000218:	00508c63          	beq	ra,t0,80000230 <reset_vector+0x1e4>
-    8000021c:	0ff0000f          	fence
-    80000220:	00018063          	beqz	gp,80000220 <reset_vector+0x1d4>
-    80000224:	00119193          	slli	gp,gp,0x1
-    80000228:	0011e193          	ori	gp,gp,1
-    8000022c:	00000073          	ecall
-    80000230:	00410c63          	beq	sp,tp,80000248 <reset_vector+0x1fc>
-    80000234:	0ff0000f          	fence
-    80000238:	00018063          	beqz	gp,80000238 <reset_vector+0x1ec>
-    8000023c:	00119193          	slli	gp,gp,0x1
-    80000240:	0011e193          	ori	gp,gp,1
-    80000244:	00000073          	ecall
-    80000248:	f2000153          	fmv.d.x	ft2,zero
-    8000024c:	f00000d3          	fmv.w.x	ft1,zero
-    80000250:	f2000253          	fmv.d.x	ft4,zero
-    80000254:	f00001d3          	fmv.w.x	ft3,zero
-    80000258:	f2010153          	fmv.d.x	ft2,sp
-    8000025c:	f00080d3          	fmv.w.x	ft1,ra
-    80000260:	0200006f          	j	80000280 <reset_vector+0x234>
-    80000264:	00000013          	nop
-    80000268:	00000013          	nop
-    8000026c:	00000013          	nop
-    80000270:	00000013          	nop
-    80000274:	00000013          	nop
-    80000278:	00000013          	nop
-    8000027c:	00000013          	nop
-    80000280:	12217253          	fmul.d	ft4,ft2,ft2
-    80000284:	00000013          	nop
-    80000288:	00000013          	nop
-    8000028c:	00000013          	nop
-    80000290:	201081d3          	fmv.s	ft3,ft1
-    80000294:	e2020253          	fmv.x.d	tp,ft4
-    80000298:	e00182d3          	fmv.x.w	t0,ft3
-    8000029c:	00508c63          	beq	ra,t0,800002b4 <reset_vector+0x268>
-    800002a0:	0ff0000f          	fence
-    800002a4:	00018063          	beqz	gp,800002a4 <reset_vector+0x258>
-    800002a8:	00119193          	slli	gp,gp,0x1
-    800002ac:	0011e193          	ori	gp,gp,1
-    800002b0:	00000073          	ecall
-    800002b4:	00410c63          	beq	sp,tp,800002cc <reset_vector+0x280>
-    800002b8:	0ff0000f          	fence
-    800002bc:	00018063          	beqz	gp,800002bc <reset_vector+0x270>
-    800002c0:	00119193          	slli	gp,gp,0x1
-    800002c4:	0011e193          	ori	gp,gp,1
-    800002c8:	00000073          	ecall
-    800002cc:	f2000153          	fmv.d.x	ft2,zero
-    800002d0:	f00000d3          	fmv.w.x	ft1,zero
-    800002d4:	f2000253          	fmv.d.x	ft4,zero
-    800002d8:	f00001d3          	fmv.w.x	ft3,zero
-    800002dc:	f2010153          	fmv.d.x	ft2,sp
-    800002e0:	f00080d3          	fmv.w.x	ft1,ra
-    800002e4:	01c0006f          	j	80000300 <reset_vector+0x2b4>
-    800002e8:	00000013          	nop
-    800002ec:	00000013          	nop
-    800002f0:	00000013          	nop
-    800002f4:	00000013          	nop
-    800002f8:	00000013          	nop
-    800002fc:	00000013          	nop
-    80000300:	12217253          	fmul.d	ft4,ft2,ft2
-    80000304:	00000013          	nop
-    80000308:	00000013          	nop
-    8000030c:	00000013          	nop
-    80000310:	00000013          	nop
-    80000314:	201081d3          	fmv.s	ft3,ft1
-    80000318:	e2020253          	fmv.x.d	tp,ft4
-    8000031c:	e00182d3          	fmv.x.w	t0,ft3
-    80000320:	00508c63          	beq	ra,t0,80000338 <reset_vector+0x2ec>
-    80000324:	0ff0000f          	fence
-    80000328:	00018063          	beqz	gp,80000328 <reset_vector+0x2dc>
-    8000032c:	00119193          	slli	gp,gp,0x1
-    80000330:	0011e193          	ori	gp,gp,1
-    80000334:	00000073          	ecall
-    80000338:	00410c63          	beq	sp,tp,80000350 <reset_vector+0x304>
-    8000033c:	0ff0000f          	fence
-    80000340:	00018063          	beqz	gp,80000340 <reset_vector+0x2f4>
-    80000344:	00119193          	slli	gp,gp,0x1
-    80000348:	0011e193          	ori	gp,gp,1
-    8000034c:	00000073          	ecall
-    80000350:	f2000153          	fmv.d.x	ft2,zero
-    80000354:	f00000d3          	fmv.w.x	ft1,zero
-    80000358:	f2000253          	fmv.d.x	ft4,zero
-    8000035c:	f00001d3          	fmv.w.x	ft3,zero
-    80000360:	f2010153          	fmv.d.x	ft2,sp
-    80000364:	f00080d3          	fmv.w.x	ft1,ra
-    80000368:	0180006f          	j	80000380 <reset_vector+0x334>
-    8000036c:	00000013          	nop
-    80000370:	00000013          	nop
-    80000374:	00000013          	nop
-    80000378:	00000013          	nop
-    8000037c:	00000013          	nop
-    80000380:	12217253          	fmul.d	ft4,ft2,ft2
-    80000384:	00000013          	nop
-    80000388:	00000013          	nop
-    8000038c:	00000013          	nop
-    80000390:	00000013          	nop
-    80000394:	00000013          	nop
-    80000398:	201081d3          	fmv.s	ft3,ft1
-    8000039c:	e2020253          	fmv.x.d	tp,ft4
-    800003a0:	e00182d3          	fmv.x.w	t0,ft3
-    800003a4:	00508c63          	beq	ra,t0,800003bc <reset_vector+0x370>
-    800003a8:	0ff0000f          	fence
-    800003ac:	00018063          	beqz	gp,800003ac <reset_vector+0x360>
-    800003b0:	00119193          	slli	gp,gp,0x1
-    800003b4:	0011e193          	ori	gp,gp,1
-    800003b8:	00000073          	ecall
-    800003bc:	00410c63          	beq	sp,tp,800003d4 <reset_vector+0x388>
-    800003c0:	0ff0000f          	fence
-    800003c4:	00018063          	beqz	gp,800003c4 <reset_vector+0x378>
-    800003c8:	00119193          	slli	gp,gp,0x1
-    800003cc:	0011e193          	ori	gp,gp,1
-    800003d0:	00000073          	ecall
-    800003d4:	f2000153          	fmv.d.x	ft2,zero
-    800003d8:	f00000d3          	fmv.w.x	ft1,zero
-    800003dc:	f2000253          	fmv.d.x	ft4,zero
-    800003e0:	f00001d3          	fmv.w.x	ft3,zero
-    800003e4:	f2010153          	fmv.d.x	ft2,sp
-    800003e8:	f00080d3          	fmv.w.x	ft1,ra
-    800003ec:	0140006f          	j	80000400 <reset_vector+0x3b4>
-    800003f0:	00000013          	nop
-    800003f4:	00000013          	nop
-    800003f8:	00000013          	nop
-    800003fc:	00000013          	nop
-    80000400:	12217253          	fmul.d	ft4,ft2,ft2
-    80000404:	00000013          	nop
-    80000408:	00000013          	nop
-    8000040c:	00000013          	nop
-    80000410:	00000013          	nop
-    80000414:	00000013          	nop
-    80000418:	00000013          	nop
-    8000041c:	201081d3          	fmv.s	ft3,ft1
-    80000420:	e2020253          	fmv.x.d	tp,ft4
-    80000424:	e00182d3          	fmv.x.w	t0,ft3
-    80000428:	00508c63          	beq	ra,t0,80000440 <reset_vector+0x3f4>
-    8000042c:	0ff0000f          	fence
-    80000430:	00018063          	beqz	gp,80000430 <reset_vector+0x3e4>
-    80000434:	00119193          	slli	gp,gp,0x1
-    80000438:	0011e193          	ori	gp,gp,1
-    8000043c:	00000073          	ecall
-    80000440:	00410c63          	beq	sp,tp,80000458 <reset_vector+0x40c>
-    80000444:	0ff0000f          	fence
-    80000448:	00018063          	beqz	gp,80000448 <reset_vector+0x3fc>
-    8000044c:	00119193          	slli	gp,gp,0x1
-    80000450:	0011e193          	ori	gp,gp,1
-    80000454:	00000073          	ecall
-    80000458:	f2000153          	fmv.d.x	ft2,zero
-    8000045c:	f00000d3          	fmv.w.x	ft1,zero
-    80000460:	0ff0000f          	fence
-    80000464:	00100193          	li	gp,1
-    80000468:	00000073          	ecall
-    8000046c:	c0001073          	unimp
+0000000080000048 <reset_vector>:
+    80000048:	00000093          	li	ra,0
+    8000004c:	00000113          	li	sp,0
+    80000050:	00000193          	li	gp,0
+    80000054:	00000213          	li	tp,0
+    80000058:	00000293          	li	t0,0
+    8000005c:	00000313          	li	t1,0
+    80000060:	00000393          	li	t2,0
+    80000064:	00000413          	li	s0,0
+    80000068:	00000493          	li	s1,0
+    8000006c:	00000513          	li	a0,0
+    80000070:	00000593          	li	a1,0
+    80000074:	00000613          	li	a2,0
+    80000078:	00000693          	li	a3,0
+    8000007c:	00000713          	li	a4,0
+    80000080:	00000793          	li	a5,0
+    80000084:	00000813          	li	a6,0
+    80000088:	00000893          	li	a7,0
+    8000008c:	00000913          	li	s2,0
+    80000090:	00000993          	li	s3,0
+    80000094:	00000a13          	li	s4,0
+    80000098:	00000a93          	li	s5,0
+    8000009c:	00000b13          	li	s6,0
+    800000a0:	00000b93          	li	s7,0
+    800000a4:	00000c13          	li	s8,0
+    800000a8:	00000c93          	li	s9,0
+    800000ac:	00000d13          	li	s10,0
+    800000b0:	00000d93          	li	s11,0
+    800000b4:	00000e13          	li	t3,0
+    800000b8:	00000e93          	li	t4,0
+    800000bc:	00000f13          	li	t5,0
+    800000c0:	00000f93          	li	t6,0
+    800000c4:	f1402573          	csrr	a0,mhartid
+    800000c8:	00051063          	bnez	a0,800000c8 <reset_vector+0x80>
+    800000cc:	00000297          	auipc	t0,0x0
+    800000d0:	01028293          	addi	t0,t0,16 # 800000dc <reset_vector+0x94>
+    800000d4:	30529073          	csrw	mtvec,t0
+    800000d8:	18005073          	csrwi	satp,0
+    800000dc:	00000297          	auipc	t0,0x0
+    800000e0:	02428293          	addi	t0,t0,36 # 80000100 <reset_vector+0xb8>
+    800000e4:	30529073          	csrw	mtvec,t0
+    800000e8:	0010029b          	addiw	t0,zero,1
+    800000ec:	03529293          	slli	t0,t0,0x35
+    800000f0:	fff28293          	addi	t0,t0,-1
+    800000f4:	3b029073          	csrw	pmpaddr0,t0
+    800000f8:	01f00293          	li	t0,31
+    800000fc:	3a029073          	csrw	pmpcfg0,t0
+    80000100:	00000297          	auipc	t0,0x0
+    80000104:	01828293          	addi	t0,t0,24 # 80000118 <reset_vector+0xd0>
+    80000108:	30529073          	csrw	mtvec,t0
+    8000010c:	30205073          	csrwi	medeleg,0
+    80000110:	30305073          	csrwi	mideleg,0
+    80000114:	30405073          	csrwi	mie,0
+    80000118:	00000193          	li	gp,0
+    8000011c:	00000297          	auipc	t0,0x0
+    80000120:	ee828293          	addi	t0,t0,-280 # 80000004 <trap_vector>
+    80000124:	30529073          	csrw	mtvec,t0
+    80000128:	00100513          	li	a0,1
+    8000012c:	01f51513          	slli	a0,a0,0x1f
+    80000130:	00055c63          	bgez	a0,80000148 <reset_vector+0x100>
+    80000134:	0ff0000f          	fence
+    80000138:	00100193          	li	gp,1
+    8000013c:	05d00893          	li	a7,93
+    80000140:	00000513          	li	a0,0
+    80000144:	00000073          	ecall
+    80000148:	00000293          	li	t0,0
+    8000014c:	00028a63          	beqz	t0,80000160 <reset_vector+0x118>
+    80000150:	10529073          	csrw	stvec,t0
+    80000154:	0000b2b7          	lui	t0,0xb
+    80000158:	1092829b          	addiw	t0,t0,265
+    8000015c:	30229073          	csrw	medeleg,t0
+    80000160:	30005073          	csrwi	mstatus,0
+    80000164:	00002537          	lui	a0,0x2
+    80000168:	30052073          	csrs	mstatus,a0
+    8000016c:	00305073          	csrwi	fcsr,0
+    80000170:	00000297          	auipc	t0,0x0
+    80000174:	01428293          	addi	t0,t0,20 # 80000184 <reset_vector+0x13c>
+    80000178:	34129073          	csrw	mepc,t0
+    8000017c:	f1402573          	csrr	a0,mhartid
+    80000180:	30200073          	mret
+    80000184:	00100613          	li	a2,1
+    80000188:	3ff0011b          	addiw	sp,zero,1023
+    8000018c:	03411113          	slli	sp,sp,0x34
+    80000190:	3f8000b7          	lui	ra,0x3f800
+    80000194:	f2000253          	fmv.d.x	ft4,zero
+    80000198:	f00001d3          	fmv.w.x	ft3,zero
+    8000019c:	f2010153          	fmv.d.x	ft2,sp
+    800001a0:	f00080d3          	fmv.w.x	ft1,ra
+    800001a4:	01c0006f          	j	800001c0 <reset_vector+0x178>
+    800001a8:	00000013          	nop
+    800001ac:	00000013          	nop
+    800001b0:	00000013          	nop
+    800001b4:	00000013          	nop
+    800001b8:	00000013          	nop
+    800001bc:	00000013          	nop
+    800001c0:	12217253          	fmul.d	ft4,ft2,ft2
+    800001c4:	201081d3          	fmv.s	ft3,ft1
+    800001c8:	e2020253          	fmv.x.d	tp,ft4
+    800001cc:	e00182d3          	fmv.x.w	t0,ft3
+    800001d0:	02508063          	beq	ra,t0,800001f0 <reset_vector+0x1a8>
+    800001d4:	0ff0000f          	fence
+    800001d8:	00018063          	beqz	gp,800001d8 <reset_vector+0x190>
+    800001dc:	00119193          	slli	gp,gp,0x1
+    800001e0:	0011e193          	ori	gp,gp,1
+    800001e4:	05d00893          	li	a7,93
+    800001e8:	00018513          	mv	a0,gp
+    800001ec:	00000073          	ecall
+    800001f0:	02410063          	beq	sp,tp,80000210 <reset_vector+0x1c8>
+    800001f4:	0ff0000f          	fence
+    800001f8:	00018063          	beqz	gp,800001f8 <reset_vector+0x1b0>
+    800001fc:	00119193          	slli	gp,gp,0x1
+    80000200:	0011e193          	ori	gp,gp,1
+    80000204:	05d00893          	li	a7,93
+    80000208:	00018513          	mv	a0,gp
+    8000020c:	00000073          	ecall
+    80000210:	f2000153          	fmv.d.x	ft2,zero
+    80000214:	f00000d3          	fmv.w.x	ft1,zero
+    80000218:	f2000253          	fmv.d.x	ft4,zero
+    8000021c:	f00001d3          	fmv.w.x	ft3,zero
+    80000220:	f2010153          	fmv.d.x	ft2,sp
+    80000224:	f00080d3          	fmv.w.x	ft1,ra
+    80000228:	0180006f          	j	80000240 <reset_vector+0x1f8>
+    8000022c:	00000013          	nop
+    80000230:	00000013          	nop
+    80000234:	00000013          	nop
+    80000238:	00000013          	nop
+    8000023c:	00000013          	nop
+    80000240:	12217253          	fmul.d	ft4,ft2,ft2
+    80000244:	00000013          	nop
+    80000248:	201081d3          	fmv.s	ft3,ft1
+    8000024c:	e2020253          	fmv.x.d	tp,ft4
+    80000250:	e00182d3          	fmv.x.w	t0,ft3
+    80000254:	02508063          	beq	ra,t0,80000274 <reset_vector+0x22c>
+    80000258:	0ff0000f          	fence
+    8000025c:	00018063          	beqz	gp,8000025c <reset_vector+0x214>
+    80000260:	00119193          	slli	gp,gp,0x1
+    80000264:	0011e193          	ori	gp,gp,1
+    80000268:	05d00893          	li	a7,93
+    8000026c:	00018513          	mv	a0,gp
+    80000270:	00000073          	ecall
+    80000274:	02410063          	beq	sp,tp,80000294 <reset_vector+0x24c>
+    80000278:	0ff0000f          	fence
+    8000027c:	00018063          	beqz	gp,8000027c <reset_vector+0x234>
+    80000280:	00119193          	slli	gp,gp,0x1
+    80000284:	0011e193          	ori	gp,gp,1
+    80000288:	05d00893          	li	a7,93
+    8000028c:	00018513          	mv	a0,gp
+    80000290:	00000073          	ecall
+    80000294:	f2000153          	fmv.d.x	ft2,zero
+    80000298:	f00000d3          	fmv.w.x	ft1,zero
+    8000029c:	f2000253          	fmv.d.x	ft4,zero
+    800002a0:	f00001d3          	fmv.w.x	ft3,zero
+    800002a4:	f2010153          	fmv.d.x	ft2,sp
+    800002a8:	f00080d3          	fmv.w.x	ft1,ra
+    800002ac:	0140006f          	j	800002c0 <reset_vector+0x278>
+    800002b0:	00000013          	nop
+    800002b4:	00000013          	nop
+    800002b8:	00000013          	nop
+    800002bc:	00000013          	nop
+    800002c0:	12217253          	fmul.d	ft4,ft2,ft2
+    800002c4:	00000013          	nop
+    800002c8:	00000013          	nop
+    800002cc:	201081d3          	fmv.s	ft3,ft1
+    800002d0:	e2020253          	fmv.x.d	tp,ft4
+    800002d4:	e00182d3          	fmv.x.w	t0,ft3
+    800002d8:	02508063          	beq	ra,t0,800002f8 <reset_vector+0x2b0>
+    800002dc:	0ff0000f          	fence
+    800002e0:	00018063          	beqz	gp,800002e0 <reset_vector+0x298>
+    800002e4:	00119193          	slli	gp,gp,0x1
+    800002e8:	0011e193          	ori	gp,gp,1
+    800002ec:	05d00893          	li	a7,93
+    800002f0:	00018513          	mv	a0,gp
+    800002f4:	00000073          	ecall
+    800002f8:	02410063          	beq	sp,tp,80000318 <reset_vector+0x2d0>
+    800002fc:	0ff0000f          	fence
+    80000300:	00018063          	beqz	gp,80000300 <reset_vector+0x2b8>
+    80000304:	00119193          	slli	gp,gp,0x1
+    80000308:	0011e193          	ori	gp,gp,1
+    8000030c:	05d00893          	li	a7,93
+    80000310:	00018513          	mv	a0,gp
+    80000314:	00000073          	ecall
+    80000318:	f2000153          	fmv.d.x	ft2,zero
+    8000031c:	f00000d3          	fmv.w.x	ft1,zero
+    80000320:	f2000253          	fmv.d.x	ft4,zero
+    80000324:	f00001d3          	fmv.w.x	ft3,zero
+    80000328:	f2010153          	fmv.d.x	ft2,sp
+    8000032c:	f00080d3          	fmv.w.x	ft1,ra
+    80000330:	0100006f          	j	80000340 <reset_vector+0x2f8>
+    80000334:	00000013          	nop
+    80000338:	00000013          	nop
+    8000033c:	00000013          	nop
+    80000340:	12217253          	fmul.d	ft4,ft2,ft2
+    80000344:	00000013          	nop
+    80000348:	00000013          	nop
+    8000034c:	00000013          	nop
+    80000350:	201081d3          	fmv.s	ft3,ft1
+    80000354:	e2020253          	fmv.x.d	tp,ft4
+    80000358:	e00182d3          	fmv.x.w	t0,ft3
+    8000035c:	02508063          	beq	ra,t0,8000037c <reset_vector+0x334>
+    80000360:	0ff0000f          	fence
+    80000364:	00018063          	beqz	gp,80000364 <reset_vector+0x31c>
+    80000368:	00119193          	slli	gp,gp,0x1
+    8000036c:	0011e193          	ori	gp,gp,1
+    80000370:	05d00893          	li	a7,93
+    80000374:	00018513          	mv	a0,gp
+    80000378:	00000073          	ecall
+    8000037c:	02410063          	beq	sp,tp,8000039c <reset_vector+0x354>
+    80000380:	0ff0000f          	fence
+    80000384:	00018063          	beqz	gp,80000384 <reset_vector+0x33c>
+    80000388:	00119193          	slli	gp,gp,0x1
+    8000038c:	0011e193          	ori	gp,gp,1
+    80000390:	05d00893          	li	a7,93
+    80000394:	00018513          	mv	a0,gp
+    80000398:	00000073          	ecall
+    8000039c:	f2000153          	fmv.d.x	ft2,zero
+    800003a0:	f00000d3          	fmv.w.x	ft1,zero
+    800003a4:	f2000253          	fmv.d.x	ft4,zero
+    800003a8:	f00001d3          	fmv.w.x	ft3,zero
+    800003ac:	f2010153          	fmv.d.x	ft2,sp
+    800003b0:	f00080d3          	fmv.w.x	ft1,ra
+    800003b4:	00c0006f          	j	800003c0 <reset_vector+0x378>
+    800003b8:	00000013          	nop
+    800003bc:	00000013          	nop
+    800003c0:	12217253          	fmul.d	ft4,ft2,ft2
+    800003c4:	00000013          	nop
+    800003c8:	00000013          	nop
+    800003cc:	00000013          	nop
+    800003d0:	00000013          	nop
+    800003d4:	201081d3          	fmv.s	ft3,ft1
+    800003d8:	e2020253          	fmv.x.d	tp,ft4
+    800003dc:	e00182d3          	fmv.x.w	t0,ft3
+    800003e0:	02508063          	beq	ra,t0,80000400 <reset_vector+0x3b8>
+    800003e4:	0ff0000f          	fence
+    800003e8:	00018063          	beqz	gp,800003e8 <reset_vector+0x3a0>
+    800003ec:	00119193          	slli	gp,gp,0x1
+    800003f0:	0011e193          	ori	gp,gp,1
+    800003f4:	05d00893          	li	a7,93
+    800003f8:	00018513          	mv	a0,gp
+    800003fc:	00000073          	ecall
+    80000400:	02410063          	beq	sp,tp,80000420 <reset_vector+0x3d8>
+    80000404:	0ff0000f          	fence
+    80000408:	00018063          	beqz	gp,80000408 <reset_vector+0x3c0>
+    8000040c:	00119193          	slli	gp,gp,0x1
+    80000410:	0011e193          	ori	gp,gp,1
+    80000414:	05d00893          	li	a7,93
+    80000418:	00018513          	mv	a0,gp
+    8000041c:	00000073          	ecall
+    80000420:	f2000153          	fmv.d.x	ft2,zero
+    80000424:	f00000d3          	fmv.w.x	ft1,zero
+    80000428:	f2000253          	fmv.d.x	ft4,zero
+    8000042c:	f00001d3          	fmv.w.x	ft3,zero
+    80000430:	f2010153          	fmv.d.x	ft2,sp
+    80000434:	f00080d3          	fmv.w.x	ft1,ra
+    80000438:	0080006f          	j	80000440 <reset_vector+0x3f8>
+    8000043c:	00000013          	nop
+    80000440:	12217253          	fmul.d	ft4,ft2,ft2
+    80000444:	00000013          	nop
+    80000448:	00000013          	nop
+    8000044c:	00000013          	nop
+    80000450:	00000013          	nop
+    80000454:	00000013          	nop
+    80000458:	201081d3          	fmv.s	ft3,ft1
+    8000045c:	e2020253          	fmv.x.d	tp,ft4
+    80000460:	e00182d3          	fmv.x.w	t0,ft3
+    80000464:	02508063          	beq	ra,t0,80000484 <reset_vector+0x43c>
+    80000468:	0ff0000f          	fence
+    8000046c:	00018063          	beqz	gp,8000046c <reset_vector+0x424>
+    80000470:	00119193          	slli	gp,gp,0x1
+    80000474:	0011e193          	ori	gp,gp,1
+    80000478:	05d00893          	li	a7,93
+    8000047c:	00018513          	mv	a0,gp
+    80000480:	00000073          	ecall
+    80000484:	02410063          	beq	sp,tp,800004a4 <reset_vector+0x45c>
+    80000488:	0ff0000f          	fence
+    8000048c:	00018063          	beqz	gp,8000048c <reset_vector+0x444>
+    80000490:	00119193          	slli	gp,gp,0x1
+    80000494:	0011e193          	ori	gp,gp,1
+    80000498:	05d00893          	li	a7,93
+    8000049c:	00018513          	mv	a0,gp
+    800004a0:	00000073          	ecall
+    800004a4:	f2000153          	fmv.d.x	ft2,zero
+    800004a8:	f00000d3          	fmv.w.x	ft1,zero
+    800004ac:	f2000253          	fmv.d.x	ft4,zero
+    800004b0:	f00001d3          	fmv.w.x	ft3,zero
+    800004b4:	f2010153          	fmv.d.x	ft2,sp
+    800004b8:	f00080d3          	fmv.w.x	ft1,ra
+    800004bc:	0040006f          	j	800004c0 <reset_vector+0x478>
+    800004c0:	12217253          	fmul.d	ft4,ft2,ft2
+    800004c4:	00000013          	nop
+    800004c8:	00000013          	nop
+    800004cc:	00000013          	nop
+    800004d0:	00000013          	nop
+    800004d4:	00000013          	nop
+    800004d8:	00000013          	nop
+    800004dc:	201081d3          	fmv.s	ft3,ft1
+    800004e0:	e2020253          	fmv.x.d	tp,ft4
+    800004e4:	e00182d3          	fmv.x.w	t0,ft3
+    800004e8:	02508063          	beq	ra,t0,80000508 <reset_vector+0x4c0>
+    800004ec:	0ff0000f          	fence
+    800004f0:	00018063          	beqz	gp,800004f0 <reset_vector+0x4a8>
+    800004f4:	00119193          	slli	gp,gp,0x1
+    800004f8:	0011e193          	ori	gp,gp,1
+    800004fc:	05d00893          	li	a7,93
+    80000500:	00018513          	mv	a0,gp
+    80000504:	00000073          	ecall
+    80000508:	02410063          	beq	sp,tp,80000528 <reset_vector+0x4e0>
+    8000050c:	0ff0000f          	fence
+    80000510:	00018063          	beqz	gp,80000510 <reset_vector+0x4c8>
+    80000514:	00119193          	slli	gp,gp,0x1
+    80000518:	0011e193          	ori	gp,gp,1
+    8000051c:	05d00893          	li	a7,93
+    80000520:	00018513          	mv	a0,gp
+    80000524:	00000073          	ecall
+    80000528:	f2000153          	fmv.d.x	ft2,zero
+    8000052c:	f00000d3          	fmv.w.x	ft1,zero
+    80000530:	0ff0000f          	fence
+    80000534:	00100193          	li	gp,1
+    80000538:	05d00893          	li	a7,93
+    8000053c:	00000513          	li	a0,0
+    80000540:	00000073          	ecall
+    80000544:	c0001073          	unimp
+    80000548:	0000                	unimp
+    8000054a:	0000                	unimp

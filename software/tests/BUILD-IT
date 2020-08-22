@@ -1,11 +1,11 @@
 export PATH=/opt/riscv-elf-gcc/bin:${PATH}
 
-rm -rf tests
+rm -rf dump
+rm -rf hex
 rm -rf riscv-tests
 
-mkdir tests
-mkdir tests/dump
-mkdir tests/hex
+mkdir dump
+mkdir hex
 
 git clone --recursive https://github.com/riscv/riscv-tests
 
@@ -18,8 +18,8 @@ cd isa
 
 source ../../elf2hex.sh
 
-mv *.dump ../../tests/dump
-mv *.hex ../../tests/hex
+mv *.dump ../../dump
+mv *.hex ../../hex
 
 cd ..
 
