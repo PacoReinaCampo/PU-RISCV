@@ -679,17 +679,17 @@ sudo make install
 ```
 
 ```
-cd sim/verilog/regression/wb/verilator
+cd sim/verilog/tests/wb/verilator
 source SIMULATE-IT
 ```
 
 ```
-cd sim/verilog/regression/ahb3/verilator
+cd sim/verilog/tests/ahb3/verilator
 source SIMULATE-IT
 ```
 
 ```
-cd sim/verilog/regression/axi4/verilator
+cd sim/verilog/tests/axi4/verilator
 source SIMULATE-IT
 ```
 
@@ -753,17 +753,17 @@ sudo make install
 ```
 
 ```
-cd sim/verilog/regression/wb/iverilog
+cd sim/verilog/tests/wb/iverilog
 source SIMULATE-IT
 ```
 
 ```
-cd sim/verilog/regression/ahb3/iverilog
+cd sim/verilog/tests/ahb3/iverilog
 source SIMULATE-IT
 ```
 
 ```
-cd sim/verilog/regression/axi4/iverilog
+cd sim/verilog/tests/axi4/iverilog
 source SIMULATE-IT
 ```
 
@@ -780,17 +780,17 @@ sudo make install
 ```
 
 ```
-cd sim/vhdl/regression/wb/ghdl
+cd sim/vhdl/tests/wb/ghdl
 source SIMULATE-IT
 ```
 
 ```
-cd sim/vhdl/regression/ahb3/ghdl
+cd sim/vhdl/tests/ahb3/ghdl
 source SIMULATE-IT
 ```
 
 ```
-cd sim/vhdl/regression/axi4/ghdl
+cd sim/vhdl/tests/axi4/ghdl
 source SIMULATE-IT
 ```
 
@@ -1260,42 +1260,52 @@ func main() {
 
 #### 4.2.3.1. GNU Linux
 
-**Building BusyBox**
+**Running Linux RISC-V 32 bit with Buildroot**
 
 type:
 ```
 export PATH=/opt/riscv-elf-gcc/bin:${PATH}
 
-git clone --recursive https://git.busybox.net/busybox
+git clone --recursive https://github.com/buildroot/buildroot
 
-cd busybox
-make CROSS_COMPILE=riscv64-unknown-linux-gnu- defconfig
-make CROSS_COMPILE=riscv64-unknown-linux-gnu-
+cd buildroot
+make qemu_riscv32_virt_defconfig
+make
+
+qemu-system-riscv32 \
+-M virt \
+-nographic \
+-bios output/images/fw_jump.elf \
+-kernel output/images/Image \
+-append "root=/dev/vda ro" \
+-drive file=output/images/rootfs.ext2,format=raw,id=hd0 \
+-device virtio-blk-device,drive=hd0 \
+-netdev user,id=net0 \
+-device virtio-net-device,netdev=net0
 ```
 
-**Building Linux**
+**Running Linux RISC-V 64 bit with Buildroot**
 
 type:
 ```
 export PATH=/opt/riscv-elf-gcc/bin:${PATH}
 
-git clone --recursive https://github.com/torvalds/linux
+git clone --recursive https://github.com/buildroot/buildroot
 
-cd linux
-make ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- defconfig
-make ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu-
-```
+cd buildroot
+make qemu_riscv32_virt_defconfig
+make
 
-**Running Linux**
-
-type:
-```
-export PATH=/opt/riscv-elf-gcc/bin:${PATH}
-
-qemu-system-riscv64 -nographic -machine virt \
--kernel Image -append "root=/dev/vda ro console=ttyS0" \
--drive file=busybox,format=raw,id=hd0 \
--device virtio-blk-device,drive=hd0
+qemu-system-riscv64 \
+-M virt \
+-nographic \
+-bios output/images/fw_jump.elf \
+-kernel output/images/Image \
+-append "root=/dev/vda ro" \
+-drive file=output/images/rootfs.ext2,format=raw,id=hd0 \
+-device virtio-blk-device,drive=hd0 \
+-netdev user,id=net0 \
+-device virtio-net-device,netdev=net0
 ```
 
 #### 4.2.3.2. GNU Hurd
@@ -1305,3 +1315,24 @@ qemu-system-riscv64 -nographic -machine virt \
 #### 4.2.4.1. GNU Debian
 
 #### 4.2.4.2. GNU Fedora
+
+**Running Fedora**
+
+type:
+```
+export PATH=/opt/riscv-elf-gcc/bin:${PATH}
+
+qemu-system-riscv64 \
+-nographic \
+-machine virt \
+-smp 4 \
+-m 2G \
+-kernel Fedora-RISCV.elf \
+-bios none \
+-object rng-random,filename=/dev/urandom,id=rng0 \
+-device virtio-rng-device,rng=rng0 \
+-device virtio-blk-device,drive=hd0 \
+-drive file=Fedora-RISCV.raw,format=raw,id=hd0 \
+-device virtio-net-device,netdev=usernet \
+-netdev user,id=usernet,hostfwd=tcp::10000-:22
+```
