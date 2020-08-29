@@ -10,3 +10,6 @@ gcc life_c.c -o life_c.run
 # RISCV-64 ISA
 riscv64-unknown-elf-gcc -o life_c.elf life_c.c
 riscv64-unknown-elf-objcopy -O ihex life_c.elf life_c.hex
+
+# Linux RISCV-64 ISA
+riscv64-unknown-linux-gnu-cpp -o life_c.linux life_c.c
