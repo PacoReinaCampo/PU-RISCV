@@ -10,6 +10,3 @@ gcc hello_c.c -o hello_c.run
 # RISCV-64 ISA
 riscv64-unknown-elf-gcc -o hello_c.elf hello_c.c
 riscv64-unknown-elf-objcopy -O ihex hello_c.elf hello_c.hex
-
-# Linux RISCV-64 ISA
-riscv64-unknown-linux-gnu-cpp -o hello_c.linux hello_c.c

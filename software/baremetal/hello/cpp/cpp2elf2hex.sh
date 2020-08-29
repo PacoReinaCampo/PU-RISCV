@@ -10,6 +10,3 @@ g++ hello_cpp.cpp -o hello_cpp.run
 # RISCV-64 ISA
 riscv64-unknown-elf-g++ -o hello_cpp.elf hello_cpp.cpp
 riscv64-unknown-elf-objcopy -O ihex hello_cpp.elf hello_cpp.hex
-
-# Linux RISCV-64 ISA
-riscv64-unknown-linux-gnu-g++ -o hello_cpp.linux hello_cpp.cpp

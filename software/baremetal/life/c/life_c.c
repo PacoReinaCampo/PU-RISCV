@@ -176,6 +176,7 @@ int main(int argc, char *argv[]) {
       printworld(&gameoflife, stdout);
       getchar();
       fflush(stdin);
+      system("clear");
       updateworld(&gameoflife);
     }while(1);
     destroyworld(&gameoflife);
