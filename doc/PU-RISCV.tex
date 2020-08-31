@@ -1943,9 +1943,21 @@ sudo make install
 \hypertarget{hardware-1}{%
 \subsection{4.1. HARDWARE}\label{hardware-1}}
 
+type:
+
 \begin{verbatim}
-cd synthesis/yosys
-source SYNTHESIZE-IT
+cd synthesis/wb/qflow
+source SYNTHESIZE-VERILOG-IT
+\end{verbatim}
+
+\begin{verbatim}
+cd synthesis/ahb3/qflow
+source SYNTHESIZE-VERILOG-IT
+\end{verbatim}
+
+\begin{verbatim}
+cd synthesis/axi4/qflow
+source SYNTHESIZE-VERILOG-IT
 \end{verbatim}
 
 \hypertarget{gscl-45-nm-asic}{%
@@ -1954,8 +1966,18 @@ source SYNTHESIZE-IT
 type:
 
 \begin{verbatim}
-cd synthesis/qflow
-source FLOW-IT
+cd synthesis/wb/qflow
+source FLOW-VERILOG-IT
+\end{verbatim}
+
+\begin{verbatim}
+cd synthesis/ahb3/qflow
+source FLOW-VERILOG-IT
+\end{verbatim}
+
+\begin{verbatim}
+cd synthesis/axi4/qflow
+source FLOW-VERILOG-IT
 \end{verbatim}
 
 \hypertarget{lattice-ice40-fpga}{%
@@ -1964,8 +1986,18 @@ source FLOW-IT
 type:
 
 \begin{verbatim}
-cd synthesis/symbiflow
-source FLOW-IT
+cd synthesis/wb/symbiflow
+source FLOW-VERILOG-IT
+\end{verbatim}
+
+\begin{verbatim}
+cd synthesis/ahb3/symbiflow
+source FLOW-VERILOG-IT
+\end{verbatim}
+
+\begin{verbatim}
+cd synthesis/axi4/symbiflow
+source FLOW-VERILOG-IT
 \end{verbatim}
 
 \hypertarget{software-1}{%

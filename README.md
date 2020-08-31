@@ -1103,25 +1103,56 @@ sudo make install
 
 ## 4.1. HARDWARE
 
+type:
 ```
-cd synthesis/yosys
-source SYNTHESIZE-IT
+cd synthesis/wb/qflow
+source SYNTHESIZE-VERILOG-IT
+```
+
+```
+cd synthesis/ahb3/qflow
+source SYNTHESIZE-VERILOG-IT
+```
+
+```
+cd synthesis/axi4/qflow
+source SYNTHESIZE-VERILOG-IT
 ```
 
 ### 4.1.1. GSCL 45 nm ASIC
 
 type:
 ```
-cd synthesis/qflow
-source FLOW-IT
+cd synthesis/wb/qflow
+source FLOW-VERILOG-IT
+```
+
+```
+cd synthesis/ahb3/qflow
+source FLOW-VERILOG-IT
+```
+
+```
+cd synthesis/axi4/qflow
+source FLOW-VERILOG-IT
 ```
 
 ### 4.1.2. Lattice iCE40 FPGA
 
 type:
 ```
-cd synthesis/symbiflow
-source FLOW-IT
+cd synthesis/wb/symbiflow
+source FLOW-VERILOG-IT
+```
+
+```
+cd synthesis/ahb3/symbiflow
+source FLOW-VERILOG-IT
+```
+
+```
+cd synthesis/axi4/symbiflow
+source FLOW-VERILOG-IT
 ```
 
 ## 4.2. SOFTWARE
