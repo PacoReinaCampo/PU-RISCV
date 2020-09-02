@@ -1,4 +1,4 @@
-../../../../../rtl/vhdl/pkg/riscv_mpsoc_pkg.vhd
+../../../../../rtl/vhdl/pkg/riscv_defines.vhd
 
 ../../../../../rtl/vhdl/core/cache/riscv_dext.vhd
 ../../../../../rtl/vhdl/core/execute/riscv_div.vhd

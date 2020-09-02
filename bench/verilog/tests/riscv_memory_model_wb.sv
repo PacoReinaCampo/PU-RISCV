@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_mpsoc_pkg.sv"
+`include "riscv_defines.sv"
 
 module riscv_memory_model_wb #(
   parameter XLEN = 64,

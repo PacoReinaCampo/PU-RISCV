@@ -42,7 +42,7 @@ cp ../../../rtl/verilog/memory/riscv_ram_queue.sv        synthesis/riscv_pu/sour
 cp ../../../rtl/verilog/pu/riscv_biu2wb.sv synthesis/riscv_pu/source
 cp ../../../rtl/verilog/pu/riscv_pu_wb.sv  synthesis/riscv_pu/source
 
-cp ../../../rtl/verilog/pkg/riscv_mpsoc_pkg.sv synthesis/riscv_pu/source
+cp ../../../rtl/verilog/pkg/riscv_defines.sv synthesis/riscv_pu/source
 
 cd synthesis/riscv_pu
 

@@ -40,7 +40,7 @@
  *   Francisco Javier Reina Campo <frareicam@gmail.com>
  */
 
-`include "riscv_mpsoc_pkg.sv"
+`include "riscv_defines.sv"
 
 module riscv_biu2axi4 #(
   parameter XLEN = 64,

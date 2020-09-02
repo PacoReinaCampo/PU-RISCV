@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_mpsoc_pkg.sv"
+`include "riscv_defines.sv"
 
 module riscv_dbg_bfm #(
   parameter XLEN = 64,

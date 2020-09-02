@@ -72,7 +72,7 @@ RTL_VLOG = $(DUT_SRC_DIR)/verilog/core/cache/riscv_dcache_core.sv \
            $(DUT_SRC_DIR)/verilog/pu/riscv_biu2axi4.sv \
            $(DUT_SRC_DIR)/verilog/pu/riscv_pu_axi4.sv
 
-RTL_VHDL = $(DUT_SRC_DIR)/vhdl/pkg/riscv_mpsoc_pkg.vhd \
+RTL_VHDL = $(DUT_SRC_DIR)/vhdl/pkg/riscv_defines.vhd \
            $(DUT_SRC_DIR)/vhdl/core/cache/riscv_dext.vhd \
            $(DUT_SRC_DIR)/vhdl/core/execute/riscv_div.vhd \
            $(DUT_SRC_DIR)/vhdl/core/execute/riscv_mul.vhd \
@@ -96,7 +96,7 @@ TB_VLOG = $(TB_SRC_DIR)/verilog/tests/riscv_testbench_axi4.sv \
           $(TB_SRC_DIR)/verilog/tests/riscv_memory_model_axi4.sv \
           $(TB_SRC_DIR)/verilog/tests/riscv_dbg_bfm.sv
 
-TB_VHDL = $(DUT_SRC_DIR)/vhdl/pkg/riscv_mpsoc_pkg.vhd
+TB_VHDL = $(DUT_SRC_DIR)/vhdl/pkg/riscv_defines.vhd
 
 
 #####################################################################
