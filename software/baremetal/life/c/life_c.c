@@ -9,7 +9,7 @@
 //                  |_|                                                       //
 //                                                                            //
 //                                                                            //
-//              RISC-V CPU                                                    //
+//              OR1K CPU                                                      //
 //              Hello World                                                   //
 //              Software                                                      //
 //                                                                            //
@@ -55,8 +55,7 @@ typedef struct world_t_ {
   void *mem;
 } world_t;
 
-void printworld(world_t *world, FILE *pOutput)
-{
+void printworld(world_t *world, FILE *pOutput) {
   int x, y;
 
   for(y = 0; y < world->height; y++) {
@@ -68,8 +67,7 @@ void printworld(world_t *world, FILE *pOutput)
   fflush(pOutput);
 }
 
-void randomizeworld(world_t *world)
-{
+void randomizeworld(world_t *world) {
   int x, y;
 
   for(y = 0; y < world->height; y++) {
@@ -79,8 +77,7 @@ void randomizeworld(world_t *world)
   }
 }
 
-void updateworld(world_t *world)
-{
+void updateworld(world_t *world) {
   int x, y, i, neighbours;
 
   for(y = 0; y < world->height; y++) {
@@ -106,13 +103,11 @@ void updateworld(world_t *world)
   }
 }
 
-void destroyworld(world_t *world)
-{
+void destroyworld(world_t *world) {
   free(world->mem);
 }
 
-int createworld(world_t *world, int width, int height)
-{
+int createworld(world_t *world, int width, int height) {
   int i, j;
   unsigned long base   = sizeof(cell_t *) * height;
   unsigned long rowlen = sizeof(cell_t)   * width;
@@ -178,7 +173,7 @@ int main(int argc, char *argv[]) {
       fflush(stdin);
       system("clear");
       updateworld(&gameoflife);
-    }while(1);
+    } while(1);
     destroyworld(&gameoflife);
   }
 
