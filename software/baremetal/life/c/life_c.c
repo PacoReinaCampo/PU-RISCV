@@ -9,7 +9,7 @@
 //                  |_|                                                       //
 //                                                                            //
 //                                                                            //
-//              OR1K CPU                                                      //
+//              RISC-V CPU                                                    //
 //              Hello World                                                   //
 //              Software                                                      //
 //                                                                            //

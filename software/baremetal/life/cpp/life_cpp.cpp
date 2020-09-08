@@ -9,7 +9,7 @@
 //                  |_|                                                       //
 //                                                                            //
 //                                                                            //
-//              OR1K CPU                                                      //
+//              RISC-V CPU                                                    //
 //              Hello World                                                   //
 //              Software                                                      //
 //                                                                            //
@@ -53,8 +53,6 @@
 #define D_RIGHT(c)  ((GETCOL(c) == COLS-1) ? (-COLS+1) :  1)
 #define D_TOP(c)    ((GETROW(c) == 0) ? ((ROWS-1) * COLS) : -COLS)
 #define D_BOTTOM(c) ((GETROW(c) == ROWS-1) ? (-(ROWS-1) * COLS) : COLS)
-
-
 
 typedef struct _cell {
   struct _cell* neighbour[8];
