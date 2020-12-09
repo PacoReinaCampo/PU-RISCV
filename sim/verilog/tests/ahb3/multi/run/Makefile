@@ -1,1 +1,0 @@
-/home/usuario/github/PU-RISCV/sim/verilog/tests/ahb3/multi/bin/Makefile
