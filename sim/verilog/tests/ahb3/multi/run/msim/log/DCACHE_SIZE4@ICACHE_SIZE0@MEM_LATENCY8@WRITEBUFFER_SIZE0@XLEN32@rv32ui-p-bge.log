@@ -1,0 +1,86 @@
+# vsim -c "+notimingchecks" -l ./log/DCACHE_SIZE4@ICACHE_SIZE0@MEM_LATENCY8@WRITEBUFFER_SIZE0@XLEN32@rv32ui-p-bge.log riscv_testbench_ahb3 -do "run -all; quit" -gINIT_FILE="../../../../../../../software/tests/hex/rv32ui-p-bge.hex" 
+# Start time: 20:46:52 on Dec 02,2020
+# Loading sv_std.std
+# Loading work.riscv_testbench_ahb3
+# Loading work.riscv_pu_ahb3
+# Loading work.riscv_core
+# Loading work.riscv_if
+# Loading work.riscv_id
+# Loading work.riscv_execution
+# Loading work.riscv_alu
+# Loading work.riscv_lsu
+# Loading work.riscv_bu
+# Loading work.riscv_memory
+# Loading work.riscv_wb
+# Loading work.riscv_state
+# Loading work.riscv_rf
+# Loading work.riscv_du
+# Loading work.riscv_imem_ctrl
+# Loading work.riscv_membuf
+# Loading work.riscv_ram_queue
+# Loading work.riscv_memmisaligned
+# Loading work.riscv_mmu
+# Loading work.riscv_pmachk
+# Loading work.riscv_pmpchk
+# Loading work.riscv_dext
+# Loading work.riscv_mux
+# Loading work.riscv_dmem_ctrl
+# Loading work.riscv_biu2ahb3
+# Loading work.riscv_dbg_bfm
+# Loading work.riscv_memory_model_ahb3
+# Loading work.riscv_mmio_if_ahb3
+# Loading work.riscv_mul
+# Loading work.riscv_div
+# Loading work.riscv_bp
+# Loading work.riscv_ram_1r1w
+# Loading work.riscv_icache_core
+# Loading work.riscv_dcache_core
+# Loading work.riscv_ram_1r1w_generic
+# Loading work.riscv_ram_1rw
+# Loading work.riscv_ram_1rw_generic
+# run -all
+# 
+# 
+#                                                                                                          
+#                                                                                                          
+#                                                               ***                     ***          **    
+#                                                             ** ***    *                ***          **   
+#                                                            **   ***  ***                **          **   
+#                                                            **         *                 **          **   
+#     ****    **   ****                                      **                           **          **   
+#    * ***  *  **    ***  *    ***       ***    ***  ****    ******   ***        ***      **      *** **   
+#   *   ****   **     ****    * ***     * ***    **** **** * *****     ***      * ***     **     ********* 
+#  **    **    **      **    *   ***   *   ***    **   ****  **         **     *   ***    **    **   ****  
+#  **    **    **      **   **    *** **    ***   **    **   **         **    **    ***   **    **    **   
+#  **    **    **      **   ********  ********    **    **   **         **    ********    **    **    **   
+#  **    **    **      **   *******   *******     **    **   **         **    *******     **    **    **   
+#  **    **    **      **   **        **          **    **   **         **    **          **    **    **   
+#   *******     ******* **  ****    * ****    *   **    **   **         **    ****    *   **    **    **   
+#    ******      *****   **  *******   *******    ***   ***  **         *** *  *******    *** *  *****     
+#        **                   *****     *****      ***   ***  **         ***    *****      ***    ***      
+#        **                                                                                                
+#        **                                                                                                
+#         **                                                                                               
+# - RISC-V Regression TestBench ---------------------------------------------------------------------------
+#   XLEN | PRIV | MMU | FPU | RVA | RVM | MULLAT
+#     64 | MHSU |   1 |   1 |   1 |   1 |      1
+# ------------------------------------------------------------------------------
+#   CORES | NODES | X | Y | Z | CORES_PER_TILE | CORES_PER_MISD | CORES_PER_SIMD
+#     1   |     1 | 1 | 1 | 1 |       --       |       --       |       --       
+# ------------------------------------------------------------------------------
+#   Test   = ../../../../../../../software/tests/hex/rv32ui-p-bge.hex
+#   ICache = 64kB
+#   DCache = 64kB
+# ------------------------------------------------------------------------------
+# 
+# 
+# -------------------------------------------------------------
+# * RISC-V test bench finished
+# * PASSED 1
+# -------------------------------------------------------------
+# 
+# 
+# ** Note: $finish    : /home/usuario/github/PU-RISCV/bench/verilog/tests/riscv_mmio_if_ahb3.sv(155)
+#    Time: 3095 ps  Iteration: 1  Instance: /riscv_testbench_ahb3/genblk1/mmio_if
+# End time: 20:46:53 on Dec 02,2020, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
