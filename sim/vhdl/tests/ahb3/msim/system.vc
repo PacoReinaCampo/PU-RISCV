@@ -5,13 +5,13 @@
 ../../../../../rtl/vhdl/core/cache/riscv_icache_core.vhd
 ../../../../../rtl/vhdl/core/cache/riscv_noicache_core.vhd
 ../../../../../rtl/vhdl/core/decode/riscv_id.vhd
-../../../../../rtl/vhdl/core/decode/riscv_if.vhd
 ../../../../../rtl/vhdl/core/execute/riscv_alu.vhd
 ../../../../../rtl/vhdl/core/execute/riscv_bu.vhd
 ../../../../../rtl/vhdl/core/execute/riscv_div.vhd
 ../../../../../rtl/vhdl/core/execute/riscv_execution.vhd
 ../../../../../rtl/vhdl/core/execute/riscv_lsu.vhd
 ../../../../../rtl/vhdl/core/execute/riscv_mul.vhd
+../../../../../rtl/vhdl/core/fetch/riscv_if.vhd
 ../../../../../rtl/vhdl/core/memory/riscv_dmem_ctrl.vhd
 ../../../../../rtl/vhdl/core/memory/riscv_imem_ctrl.vhd
 ../../../../../rtl/vhdl/core/memory/riscv_membuf.vhd

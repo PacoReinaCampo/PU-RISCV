@@ -386,7 +386,7 @@ architecture RTL of riscv_pu_wb is
       );
   end component;
 
-  component riscv_biu_wb
+  component riscv_biu2wb
     generic (
       XLEN : integer := 64;
       PLEN : integer := 64
@@ -710,7 +710,7 @@ begin
       );
 
   --Instantiate BIU
-  ibiu : riscv_biu_wb
+  ibiu : riscv_biu2wb
     generic map (
       XLEN => XLEN,
       PLEN => PLEN
@@ -747,7 +747,7 @@ begin
       biu_err_o     => ibiu_err
       );
 
-  dbiu : riscv_biu_wb
+  dbiu : riscv_biu2wb
     generic map (
       XLEN => XLEN,
       PLEN => PLEN
