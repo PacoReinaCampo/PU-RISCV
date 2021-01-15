@@ -46,7 +46,7 @@ all: build simulate
 
 build:
 	xvlog -i ../../../../../rtl/verilog/pkg -prj system.verilog.prj
-	xvlog -prj system.vhdl.prj
+	xvhdl -prj system.vhdl.prj
 
 simulate:
 	xelab riscv_testbench_ahb3

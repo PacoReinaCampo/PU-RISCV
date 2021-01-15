@@ -23,8 +23,8 @@ sv work ../../../../../rtl/verilog/memory/riscv_ram_queue.sv
 sv work ../../../../../rtl/verilog/pu/riscv_biu2ahb3.sv
 sv work ../../../../../rtl/verilog/pu/riscv_pu_ahb3.sv
 
-sv work ../../../../../bench/verilog/regression/riscv_testbench_ahb3.sv
-sv work ../../../../../bench/verilog/regression/riscv_htif.sv
-sv work ../../../../../bench/verilog/regression/riscv_mmio_if_ahb3.sv
-sv work ../../../../../bench/verilog/regression/riscv_memory_model_ahb3.sv
-sv work ../../../../../bench/verilog/regression/riscv_dbg_bfm.sv
+sv work ../../../../../bench/verilog/tests/riscv_testbench_ahb3.sv
+sv work ../../../../../bench/verilog/tests/riscv_htif.sv
+sv work ../../../../../bench/verilog/tests/riscv_mmio_if_ahb3.sv
+sv work ../../../../../bench/verilog/tests/riscv_memory_model_ahb3.sv
+sv work ../../../../../bench/verilog/tests/riscv_dbg_bfm.sv

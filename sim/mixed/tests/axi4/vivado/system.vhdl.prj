@@ -28,8 +28,8 @@ vhdl work ../../../../../rtl/vhdl/memory/riscv_ram_queue.vhd
 
 vhdl work ../../../../../rtl/vhdl/pu/riscv_biu2axi4.vhd
 
-vhdl work ../../../../../bench/vhdl/regression/riscv_dbg_bfm.vhd
-vhdl work ../../../../../bench/vhdl/regression/riscv_htif.vhd
-vhdl work ../../../../../bench/vhdl/regression/riscv_memory_model_axi4.vhd
-vhdl work ../../../../../bench/vhdl/regression/riscv_mmio_if_axi4.vhd
-vhdl work ../../../../../bench/vhdl/regression/riscv_testbench_axi4.vhd
+vhdl work ../../../../../bench/vhdl/tests/riscv_dbg_bfm.vhd
+vhdl work ../../../../../bench/vhdl/tests/riscv_htif.vhd
+vhdl work ../../../../../bench/vhdl/tests/riscv_memory_model_axi4.vhd
+vhdl work ../../../../../bench/vhdl/tests/riscv_mmio_if_axi4.vhd
+vhdl work ../../../../../bench/vhdl/tests/riscv_testbench_axi4.vhd

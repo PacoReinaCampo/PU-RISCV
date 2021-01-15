@@ -28,8 +28,8 @@
 
 ../../../../../rtl/vhdl/pu/riscv_biu2axi4.vhd
 
-../../../../../bench/vhdl/regression/riscv_dbg_bfm.vhd
-../../../../../bench/vhdl/regression/riscv_htif.vhd
-../../../../../bench/vhdl/regression/riscv_memory_model_axi4.vhd
-../../../../../bench/vhdl/regression/riscv_mmio_if_axi4.vhd
-../../../../../bench/vhdl/regression/riscv_testbench_axi4.vhd
+../../../../../bench/vhdl/tests/riscv_dbg_bfm.vhd
+../../../../../bench/vhdl/tests/riscv_htif.vhd
+../../../../../bench/vhdl/tests/riscv_memory_model_axi4.vhd
+../../../../../bench/vhdl/tests/riscv_mmio_if_axi4.vhd
+../../../../../bench/vhdl/tests/riscv_testbench_axi4.vhd
