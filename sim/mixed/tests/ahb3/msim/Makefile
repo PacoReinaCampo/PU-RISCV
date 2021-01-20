@@ -7,3 +7,6 @@ build:
 
 simulate:
 	vsim -c -do run.do work.riscv_testbench_ahb3
+
+clean:
+	rm -rf work transcript

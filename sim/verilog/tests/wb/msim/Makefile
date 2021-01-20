@@ -6,3 +6,6 @@ build:
 
 simulate:
 	vsim -c -do run.do work.riscv_pu_wb
+
+clean:
+	rm -rf work transcript
