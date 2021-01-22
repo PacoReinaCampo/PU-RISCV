@@ -1,5 +1,3 @@
-del transcript
-rmdir /s /q work
 vlib work
 vlog -sv +incdir+../../../../../rtl/verilog/pkg -f system.verilog.vc
 vcom -2008 -f system.vhdl.vc
