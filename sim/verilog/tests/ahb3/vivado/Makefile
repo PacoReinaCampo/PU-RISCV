@@ -52,4 +52,4 @@ simulate:
 	xsim -R riscv_testbench_ahb3
 
 clean:
-	rm -rf *.dir *.jou *.log *.pb
+	rm -rf *.dir *.jou *.log *.pb .Xil

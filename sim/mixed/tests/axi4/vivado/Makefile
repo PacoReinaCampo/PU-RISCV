@@ -53,4 +53,4 @@ simulate:
 	xsim -R riscv_testbench_axi4
 
 clean:
-	rm -rf *.dir *.jou *.log *.pb
+	rm -rf *.dir *.jou *.log *.pb .Xil
