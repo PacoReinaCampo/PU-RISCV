@@ -49,7 +49,8 @@ build:
 	xvhdl -prj system.verilog.prj
 
 simulate:
-	xelab riscv_testbench_ahb3
+	xelab riscv_testbench_wb
+	xsim -R riscv_testbench_wb
 
 clean:
 	rm -rf *.dir *.jou *.log *.pb

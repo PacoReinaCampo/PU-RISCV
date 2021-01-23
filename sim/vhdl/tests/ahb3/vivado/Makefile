@@ -49,6 +49,7 @@ build:
 
 simulate:
 	xelab riscv_testbench_ahb3
+	xsim -R riscv_testbench_ahb3
 
 clean:
 	rm -rf *.dir *.jou *.log *.pb

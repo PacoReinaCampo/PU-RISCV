@@ -49,6 +49,7 @@ build:
 
 simulate:
 	xelab riscv_testbench_wb
+	xsim -R riscv_testbench_wb
 
 clean:
 	rm -rf *.dir *.jou *.log *.pb

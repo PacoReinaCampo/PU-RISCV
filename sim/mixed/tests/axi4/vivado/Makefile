@@ -50,6 +50,7 @@ build:
 
 simulate:
 	xelab riscv_testbench_axi4
+	xsim -R riscv_testbench_axi4
 
 clean:
 	rm -rf *.dir *.jou *.log *.pb

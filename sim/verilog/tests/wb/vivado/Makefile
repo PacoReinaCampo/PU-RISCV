@@ -48,7 +48,8 @@ build:
 	xvlog -i ../../../../../rtl/verilog/pkg -prj system.prj
 
 simulate:
-	xelab riscv_testbench_ahb3
+	xelab riscv_testbench_wb
+	xsim -R riscv_testbench_wb
 
 clean:
 	rm -rf *.dir *.jou *.log *.pb
