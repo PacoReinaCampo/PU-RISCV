@@ -244,7 +244,7 @@ architecture RTL of riscv_dcache_core is
   end be_mux;
 
   function reduce_mor (
-    reduce_mor_in : std_logic_matrix(DCACHE_WAYS-1 downto 0)(XLEN-1 downto 0)
+    reduce_mor_in : std_logic_matrix(DCACHE_WAYS-1 downto 0)(SETS-1 downto 0)
   ) return std_logic is
     variable reduce_mor_out : std_logic := '0';
   begin
@@ -301,7 +301,7 @@ architecture RTL of riscv_dcache_core is
   signal tag_out_tag   : std_logic_matrix(DCACHE_WAYS-1 downto 0)(TAG_BITS-1 downto 0);
 
   signal tag_byp_idx : std_logic_matrix(DCACHE_WAYS-1 downto 0)(IDX_BITS-1 downto 0);
-  signal tag_byp_tag : std_logic_matrix(DCACHE_WAYS-1 downto 0)(SETS-1 downto 0);
+  signal tag_byp_tag : std_logic_matrix(DCACHE_WAYS-1 downto 0)(TAG_BITS-1 downto 0);
   signal tag_valid   : std_logic_matrix(DCACHE_WAYS-1 downto 0)(SETS-1 downto 0);
   signal tag_dirty   : std_logic_matrix(DCACHE_WAYS-1 downto 0)(SETS-1 downto 0);
 

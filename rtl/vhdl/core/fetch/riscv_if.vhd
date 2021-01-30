@@ -236,19 +236,19 @@ begin
               if (is_16bit_instruction = '1') then
                 parcel_shift_register <= (INSTR_NOP & new_parcel);
               else
-                parcel_shift_register <= (new_parcel & parcel_shift_register(31 downto 0));
+                parcel_shift_register <= (new_parcel & parcel_shift_register(XLEN-1 downto 0));
               end if;
             when "011" =>
               if (is_16bit_instruction = '1') then
-                parcel_shift_register <= (new_parcel & parcel_shift_register(ILEN+31 downto ILEN));
+                parcel_shift_register <= (new_parcel & parcel_shift_register(ILEN+XLEN-1 downto ILEN));
               else
                 parcel_shift_register <= (INSTR_NOP & new_parcel);
               end if;
             when "111" =>
               if (is_16bit_instruction = '1') then
-                parcel_shift_register <= (INSTR_NOP & parcel_shift_register(ILEN+31 downto ILEN));
+                parcel_shift_register <= (INSTR_NOP & parcel_shift_register(ILEN+XLEN-1 downto ILEN));
               else
-                parcel_shift_register <= (new_parcel & parcel_shift_register(63 downto 32));
+                parcel_shift_register <= (new_parcel & parcel_shift_register(ILEN+XLEN-1 downto ILEN));
               end if;
             when others =>
               null;

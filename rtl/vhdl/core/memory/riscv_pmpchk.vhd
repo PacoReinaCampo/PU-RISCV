@@ -116,7 +116,7 @@ architecture RTL of riscv_pmpchk is
     n := 0;
     if (na4 = '0') then
       truth := '1';
-      for i in 0 to PLEN - 1 loop
+      for i in 0 to PLEN - 3 loop
         if (truth = '1') then
           if (pmpddr(i+2) = '1') then
             n := n+1;
@@ -150,7 +150,7 @@ architecture RTL of riscv_pmpchk is
     n := 0;
     if (na4 = '0') then
       truth := '1';
-      for i in 0 to PLEN - 1 loop
+      for i in 0 to PLEN - 3 loop
         if (truth = '1') then
           if (pmpddr(i+2) = '1') then
             n := n+1;

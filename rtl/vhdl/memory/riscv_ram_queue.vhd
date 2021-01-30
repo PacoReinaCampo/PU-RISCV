@@ -109,10 +109,10 @@ begin
     variable were : std_logic_vector(1 downto 0);
   begin
     if (rst_ni = '0') then
-      queue_wadr <= X"0";
+      queue_wadr <= (others => '0');
     elsif (rising_edge(clk_i) or falling_edge(rst_ni)) then
       if (clr_i = '1') then
-        queue_wadr <= X"0";
+        queue_wadr <= (others => '0');
       elsif (ena_i = '1') then
         were := we_i & re_i;
         case (were) is

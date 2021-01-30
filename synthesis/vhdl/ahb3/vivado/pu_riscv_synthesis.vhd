@@ -52,88 +52,8 @@ use work.riscv_defines.all;
 
 entity pu_riscv_synthesis is
   generic (
-    XLEN : integer := 32;
-    PLEN : integer := 32;
-
-    HAS_USER  : std_logic := '1';
-    HAS_SUPER : std_logic := '1';
-    HAS_HYPER : std_logic := '1';
-    HAS_BPU   : std_logic := '1';
-    HAS_FPU   : std_logic := '1';
-    HAS_MMU   : std_logic := '1';
-    HAS_RVM   : std_logic := '1';
-    HAS_RVA   : std_logic := '1';
-    HAS_RVC   : std_logic := '1';
-    IS_RV32E  : std_logic := '1';
-
-    MULT_LATENCY : std_logic := '1';
-
-    BREAKPOINTS : integer := 8;         --Number of hardware breakpoints
-
-    PMA_CNT : integer := 4;
-    PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
-
-    BP_GLOBAL_BITS    : integer := 2;
-    BP_LOCAL_BITS     : integer := 10;
-    BP_LOCAL_BITS_LSB : integer := 2;
-
-    ICACHE_SIZE        : integer := 32;  --in KBytes
-    ICACHE_BLOCK_SIZE  : integer := 32;  --in Bytes
-    ICACHE_WAYS        : integer := 2;   --'n'-way set associative
-    ICACHE_REPLACE_ALG : integer := 0;
-    ITCM_SIZE          : integer := 0;
-
-    DCACHE_SIZE        : integer := 32;  --in KBytes
-    DCACHE_BLOCK_SIZE  : integer := 32;  --in Bytes
-    DCACHE_WAYS        : integer := 2;   --'n'-way set associative
-    DCACHE_REPLACE_ALG : integer := 0;
-    DTCM_SIZE          : integer := 0;
-    WRITEBUFFER_SIZE   : integer := 8;
-
-    TECHNOLOGY : string := "GENERIC";
-
-    PC_INIT : std_logic_vector(XLEN-1 downto 0) := X"80000000";
-
-    MNMIVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := X"00000004";
-    MTVEC_DEFAULT   : std_logic_vector(XLEN-1 downto 0) := X"00000040";
-    HTVEC_DEFAULT   : std_logic_vector(XLEN-1 downto 0) := X"00000080";
-    STVEC_DEFAULT   : std_logic_vector(XLEN-1 downto 0) := X"000000C0";
-    UTVEC_DEFAULT   : std_logic_vector(XLEN-1 downto 0) := X"00000100";
-
-    JEDEC_BANK            : integer                      := 10;
-    JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
-
-    HARTID : integer := 0;
-
-    PARCEL_SIZE : integer := 32
-  );
-  port (
-    HRESETn : in std_logic;
-    HCLK    : in std_logic;
-
-    --Interrupts
-    ext_nmi  : in std_logic;
-    ext_tint : in std_logic;
-    ext_sint : in std_logic;
-    ext_int  : in std_logic_vector(3 downto 0);
-
-    --Debug Interface
-    dbg_stall : in  std_logic;
-    dbg_strb  : in  std_logic;
-    dbg_we    : in  std_logic;
-    dbg_addr  : in  std_logic_vector(PLEN-1 downto 0);
-    dbg_dati  : in  std_logic_vector(XLEN-1 downto 0);
-    dbg_dato  : out std_logic_vector(XLEN-1 downto 0);
-    dbg_ack   : out std_logic;
-    dbg_bp    : out std_logic
-  );
-end pu_riscv_synthesis;
-
-architecture RTL of pu_riscv_synthesis is
-  component riscv_pu_ahb3
-    generic (
-      XLEN : integer := 32;
-      PLEN : integer := 32;
+      XLEN : integer := 64;
+      PLEN : integer := 64;
 
       HAS_USER  : std_logic := '1';
       HAS_SUPER : std_logic := '1';
@@ -157,14 +77,14 @@ architecture RTL of pu_riscv_synthesis is
       BP_LOCAL_BITS     : integer := 10;
       BP_LOCAL_BITS_LSB : integer := 2;
 
-      ICACHE_SIZE        : integer := 32;  --in KBytes
-      ICACHE_BLOCK_SIZE  : integer := 32;  --in Bytes
+      ICACHE_SIZE        : integer := 64;  --in KBytes
+      ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
       ICACHE_WAYS        : integer := 2;   --'n'-way set associative
       ICACHE_REPLACE_ALG : integer := 0;
       ITCM_SIZE          : integer := 0;
 
-      DCACHE_SIZE        : integer := 32;  --in KBytes
-      DCACHE_BLOCK_SIZE  : integer := 32;  --in Bytes
+      DCACHE_SIZE        : integer := 64;  --in KBytes
+      DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
       DCACHE_WAYS        : integer := 2;   --'n'-way set associative
       DCACHE_REPLACE_ALG : integer := 0;
       DTCM_SIZE          : integer := 0;
@@ -172,20 +92,102 @@ architecture RTL of pu_riscv_synthesis is
 
       TECHNOLOGY : string := "GENERIC";
 
-      PC_INIT : std_logic_vector(31 downto 0) := X"80000000";
+      PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000";
 
-      MNMIVEC_DEFAULT : std_logic_vector(31 downto 0) := X"00000004";
-      MTVEC_DEFAULT   : std_logic_vector(31 downto 0) := X"00000040";
-      HTVEC_DEFAULT   : std_logic_vector(31 downto 0) := X"00000080";
-      STVEC_DEFAULT   : std_logic_vector(31 downto 0) := X"000000C0";
-      UTVEC_DEFAULT   : std_logic_vector(31 downto 0) := X"00000100";
+      MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
+      MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
+      HTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000080";
+      STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
+      UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
 
-      JEDEC_BANK            : integer                      := 10;
+      JEDEC_BANK : integer := 10;
+
       JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
 
       HARTID : integer := 0;
 
-      PARCEL_SIZE : integer := 32
+      PARCEL_SIZE : integer := 64
+  );
+  port (
+    HRESETn : in std_logic;
+    HCLK    : in std_logic;
+
+    --Interrupts
+    ext_nmi  : in std_logic;
+    ext_tint : in std_logic;
+    ext_sint : in std_logic;
+    ext_int  : in std_logic_vector(3 downto 0);
+
+    --Debug Interface
+    dbg_stall : in  std_logic;
+    dbg_strb  : in  std_logic;
+    dbg_we    : in  std_logic;
+    dbg_addr  : in  std_logic_vector(31 downto 0);
+    dbg_dati  : in  std_logic_vector(31 downto 0);
+    dbg_dato  : out std_logic_vector(31 downto 0);
+    dbg_ack   : out std_logic;
+    dbg_bp    : out std_logic
+  );
+end pu_riscv_synthesis;
+
+architecture RTL of pu_riscv_synthesis is
+  component riscv_pu_ahb3
+    generic (
+      XLEN : integer := 64;
+      PLEN : integer := 64;
+
+      HAS_USER  : std_logic := '1';
+      HAS_SUPER : std_logic := '1';
+      HAS_HYPER : std_logic := '1';
+      HAS_BPU   : std_logic := '1';
+      HAS_FPU   : std_logic := '1';
+      HAS_MMU   : std_logic := '1';
+      HAS_RVM   : std_logic := '1';
+      HAS_RVA   : std_logic := '1';
+      HAS_RVC   : std_logic := '1';
+      IS_RV32E  : std_logic := '1';
+
+      MULT_LATENCY : std_logic := '1';
+
+      BREAKPOINTS : integer := 8;       --Number of hardware breakpoints
+
+      PMA_CNT : integer := 4;
+      PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
+
+      BP_GLOBAL_BITS    : integer := 2;
+      BP_LOCAL_BITS     : integer := 10;
+      BP_LOCAL_BITS_LSB : integer := 2;
+
+      ICACHE_SIZE        : integer := 64;  --in KBytes
+      ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+      ICACHE_WAYS        : integer := 2;   --'n'-way set associative
+      ICACHE_REPLACE_ALG : integer := 0;
+      ITCM_SIZE          : integer := 0;
+
+      DCACHE_SIZE        : integer := 64;  --in KBytes
+      DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+      DCACHE_WAYS        : integer := 2;   --'n'-way set associative
+      DCACHE_REPLACE_ALG : integer := 0;
+      DTCM_SIZE          : integer := 0;
+      WRITEBUFFER_SIZE   : integer := 8;
+
+      TECHNOLOGY : string := "GENERIC";
+
+      PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000";
+
+      MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
+      MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
+      HTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000080";
+      STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
+      UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
+
+      JEDEC_BANK : integer := 10;
+
+      JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
+
+      HARTID : integer := 0;
+
+      PARCEL_SIZE : integer := 64
     );
     port (
       --AHB interfaces
@@ -243,8 +245,8 @@ architecture RTL of pu_riscv_synthesis is
     generic (
       MEM_SIZE          : integer := 256;  --Memory in Bytes
       MEM_DEPTH         : integer := 256;  --Memory depth
-      PLEN              : integer := 32;
-      XLEN              : integer := 32;
+      PLEN              : integer := 64;
+      XLEN              : integer := 64;
       TECHNOLOGY        : string  := "GENERIC";
       REGISTERED_OUTPUT : string  := "NO"
     );
@@ -315,6 +317,10 @@ architecture RTL of pu_riscv_synthesis is
   signal dat_HMASTLOCK : std_logic;
   signal dat_HREADY    : std_logic;
   signal dat_HRESP     : std_logic;
+
+  --Debug Interface
+  signal dbg_dato_s : std_logic_vector(XLEN-1 downto 0);
+
 begin
   --//////////////////////////////////////////////////////////////
   --
@@ -322,10 +328,11 @@ begin
   --
 
   --Define PMA regions
-
-  --crt.0 (ROM) region
   pma_adr <= (others => (others => '0'));
   pma_cfg <= (others => (others => '0'));
+
+  --Debug Interface
+  dbg_dato_s <= X"00000000" & dbg_dato;
 
   -- Processing Unit
   dut : riscv_pu_ahb3
@@ -373,7 +380,7 @@ begin
       PC_INIT => PC_INIT,
 
       MNMIVEC_DEFAULT => MNMIVEC_DEFAULT,
-      MTVEC_DEFAULT   => X"00000004",
+      MTVEC_DEFAULT   => MTVEC_DEFAULT,
       HTVEC_DEFAULT   => HTVEC_DEFAULT,
       STVEC_DEFAULT   => STVEC_DEFAULT,
       UTVEC_DEFAULT   => UTVEC_DEFAULT,
@@ -429,9 +436,9 @@ begin
       dbg_stall => dbg_stall,
       dbg_strb  => dbg_strb,
       dbg_we    => dbg_we,
-      dbg_addr  => dbg_addr,
-      dbg_dati  => dbg_dati,
-      dbg_dato  => dbg_dato,
+      dbg_addr  => X"00000000" & dbg_addr,
+      dbg_dati  => X"00000000" & dbg_dati,
+      dbg_dato  => dbg_dato_s,
       dbg_ack   => dbg_ack,
       dbg_bp    => dbg_bp
     );

@@ -123,7 +123,7 @@ architecture RTL of riscv_pmachk is
     n := 0;
     if (na4 = '0') then
       truth := '1';
-      for i in 0 to PLEN - 1 loop
+      for i in 0 to PLEN - 3 loop
         if (truth = '1') then
           if (pmaddr(i+2) = '1') then
             n := n+1;
@@ -157,7 +157,7 @@ architecture RTL of riscv_pmachk is
     n := 0;
     if (na4 = '0') then
       truth := '1';
-      for i in 0 to PLEN - 1 loop
+      for i in 0 to PLEN - 3 loop
         if (truth = '1') then
           if (pmaddr(i+2) = '1') then
             n := n+1;

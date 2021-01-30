@@ -267,7 +267,7 @@ begin
                   neg_s <= opA32(31);
 
                   pa_p <= (others => '0');
-                  pa_a <= (absolute(sext32(opA32)) & (XLEN-33 downto 0 => '0'));
+                  pa_a <= absolute(sext32(opA32));
                   b    <= absolute(sext32(opB32));
                 end if;
               when (DIVU) =>
@@ -341,7 +341,7 @@ begin
                   neg_s <= opA32(31);
 
                   pa_p <= (others => '0');
-                  pa_a <= absolute(sext32(opA32)) & (XLEN-33 downto 0 => '0');
+                  pa_a <= absolute(sext32(opA32));
                   b    <= absolute(sext32(opB32));
                 end if;
               when (REMU) =>
@@ -411,7 +411,7 @@ begin
               end if;
             when DIVW =>
               if (neg_q = '1') then
-                div_r <= sext32(twos(pa_a));
+                --div_r <= sext32(twos(pa_a));
               else
                 div_r <= pa_a;
               end if;
@@ -427,7 +427,7 @@ begin
               end if;
             when REMW =>
               if (neg_s = '1') then
-                div_r <= sext32(twos(pa_p));
+                --div_r <= sext32(twos(pa_p));
               else
                 div_r <= pa_p;
               end if;

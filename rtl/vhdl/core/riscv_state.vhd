@@ -1492,7 +1492,7 @@ begin
           csr_scause <= (XLEN-1 downto 4 => '0') & trap_cause;
 
           if (wb_exception(CAUSE_ILLEGAL_INSTRUCTION) = '1') then
-            csr_stval <= (XLEN-1 downto 32 => '0') & wb_instr;
+            csr_stval <= wb_instr;
           elsif ( wb_exception(CAUSE_MISALIGNED_INSTRUCTION) = '1' or
                   wb_exception(CAUSE_INSTRUCTION_ACCESS_FAULT) = '1' or
                   wb_exception(CAUSE_INSTRUCTION_PAGE_FAULT) = '1' or
