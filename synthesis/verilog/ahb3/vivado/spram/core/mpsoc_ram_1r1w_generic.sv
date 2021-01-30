@@ -10,7 +10,7 @@
 //                                                                            //
 //                                                                            //
 //              MPSoC-RISCV CPU                                               //
-//              Master Slave Interface Tesbench                               //
+//              Memory - Technology Independent (Inferrable) Memory Wrapper   //
 //              AMBA3 AHB-Lite Bus Interface                                  //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,63 +40,60 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-module mpsoc_spram_synthesis #(
-  parameter MEM_SIZE          = 256,  //Memory in Bytes
-  parameter MEM_DEPTH         = 256,  //Memory depth
-  parameter PLEN              = 8,
-  parameter XLEN              = 32,
-  parameter TECHNOLOGY        = "GENERIC",
-  parameter REGISTERED_OUTPUT = "NO"
+module mpsoc_ram_1r1w_generic #(
+  parameter ABITS = 10,
+  parameter DBITS = 32
 )
   (
-    input                 HRESETn,
-    input                 HCLK,
+    input                        rst_ni,
+    input                        clk_i,
 
-    input                 HSEL,
-    input      [PLEN-1:0] HADDR,
-    input      [XLEN-1:0] HWDATA,
-    output reg [XLEN-1:0] HRDATA,
-    input                 HWRITE,
-    input      [     2:0] HSIZE,
-    input      [     2:0] HBURST,
-    input      [     3:0] HPROT,
-    input      [     1:0] HTRANS,
-    input                 HMASTLOCK,
-    output reg            HREADYOUT,
-    input                 HREADY,
-    output                HRESP
+    //Write side
+    input      [ ABITS     -1:0] waddr_i,
+    input      [ DBITS     -1:0] din_i,
+    input                        we_i,
+    input      [(DBITS+7)/8-1:0] be_i,
+
+    //Read side
+    input      [ ABITS     -1:0] raddr_i,
+    output reg [ DBITS     -1:0] dout_o
   );
+
+  //////////////////////////////////////////////////////////////////
+  //
+  // Variables
+  //
+  genvar i;
+
+  logic [DBITS-1:0] mem_array [2**ABITS -1:0];  //memory array
 
   //////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
 
-  //DUT AHB3
-  mpsoc_ahb3_spram #(
-    .MEM_SIZE          ( MEM_SIZE ),
-    .MEM_DEPTH         ( MEM_DEPTH ),
-    .PLEN              ( PLEN ),
-    .XLEN              ( XLEN ),
-    .TECHNOLOGY        ( TECHNOLOGY ),
-    .REGISTERED_OUTPUT ( REGISTERED_OUTPUT )
-  )
-  ahb3_spram (
-    .HRESETn   ( HRESETn ),
-    .HCLK      ( HCLK    ),
+  //write side
+  generate
+    for (i=0; i<(DBITS+7)/8; i=i+1) begin: write
+      if (i*8 +8 > DBITS) begin
+        always @(posedge clk_i) begin
+          if (we_i && be_i[i])
+            mem_array[ waddr_i ] [DBITS-1:i*8] <= din_i[DBITS-1:i*8];
+        end
+      end
+      else begin
+        always @(posedge clk_i) begin
+          if (we_i && be_i[i])
+            mem_array[ waddr_i ][i*8+:8] <= din_i[i*8+:8];
+        end
+      end
+    end
+  endgenerate
 
-    .HSEL      ( HSEL      ),
-    .HADDR     ( HADDR     ),
-    .HWDATA    ( HWDATA    ),
-    .HRDATA    ( HRDATA    ),
-    .HWRITE    ( HWRITE    ),
-    .HSIZE     ( HSIZE     ),
-    .HBURST    ( HBURST    ),
-    .HPROT     ( HPROT     ),
-    .HTRANS    ( HTRANS    ),
-    .HMASTLOCK ( HMASTLOCK ),
-    .HREADYOUT ( HREADYOUT ),
-    .HREADY    ( HREADY    ),
-    .HRESP     ( HRESP     )
-  );
+  //read side
+
+  //per Altera's recommendations. Prevents bypass logic
+  always @(posedge clk_i) begin
+    dout_o <= mem_array[ raddr_i ];
+  end
 endmodule
