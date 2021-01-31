@@ -58,19 +58,19 @@ entity riscv_biu2wb is
     HRESETn : in std_logic;
     HCLK    : in std_logic;
 
-    --AHB3 Lite Bus
-    HSEL      : out std_logic;
-    HADDR     : out std_logic_vector(PLEN-1 downto 0);
-    HRDATA    : in  std_logic_vector(XLEN-1 downto 0);
-    HWDATA    : out std_logic_vector(XLEN-1 downto 0);
-    HWRITE    : out std_logic;
-    HSIZE     : out std_logic_vector(2 downto 0);
-    HBURST    : out std_logic_vector(2 downto 0);
-    HPROT     : out std_logic_vector(3 downto 0);
-    HTRANS    : out std_logic_vector(1 downto 0);
-    HMASTLOCK : out std_logic;
-    HREADY    : in  std_logic;
-    HRESP     : in  std_logic;
+    --Wishbone Bus
+    wb_adr_o : out std_logic_vector(PLEN-1 downto 0);
+    wb_dat_o : out std_logic_vector(XLEN-1 downto 0);
+    wb_sel_o : out std_logic_vector(3 downto 0);
+    wb_we_o  : out std_logic;
+    wb_stb_o : out std_logic;
+    wb_cyc_o : out std_logic;
+    wb_cti_o : out std_logic_vector(2 downto 0);
+    wb_bte_o : out std_logic_vector(1 downto 0);
+    wb_dat_i : in  std_logic_vector(XLEN-1 downto 0);
+    wb_ack_i : in  std_logic;
+    wb_err_i : in  std_logic;
+    wb_rty_i : in  std_logic_vector(2 downto 0);
 
     --BIU Bus (Core ports)
     biu_stb_i     : in  std_logic;  --strobe
