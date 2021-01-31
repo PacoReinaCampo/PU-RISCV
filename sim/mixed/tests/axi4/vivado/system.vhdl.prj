@@ -26,10 +26,10 @@ vhdl work ../../../../../rtl/vhdl/memory/riscv_ram_1rw_generic.vhd
 vhdl work ../../../../../rtl/vhdl/memory/riscv_ram_1rw.vhd
 vhdl work ../../../../../rtl/vhdl/memory/riscv_ram_queue.vhd
 
-vhdl work ../../../../../rtl/vhdl/pu/riscv_biu2axi4.vhd
+vhdl work ../../../../../rtl/vhdl/pu/axi4/riscv_biu2axi4.vhd
 
+vhdl work ../../../../../bench/vhdl/tests/axi4/riscv_memory_model_axi4.vhd
+vhdl work ../../../../../bench/vhdl/tests/axi4/riscv_mmio_if_axi4.vhd
+vhdl work ../../../../../bench/vhdl/tests/axi4/riscv_testbench_axi4.vhd
 vhdl work ../../../../../bench/vhdl/tests/riscv_dbg_bfm.vhd
 vhdl work ../../../../../bench/vhdl/tests/riscv_htif.vhd
-vhdl work ../../../../../bench/vhdl/tests/riscv_memory_model_axi4.vhd
-vhdl work ../../../../../bench/vhdl/tests/riscv_mmio_if_axi4.vhd
-vhdl work ../../../../../bench/vhdl/tests/riscv_testbench_axi4.vhd

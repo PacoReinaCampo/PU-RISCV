@@ -7,4 +7,4 @@ sv work ../../../../../rtl/verilog/core/memory/riscv_mux.sv
 sv work ../../../../../rtl/verilog/core/riscv_core.sv
 sv work ../../../../../rtl/verilog/core/riscv_rf.sv
 
-sv work ../../../../../rtl/verilog/pu/riscv_pu_wb.sv
+sv work ../../../../../rtl/verilog/pu/wb/riscv_pu_wb.sv
