@@ -34,13 +34,13 @@ build:
 	ghdl -a --std=08 ../../../../../rtl/vhdl/memory/riscv_ram_1rw.vhd
 	ghdl -a --std=08 ../../../../../rtl/vhdl/memory/riscv_ram_1rw_generic.vhd
 	ghdl -a --std=08 ../../../../../rtl/vhdl/memory/riscv_ram_queue.vhd
-	ghdl -a --std=08 ../../../../../rtl/vhdl/pu/riscv_biu2wb.vhd
-	ghdl -a --std=08 ../../../../../rtl/vhdl/pu/riscv_pu_wb.vhd
+	ghdl -a --std=08 ../../../../../rtl/vhdl/pu/wb/riscv_biu2wb.vhd
+	ghdl -a --std=08 ../../../../../rtl/vhdl/pu/wb/riscv_pu_wb.vhd
+	ghdl -a --std=08 ../../../../../bench/vhdl/tests/wb/riscv_memory_model_wb.vhd
+	ghdl -a --std=08 ../../../../../bench/vhdl/tests/wb/riscv_mmio_if_wb.vhd
+	ghdl -a --std=08 ../../../../../bench/vhdl/tests/wb/riscv_testbench_wb.vhd
 	ghdl -a --std=08 ../../../../../bench/vhdl/tests/riscv_dbg_bfm.vhd
 	ghdl -a --std=08 ../../../../../bench/vhdl/tests/riscv_htif.vhd
-	ghdl -a --std=08 ../../../../../bench/vhdl/tests/riscv_memory_model_wb.vhd
-	ghdl -a --std=08 ../../../../../bench/vhdl/tests/riscv_mmio_if_wb.vhd
-	ghdl -a --std=08 ../../../../../bench/vhdl/tests/riscv_testbench_wb.vhd
 
 simulate:
 	ghdl -m --std=08 riscv_testbench_wb

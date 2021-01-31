@@ -271,8 +271,8 @@ module pu_riscv_synthesis #(
     .DW      ( XLEN )
   )
   instruction_wb (
-    .wb_clk_i ( HRESETn ),
-    .wb_rst_i ( HCLK    ),
+    .wb_clk_i ( HCLK    ),
+    .wb_rst_i ( HRESETn ),
 
     .wb_adr_i ( wb_ins_adr_o ),
     .wb_dat_i ( wb_ins_dat_o ),
@@ -295,8 +295,8 @@ module pu_riscv_synthesis #(
     .DW      ( XLEN )
   )
   data_wb (
-    .wb_clk_i ( HRESETn ),
-    .wb_rst_i ( HCLK    ),
+    .wb_clk_i ( HCLK    ),
+    .wb_rst_i ( HRESETn ),
 
     .wb_adr_i ( wb_dat_adr_o ),
     .wb_dat_i ( wb_dat_dat_o ),

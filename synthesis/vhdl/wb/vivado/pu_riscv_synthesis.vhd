@@ -14,7 +14,7 @@
 --                                                                            //
 --              PU-RISCV                                                      //
 --              Synthesis                                                     //
---              AMBA3 AHB-Lite Bus Interface                                  //
+--              Wishbone Bus Interface                                        //
 --                                                                            //
 --//////////////////////////////////////////////////////////////////////////////
 
@@ -52,61 +52,61 @@ use work.riscv_defines.all;
 
 entity pu_riscv_synthesis is
   generic (
-      XLEN : integer := 64;
-      PLEN : integer := 64;
+    XLEN : integer := 64;
+    PLEN : integer := 64;
 
-      HAS_USER  : std_logic := '1';
-      HAS_SUPER : std_logic := '1';
-      HAS_HYPER : std_logic := '1';
-      HAS_BPU   : std_logic := '1';
-      HAS_FPU   : std_logic := '1';
-      HAS_MMU   : std_logic := '1';
-      HAS_RVM   : std_logic := '1';
-      HAS_RVA   : std_logic := '1';
-      HAS_RVC   : std_logic := '1';
-      IS_RV32E  : std_logic := '1';
+    HAS_USER  : std_logic := '1';
+    HAS_SUPER : std_logic := '1';
+    HAS_HYPER : std_logic := '1';
+    HAS_BPU   : std_logic := '1';
+    HAS_FPU   : std_logic := '1';
+    HAS_MMU   : std_logic := '1';
+    HAS_RVM   : std_logic := '1';
+    HAS_RVA   : std_logic := '1';
+    HAS_RVC   : std_logic := '1';
+    IS_RV32E  : std_logic := '1';
 
-      MULT_LATENCY : std_logic := '1';
+    MULT_LATENCY : std_logic := '1';
 
-      BREAKPOINTS : integer := 8;       --Number of hardware breakpoints
+    BREAKPOINTS : integer := 8;       --Number of hardware breakpoints
 
-      PMA_CNT : integer := 4;
-      PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
+    PMA_CNT : integer := 4;
+    PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
 
-      BP_GLOBAL_BITS    : integer := 2;
-      BP_LOCAL_BITS     : integer := 10;
-      BP_LOCAL_BITS_LSB : integer := 2;
+    BP_GLOBAL_BITS    : integer := 2;
+    BP_LOCAL_BITS     : integer := 10;
+    BP_LOCAL_BITS_LSB : integer := 2;
 
-      ICACHE_SIZE        : integer := 64;  --in KBytes
-      ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
-      ICACHE_WAYS        : integer := 2;   --'n'-way set associative
-      ICACHE_REPLACE_ALG : integer := 0;
-      ITCM_SIZE          : integer := 0;
+    ICACHE_SIZE        : integer := 64;  --in KBytes
+    ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+    ICACHE_WAYS        : integer := 2;   --'n'-way set associative
+    ICACHE_REPLACE_ALG : integer := 0;
+    ITCM_SIZE          : integer := 0;
 
-      DCACHE_SIZE        : integer := 64;  --in KBytes
-      DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
-      DCACHE_WAYS        : integer := 2;   --'n'-way set associative
-      DCACHE_REPLACE_ALG : integer := 0;
-      DTCM_SIZE          : integer := 0;
-      WRITEBUFFER_SIZE   : integer := 8;
+    DCACHE_SIZE        : integer := 64;  --in KBytes
+    DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+    DCACHE_WAYS        : integer := 2;   --'n'-way set associative
+    DCACHE_REPLACE_ALG : integer := 0;
+    DTCM_SIZE          : integer := 0;
+    WRITEBUFFER_SIZE   : integer := 8;
 
-      TECHNOLOGY : string := "GENERIC";
+    TECHNOLOGY : string := "GENERIC";
 
-      PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000";
+    PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000";
 
-      MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
-      MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
-      HTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000080";
-      STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
-      UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
+    MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
+    MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
+    HTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000080";
+    STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
+    UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
 
-      JEDEC_BANK : integer := 10;
+    JEDEC_BANK : integer := 10;
 
-      JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
+    JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
 
-      HARTID : integer := 0;
+    HARTID : integer := 0;
 
-      PARCEL_SIZE : integer := 64
+    PARCEL_SIZE : integer := 64
   );
   port (
     HRESETn : in std_logic;
@@ -131,7 +131,7 @@ entity pu_riscv_synthesis is
 end pu_riscv_synthesis;
 
 architecture RTL of pu_riscv_synthesis is
-  component riscv_pu_ahb3
+  component riscv_pu_wb
     generic (
       XLEN : integer := 64;
       PLEN : integer := 64;
@@ -190,38 +190,38 @@ architecture RTL of pu_riscv_synthesis is
       PARCEL_SIZE : integer := 64
     );
     port (
-      --AHB interfaces
       HRESETn : in std_logic;
       HCLK    : in std_logic;
 
       pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
       pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
-      ins_HSEL      : out std_logic;
-      ins_HADDR     : out std_logic_vector(PLEN-1 downto 0);
-      ins_HWDATA    : out std_logic_vector(XLEN-1 downto 0);
-      ins_HRDATA    : in  std_logic_vector(XLEN-1 downto 0);
-      ins_HWRITE    : out std_logic;
-      ins_HSIZE     : out std_logic_vector(2 downto 0);
-      ins_HBURST    : out std_logic_vector(2 downto 0);
-      ins_HPROT     : out std_logic_vector(3 downto 0);
-      ins_HTRANS    : out std_logic_vector(1 downto 0);
-      ins_HMASTLOCK : out std_logic;
-      ins_HREADY    : in  std_logic;
-      ins_HRESP     : in  std_logic;
+      --WB interfaces
+      wb_ins_adr_o : out std_logic_vector(PLEN-1 downto 0);
+      wb_ins_dat_o : out std_logic_vector(XLEN-1 downto 0);
+      wb_ins_sel_o : out std_logic_vector(3 downto 0);
+      wb_ins_we_o  : out std_logic;
+      wb_ins_cyc_o : out std_logic;
+      wb_ins_stb_o : out std_logic;
+      wb_ins_cti_o : out std_logic_vector(2 downto 0);
+      wb_ins_bte_o : out std_logic_vector(1 downto 0);
+      wb_ins_dat_i : in  std_logic_vector(XLEN-1 downto 0);
+      wb_ins_ack_i : in  std_logic;
+      wb_ins_err_i : in  std_logic;
+      wb_ins_rty_i : in  std_logic_vector(2 downto 0);
 
-      dat_HSEL      : out std_logic;
-      dat_HADDR     : out std_logic_vector(PLEN-1 downto 0);
-      dat_HWDATA    : out std_logic_vector(XLEN-1 downto 0);
-      dat_HRDATA    : in  std_logic_vector(XLEN-1 downto 0);
-      dat_HWRITE    : out std_logic;
-      dat_HSIZE     : out std_logic_vector(2 downto 0);
-      dat_HBURST    : out std_logic_vector(2 downto 0);
-      dat_HPROT     : out std_logic_vector(3 downto 0);
-      dat_HTRANS    : out std_logic_vector(1 downto 0);
-      dat_HMASTLOCK : out std_logic;
-      dat_HREADY    : in  std_logic;
-      dat_HRESP     : in  std_logic;
+      wb_dat_adr_o : out std_logic_vector(PLEN-1 downto 0);
+      wb_dat_dat_o : out std_logic_vector(XLEN-1 downto 0);
+      wb_dat_sel_o : out std_logic_vector(3 downto 0);
+      wb_dat_we_o  : out std_logic;
+      wb_dat_stb_o : out std_logic;
+      wb_dat_cyc_o : out std_logic;
+      wb_dat_cti_o : out std_logic_vector(2 downto 0);
+      wb_dat_bte_o : out std_logic_vector(1 downto 0);
+      wb_dat_dat_i : in  std_logic_vector(XLEN-1 downto 0);
+      wb_dat_ack_i : in  std_logic;
+      wb_dat_err_i : in  std_logic;
+      wb_dat_rty_i : in  std_logic_vector(2 downto 0);
 
       --Interrupts
       ext_nmi  : in std_logic;
@@ -241,35 +241,33 @@ architecture RTL of pu_riscv_synthesis is
     );
   end component;
 
-  component mpsoc_ahb3_spram
+  component mpsoc_wb_spram
     generic (
-      MEM_SIZE          : integer := 256;  --Memory in Bytes
-      MEM_DEPTH         : integer := 256;  --Memory depth
-      PLEN              : integer := 64;
-      XLEN              : integer := 64;
-      TECHNOLOGY        : string  := "GENERIC";
-      REGISTERED_OUTPUT : string  := "NO"
-    );
-    port (
-      HRESETn : in std_logic;
-      HCLK    : in std_logic;
+      --Memory parameters
+      DEPTH   : integer := 256;
+      MEMFILE : string  := "";
 
-      --AHB Slave Interfaces (receive data from AHB Masters)
-      --AHB Masters connect to these ports
-      HSEL      : in  std_logic;
-      HADDR     : in  std_logic_vector(PLEN-1 downto 0);
-      HWDATA    : in  std_logic_vector(XLEN-1 downto 0);
-      HRDATA    : out std_logic_vector(XLEN-1 downto 0);
-      HWRITE    : in  std_logic;
-      HSIZE     : in  std_logic_vector(2 downto 0);
-      HBURST    : in  std_logic_vector(2 downto 0);
-      HPROT     : in  std_logic_vector(3 downto 0);
-      HTRANS    : in  std_logic_vector(1 downto 0);
-      HMASTLOCK : in  std_logic;
-      HREADYOUT : out std_logic;
-      HREADY    : in  std_logic;
-      HRESP     : out std_logic
-    );
+      --Wishbone parameters
+      DW : integer := 32;
+      AW : integer := integer(log2(real(256)))
+      );
+    port (
+      wb_clk_i : in std_logic;
+      wb_rst_i : in std_logic;
+
+      wb_adr_i : in std_logic_vector(AW-1 downto 0);
+      wb_dat_i : in std_logic_vector(DW-1 downto 0);
+      wb_sel_i : in std_logic_vector(3 downto 0);
+      wb_we_i  : in std_logic;
+      wb_bte_i : in std_logic_vector(1 downto 0);
+      wb_cti_i : in std_logic_vector(2 downto 0);
+      wb_cyc_i : in std_logic;
+      wb_stb_i : in std_logic;
+
+      wb_ack_o : out std_logic;
+      wb_err_o : out std_logic;
+      wb_dat_o : out std_logic_vector(DW-1 downto 0)
+      );
   end component;
 
   --////////////////////////////////////////////////////////////////
@@ -290,33 +288,33 @@ architecture RTL of pu_riscv_synthesis is
   signal pma_cfg : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
   signal pma_adr : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
-  --AHB3 instruction
-  signal ins_HSEL      : std_logic;
-  signal ins_HADDR     : std_logic_vector(PLEN-1 downto 0);
-  signal ins_HWDATA    : std_logic_vector(XLEN-1 downto 0);
-  signal ins_HRDATA    : std_logic_vector(XLEN-1 downto 0);
-  signal ins_HWRITE    : std_logic;
-  signal ins_HSIZE     : std_logic_vector(2 downto 0);
-  signal ins_HBURST    : std_logic_vector(2 downto 0);
-  signal ins_HPROT     : std_logic_vector(3 downto 0);
-  signal ins_HTRANS    : std_logic_vector(1 downto 0);
-  signal ins_HMASTLOCK : std_logic;
-  signal ins_HREADY    : std_logic;
-  signal ins_HRESP     : std_logic;
+  --WB Instruction
+  signal wb_ins_adr_o : std_logic_vector(PLEN-1 downto 0);
+  signal wb_ins_dat_o : std_logic_vector(XLEN-1 downto 0);
+  signal wb_ins_sel_o : std_logic_vector(3 downto 0);
+  signal wb_ins_we_o  : std_logic;
+  signal wb_ins_cyc_o : std_logic;
+  signal wb_ins_stb_o : std_logic;
+  signal wb_ins_cti_o : std_logic_vector(2 downto 0);
+  signal wb_ins_bte_o : std_logic_vector(1 downto 0);
+  signal wb_ins_dat_i : std_logic_vector(XLEN-1 downto 0);
+  signal wb_ins_ack_i : std_logic;
+  signal wb_ins_err_i : std_logic;
+  signal wb_ins_rty_i : std_logic_vector(2 downto 0);
 
-  --AHB3 data
-  signal dat_HSEL      : std_logic;
-  signal dat_HADDR     : std_logic_vector(PLEN-1 downto 0);
-  signal dat_HWDATA    : std_logic_vector(XLEN-1 downto 0);
-  signal dat_HRDATA    : std_logic_vector(XLEN-1 downto 0);
-  signal dat_HWRITE    : std_logic;
-  signal dat_HSIZE     : std_logic_vector(2 downto 0);
-  signal dat_HBURST    : std_logic_vector(2 downto 0);
-  signal dat_HPROT     : std_logic_vector(3 downto 0);
-  signal dat_HTRANS    : std_logic_vector(1 downto 0);
-  signal dat_HMASTLOCK : std_logic;
-  signal dat_HREADY    : std_logic;
-  signal dat_HRESP     : std_logic;
+  --WB Data
+  signal wb_dat_adr_o : std_logic_vector(PLEN-1 downto 0);
+  signal wb_dat_dat_o : std_logic_vector(XLEN-1 downto 0);
+  signal wb_dat_sel_o : std_logic_vector(3 downto 0);
+  signal wb_dat_we_o  : std_logic;
+  signal wb_dat_stb_o : std_logic;
+  signal wb_dat_cyc_o : std_logic;
+  signal wb_dat_cti_o : std_logic_vector(2 downto 0);
+  signal wb_dat_bte_o : std_logic_vector(1 downto 0);
+  signal wb_dat_dat_i : std_logic_vector(XLEN-1 downto 0);
+  signal wb_dat_ack_i : std_logic;
+  signal wb_dat_err_i : std_logic;
+  signal wb_dat_rty_i : std_logic_vector(2 downto 0);
 
   --Debug Interface
   signal dbg_dato_s : std_logic_vector(XLEN-1 downto 0);
@@ -335,7 +333,7 @@ begin
   dbg_dato_s <= X"00000000" & dbg_dato;
 
   -- Processing Unit
-  dut : riscv_pu_ahb3
+  dut : riscv_pu_wb
     generic map (
       XLEN => XLEN,
       PLEN => PLEN,
@@ -399,33 +397,34 @@ begin
       pma_cfg_i => pma_cfg,
       pma_adr_i => pma_adr,
 
-      --AHB3 instruction
-      ins_HSEL      => ins_HSEL,
-      ins_HADDR     => ins_HADDR,
-      ins_HWDATA    => ins_HWDATA,
-      ins_HRDATA    => ins_HRDATA,
-      ins_HWRITE    => ins_HWRITE,
-      ins_HSIZE     => ins_HSIZE,
-      ins_HBURST    => ins_HBURST,
-      ins_HPROT     => ins_HPROT,
-      ins_HTRANS    => ins_HTRANS,
-      ins_HMASTLOCK => ins_HMASTLOCK,
-      ins_HREADY    => ins_HREADY,
-      ins_HRESP     => ins_HRESP,
+      --WB instruction
+      wb_ins_adr_o => wb_ins_adr_o,
+      wb_ins_dat_o => wb_ins_dat_o,
+      wb_ins_sel_o => wb_ins_sel_o,
+      wb_ins_we_o  => wb_ins_we_o,
+      wb_ins_cyc_o => wb_ins_cyc_o,
+      wb_ins_stb_o => wb_ins_stb_o,
+      wb_ins_cti_o => wb_ins_cti_o,
+      wb_ins_bte_o => wb_ins_bte_o,
+      wb_ins_dat_i => wb_ins_dat_i,
+      wb_ins_ack_i => wb_ins_ack_i,
+      wb_ins_err_i => wb_ins_err_i,
+      wb_ins_rty_i => wb_ins_rty_i,
 
-      --AHB3 data
-      dat_HSEL      => dat_HSEL,
-      dat_HADDR     => dat_HADDR,
-      dat_HWDATA    => dat_HWDATA,
-      dat_HRDATA    => dat_HRDATA,
-      dat_HWRITE    => dat_HWRITE,
-      dat_HSIZE     => dat_HSIZE,
-      dat_HBURST    => dat_HBURST,
-      dat_HPROT     => dat_HPROT,
-      dat_HTRANS    => dat_HTRANS,
-      dat_HMASTLOCK => dat_HMASTLOCK,
-      dat_HREADY    => dat_HREADY,
-      dat_HRESP     => dat_HRESP,
+      --WB data
+      wb_dat_adr_o => wb_dat_adr_o,
+      wb_dat_dat_o => wb_dat_dat_o,
+      wb_dat_sel_o => wb_dat_sel_o,
+      wb_dat_we_o  => wb_dat_we_o,
+      wb_dat_cyc_o => wb_dat_cyc_o,
+      wb_dat_stb_o => wb_dat_stb_o,
+      wb_dat_cti_o => wb_dat_cti_o,
+      wb_dat_bte_o => wb_dat_bte_o,
+      wb_dat_dat_i => wb_dat_dat_i,
+      wb_dat_ack_i => wb_dat_ack_i,
+      wb_dat_err_i => wb_dat_err_i,
+      wb_dat_rty_i => wb_dat_rty_i,
+ 
       --Interrupts
       ext_nmi       => ext_nmi,
       ext_tint      => ext_tint,
@@ -443,61 +442,53 @@ begin
       dbg_bp    => dbg_bp
     );
 
-  --Instruction AHB3
-  instruction_ahb3 : mpsoc_ahb3_spram
+  --Instruction wb
+  instruction_wb : mpsoc_wb_spram
     generic map (
-      MEM_SIZE          => 256,
-      MEM_DEPTH         => 256,
-      PLEN              => PLEN,
-      XLEN              => XLEN,
-      TECHNOLOGY        => TECHNOLOGY,
-      REGISTERED_OUTPUT => "NO"
+      DEPTH   => 256,
+      MEMFILE => "",
+      AW      => PLEN,
+      DW      => XLEN
     )
     port map (
-      HRESETn => HRESETn,
-      HCLK    => HCLK,
+      wb_clk_i => HCLK,
+      wb_rst_i => HRESETn,
 
-      HSEL      => ins_HSEL,
-      HADDR     => ins_HADDR,
-      HWDATA    => ins_HWDATA,
-      HRDATA    => ins_HRDATA,
-      HWRITE    => ins_HWRITE,
-      HSIZE     => ins_HSIZE,
-      HBURST    => ins_HBURST,
-      HPROT     => ins_HPROT,
-      HTRANS    => ins_HTRANS,
-      HMASTLOCK => ins_HMASTLOCK,
-      HREADYOUT => open,
-      HREADY    => ins_HREADY,
-      HRESP     => ins_HRESP
+      wb_adr_i => wb_ins_adr_o,
+      wb_dat_i => wb_ins_dat_o,
+      wb_sel_i => wb_ins_sel_o,
+      wb_we_i  => wb_ins_we_o,
+      wb_bte_i => wb_ins_bte_o,
+      wb_cti_i => wb_ins_cti_o,
+      wb_cyc_i => wb_ins_cyc_o,
+      wb_stb_i => wb_ins_stb_o,
+      wb_ack_o => wb_ins_ack_i,
+      wb_err_o => wb_ins_err_i,
+      wb_dat_o => wb_ins_dat_i
     );
 
-  --Data AHB3
-  data_ahb3 : mpsoc_ahb3_spram
+  --Data wb
+  data_wb : mpsoc_wb_spram
     generic map (
-      MEM_SIZE          => 256,
-      MEM_DEPTH         => 256,
-      PLEN              => PLEN,
-      XLEN              => XLEN,
-      TECHNOLOGY        => TECHNOLOGY,
-      REGISTERED_OUTPUT => "NO"
+      DEPTH   => 256,
+      MEMFILE => "",
+      AW      => PLEN,
+      DW      => XLEN
     )
     port map (
-      HRESETn => HRESETn,
-      HCLK    => HCLK,
+      wb_clk_i => HCLK,
+      wb_rst_i => HRESETn,
 
-      HSEL      => dat_HSEL,
-      HADDR     => dat_HADDR,
-      HWDATA    => dat_HWDATA,
-      HRDATA    => dat_HRDATA,
-      HWRITE    => dat_HWRITE,
-      HSIZE     => dat_HSIZE,
-      HBURST    => dat_HBURST,
-      HPROT     => dat_HPROT,
-      HTRANS    => dat_HTRANS,
-      HMASTLOCK => dat_HMASTLOCK,
-      HREADYOUT => open,
-      HREADY    => dat_HREADY,
-      HRESP     => dat_HRESP
+      wb_adr_i => wb_dat_adr_o,
+      wb_dat_i => wb_dat_dat_o,
+      wb_sel_i => wb_dat_sel_o,
+      wb_we_i  => wb_dat_we_o,
+      wb_bte_i => wb_dat_bte_o,
+      wb_cti_i => wb_dat_cti_o,
+      wb_cyc_i => wb_dat_cyc_o,
+      wb_stb_i => wb_dat_stb_o,
+      wb_ack_o => wb_dat_ack_i,
+      wb_err_o => wb_dat_err_i,
+      wb_dat_o => wb_dat_dat_i
     );
 end RTL;

@@ -107,38 +107,38 @@ entity riscv_pu_wb is
     PARCEL_SIZE : integer := 64
     );
   port (
-    --AHB interfaces
     HRESETn : in std_logic;
     HCLK    : in std_logic;
 
     pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
     pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
-    ins_HSEL      : out std_logic;
-    ins_HADDR     : out std_logic_vector(PLEN-1 downto 0);
-    ins_HWDATA    : out std_logic_vector(XLEN-1 downto 0);
-    ins_HRDATA    : in  std_logic_vector(XLEN-1 downto 0);
-    ins_HWRITE    : out std_logic;
-    ins_HSIZE     : out std_logic_vector(2 downto 0);
-    ins_HBURST    : out std_logic_vector(2 downto 0);
-    ins_HPROT     : out std_logic_vector(3 downto 0);
-    ins_HTRANS    : out std_logic_vector(1 downto 0);
-    ins_HMASTLOCK : out std_logic;
-    ins_HREADY    : in  std_logic;
-    ins_HRESP     : in  std_logic;
+    --WB interfaces
+    wb_ins_adr_o : out std_logic_vector(PLEN-1 downto 0);
+    wb_ins_dat_o : out std_logic_vector(XLEN-1 downto 0);
+    wb_ins_sel_o : out std_logic_vector(3 downto 0);
+    wb_ins_we_o  : out std_logic;
+    wb_ins_cyc_o : out std_logic;
+    wb_ins_stb_o : out std_logic;
+    wb_ins_cti_o : out std_logic_vector(2 downto 0);
+    wb_ins_bte_o : out std_logic_vector(1 downto 0);
+    wb_ins_dat_i : in  std_logic_vector(XLEN-1 downto 0);
+    wb_ins_ack_i : in  std_logic;
+    wb_ins_err_i : in  std_logic;
+    wb_ins_rty_i : in  std_logic_vector(2 downto 0);
 
-    dat_HSEL      : out std_logic;
-    dat_HADDR     : out std_logic_vector(PLEN-1 downto 0);
-    dat_HWDATA    : out std_logic_vector(XLEN-1 downto 0);
-    dat_HRDATA    : in  std_logic_vector(XLEN-1 downto 0);
-    dat_HWRITE    : out std_logic;
-    dat_HSIZE     : out std_logic_vector(2 downto 0);
-    dat_HBURST    : out std_logic_vector(2 downto 0);
-    dat_HPROT     : out std_logic_vector(3 downto 0);
-    dat_HTRANS    : out std_logic_vector(1 downto 0);
-    dat_HMASTLOCK : out std_logic;
-    dat_HREADY    : in  std_logic;
-    dat_HRESP     : in  std_logic;
+    wb_dat_adr_o : out std_logic_vector(PLEN-1 downto 0);
+    wb_dat_dat_o : out std_logic_vector(XLEN-1 downto 0);
+    wb_dat_sel_o : out std_logic_vector(3 downto 0);
+    wb_dat_we_o  : out std_logic;
+    wb_dat_stb_o : out std_logic;
+    wb_dat_cyc_o : out std_logic;
+    wb_dat_cti_o : out std_logic_vector(2 downto 0);
+    wb_dat_bte_o : out std_logic_vector(1 downto 0);
+    wb_dat_dat_i : in  std_logic_vector(XLEN-1 downto 0);
+    wb_dat_ack_i : in  std_logic;
+    wb_dat_err_i : in  std_logic;
+    wb_dat_rty_i : in  std_logic_vector(2 downto 0);
 
     --Interrupts
     ext_nmi  : in std_logic;
@@ -395,19 +395,19 @@ architecture RTL of riscv_pu_wb is
       HRESETn : in std_logic;
       HCLK    : in std_logic;
 
-      --AHB3 Lite Bus
-      HSEL      : out std_logic;
-      HADDR     : out std_logic_vector(PLEN-1 downto 0);
-      HRDATA    : in  std_logic_vector(XLEN-1 downto 0);
-      HWDATA    : out std_logic_vector(XLEN-1 downto 0);
-      HWRITE    : out std_logic;
-      HSIZE     : out std_logic_vector(2 downto 0);
-      HBURST    : out std_logic_vector(2 downto 0);
-      HPROT     : out std_logic_vector(3 downto 0);
-      HTRANS    : out std_logic_vector(1 downto 0);
-      HMASTLOCK : out std_logic;
-      HREADY    : in  std_logic;
-      HRESP     : in  std_logic;
+      --WB Bus
+      wb_adr_o : out std_logic_vector(PLEN-1 downto 0);
+      wb_dat_o : out std_logic_vector(XLEN-1 downto 0);
+      wb_sel_o : out std_logic_vector(3 downto 0);
+      wb_we_o  : out std_logic;
+      wb_cyc_o : out std_logic;
+      wb_stb_o : out std_logic;
+      wb_cti_o : out std_logic_vector(2 downto 0);
+      wb_bte_o : out std_logic_vector(1 downto 0);
+      wb_dat_i : in  std_logic_vector(XLEN-1 downto 0);
+      wb_ack_i : in  std_logic;
+      wb_err_i : in  std_logic;
+      wb_rty_i : in  std_logic_vector(2 downto 0);
 
       --BIU Bus (Core ports)
       biu_stb_i     : in  std_logic;    --strobe
@@ -718,18 +718,19 @@ begin
     port map (
       HRESETn   => HRESETn,
       HCLK      => HCLK,
-      HSEL      => ins_HSEL,
-      HADDR     => ins_HADDR,
-      HWDATA    => ins_HWDATA,
-      HRDATA    => ins_HRDATA,
-      HWRITE    => ins_HWRITE,
-      HSIZE     => ins_HSIZE,
-      HBURST    => ins_HBURST,
-      HPROT     => ins_HPROT,
-      HTRANS    => ins_HTRANS,
-      HMASTLOCK => ins_HMASTLOCK,
-      HREADY    => ins_HREADY,
-      HRESP     => ins_HRESP,
+
+      wb_adr_o => wb_ins_adr_o,
+      wb_dat_o => wb_ins_dat_o,
+      wb_sel_o => wb_ins_sel_o,
+      wb_we_o  => wb_ins_we_o,
+      wb_cyc_o => wb_ins_cyc_o,
+      wb_stb_o => wb_ins_stb_o,
+      wb_cti_o => wb_ins_cti_o,
+      wb_bte_o => wb_ins_bte_o,
+      wb_dat_i => wb_ins_dat_i,
+      wb_ack_i => wb_ins_ack_i,
+      wb_err_i => wb_ins_err_i,
+      wb_rty_i => wb_ins_rty_i,
 
       biu_stb_i     => ibiu_stb,
       biu_stb_ack_o => ibiu_stb_ack,
@@ -755,18 +756,19 @@ begin
     port map (
       HRESETn   => HRESETn,
       HCLK      => HCLK,
-      HSEL      => dat_HSEL,
-      HADDR     => dat_HADDR,
-      HWDATA    => dat_HWDATA,
-      HRDATA    => dat_HRDATA,
-      HWRITE    => dat_HWRITE,
-      HSIZE     => dat_HSIZE,
-      HBURST    => dat_HBURST,
-      HPROT     => dat_HPROT,
-      HTRANS    => dat_HTRANS,
-      HMASTLOCK => dat_HMASTLOCK,
-      HREADY    => dat_HREADY,
-      HRESP     => dat_HRESP,
+
+      wb_adr_o => wb_dat_adr_o,
+      wb_dat_o => wb_dat_dat_o,
+      wb_sel_o => wb_dat_sel_o,
+      wb_we_o  => wb_dat_we_o,
+      wb_cyc_o => wb_dat_cyc_o,
+      wb_stb_o => wb_dat_stb_o,
+      wb_cti_o => wb_dat_cti_o,
+      wb_bte_o => wb_dat_bte_o,
+      wb_dat_i => wb_dat_dat_i,
+      wb_ack_i => wb_dat_ack_i,
+      wb_err_i => wb_dat_err_i,
+      wb_rty_i => wb_dat_rty_i,
 
       biu_stb_i     => dbiu_stb,
       biu_stb_ack_o => dbiu_stb_ack,
