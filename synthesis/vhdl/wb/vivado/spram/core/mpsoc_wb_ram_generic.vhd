@@ -49,7 +49,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-use work.mpsoc_spram_wb_pkg.all;
+use work.riscv_defines.all;
 
 entity mpsoc_wb_ram_generic is
   generic (

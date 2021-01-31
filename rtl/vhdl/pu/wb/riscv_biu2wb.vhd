@@ -259,10 +259,6 @@ architecture RTL of riscv_biu2wb is
 
   signal biu_err : std_logic;
 
-
-  signal HADDR_O  : std_logic_vector(PLEN-1 downto 0);
-  signal HBURST_O : std_logic_vector(2 downto 0);
-
 begin
   --////////////////////////////////////////////////////////////////
   --
@@ -277,60 +273,55 @@ begin
       biu_err   <= '0';
       burst_cnt <= (others => '0');
 
-      HSEL      <= '0';
-      HADDR_O   <= (others => '0');
-      HWRITE    <= '0';
-      HSIZE     <= (others => '0');  --dont care
-      HBURST_O  <= (others => '0');  --dont care
-      HPROT     <= HPROT_DATA or HPROT_PRIVILEGED or HPROT_NON_BUFFERABLE or HPROT_NON_CACHEABLE;
-      HTRANS    <= HTRANS_IDLE;
-      HMASTLOCK <= '0';
+      wb_stb_o <= '0';
+      wb_adr_o <= (others => '0');
+      wb_we_o  <= '0';
+      wb_cti_o <= (others => '0');  --dont care
+      wb_sel_o <= HPROT_DATA or HPROT_PRIVILEGED or HPROT_NON_BUFFERABLE or HPROT_NON_CACHEABLE;
+      wb_bte_o <= HTRANS_IDLE;
+      wb_cyc_o <= '0';
     elsif (rising_edge(HCLK) or falling_edge(HRESETn)) then
       --strobe/ack signals
       biu_err <= '0';
 
-      if (HREADY = '1') then
+      if (wb_ack_i = '1') then
         if (reduce_nor(burst_cnt) = '1') then  --burst complete
           if (biu_stb_i = '1' and biu_err = '0') then
             data_ena  <= '1';
             burst_cnt <= biu_type2cnt(biu_type_i);
 
-            HSEL      <= '1';
-            HTRANS    <= HTRANS_NONSEQ;  --start of burst
-            HADDR_O   <= biu_adri_i;
-            HWRITE    <= biu_we_i;
-            HSIZE     <= biu_size2hsize(biu_size_i);
-            HBURST_O  <= biu_type2hburst(biu_type_i);
-            HPROT     <= biu_prot2hprot(biu_prot_i);
-            HMASTLOCK <= biu_lock_i;
+            wb_stb_o <= '1';
+            wb_bte_o <= HTRANS_NONSEQ;  --start of burst
+            wb_adr_o <= biu_adri_i;
+            wb_we_o  <= biu_we_i;
+            wb_cti_o <= biu_type2hburst(biu_type_i);
+            wb_sel_o <= biu_prot2hprot(biu_prot_i);
+            wb_cyc_o <= biu_lock_i;
           else
-            data_ena  <= '0';
-            HSEL      <= '0';
-            HTRANS    <= HTRANS_IDLE;  --no new transfer
-            HMASTLOCK <= biu_lock_i;
+            data_ena <= '0';
+            wb_stb_o <= '0';
+            wb_bte_o <= HTRANS_IDLE;  --no new transfer
+            wb_cyc_o <= biu_lock_i;
           end if;
         else  --continue burst
           data_ena  <= '1';
           burst_cnt <= std_logic_vector(unsigned(burst_cnt)-to_unsigned(1, 4));
 
-          HTRANS  <= HTRANS_SEQ;  --continue burst
-          HADDR_O <= nxt_addr(HADDR_O, HBURST_O);  --next address
+          wb_bte_o <= HTRANS_SEQ;  --continue burst
+          wb_adr_o <= nxt_addr(wb_adr_o, wb_cti_o);  --next address
         end if;
       --error response
-      elsif (HRESP = HRESP_ERROR) then
+      elsif (wb_err_i = HRESP_ERROR) then
         burst_cnt <= (others => '0');  --burst done (interrupted)
 
-        HSEL   <= '0';
-        HTRANS <= HTRANS_IDLE;
+        wb_stb_o <= '0';
+        wb_bte_o <= HTRANS_IDLE;
 
-        data_ena  <= '0';
-        biu_err   <= '1';
+        data_ena <= '0';
+        biu_err  <= '1';
       end if;
     end if;
   end process;
-
-  HBURST <= HBURST_O;
-  HADDR  <= HADDR_O;
 
   biu_err_o <= biu_err;
 
@@ -338,7 +329,7 @@ begin
   processing_1 : process (HCLK)
   begin
     if (rising_edge(HCLK)) then
-      if (HREADY = '1') then
+      if (wb_ack_i = '1') then
         biu_di_dly <= biu_d_i;
       end if;
     end if;
@@ -347,9 +338,9 @@ begin
   processing_2 : process (HCLK)
   begin
     if (rising_edge(HCLK)) then
-      if (HREADY = '1') then
-        HWDATA     <= biu_di_dly;
-        biu_adro_o <= HADDR_O;
+      if (wb_ack_i = '1') then
+        wb_dat_o   <= biu_di_dly;
+        biu_adro_o <= wb_adr_o;
       end if;
     end if;
   end process;
@@ -359,14 +350,14 @@ begin
     if (HRESETn = '0') then
       data_ena_d <= '0';
     elsif (rising_edge(HCLK) or falling_edge(HRESETn)) then
-      if (HREADY = '1') then
+      if (wb_ack_i = '1') then
         data_ena_d <= data_ena;
       end if;
     end if;
   end process;
 
-  biu_q_o       <= HRDATA;
-  biu_ack_o     <= HREADY and data_ena_d;
-  biu_d_ack_o   <= HREADY and data_ena;
-  biu_stb_ack_o <= HREADY and reduce_nor(burst_cnt) and biu_stb_i and not biu_err;
+  biu_q_o       <= wb_dat_i;
+  biu_ack_o     <= wb_ack_i and data_ena_d;
+  biu_d_ack_o   <= wb_ack_i and data_ena;
+  biu_stb_ack_o <= wb_ack_i and reduce_nor(burst_cnt) and biu_stb_i and not biu_err;
 end RTL;

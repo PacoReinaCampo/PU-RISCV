@@ -270,8 +270,8 @@ begin
       clk   => wb_clk_i,
       we    => we_i,
       din   => wb_dat_i,
-      waddr => adr_r(AW-1 downto 2),
-      raddr => adr(AW-1 downto 2),
+      waddr => adr_r(integer(log2(real(DEPTH/4)))-1 downto 0),
+      raddr => adr(integer(log2(real(DEPTH/4)))-1 downto 0),
       dout  => wb_dat_o
       );
 
