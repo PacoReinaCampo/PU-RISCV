@@ -7,4 +7,4 @@
 ../../../../../rtl/verilog/core/riscv_core.sv
 ../../../../../rtl/verilog/core/riscv_rf.sv
 
-../../../../../rtl/verilog/pu/riscv_pu_axi4.sv
+../../../../../rtl/verilog/pu/axi4/riscv_pu_axi4.sv

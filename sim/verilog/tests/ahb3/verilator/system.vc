@@ -32,5 +32,5 @@
 ../../../../../rtl/verilog/memory/riscv_ram_1rw.sv
 ../../../../../rtl/verilog/memory/riscv_ram_queue.sv
 
-../../../../../rtl/verilog/pu/riscv_biu2ahb3.sv
-../../../../../rtl/verilog/pu/riscv_pu_ahb3.sv
+../../../../../rtl/verilog/pu/ahb3/riscv_biu2ahb3.sv
+../../../../../rtl/verilog/pu/ahb3/riscv_pu_ahb3.sv

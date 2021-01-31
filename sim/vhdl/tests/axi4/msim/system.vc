@@ -34,11 +34,11 @@
 ../../../../../rtl/vhdl/memory/riscv_ram_1rw_generic.vhd
 ../../../../../rtl/vhdl/memory/riscv_ram_queue.vhd
 
-../../../../../rtl/vhdl/pu/riscv_biu2axi4.vhd
-../../../../../rtl/vhdl/pu/riscv_pu_axi4.vhd
+../../../../../rtl/vhdl/pu/axi4/riscv_biu2axi4.vhd
+../../../../../rtl/vhdl/pu/axi4/riscv_pu_axi4.vhd
 
+../../../../../bench/vhdl/tests/axi4/riscv_memory_model_axi4.vhd
+../../../../../bench/vhdl/tests/axi4/riscv_mmio_if_axi4.vhd
+../../../../../bench/vhdl/tests/axi4/riscv_testbench_axi4.vhd
 ../../../../../bench/vhdl/tests/riscv_dbg_bfm.vhd
 ../../../../../bench/vhdl/tests/riscv_htif.vhd
-../../../../../bench/vhdl/tests/riscv_memory_model_axi4.vhd
-../../../../../bench/vhdl/tests/riscv_mmio_if_axi4.vhd
-../../../../../bench/vhdl/tests/riscv_testbench_axi4.vhd

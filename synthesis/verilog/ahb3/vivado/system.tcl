@@ -76,8 +76,8 @@ read_verilog -sv ../../../../rtl/verilog/memory/riscv_ram_1rw_generic.sv
 read_verilog -sv ../../../../rtl/verilog/memory/riscv_ram_1rw.sv
 read_verilog -sv ../../../../rtl/verilog/memory/riscv_ram_queue.sv
 
-read_verilog -sv ../../../../rtl/verilog/pu/riscv_biu2ahb3.sv
-read_verilog -sv ../../../../rtl/verilog/pu/riscv_pu_ahb3.sv
+read_verilog -sv ../../../../rtl/verilog/pu/ahb3/riscv_biu2ahb3.sv
+read_verilog -sv ../../../../rtl/verilog/pu/ahb3/riscv_pu_ahb3.sv
 
 read_verilog -sv spram/core/mpsoc_ahb3_spram.sv
 read_verilog -sv spram/core/mpsoc_ram_1r1w.sv

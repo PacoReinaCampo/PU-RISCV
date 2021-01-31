@@ -26,10 +26,10 @@
 ../../../../../rtl/vhdl/memory/riscv_ram_1rw.vhd
 ../../../../../rtl/vhdl/memory/riscv_ram_queue.vhd
 
-../../../../../rtl/vhdl/pu/riscv_biu2wb.vhd
+../../../../../rtl/vhdl/pu/wb/riscv_biu2wb.vhd
 
+../../../../../bench/vhdl/tests/wb/riscv_memory_model_wb.vhd
+../../../../../bench/vhdl/tests/wb/riscv_mmio_if_wb.vhd
+../../../../../bench/vhdl/tests/wb/riscv_testbench_wb.vhd
 ../../../../../bench/vhdl/tests/riscv_dbg_bfm.vhd
 ../../../../../bench/vhdl/tests/riscv_htif.vhd
-../../../../../bench/vhdl/tests/riscv_memory_model_wb.vhd
-../../../../../bench/vhdl/tests/riscv_mmio_if_wb.vhd
-../../../../../bench/vhdl/tests/riscv_testbench_wb.vhd

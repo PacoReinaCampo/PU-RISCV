@@ -79,8 +79,8 @@ RTL_VLOG = $(DUT_SRC_DIR)/core/cache/riscv_dcache_core.sv \
            $(DUT_SRC_DIR)/memory/riscv_ram_1rw_generic.sv \
            $(DUT_SRC_DIR)/memory/riscv_ram_1rw.sv \
            $(DUT_SRC_DIR)/memory/riscv_ram_queue.sv \
-           $(DUT_SRC_DIR)/pu/riscv_biu2wb.sv \
-           $(DUT_SRC_DIR)/pu/riscv_pu_wb.sv
+           $(DUT_SRC_DIR)/pu/wb/riscv_biu2wb.sv \
+           $(DUT_SRC_DIR)/pu/wb/riscv_pu_wb.sv
 RTL_VHDL =
 
 
@@ -89,11 +89,11 @@ RTL_VHDL =
 #####################################################################
 TB_TOP=riscv_testbench_wb
 TB_SRC_DIR=$(ROOT_DIR)/bench/verilog/tests
-TB_VLOG = $(TB_SRC_DIR)/riscv_testbench_wb.sv \
-          $(TB_SRC_DIR)/riscv_htif.sv \
-          $(TB_SRC_DIR)/riscv_mmio_if_wb.sv \
-          $(TB_SRC_DIR)/riscv_memory_model_wb.sv \
-          $(TB_SRC_DIR)/riscv_dbg_bfm.sv
+TB_VLOG = $(TB_SRC_DIR)/wb/riscv_memory_model_wb.sv \
+          $(TB_SRC_DIR)/wb/riscv_mmio_if_wb.sv \
+          $(TB_SRC_DIR)/wb/riscv_testbench_wb.sv \
+          $(TB_SRC_DIR)/riscv_dbg_bfm.sv \
+          $(TB_SRC_DIR)/riscv_htif.sv
 
 TB_VHDL =
 
