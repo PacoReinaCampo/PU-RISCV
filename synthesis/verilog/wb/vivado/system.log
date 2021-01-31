@@ -1,0 +1,85 @@
+#-----------------------------------------------------------
+# Vivado v2020.2 (64-bit)
+# SW Build 3064766 on Wed Nov 18 09:12:47 MST 2020
+# IP Build 3064653 on Wed Nov 18 14:17:31 MST 2020
+# Start of session at: Sun Jan 31 01:50:16 2021
+# Process ID: 36830
+# Current directory: /home/us1/github/PU-RISCV/synthesis/verilog/wb/vivado
+# Command line: vivado -nojournal -log system.log -mode batch -source system.tcl
+# Log file: /home/us1/github/PU-RISCV/synthesis/verilog/wb/vivado/system.log
+# Journal file: 
+#-----------------------------------------------------------
+source system.tcl
+# read_verilog -sv ../../../../rtl/verilog/core/cache/riscv_dcache_core.sv
+# read_verilog -sv ../../../../rtl/verilog/core/cache/riscv_dext.sv
+# read_verilog -sv ../../../../rtl/verilog/core/cache/riscv_icache_core.sv
+# read_verilog -sv ../../../../rtl/verilog/core/cache/riscv_noicache_core.sv
+# read_verilog -sv ../../../../rtl/verilog/core/decode/riscv_id.sv
+# read_verilog -sv ../../../../rtl/verilog/core/execute/riscv_alu.sv
+# read_verilog -sv ../../../../rtl/verilog/core/execute/riscv_bu.sv
+# read_verilog -sv ../../../../rtl/verilog/core/execute/riscv_div.sv
+# read_verilog -sv ../../../../rtl/verilog/core/execute/riscv_execution.sv
+# read_verilog -sv ../../../../rtl/verilog/core/execute/riscv_lsu.sv
+# read_verilog -sv ../../../../rtl/verilog/core/execute/riscv_mul.sv
+# read_verilog -sv ../../../../rtl/verilog/core/fetch/riscv_if.sv
+# read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_dmem_ctrl.sv
+# read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_imem_ctrl.sv
+# read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_membuf.sv
+# read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_memmisaligned.sv
+# read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_mmu.sv
+# read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_mux.sv
+# read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_pmachk.sv
+# read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_pmpchk.sv
+# read_verilog -sv ../../../../rtl/verilog/core/riscv_bp.sv
+# read_verilog -sv ../../../../rtl/verilog/core/riscv_core.sv
+# read_verilog -sv ../../../../rtl/verilog/core/riscv_du.sv
+# read_verilog -sv ../../../../rtl/verilog/core/riscv_memory.sv
+# read_verilog -sv ../../../../rtl/verilog/core/riscv_rf.sv
+# read_verilog -sv ../../../../rtl/verilog/core/riscv_state.sv
+# read_verilog -sv ../../../../rtl/verilog/core/riscv_wb.sv
+# read_verilog -sv ../../../../rtl/verilog/memory/riscv_ram_1r1w_generic.sv
+# read_verilog -sv ../../../../rtl/verilog/memory/riscv_ram_1r1w.sv
+# read_verilog -sv ../../../../rtl/verilog/memory/riscv_ram_1rw_generic.sv
+# read_verilog -sv ../../../../rtl/verilog/memory/riscv_ram_1rw.sv
+# read_verilog -sv ../../../../rtl/verilog/memory/riscv_ram_queue.sv
+# read_verilog -sv ../../../../rtl/verilog/pu/riscv_biu2wb.sv
+# read_verilog -sv ../../../../rtl/verilog/pu/riscv_pu_wb.sv
+# read_verilog -sv spram/core/mpsoc_wb_ram_generic.sv
+# read_verilog -sv spram/core/mpsoc_wb_spram.sv
+# read_verilog -sv pu_riscv_synthesis.sv
+# read_xdc system.xdc
+# synth_design -part xc7z020-clg484-1 -include_dirs ../../../../rtl/verilog/pkg -top pu_riscv_synthesis
+Command: synth_design -part xc7z020-clg484-1 -include_dirs ../../../../rtl/verilog/pkg -top pu_riscv_synthesis
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7z020'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z020'
+INFO: [Device 21-403] Loading part xc7z020clg484-1
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 4 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 36877
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_dcache_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/cache/riscv_dcache_core.sv:166]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_dcache_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/cache/riscv_dcache_core.sv:167]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_dcache_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/cache/riscv_dcache_core.sv:168]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_dcache_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/cache/riscv_dcache_core.sv:169]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_dcache_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/cache/riscv_dcache_core.sv:170]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_dcache_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/cache/riscv_dcache_core.sv:171]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_dcache_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/cache/riscv_dcache_core.sv:173]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_dcache_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/cache/riscv_dcache_core.sv:174]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_dcache_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/cache/riscv_dcache_core.sv:175]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_dcache_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/cache/riscv_dcache_core.sv:177]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_dcache_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/cache/riscv_dcache_core.sv:178]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_dcache_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/cache/riscv_dcache_core.sv:179]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_mux with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/memory/riscv_mux.sv:133]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_mux with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/memory/riscv_mux.sv:134]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/riscv_core.sv:196]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/riscv_core.sv:197]
+WARNING: [Synth 8-2507] parameter declaration becomes local in riscv_core with formal parameter declaration list [/home/us1/github/PU-RISCV/rtl/verilog/core/riscv_core.sv:198]
+ERROR: [Synth 8-1031] HSIZE is not declared [/home/us1/github/PU-RISCV/rtl/verilog/pu/riscv_biu2wb.sv:188]
+ERROR: [Synth 8-1031] HSIZE is not declared [/home/us1/github/PU-RISCV/rtl/verilog/pu/riscv_biu2wb.sv:208]
+INFO: [Synth 8-2350] module riscv_biu2wb ignored due to previous errors [/home/us1/github/PU-RISCV/rtl/verilog/pu/riscv_biu2wb.sv:45]
+Failed to read verilog '/home/us1/github/PU-RISCV/rtl/verilog/pu/riscv_biu2wb.sv'
+INFO: [Common 17-83] Releasing license: Synthesis
+7 Infos, 17 Warnings, 0 Critical Warnings and 3 Errors encountered.
+synth_design failed
+ERROR: [Common 17-69] Command failed: Synthesis failed - please see the console or run log file for details
+INFO: [Common 17-206] Exiting Vivado at Sun Jan 31 01:50:35 2021...

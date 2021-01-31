@@ -1,4 +1,4 @@
--- Converted from mpsoc_spram_synthesis.sv
+-- Converted from mpsoc_wb_ram_generic.v
 -- by verilog2vhdl - QueenField
 
 --//////////////////////////////////////////////////////////////////////////////
@@ -13,8 +13,8 @@
 --                                                                            //
 --                                                                            //
 --              MPSoC-RISCV CPU                                               //
---              Master Slave Interface Tesbench                               //
---              AMBA3 AHB-Lite Bus Interface                                  //
+--              Single Port RAM                                               //
+--              Wishbone Bus Interface                                        //
 --                                                                            //
 --//////////////////////////////////////////////////////////////////////////////
 
@@ -40,6 +40,7 @@
 -- *
 -- * =============================================================================
 -- * Author(s):
+-- *   Olof Kindgren <olof.kindgren@gmail.com>
 -- *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 -- */
 
@@ -50,93 +51,55 @@ use ieee.math_real.all;
 
 use work.mpsoc_spram_wb_pkg.all;
 
-entity mpsoc_spram_synthesis is
+entity mpsoc_wb_ram_generic is
   generic (
-    --Memory parameters
     DEPTH   : integer := 256;
     MEMFILE : string  := "";
-    --Wishbone parameters
-    DW      : integer := 32;
-    AW      : integer := integer(log2(real(DEPTH)))
-  );
+
+    AW : integer := integer(log2(real(DEPTH)));
+    DW : integer := 32
+    );
   port (
-    wb_clk_i : in std_logic;
-    wb_rst_i : in std_logic;
-
-    wb_adr_i : in std_logic_vector(AW-1 downto 0);
-    wb_dat_i : in std_logic_vector(DW-1 downto 0);
-    wb_sel_i : in std_logic_vector(3 downto 0);
-    wb_we_i  : in std_logic;
-    wb_bte_i : in std_logic_vector(1 downto 0);
-    wb_cti_i : in std_logic_vector(2 downto 0);
-    wb_cyc_i : in std_logic;
-    wb_stb_i : in std_logic;
-
-    wb_ack_o : out std_logic;
-    wb_err_o : out std_logic;
-    wb_dat_o : out std_logic_vector(DW-1 downto 0)
+    clk   : in  std_logic;
+    we    : in  std_logic_vector(3 downto 0);
+    din   : in  std_logic_vector(DW-1 downto 0);
+    waddr : in  std_logic_vector(AW-1 downto 0);
+    raddr : in  std_logic_vector(AW-1 downto 0);
+    dout  : out std_logic_vector(DW-1 downto 0)
     );
-end mpsoc_spram_synthesis;
+end mpsoc_wb_ram_generic;
 
-architecture RTL of mpsoc_spram_synthesis is
-  component mpsoc_wb_spram
-    generic (
-      --Memory parameters
-      DEPTH   : integer := 256;
-      MEMFILE : string  := "";
-      --Wishbone parameters
-      DW      : integer := 32;
-      AW      : integer := integer(log2(real(DEPTH)))
-    );
-    port (
-      wb_clk_i : in std_logic;
-      wb_rst_i : in std_logic;
-
-      wb_adr_i : in std_logic_vector(AW-1 downto 0);
-      wb_dat_i : in std_logic_vector(DW-1 downto 0);
-      wb_sel_i : in std_logic_vector(3 downto 0);
-      wb_we_i  : in std_logic;
-      wb_bte_i : in std_logic_vector(1 downto 0);
-      wb_cti_i : in std_logic_vector(2 downto 0);
-      wb_cyc_i : in std_logic;
-      wb_stb_i : in std_logic;
-
-      wb_ack_o : out std_logic;
-      wb_err_o : out std_logic;
-      wb_dat_o : out std_logic_vector(DW-1 downto 0)
-    );
-  end component;
+architecture RTL of mpsoc_wb_ram_generic is
+  --////////////////////////////////////////////////////////////////
+  --
+  -- Variables
+  --
+  signal mem : std_logic_matrix(DEPTH-1 downto 0)(DW-1 downto 0);
 
 begin
-
   --////////////////////////////////////////////////////////////////
   --
   -- Module Body
   --
+  processing_0 : process (clk)
+  begin
+    if (rising_edge(clk)) then
+      if (we(0) = '1') then
+        mem(to_integer(unsigned(raddr)))(7 downto 0) <= din(7 downto 0);
+      end if;
+      if (we(1) = '1') then
+        mem(to_integer(unsigned(raddr)))(15 downto 8) <= din(15 downto 8);
+      end if;
+      if (we(2) = '1') then
+        mem(to_integer(unsigned(raddr)))(23 downto 16) <= din(23 downto 16);
+      end if;
+      if (we(3) = '1') then
+        mem(to_integer(unsigned(raddr)))(31 downto 24) <= din(31 downto 24);
+      end if;
+      dout <= mem(to_integer(unsigned(raddr)));
+    end if;
+  end process;
 
-  --DUT WB
-  wb_spram : mpsoc_wb_spram
-    generic map (
-      DEPTH   => DEPTH,
-      MEMFILE => MEMFILE,
-
-      AW => AW,
-      DW => DW
-      )
-    port map (
-      wb_clk_i => wb_clk_i,
-      wb_rst_i => wb_rst_i,
-
-      wb_adr_i => wb_adr_i,
-      wb_dat_i => wb_dat_i,
-      wb_sel_i => wb_sel_i,
-      wb_we_i  => wb_we_i,
-      wb_bte_i => wb_bte_i,
-      wb_cti_i => wb_cti_i,
-      wb_cyc_i => wb_cyc_i,
-      wb_stb_i => wb_stb_i,
-      wb_ack_o => wb_ack_o,
-      wb_err_o => wb_err_o,
-      wb_dat_o => wb_dat_o
-      );
+  generating_0 : if (MEMFILE /= "") generate
+  end generate;
 end RTL;

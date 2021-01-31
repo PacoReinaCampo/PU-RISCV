@@ -42,16 +42,53 @@
 ##                                                                               ##
 ###################################################################################
 
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/wb/core/mpsoc_wb_ram_generic.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/wb/core/mpsoc_wb_spram.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/riscv_dcache_core.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/riscv_dext.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/riscv_icache_core.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/riscv_noicache_core.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/decode/riscv_id.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/riscv_alu.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/riscv_bu.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/riscv_div.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/riscv_execution.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/riscv_lsu.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/riscv_mul.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/fetch/riscv_if.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_dmem_ctrl.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_imem_ctrl.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_membuf.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_memmisaligned.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_mmu.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_mux.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_pmachk.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_pmpchk.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/riscv_bp.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/riscv_core.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/riscv_du.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/riscv_memory.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/riscv_rf.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/riscv_state.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/riscv_wb.vhd
 
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/wb/pkg/mpsoc_spram_wb_pkg.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/riscv_ram_1r1w_generic.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/riscv_ram_1r1w.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/riscv_ram_1rw_generic.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/riscv_ram_1rw.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/riscv_ram_queue.vhd
 
-read_vhdl -vhdl2008 mpsoc_spram_synthesis.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pu/riscv_biu2ahb3.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pu/riscv_pu_ahb3.vhd
+
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/riscv_defines.vhd
+
+read_vhdl -vhdl2008 spram/core/mpsoc_wb_ram_generic.vhd
+read_vhdl -vhdl2008 spram/core/mpsoc_wb_spram.vhd
+
+read_vhdl -vhdl2008 pu_riscv_synthesis.vhd
 
 read_xdc system.xdc
 
-synth_design -part xc7z020-clg484-1 -top mpsoc_spram_synthesis
+synth_design -part xc7z020-clg484-1 -top pu_riscv_synthesis
 
 opt_design
 place_design

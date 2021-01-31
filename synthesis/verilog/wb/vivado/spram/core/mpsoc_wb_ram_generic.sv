@@ -10,8 +10,8 @@
 //                                                                            //
 //                                                                            //
 //              MPSoC-RISCV CPU                                               //
-//              Master Slave Interface Tesbench                               //
-//              AMBA3 AHB-Lite Bus Interface                                  //
+//              Single Port RAM                                               //
+//              Wishbone Bus Interface                                        //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -37,65 +37,49 @@
  *
  * =============================================================================
  * Author(s):
+ *   Olof Kindgren <olof.kindgren@gmail.com>
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-module mpsoc_spram_synthesis #(
-  //Memory parameters
+module mpsoc_wb_ram_generic #(
   parameter DEPTH   = 256,
   parameter MEMFILE = "",
 
-  //Wishbone parameters
-  parameter DW = 32,
-  parameter AW = $clog2(DEPTH)
+  parameter AW = $clog2(DEPTH),
+  parameter DW = 32
 )
   (
-    input           wb_clk_i,
-    input           wb_rst_i,
-
-    input  [AW-1:0] wb_adr_i,
-    input  [DW-1:0] wb_dat_i,
-    input  [   3:0] wb_sel_i,
-    input           wb_we_i,
-    input  [   1:0] wb_bte_i,
-    input  [   2:0] wb_cti_i,
-    input           wb_cyc_i,
-    input           wb_stb_i,
-
-    output reg      wb_ack_o,
-    output          wb_err_o,
-    output [DW-1:0] wb_dat_o
+    input               clk,
+    input      [   3:0] we,
+    input      [DW-1:0] din,
+    input      [AW-1:0] waddr,
+    input      [AW-1:0] raddr,
+    output reg [DW-1:0] dout
   );
+
+  //////////////////////////////////////////////////////////////////
+  //
+  // Variables
+  //
+  reg [DW-1:0] mem [0:DEPTH-1] /* verilator public */;
 
   //////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
+  always @(posedge clk) begin
+    if (we[0]) mem[waddr][7:0]   <= din[7:0];
+    if (we[1]) mem[waddr][15:8]  <= din[15:8];
+    if (we[2]) mem[waddr][23:16] <= din[23:16];
+    if (we[3]) mem[waddr][31:24] <= din[31:24];
+    dout <= mem[raddr];
+  end
 
-  //DUT WB
-  mpsoc_wb_spram #(
-    //Memory parameters
-    .DEPTH   ( DEPTH   ),
-    .MEMFILE ( MEMFILE ),
-
-    //Wishbone parameters
-    .AW ( AW ),
-    .DW ( DW )
-  )
-  wb_spram (
-    .wb_clk_i ( wb_clk_i ),
-    .wb_rst_i ( wb_rst_i ),
-
-    .wb_adr_i ( wb_adr_i ),
-    .wb_dat_i ( wb_dat_i ),
-    .wb_sel_i ( wb_sel_i ),
-    .wb_we_i  ( wb_we_i  ),
-    .wb_bte_i ( wb_bte_i ),
-    .wb_cti_i ( wb_cti_i ),
-    .wb_cyc_i ( wb_cyc_i ),
-    .wb_stb_i ( wb_stb_i ),
-    .wb_ack_o ( wb_ack_o ),
-    .wb_err_o ( wb_err_o ),
-    .wb_dat_o ( wb_dat_o )
-  );
+  generate
+    initial
+      if(MEMFILE != "") begin
+        $display("Preloading %m from %s", MEMFILE);
+        $readmemh(MEMFILE, mem);
+      end
+  endgenerate
 endmodule
