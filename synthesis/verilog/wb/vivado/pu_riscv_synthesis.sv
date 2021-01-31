@@ -187,7 +187,7 @@ module pu_riscv_synthesis #(
   assign pma_cfg[3] = {`MEM_TYPE_MAIN, 8'b1111_0000, `AMO_TYPE_NONE, `TOR};
 
   // Processing Unit
-  riscv_pu_ahb3 #(
+  riscv_pu_wb #(
     .XLEN             ( XLEN             ),
     .PLEN             ( PLEN             ),
     .PC_INIT          ( PC_INIT          ),

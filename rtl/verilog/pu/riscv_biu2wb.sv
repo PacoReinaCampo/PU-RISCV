@@ -178,18 +178,17 @@ module riscv_biu2wb #(
   //State Machine
   always @(posedge HCLK, negedge HRESETn)
     if (!HRESETn) begin
-      data_ena    <= 1'b0;
-      biu_err_o   <= 1'b0;
-      burst_cnt   <= 'h0;
+      data_ena  <= 1'b0;
+      biu_err_o <= 1'b0;
+      burst_cnt <= 'h0;
 
-      wb_stb_o        <= 1'b0;
-      wb_adr_o       <= 'h0;
-      wb_we_o      <= 1'b0;
-      HSIZE       <= 'h0; //dont care
-      wb_cti_o      <= 'h0; //dont care
-      wb_sel_o       <= `HPROT_DATA | `HPROT_PRIVILEGED | `HPROT_NON_BUFFERABLE | `HPROT_NON_CACHEABLE;
-      wb_bte_o      <= `HTRANS_IDLE;
-      wb_cyc_o   <= 1'b0;
+      wb_stb_o <= 1'b0;
+      wb_adr_o <= 'h0;
+      wb_we_o  <= 1'b0;
+      wb_cti_o <= 'h0; //dont care
+      wb_sel_o <= `HPROT_DATA | `HPROT_PRIVILEGED | `HPROT_NON_BUFFERABLE | `HPROT_NON_CACHEABLE;
+      wb_bte_o <= `HTRANS_IDLE;
+      wb_cyc_o <= 1'b0;
     end
   else begin
     //strobe/ack signals
@@ -201,20 +200,19 @@ module riscv_biu2wb #(
           data_ena    <= 1'b1;
           burst_cnt   <= biu_type2cnt(biu_type_i);
 
-          wb_stb_o        <= 1'b1;
-          wb_bte_o      <= `HTRANS_NONSEQ; //start of burst
-          wb_adr_o       <= biu_adri_i;
-          wb_we_o      <= biu_we_i;
-          HSIZE       <= biu_size2hsize (biu_size_i);
-          wb_cti_o      <= biu_type2hburst(biu_type_i);
-          wb_sel_o       <= biu_prot2hprot (biu_prot_i);
-          wb_cyc_o   <= biu_lock_i;
+          wb_stb_o <= 1'b1;
+          wb_bte_o <= `HTRANS_NONSEQ; //start of burst
+          wb_adr_o <= biu_adri_i;
+          wb_we_o  <= biu_we_i;
+          wb_cti_o <= biu_type2hburst(biu_type_i);
+          wb_sel_o <= biu_prot2hprot (biu_prot_i);
+          wb_cyc_o <= biu_lock_i;
         end
         else begin
-          data_ena  <= 1'b0;
+          data_ena <= 1'b0;
 
-          wb_stb_o      <= 1'b0;
-          wb_bte_o    <= `HTRANS_IDLE; //no new transfer
+          wb_stb_o <= 1'b0;
+          wb_bte_o <= `HTRANS_IDLE; //no new transfer
           wb_cyc_o <= biu_lock_i;
         end
       end
@@ -222,8 +220,8 @@ module riscv_biu2wb #(
         data_ena  <= 1'b1;
         burst_cnt <= burst_cnt - 1;
 
-        wb_bte_o    <= `HTRANS_SEQ; //continue burst
-        wb_adr_o     <= nxt_addr(wb_adr_o,wb_cti_o); //next address
+        wb_bte_o <= `HTRANS_SEQ; //continue burst
+        wb_adr_o <= nxt_addr(wb_adr_o,wb_cti_o); //next address
       end
     end
     else begin
@@ -231,8 +229,8 @@ module riscv_biu2wb #(
       if (wb_err_i == `HRESP_ERROR) begin
         burst_cnt <= 'h0; //burst done (interrupted)
 
-        wb_stb_o      <= 1'b0;
-        wb_bte_o    <= `HTRANS_IDLE;
+        wb_stb_o <= 1'b0;
+        wb_bte_o <= `HTRANS_IDLE;
 
         data_ena  <= 1'b0;
         biu_err_o <= 1'b1;
@@ -247,13 +245,13 @@ module riscv_biu2wb #(
 
   always @(posedge HCLK) begin
     if (wb_ack_i) begin
-      wb_dat_o     <= biu_di_dly;
+      wb_dat_o   <= biu_di_dly;
       biu_adro_o <= wb_adr_o;
     end
   end
 
   always @(posedge HCLK, negedge HRESETn) begin
-    if      (!HRESETn) data_ena_d <= 1'b0;
+    if      (!HRESETn  ) data_ena_d <= 1'b0;
     else if ( wb_ack_i ) data_ena_d <= data_ena;
   end
 
