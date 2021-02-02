@@ -10,8 +10,8 @@
 //                                                                            //
 //                                                                            //
 //              MPSoC-RISCV CPU                                               //
-//              Master Slave Interface Tesbench                               //
-//              AMBA3 AHB-Lite Bus Interface                                  //
+//              Master Slave Interface                                        //
+//              Wishbone Bus Interface                                        //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -37,65 +37,81 @@
  *
  * =============================================================================
  * Author(s):
+ *   Olof Kindgren <olof.kindgren@gmail.com>
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-module mpsoc_spram_synthesis #(
-  //Memory parameters
-  parameter DEPTH   = 256,
-  parameter MEMFILE = "",
+//////////////////////////////////////////////////////////////////
+//
+// Constants
+//
 
-  //Wishbone parameters
-  parameter DW = 32,
-  parameter AW = $clog2(DEPTH)
-)
-  (
-    input           wb_clk_i,
-    input           wb_rst_i,
+localparam CLASSIC_CYCLE = 1'b0;
+localparam BURST_CYCLE   = 1'b1;
 
-    input  [AW-1:0] wb_adr_i,
-    input  [DW-1:0] wb_dat_i,
-    input  [   3:0] wb_sel_i,
-    input           wb_we_i,
-    input  [   1:0] wb_bte_i,
-    input  [   2:0] wb_cti_i,
-    input           wb_cyc_i,
-    input           wb_stb_i,
+localparam READ  = 1'b0;
+localparam WRITE = 1'b1;
 
-    output reg      wb_ack_o,
-    output          wb_err_o,
-    output [DW-1:0] wb_dat_o
-  );
+localparam [2:0] CTI_CLASSIC      = 3'b000;
+localparam [2:0] CTI_CONST_BURST  = 3'b001;
+localparam [2:0] CTI_INC_BURST    = 3'b010;
+localparam [2:0] CTI_END_OF_BURST = 3'b111;
 
-  //////////////////////////////////////////////////////////////////
-  //
-  // Module Body
-  //
 
-  //DUT WB
-  mpsoc_wb_spram #(
-    //Memory parameters
-    .DEPTH   ( DEPTH   ),
-    .MEMFILE ( MEMFILE ),
+localparam [1:0] BTE_LINEAR  = 2'd0;
+localparam [1:0] BTE_WRAP_4  = 2'd1;
+localparam [1:0] BTE_WRAP_8  = 2'd2;
+localparam [1:0] BTE_WRAP_16 = 2'd3;
 
-    //Wishbone parameters
-    .AW ( AW ),
-    .DW ( DW )
-  )
-  wb_spram (
-    .wb_clk_i ( wb_clk_i ),
-    .wb_rst_i ( wb_rst_i ),
+//////////////////////////////////////////////////////////////////
+//
+// Functions
+//
 
-    .wb_adr_i ( wb_adr_i ),
-    .wb_dat_i ( wb_dat_i ),
-    .wb_sel_i ( wb_sel_i ),
-    .wb_we_i  ( wb_we_i  ),
-    .wb_bte_i ( wb_bte_i ),
-    .wb_cti_i ( wb_cti_i ),
-    .wb_cyc_i ( wb_cyc_i ),
-    .wb_stb_i ( wb_stb_i ),
-    .wb_ack_o ( wb_ack_o ),
-    .wb_err_o ( wb_err_o ),
-    .wb_dat_o ( wb_dat_o )
-  );
-endmodule
+function get_cycle_type;
+  input [2:0] cti;
+  begin
+    get_cycle_type = (cti === CTI_CLASSIC) ? CLASSIC_CYCLE : BURST_CYCLE;
+  end
+endfunction
+
+function wb_is_last;
+  input [2:0] cti;
+  begin
+    case (cti)
+      CTI_CLASSIC      : wb_is_last = 1'b1;
+      CTI_CONST_BURST  : wb_is_last = 1'b0;
+      CTI_INC_BURST    : wb_is_last = 1'b0;
+      CTI_END_OF_BURST : wb_is_last = 1'b1;
+      default          : $display("%d : Illegal Wishbone B3 cycle type (%b)", $time, cti);
+    endcase
+  end
+endfunction
+
+function [31:0] wb_next_adr;
+  input [31:0] adr_i;
+  input [ 2:0] cti_i;
+  input [ 2:0] bte_i;
+
+  input integer dw;
+
+  reg [31:0] adr;
+
+  integer shift;
+
+  begin
+    if (dw == 64) shift = 3;
+    else if (dw == 32) shift = 2;
+    else if (dw == 16) shift = 1;
+    else shift = 0;
+    adr = adr_i >> shift;
+    if (cti_i == CTI_INC_BURST)
+      case (bte_i)
+        BTE_LINEAR   : adr = adr + 1;
+        BTE_WRAP_4   : adr = {adr[31:2], adr[1:0]+2'd1};
+        BTE_WRAP_8   : adr = {adr[31:3], adr[2:0]+3'd1};
+        BTE_WRAP_16  : adr = {adr[31:4], adr[3:0]+4'd1};
+      endcase
+    wb_next_adr = adr << shift;
+  end
+endfunction

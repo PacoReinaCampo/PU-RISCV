@@ -10,8 +10,8 @@
 //                                                                            //
 //                                                                            //
 //              MPSoC-RISCV CPU                                               //
-//              Master Slave Interface Tesbench                               //
-//              AMBA3 AHB-Lite Bus Interface                                  //
+//              Single Port RAM                                               //
+//              Wishbone Bus Interface                                        //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -37,80 +37,49 @@
  *
  * =============================================================================
  * Author(s):
+ *   Olof Kindgren <olof.kindgren@gmail.com>
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-module mpsoc_spram_testbench;
+module mpsoc_wb_ram_generic #(
+  parameter DEPTH   = 256,
+  parameter MEMFILE = "",
 
-  //////////////////////////////////////////////////////////////////
-  //
-  // Constants
-  //
-
-  localparam XLEN = 64;
-  localparam PLEN = 64;
-
-  localparam SYNC_DEPTH = 3;
-  localparam TECHNOLOGY = "GENERIC";
-
-  //Memory parameters
-  parameter DEPTH   = 256;
-  parameter MEMFILE = "";
+  parameter AW = $clog2(DEPTH),
+  parameter DW = 32
+)
+  (
+    input               clk,
+    input      [   3:0] we,
+    input      [DW-1:0] din,
+    input      [AW-1:0] waddr,
+    input      [AW-1:0] raddr,
+    output reg [DW-1:0] dout
+  );
 
   //////////////////////////////////////////////////////////////////
   //
   // Variables
   //
-
-  //Common signals
-  wire                                     HRESETn;
-  wire                                     HCLK;
-
-  //AHB3 signals
-  wire                                     mst_spram_HSEL;
-  wire               [PLEN           -1:0] mst_spram_HADDR;
-  wire               [XLEN           -1:0] mst_spram_HWDATA;
-  wire               [XLEN           -1:0] mst_spram_HRDATA;
-  wire                                     mst_spram_HWRITE;
-  wire               [                2:0] mst_spram_HSIZE;
-  wire               [                2:0] mst_spram_HBURST;
-  wire               [                3:0] mst_spram_HPROT;
-  wire               [                1:0] mst_spram_HTRANS;
-  wire                                     mst_spram_HMASTLOCK;
-  wire                                     mst_spram_HREADY;
-  wire                                     mst_spram_HREADYOUT;
-  wire                                     mst_spram_HRESP;
+  reg [DW-1:0] mem [0:DEPTH-1] /* verilator public */;
 
   //////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
+  always @(posedge clk) begin
+    if (we[0]) mem[waddr][7:0]   <= din[7:0];
+    if (we[1]) mem[waddr][15:8]  <= din[15:8];
+    if (we[2]) mem[waddr][23:16] <= din[23:16];
+    if (we[3]) mem[waddr][31:24] <= din[31:24];
+    dout <= mem[raddr];
+  end
 
-  //DUT AHB3
-  mpsoc_ahb3_spram #(
-    .MEM_SIZE          ( 256 ),
-    .MEM_DEPTH         ( 256 ),
-    .PLEN              ( PLEN ),
-    .XLEN              ( XLEN ),
-    .TECHNOLOGY        ( TECHNOLOGY ),
-    .REGISTERED_OUTPUT ( "NO" )
-  )
-  ahb3_spram (
-    .HRESETn   ( HRESETn ),
-    .HCLK      ( HCLK    ),
-
-    .HSEL      ( mst_spram_HSEL      ),
-    .HADDR     ( mst_spram_HADDR     ),
-    .HWDATA    ( mst_spram_HWDATA    ),
-    .HRDATA    ( mst_spram_HRDATA    ),
-    .HWRITE    ( mst_spram_HWRITE    ),
-    .HSIZE     ( mst_spram_HSIZE     ),
-    .HBURST    ( mst_spram_HBURST    ),
-    .HPROT     ( mst_spram_HPROT     ),
-    .HTRANS    ( mst_spram_HTRANS    ),
-    .HMASTLOCK ( mst_spram_HMASTLOCK ),
-    .HREADYOUT ( mst_spram_HREADYOUT ),
-    .HREADY    ( mst_spram_HREADY    ),
-    .HRESP     ( mst_spram_HRESP     )
-  );
+  generate
+    initial
+      if(MEMFILE != "") begin
+        $display("Preloading %m from %s", MEMFILE);
+        $readmemh(MEMFILE, mem);
+      end
+  endgenerate
 endmodule

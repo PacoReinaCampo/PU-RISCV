@@ -334,9 +334,9 @@ module riscv_ahb2axi #(
   assign buf_rdata_clk_en     = bus_clk_en & buf_rdata_en;
 
   always @(negedge clk) begin
-    ahb3_clk      = clk & (bus_clk_en           | scan_mode);
-    ahb3_addr_clk = clk & (ahb3_bus_addr_clk_en | scan_mode);
-    buf_rdata_clk = clk & (buf_rdata_clk_en     | scan_mode);
+    ahb3_clk      = (bus_clk_en           | scan_mode);  // clk &
+    ahb3_addr_clk = (ahb3_bus_addr_clk_en | scan_mode);  // clk &
+    buf_rdata_clk = (buf_rdata_clk_en     | scan_mode);  // clk &
   end
 
   // Address check  dccm
@@ -467,6 +467,6 @@ module riscv_ahb2axi #(
 
   // Clock header logic
   always @(negedge clk) begin
-    bus_clk = clk & (bus_clk_en | scan_mode);
+    bus_clk = (bus_clk_en | scan_mode);  // clk &
   end
 endmodule

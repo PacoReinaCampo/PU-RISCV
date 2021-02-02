@@ -10,7 +10,7 @@
 //                                                                            //
 //                                                                            //
 //              MPSoC-RISCV CPU                                               //
-//              Master Slave Interface Tesbench                               //
+//              Memory - 1R1W RAM Block                                       //
 //              AMBA3 AHB-Lite Bus Interface                                  //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,77 +40,113 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-module mpsoc_spram_testbench;
+module mpsoc_ram_1r1w #(
+  parameter ABITS      = 10,
+  parameter DBITS      = 32,
+  parameter TECHNOLOGY = "GENERIC"
+)
+  (
+    input                    rst_ni,
+    input                    clk_i,
 
-  //////////////////////////////////////////////////////////////////
-  //
-  // Constants
-  //
+    //Write side
+    input  [ ABITS     -1:0] waddr_i,
+    input  [ DBITS     -1:0] din_i,
+    input                    we_i,
+    input  [(DBITS+7)/8-1:0] be_i,
 
-  localparam XLEN = 64;
-  localparam PLEN = 64;
-
-  localparam SYNC_DEPTH = 3;
-  localparam TECHNOLOGY = "GENERIC";
-
-  //Memory parameters
-  parameter DEPTH   = 256;
-  parameter MEMFILE = "";
+    //Read side
+    input  [ ABITS     -1:0] raddr_i,
+    input                    re_i,
+    output [ DBITS     -1:0] dout_o
+  );
 
   //////////////////////////////////////////////////////////////////
   //
   // Variables
   //
-
-  //Common signals
-  wire                                     HRESETn;
-  wire                                     HCLK;
-
-  //AHB3 signals
-  wire                                     mst_spram_HSEL;
-  wire               [PLEN           -1:0] mst_spram_HADDR;
-  wire               [XLEN           -1:0] mst_spram_HWDATA;
-  wire               [XLEN           -1:0] mst_spram_HRDATA;
-  wire                                     mst_spram_HWRITE;
-  wire               [                2:0] mst_spram_HSIZE;
-  wire               [                2:0] mst_spram_HBURST;
-  wire               [                3:0] mst_spram_HPROT;
-  wire               [                1:0] mst_spram_HTRANS;
-  wire                                     mst_spram_HMASTLOCK;
-  wire                                     mst_spram_HREADY;
-  wire                                     mst_spram_HREADYOUT;
-  wire                                     mst_spram_HRESP;
+  logic             contention;
+  logic             contention_reg;
+  logic [DBITS-1:0] mem_dout;
+  logic [DBITS-1:0] din_dly;
 
   //////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
+  generate
+    if (TECHNOLOGY == "N3XS" || TECHNOLOGY == "n3xs") begin
+      //eASIC N3XS
+      mpsoc_ram_1r1w_easic_n3xs #(
+        .ABITS ( ABITS ),
+        .DBITS ( DBITS )
+      )
+      ram_inst (
+        .rst_ni  ( rst_ni     ),
+        .clk_i   ( clk_i      ),
 
-  //DUT AHB3
-  mpsoc_ahb3_spram #(
-    .MEM_SIZE          ( 256 ),
-    .MEM_DEPTH         ( 256 ),
-    .PLEN              ( PLEN ),
-    .XLEN              ( XLEN ),
-    .TECHNOLOGY        ( TECHNOLOGY ),
-    .REGISTERED_OUTPUT ( "NO" )
-  )
-  ahb3_spram (
-    .HRESETn   ( HRESETn ),
-    .HCLK      ( HCLK    ),
+        .waddr_i ( waddr_i    ),
+        .din_i   ( din_i      ),
+        .we_i    ( we_i       ),
+        .be_i    ( be_i       ),
 
-    .HSEL      ( mst_spram_HSEL      ),
-    .HADDR     ( mst_spram_HADDR     ),
-    .HWDATA    ( mst_spram_HWDATA    ),
-    .HRDATA    ( mst_spram_HRDATA    ),
-    .HWRITE    ( mst_spram_HWRITE    ),
-    .HSIZE     ( mst_spram_HSIZE     ),
-    .HBURST    ( mst_spram_HBURST    ),
-    .HPROT     ( mst_spram_HPROT     ),
-    .HTRANS    ( mst_spram_HTRANS    ),
-    .HMASTLOCK ( mst_spram_HMASTLOCK ),
-    .HREADYOUT ( mst_spram_HREADYOUT ),
-    .HREADY    ( mst_spram_HREADY    ),
-    .HRESP     ( mst_spram_HRESP     )
-  );
+        .raddr_i ( raddr_i    ),
+        .re_i    (~contention ),
+        .dout_o  ( mem_dout   )
+      );
+    end
+    else if (TECHNOLOGY == "N3X" || TECHNOLOGY == "n3x") begin
+      //eASIC N3X
+      mpsoc_ram_1r1w_easic_n3x #(
+        .ABITS ( ABITS ),
+        .DBITS ( DBITS )
+      )
+      ram_inst (
+        .rst_ni  ( rst_ni     ),
+        .clk_i   ( clk_i      ),
+
+        .waddr_i ( waddr_i    ),
+        .din_i   ( din_i      ),
+        .we_i    ( we_i       ),
+        .be_i    ( be_i       ),
+
+        .raddr_i ( raddr_i    ),
+        .re_i    (~contention ),
+        .dout_o  ( mem_dout   )
+      );
+    end
+    else begin //(TECHNOLOGY == "GENERIC")
+      //GENERIC  -- inferrable memory
+
+      //initial $display ("INFO   : No memory technology specified. Using generic inferred memory (%m)");
+      mpsoc_ram_1r1w_generic #(
+        .ABITS ( ABITS ),
+        .DBITS ( DBITS )
+      )
+      ram_inst (
+        .rst_ni  ( rst_ni   ),
+        .clk_i   ( clk_i    ),
+
+        .waddr_i ( waddr_i  ),
+        .din_i   ( din_i    ),
+        .we_i    ( we_i     ),
+        .be_i    ( be_i     ),
+
+        .raddr_i ( raddr_i  ),
+        .dout_o  ( mem_dout )
+      );
+    end
+  endgenerate
+
+  //TODO Handle 'be' ... requires partial old, partial new data
+
+  //now ... write-first; we'll still need some bypass logic
+  assign contention = we_i && (raddr_i == waddr_i) ? re_i : 1'b0; //prevent 'x' from propagating from eASIC memories
+
+  always @(posedge clk_i) begin
+    contention_reg <= contention;
+    din_dly        <= din_i;
+  end
+
+  assign dout_o = contention_reg ? din_dly : mem_dout;
 endmodule
