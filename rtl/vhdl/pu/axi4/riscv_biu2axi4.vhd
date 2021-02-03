@@ -43,23 +43,29 @@
 -- *   Francisco Javier Reina Campo <frareicam@gmail.com>
 -- */
 
-use work."riscv_defines.sv".all;
-
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.riscv_defines.all;
+
 entity riscv_biu2axi4 is
+  generic (
+    XLEN : integer := 64;
+    PLEN : integer := 64;
+    AXI_ID_WIDTH : integer := 10;
+    AXI_ADDR_WIDTH : integer := 64;
+    AXI_DATA_WIDTH : integer := 64;
+    AXI_STRB_WIDTH : integer := 10;
+    AXI_USER_WIDTH : integer := 10;
+    AHB_ADDR_WIDTH : integer := 64;
+    AHB_DATA_WIDTH : integer := 64
+  );
   port (
-
-
-
-
     HRESETn : in std_logic;
     HCLK : in std_logic;
 
-  --AXI4 instruction
+    --AXI4 instruction
     axi4_aw_id : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
     axi4_aw_addr : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
     axi4_aw_len : out std_logic_vector(7 downto 0);
@@ -109,7 +115,7 @@ entity riscv_biu2axi4 is
     axi4_b_valid : in std_logic;
     axi4_b_ready : out std_logic;
 
-  --BIU Bus (Core ports)
+    --BIU Bus (Core ports)
     biu_stb_i : in std_logic;  --strobe
     biu_stb_ack_o : out std_logic;  --strobe acknowledge; can send new strobe
     biu_d_ack_o : out std_logic;  --data acknowledge (send new biu_d_i); for pipelined buses
@@ -125,15 +131,6 @@ entity riscv_biu2axi4 is
     biu_ack_o : out std_logic   --transfer acknowledge
     biu_err_o : out std_logic  --transfer error
   );
-  constant XLEN : integer := 64;
-  constant PLEN : integer := 64;
-  constant AXI_ID_WIDTH : integer := 10;
-  constant AXI_ADDR_WIDTH : integer := 64;
-  constant AXI_DATA_WIDTH : integer := 64;
-  constant AXI_STRB_WIDTH : integer := 10;
-  constant AXI_USER_WIDTH : integer := 10;
-  constant AHB_ADDR_WIDTH : integer := 64;
-  constant AHB_DATA_WIDTH : integer := 64;
 end riscv_biu2axi4;
 
 architecture RTL of riscv_biu2axi4 is

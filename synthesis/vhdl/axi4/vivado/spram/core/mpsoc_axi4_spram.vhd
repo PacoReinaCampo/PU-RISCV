@@ -48,6 +48,13 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity mpsoc_axi4_spram is
+  generic (
+    AXI_ID_WIDTH : integer := 10;
+    AXI_ADDR_WIDTH : integer := 64;
+    AXI_DATA_WIDTH : integer := 64;
+    AXI_STRB_WIDTH : integer := 8;
+    AXI_USER_WIDTH : integer := 10
+  );  
   port (
     clk_i : in std_logic;  -- Clock
     rst_ni : in std_logic;  -- Asynchronous reset active low
@@ -108,11 +115,6 @@ entity mpsoc_axi4_spram is
     data_o : out std_logic_vector(AXI_DATA_WIDTH-1 downto 0) 
     data_i : in std_logic_vector(AXI_DATA_WIDTH-1 downto 0)
   );
-  constant AXI_ID_WIDTH : integer := 10;
-  constant AXI_ADDR_WIDTH : integer := 64;
-  constant AXI_DATA_WIDTH : integer := 64;
-  constant AXI_STRB_WIDTH : integer := 8;
-  constant AXI_USER_WIDTH : integer := 10;
 end mpsoc_axi4_spram;
 
 architecture RTL of mpsoc_axi4_spram is

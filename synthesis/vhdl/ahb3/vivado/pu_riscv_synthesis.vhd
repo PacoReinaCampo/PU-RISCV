@@ -426,6 +426,7 @@ begin
       dat_HMASTLOCK => dat_HMASTLOCK,
       dat_HREADY    => dat_HREADY,
       dat_HRESP     => dat_HRESP,
+
       --Interrupts
       ext_nmi       => ext_nmi,
       ext_tint      => ext_tint,

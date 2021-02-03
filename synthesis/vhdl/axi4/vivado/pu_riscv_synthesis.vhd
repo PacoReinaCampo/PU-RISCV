@@ -43,50 +43,265 @@
 -- *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 -- */
 
-use work."riscv_defines.sv".all;
-
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.riscv_defines.all;
+
 entity pu_riscv_synthesis is
+  generic (
+      XLEN : integer := 64;
+      PLEN : integer := 64;
+
+      HAS_USER  : std_logic := '1';
+      HAS_SUPER : std_logic := '1';
+      HAS_HYPER : std_logic := '1';
+      HAS_BPU   : std_logic := '1';
+      HAS_FPU   : std_logic := '1';
+      HAS_MMU   : std_logic := '1';
+      HAS_RVM   : std_logic := '1';
+      HAS_RVA   : std_logic := '1';
+      HAS_RVC   : std_logic := '1';
+      IS_RV32E  : std_logic := '1';
+
+      MULT_LATENCY : std_logic := '1';
+
+      BREAKPOINTS : integer := 8;       --Number of hardware breakpoints
+
+      PMA_CNT : integer := 4;
+      PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
+
+      BP_GLOBAL_BITS    : integer := 2;
+      BP_LOCAL_BITS     : integer := 10;
+      BP_LOCAL_BITS_LSB : integer := 2;
+
+      ICACHE_SIZE        : integer := 64;  --in KBytes
+      ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+      ICACHE_WAYS        : integer := 2;   --'n'-way set associative
+      ICACHE_REPLACE_ALG : integer := 0;
+      ITCM_SIZE          : integer := 0;
+
+      DCACHE_SIZE        : integer := 64;  --in KBytes
+      DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+      DCACHE_WAYS        : integer := 2;   --'n'-way set associative
+      DCACHE_REPLACE_ALG : integer := 0;
+      DTCM_SIZE          : integer := 0;
+      WRITEBUFFER_SIZE   : integer := 8;
+
+      TECHNOLOGY : string := "GENERIC";
+
+      PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000";
+
+      MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
+      MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
+      HTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000080";
+      STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
+      UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
+
+      JEDEC_BANK : integer := 10;
+
+      JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
+
+      HARTID : integer := 0;
+
+      PARCEL_SIZE : integer := 64
+  );
   port (
+    HRESETn : in std_logic;
+    HCLK    : in std_logic;
 
+    --Interrupts
+    ext_nmi  : in std_logic;
+    ext_tint : in std_logic;
+    ext_sint : in std_logic;
+    ext_int  : in std_logic_vector(3 downto 0);
 
+    --Debug Interface
+    dbg_stall : in  std_logic;
+    dbg_strb  : in  std_logic;
+    dbg_we    : in  std_logic;
+    dbg_addr  : in  std_logic_vector(31 downto 0);
+    dbg_dati  : in  std_logic_vector(31 downto 0);
+    dbg_dato  : out std_logic_vector(31 downto 0);
+    dbg_ack   : out std_logic;
+    dbg_bp    : out std_logic
+  );
+end pu_riscv_synthesis;
 
+architecture RTL of pu_riscv_synthesis is
+  component riscv_pu_axi4
+  generic (
+    AXI_ID_WIDTH : integer := 10;
+    AXI_ADDR_WIDTH : integer := 64;
+    AXI_DATA_WIDTH : integer := 64;
+    AXI_STRB_WIDTH : integer := 10;
+    AXI_USER_WIDTH : integer := 10;
 
-  --Number of hardware breakpoints
+    AHB_ADDR_WIDTH : integer := 64;
+    AHB_DATA_WIDTH : integer := 64;
+    XLEN : integer := 64;
+    PLEN : integer := 64;
+    PC_INIT : std_logic_vector(XLEN-1 downto 0) := X"80000000";
+    HAS_USER : integer := 1;
+    HAS_SUPER : integer := 1;
+    HAS_HYPER : integer := 1;
+    HAS_BPU : integer := 1;
+    HAS_FPU : integer := 1;
+    HAS_MMU : integer := 1;
+    HAS_RVM : integer := 1;
+    HAS_RVA : integer := 1;
+    HAS_RVC : integer := 1;
+    IS_RV32E : integer := 0;
 
-  --Number of Physical Memory Protection entries
+    MULT_LATENCY : integer := 1;
 
+    BREAKPOINTS : integer := 8;  --Number of hardware breakpoints
 
+    PMA_CNT : integer := 4;
+    PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
 
-  --in KBytes
-  --in Bytes
-  --'n'-way set associative
+    BP_GLOBAL_BITS : integer := 2;
+    BP_LOCAL_BITS : integer := 10;
+    BP_LOCAL_BITS_LSB : integer := 2;
 
+    ICACHE_SIZE : integer := 64;  --in KBytes
+    ICACHE_BLOCK_SIZE : integer := 64;  --in Bytes
+    ICACHE_WAYS : integer := 2;  --'n'-way set associative
+    ICACHE_REPLACE_ALG : integer := 0;
+    ITCM_SIZE : integer := 0;
 
-  --in KBytes
-  --in Bytes
-  --'n'-way set associative
+    DCACHE_SIZE : integer := 64;  --in KBytes
+    DCACHE_BLOCK_SIZE : integer := 64;  --in Bytes
+    DCACHE_WAYS : integer := 2;  --'n'-way set associative
+    DCACHE_REPLACE_ALG : integer := 0;
+    DTCM_SIZE : integer := 0;
+    WRITEBUFFER_SIZE : integer := 8;
 
+    TECHNOLOGY : integer := "GENERIC";
 
+    MNMIVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"004";
+    MTVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"040";
+    HTVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"080";
+    STVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"0C0";
+    UTVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"100";
 
+    JEDEC_BANK : integer := 10;
+    JEDEC_MANUFACTURER_ID : integer := X"6e";
 
+    HARTID : integer := 0;
 
-
-
-
-
-
+    PARCEL_SIZE : integer := 32
+  );
+  port (
     HRESETn : in std_logic;
     HCLK : in std_logic;
 
+    pma_cfg_i : in std_logic_vector(13 downto 0);
+    pma_adr_i : in std_logic_vector(XLEN-1 downto 0);
+
+  --AXI4 instruction
+    axi4_ins_aw_id : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
+    axi4_ins_aw_addr : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
+    axi4_ins_aw_len : out std_logic_vector(7 downto 0);
+    axi4_ins_aw_size : out std_logic_vector(2 downto 0);
+    axi4_ins_aw_burst : out std_logic_vector(1 downto 0);
+    axi4_ins_aw_lock : out std_logic;
+    axi4_ins_aw_cache : out std_logic_vector(3 downto 0);
+    axi4_ins_aw_prot : out std_logic_vector(2 downto 0);
+    axi4_ins_aw_qos : out std_logic_vector(3 downto 0);
+    axi4_ins_aw_region : out std_logic_vector(3 downto 0);
+    axi4_ins_aw_user : out std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi4_ins_aw_valid : out std_logic;
+    axi4_ins_aw_ready : in std_logic;
+
+    axi4_ins_ar_id : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
+    axi4_ins_ar_addr : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
+    axi4_ins_ar_len : out std_logic_vector(7 downto 0);
+    axi4_ins_ar_size : out std_logic_vector(2 downto 0);
+    axi4_ins_ar_burst : out std_logic_vector(1 downto 0);
+    axi4_ins_ar_lock : out std_logic;
+    axi4_ins_ar_cache : out std_logic_vector(3 downto 0);
+    axi4_ins_ar_prot : out std_logic_vector(2 downto 0);
+    axi4_ins_ar_qos : out std_logic_vector(3 downto 0);
+    axi4_ins_ar_region : out std_logic_vector(3 downto 0);
+    axi4_ins_ar_user : out std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi4_ins_ar_valid : out std_logic;
+    axi4_ins_ar_ready : in std_logic;
+
+    axi4_ins_w_data : out std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+    axi4_ins_w_strb : out std_logic_vector(AXI_STRB_WIDTH-1 downto 0);
+    axi4_ins_w_last : out std_logic;
+    axi4_ins_w_user : out std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi4_ins_w_valid : out std_logic;
+    axi4_ins_w_ready : in std_logic;
+
+    axi4_ins_r_id : in std_logic_vector(AXI_ID_WIDTH-1 downto 0);
+    axi4_ins_r_data : in std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+    axi4_ins_r_resp : in std_logic_vector(1 downto 0);
+    axi4_ins_r_last : in std_logic;
+    axi4_ins_r_user : in std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi4_ins_r_valid : in std_logic;
+    axi4_ins_r_ready : out std_logic;
+
+    axi4_ins_b_id : in std_logic_vector(AXI_ID_WIDTH-1 downto 0);
+    axi4_ins_b_resp : in std_logic_vector(1 downto 0);
+    axi4_ins_b_user : in std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi4_ins_b_valid : in std_logic;
+    axi4_ins_b_ready : out std_logic;
+
+  --AXI4 data
+    axi4_dat_aw_id : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
+    axi4_dat_aw_addr : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
+    axi4_dat_aw_len : out std_logic_vector(7 downto 0);
+    axi4_dat_aw_size : out std_logic_vector(2 downto 0);
+    axi4_dat_aw_burst : out std_logic_vector(1 downto 0);
+    axi4_dat_aw_lock : out std_logic;
+    axi4_dat_aw_cache : out std_logic_vector(3 downto 0);
+    axi4_dat_aw_prot : out std_logic_vector(2 downto 0);
+    axi4_dat_aw_qos : out std_logic_vector(3 downto 0);
+    axi4_dat_aw_region : out std_logic_vector(3 downto 0);
+    axi4_dat_aw_user : out std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi4_dat_aw_valid : out std_logic;
+    axi4_dat_aw_ready : in std_logic;
+
+    axi4_dat_ar_id : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
+    axi4_dat_ar_addr : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
+    axi4_dat_ar_len : out std_logic_vector(7 downto 0);
+    axi4_dat_ar_size : out std_logic_vector(2 downto 0);
+    axi4_dat_ar_burst : out std_logic_vector(1 downto 0);
+    axi4_dat_ar_lock : out std_logic;
+    axi4_dat_ar_cache : out std_logic_vector(3 downto 0);
+    axi4_dat_ar_prot : out std_logic_vector(2 downto 0);
+    axi4_dat_ar_qos : out std_logic_vector(3 downto 0);
+    axi4_dat_ar_region : out std_logic_vector(3 downto 0);
+    axi4_dat_ar_user : out std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi4_dat_ar_valid : out std_logic;
+    axi4_dat_ar_ready : in std_logic;
+
+    axi4_dat_w_data : out std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+    axi4_dat_w_strb : out std_logic_vector(AXI_STRB_WIDTH-1 downto 0);
+    axi4_dat_w_last : out std_logic;
+    axi4_dat_w_user : out std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi4_dat_w_valid : out std_logic;
+    axi4_dat_w_ready : in std_logic;
+
+    axi4_dat_r_id : in std_logic_vector(AXI_ID_WIDTH-1 downto 0);
+    axi4_dat_r_data : in std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+    axi4_dat_r_resp : in std_logic_vector(1 downto 0);
+    axi4_dat_r_last : in std_logic;
+    axi4_dat_r_user : in std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi4_dat_r_valid : in std_logic;
+    axi4_dat_r_ready : out std_logic;
+
+    axi4_dat_b_id : in std_logic_vector(AXI_ID_WIDTH-1 downto 0);
+    axi4_dat_b_resp : in std_logic_vector(1 downto 0);
+    axi4_dat_b_user : in std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi4_dat_b_valid : in std_logic;
+    axi4_dat_b_ready : out std_logic;
+
   --Interrupts
-    ext_nmi : in std_logic;
-    ext_tint : in std_logic;
-    ext_sint : in std_logic;
+    ext_nmi, ext_tint, ext_sint : in std_logic;
     ext_int : in std_logic_vector(3 downto 0);
 
   --Debug Interface
@@ -99,244 +314,81 @@ entity pu_riscv_synthesis is
     dbg_ack : out std_logic 
     dbg_bp : out std_logic
   );
-  constant XLEN : integer := 32;
-  constant PLEN : integer := 32;
-  constant PC_INIT : std_logic_vector(XLEN-1 downto 0) := X"8000_0000";
-  constant HAS_USER : integer := 1;
-  constant HAS_SUPER : integer := 1;
-  constant HAS_HYPER : integer := 1;
-  constant HAS_BPU : integer := 1;
-  constant HAS_FPU : integer := 1;
-  constant HAS_MMU : integer := 1;
-  constant HAS_RVM : integer := 1;
-  constant HAS_RVA : integer := 1;
-  constant HAS_RVC : integer := 1;
-  constant IS_RV32E : integer := 0;
-  constant MULT_LATENCY : integer := 1;
-  constant BREAKPOINTS : integer := 8;
-  constant PMA_CNT : integer := 4;
-  constant PMP_CNT : integer := 16;
-  constant BP_GLOBAL_BITS : integer := 2;
-  constant BP_LOCAL_BITS : integer := 10;
-  constant BP_LOCAL_BITS_LSB : integer := 2;
-  constant ICACHE_SIZE : integer := 64;
-  constant ICACHE_BLOCK_SIZE : integer := 64;
-  constant ICACHE_WAYS : integer := 2;
-  constant ICACHE_REPLACE_ALG : integer := 0;
-  constant ITCM_SIZE : integer := 0;
-  constant DCACHE_SIZE : integer := 64;
-  constant DCACHE_BLOCK_SIZE : integer := 64;
-  constant DCACHE_WAYS : integer := 2;
-  constant DCACHE_REPLACE_ALG : integer := 0;
-  constant DTCM_SIZE : integer := 0;
-  constant WRITEBUFFER_SIZE : integer := 8;
-  constant TECHNOLOGY : integer := "GENERIC";
-  constant MNMIVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"004";
-  constant MTVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"040";
-  constant HTVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"080";
-  constant STVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"0C0";
-  constant UTVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"100";
-  constant JEDEC_BANK : integer := 10;
-  constant JEDEC_MANUFACTURER_ID : integer := X"6e";
-  constant HARTID : integer := 0;
-  constant PARCEL_SIZE : integer := 32;
-end pu_riscv_synthesis;
-
-architecture RTL of pu_riscv_synthesis is
-  component riscv_pu_axi4
-  generic (
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?
-  );
-  port (
-    HRESETn : std_logic_vector(? downto 0);
-    HCLK : std_logic_vector(? downto 0);
-    pma_cfg_i : std_logic_vector(? downto 0);
-    pma_adr_i : std_logic_vector(? downto 0);
-    axi4_ins_aw_id : std_logic_vector(? downto 0);
-    axi4_ins_aw_addr : std_logic_vector(? downto 0);
-    axi4_ins_aw_len : std_logic_vector(? downto 0);
-    axi4_ins_aw_size : std_logic_vector(? downto 0);
-    axi4_ins_aw_burst : std_logic_vector(? downto 0);
-    axi4_ins_aw_lock : std_logic_vector(? downto 0);
-    axi4_ins_aw_cache : std_logic_vector(? downto 0);
-    axi4_ins_aw_prot : std_logic_vector(? downto 0);
-    axi4_ins_aw_qos : std_logic_vector(? downto 0);
-    axi4_ins_aw_region : std_logic_vector(? downto 0);
-    axi4_ins_aw_user : std_logic_vector(? downto 0);
-    axi4_ins_aw_valid : std_logic_vector(? downto 0);
-    axi4_ins_aw_ready : std_logic_vector(? downto 0);
-    axi4_ins_ar_id : std_logic_vector(? downto 0);
-    axi4_ins_ar_addr : std_logic_vector(? downto 0);
-    axi4_ins_ar_len : std_logic_vector(? downto 0);
-    axi4_ins_ar_size : std_logic_vector(? downto 0);
-    axi4_ins_ar_burst : std_logic_vector(? downto 0);
-    axi4_ins_ar_lock : std_logic_vector(? downto 0);
-    axi4_ins_ar_cache : std_logic_vector(? downto 0);
-    axi4_ins_ar_prot : std_logic_vector(? downto 0);
-    axi4_ins_ar_qos : std_logic_vector(? downto 0);
-    axi4_ins_ar_region : std_logic_vector(? downto 0);
-    axi4_ins_ar_user : std_logic_vector(? downto 0);
-    axi4_ins_ar_valid : std_logic_vector(? downto 0);
-    axi4_ins_ar_ready : std_logic_vector(? downto 0);
-    axi4_ins_w_data : std_logic_vector(? downto 0);
-    axi4_ins_w_strb : std_logic_vector(? downto 0);
-    axi4_ins_w_last : std_logic_vector(? downto 0);
-    axi4_ins_w_user : std_logic_vector(? downto 0);
-    axi4_ins_w_valid : std_logic_vector(? downto 0);
-    axi4_ins_w_ready : std_logic_vector(? downto 0);
-    axi4_ins_r_id : std_logic_vector(? downto 0);
-    axi4_ins_r_data : std_logic_vector(? downto 0);
-    axi4_ins_r_resp : std_logic_vector(? downto 0);
-    axi4_ins_r_last : std_logic_vector(? downto 0);
-    axi4_ins_r_user : std_logic_vector(? downto 0);
-    axi4_ins_r_valid : std_logic_vector(? downto 0);
-    axi4_ins_r_ready : std_logic_vector(? downto 0);
-    axi4_ins_b_id : std_logic_vector(? downto 0);
-    axi4_ins_b_resp : std_logic_vector(? downto 0);
-    axi4_ins_b_user : std_logic_vector(? downto 0);
-    axi4_ins_b_valid : std_logic_vector(? downto 0);
-    axi4_ins_b_ready : std_logic_vector(? downto 0);
-    axi4_dat_aw_id : std_logic_vector(? downto 0);
-    axi4_dat_aw_addr : std_logic_vector(? downto 0);
-    axi4_dat_aw_len : std_logic_vector(? downto 0);
-    axi4_dat_aw_size : std_logic_vector(? downto 0);
-    axi4_dat_aw_burst : std_logic_vector(? downto 0);
-    axi4_dat_aw_lock : std_logic_vector(? downto 0);
-    axi4_dat_aw_cache : std_logic_vector(? downto 0);
-    axi4_dat_aw_prot : std_logic_vector(? downto 0);
-    axi4_dat_aw_qos : std_logic_vector(? downto 0);
-    axi4_dat_aw_region : std_logic_vector(? downto 0);
-    axi4_dat_aw_user : std_logic_vector(? downto 0);
-    axi4_dat_aw_valid : std_logic_vector(? downto 0);
-    axi4_dat_aw_ready : std_logic_vector(? downto 0);
-    axi4_dat_ar_id : std_logic_vector(? downto 0);
-    axi4_dat_ar_addr : std_logic_vector(? downto 0);
-    axi4_dat_ar_len : std_logic_vector(? downto 0);
-    axi4_dat_ar_size : std_logic_vector(? downto 0);
-    axi4_dat_ar_burst : std_logic_vector(? downto 0);
-    axi4_dat_ar_lock : std_logic_vector(? downto 0);
-    axi4_dat_ar_cache : std_logic_vector(? downto 0);
-    axi4_dat_ar_prot : std_logic_vector(? downto 0);
-    axi4_dat_ar_qos : std_logic_vector(? downto 0);
-    axi4_dat_ar_region : std_logic_vector(? downto 0);
-    axi4_dat_ar_user : std_logic_vector(? downto 0);
-    axi4_dat_ar_valid : std_logic_vector(? downto 0);
-    axi4_dat_ar_ready : std_logic_vector(? downto 0);
-    axi4_dat_w_data : std_logic_vector(? downto 0);
-    axi4_dat_w_strb : std_logic_vector(? downto 0);
-    axi4_dat_w_last : std_logic_vector(? downto 0);
-    axi4_dat_w_user : std_logic_vector(? downto 0);
-    axi4_dat_w_valid : std_logic_vector(? downto 0);
-    axi4_dat_w_ready : std_logic_vector(? downto 0);
-    axi4_dat_r_id : std_logic_vector(? downto 0);
-    axi4_dat_r_data : std_logic_vector(? downto 0);
-    axi4_dat_r_resp : std_logic_vector(? downto 0);
-    axi4_dat_r_last : std_logic_vector(? downto 0);
-    axi4_dat_r_user : std_logic_vector(? downto 0);
-    axi4_dat_r_valid : std_logic_vector(? downto 0);
-    axi4_dat_r_ready : std_logic_vector(? downto 0);
-    axi4_dat_b_id : std_logic_vector(? downto 0);
-    axi4_dat_b_resp : std_logic_vector(? downto 0);
-    axi4_dat_b_user : std_logic_vector(? downto 0);
-    axi4_dat_b_valid : std_logic_vector(? downto 0);
-    axi4_dat_b_ready : std_logic_vector(? downto 0);
-    ext_nmi : std_logic_vector(? downto 0);
-    ext_tint : std_logic_vector(? downto 0);
-    ext_sint : std_logic_vector(? downto 0);
-    ext_int : std_logic_vector(? downto 0);
-    dbg_stall : std_logic_vector(? downto 0);
-    dbg_strb : std_logic_vector(? downto 0);
-    dbg_we : std_logic_vector(? downto 0);
-    dbg_addr : std_logic_vector(? downto 0);
-    dbg_dati : std_logic_vector(? downto 0);
-    dbg_dato : std_logic_vector(? downto 0);
-    dbg_ack : std_logic_vector(? downto 0);
-    dbg_bp : std_logic_vector(? downto 0)
-  );
   end component;
 
   component mpsoc_axi4_spram
   generic (
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?;
-    ? : std_logic_vector(? downto 0) := ?
-  );
+    AXI_ID_WIDTH : integer := 10;
+    AXI_ADDR_WIDTH : integer := 64;
+    AXI_DATA_WIDTH : integer := 64;
+    AXI_STRB_WIDTH : integer := 8;
+    AXI_USER_WIDTH : integer := 10
+  );  
   port (
-    clk_i : std_logic_vector(? downto 0);
-    rst_ni : std_logic_vector(? downto 0);
-    axi_aw_id : std_logic_vector(? downto 0);
-    axi_aw_addr : std_logic_vector(? downto 0);
-    axi_aw_len : std_logic_vector(? downto 0);
-    axi_aw_size : std_logic_vector(? downto 0);
-    axi_aw_burst : std_logic_vector(? downto 0);
-    axi_aw_lock : std_logic_vector(? downto 0);
-    axi_aw_cache : std_logic_vector(? downto 0);
-    axi_aw_prot : std_logic_vector(? downto 0);
-    axi_aw_qos : std_logic_vector(? downto 0);
-    axi_aw_region : std_logic_vector(? downto 0);
-    axi_aw_user : std_logic_vector(? downto 0);
-    axi_aw_valid : std_logic_vector(? downto 0);
-    axi_aw_ready : std_logic_vector(? downto 0);
-    axi_ar_id : std_logic_vector(? downto 0);
-    axi_ar_addr : std_logic_vector(? downto 0);
-    axi_ar_len : std_logic_vector(? downto 0);
-    axi_ar_size : std_logic_vector(? downto 0);
-    axi_ar_burst : std_logic_vector(? downto 0);
-    axi_ar_lock : std_logic_vector(? downto 0);
-    axi_ar_cache : std_logic_vector(? downto 0);
-    axi_ar_prot : std_logic_vector(? downto 0);
-    axi_ar_qos : std_logic_vector(? downto 0);
-    axi_ar_region : std_logic_vector(? downto 0);
-    axi_ar_user : std_logic_vector(? downto 0);
-    axi_ar_valid : std_logic_vector(? downto 0);
-    axi_ar_ready : std_logic_vector(? downto 0);
-    axi_w_data : std_logic_vector(? downto 0);
-    axi_w_strb : std_logic_vector(? downto 0);
-    axi_w_last : std_logic_vector(? downto 0);
-    axi_w_user : std_logic_vector(? downto 0);
-    axi_w_valid : std_logic_vector(? downto 0);
-    axi_w_ready : std_logic_vector(? downto 0);
-    axi_r_id : std_logic_vector(? downto 0);
-    axi_r_data : std_logic_vector(? downto 0);
-    axi_r_resp : std_logic_vector(? downto 0);
-    axi_r_last : std_logic_vector(? downto 0);
-    axi_r_user : std_logic_vector(? downto 0);
-    axi_r_valid : std_logic_vector(? downto 0);
-    axi_r_ready : std_logic_vector(? downto 0);
-    axi_b_id : std_logic_vector(? downto 0);
-    axi_b_resp : std_logic_vector(? downto 0);
-    axi_b_user : std_logic_vector(? downto 0);
-    axi_b_valid : std_logic_vector(? downto 0);
-    axi_b_ready : std_logic_vector(? downto 0);
-    req_o : std_logic_vector(? downto 0);
-    we_o : std_logic_vector(? downto 0);
-    addr_o : std_logic_vector(? downto 0);
-    be_o : std_logic_vector(? downto 0);
-    data_o : std_logic_vector(? downto 0);
-    data_i : std_logic_vector(? downto 0)
+    clk_i : in std_logic;  -- Clock
+    rst_ni : in std_logic;  -- Asynchronous reset active low
+
+    axi_aw_id : in std_logic_vector(AXI_ID_WIDTH-1 downto 0);
+    axi_aw_addr : in std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
+    axi_aw_len : in std_logic_vector(7 downto 0);
+    axi_aw_size : in std_logic_vector(2 downto 0);
+    axi_aw_burst : in std_logic_vector(1 downto 0);
+    axi_aw_lock : in std_logic;
+    axi_aw_cache : in std_logic_vector(3 downto 0);
+    axi_aw_prot : in std_logic_vector(2 downto 0);
+    axi_aw_qos : in std_logic_vector(3 downto 0);
+    axi_aw_region : in std_logic_vector(3 downto 0);
+    axi_aw_user : in std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi_aw_valid : in std_logic;
+    axi_aw_ready : out std_logic;
+
+    axi_ar_id : in std_logic_vector(AXI_ID_WIDTH-1 downto 0);
+    axi_ar_addr : in std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
+    axi_ar_len : in std_logic_vector(7 downto 0);
+    axi_ar_size : in std_logic_vector(2 downto 0);
+    axi_ar_burst : in std_logic_vector(1 downto 0);
+    axi_ar_lock : in std_logic;
+    axi_ar_cache : in std_logic_vector(3 downto 0);
+    axi_ar_prot : in std_logic_vector(2 downto 0);
+    axi_ar_qos : in std_logic_vector(3 downto 0);
+    axi_ar_region : in std_logic_vector(3 downto 0);
+    axi_ar_user : in std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi_ar_valid : in std_logic;
+    axi_ar_ready : out std_logic;
+
+    axi_w_data : in std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+    axi_w_strb : in std_logic_vector(AXI_STRB_WIDTH-1 downto 0);
+    axi_w_last : in std_logic;
+    axi_w_user : in std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi_w_valid : in std_logic;
+    axi_w_ready : out std_logic;
+
+    axi_r_id : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
+    axi_r_data : out std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+    axi_r_resp : out std_logic_vector(1 downto 0);
+    axi_r_last : out std_logic;
+    axi_r_user : out std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi_r_valid : out std_logic;
+    axi_r_ready : in std_logic;
+
+    axi_b_id : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
+    axi_b_resp : out std_logic_vector(1 downto 0);
+    axi_b_user : out std_logic_vector(AXI_USER_WIDTH-1 downto 0);
+    axi_b_valid : out std_logic;
+    axi_b_ready : in std_logic;
+
+    req_o : out std_logic;
+    we_o : out std_logic;
+    addr_o : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
+    be_o : out std_logic_vector(AXI_DATA_WIDTH/8-1 downto 0);
+    data_o : out std_logic_vector(AXI_DATA_WIDTH-1 downto 0) 
+    data_i : in std_logic_vector(AXI_DATA_WIDTH-1 downto 0)
   );
   end component;
 
   --////////////////////////////////////////////////////////////////
   --
-  -- Variables
+  -- Constants
   --
 
   constant HTIF : integer := 0;  -- Host-Interface
@@ -348,14 +400,15 @@ architecture RTL of pu_riscv_synthesis is
   constant AXI_DATA_WIDTH : integer := 64;
   constant AXI_STRB_WIDTH : integer := 8;
   constant AXI_USER_WIDTH : integer := 10;
+
   --////////////////////////////////////////////////////////////////
   --
   -- Variables
   --
 
   --PMA configuration
-  signal pma_cfg : std_logic_vector(13 downto 0);
-  signal pma_adr : std_logic_vector(PLEN-1 downto 0);
+  signal pma_cfg : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
+  signal pma_adr : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
   -- AXI4 Instruction
   signal axi4_ins_aw_id : std_logic_vector(AXI_ID_WIDTH-1 downto 0);
@@ -456,54 +509,81 @@ architecture RTL of pu_riscv_synthesis is
   signal axi4_dat_b_user : std_logic_vector(AXI_USER_WIDTH-1 downto 0);
   signal axi4_dat_b_valid : std_logic;
   signal axi4_dat_b_ready : std_logic;
-begin
+
+  --Debug Interface
+  signal dbg_dato_s : std_logic_vector(XLEN-1 downto 0);
+
+  begin
+
   --//////////////////////////////////////////////////////////////
   --
   -- Module Body
   --
 
   --Define PMA regions
+  pma_adr <= (others => (others => '0'));
+  pma_cfg <= (others => (others => '0'));
 
-  --crt.0 (ROM) region
-  pma_adr(0) <= TOHOST srl 2;
-  pma_cfg(0) <= (MEM_TYPE_MAIN & "1111_1000" & AMO_TYPE_NONE & TOR);
-
-  --TOHOST region
-  pma_adr(1) <= ((TOHOST srl 2) and not X"f") or X"7";
-  pma_cfg(1) <= (MEM_TYPE_IO & "0100_0000" & AMO_TYPE_NONE & NAPOT);
-
-  --UART-Tx region
-  pma_adr(2) <= UART_TX srl 2;
-  pma_cfg(2) <= (MEM_TYPE_IO & "0100_0000" & AMO_TYPE_NONE & NA4);
-
-  --RAM region
-  pma_adr(3) <= 1 sll 31;
-  pma_cfg(3) <= (MEM_TYPE_MAIN & "1111_0000" & AMO_TYPE_NONE & TOR);
+  --Debug Interface
+  dbg_dato_s <= X"00000000" & dbg_dato;
 
   -- Processing Unit
   dut : riscv_pu_axi4
   generic map (
-    XLEN, 
-    PLEN, 
-    PC_INIT, 
-    HAS_USER, 
-    HAS_SUPER, 
-    HAS_HYPER, 
-    HAS_RVA, 
-    HAS_RVM, 
+      XLEN => XLEN,
+      PLEN => PLEN,
 
-    MULT_LATENCY, 
+      HAS_USER  => HAS_USER,
+      HAS_SUPER => HAS_SUPER,
+      HAS_HYPER => HAS_HYPER,
+      HAS_BPU   => HAS_BPU,
+      HAS_FPU   => HAS_FPU,
+      HAS_MMU   => HAS_MMU,
+      HAS_RVM   => HAS_RVM,
+      HAS_RVA   => HAS_RVA,
+      HAS_RVC   => HAS_RVC,
+      IS_RV32E  => IS_RV32E,
 
-    PMA_CNT, 
+      MULT_LATENCY => MULT_LATENCY,
 
-    ICACHE_SIZE, 
-    ICACHE_WAYS, 
-    DCACHE_SIZE, 
-    DTCM_SIZE, 
+      BREAKPOINTS => BREAKPOINTS,
 
-    WRITEBUFFER_SIZE, 
+      PMA_CNT => PMA_CNT,
+      PMP_CNT => PMP_CNT,
 
-    MTVEC_DEFAULT
+      BP_GLOBAL_BITS    => BP_GLOBAL_BITS,
+      BP_LOCAL_BITS     => BP_LOCAL_BITS,
+      BP_LOCAL_BITS_LSB => BP_LOCAL_BITS_LSB,
+
+      ICACHE_SIZE        => ICACHE_SIZE,
+      ICACHE_BLOCK_SIZE  => ICACHE_BLOCK_SIZE,
+      ICACHE_WAYS        => 1,
+      ICACHE_REPLACE_ALG => ICACHE_REPLACE_ALG,
+      ITCM_SIZE          => ITCM_SIZE,
+
+      DCACHE_SIZE        => DCACHE_SIZE,
+      DCACHE_BLOCK_SIZE  => DCACHE_BLOCK_SIZE,
+      DCACHE_WAYS        => DCACHE_WAYS,
+      DCACHE_REPLACE_ALG => DCACHE_REPLACE_ALG,
+      DTCM_SIZE          => 0,
+      WRITEBUFFER_SIZE   => WRITEBUFFER_SIZE,
+
+      TECHNOLOGY => TECHNOLOGY,
+
+      PC_INIT => PC_INIT,
+
+      MNMIVEC_DEFAULT => MNMIVEC_DEFAULT,
+      MTVEC_DEFAULT   => MTVEC_DEFAULT,
+      HTVEC_DEFAULT   => HTVEC_DEFAULT,
+      STVEC_DEFAULT   => STVEC_DEFAULT,
+      UTVEC_DEFAULT   => UTVEC_DEFAULT,
+
+      JEDEC_BANK            => JEDEC_BANK,
+      JEDEC_MANUFACTURER_ID => JEDEC_MANUFACTURER_ID,
+
+      HARTID => HARTID,
+
+      PARCEL_SIZE => PARCEL_SIZE
   )
   port map (
     HRESETn => HRESETn,
@@ -603,6 +683,7 @@ begin
     axi4_dat_b_user => axi4_dat_b_user,
     axi4_dat_b_valid => axi4_dat_b_valid,
     axi4_dat_b_ready => axi4_dat_b_ready,
+
     --Interrupts
     ext_nmi => ext_nmi,
     ext_tint => ext_tint,
@@ -610,25 +691,24 @@ begin
     ext_int => ext_int,
 
     --Debug Interface
-    dbg_stall => dbg_stall,
-    dbg_strb => dbg_strb,
-    dbg_we => dbg_we,
-    dbg_addr => dbg_addr,
-    dbg_dati => dbg_dati,
-    dbg_dato => db_dato,
-    dbg_ack => dbg_ack,
-    dbg_bp => dbg_bp
+      dbg_stall => dbg_stall,
+      dbg_strb  => dbg_strb,
+      dbg_we    => dbg_we,
+      dbg_addr  => X"00000000" & dbg_addr,
+      dbg_dati  => X"00000000" & dbg_dati,
+      dbg_dato  => dbg_dato_s,
+      dbg_ack   => dbg_ack,
+      dbg_bp    => dbg_bp
   );
-
 
   --Instruction AXI4
   instruction_axi4 : mpsoc_axi4_spram
   generic map (
-    AXI_ID_WIDTH, 
-    AXI_ADDR_WIDTH, 
-    AXI_DATA_WIDTH, 
-    AXI_STRB_WIDTH, 
-    AXI_USER_WIDTH
+    AXI_ID_WIDTH => AXI_ID_WIDTH, 
+    AXI_ADDR_WIDTH => AXI_ADDR_WIDTH, 
+    AXI_DATA_WIDTH => AXI_DATA_WIDTH, 
+    AXI_STRB_WIDTH => AXI_STRB_WIDTH, 
+    AXI_USER_WIDTH => AXI_USER_WIDTH
   )
   port map (
     clk_i => HCLK,  -- Clock
@@ -691,15 +771,14 @@ begin
     data_i => 0
   );
 
-
   --Data AXI4
   data_axi4 : mpsoc_axi4_spram
   generic map (
-    AXI_ID_WIDTH, 
-    AXI_ADDR_WIDTH, 
-    AXI_DATA_WIDTH, 
-    AXI_STRB_WIDTH, 
-    AXI_USER_WIDTH
+    AXI_ID_WIDTH => AXI_ID_WIDTH, 
+    AXI_ADDR_WIDTH => AXI_ADDR_WIDTH, 
+    AXI_DATA_WIDTH => AXI_DATA_WIDTH, 
+    AXI_STRB_WIDTH => AXI_STRB_WIDTH, 
+    AXI_USER_WIDTH => AXI_USER_WIDTH
   )
   port map (
     clk_i => HCLK,  -- Clock
