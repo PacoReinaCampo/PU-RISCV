@@ -78,17 +78,19 @@ read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/riscv_ram_1rw_generic.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/riscv_ram_1rw.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/riscv_ram_queue.vhd
 
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/pu/axi4/riscv_biu2axi4.vhd
+read_verilog -sv ../../../../rtl/verilog/pu/axi4/riscv_biu2axi4.sv
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/pu/axi4/riscv_pu_axi4.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/pu/riscv_ahb2axi.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/pu/riscv_axi2ahb.vhd
+read_verilog -sv ../../../../rtl/verilog/pu/riscv_ahb2axi.sv
+read_verilog -sv ../../../../rtl/verilog/pu/riscv_axi2ahb.sv
 
-read_vhdl -vhdl2008 spram/core/mpsoc_axi4_spram.vhd
+read_verilog -sv ../../../verilog/axi4/vivado/spram/core/mpsoc_axi4_spram.sv
+
 read_vhdl -vhdl2008 pu_riscv_synthesis.vhd
 
 read_xdc system.xdc
 
-synth_design -part xc7z020-clg484-1 -top pu_riscv_synthesis
+synth_design -part xc7z020-clg484-1 -top pu_riscv_synthesis \
+-include_dirs ../../../../rtl/verilog/pkg
 
 opt_design
 place_design

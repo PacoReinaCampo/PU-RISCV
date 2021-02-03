@@ -51,7 +51,7 @@ use work.riscv_defines.all;
 
 entity riscv_pu_axi4 is
   generic (
-    AXI_ID_WIDTH : integer := 10;
+    AXI_ID_WIDTH   : integer := 10;
     AXI_ADDR_WIDTH : integer := 64;
     AXI_DATA_WIDTH : integer := 64;
     AXI_STRB_WIDTH : integer := 10;
@@ -59,65 +59,68 @@ entity riscv_pu_axi4 is
 
     AHB_ADDR_WIDTH : integer := 64;
     AHB_DATA_WIDTH : integer := 64;
+
     XLEN : integer := 64;
     PLEN : integer := 64;
-    PC_INIT : std_logic_vector(XLEN-1 downto 0) := X"80000000";
-    HAS_USER : integer := 1;
-    HAS_SUPER : integer := 1;
-    HAS_HYPER : integer := 1;
-    HAS_BPU : integer := 1;
-    HAS_FPU : integer := 1;
-    HAS_MMU : integer := 1;
-    HAS_RVM : integer := 1;
-    HAS_RVA : integer := 1;
-    HAS_RVC : integer := 1;
-    IS_RV32E : integer := 0;
 
-    MULT_LATENCY : integer := 1;
+    HAS_USER  : std_logic := '1';
+    HAS_SUPER : std_logic := '1';
+    HAS_HYPER : std_logic := '1';
+    HAS_BPU   : std_logic := '1';
+    HAS_FPU   : std_logic := '1';
+    HAS_MMU   : std_logic := '1';
+    HAS_RVM   : std_logic := '1';
+    HAS_RVA   : std_logic := '1';
+    HAS_RVC   : std_logic := '1';
+    IS_RV32E  : std_logic := '1';
 
-    BREAKPOINTS : integer := 8;  --Number of hardware breakpoints
+    MULT_LATENCY : std_logic := '1';
+
+    BREAKPOINTS : integer := 8;         --Number of hardware breakpoints
 
     PMA_CNT : integer := 4;
     PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
 
-    BP_GLOBAL_BITS : integer := 2;
-    BP_LOCAL_BITS : integer := 10;
+    BP_GLOBAL_BITS    : integer := 2;
+    BP_LOCAL_BITS     : integer := 10;
     BP_LOCAL_BITS_LSB : integer := 2;
 
-    ICACHE_SIZE : integer := 64;  --in KBytes
-    ICACHE_BLOCK_SIZE : integer := 64;  --in Bytes
-    ICACHE_WAYS : integer := 2;  --'n'-way set associative
+    ICACHE_SIZE        : integer := 64;  --in KBytes
+    ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+    ICACHE_WAYS        : integer := 2;   --'n'-way set associative
     ICACHE_REPLACE_ALG : integer := 0;
-    ITCM_SIZE : integer := 0;
+    ITCM_SIZE          : integer := 0;
 
-    DCACHE_SIZE : integer := 64;  --in KBytes
-    DCACHE_BLOCK_SIZE : integer := 64;  --in Bytes
-    DCACHE_WAYS : integer := 2;  --'n'-way set associative
+    DCACHE_SIZE        : integer := 64;  --in KBytes
+    DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+    DCACHE_WAYS        : integer := 2;   --'n'-way set associative
     DCACHE_REPLACE_ALG : integer := 0;
-    DTCM_SIZE : integer := 0;
-    WRITEBUFFER_SIZE : integer := 8;
+    DTCM_SIZE          : integer := 0;
+    WRITEBUFFER_SIZE   : integer := 8;
 
-    TECHNOLOGY : integer := "GENERIC";
+    TECHNOLOGY : string := "GENERIC";
 
-    MNMIVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"004";
-    MTVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"040";
-    HTVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"080";
-    STVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"0C0";
-    UTVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"100";
+    PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000";
 
-    JEDEC_BANK : integer := 10;
-    JEDEC_MANUFACTURER_ID : integer := X"6e";
+    MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
+    MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
+    HTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000080";
+    STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
+    UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
+
+    JEDEC_BANK            : integer                      := 10;
+    JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
 
     HARTID : integer := 0;
 
-    PARCEL_SIZE : integer := 32
+    PARCEL_SIZE : integer := 64
   );
   port (
     HRESETn : in std_logic;
     HCLK : in std_logic;
 
-    pma_cfg_i : in std_logic_vector(13 downto 0);
-    pma_adr_i : in std_logic_vector(XLEN-1 downto 0);
+    pma_cfg_i : in std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
+    pma_adr_i : in std_logic_matrix(PMA_CNT-1 downto 0)(XLEN-1 downto 0);
 
   --AXI4 instruction
     axi4_ins_aw_id : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
@@ -542,7 +545,7 @@ architecture RTL of riscv_pu_axi4 is
     biu_we_i : in std_logic;
     biu_d_i : in std_logic_vector(XLEN-1 downto 0);
     biu_q_o : out std_logic_vector(XLEN-1 downto 0);
-    biu_ack_o : out std_logic   --transfer acknowledge
+    biu_ack_o : out std_logic;  --transfer acknowledge
     biu_err_o : out std_logic  --transfer error
   );
   end component;
@@ -588,6 +591,7 @@ architecture RTL of riscv_pu_axi4 is
   signal ibiu_d : std_logic_vector(XLEN-1 downto 0);
   signal ibiu_q : std_logic_vector(XLEN-1 downto 0);
   signal ibiu_ack, ibiu_err : std_logic;
+
   --Data Memory BIU connections
   signal dbiu_stb : std_logic;
   signal dbiu_stb_ack : std_logic;
@@ -611,51 +615,51 @@ begin
   --Instantiate RISC-V core
   core : riscv_core
   generic map (
-      XLEN           : integer   := 64;
-      PLEN           : integer   := 64;
-      ILEN           : integer   := 64;
-      EXCEPTION_SIZE : integer   := 16;
-      HAS_USER       : std_logic := '1';
-      HAS_SUPER      : std_logic := '1';
-      HAS_HYPER      : std_logic := '1';
-      HAS_BPU        : std_logic := '1';
-      HAS_FPU        : std_logic := '1';
-      HAS_MMU        : std_logic := '1';
-      HAS_RVA        : std_logic := '1';
-      HAS_RVM        : std_logic := '1';
-      HAS_RVC        : std_logic := '1';
-      IS_RV32E       : std_logic := '1';
+      XLEN           => XLEN,
+      PLEN           => PLEN,
+      ILEN           => ILEN,
+      EXCEPTION_SIZE => EXCEPTION_SIZE,
+      HAS_USER       => HAS_USER,
+      HAS_SUPER      => HAS_SUPER,
+      HAS_HYPER      => HAS_HYPER,
+      HAS_BPU        => HAS_BPU,
+      HAS_FPU        => HAS_FPU,
+      HAS_MMU        => HAS_MMU,
+      HAS_RVA        => HAS_RVA,
+      HAS_RVM        => HAS_RVM,
+      HAS_RVC        => HAS_RVC,
+      IS_RV32E       => IS_RV32E,
 
-      MULT_LATENCY : std_logic := '1';
+      MULT_LATENCY => MULT_LATENCY,
 
-      BREAKPOINTS : integer := 8;
+      BREAKPOINTS => BREAKPOINTS,
 
-      PMA_CNT : integer := 4;
-      PMP_CNT : integer := 16;
+      PMA_CNT => PMA_CNT,
+      PMP_CNT => PMP_CNT,
 
-      BP_GLOBAL_BITS    : integer := 2;
-      BP_LOCAL_BITS     : integer := 10;
-      BP_LOCAL_BITS_LSB : integer := 2;
+      BP_GLOBAL_BITS    => BP_GLOBAL_BITS,
+      BP_LOCAL_BITS     => BP_LOCAL_BITS,
+      BP_LOCAL_BITS_LSB => BP_LOCAL_BITS_LSB,
 
-      DU_ADDR_SIZE    : integer := 12;
-      MAX_BREAKPOINTS : integer := 8;
+      DU_ADDR_SIZE    => DU_ADDR_SIZE,
+      MAX_BREAKPOINTS => MAX_BREAKPOINTS,
 
-      TECHNOLOGY : string := "GENERIC";
+      TECHNOLOGY => TECHNOLOGY,
 
-      PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000";
+      PC_INIT => PC_INIT,
 
-      MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
-      MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
-      HTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000080";
-      STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
-      UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
+      MNMIVEC_DEFAULT => MNMIVEC_DEFAULT,
+      MTVEC_DEFAULT   => MTVEC_DEFAULT,
+      HTVEC_DEFAULT   => HTVEC_DEFAULT,
+      STVEC_DEFAULT   => STVEC_DEFAULT,
+      UTVEC_DEFAULT   => UTVEC_DEFAULT,
 
-      JEDEC_BANK            : integer                      := 10;
-      JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
+      JEDEC_BANK            => JEDEC_BANK,
+      JEDEC_MANUFACTURER_ID => JEDEC_MANUFACTURER_ID,
 
-      HARTID : integer := 0;
+      HARTID => HARTID,
 
-      PARCEL_SIZE : integer := 64
+      PARCEL_SIZE => PARCEL_SIZE
   )
   port map (
     rstn => HRESETn,
@@ -793,7 +797,7 @@ begin
     mem_req_i => dmem_req,
     mem_adr_i => dmem_adr,
     mem_size_i => dmem_size,
-    mem_lock_i => open,
+    mem_lock_i => '0',
     mem_we_i => dmem_we,
     mem_d_i => dmem_d,
     mem_q_o => dmem_q,

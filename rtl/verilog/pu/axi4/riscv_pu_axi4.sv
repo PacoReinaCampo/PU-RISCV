@@ -54,6 +54,7 @@ module riscv_pu_axi4 #(
 
   parameter            XLEN               = 64,
   parameter            PLEN               = 64,
+
   parameter [XLEN-1:0] PC_INIT            = 'h8000_0000,
   parameter            HAS_USER           = 1,
   parameter            HAS_SUPER          = 1,

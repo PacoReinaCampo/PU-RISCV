@@ -51,6 +51,15 @@ use work.riscv_defines.all;
 
 entity pu_riscv_synthesis is
   generic (
+    AXI_ID_WIDTH   : integer := 10;
+    AXI_ADDR_WIDTH : integer := 64;
+    AXI_DATA_WIDTH : integer := 64;
+    AXI_STRB_WIDTH : integer := 10;
+    AXI_USER_WIDTH : integer := 10;
+
+      AHB_ADDR_WIDTH : integer := 64;
+      AHB_DATA_WIDTH : integer := 64;
+
       XLEN : integer := 64;
       PLEN : integer := 64;
 
@@ -132,7 +141,7 @@ end pu_riscv_synthesis;
 architecture RTL of pu_riscv_synthesis is
   component riscv_pu_axi4
   generic (
-    AXI_ID_WIDTH : integer := 10;
+    AXI_ID_WIDTH   : integer := 10;
     AXI_ADDR_WIDTH : integer := 64;
     AXI_DATA_WIDTH : integer := 64;
     AXI_STRB_WIDTH : integer := 10;
@@ -140,65 +149,68 @@ architecture RTL of pu_riscv_synthesis is
 
     AHB_ADDR_WIDTH : integer := 64;
     AHB_DATA_WIDTH : integer := 64;
+
     XLEN : integer := 64;
     PLEN : integer := 64;
-    PC_INIT : std_logic_vector(XLEN-1 downto 0) := X"80000000";
-    HAS_USER : integer := 1;
-    HAS_SUPER : integer := 1;
-    HAS_HYPER : integer := 1;
-    HAS_BPU : integer := 1;
-    HAS_FPU : integer := 1;
-    HAS_MMU : integer := 1;
-    HAS_RVM : integer := 1;
-    HAS_RVA : integer := 1;
-    HAS_RVC : integer := 1;
-    IS_RV32E : integer := 0;
 
-    MULT_LATENCY : integer := 1;
+    HAS_USER  : std_logic := '1';
+    HAS_SUPER : std_logic := '1';
+    HAS_HYPER : std_logic := '1';
+    HAS_BPU   : std_logic := '1';
+    HAS_FPU   : std_logic := '1';
+    HAS_MMU   : std_logic := '1';
+    HAS_RVM   : std_logic := '1';
+    HAS_RVA   : std_logic := '1';
+    HAS_RVC   : std_logic := '1';
+    IS_RV32E  : std_logic := '1';
 
-    BREAKPOINTS : integer := 8;  --Number of hardware breakpoints
+    MULT_LATENCY : std_logic := '1';
+
+    BREAKPOINTS : integer := 8;         --Number of hardware breakpoints
 
     PMA_CNT : integer := 4;
     PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
 
-    BP_GLOBAL_BITS : integer := 2;
-    BP_LOCAL_BITS : integer := 10;
+    BP_GLOBAL_BITS    : integer := 2;
+    BP_LOCAL_BITS     : integer := 10;
     BP_LOCAL_BITS_LSB : integer := 2;
 
-    ICACHE_SIZE : integer := 64;  --in KBytes
-    ICACHE_BLOCK_SIZE : integer := 64;  --in Bytes
-    ICACHE_WAYS : integer := 2;  --'n'-way set associative
+    ICACHE_SIZE        : integer := 64;  --in KBytes
+    ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+    ICACHE_WAYS        : integer := 2;   --'n'-way set associative
     ICACHE_REPLACE_ALG : integer := 0;
-    ITCM_SIZE : integer := 0;
+    ITCM_SIZE          : integer := 0;
 
-    DCACHE_SIZE : integer := 64;  --in KBytes
-    DCACHE_BLOCK_SIZE : integer := 64;  --in Bytes
-    DCACHE_WAYS : integer := 2;  --'n'-way set associative
+    DCACHE_SIZE        : integer := 64;  --in KBytes
+    DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+    DCACHE_WAYS        : integer := 2;   --'n'-way set associative
     DCACHE_REPLACE_ALG : integer := 0;
-    DTCM_SIZE : integer := 0;
-    WRITEBUFFER_SIZE : integer := 8;
+    DTCM_SIZE          : integer := 0;
+    WRITEBUFFER_SIZE   : integer := 8;
 
-    TECHNOLOGY : integer := "GENERIC";
+    TECHNOLOGY : string := "GENERIC";
 
-    MNMIVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"004";
-    MTVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"040";
-    HTVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"080";
-    STVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"0C0";
-    UTVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := PC_INIT-X"100";
+    PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000";
 
-    JEDEC_BANK : integer := 10;
-    JEDEC_MANUFACTURER_ID : integer := X"6e";
+    MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
+    MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
+    HTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000080";
+    STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
+    UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
+
+    JEDEC_BANK            : integer                      := 10;
+    JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
 
     HARTID : integer := 0;
 
-    PARCEL_SIZE : integer := 32
+    PARCEL_SIZE : integer := 64
   );
   port (
     HRESETn : in std_logic;
     HCLK : in std_logic;
 
-    pma_cfg_i : in std_logic_vector(13 downto 0);
-    pma_adr_i : in std_logic_vector(XLEN-1 downto 0);
+    pma_cfg_i : in std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
+    pma_adr_i : in std_logic_matrix(PMA_CNT-1 downto 0)(XLEN-1 downto 0);
 
   --AXI4 instruction
     axi4_ins_aw_id : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
@@ -311,7 +323,7 @@ architecture RTL of pu_riscv_synthesis is
     dbg_addr : in std_logic_vector(PLEN-1 downto 0);
     dbg_dati : in std_logic_vector(XLEN-1 downto 0);
     dbg_dato : out std_logic_vector(XLEN-1 downto 0);
-    dbg_ack : out std_logic 
+    dbg_ack : out std_logic;
     dbg_bp : out std_logic
   );
   end component;
@@ -381,25 +393,10 @@ architecture RTL of pu_riscv_synthesis is
     we_o : out std_logic;
     addr_o : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
     be_o : out std_logic_vector(AXI_DATA_WIDTH/8-1 downto 0);
-    data_o : out std_logic_vector(AXI_DATA_WIDTH-1 downto 0) 
+    data_o : out std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
     data_i : in std_logic_vector(AXI_DATA_WIDTH-1 downto 0)
   );
   end component;
-
-  --////////////////////////////////////////////////////////////////
-  --
-  -- Constants
-  --
-
-  constant HTIF : integer := 0;  -- Host-Interface
-  constant TOHOST : std_logic_vector(31 downto 0) := X"80001000";
-  constant UART_TX : std_logic_vector(31 downto 0) := X"80001080";
-
-  constant AXI_ID_WIDTH : integer := 10;
-  constant AXI_ADDR_WIDTH : integer := 64;
-  constant AXI_DATA_WIDTH : integer := 64;
-  constant AXI_STRB_WIDTH : integer := 8;
-  constant AXI_USER_WIDTH : integer := 10;
 
   --////////////////////////////////////////////////////////////////
   --
@@ -768,7 +765,7 @@ architecture RTL of pu_riscv_synthesis is
     addr_o => open,
     be_o => open,
     data_o => open,
-    data_i => 0
+    data_i => (others => '0')
   );
 
   --Data AXI4
@@ -838,6 +835,6 @@ architecture RTL of pu_riscv_synthesis is
     addr_o => open,
     be_o => open,
     data_o => open,
-    data_i => 0
+    data_i => (others => '0')
   );
 end RTL;
