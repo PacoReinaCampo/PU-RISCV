@@ -1,3 +1,7 @@
+cd ../../../../..
+call settings64_msim.bat
+cd sim/verilog/tests/ahb3/msim
+
 vlib work
 vlog -sv +incdir+../../../../../rtl/verilog/pkg -f system.verilog.vc
 vcom -2008 -f system.vhdl.vc
