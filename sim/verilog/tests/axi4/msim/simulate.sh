@@ -1,4 +1,6 @@
-export PATH=$PATH:/opt/intelFPGA_pro/20.2/modelsim_ase/linuxaloem/
+cd ../../../../..
+sh settings64_msim.sh
+cd sim/veroñpg/tests/axi4/msim
 
 make clean
 make

@@ -1,1 +1,1 @@
-export PATH=$PATH:/opt/Xilinx/Vivado/2020.2/bin/
+export PATH=$PATH:/opt/intelFPGA_pro/20.2/modelsim_ase/linuxaloem/
