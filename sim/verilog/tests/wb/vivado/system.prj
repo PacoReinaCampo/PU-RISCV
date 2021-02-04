@@ -32,11 +32,11 @@ sv work ../../../../../rtl/verilog/memory/riscv_ram_1rw_generic.sv
 sv work ../../../../../rtl/verilog/memory/riscv_ram_1rw.sv
 sv work ../../../../../rtl/verilog/memory/riscv_ram_queue.sv
 
-sv work ../../../../../rtl/verilog/pu/wb/riscv_biu2ahb3.sv
-sv work ../../../../../rtl/verilog/pu/wb/riscv_pu_ahb3.sv
+sv work ../../../../../rtl/verilog/pu/wb/riscv_biu2wb.sv
+sv work ../../../../../rtl/verilog/pu/wb/riscv_pu_wb.sv
 
-sv work ../../../../../bench/verilog/tests/wb/riscv_memory_model_ahb3.sv
-sv work ../../../../../bench/verilog/tests/wb/riscv_mmio_if_ahb3.sv
-sv work ../../../../../bench/verilog/tests/wb/riscv_testbench_ahb3.sv
+sv work ../../../../../bench/verilog/tests/wb/riscv_memory_model_wb.sv
+sv work ../../../../../bench/verilog/tests/wb/riscv_mmio_if_wb.sv
+sv work ../../../../../bench/verilog/tests/wb/riscv_testbench_wb.sv
 sv work ../../../../../bench/verilog/tests/riscv_dbg_bfm.sv
 sv work ../../../../../bench/verilog/tests/riscv_htif.sv

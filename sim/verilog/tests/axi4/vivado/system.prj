@@ -32,11 +32,11 @@ sv work ../../../../../rtl/verilog/memory/riscv_ram_1rw_generic.sv
 sv work ../../../../../rtl/verilog/memory/riscv_ram_1rw.sv
 sv work ../../../../../rtl/verilog/memory/riscv_ram_queue.sv
 
-sv work ../../../../../rtl/verilog/pu/axi4/riscv_biu2ahb3.sv
-sv work ../../../../../rtl/verilog/pu/axi4/riscv_pu_ahb3.sv
+sv work ../../../../../rtl/verilog/pu/axi4/riscv_biu2axi4.sv
+sv work ../../../../../rtl/verilog/pu/axi4/riscv_pu_axi4.sv
 
-sv work ../../../../../bench/verilog/tests/axi4/riscv_memory_model_ahb3.sv
-sv work ../../../../../bench/verilog/tests/axi4/riscv_mmio_if_ahb3.sv
-sv work ../../../../../bench/verilog/tests/axi4/riscv_testbench_ahb3.sv
+sv work ../../../../../bench/verilog/tests/axi4/riscv_memory_model_axi4.sv
+sv work ../../../../../bench/verilog/tests/axi4/riscv_mmio_if_axi4.sv
+sv work ../../../../../bench/verilog/tests/axi4/riscv_testbench_axi4.sv
 sv work ../../../../../bench/verilog/tests/riscv_dbg_bfm.sv
 sv work ../../../../../bench/verilog/tests/riscv_htif.sv
