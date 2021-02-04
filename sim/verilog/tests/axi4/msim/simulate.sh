@@ -1,6 +1,4 @@
-cd ../../../../..
-sh settings64_msim.sh
-cd sim/veroñpg/tests/axi4/msim
+source ../../../../../settings64_msim.sh
 
 make clean
 make

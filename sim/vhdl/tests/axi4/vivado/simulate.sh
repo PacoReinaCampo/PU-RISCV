@@ -1,4 +1,4 @@
-export PATH=$PATH:/opt/Xilinx/Vivado/2020.2/bin/
+source ../../../../../settings64_msim.sh
 
 make clean
 make
