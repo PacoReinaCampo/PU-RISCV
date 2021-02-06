@@ -1,6 +1,4 @@
-cd ../../../../..
-call settings64_msim.bat
-cd sim/verilog/tests/wb/msim
+call ../../../../../settings64_vivado.bat
 
 vlib work
 vlog -sv +incdir+../../../../../rtl/verilog/pkg -f system.vc

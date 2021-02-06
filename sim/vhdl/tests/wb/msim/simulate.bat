@@ -1,6 +1,4 @@
-cd ../../../../..
-call settings64_msim.bat
-cd sim/vhdl/tests/wb/msim
+call ../../../../../settings64_msim.bat
 
 vlib work
 vcom -2008 -f system.vc

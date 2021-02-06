@@ -1,6 +1,4 @@
-cd ../../../../..
-call settings64_vivado.bat
-cd sim/verilog/tests/wb/vivado
+call ../../../../../settings64_vivado.bat
 
 xvlog -i ../../../../../rtl/verilog/pkg -prj system.verilog.prj
 xvhdl -prj system.vhdl.prj

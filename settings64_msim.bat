@@ -1,1 +1,1 @@
-SET PATH=C:\apps\Microsemi\Libero_SoC_v11.8\Modelsim\win32acoem;%PATH%
+SET PATH=C:\intelFPGA_lite\20.1\modelsim_ase\win32aloem;%PATH%
