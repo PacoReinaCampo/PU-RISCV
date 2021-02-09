@@ -42,6 +42,69 @@
 ##                                                                               ##
 ###################################################################################
 
-read_verilog -I rtl/verilog/pkg -sv rtl/verilog/ram/mpsoc_spram.sv
-read_verilog -I rtl/verilog/pkg -sv rtl/verilog/ram/mpsoc_ram_1r1w.sv
-read_verilog -I rtl/verilog/pkg -sv rtl/verilog/ram/mpsoc_ram_1r1w_generic.sv
+# read design
+verilog_defaults -add -I ../../../../rtl/verilog/pkg
+
+read_verilog -sv ../../../../rtl/verilog/core/cache/riscv_dcache_core.sv
+read_verilog -sv ../../../../rtl/verilog/core/cache/riscv_dext.sv
+read_verilog -sv ../../../../rtl/verilog/core/cache/riscv_icache_core.sv
+read_verilog -sv ../../../../rtl/verilog/core/cache/riscv_noicache_core.sv
+read_verilog -sv ../../../../rtl/verilog/core/decode/riscv_id.sv
+read_verilog -sv ../../../../rtl/verilog/core/execute/riscv_alu.sv
+read_verilog -sv ../../../../rtl/verilog/core/execute/riscv_bu.sv
+read_verilog -sv ../../../../rtl/verilog/core/execute/riscv_div.sv
+read_verilog -sv ../../../../rtl/verilog/core/execute/riscv_execution.sv
+read_verilog -sv ../../../../rtl/verilog/core/execute/riscv_lsu.sv
+read_verilog -sv ../../../../rtl/verilog/core/execute/riscv_mul.sv
+read_verilog -sv ../../../../rtl/verilog/core/fetch/riscv_if.sv
+read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_dmem_ctrl.sv
+read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_imem_ctrl.sv
+read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_membuf.sv
+read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_memmisaligned.sv
+read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_mmu.sv
+read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_mux.sv
+read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_pmachk.sv
+read_verilog -sv ../../../../rtl/verilog/core/memory/riscv_pmpchk.sv
+read_verilog -sv ../../../../rtl/verilog/core/riscv_bp.sv
+read_verilog -sv ../../../../rtl/verilog/core/riscv_core.sv
+read_verilog -sv ../../../../rtl/verilog/core/riscv_du.sv
+read_verilog -sv ../../../../rtl/verilog/core/riscv_memory.sv
+read_verilog -sv ../../../../rtl/verilog/core/riscv_rf.sv
+read_verilog -sv ../../../../rtl/verilog/core/riscv_state.sv
+read_verilog -sv ../../../../rtl/verilog/core/riscv_wb.sv
+
+read_verilog -sv ../../../../rtl/verilog/memory/riscv_ram_1r1w_generic.sv
+read_verilog -sv ../../../../rtl/verilog/memory/riscv_ram_1r1w.sv
+read_verilog -sv ../../../../rtl/verilog/memory/riscv_ram_1rw_generic.sv
+read_verilog -sv ../../../../rtl/verilog/memory/riscv_ram_1rw.sv
+read_verilog -sv ../../../../rtl/verilog/memory/riscv_ram_queue.sv
+
+read_verilog -sv ../../../../rtl/verilog/pu/axi4/riscv_biu2axi4.sv
+read_verilog -sv ../../../../rtl/verilog/pu/axi4/riscv_pu_axi4.sv
+
+read_verilog -sv spram/core/mpsoc_axi4_spram.sv
+read_verilog -sv spram/core/mpsoc_ram_1r1w.sv
+read_verilog -sv spram/core/mpsoc_ram_1r1w_generic.sv
+
+read_verilog -sv pu_riscv_synthesis.sv
+
+# elaborate design hierarchy
+hierarchy -check -top pu_riscv_synthesis
+
+# improve design
+proc; opt; fsm; opt; memory; opt
+
+# map to internal cell library
+techmap; opt
+
+# map flip-flops to cmos_cells.lib
+dfflibmap -liberty cmos_cells.lib
+
+# map logic to cmos_cells.lib
+abc -liberty cmos_cells.lib
+
+# clean
+clean
+
+# write synthesized design
+write_edif system.edif
