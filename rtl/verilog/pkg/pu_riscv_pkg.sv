@@ -118,7 +118,7 @@
 
   `define BUFFER_DEPTH       4
 
-  //RF access
+  //RF Access
   `define RDPORTS            1
   `define WRPORTS            1
   `define AR_BITS            5
