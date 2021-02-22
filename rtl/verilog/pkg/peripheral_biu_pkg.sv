@@ -40,38 +40,42 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-  //BIU Constants Package
-  `define BYTE       3'b000
-  `define HWORD      3'b001
-  `define WORD       3'b010
-  `define DWORD      3'b011
-  `define QWORD      3'b100
-  `define UNDEF_SIZE 3'bxxx
+package peripheral_biu_pkg;
 
-  `define SINGLE      3'b000
-  `define INCR        3'b001
-  `define WRAP4       3'b010
-  `define INCR4       3'b011
-  `define WRAP8       3'b100
-  `define INCR8       3'b101
-  `define WRAP16      3'b110
-  `define INCR16      3'b111
-  `define UNDEF_BURST 3'bxxx
+  //BIU Constants Package
+  localparam BYTE       = 3'b000;
+  localparam HWORD      = 3'b001;
+  localparam WORD       = 3'b010;
+  localparam DWORD      = 3'b011;
+  localparam QWORD      = 3'b100;
+  localparam UNDEF_SIZE = 3'bxxx;
+
+  localparam SINGLE      = 3'b000;
+  localparam INCR        = 3'b001;
+  localparam WRAP4       = 3'b010;
+  localparam INCR4       = 3'b011;
+  localparam WRAP8       = 3'b100;
+  localparam INCR8       = 3'b101;
+  localparam WRAP16      = 3'b110;
+  localparam INCR16      = 3'b111;
+  localparam UNDEF_BURST = 3'bxxx;
 
   //Enumeration Codes
-  `define PROT_INSTRUCTION  3'b000
-  `define PROT_DATA         3'b001
-  `define PROT_USER         3'b000
-  `define PROT_PRIVILEGED   3'b010
-  `define PROT_NONCACHEABLE 3'b000
-  `define PROT_CACHEABLE    3'b100
+  localparam PROT_INSTRUCTION  = 3'b000;
+  localparam PROT_DATA         = 3'b001;
+  localparam PROT_USER         = 3'b000;
+  localparam PROT_PRIVILEGED   = 3'b010;
+  localparam PROT_NONCACHEABLE = 3'b000;
+  localparam PROT_CACHEABLE    = 3'b100;
 
   //Complex Enumerations
-  `define NONCACHEABLE_USER_INSTRUCTION       3'b000
-  `define NONCACHEABLE_USER_DATA              3'b001
-  `define NONCACHEABLE_PRIVILEGED_INSTRUCTION 3'b010
-  `define NONCACHEABLE_PRIVILEGED_DATA        3'b011
-  `define CACHEABLE_USER_INSTRUCTION          3'b100
-  `define CACHEABLE_USER_DATA                 3'b101
-  `define CACHEABLE_PRIVILEGED_INSTRUCTION    3'b110
-  `define CACHEABLE_PRIVILEGED_DATA           3'b111
+  localparam NONCACHEABLE_USER_INSTRUCTION       = 3'b000;
+  localparam NONCACHEABLE_USER_DATA              = 3'b001;
+  localparam NONCACHEABLE_PRIVILEGED_INSTRUCTION = 3'b010;
+  localparam NONCACHEABLE_PRIVILEGED_DATA        = 3'b011;
+  localparam CACHEABLE_USER_INSTRUCTION          = 3'b100;
+  localparam CACHEABLE_USER_DATA                 = 3'b101;
+  localparam CACHEABLE_PRIVILEGED_INSTRUCTION    = 3'b110;
+  localparam CACHEABLE_PRIVILEGED_DATA           = 3'b111;
+
+endpackage

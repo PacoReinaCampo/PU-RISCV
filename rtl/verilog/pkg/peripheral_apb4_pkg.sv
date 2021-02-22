@@ -40,5 +40,9 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-  `define PADDR_SIZE 64
-  `define PDATA_SIZE 64
+package peripheral_apb4_pkg;
+
+  localparam PADDR_SIZE = 64;
+  localparam PDATA_SIZE = 64;
+
+endpackage

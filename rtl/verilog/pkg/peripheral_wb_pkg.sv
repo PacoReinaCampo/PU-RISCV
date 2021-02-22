@@ -40,19 +40,23 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
+package peripheral_wb_pkg;
+
   //WB Package
-  `define CLASSIC_CYCLE 1'b0
-  `define BURST_CYCLE   1'b1
+  localparam CLASSIC_CYCLE = 1'b0;
+  localparam BURST_CYCLE   = 1'b1;
 
-  `define READ  1'b0
-  `define WRITE 1'b1
+  localparam READ  = 1'b0;
+  localparam WRITE = 1'b1;
 
-  `define CTI_CLASSIC      3'b000
-  `define CTI_CONST_BURST  3'b001
-  `define CTI_INC_BURST    3'b010
-  `define CTI_END_OF_BURST 3'b111
+  localparam CTI_CLASSIC      = 3'b000;
+  localparam CTI_CONST_BURST  = 3'b001;
+  localparam CTI_INC_BURST    = 3'b010;
+  localparam CTI_END_OF_BURST = 3'b111;
 
-  `define BTE_LINEAR  2'd0
-  `define BTE_WRAP_4  2'd1
-  `define BTE_WRAP_8  2'd2
-  `define BTE_WRAP_16 2'd3
+  localparam BTE_LINEAR  = 2'd0;
+  localparam BTE_WRAP_4  = 2'd1;
+  localparam BTE_WRAP_8  = 2'd2;
+  localparam BTE_WRAP_16 = 2'd3;
+
+endpackage

@@ -50,8 +50,8 @@ use ieee.math_real.all;
 
 package peripheral_ahb3_pkg is
 
-  constant HADDR_SIZE : integer := XLEN;
-  constant HDATA_SIZE : integer := PLEN;
+  constant HADDR_SIZE : integer := 64;
+  constant HDATA_SIZE : integer := 64;
 
   --HTRANS
   constant HTRANS_IDLE   : std_logic_vector(1 downto 0) := "00";
