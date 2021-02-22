@@ -1,4 +1,7 @@
-../../../../../rtl/vhdl/pkg/riscv_defines.vhd
+../../../../../rtl/vhdl/pkg/peripheral_ahb3_pkg.vhd
+../../../../../rtl/vhdl/pkg/peripheral_biu_pkg.vhd
+../../../../../rtl/vhdl/pkg/pu_riscv_pkg.vhd
+../../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
 
 ../../../../../rtl/vhdl/core/cache/riscv_dext.vhd
 ../../../../../rtl/vhdl/core/execute/riscv_div.vhd

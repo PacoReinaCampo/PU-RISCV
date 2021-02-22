@@ -42,7 +42,10 @@
 ##                                                                               ##
 ###################################################################################
 
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/riscv_defines.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/peripheral_axi4_pkg.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/peripheral_biu_pkg.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/pu_riscv_pkg.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
 
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/riscv_dcache_core.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/riscv_dext.vhd

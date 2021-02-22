@@ -42,6 +42,11 @@
 ##                                                                               ##
 ###################################################################################
 
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/peripheral_wb_pkg.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/peripheral_biu_pkg.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/pu_riscv_pkg.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
+
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/riscv_dcache_core.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/riscv_dext.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/riscv_icache_core.vhd
@@ -78,8 +83,6 @@ read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/riscv_ram_queue.vhd
 
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/pu/wb/riscv_biu2wb.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/pu/wb/riscv_pu_wb.vhd
-
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/riscv_defines.vhd
 
 read_vhdl -vhdl2008 spram/core/mpsoc_wb_ram_generic.vhd
 read_vhdl -vhdl2008 spram/core/mpsoc_wb_spram.vhd

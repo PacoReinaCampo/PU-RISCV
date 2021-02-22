@@ -42,6 +42,10 @@
 ##                                                                               ##
 ###################################################################################
 
+read_verilog -sv ../../../../rtl/verilog/pkg/peripheral_axi4_pkg.sv
+read_verilog -sv ../../../../rtl/verilog/pkg/peripheral_biu_pkg.sv
+read_verilog -sv ../../../../rtl/verilog/pkg/pu_riscv_pkg.sv
+
 read_verilog -sv ../../../../rtl/verilog/core/cache/riscv_dcache_core.sv
 read_verilog -sv ../../../../rtl/verilog/core/cache/riscv_dext.sv
 read_verilog -sv ../../../../rtl/verilog/core/cache/riscv_icache_core.sv
@@ -86,7 +90,7 @@ read_verilog -sv pu_riscv_synthesis.sv
 
 read_xdc system.xdc
 
-synth_design -part xc7z020-clg484-1 -include_dirs ../../../../rtl/verilog/pkg -top pu_riscv_synthesis
+synth_design -part xc7z020-clg484-1 -top pu_riscv_synthesis
 
 opt_design
 place_design

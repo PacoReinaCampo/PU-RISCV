@@ -1,4 +1,7 @@
-vhdl work ../../../../../rtl/vhdl/pkg/riscv_defines.vhd
+vhdl work ../../../../../rtl/vhdl/pkg/peripheral_ahb3_pkg.vhd
+vhdl work ../../../../../rtl/vhdl/pkg/peripheral_biu_pkg.vhd
+vhdl work ../../../../../rtl/vhdl/pkg/pu_riscv_pkg.vhd
+vhdl work ../../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
 
 vhdl work ../../../../../rtl/vhdl/core/cache/riscv_dext.vhd
 vhdl work ../../../../../rtl/vhdl/core/execute/riscv_div.vhd

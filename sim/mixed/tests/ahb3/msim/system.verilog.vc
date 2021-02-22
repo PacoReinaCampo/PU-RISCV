@@ -1,4 +1,6 @@
-+incdir+../../../../../rtl/verilog/pkg
+../../../../../rtl/verilog/pkg/peripheral_ahb3_pkg.sv
+../../../../../rtl/verilog/pkg/peripheral_biu_pkg.sv
+../../../../../rtl/verilog/pkg/pu_riscv_pkg.sv
 
 ../../../../../rtl/verilog/core/cache/riscv_dcache_core.sv
 ../../../../../rtl/verilog/core/cache/riscv_icache_core.sv

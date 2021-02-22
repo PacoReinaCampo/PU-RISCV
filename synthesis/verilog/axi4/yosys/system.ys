@@ -43,7 +43,9 @@
 ###################################################################################
 
 # read design
-verilog_defaults -add -I ../../../../rtl/verilog/pkg
+read_verilog -sv ../../../../rtl/verilog/pkg/peripheral_axi4_pkg.sv
+read_verilog -sv ../../../../rtl/verilog/pkg/peripheral_biu_pkg.sv
+read_verilog -sv ../../../../rtl/verilog/pkg/pu_riscv_pkg.sv
 
 read_verilog -sv ../../../../rtl/verilog/core/cache/riscv_dcache_core.sv
 read_verilog -sv ../../../../rtl/verilog/core/cache/riscv_dext.sv
