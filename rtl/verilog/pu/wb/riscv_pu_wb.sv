@@ -40,8 +40,6 @@
  *   Francisco Javier Reina Campo <frareicam@gmail.com>
  */
 
-`include "riscv_defines.sv"
-
 module riscv_pu_wb #(
   parameter            XLEN               = 64,
   parameter            PLEN               = 64,

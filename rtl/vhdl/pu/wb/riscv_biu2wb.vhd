@@ -47,7 +47,9 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.riscv_defines.all;
+use work.peripheral_wb_pkg.all;
+use work.peripheral_biu_pkg.all;
+use work.vhdl_pkg.all;
 
 entity riscv_biu2wb is
   generic (

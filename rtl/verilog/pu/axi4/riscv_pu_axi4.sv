@@ -40,8 +40,6 @@
  *   Francisco Javier Reina Campo <frareicam@gmail.com>
  */
 
-`include "riscv_defines.sv"
-
 module riscv_pu_axi4 #(
   parameter            AXI_ID_WIDTH       = 10,
   parameter            AXI_ADDR_WIDTH     = 64,

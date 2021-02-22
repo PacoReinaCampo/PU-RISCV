@@ -40,7 +40,8 @@
  *   Francisco Javier Reina Campo <frareicam@gmail.com>
  */
 
-`include "riscv_defines.sv"
+import peripheral_wb_pkg::*;
+import peripheral_biu_pkg::*;
 
 module riscv_biu2wb #(
   parameter XLEN = 64,
