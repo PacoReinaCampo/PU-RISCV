@@ -1,7 +1,10 @@
 all: build simulate
 
 build:
-	ghdl -a --std=08 ../../../../../rtl/vhdl/pkg/riscv_defines.vhd
+	ghdl -a --std=08 ../../../../../rtl/vhdl/pkg/peripheral_wb_pkg.vhd
+	ghdl -a --std=08 ../../../../../rtl/vhdl/pkg/peripheral_biu_pkg.vhd
+	ghdl -a --std=08 ../../../../../rtl/vhdl/pkg/pu_riscv_pkg.vhd
+	ghdl -a --std=08 ../../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
 	ghdl -a --std=08 ../../../../../rtl/vhdl/core/cache/riscv_dcache_core.vhd
 	ghdl -a --std=08 ../../../../../rtl/vhdl/core/cache/riscv_dext.vhd
 	ghdl -a --std=08 ../../../../../rtl/vhdl/core/cache/riscv_icache_core.vhd

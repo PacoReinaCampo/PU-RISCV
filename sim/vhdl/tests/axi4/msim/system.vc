@@ -1,4 +1,7 @@
-../../../../../rtl/vhdl/pkg/riscv_defines.vhd
+../../../../../rtl/vhdl/pkg/peripheral_axi4_pkg.vhd
+../../../../../rtl/vhdl/pkg/peripheral_biu_pkg.vhd
+../../../../../rtl/vhdl/pkg/pu_riscv_pkg.vhd
+../../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
 
 ../../../../../rtl/vhdl/core/cache/riscv_dcache_core.vhd
 ../../../../../rtl/vhdl/core/cache/riscv_dext.vhd
@@ -36,6 +39,8 @@
 
 ../../../../../rtl/vhdl/pu/axi4/riscv_biu2axi4.vhd
 ../../../../../rtl/vhdl/pu/axi4/riscv_pu_axi4.vhd
+../../../../../rtl/vhdl/pu/riscv_ahb2axi.vhd
+../../../../../rtl/vhdl/pu/riscv_axi2ahb.vhd
 
 ../../../../../bench/vhdl/tests/axi4/riscv_memory_model_axi4.vhd
 ../../../../../bench/vhdl/tests/axi4/riscv_mmio_if_axi4.vhd

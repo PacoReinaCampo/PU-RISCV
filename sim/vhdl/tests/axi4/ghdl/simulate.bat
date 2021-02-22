@@ -1,7 +1,10 @@
 @echo off
 call ../../../../../settings64_ghdl.bat
 
-ghdl -a --std=08 ../../../../../rtl/vhdl/pkg/riscv_defines.vhd
+ghdl -a --std=08 ../../../../../rtl/vhdl/pkg/peripheral_axi4_pkg.vhd
+ghdl -a --std=08 ../../../../../rtl/vhdl/pkg/peripheral_biu_pkg.vhd
+ghdl -a --std=08 ../../../../../rtl/vhdl/pkg/pu_riscv_pkg.vhd
+ghdl -a --std=08 ../../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
 ghdl -a --std=08 ../../../../../rtl/vhdl/core/cache/riscv_dcache_core.vhd
 ghdl -a --std=08 ../../../../../rtl/vhdl/core/cache/riscv_dext.vhd
 ghdl -a --std=08 ../../../../../rtl/vhdl/core/cache/riscv_icache_core.vhd
@@ -36,6 +39,8 @@ ghdl -a --std=08 ../../../../../rtl/vhdl/memory/riscv_ram_1rw_generic.vhd
 ghdl -a --std=08 ../../../../../rtl/vhdl/memory/riscv_ram_queue.vhd
 ghdl -a --std=08 ../../../../../rtl/vhdl/pu/axi4/riscv_biu2axi4.vhd
 ghdl -a --std=08 ../../../../../rtl/vhdl/pu/axi4/riscv_pu_axi4.vhd
+ghdl -a --std=08 ../../../../../rtl/vhdl/pu/riscv_ahb2axi.vhd
+ghdl -a --std=08 ../../../../../rtl/vhdl/pu/riscv_axi2ahb.vhd
 ghdl -a --std=08 ../../../../../bench/vhdl/tests/axi4/riscv_memory_model_axi4.vhd
 ghdl -a --std=08 ../../../../../bench/vhdl/tests/axi4/riscv_mmio_if_axi4.vhd
 ghdl -a --std=08 ../../../../../bench/vhdl/tests/axi4/riscv_testbench_axi4.vhd

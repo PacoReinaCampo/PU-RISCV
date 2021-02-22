@@ -1,4 +1,6 @@
-+incdir+../../../../../rtl/verilog/pkg
+../../../../../rtl/verilog/pkg/peripheral_axi4_pkg.sv
+../../../../../rtl/verilog/pkg/peripheral_biu_pkg.sv
+../../../../../rtl/verilog/pkg/pu_riscv_pkg.sv
 
 ../../../../../rtl/verilog/core/cache/riscv_dcache_core.sv
 ../../../../../rtl/verilog/core/cache/riscv_dext.sv
@@ -38,9 +40,3 @@
 ../../../../../rtl/verilog/pu/axi4/riscv_pu_axi4.sv
 ../../../../../rtl/verilog/pu/riscv_ahb2axi.sv
 ../../../../../rtl/verilog/pu/riscv_axi2ahb.sv
-
-../../../../../bench/verilog/tests/axi4/riscv_memory_model_axi4.sv
-../../../../../bench/verilog/tests/axi4/riscv_mmio_if_axi4.sv
-../../../../../bench/verilog/tests/axi4/riscv_testbench_axi4.sv
-../../../../../bench/verilog/tests/riscv_dbg_bfm.sv
-../../../../../bench/verilog/tests/riscv_htif.sv
