@@ -1,4 +1,4 @@
--- Converted from mpsoc_wb_ram_generic.v
+-- Converted from pkg/peripheral_apb4_pkg.sv
 -- by verilog2vhdl - QueenField
 
 --//////////////////////////////////////////////////////////////////////////////
@@ -13,12 +13,12 @@
 --                                                                            //
 --                                                                            //
 --              MPSoC-RISCV CPU                                               //
---              Single Port RAM                                               //
---              Wishbone Bus Interface                                        //
+--              RISC-V Package                                                //
+--              AMBA3 AHB-Lite Bus Interface                                  //
 --                                                                            //
 --//////////////////////////////////////////////////////////////////////////////
 
--- Copyright (c) 2018-2019 by the author(s)
+-- Copyright (c) 2017-2018 by the author(s)
 -- *
 -- * Permission is hereby granted, free of charge, to any person obtaining a copy
 -- * of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,6 @@
 -- *
 -- * =============================================================================
 -- * Author(s):
--- *   Olof Kindgren <olof.kindgren@gmail.com>
 -- *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 -- */
 
@@ -49,55 +48,9 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-entity mpsoc_wb_ram_generic is
-  generic (
-    DEPTH   : integer := 256;
-    MEMFILE : string  := "";
+package peripheral_axi4_pkg is
 
-    AW : integer := integer(log2(real(DEPTH)));
-    DW : integer := 32
-    );
-  port (
-    clk   : in  std_logic;
-    we    : in  std_logic_vector(3 downto 0);
-    din   : in  std_logic_vector(DW-1 downto 0);
-    waddr : in  std_logic_vector(AW-1 downto 0);
-    raddr : in  std_logic_vector(AW-1 downto 0);
-    dout  : out std_logic_vector(DW-1 downto 0)
-    );
-end mpsoc_wb_ram_generic;
+  constant AXI_ADDR_WIDTH : integer := 64;
+  constant AXI_DATA_WIDTH : integer := 64;
 
-architecture RTL of mpsoc_wb_ram_generic is
-  --////////////////////////////////////////////////////////////////
-  --
-  -- Variables
-  --
-  signal mem : std_logic_matrix(DEPTH-1 downto 0)(DW-1 downto 0);
-
-begin
-  --////////////////////////////////////////////////////////////////
-  --
-  -- Module Body
-  --
-  processing_0 : process (clk)
-  begin
-    if (rising_edge(clk)) then
-      if (we(0) = '1') then
-        mem(to_integer(unsigned(raddr)))(7 downto 0) <= din(7 downto 0);
-      end if;
-      if (we(1) = '1') then
-        mem(to_integer(unsigned(raddr)))(15 downto 8) <= din(15 downto 8);
-      end if;
-      if (we(2) = '1') then
-        mem(to_integer(unsigned(raddr)))(23 downto 16) <= din(23 downto 16);
-      end if;
-      if (we(3) = '1') then
-        mem(to_integer(unsigned(raddr)))(31 downto 24) <= din(31 downto 24);
-      end if;
-      dout <= mem(to_integer(unsigned(raddr)));
-    end if;
-  end process;
-
-  generating_0 : if (MEMFILE /= "") generate
-  end generate;
-end RTL;
+end peripheral_axi4_pkg;

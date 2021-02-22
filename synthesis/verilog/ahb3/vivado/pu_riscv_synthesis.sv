@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import peripheral_ahb3_pkg::*;
 
 module pu_riscv_synthesis #(
   parameter            XLEN               = 32,
@@ -172,19 +172,19 @@ module pu_riscv_synthesis #(
 
   //crt.0 (ROM) region
   assign pma_adr[0] = TOHOST >> 2;
-  assign pma_cfg[0] = {`MEM_TYPE_MAIN, 8'b1111_1000, `AMO_TYPE_NONE, `TOR};
+  assign pma_cfg[0] = {MEM_TYPE_MAIN, 8'b1111_1000, AMO_TYPE_NONE, TOR};
 
   //TOHOST region
   assign pma_adr[1] = ((TOHOST >> 2) & ~'hf) | 'h7;
-  assign pma_cfg[1] = {`MEM_TYPE_IO, 8'b0100_0000, `AMO_TYPE_NONE, `NAPOT};
+  assign pma_cfg[1] = {MEM_TYPE_IO, 8'b0100_0000, AMO_TYPE_NONE, NAPOT};
 
   //UART-Tx region
   assign pma_adr[2] = UART_TX >> 2;
-  assign pma_cfg[2] = {`MEM_TYPE_IO, 8'b0100_0000, `AMO_TYPE_NONE, `NA4};
+  assign pma_cfg[2] = {MEM_TYPE_IO, 8'b0100_0000, AMO_TYPE_NONE, NA4};
 
   //RAM region
   assign pma_adr[3] = 1 << 31;
-  assign pma_cfg[3] = {`MEM_TYPE_MAIN, 8'b1111_0000, `AMO_TYPE_NONE, `TOR};
+  assign pma_cfg[3] = {MEM_TYPE_MAIN, 8'b1111_0000, AMO_TYPE_NONE, TOR};
 
   // Processing Unit
   riscv_pu_ahb3 #(
