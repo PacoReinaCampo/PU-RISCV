@@ -40,8 +40,6 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
-
 module riscv_memory #(
   parameter XLEN = 64,
   parameter ILEN = 64,

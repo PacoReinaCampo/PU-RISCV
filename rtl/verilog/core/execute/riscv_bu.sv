@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import pu_riscv_pkg::*;
 
 module riscv_bu #(
   parameter            XLEN           = 64,
@@ -144,9 +144,9 @@ module riscv_bu #(
         bu_exception <= id_exception;
 
         casex ( {id_bubble,opcode} )
-          {1'b0,`OPC_JALR  } : bu_exception[`CAUSE_MISALIGNED_INSTRUCTION] <= id_exception[`CAUSE_MISALIGNED_INSTRUCTION] | has_rvc ? nxt_pc[0] : |nxt_pc[1:0];
-          {1'b0,`OPC_BRANCH} : bu_exception[`CAUSE_MISALIGNED_INSTRUCTION] <= id_exception[`CAUSE_MISALIGNED_INSTRUCTION] | has_rvc ? nxt_pc[0] : |nxt_pc[1:0];
-          default            : bu_exception[`CAUSE_MISALIGNED_INSTRUCTION] <= id_exception[`CAUSE_MISALIGNED_INSTRUCTION];
+          {1'b0,OPC_JALR  } : bu_exception[CAUSE_MISALIGNED_INSTRUCTION] <= id_exception[CAUSE_MISALIGNED_INSTRUCTION] | has_rvc ? nxt_pc[0] : |nxt_pc[1:0];
+          {1'b0,OPC_BRANCH} : bu_exception[CAUSE_MISALIGNED_INSTRUCTION] <= id_exception[CAUSE_MISALIGNED_INSTRUCTION] | has_rvc ? nxt_pc[0] : |nxt_pc[1:0];
+          default            : bu_exception[CAUSE_MISALIGNED_INSTRUCTION] <= id_exception[CAUSE_MISALIGNED_INSTRUCTION];
         endcase
       end
     end
@@ -178,64 +178,64 @@ module riscv_bu #(
 
   always @(*) begin
     casex ( {id_bubble,func7,func3,opcode} )
-      {1'b0,`JAL    }: begin //This is really only for the debug unit, such that NPC points to the correct address
+      {1'b0,JAL    }: begin //This is really only for the debug unit, such that NPC points to the correct address
         btaken     = 'b1;
         bp_update  = 'b0;
         pipeflush  = 'b0; //Handled in IF, do NOT flush here!!
         cacheflush = 'b0;
         nxt_pc     = id_pc + immJ;
       end
-      {1'b0,`JALR   }: begin
+      {1'b0,JALR   }: begin
         btaken     = 'b1;
         bp_update  = 'b0;
         pipeflush  = 'b1;
         cacheflush = 'b0;
         nxt_pc     = (opA + opB) & { {XLEN-1{1'b1}},1'b0 };
       end
-      {1'b0,`BEQ    }: begin
+      {1'b0,BEQ    }: begin
         btaken     = (opA == opB);
         bp_update  = 'b1;
         pipeflush  = btaken ^ id_bp_predict[1];
         cacheflush = 'b0;
         nxt_pc     = btaken ? id_pc + immB : id_pc +'h4;
       end
-      {1'b0,`BNE    }: begin
+      {1'b0,BNE    }: begin
         btaken     = (opA != opB);
         bp_update  = 'b1;
         pipeflush  = btaken ^ id_bp_predict[1];
         cacheflush = 'b0;
         nxt_pc     = btaken ? id_pc + immB : id_pc + 'h4;
       end
-      {1'b0,`BLTU    }: begin
+      {1'b0,BLTU    }: begin
         btaken     = (opA < opB);
         bp_update  = 'b1;
         pipeflush  = btaken ^ id_bp_predict[1];
         cacheflush = 'b0;
         nxt_pc     = btaken ? id_pc + immB : id_pc + 'h4;
       end
-      {1'b0,`BGEU   }: begin
+      {1'b0,BGEU   }: begin
         btaken     = (opA >= opB);
         bp_update  = 'b1;
         pipeflush  = btaken ^ id_bp_predict[1];
         cacheflush = 'b0;
         nxt_pc     = btaken ? id_pc + immB : id_pc +'h4;
       end
-      {1'b0,`BLT   }: begin
+      {1'b0,BLT   }: begin
         btaken     = $signed(opA) <  $signed(opB); 
         bp_update  = 'b1;
         pipeflush  = btaken ^ id_bp_predict[1];
         cacheflush = 'b0;
         nxt_pc     = btaken ? id_pc + immB : id_pc + 'h4;
       end
-      {1'b0,`BGE    }: begin
+      {1'b0,BGE    }: begin
         btaken     = $signed(opA) >= $signed(opB);
         bp_update  = 'b1;
         pipeflush  = btaken ^ id_bp_predict[1];
         cacheflush = 'b0;
         nxt_pc     = btaken ? id_pc + immB : id_pc + 'h4;
       end
-      {1'b0,`MISCMEM}: case (id_instr)
-        `FENCE_I: begin
+      {1'b0,MISCMEM}: case (id_instr)
+        FENCE_I: begin
           btaken     = 'b0;
           bp_update  = 'b0;
           pipeflush  = 'b1;

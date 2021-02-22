@@ -46,10 +46,10 @@ package peripheral_ahb3_pkg;
   localparam HDATA_SIZE = 64;
 
   //HTRANS
-  localparam HTRANS_IDLE   = 2'b00
-  localparam HTRANS_BUSY   = 2'b01
-  localparam HTRANS_NONSEQ = 2'b10
-  localparam HTRANS_SEQ    = 2'b11
+  localparam HTRANS_IDLE   = 2'b00;
+  localparam HTRANS_BUSY   = 2'b01;
+  localparam HTRANS_NONSEQ = 2'b10;
+  localparam HTRANS_SEQ    = 2'b11;
 
   //HSIZE
   localparam HSIZE_B8    = 3'b000;

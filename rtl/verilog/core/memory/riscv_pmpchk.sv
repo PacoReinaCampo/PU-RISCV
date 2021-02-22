@@ -40,7 +40,8 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import pu_riscv_pkg::*;
+import peripheral_biu_pkg::*;
 
 module riscv_pmpchk #(
   parameter XLEN    = 64,
@@ -75,11 +76,11 @@ module riscv_pmpchk #(
     input [2:0] size;
 
     case (size)
-      `BYTE   : size2bytes = 1;
-      `HWORD  : size2bytes = 2;
-      `WORD   : size2bytes = 4;
-      `DWORD  : size2bytes = 8;
-      `QWORD  : size2bytes = 16;
+      BYTE    : size2bytes = 1;
+      HWORD   : size2bytes = 2;
+      WORD    : size2bytes = 4;
+      DWORD   : size2bytes = 8;
+      QWORD   : size2bytes = 16;
       default : begin
         size2bytes = 0-1;
         //$error ("Illegal biu_size_t");
@@ -220,9 +221,9 @@ module riscv_pmpchk #(
       //lower bounds
       always @(*) begin
         case (st_pmpcfg_i[i][4:3])
-          `TOR    : pmp_lb[i] = (i==0) ? 0 : st_pmpcfg_i[i][4:3] != `TOR ? pmp_ub[i] : st_pmpaddr_i[i][PLEN-3:0];
-          `NA4    : pmp_lb[i] = napot_lb(1'b1, st_pmpaddr_i[i]);
-          `NAPOT  : pmp_lb[i] = napot_lb(1'b0, st_pmpaddr_i[i]);
+          TOR    : pmp_lb[i] = (i==0) ? 0 : st_pmpcfg_i[i][4:3] != TOR ? pmp_ub[i] : st_pmpaddr_i[i][PLEN-3:0];
+          NA4    : pmp_lb[i] = napot_lb(1'b1, st_pmpaddr_i[i]);
+          NAPOT  : pmp_lb[i] = napot_lb(1'b0, st_pmpaddr_i[i]);
           default : pmp_lb[i] = 'hx;
         endcase
       end
@@ -230,9 +231,9 @@ module riscv_pmpchk #(
       //upper bounds
       always @(*) begin
         case (st_pmpcfg_i[i][4:3])
-          `TOR    : pmp_ub[i] = st_pmpaddr_i[i][PLEN-3:0];
-          `NA4    : pmp_ub[i] = napot_ub(1'b1, st_pmpaddr_i[i]);
-          `NAPOT  : pmp_ub[i] = napot_ub(1'b0, st_pmpaddr_i[i]);
+          TOR    : pmp_ub[i] = st_pmpaddr_i[i][PLEN-3:0];
+          NA4    : pmp_ub[i] = napot_ub(1'b1, st_pmpaddr_i[i]);
+          NAPOT  : pmp_ub[i] = napot_ub(1'b0, st_pmpaddr_i[i]);
           default : pmp_ub[i] = 'hx;
         endcase
       end
@@ -241,7 +242,7 @@ module riscv_pmpchk #(
       assign pmp_match    [i] = match_any( access_lb[PLEN-1:2],
                                            access_ub[PLEN-1:2],
                                            pmp_lb[i],
-                                           pmp_ub[i]) & (st_pmpcfg_i[i][4:3] != `OFF);
+                                           pmp_ub[i]) & (st_pmpcfg_i[i][4:3] != OFF);
 
       assign pmp_match_all[i] = match_all( access_lb[PLEN-1:2],
                                            access_ub[PLEN-1:2],
@@ -259,13 +260,13 @@ module riscv_pmpchk #(
    * 3. privilegel level is S or U AND no PMPs matched AND PMPs are implemented
    */
 
-  assign exception_o = req_i & (~|pmp_match ? (st_prv_i != `PRV_M) & (PMP_CNT > 0)  //Prv.Lvl != M-Mode, no PMP matched, but PMPs implemented -> FAIL
+  assign exception_o = req_i & (~|pmp_match ? (st_prv_i != PRV_M) & (PMP_CNT > 0)  //Prv.Lvl != M-Mode, no PMP matched, but PMPs implemented -> FAIL
                                 : ~pmp_match_all[ matched_pmp ]     |
                                 (
-                                  ((st_prv_i != `PRV_M) | matched_pmpcfg[7] ) &  //pmpcfg.l set or privilege level != M-mode
-                                  ((~matched_pmpcfg[0] & ~we_i           ) |     // read-access while not allowed          -> FAIL
-                                   (~matched_pmpcfg[1] &  we_i           ) |     // write-access while not allowed         -> FAIL
-                                   (~matched_pmpcfg[2] &  instruction_i  ) )     // instruction read, but not instruction  -> FAIL
+                                  ((st_prv_i != PRV_M) | matched_pmpcfg[7] ) &  //pmpcfg.l set or privilege level != M-mode
+                                  ((~matched_pmpcfg[0] & ~we_i           ) |    // read-access while not allowed          -> FAIL
+                                   (~matched_pmpcfg[1] &  we_i           ) |    // write-access while not allowed         -> FAIL
+                                   (~matched_pmpcfg[2] &  instruction_i  ) )    // instruction read, but not instruction  -> FAIL
                                 )
                                );
 endmodule

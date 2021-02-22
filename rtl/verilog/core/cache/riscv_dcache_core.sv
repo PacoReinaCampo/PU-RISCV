@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import peripheral_biu_pkg::*;
 
 module riscv_dcache_core #(
   parameter XLEN = 64,
@@ -141,10 +141,11 @@ module riscv_dcache_core #(
     adr_lsbs = adr[$clog2(XLEN/8)-1:0];
 
     case (size)
-      `BYTE : size2be = 'h1  << adr_lsbs;
-      `HWORD: size2be = 'h3  << adr_lsbs;
-      `WORD : size2be = 'hf  << adr_lsbs;
-      `DWORD: size2be = 'hff << adr_lsbs;
+      BYTE    : size2be = 'h1  << adr_lsbs;
+      HWORD   : size2be = 'h3  << adr_lsbs;
+      WORD    : size2be = 'hf  << adr_lsbs;
+      DWORD   : size2be = 'hff << adr_lsbs;
+      default : ;
     endcase
   endfunction
 
@@ -665,7 +666,7 @@ module riscv_dcache_core #(
       FLUSH       : tag_idx = flush_idx;
       FLUSHWAYS   : tag_idx = flush_idx;
       RECOVER     : tag_idx = mem_vreq_dly ? vadr_dly_idx  //pending access
-        : vadr_idx;     //new access
+                                           : vadr_idx;     //new access
       default     : tag_idx = vadr_idx;                    //current access
     endcase
   end
@@ -803,7 +804,7 @@ module riscv_dcache_core #(
   // Bus Interface State Machine
   //----------------------------------------------------------------
   assign biu_lock_o = 1'b0;
-  assign biu_prot_o = (mem_prot_i | `PROT_CACHEABLE);
+  assign biu_prot_o = (mem_prot_i | PROT_CACHEABLE);
 
   always @(posedge clk_i, negedge rst_ni) begin
     if (!rst_ni) begin
@@ -991,9 +992,9 @@ module riscv_dcache_core #(
   end
 
   //transfer size
-  assign biu_size_o = XLEN == 64 ? `DWORD : `WORD;
+  assign biu_size_o = XLEN == 64 ? DWORD : WORD;
 
   //burst length
-  assign biu_type_o = BURST_SIZE == 16 ? `WRAP16 :
-                      BURST_SIZE == 8  ? `WRAP8  : `WRAP4;
+  assign biu_type_o = BURST_SIZE == 16 ? WRAP16 :
+                      BURST_SIZE == 8  ? WRAP8  : WRAP4;
 endmodule

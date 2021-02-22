@@ -40,7 +40,8 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import pu_riscv_pkg::*;
+import peripheral_biu_pkg::*;
 
 module riscv_pmachk #(
   parameter XLEN    = 64,
@@ -81,11 +82,11 @@ module riscv_pmachk #(
     input [2:0] size;
 
     case (size)
-      `BYTE   : size2bytes = 1;
-      `HWORD  : size2bytes = 2;
-      `WORD   : size2bytes = 4;
-      `DWORD  : size2bytes = 8;
-      `QWORD  : size2bytes = 16;
+      BYTE    : size2bytes = 1;
+      HWORD   : size2bytes = 2;
+      WORD    : size2bytes = 4;
+      DWORD   : size2bytes = 8;
+      QWORD   : size2bytes = 16;
       default : begin
         size2bytes = -1;
         //$error ("Illegal biu_size_t");
@@ -215,22 +216,22 @@ module riscv_pmachk #(
   //PMA configurations
   generate
     for (i=0; i < PMA_CNT; i=i+1) begin: set_pmacfg
-      assign pmacfg[i][13:12] = pma_cfg_i[i][13:12] == `MEM_TYPE_EMPTY ? `MEM_TYPE_IO
+      assign pmacfg[i][13:12] = pma_cfg_i[i][13:12] == MEM_TYPE_EMPTY ? MEM_TYPE_IO
                               : pma_cfg_i[i][13:12];
-      assign pmacfg[i][3:2]   = pma_cfg_i[i][13:12] == `MEM_TYPE_EMPTY ? `AMO_TYPE_NONE
+      assign pmacfg[i][3:2]   = pma_cfg_i[i][13:12] == MEM_TYPE_EMPTY ? AMO_TYPE_NONE
                               : pma_cfg_i[i][3:2];
-      assign pmacfg[i][11]    = pma_cfg_i[i][13:12] == `MEM_TYPE_EMPTY ? 1'b0
+      assign pmacfg[i][11]    = pma_cfg_i[i][13:12] == MEM_TYPE_EMPTY ? 1'b0
                               : pma_cfg_i[i][11];
-      assign pmacfg[i][10]    = pma_cfg_i[i][13:12] == `MEM_TYPE_EMPTY ? 1'b0
+      assign pmacfg[i][10]    = pma_cfg_i[i][13:12] == MEM_TYPE_EMPTY ? 1'b0
                               : pma_cfg_i[i][10];
-      assign pmacfg[i][9]     = pma_cfg_i[i][13:12] == `MEM_TYPE_EMPTY ? 1'b0
+      assign pmacfg[i][9]     = pma_cfg_i[i][13:12] == MEM_TYPE_EMPTY ? 1'b0
                               : pma_cfg_i[i][9];
-      assign pmacfg[i][8]     = pma_cfg_i[i][13:12] == `MEM_TYPE_MAIN  ? pma_cfg_i[i][8]
+      assign pmacfg[i][8]     = pma_cfg_i[i][13:12] == MEM_TYPE_MAIN  ? pma_cfg_i[i][8]
                               : 1'b0;
       assign pmacfg[i][7]     = pma_cfg_i[i][7] & pmacfg[i][8];
-      assign pmacfg[i][6]     = pma_cfg_i[i][13:12] == `MEM_TYPE_IO    ? pma_cfg_i[i][6]
+      assign pmacfg[i][6]     = pma_cfg_i[i][13:12] == MEM_TYPE_IO    ? pma_cfg_i[i][6]
                               : 1'b1;
-      assign pmacfg[i][5]     = pma_cfg_i[i][13:12] == `MEM_TYPE_IO    ? pma_cfg_i[i][5]
+      assign pmacfg[i][5]     = pma_cfg_i[i][13:12] == MEM_TYPE_IO    ? pma_cfg_i[i][5]
                               : 1'b1;
       assign pmacfg[i][4]     = pma_cfg_i[i][4];
       assign pmacfg[i][1:0]   = pma_cfg_i[i][1:0];
@@ -247,9 +248,9 @@ module riscv_pmachk #(
       always @(*) begin
         case (pmacfg[i][1:0])
           //TOR after NAPOT ...
-          `TOR    : pma_lb[i] = (i==0) ? {PLEN-2{1'b0}} : pmacfg[i-1][1:0] != `TOR ? pma_ub[i-1] : pma_adr_i[i-1][PLEN-2 -1:0];
-          `NA4    : pma_lb[i] = napot_lb(1'b1, pma_adr_i[i]);
-          `NAPOT  : pma_lb[i] = napot_lb(1'b0, pma_adr_i[i]);
+          TOR     : pma_lb[i] = (i==0) ? {PLEN-2{1'b0}} : pmacfg[i-1][1:0] != TOR ? pma_ub[i-1] : pma_adr_i[i-1][PLEN-2 -1:0];
+          NA4     : pma_lb[i] = napot_lb(1'b1, pma_adr_i[i]);
+          NAPOT   : pma_lb[i] = napot_lb(1'b0, pma_adr_i[i]);
           default : pma_lb[i] = {$bits(pma_lb[i]){1'bx}};
         endcase
       end
@@ -257,16 +258,16 @@ module riscv_pmachk #(
       //upper bounds
       always @(*) begin
         case (pmacfg[i][1:0])
-          `TOR    : pma_ub[i] = pma_adr_i[i][PLEN-2 -1:0];
-          `NA4    : pma_ub[i] = napot_ub(1'b1, pma_adr_i[i]);
-          `NAPOT  : pma_ub[i] = napot_ub(1'b0, pma_adr_i[i]);
+          TOR     : pma_ub[i] = pma_adr_i[i][PLEN-2 -1:0];
+          NA4     : pma_ub[i] = napot_ub(1'b1, pma_adr_i[i]);
+          NAPOT   : pma_ub[i] = napot_ub(1'b0, pma_adr_i[i]);
           default : pma_ub[i] = {$bits(pma_ub[i]){1'bx}};
         endcase
       end
 
       //match
-      assign pma_match    [i] = match_any(access_lb[PLEN-1:2], access_ub[PLEN-1:2], pma_lb[i], pma_ub[i]) & (pmacfg[i][1:0] != `OFF);
-      assign pma_match_all[i] = match_all(access_lb[PLEN-1:2], access_ub[PLEN-1:2], pma_lb[i], pma_ub[i]) & (pmacfg[i][1:0] != `OFF);
+      assign pma_match    [i] = match_any(access_lb[PLEN-1:2], access_ub[PLEN-1:2], pma_lb[i], pma_ub[i]) & (pmacfg[i][1:0] != OFF);
+      assign pma_match_all[i] = match_all(access_lb[PLEN-1:2], access_ub[PLEN-1:2], pma_lb[i], pma_ub[i]) & (pmacfg[i][1:0] != OFF);
     end
   endgenerate
 
@@ -285,6 +286,6 @@ module riscv_pmachk #(
 
   //Access Types
   assign is_cache_access_o = req_i & ~exception_o & ~misaligned_o &  matched_pma[8];          //implies MEM_TYPE_MAIN
-  assign is_ext_access_o   = req_i & ~exception_o & ~misaligned_o & ~matched_pma[8] & matched_pma[13:12] != `MEM_TYPE_TCM;
-  assign is_tcm_access_o   = req_i & ~exception_o & ~misaligned_o & (matched_pma[13:12] == `MEM_TYPE_TCM);
+  assign is_ext_access_o   = req_i & ~exception_o & ~misaligned_o & ~matched_pma[8] & matched_pma[13:12] != MEM_TYPE_TCM;
+  assign is_tcm_access_o   = req_i & ~exception_o & ~misaligned_o & (matched_pma[13:12] == MEM_TYPE_TCM);
 endmodule

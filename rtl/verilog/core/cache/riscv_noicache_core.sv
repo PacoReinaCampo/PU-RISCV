@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import peripheral_biu_pkg::*;
 
 module riscv_noicache_core #(
   parameter XLEN        = 64,
@@ -125,11 +125,11 @@ module riscv_noicache_core #(
   //External Interface
   assign biu_stb   = dcflush_rdy & ~if_flush & ~if_stall & ~biu_fifo_valid[1]; //TODO when is ~biu_fifo[1] required?
   assign biu_adri  = if_nxt_pc[PLEN -1:0];
-  assign biu_size  = XLEN==64 ? `DWORD : `WORD;
+  assign biu_size  = XLEN==64 ? DWORD : WORD;
   assign biu_lock  = 1'b0;
   assign biu_we    = 1'b0;   //no writes
   assign biu_di    =  'h0;
-  assign biu_type  = `SINGLE; //single access
+  assign biu_type  = SINGLE; //single access
 
   //Instruction cache..
   assign biu_is_instruction = 1'b1;

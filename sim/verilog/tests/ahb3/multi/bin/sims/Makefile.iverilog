@@ -55,10 +55,10 @@ LOG = log/$(TOP).log
 
 sim: vlog
 	echo "--- Running sim"
-	vvp $(SIM_OPTS)		\
-	  -l $(LOG) $(TOP)	\
-	  -do "run -all; quit"	\
-	  $(foreach p, $(PARAMETERS),-g`echo $p | sed -r 's/(\w+)=([^0-9].*)/\1="\2"/'`)
+	vvp $(SIM_OPTS) \
+	-l $(LOG) $(TOP) \
+	-do "run -all; quit" \
+	$(foreach p, $(PARAMETERS),-g`echo $p | sed -r 's/(\w+)=([^0-9].*)/\1="\2"/'`)
 	
 clean:
 	@rm -rf work log
@@ -76,9 +76,8 @@ clean:
 
 vlog: work $(VLOG)
 	echo "--- Running vlog"
-	vlog -work work $(VLOG)					\
-	-sv							\
-	$(foreach d,$(INCDIRS),+incdir+$d)
+	vlog -work work $(VLOG) \
+	-sv
 
 
 #################################################################

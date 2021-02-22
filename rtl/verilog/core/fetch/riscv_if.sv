@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import pu_riscv_pkg::*;
 
 module riscv_if #(
   parameter XLEN           = 64,
@@ -174,19 +174,19 @@ module riscv_if #(
   //instruction shift register, for 16bit instruction support
   assign new_parcel = if_parcel;
   always @(posedge clk,negedge rstn) begin
-    if      (!rstn    ) parcel_shift_register <= {`INSTR_NOP,`INSTR_NOP};
-    else if ( flushes ) parcel_shift_register <= {`INSTR_NOP,`INSTR_NOP};
+    if      (!rstn    ) parcel_shift_register <= {INSTR_NOP,INSTR_NOP};
+    else if ( flushes ) parcel_shift_register <= {INSTR_NOP,INSTR_NOP};
     else if (!id_stall)
       if (branch_taken)
-        parcel_shift_register <= {`INSTR_NOP,`INSTR_NOP};
+        parcel_shift_register <= {INSTR_NOP,INSTR_NOP};
     else
       case (parcel_sr_valid)
-        3'b000:                           parcel_shift_register <= {`INSTR_NOP , new_parcel};
-        3'b001: if (is_16bit_instruction) parcel_shift_register <= {`INSTR_NOP , new_parcel};
+        3'b000:                           parcel_shift_register <= {INSTR_NOP , new_parcel};
+        3'b001: if (is_16bit_instruction) parcel_shift_register <= {INSTR_NOP , new_parcel};
                 else                      parcel_shift_register <= {new_parcel, parcel_shift_register[15:0]};
         3'b011: if (is_16bit_instruction) parcel_shift_register <= {new_parcel, parcel_shift_register[16 +: ILEN]};
-                else                      parcel_shift_register <= {`INSTR_NOP , new_parcel};
-        3'b111: if (is_16bit_instruction) parcel_shift_register <= {`INSTR_NOP , parcel_shift_register[16 +: ILEN]};
+                else                      parcel_shift_register <= {INSTR_NOP , new_parcel};
+        3'b111: if (is_16bit_instruction) parcel_shift_register <= {INSTR_NOP , parcel_shift_register[16 +: ILEN]};
                 else                      parcel_shift_register <= {new_parcel, parcel_shift_register[32 +: 16]};
       endcase
   end
@@ -221,15 +221,15 @@ module riscv_if #(
   //Convert 16bit instructions to 32bit instructions here.
   always @(*) begin
     case(active_parcel)
-      `WFI    : pd_instr = `INSTR_NOP;                               //Implement WFI as a nop 
+      WFI    : pd_instr = INSTR_NOP;                               //Implement WFI as a nop 
       default : if (is_32bit_instruction) pd_instr = active_parcel;
                 else                      pd_instr = -1;             //Illegal
     endcase
   end
 
   always @(posedge clk,negedge rstn) begin
-    if      (!rstn    ) if_instr <= `INSTR_NOP;
-    else if ( flushes ) if_instr <= `INSTR_NOP;
+    if      (!rstn    ) if_instr <= INSTR_NOP;
+    else if ( flushes ) if_instr <= INSTR_NOP;
     else if (!id_stall) if_instr <= pd_instr;
   end
 
@@ -248,14 +248,14 @@ module riscv_if #(
   // Branch and Jump prediction
   always @(*) begin
     casex ({pd_bubble,opcode})
-      {1'b0,`OPC_JAL   } : begin
+      {1'b0,OPC_JAL   } : begin
         branch_taken = 1'b1;
         branch_pc    = pd_pc + immJ;
       end
-      {1'b0,`OPC_BRANCH} : begin
+      {1'b0,OPC_BRANCH} : begin
         //if this CPU has a Branch Predict Unit, then use it's prediction
         //otherwise assume backwards jumps taken, forward jumps not taken
-        branch_taken = `HAS_BPU ? bp_bp_predict[1] : immB[31];
+        branch_taken = HAS_BPU ? bp_bp_predict[1] : immB[31];
         branch_pc    = pd_pc + immB;
       end
       default           : begin
@@ -267,7 +267,7 @@ module riscv_if #(
 
   always @(posedge clk,negedge rstn) begin
     if      (!rstn    ) if_bp_predict <= 2'b00;
-    else if (!id_stall) if_bp_predict <= (`HAS_BPU) ? bp_bp_predict : {branch_taken,1'b0};
+    else if (!id_stall) if_bp_predict <= (HAS_BPU) ? bp_bp_predict : {branch_taken,1'b0};
   end
 
   //Exceptions
@@ -278,8 +278,8 @@ module riscv_if #(
     else if ( flushes                  ) parcel_exception <= 'h0;
     else if ( parcel_valid && !id_stall) begin
       parcel_exception <= 'h0;
-      parcel_exception[`CAUSE_MISALIGNED_INSTRUCTION  ] <= if_parcel_misaligned;
-      parcel_exception[`CAUSE_INSTRUCTION_ACCESS_FAULT] <= if_parcel_page_fault;
+      parcel_exception[CAUSE_MISALIGNED_INSTRUCTION  ] <= if_parcel_misaligned;
+      parcel_exception[CAUSE_INSTRUCTION_ACCESS_FAULT] <= if_parcel_page_fault;
     end
   end
 

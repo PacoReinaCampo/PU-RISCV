@@ -112,20 +112,20 @@ package pu_riscv_pkg;
   localparam JEDEC_BANK            = 10;
   localparam JEDEC_MANUFACTURER_ID = 'h6e;
 
-  localparam HARTID             0;
+  localparam HARTID             = 0;
 
-  localparam PARCEL_SIZE        32;
+  localparam PARCEL_SIZE        = 32;
 
-  localparam SYNC_DEPTH         3;
+  localparam SYNC_DEPTH         = 3;
 
-  localparam BUFFER_DEPTH       4;
+  localparam BUFFER_DEPTH       = 4;
 
   //RF Access
   localparam RDPORTS            = 1;
   localparam WRPORTS            = 1;
   localparam AR_BITS            = 5;
 
-  localparam PMPCFG_MASK        8'h9F;
+  localparam PMPCFG_MASK        = 8'h9F;
 
   //Definitions Package
   localparam ARCHID             = 12;
@@ -141,7 +141,7 @@ package pu_riscv_pkg;
 
   //RISCV Opcodes Package
   localparam ILEN      = 64;
-  localparam INSTR_NOP = ILEN'h13;
+  localparam INSTR_NOP = 64'h13;
 
   //Opcodes
   localparam OPC_LOAD     = 5'b00_000;
@@ -517,7 +517,7 @@ package pu_riscv_pkg;
   //
   
   //One Debug Unit per Hardware Thread (hart)
-  localparam DU_ADDR_SIZE  = 12;  // 12bit internal address bus
+  localparam DU_ADDR_SIZE = 12;  // 12bit internal address bus
 
   localparam MAX_BREAKPOINTS = 8;
 

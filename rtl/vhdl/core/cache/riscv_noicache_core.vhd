@@ -48,9 +48,16 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-use work.riscv_defines.all;
+use work.peripheral_biu_pkg.all;
+use work.vhdl_pkg.all;
 
 entity riscv_noicache_core is
+  generic (
+    XLEN        : integer := 64;
+    PLEN        : integer := 64;
+    PARCEL_SIZE : integer := 64
+  );
+  
   port (
     rstn : in std_logic;
     clk  : in std_logic;

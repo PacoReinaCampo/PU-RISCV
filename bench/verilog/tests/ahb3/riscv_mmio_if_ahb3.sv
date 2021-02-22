@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import peripheral_ahb3_pkg::*;
 
 module riscv_mmio_if_ahb3 #(
   parameter HDATA_SIZE    = 32,
@@ -102,7 +102,7 @@ module riscv_mmio_if_ahb3 #(
   end
 
   //Catch write to host address
-  assign HRESP = `HRESP_OKAY;
+  assign HRESP = HRESP_OKAY;
 
   always @(posedge HCLK) begin
     dHTRANS <= HTRANS;
@@ -114,7 +114,7 @@ module riscv_mmio_if_ahb3 #(
     if (!HRESETn) begin
       HREADYOUT <= 1'b1;
     end
-    else if (HTRANS == `HTRANS_IDLE) begin
+    else if (HTRANS == HTRANS_IDLE) begin
     end
   end
 
@@ -124,8 +124,8 @@ module riscv_mmio_if_ahb3 #(
       catch_uart_tx <= 1'b0;
     end
     else begin
-      catch_test    <= dHTRANS == `HTRANS_NONSEQ && dHWRITE && dHADDR == CATCH_TEST;
-      catch_uart_tx <= dHTRANS == `HTRANS_NONSEQ && dHWRITE && dHADDR == CATCH_UART_TX;
+      catch_test    <= dHTRANS == HTRANS_NONSEQ && dHWRITE && dHADDR == CATCH_TEST;
+      catch_uart_tx <= dHTRANS == HTRANS_NONSEQ && dHWRITE && dHADDR == CATCH_UART_TX;
       data_reg      <= HWDATA;
     end
   end

@@ -40,7 +40,8 @@
  *   Francisco Javier Reina Campo <frareicam@gmail.com>
  */
 
-`include "riscv_defines.sv"
+import peripheral_ahb3_pkg::*;
+import peripheral_biu_pkg::*;
 
 module riscv_biu2ahb3 #(
   parameter XLEN = 64,
@@ -90,10 +91,10 @@ module riscv_biu2ahb3 #(
     input [2:0] size;
 
     case (size)
-      3'b000  : biu_size2hsize = `HSIZE_BYTE;
-      3'b001  : biu_size2hsize = `HSIZE_HWORD;
-      3'b010  : biu_size2hsize = `HSIZE_WORD;
-      3'b011  : biu_size2hsize = `HSIZE_DWORD;
+      3'b000  : biu_size2hsize = HSIZE_BYTE;
+      3'b001  : biu_size2hsize = HSIZE_HWORD;
+      3'b010  : biu_size2hsize = HSIZE_WORD;
+      3'b011  : biu_size2hsize = HSIZE_DWORD;
       default : biu_size2hsize = 3'hx; //OOPSS
     endcase
   endfunction
@@ -103,15 +104,15 @@ module riscv_biu2ahb3 #(
     input [2:0] biu_type;
 
     case (biu_type)
-      `SINGLE  : biu_type2cnt =  0;
-      `INCR    : biu_type2cnt =  0;
-      `WRAP4   : biu_type2cnt =  3;
-      `INCR4   : biu_type2cnt =  3;
-      `WRAP8   : biu_type2cnt =  7;
-      `INCR8   : biu_type2cnt =  7;
-      `WRAP16  : biu_type2cnt = 15;
-      `INCR16  : biu_type2cnt = 15;
-      default  : biu_type2cnt = 4'hx; //OOPS
+      SINGLE  : biu_type2cnt =  0;
+      INCR    : biu_type2cnt =  0;
+      WRAP4   : biu_type2cnt =  3;
+      INCR4   : biu_type2cnt =  3;
+      WRAP8   : biu_type2cnt =  7;
+      INCR8   : biu_type2cnt =  7;
+      WRAP16  : biu_type2cnt = 15;
+      INCR16  : biu_type2cnt = 15;
+      default : biu_type2cnt = 4'hx; //OOPS
     endcase
   endfunction
 
@@ -120,15 +121,15 @@ module riscv_biu2ahb3 #(
     input [2:0] biu_type;
 
     case (biu_type)
-      `SINGLE  : biu_type2hburst = `HBURST_SINGLE;
-      `INCR    : biu_type2hburst = `HBURST_INCR;
-      `WRAP4   : biu_type2hburst = `HBURST_WRAP4;
-      `INCR4   : biu_type2hburst = `HBURST_INCR4;
-      `WRAP8   : biu_type2hburst = `HBURST_WRAP8;
-      `INCR8   : biu_type2hburst = `HBURST_INCR8;
-      `WRAP16  : biu_type2hburst = `HBURST_WRAP16;
-      `INCR16  : biu_type2hburst = `HBURST_INCR16;
-      default  : biu_type2hburst = 3'hx; //OOPS
+      SINGLE  : biu_type2hburst = HBURST_SINGLE;
+      INCR    : biu_type2hburst = HBURST_INCR;
+      WRAP4   : biu_type2hburst = HBURST_WRAP4;
+      INCR4   : biu_type2hburst = HBURST_INCR4;
+      WRAP8   : biu_type2hburst = HBURST_WRAP8;
+      INCR8   : biu_type2hburst = HBURST_INCR8;
+      WRAP16  : biu_type2hburst = HBURST_WRAP16;
+      INCR16  : biu_type2hburst = HBURST_INCR16;
+      default : biu_type2hburst = 3'hx; //OOPS
     endcase
   endfunction
 
@@ -136,9 +137,9 @@ module riscv_biu2ahb3 #(
   function automatic [3:0] biu_prot2hprot;
     input [2:0] biu_prot;
 
-    biu_prot2hprot  = biu_prot & `PROT_DATA                         ? `HPROT_DATA       : `HPROT_OPCODE;
-    biu_prot2hprot  = biu_prot2hprot | (biu_prot & `PROT_PRIVILEGED ? `HPROT_PRIVILEGED : `HPROT_USER);
-    biu_prot2hprot  = biu_prot2hprot | (biu_prot & `PROT_CACHEABLE  ? `HPROT_CACHEABLE  : `HPROT_NON_CACHEABLE);
+    biu_prot2hprot  = biu_prot & PROT_DATA                         ? HPROT_DATA       : HPROT_OPCODE;
+    biu_prot2hprot  = biu_prot2hprot | (biu_prot & PROT_PRIVILEGED ? HPROT_PRIVILEGED : HPROT_USER);
+    biu_prot2hprot  = biu_prot2hprot | (biu_prot & PROT_CACHEABLE  ? HPROT_CACHEABLE  : HPROT_NON_CACHEABLE);
   endfunction
 
   //convert burst type to counter length (actually length -1)
@@ -152,9 +153,9 @@ module riscv_biu2ahb3 #(
 
     //wrap?
     case (hburst)
-      `HBURST_WRAP4  : nxt_addr = (XLEN==32) ? {addr[PLEN-1: 4],nxt_addr[3:0]} : {addr[PLEN-1:5],nxt_addr[4:0]};
-      `HBURST_WRAP8  : nxt_addr = (XLEN==32) ? {addr[PLEN-1: 5],nxt_addr[4:0]} : {addr[PLEN-1:6],nxt_addr[5:0]};
-      `HBURST_WRAP16 : nxt_addr = (XLEN==32) ? {addr[PLEN-1: 6],nxt_addr[5:0]} : {addr[PLEN-1:7],nxt_addr[6:0]};
+      HBURST_WRAP4  : nxt_addr = (XLEN==32) ? {addr[PLEN-1: 4],nxt_addr[3:0]} : {addr[PLEN-1:5],nxt_addr[4:0]};
+      HBURST_WRAP8  : nxt_addr = (XLEN==32) ? {addr[PLEN-1: 5],nxt_addr[4:0]} : {addr[PLEN-1:6],nxt_addr[5:0]};
+      HBURST_WRAP16 : nxt_addr = (XLEN==32) ? {addr[PLEN-1: 6],nxt_addr[5:0]} : {addr[PLEN-1:7],nxt_addr[6:0]};
       default        : ;
     endcase
   endfunction
@@ -186,8 +187,8 @@ module riscv_biu2ahb3 #(
       HWRITE      <= 1'b0;
       HSIZE       <= 'h0; //dont care
       HBURST      <= 'h0; //dont care
-      HPROT       <= `HPROT_DATA | `HPROT_PRIVILEGED | `HPROT_NON_BUFFERABLE | `HPROT_NON_CACHEABLE;
-      HTRANS      <= `HTRANS_IDLE;
+      HPROT       <= HPROT_DATA | HPROT_PRIVILEGED | HPROT_NON_BUFFERABLE | HPROT_NON_CACHEABLE;
+      HTRANS      <= HTRANS_IDLE;
       HMASTLOCK   <= 1'b0;
     end
   else begin
@@ -201,7 +202,7 @@ module riscv_biu2ahb3 #(
           burst_cnt   <= biu_type2cnt(biu_type_i);
 
           HSEL        <= 1'b1;
-          HTRANS      <= `HTRANS_NONSEQ; //start of burst
+          HTRANS      <= HTRANS_NONSEQ; //start of burst
           HADDR       <= biu_adri_i;
           HWRITE      <= biu_we_i;
           HSIZE       <= biu_size2hsize (biu_size_i);
@@ -213,7 +214,7 @@ module riscv_biu2ahb3 #(
           data_ena  <= 1'b0;
 
           HSEL      <= 1'b0;
-          HTRANS    <= `HTRANS_IDLE; //no new transfer
+          HTRANS    <= HTRANS_IDLE; //no new transfer
           HMASTLOCK <= biu_lock_i;
         end
       end
@@ -221,17 +222,17 @@ module riscv_biu2ahb3 #(
         data_ena  <= 1'b1;
         burst_cnt <= burst_cnt - 1;
 
-        HTRANS    <= `HTRANS_SEQ; //continue burst
+        HTRANS    <= HTRANS_SEQ; //continue burst
         HADDR     <= nxt_addr(HADDR,HBURST); //next address
       end
     end
     else begin
       //error response
-      if (HRESP == `HRESP_ERROR) begin
+      if (HRESP == HRESP_ERROR) begin
         burst_cnt <= 'h0; //burst done (interrupted)
 
         HSEL      <= 1'b0;
-        HTRANS    <= `HTRANS_IDLE;
+        HTRANS    <= HTRANS_IDLE;
 
         data_ena  <= 1'b0;
         biu_err_o <= 1'b1;

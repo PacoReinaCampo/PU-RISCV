@@ -40,7 +40,8 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import pu_riscv_pkg::*;
+import peripheral_biu_pkg::*;
 
 module riscv_lsu #(
   parameter XLEN           = 64,
@@ -123,7 +124,7 @@ module riscv_lsu #(
   assign func3  = id_instr[14:12];
   assign opcode = id_instr[ 6: 2];
 
-  assign xlen32 = (st_xlen == `RV32I);
+  assign xlen32 = (st_xlen == RV32I);
 
   assign lsu_r  = 'h0; //for AMO
 
@@ -145,13 +146,13 @@ module riscv_lsu #(
         IDLE : if (!ex_stall) begin
           if (!id_bubble && ~(|id_exception || |ex_exception || |mem_exception || |wb_exception)) begin
             case (opcode)
-              `OPC_LOAD : begin
+              OPC_LOAD : begin
                 dmem_req   <= 1'b1;
                 lsu_stall  <= 1'b0;
                 lsu_bubble <= 1'b0;
                 state      <= IDLE;
               end
-              `OPC_STORE: begin
+              OPC_STORE: begin
                 dmem_req   <= 1'b1;
                 lsu_stall  <= 1'b0;
                 lsu_bubble <= 1'b0;
@@ -188,13 +189,13 @@ module riscv_lsu #(
     case (state)
       IDLE   : if (!id_bubble)
         case (opcode)
-          `OPC_LOAD : begin
+          OPC_LOAD : begin
             dmem_we   <= 1'b0;
             dmem_size <= size;
             dmem_adr  <= adr;
             dmem_d    <=  'hx;
           end
-          `OPC_STORE: begin
+          OPC_STORE: begin
             dmem_we   <= 1'b1;
             dmem_size <= size;
             dmem_adr  <= adr;
@@ -205,7 +206,7 @@ module riscv_lsu #(
 
       default: begin
         dmem_we   <= 1'bx;
-        dmem_size <= `UNDEF_SIZE;
+        dmem_size <= UNDEF_SIZE;
         dmem_adr  <=  'hx;
         dmem_d    <=  'hx;
       end
@@ -215,18 +216,18 @@ module riscv_lsu #(
   //memory address
   always @(*) begin
     casex ( {xlen32,func7,func3,opcode} )
-      {1'b?,`LB    }: adr = opA + opB;
-      {1'b?,`LH    }: adr = opA + opB;
-      {1'b?,`LW    }: adr = opA + opB;
-      {1'b0,`LD    }: adr = opA + opB;  //RV64
-      {1'b?,`LBU   }: adr = opA + opB;
-      {1'b?,`LHU   }: adr = opA + opB;
-      {1'b0,`LWU   }: adr = opA + opB;  //RV64
-      {1'b?,`SB    }: adr = opA + immS;
-      {1'b?,`SH    }: adr = opA + immS;
-      {1'b?,`SW    }: adr = opA + immS;
-      {1'b0,`SD    }: adr = opA + immS;  //RV64
-      default       : adr = opA + opB;   //'hx;
+      {1'b?,LB    }: adr = opA + opB;
+      {1'b?,LH    }: adr = opA + opB;
+      {1'b?,LW    }: adr = opA + opB;
+      {1'b0,LD    }: adr = opA + opB;  //RV64
+      {1'b?,LBU   }: adr = opA + opB;
+      {1'b?,LHU   }: adr = opA + opB;
+      {1'b0,LWU   }: adr = opA + opB;  //RV64
+      {1'b?,SB    }: adr = opA + immS;
+      {1'b?,SH    }: adr = opA + immS;
+      {1'b?,SW    }: adr = opA + immS;
+      {1'b0,SD    }: adr = opA + immS;  //RV64
+      default      : adr = opA + opB;   //'hx;
     endcase
   end
 
@@ -235,28 +236,28 @@ module riscv_lsu #(
     if (XLEN==64) begin //RV64
       always @(*) begin
         casex ( {func7,func3,opcode} ) //func7 is don't care
-          `LB     : size = `BYTE;
-          `LH     : size = `HWORD;
-          `LW     : size = `WORD;
-          `LD     : size = `DWORD;
-          `LBU    : size = `BYTE;
-          `LHU    : size = `HWORD;
-          `LWU    : size = `WORD;
-          `SB     : size = `BYTE;
-          `SH     : size = `HWORD;
-          `SW     : size = `WORD;
-          `SD     : size = `DWORD;
-          default : size = `UNDEF_SIZE;
+          LB      : size = BYTE;
+          LH      : size = HWORD;
+          LW      : size = WORD;
+          LD      : size = DWORD;
+          LBU     : size = BYTE;
+          LHU     : size = HWORD;
+          LWU     : size = WORD;
+          SB      : size = BYTE;
+          SH      : size = HWORD;
+          SW      : size = WORD;
+          SD      : size = DWORD;
+          default : size = UNDEF_SIZE;
         endcase
       end
 
       //memory write data
       always @(*) begin
         casex ( {func7,func3,opcode} ) //func7 is don't care
-          `SB     : d = opB[ 7:0] << (8* adr[2:0]);
-          `SH     : d = opB[15:0] << (8* adr[2:0]);
-          `SW     : d = opB[31:0] << (8* adr[2:0]);
-          `SD     : d = opB;
+          SB      : d = opB[ 7:0] << (8* adr[2:0]);
+          SH      : d = opB[15:0] << (8* adr[2:0]);
+          SW      : d = opB[31:0] << (8* adr[2:0]);
+          SD      : d = opB;
           default : d = 'hx;
         endcase
       end
@@ -264,24 +265,24 @@ module riscv_lsu #(
     else begin //RV32
       always @(*) begin
         casex ( {func7,func3,opcode} ) //func7 is don't care
-          `LB     : size = `BYTE;
-          `LH     : size = `HWORD;
-          `LW     : size = `WORD;
-          `LBU    : size = `BYTE;
-          `LHU    : size = `HWORD;
-          `SB     : size = `BYTE;
-          `SH     : size = `HWORD;
-          `SW     : size = `WORD;
-          default : size = `UNDEF_SIZE;
+          LB      : size = BYTE;
+          LH      : size = HWORD;
+          LW      : size = WORD;
+          LBU     : size = BYTE;
+          LHU     : size = HWORD;
+          SB      : size = BYTE;
+          SH      : size = HWORD;
+          SW      : size = WORD;
+          default : size = UNDEF_SIZE;
         endcase
       end
 
       //memory write data
       always @(*) begin
         casex ( {func7,func3,opcode} ) //func7 is don't care
-          `SB     : d = opB[ 7:0] << (8* adr[1:0]);
-          `SH     : d = opB[15:0] << (8* adr[1:0]);
-          `SW     : d = opB;
+          SB      : d = opB[ 7:0] << (8* adr[1:0]);
+          SH      : d = opB[15:0] << (8* adr[1:0]);
+          SW      : d = opB;
           default : d = 'hx;
         endcase
       end

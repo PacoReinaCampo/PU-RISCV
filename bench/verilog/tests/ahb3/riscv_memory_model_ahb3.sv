@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import peripheral_ahb3_pkg::*;
 
 module riscv_memory_model_ahb3 #(
   parameter XLEN = 64,
@@ -253,10 +253,10 @@ module riscv_memory_model_ahb3 #(
             ack_latency[u] <= {MEM_LATENCY{1'b1}};
           end
           else if (HREADY[u]) begin
-            if      ( HTRANS[u] == `HTRANS_IDLE  ) begin
+            if      ( HTRANS[u] == HTRANS_IDLE  ) begin
               ack_latency[u] <= {MEM_LATENCY{1'b1}};
             end
-            else if ( HTRANS[u] == `HTRANS_NONSEQ) begin
+            else if ( HTRANS[u] == HTRANS_NONSEQ) begin
               ack_latency[u] <= 'h0;
             end
           end
@@ -270,7 +270,7 @@ module riscv_memory_model_ahb3 #(
         assign HREADY[u] = 1'b1;
       end
 
-      assign HRESP[u] = `HRESP_OKAY;
+      assign HRESP[u] = HRESP_OKAY;
 
       //Write Section
 
@@ -285,21 +285,21 @@ module riscv_memory_model_ahb3 #(
       end
 
       always @(posedge HCLK) begin
-        if (HREADY[u] && HTRANS[u] != `HTRANS_BUSY) begin
+        if (HREADY[u] && HTRANS[u] != HTRANS_BUSY) begin
           waddr[u] <= HADDR[u] & ( {XLEN{1'b1}} << $clog2(XLEN/8) );
 
           case (HSIZE[u])
-            `HSIZE_BYTE : dbe[u] <= 1'h1  << HADDR[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_HWORD: dbe[u] <= 2'h3  << HADDR[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_WORD : dbe[u] <= 4'hf  << HADDR[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_DWORD: dbe[u] <= 8'hff << HADDR[u][$clog2(XLEN/8)-1:0];
+            HSIZE_BYTE : dbe[u] <= 1'h1  << HADDR[u][$clog2(XLEN/8)-1:0];
+            HSIZE_HWORD: dbe[u] <= 2'h3  << HADDR[u][$clog2(XLEN/8)-1:0];
+            HSIZE_WORD : dbe[u] <= 4'hf  << HADDR[u][$clog2(XLEN/8)-1:0];
+            HSIZE_DWORD: dbe[u] <= 8'hff << HADDR[u][$clog2(XLEN/8)-1:0];
           endcase
         end
       end
 
       always @(posedge HCLK) begin
         if (HREADY[u]) begin
-          wreq[u] <= (HTRANS[u] != `HTRANS_IDLE & HTRANS[u] != `HTRANS_BUSY) & HWRITE[u];
+          wreq[u] <= (HTRANS[u] != HTRANS_IDLE & HTRANS[u] != HTRANS_BUSY) & HWRITE[u];
         end
       end
 
@@ -317,7 +317,7 @@ module riscv_memory_model_ahb3 #(
       assign iaddr[u] = HADDR[u] & ( {XLEN{1'b1}} << $clog2(XLEN/8) );
 
       always @(posedge HCLK) begin
-        if (HREADY[u] && (HTRANS[u] != `HTRANS_IDLE) && (HTRANS[u] != `HTRANS_BUSY) && !HWRITE[u])
+        if (HREADY[u] && (HTRANS[u] != HTRANS_IDLE) && (HTRANS[u] != HTRANS_BUSY) && !HWRITE[u])
           if (iaddr[u] == waddr[u] && wreq[u]) begin
             for (n=0; n<XLEN/8; n++) begin
               if (dbe[u]) HRDATA[u][n*8+:8] <= HWDATA[u][n*8+:8];

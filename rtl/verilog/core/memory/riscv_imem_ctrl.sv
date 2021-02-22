@@ -40,7 +40,8 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import pu_riscv_pkg::*;
+import peripheral_biu_pkg::*;
 
 module riscv_imem_ctrl #(
   parameter XLEN = 64,
@@ -287,9 +288,9 @@ module riscv_imem_ctrl #(
   assign stall_nxt_pc_o = nxt_pc_queue_full | parcel_queue_full | ~dcflush_rdy_i;
 
   assign buf_ack  = ext_access_ack | cache_ack | tcm_ack;
-  assign buf_size = `WORD;
+  assign buf_size = WORD;
   assign buf_lock = 1'b0;
-  assign buf_prot = (`PROT_DATA | st_prv_i == `PRV_U ? `PROT_USER : `PROT_PRIVILEGED);
+  assign buf_prot = (PROT_DATA | st_prv_i == PRV_U ? PROT_USER : PROT_PRIVILEGED);
 
   //Hookup misalignment check
   riscv_memmisaligned #(
@@ -481,7 +482,7 @@ module riscv_imem_ctrl #(
       .mem_req_i          ( ext_access_req    ),
       .mem_adr_i          ( padr              ),
       .mem_size_i         ( psize             ),
-      .mem_type_i         ( `SINGLE           ),
+      .mem_type_i         ( SINGLE            ),
       .mem_lock_i         ( plock             ),
       .mem_prot_i         ( pprot             ),
       .mem_we_i           ( 1'b0              ),

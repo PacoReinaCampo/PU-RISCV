@@ -40,8 +40,6 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
-
 module riscv_rf #(
   parameter XLEN    = 64,
   parameter AR_BITS = 5,

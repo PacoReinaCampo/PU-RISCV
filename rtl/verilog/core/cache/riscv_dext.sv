@@ -40,8 +40,6 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
-
 module riscv_dext #(
   parameter XLEN  = 64,
   parameter PLEN  = 64,  //Physical address bus size

@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import pu_riscv_pkg::*;
 
 module riscv_du #(
   parameter XLEN = 64,
@@ -153,9 +153,9 @@ module riscv_du #(
 
   // Decode incoming address
   assign du_bank_addr    = dbg_addr[PLEN-1:DU_ADDR_SIZE];
-  assign du_sel_internal = du_bank_addr == `DBG_INTERNAL;
-  assign du_sel_gprs     = du_bank_addr == `DBG_GPRS;
-  assign du_sel_csrs     = du_bank_addr == `DBG_CSRS;
+  assign du_sel_internal = du_bank_addr == DBG_INTERNAL;
+  assign du_sel_gprs     = du_bank_addr == DBG_GPRS;
+  assign du_sel_csrs     = du_bank_addr == DBG_CSRS;
 
   //generate 1 cycle pulse strobe
   always @(posedge clk) begin
@@ -196,44 +196,44 @@ module riscv_du #(
     du_addr        <= dbg_addr[DU_ADDR_SIZE-1:0];
     du_dato        <= dbg_dati;
 
-    du_we_rf       <= du_we & du_sel_gprs & (dbg_addr[DU_ADDR_SIZE-1:0] == `DBG_GPR);
-    du_we_frf      <= du_we & du_sel_gprs & (dbg_addr[DU_ADDR_SIZE-1:0] == `DBG_FPR);
+    du_we_rf       <= du_we & du_sel_gprs & (dbg_addr[DU_ADDR_SIZE-1:0] == DBG_GPR);
+    du_we_frf      <= du_we & du_sel_gprs & (dbg_addr[DU_ADDR_SIZE-1:0] == DBG_FPR);
     du_we_internal <= du_we & du_sel_internal;
     du_we_csr      <= du_we & du_sel_csrs;
-    du_we_pc       <= du_we & du_sel_gprs & (dbg_addr[DU_ADDR_SIZE-1:0] == `DBG_NPC);
+    du_we_pc       <= du_we & du_sel_gprs & (dbg_addr[DU_ADDR_SIZE-1:0] == DBG_NPC);
   end
 
   // Return signals
   always @(*) begin
     case (du_addr)
-      `DBG_CTRL   : du_internal_regs = { {XLEN- 2{1'b0}}, dbg_branch_break_ena, dbg_instr_break_ena };
-      `DBG_HIT    : du_internal_regs = { {XLEN-16{1'b0}}, dbg_bp_hit, 6'h0, dbg_branch_break_hit, dbg_instr_break_hit};
-      `DBG_IE     : du_internal_regs = { {XLEN-32{1'b0}}, dbg_ie};
-      `DBG_CAUSE  : du_internal_regs = { {XLEN-32{1'b0}}, dbg_cause};
+      DBG_CTRL   : du_internal_regs = { {XLEN- 2{1'b0}}, dbg_branch_break_ena, dbg_instr_break_ena };
+      DBG_HIT    : du_internal_regs = { {XLEN-16{1'b0}}, dbg_bp_hit, 6'h0, dbg_branch_break_hit, dbg_instr_break_hit};
+      DBG_IE     : du_internal_regs = { {XLEN-32{1'b0}}, dbg_ie};
+      DBG_CAUSE  : du_internal_regs = { {XLEN-32{1'b0}}, dbg_cause};
 
-      `DBG_BPCTRL0: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[0], 2'h0, dbg_enabled[0], dbg_implemented[0]};
-      `DBG_BPDATA0: du_internal_regs = dbg_data[0];
+      DBG_BPCTRL0: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[0], 2'h0, dbg_enabled[0], dbg_implemented[0]};
+      DBG_BPDATA0: du_internal_regs = dbg_data[0];
 
-      `DBG_BPCTRL1: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[1], 2'h0, dbg_enabled[1], dbg_implemented[1]};
-      `DBG_BPDATA1: du_internal_regs = dbg_data[1];
+      DBG_BPCTRL1: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[1], 2'h0, dbg_enabled[1], dbg_implemented[1]};
+      DBG_BPDATA1: du_internal_regs = dbg_data[1];
 
-      `DBG_BPCTRL2: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[2], 2'h0, dbg_enabled[2], dbg_implemented[2]};
-      `DBG_BPDATA2: du_internal_regs = dbg_data[2];
+      DBG_BPCTRL2: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[2], 2'h0, dbg_enabled[2], dbg_implemented[2]};
+      DBG_BPDATA2: du_internal_regs = dbg_data[2];
 
-      `DBG_BPCTRL3: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[3], 2'h0, dbg_enabled[3], dbg_implemented[3]};
-      `DBG_BPDATA3: du_internal_regs = dbg_data[3];
+      DBG_BPCTRL3: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[3], 2'h0, dbg_enabled[3], dbg_implemented[3]};
+      DBG_BPDATA3: du_internal_regs = dbg_data[3];
 
-      `DBG_BPCTRL4: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[4], 2'h0, dbg_enabled[4], dbg_implemented[4]};
-      `DBG_BPDATA4: du_internal_regs = dbg_data[4];
+      DBG_BPCTRL4: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[4], 2'h0, dbg_enabled[4], dbg_implemented[4]};
+      DBG_BPDATA4: du_internal_regs = dbg_data[4];
 
-      `DBG_BPCTRL5: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[5], 2'h0, dbg_enabled[5], dbg_implemented[5]};
-      `DBG_BPDATA5: du_internal_regs = dbg_data[5];
+      DBG_BPCTRL5: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[5], 2'h0, dbg_enabled[5], dbg_implemented[5]};
+      DBG_BPDATA5: du_internal_regs = dbg_data[5];
 
-      `DBG_BPCTRL6: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[6], 2'h0, dbg_enabled[6], dbg_implemented[6]};
-      `DBG_BPDATA6: du_internal_regs = dbg_data[6];
+      DBG_BPCTRL6: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[6], 2'h0, dbg_enabled[6], dbg_implemented[6]};
+      DBG_BPDATA6: du_internal_regs = dbg_data[6];
 
-      `DBG_BPCTRL7: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[7], 2'h0, dbg_enabled[7], dbg_implemented[7]};
-      `DBG_BPDATA7: du_internal_regs = dbg_data[7];
+      DBG_BPCTRL7: du_internal_regs = { {XLEN- 7{1'b0}}, dbg_cc[7], 2'h0, dbg_enabled[7], dbg_implemented[7]};
+      DBG_BPDATA7: du_internal_regs = dbg_data[7];
 
       default     : du_internal_regs = 'h0;
     endcase
@@ -241,12 +241,12 @@ module riscv_du #(
 
   always @(posedge clk) begin
     casex (dbg_addr)
-      {`DBG_INTERNAL, 12'h???}: dbg_dato <= du_internal_regs;
-      {`DBG_GPRS,    `DBG_GPR}: dbg_dato <= du_dati_rf;
-      {`DBG_GPRS,    `DBG_FPR}: dbg_dato <= du_dati_frf;
-      {`DBG_GPRS,    `DBG_NPC}: dbg_dato <= bu_flush ? bu_nxt_pc : id_pc;
-      {`DBG_GPRS,    `DBG_PPC}: dbg_dato <= ex_pc;
-      {`DBG_CSRS,     12'h???}: dbg_dato <= st_csr_rval;
+      {DBG_INTERNAL, 12'h???}: dbg_dato <= du_internal_regs;
+      {DBG_GPRS,     DBG_GPR}: dbg_dato <= du_dati_rf;
+      {DBG_GPRS,     DBG_FPR}: dbg_dato <= du_dati_frf;
+      {DBG_GPRS,     DBG_NPC}: dbg_dato <= bu_flush ? bu_nxt_pc : id_pc;
+      {DBG_GPRS,     DBG_PPC}: dbg_dato <= ex_pc;
+      {DBG_CSRS,     12'h???}: dbg_dato <= st_csr_rval;
       default                 : dbg_dato <= 'h0;
     endcase
   end
@@ -259,7 +259,7 @@ module riscv_du #(
       dbg_instr_break_ena  <= 1'b0;
       dbg_branch_break_ena <= 1'b0;
     end
-    else if (du_we_internal && du_addr == `DBG_CTRL) begin
+    else if (du_we_internal && du_addr == DBG_CTRL) begin
       dbg_instr_break_ena  <= du_dato[0];
       dbg_branch_break_ena <= du_dato[1];
     end
@@ -271,7 +271,7 @@ module riscv_du #(
       dbg_instr_break_hit  <= 1'b0;
       dbg_branch_break_hit <= 1'b0;
     end
-    else if (du_we_internal && du_addr == `DBG_HIT) begin
+    else if (du_we_internal && du_addr == DBG_HIT) begin
       dbg_instr_break_hit  <= du_dato[0];
       dbg_branch_break_hit <= du_dato[1];
     end
@@ -286,7 +286,7 @@ module riscv_du #(
       if (n < BREAKPOINTS) begin
         always @(posedge clk,negedge rstn) begin
           if      (!rstn                                 ) dbg_bp_hit[n] <= 1'b0;
-          else if ( du_we_internal && du_addr == `DBG_HIT) dbg_bp_hit[n] <= du_dato[n + 4];
+          else if ( du_we_internal && du_addr == DBG_HIT ) dbg_bp_hit[n] <= du_dato[n + 4];
           else if ( bp_hit[n]                            ) dbg_bp_hit[n] <= 1'b1;
         end
       end
@@ -298,7 +298,7 @@ module riscv_du #(
   //DBG IE
   always @(posedge clk,negedge rstn) begin
     if      (!rstn                                ) dbg_ie <= 'h0;
-    else if ( du_we_internal && du_addr == `DBG_IE) dbg_ie <= du_dato[31:0];
+    else if ( du_we_internal && du_addr == DBG_IE ) dbg_ie <= du_dato[31:0];
   end
 
   //send to Thread-State
@@ -306,8 +306,8 @@ module riscv_du #(
 
   //DBG CAUSE
   always @(posedge clk,negedge rstn) begin
-    if (!rstn)                                         dbg_cause <= 'h0;
-    else if ( du_we_internal && du_addr == `DBG_CAUSE) dbg_cause <= du_dato;
+    if (!rstn)                                        dbg_cause <= 'h0;
+    else if ( du_we_internal && du_addr == DBG_CAUSE) dbg_cause <= du_dato;
     else if (|du_exceptions[15:0]) begin //traps
       casex (du_exceptions[15:0])
         16'h???1 : dbg_cause <=  0;
@@ -363,14 +363,14 @@ module riscv_du #(
             dbg_enabled[n] <= 'b0;
             dbg_cc[n]      <= 'h0;
           end
-          else if (du_we_internal && du_addr == (`DBG_BPCTRL0 + 2*n) ) begin
+          else if (du_we_internal && du_addr == (DBG_BPCTRL0 + 2*n) ) begin
             dbg_enabled[n] <= du_dato[1];
             dbg_cc[n]      <= du_dato[6:4];
           end
         end
         always @(posedge clk,negedge rstn) begin
-          if (!rstn)                                                   dbg_data[n] <= 'h0;
-          else if (du_we_internal && du_addr == (`DBG_BPDATA0 + 2*n) ) dbg_data[n] <= du_dato;
+          if (!rstn)                                                  dbg_data[n] <= 'h0;
+          else if (du_we_internal && du_addr == (DBG_BPDATA0 + 2*n) ) dbg_data[n] <= du_dato;
         end
       end
       else begin
@@ -390,11 +390,11 @@ module riscv_du #(
    */
 
   assign bp_instr_hit  =dbg_instr_break_ena  & ~if_bubble;
-  assign bp_branch_hit = dbg_branch_break_ena & ~if_bubble & (if_instr[6:2] == `OPC_BRANCH);
+  assign bp_branch_hit = dbg_branch_break_ena & ~if_bubble & (if_instr[6:2] == OPC_BRANCH);
 
   //Memory access
-  assign mem_read  = ~|mem_exception & ~mem_bubble & (mem_instr[6:2] == `OPC_LOAD );
-  assign mem_write = ~|mem_exception & ~mem_bubble & (mem_instr[6:2] == `OPC_STORE);
+  assign mem_read  = ~|mem_exception & ~mem_bubble & (mem_instr[6:2] == OPC_LOAD );
+  assign mem_write = ~|mem_exception & ~mem_bubble & (mem_instr[6:2] == OPC_STORE);
 
   generate
     for (n=0; n<MAX_BREAKPOINTS; n=n+1) begin: gen_bp_hit
@@ -403,14 +403,14 @@ module riscv_du #(
           if (!dbg_enabled[n] || !dbg_implemented[n]) bp_hit[n] = 1'b0;
           else
             case (dbg_cc[n])
-              `BP_CTRL_CC_FETCH    : bp_hit[n] = (if_pc      == dbg_data[n]) & ~bu_flush & ~st_flush;
-              `BP_CTRL_CC_LD_ADR   : bp_hit[n] = (mem_memadr == dbg_data[n]) & dmem_ack & mem_read;
-              `BP_CTRL_CC_ST_ADR   : bp_hit[n] = (mem_memadr == dbg_data[n]) & dmem_ack & mem_write;
-              `BP_CTRL_CC_LDST_ADR : bp_hit[n] = (mem_memadr == dbg_data[n]) & dmem_ack & (mem_read | mem_write);
-            //`BP_CTRL_CC_LD_ADR   : bp_hit[n] = (mem_adr    == dbg_data[n]) & mem_req & ~mem_we;
-            //`BP_CTRL_CC_ST_ADR   : bp_hit[n] = (mem_adr    == dbg_data[n]) & mem_req &  mem_we;
-            //`BP_CTRL_CC_LDST_ADR : bp_hit[n] = (mem_adr    == dbg_data[n]) & mem_req;
-              default              : bp_hit[n] = 1'b0;
+              BP_CTRL_CC_FETCH    : bp_hit[n] = (if_pc      == dbg_data[n]) & ~bu_flush & ~st_flush;
+              BP_CTRL_CC_LD_ADR   : bp_hit[n] = (mem_memadr == dbg_data[n]) & dmem_ack & mem_read;
+              BP_CTRL_CC_ST_ADR   : bp_hit[n] = (mem_memadr == dbg_data[n]) & dmem_ack & mem_write;
+              BP_CTRL_CC_LDST_ADR : bp_hit[n] = (mem_memadr == dbg_data[n]) & dmem_ack & (mem_read | mem_write);
+            //BP_CTRL_CC_LD_ADR   : bp_hit[n] = (mem_adr    == dbg_data[n]) & mem_req & ~mem_we;
+            //BP_CTRL_CC_ST_ADR   : bp_hit[n] = (mem_adr    == dbg_data[n]) & mem_req &  mem_we;
+            //BP_CTRL_CC_LDST_ADR : bp_hit[n] = (mem_adr    == dbg_data[n]) & mem_req;
+              default             : bp_hit[n] = 1'b0;
             endcase
         end
       end

@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import peripheral_biu_pkg::*;
 
 module riscv_memmisaligned #(
   parameter XLEN    = 64,
@@ -74,10 +74,10 @@ module riscv_memmisaligned #(
       misaligned = (HAS_RVC != 0) ? adr_i[0] : |adr_i[1:0];
     else begin
       case (size_i)
-        `BYTE   : misaligned = 1'b0;
-        `HWORD  : misaligned =  adr_i[  0];
-        `WORD   : misaligned = |adr_i[1:0];
-        `DWORD  : misaligned = |adr_i[2:0];
+        BYTE    : misaligned = 1'b0;
+        HWORD   : misaligned =  adr_i[  0];
+        WORD    : misaligned = |adr_i[1:0];
+        DWORD   : misaligned = |adr_i[2:0];
         default : misaligned = 1'b1;
       endcase
     end

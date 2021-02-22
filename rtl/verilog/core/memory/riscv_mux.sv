@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import peripheral_biu_pkg::*;
 
 module riscv_mux #(
   parameter XLEN  = 64,
@@ -94,14 +94,14 @@ module riscv_mux #(
     input [2:0] biu_type;
 
     case (biu_type)
-      `SINGLE : biu_type2cnt =  0;
-      `INCR   : biu_type2cnt =  0;
-      `WRAP4  : biu_type2cnt =  3;
-      `INCR4  : biu_type2cnt =  3;
-      `WRAP8  : biu_type2cnt =  7;
-      `INCR8  : biu_type2cnt =  7;
-      `WRAP16 : biu_type2cnt = 15;
-      `INCR16 : biu_type2cnt = 15;
+      SINGLE : biu_type2cnt =  0;
+      INCR   : biu_type2cnt =  0;
+      WRAP4  : biu_type2cnt =  3;
+      INCR4  : biu_type2cnt =  3;
+      WRAP8  : biu_type2cnt =  7;
+      INCR8  : biu_type2cnt =  7;
+      WRAP16 : biu_type2cnt = 15;
+      INCR16 : biu_type2cnt = 15;
     endcase
   endfunction
 

@@ -40,7 +40,8 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import pu_riscv_pkg::*;
+import peripheral_biu_pkg::*;
 
 module riscv_wb #(
   parameter XLEN = 64,
@@ -116,7 +117,7 @@ module riscv_wb #(
 
   //Instruction
   always @(posedge clk_i, negedge rst_ni) begin
-    if      (!rst_ni    ) wb_instr_o <= `INSTR_NOP;
+    if      (!rst_ni    ) wb_instr_o <= INSTR_NOP;
     else if (!wb_stall_o) wb_instr_o <= mem_instr_i;
   end
 
@@ -129,23 +130,23 @@ module riscv_wb #(
   always @(*) begin
     exception = mem_exception_i;
 
-    if (opcode == `OPC_LOAD && ~mem_bubble_i)
-      exception[`CAUSE_MISALIGNED_LOAD   ] = dmem_misaligned_i;
+    if (opcode == OPC_LOAD && ~mem_bubble_i)
+      exception[CAUSE_MISALIGNED_LOAD   ] = dmem_misaligned_i;
 
-    if (opcode == `OPC_STORE && ~mem_bubble_i)
-      exception[`CAUSE_MISALIGNED_STORE  ] = dmem_misaligned_i;
+    if (opcode == OPC_STORE && ~mem_bubble_i)
+      exception[CAUSE_MISALIGNED_STORE  ] = dmem_misaligned_i;
 
-    if (opcode == `OPC_LOAD & ~mem_bubble_i)
-      exception[`CAUSE_LOAD_ACCESS_FAULT ] = dmem_err_i;
+    if (opcode == OPC_LOAD & ~mem_bubble_i)
+      exception[CAUSE_LOAD_ACCESS_FAULT ] = dmem_err_i;
 
-    if (opcode == `OPC_STORE & ~mem_bubble_i)
-      exception[`CAUSE_STORE_ACCESS_FAULT] = dmem_err_i;
+    if (opcode == OPC_STORE & ~mem_bubble_i)
+      exception[CAUSE_STORE_ACCESS_FAULT] = dmem_err_i;
 
-    if (opcode == `OPC_LOAD && ~mem_bubble_i)
-      exception[`CAUSE_LOAD_PAGE_FAULT   ] = dmem_page_fault_i;
+    if (opcode == OPC_LOAD && ~mem_bubble_i)
+      exception[CAUSE_LOAD_PAGE_FAULT   ] = dmem_page_fault_i;
 
-    if (opcode == `OPC_STORE && ~mem_bubble_i)
-      exception[`CAUSE_STORE_PAGE_FAULT  ] = dmem_page_fault_i;
+    if (opcode == OPC_STORE && ~mem_bubble_i)
+      exception[CAUSE_STORE_PAGE_FAULT  ] = dmem_page_fault_i;
   end
 
   always @(posedge clk_i, negedge rst_ni) begin
@@ -156,12 +157,12 @@ module riscv_wb #(
   always @(posedge clk_i, negedge rst_ni) begin
     if (!rst_ni)
       wb_badaddr_o <= 'h0;
-    else if (exception[`CAUSE_MISALIGNED_LOAD   ] ||
-             exception[`CAUSE_MISALIGNED_STORE  ] ||
-             exception[`CAUSE_LOAD_ACCESS_FAULT ] ||
-             exception[`CAUSE_STORE_ACCESS_FAULT] ||
-             exception[`CAUSE_LOAD_PAGE_FAULT   ] ||
-             exception[`CAUSE_STORE_PAGE_FAULT  ] )
+    else if (exception[CAUSE_MISALIGNED_LOAD   ] ||
+             exception[CAUSE_MISALIGNED_STORE  ] ||
+             exception[CAUSE_LOAD_ACCESS_FAULT ] ||
+             exception[CAUSE_STORE_ACCESS_FAULT] ||
+             exception[CAUSE_LOAD_PAGE_FAULT   ] ||
+             exception[CAUSE_STORE_PAGE_FAULT  ] )
       wb_badaddr_o <= mem_memadr_i;
     else
       wb_badaddr_o <= mem_pc_i;
@@ -170,29 +171,29 @@ module riscv_wb #(
   //From Memory
   always @(*) begin
     casex ( {mem_bubble_i,|mem_exception_i, opcode} )
-      {2'b00,`OPC_LOAD } : wb_stall_o = ~(dmem_ack_i | dmem_err_i | dmem_misaligned_i | dmem_page_fault_i);
-      {2'b00,`OPC_STORE} : wb_stall_o = ~(dmem_ack_i | dmem_err_i | dmem_misaligned_i | dmem_page_fault_i);
-      default            : wb_stall_o = 1'b0;
+      {2'b00,OPC_LOAD } : wb_stall_o = ~(dmem_ack_i | dmem_err_i | dmem_misaligned_i | dmem_page_fault_i);
+      {2'b00,OPC_STORE} : wb_stall_o = ~(dmem_ack_i | dmem_err_i | dmem_misaligned_i | dmem_page_fault_i);
+      default           : wb_stall_o = 1'b0;
     endcase
   end
 
   // data from memory
   generate
     if (XLEN==64) begin
-      assign m_qb = dmem_q_i >> (8* mem_memadr_i[2:0]);
-      assign m_qh = dmem_q_i >> (8* mem_memadr_i[2:0]);
-      assign m_qw = dmem_q_i >> (8* mem_memadr_i[2:0]);
+      assign m_qb = dmem_q_i >> (8*mem_memadr_i[2:0]);
+      assign m_qh = dmem_q_i >> (8*mem_memadr_i[2:0]);
+      assign m_qw = dmem_q_i >> (8*mem_memadr_i[2:0]);
       assign m_qd = dmem_q_i;
 
       always @(*) begin
         casex ( {func7,func3,opcode} )
-          `LB     : m_data = { {XLEN- 8{m_qb[ 7]}},m_qb};
-          `LH     : m_data = { {XLEN-16{m_qh[15]}},m_qh};
-          `LW     : m_data = { {XLEN-32{m_qw[31]}},m_qw};
-          `LD     : m_data = {                     m_qd};
-          `LBU    : m_data = { {XLEN- 8{    1'b0}},m_qb};
-          `LHU    : m_data = { {XLEN-16{    1'b0}},m_qh};
-          `LWU    : m_data = { {XLEN-32{    1'b0}},m_qw};
+          LB      : m_data = { {XLEN- 8{m_qb[ 7]}},m_qb};
+          LH      : m_data = { {XLEN-16{m_qh[15]}},m_qh};
+          LW      : m_data = { {XLEN-32{m_qw[31]}},m_qw};
+          LD      : m_data = {                     m_qd};
+          LBU     : m_data = { {XLEN- 8{    1'b0}},m_qb};
+          LHU     : m_data = { {XLEN-16{    1'b0}},m_qh};
+          LWU     : m_data = { {XLEN-32{    1'b0}},m_qw};
           default : m_data = 'hx;
         endcase
       end
@@ -204,11 +205,11 @@ module riscv_wb #(
 
       always @(*) begin
         casex ( {func7,func3,opcode} )
-          `LB     : m_data = { {XLEN- 8{m_qb[ 7]}},m_qb};
-          `LH     : m_data = { {XLEN-16{m_qh[15]}},m_qh};
-          `LW     : m_data = {                     m_qw};
-          `LBU    : m_data = { {XLEN- 8{    1'b0}},m_qb};
-          `LHU    : m_data = { {XLEN-16{    1'b0}},m_qh};
+          LB      : m_data = { {XLEN- 8{m_qb[ 7]}},m_qb};
+          LH      : m_data = { {XLEN-16{m_qh[15]}},m_qh};
+          LW      : m_data = {                     m_qw};
+          LBU     : m_data = { {XLEN- 8{    1'b0}},m_qb};
+          LHU     : m_data = { {XLEN-16{    1'b0}},m_qh};
           default : m_data = 'hx;
         endcase
       end
@@ -226,7 +227,7 @@ module riscv_wb #(
   always @(posedge clk_i) begin
     if (!wb_stall_o)
       casex (opcode)
-        `OPC_LOAD: wb_r_o <= m_data;
+        OPC_LOAD : wb_r_o <= m_data;
         default  : wb_r_o <= mem_r_i;
       endcase
   end
@@ -236,13 +237,13 @@ module riscv_wb #(
     if      (!rst_ni   ) wb_we_o <= 'b0;
     else if (|exception) wb_we_o <= 'b0;
     else casex (opcode)
-      `OPC_MISC_MEM : wb_we_o <= 'b0;
-      `OPC_LOAD     : wb_we_o <= ~mem_bubble_i & |dst & ~wb_stall_o;
-      `OPC_STORE    : wb_we_o <= 'b0;
-      `OPC_STORE_FP : wb_we_o <= 'b0;
-      `OPC_BRANCH   : wb_we_o <= 'b0;
-      //`OPC_SYSTEM : wb_we_o <= 'b0;
-      default       : wb_we_o <= ~mem_bubble_i & |dst;
+      OPC_MISC_MEM : wb_we_o <= 'b0;
+      OPC_LOAD     : wb_we_o <= ~mem_bubble_i & |dst & ~wb_stall_o;
+      OPC_STORE    : wb_we_o <= 'b0;
+      OPC_STORE_FP : wb_we_o <= 'b0;
+      OPC_BRANCH   : wb_we_o <= 'b0;
+    //OPC_SYSTEM   : wb_we_o <= 'b0;
+      default      : wb_we_o <= ~mem_bubble_i & |dst;
     endcase
   end
 

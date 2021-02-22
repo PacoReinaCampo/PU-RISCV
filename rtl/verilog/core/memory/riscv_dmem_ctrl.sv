@@ -40,7 +40,8 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import pu_riscv_pkg::*;
+import peripheral_biu_pkg::*;
 
 module riscv_dmem_ctrl #(
   parameter XLEN = 64,
@@ -259,7 +260,7 @@ module riscv_dmem_ctrl #(
   assign buf_lock = queue_q[  XLEN+1];
   assign buf_we   = queue_q[  XLEN];
   assign buf_d    = queue_q[  XLEN-1:0];
-  assign buf_prot = (`PROT_DATA | st_prv_i == `PRV_U ? `PROT_USER : `PROT_PRIVILEGED);
+  assign buf_prot = (PROT_DATA | st_prv_i == PRV_U ? PROT_USER : PROT_PRIVILEGED);
 
   //Hookup misalignment check
   riscv_memmisaligned #(
@@ -445,7 +446,7 @@ module riscv_dmem_ctrl #(
     riscv_dext #(
       .XLEN  ( XLEN ),
       .PLEN  ( PLEN ),
-      .DEPTH ( 2 )
+      .DEPTH ( 2    )
     )
     dext_inst (
       .rst_ni             ( rst_ni            ),
@@ -455,7 +456,7 @@ module riscv_dmem_ctrl #(
       .mem_req_i          ( ext_access_req    ),
       .mem_adr_i          ( padr              ),
       .mem_size_i         ( psize             ),
-      .mem_type_i         ( `SINGLE           ),
+      .mem_type_i         ( SINGLE            ),
       .mem_lock_i         ( plock             ),
       .mem_prot_i         ( pprot             ),
       .mem_we_i           ( pwe               ),

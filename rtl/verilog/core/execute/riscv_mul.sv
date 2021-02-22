@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import pu_riscv_pkg::*;
 
 module riscv_mul #(
   parameter XLEN = 64,
@@ -77,7 +77,7 @@ module riscv_mul #(
   localparam DXLEN       = 2*XLEN;
 
   localparam MAX_LATENCY = 3;
-  localparam LATENCY     = `MULT_LATENCY > MAX_LATENCY ? MAX_LATENCY : `MULT_LATENCY;
+  localparam LATENCY     = MULT_LATENCY > MAX_LATENCY ? MAX_LATENCY : MULT_LATENCY;
 
   ////////////////////////////////////////////////////////////////
   //
@@ -167,7 +167,7 @@ module riscv_mul #(
   assign mul_func3  = mul_instr[14:12];
   assign mul_opcode = mul_instr[ 6: 2];
 
-  assign xlen32     = st_xlen == `RV32I;
+  assign xlen32     = st_xlen == RV32I;
 
   //32bit operands
   assign opA32   = opA[31:0];
@@ -184,8 +184,8 @@ module riscv_mul #(
   //multiplier operand-A
   always @(*) begin
     casex ( {func7,func3,opcode} )
-      `MULW   : mult_opA = abs( sext32(opA32) ); //RV64
-      `MULHU  : mult_opA =             opA     ;
+      MULW    : mult_opA = abs( sext32(opA32) ); //RV64
+      MULHU   : mult_opA =             opA     ;
       default : mult_opA = abs(        opA    );
     endcase
   end
@@ -193,9 +193,9 @@ module riscv_mul #(
   //multiplier operand-B
   always @(*) begin
     casex ( {func7,func3,opcode} )
-      `MULW   : mult_opB = abs( sext32(opB32) ); //RV64
-      `MULHSU : mult_opB =             opB     ;
-      `MULHU  : mult_opB =             opB     ;
+      MULW    : mult_opB = abs( sext32(opB32) ); //RV64
+      MULHSU  : mult_opB =             opB     ;
+      MULHU   : mult_opB =             opB     ;
       default : mult_opB = abs(        opB    );
     endcase
   end
@@ -203,11 +203,11 @@ module riscv_mul #(
   //negate multiplier output?
   always @(*) begin
     casex ( {func7,func3,opcode} )
-      `MUL    : mult_neg = opA[XLEN-1] ^ opB[XLEN-1];
-      `MULH   : mult_neg = opA[XLEN-1] ^ opB[XLEN-1];
-      `MULHSU : mult_neg = opA[XLEN-1];
-      `MULHU  : mult_neg = 1'b0;
-      `MULW   : mult_neg = opA32[31] ^ opB32[31];  //RV64
+      MUL    : mult_neg = opA[XLEN-1] ^ opB[XLEN-1];
+      MULH   : mult_neg = opA[XLEN-1] ^ opB[XLEN-1];
+      MULHSU : mult_neg = opA[XLEN-1];
+      MULHU  : mult_neg = 1'b0;
+      MULW   : mult_neg = opA32[31] ^ opB32[31];  //RV64
       default : mult_neg = 'hx;
     endcase
   end
@@ -297,8 +297,8 @@ module riscv_mul #(
   //Final output register
   always @(posedge clk) begin
     casex ( {mul_func7,mul_func3,mul_opcode} )
-      `MUL    : mul_r <= mult_r_signed_reg[XLEN -1:   0];
-      `MULW   : mul_r <= sext32( mult_r_signed_reg[31:0] );  //RV64
+      MUL     : mul_r <= mult_r_signed_reg[XLEN -1:   0];
+      MULW    : mul_r <= sext32( mult_r_signed_reg[31:0] );  //RV64
       default : mul_r <= mult_r_signed_reg[DXLEN-1:XLEN];
     endcase
   end
@@ -306,11 +306,11 @@ module riscv_mul #(
   //Stall / Bubble generation
   always @(*) begin
     casex ( {func7,func3,opcode} )
-      `MUL    : is_mul = 1'b1;
-      `MULH   : is_mul = 1'b1;
-      `MULW   : is_mul = ~xlen32;
-      `MULHSU : is_mul = 1'b1;
-      `MULHU  : is_mul = 1'b1;
+      MUL     : is_mul = 1'b1;
+      MULH    : is_mul = 1'b1;
+      MULW    : is_mul = ~xlen32;
+      MULHSU  : is_mul = 1'b1;
+      MULHU   : is_mul = 1'b1;
       default : is_mul = 1'b0;
     endcase
   end
@@ -341,7 +341,7 @@ module riscv_mul #(
             end
           end
         ST_WAIT: if (|cnt)
-          cnt <= cnt -1;
+          cnt <= cnt-1;
         else begin
           state <= ST_IDLE;
           cnt   <= LATENCY;

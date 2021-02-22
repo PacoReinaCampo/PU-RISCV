@@ -48,12 +48,15 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-use work.riscv_defines.all;
+use work.peripheral_biu_pkg.all;
+use work.vhdl_pkg.all;
 
 entity riscv_icache_core is
   generic (
     XLEN : integer := 64;
     PLEN : integer := 64;
+
+    PARCEL_SIZE : integer := 64;
 
     ICACHE_SIZE        : integer := 64;
     ICACHE_BLOCK_SIZE  : integer := 64;
@@ -221,25 +224,25 @@ architecture RTL of riscv_icache_core is
   signal tag_we : std_logic_vector(ICACHE_WAYS-1 downto 0);
 
   signal tag_in_valid : std_logic_vector(ICACHE_WAYS-1 downto 0);
-  signal tag_in_tag   : std_logic_matrix(DCACHE_WAYS-1 downto 0)(TAG_BITS-1 downto 0);
+  signal tag_in_tag   : std_logic_matrix(ICACHE_WAYS-1 downto 0)(TAG_BITS-1 downto 0);
 
   signal tag_out_valid : std_logic_vector(ICACHE_WAYS-1 downto 0);
-  signal tag_out_tag   : std_logic_matrix(DCACHE_WAYS-1 downto 0)(TAG_BITS-1 downto 0);
+  signal tag_out_tag   : std_logic_matrix(ICACHE_WAYS-1 downto 0)(TAG_BITS-1 downto 0);
 
-  signal tag_byp_idx : std_logic_matrix(DCACHE_WAYS-1 downto 0)(IDX_BITS-1 downto 0);
-  signal tag_byp_tag : std_logic_matrix(DCACHE_WAYS-1 downto 0)(TAG_BITS-1 downto 0);
-  signal tag_valid   : std_logic_matrix(DCACHE_WAYS-1 downto 0)(SETS-1 downto 0);
+  signal tag_byp_idx : std_logic_matrix(ICACHE_WAYS-1 downto 0)(IDX_BITS-1 downto 0);
+  signal tag_byp_tag : std_logic_matrix(ICACHE_WAYS-1 downto 0)(TAG_BITS-1 downto 0);
+  signal tag_valid   : std_logic_matrix(ICACHE_WAYS-1 downto 0)(SETS-1 downto 0);
 
   signal dat_idx     : std_logic_vector(IDX_BITS-1 downto 0);
   signal dat_idx_dly : std_logic_vector(IDX_BITS-1 downto 0);
   signal dat_we      : std_logic_vector(ICACHE_WAYS-1 downto 0);
   signal dat_be      : std_logic_vector(BLK_BITS/8-1 downto 0);
   signal dat_in      : std_logic_vector(BLK_BITS-1 downto 0);
-  signal dat_out     : std_logic_matrix(DCACHE_WAYS-1 downto 0)(BLK_BITS-1 downto 0);
+  signal dat_out     : std_logic_matrix(ICACHE_WAYS-1 downto 0)(BLK_BITS-1 downto 0);
 
-  signal way_q_mux   : std_logic_matrix(DCACHE_WAYS-1 downto 0)(BLK_BITS-1 downto 0);
+  signal way_q_mux   : std_logic_matrix(ICACHE_WAYS-1 downto 0)(BLK_BITS-1 downto 0);
   signal way_hit     : std_logic_vector(ICACHE_WAYS-1 downto 0);
-  signal way_compare : std_logic_matrix(DCACHE_WAYS-1 downto 0)(TAG_BITS-1 downto 0);
+  signal way_compare : std_logic_matrix(ICACHE_WAYS-1 downto 0)(TAG_BITS-1 downto 0);
 
   signal dat_offset    : std_logic_vector(DAT_OFF_BITS-1 downto 0);
   signal parcel_offset : std_logic_vector(PARCEL_OFF_BITS downto 0);

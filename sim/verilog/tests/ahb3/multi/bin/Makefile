@@ -44,7 +44,7 @@
 
 all: regression
 
-SIMULATORS = msim riviera
+SIMULATORS = iverilog msim vivado
 SIM        = msim
 
 MS     = -s
@@ -161,20 +161,20 @@ tests = $(uitests) $(mitests)
 add_regression    = $(foreach p,$(REGRESSION_$(1)), $(addprefix $(1)$(p)@, $(2)))
 add_regression_if = $(if $(filter $(2), $(subst -, , $(1))), $(call add_regression,$(3),$(4)),$(4))
 
-logs = $(call add_regression,DCACHE_SIZE,					\
-       $(call add_regression,ICACHE_SIZE,					\
-       $(call add_regression,MEM_LATENCY,					\
-       $(call add_regression,WRITEBUFFER_SIZE,					\
-       $(call add_regression,XLEN,						\
-       $(foreach t,$(tests),							\
-         $(call add_regression_if,$t,$(U_MUL_TESTS),MULT_LATENCY,		\
-         $t.log									\
-         )									\
-       )									\
-       )									\
-       )									\
-       )									\
-       )									\
+logs = $(call add_regression,DCACHE_SIZE, \
+       $(call add_regression,ICACHE_SIZE, \
+       $(call add_regression,MEM_LATENCY, \
+       $(call add_regression,WRITEBUFFER_SIZE, \
+       $(call add_regression,XLEN, \
+       $(foreach t,$(tests), \
+         $(call add_regression_if,$t,$(U_MUL_TESTS),MULT_LATENCY, \
+         $t.log \
+         ) \
+       ) \
+       ) \
+       ) \
+       ) \
+       ) \
        )
 
 regression: $(logs)
@@ -199,11 +199,10 @@ regression: $(logs)
 ##########################################################################
 .PHONY: $(SIMULATORS)
 $(SIMULATORS): % : %/Makefile
-	@$(MAKE) $(MS) -C $@ sim				\
-	VLOG="$(abspath $(RTL_VLOG) $(TB_VLOG))"		\
-	VHDL="$(abspath $(RTL_VHDL) $(TB_VHDL))"		\
-	INCDIRS="$(abspath $(INCDIRS))"				\
-	TOP=$(TB_TOP)						\
+	@$(MAKE) $(MS) -C $@ sim \
+	VLOG="$(abspath $(PACKAGE_VLOG) $(RTL_VLOG) $(TB_VLOG))" \
+	VHDL="$(abspath $(PACKAGE_VHDL) $(RTL_VHDL) $(TB_VHDL))" \
+	TOP=$(TB_TOP) \
 	LOG=$(LOG) PARAMETERS="$(PARAMETERS)"
 
 

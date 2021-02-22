@@ -40,8 +40,6 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
-
 module riscv_mmu #(
   parameter XLEN  = 64,
   parameter PLEN  = 64

@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "riscv_defines.sv"
+import pu_riscv_pkg::*;
 
 module riscv_div #(
   parameter XLEN = 64,
@@ -150,7 +150,7 @@ module riscv_div #(
   assign div_func3  = div_instr[14:12];
   assign div_opcode = div_instr[ 6: 2];
 
-  assign xlen32     = st_xlen == `RV32I;
+  assign xlen32     = st_xlen == RV32I;
 
   //retain instruction
   always @(posedge clk) begin
@@ -197,7 +197,7 @@ module riscv_div #(
 
         ST_CHK: if (!ex_stall && !id_bubble)
           casex ( {xlen32,func7,func3,opcode} )
-            {1'b?,`DIV  } :
+            {1'b?,DIV  } :
               if (~|opB) begin //signed divide by zero
                 div_r      <= {XLEN{1'b1}}; //=-1
                 div_bubble <= 1'b0;
@@ -218,7 +218,7 @@ module riscv_div #(
               pa_a      <= abs(opA);
               b         <= abs(opB);
             end
-            {1'b0,`DIVW } :
+            {1'b0,DIVW } :
               if (~|opB32) begin //signed divide by zero
                 div_r      <= {XLEN{1'b1}}; //=-1
                 div_bubble <= 1'b0;
@@ -240,7 +240,7 @@ module riscv_div #(
               b         <= abs( sext32(opB32) );
             end
 
-            {1'b?,`DIVU } :
+            {1'b?,DIVU } :
               if (~|opB) begin //unsigned divide by zero
                 div_r      <= {XLEN{1'b1}}; //= 2^XLEN -1
                 div_bubble <= 1'b0;
@@ -257,7 +257,7 @@ module riscv_div #(
               pa_a      <= opA;
               b         <= opB;
             end
-            {1'b0,`DIVUW} :
+            {1'b0,DIVUW} :
               if (~|opB32) begin //unsigned divide by zero
                 div_r      <= {XLEN{1'b1}}; //= 2^XLEN -1
                 div_bubble <= 1'b0;
@@ -274,7 +274,7 @@ module riscv_div #(
               pa_a      <= { opA32, {XLEN-32{1'b0}} };
               b         <= { {XLEN-32{1'b0}}, opB32 };
             end
-            {1'b?,`REM  } :
+            {1'b?,REM  } :
               if (~|opB) begin //signed divide by zero
                 div_r      <= opA;
                 div_bubble <= 1'b0;
@@ -295,7 +295,7 @@ module riscv_div #(
               pa_a      <= abs(opA);
               b         <= abs(opB);
             end
-            {1'b0,`REMW } :
+            {1'b0,REMW } :
               if (~|opB32) begin //signed divide by zero
                 div_r      <= sext32(opA32);
                 div_bubble <= 1'b0;
@@ -316,7 +316,7 @@ module riscv_div #(
               pa_a      <= { abs( sext32(opA32) ), {XLEN-32{1'b0}} };
               b         <= abs( sext32(opB32) );
             end
-            {1'b?,`REMU } :
+            {1'b?,REMU } :
               if (~|opB) begin //unsigned divide by zero
                 div_r      <= opA;
                 div_bubble <= 1'b0;
@@ -333,7 +333,7 @@ module riscv_div #(
               pa_a      <= opA;
               b         <= opB;
             end
-            {1'b0,`REMUW} :
+            {1'b0,REMUW} :
               if (~|opB32) begin
                 div_r      <= sext32(opA32);
                 div_bubble <= 1'b0;
@@ -373,14 +373,14 @@ module riscv_div #(
           div_bubble <= 1'b0;
           div_stall  <= 1'b0;
           casex ( {div_func7,div_func3,div_opcode} )
-            `DIV    : div_r <=         neg_q ? twos(pa_a) : pa_a; 
-            `DIVW   : div_r <= sext32( neg_q ? twos(pa_a) : pa_a );
-            `DIVU   : div_r <=                              pa_a;
-            `DIVUW  : div_r <= sext32(                      pa_a );
-            `REM    : div_r <=         neg_s ? twos(pa_p) : pa_p;
-            `REMW   : div_r <= sext32( neg_s ? twos(pa_p) : pa_p );
-            `REMU   : div_r <=                              pa_p;
-            `REMUW  : div_r <= sext32(                      pa_p );
+            DIV     : div_r <=         neg_q ? twos(pa_a) : pa_a; 
+            DIVW    : div_r <= sext32( neg_q ? twos(pa_a) : pa_a );
+            DIVU    : div_r <=                              pa_a;
+            DIVUW   : div_r <= sext32(                      pa_a );
+            REM     : div_r <=         neg_s ? twos(pa_p) : pa_p;
+            REMW    : div_r <= sext32( neg_s ? twos(pa_p) : pa_p );
+            REMU    : div_r <=                              pa_p;
+            REMUW   : div_r <= sext32(                      pa_p );
             default : div_r <= 'hx;
           endcase
         end
