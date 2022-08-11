@@ -1336,7 +1336,7 @@ export PATH=/opt/riscv-elf-gcc/bin:${PATH}
 git clone --recursive https://github.com/buildroot/buildroot
 
 cd buildroot
-make qemu_riscv32_virt_defconfig
+make qemu_riscv64_virt_defconfig
 make
 
 qemu-system-riscv64 \
