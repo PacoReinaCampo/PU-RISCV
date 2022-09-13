@@ -9,3 +9,11 @@
 ### MISD
 
 ### MIMD
+
+## System on Chip
+
+### Bus on Chip
+
+### Network on Chip
+
+## Multi-Processor System on Chip
