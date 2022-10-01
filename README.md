@@ -1,4 +1,4 @@
-# MPSoC-RISCV
+# PU-RISCV
 ## QueenField
 
 ![QueenField](../master/icon.jpg)
