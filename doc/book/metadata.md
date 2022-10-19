@@ -1,6 +1,6 @@
 ---
 title: 'PU-RISCV'
-subtitle: 'QueenField ![](../../icon.jpg)'
+subtitle: 'QueenField ![](../../pu-riscv.svg){width=17cm}'
 
 author: Paco Reina Campo
 
