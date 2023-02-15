@@ -10,7 +10,18 @@ library
 │   │   └── peripheral.psl
 │   └── wb
 │       └── peripheral.psl
-└── core
+├── core
+│   ├── ahb3
+│   │   └── peripheral.psl
+│   ├── apb4
+│   │   └── peripheral.psl
+│   ├── axi4
+│   │   └── peripheral.psl
+│   ├── bb
+│   │   └── peripheral.psl
+│   └── wb
+│       └── peripheral.psl
+└── pu
     ├── ahb3
     │   └── peripheral.psl
     ├── apb4
@@ -22,4 +33,4 @@ library
     └── wb
         └── peripheral.psl
 
-12 directories, 10 files
+18 directories, 15 files

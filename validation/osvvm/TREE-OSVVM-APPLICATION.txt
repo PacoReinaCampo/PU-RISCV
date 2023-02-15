@@ -10,7 +10,18 @@ application
 │   │   └── peripheral_osvvm_design.vhd
 │   └── wb
 │       └── peripheral_osvvm_design.vhd
-└── core
+├── core
+│   ├── ahb3
+│   │   └── peripheral_osvvm_design.vhd
+│   ├── apb4
+│   │   └── peripheral_osvvm_design.vhd
+│   ├── axi4
+│   │   └── peripheral_osvvm_design.vhd
+│   ├── bb
+│   │   └── peripheral_osvvm_design.vhd
+│   └── wb
+│       └── peripheral_osvvm_design.vhd
+└── pu
     ├── ahb3
     │   └── peripheral_osvvm_design.vhd
     ├── apb4
@@ -22,4 +33,4 @@ application
     └── wb
         └── peripheral_osvvm_design.vhd
 
-12 directories, 10 files
+18 directories, 15 files

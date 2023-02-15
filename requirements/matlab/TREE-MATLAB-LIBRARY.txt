@@ -10,7 +10,18 @@ library
 │   │   └── peripheral.m
 │   └── wb
 │       └── peripheral.m
-└── core
+├── core
+│   ├── ahb3
+│   │   └── peripheral.m
+│   ├── apb4
+│   │   └── peripheral.m
+│   ├── axi4
+│   │   └── peripheral.m
+│   ├── bb
+│   │   └── peripheral.m
+│   └── wb
+│       └── peripheral.m
+└── pu
     ├── ahb3
     │   └── peripheral.m
     ├── apb4
@@ -22,4 +33,4 @@ library
     └── wb
         └── peripheral.m
 
-12 directories, 10 files
+18 directories, 15 files

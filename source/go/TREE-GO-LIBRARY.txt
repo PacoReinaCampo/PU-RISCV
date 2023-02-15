@@ -10,7 +10,18 @@ library
 │   │   └── peripheral.go
 │   └── wb
 │       └── peripheral.go
-└── core
+├── core
+│   ├── ahb3
+│   │   └── peripheral.go
+│   ├── apb4
+│   │   └── peripheral.go
+│   ├── axi4
+│   │   └── peripheral.go
+│   ├── bb
+│   │   └── peripheral.go
+│   └── wb
+│       └── peripheral.go
+└── pu
     ├── ahb3
     │   └── peripheral.go
     ├── apb4
@@ -22,4 +33,4 @@ library
     └── wb
         └── peripheral.go
 
-12 directories, 10 files
+18 directories, 15 files

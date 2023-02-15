@@ -15,7 +15,23 @@ application
 │   └── wb
 │       ├── peripheral_test.adb
 │       └── peripheral_test.ads
-└── core
+├── core
+│   ├── ahb3
+│   │   ├── peripheral_test.adb
+│   │   └── peripheral_test.ads
+│   ├── apb4
+│   │   ├── peripheral_test.adb
+│   │   └── peripheral_test.ads
+│   ├── axi4
+│   │   ├── peripheral_test.adb
+│   │   └── peripheral_test.ads
+│   ├── bb
+│   │   ├── peripheral_test.adb
+│   │   └── peripheral_test.ads
+│   └── wb
+│       ├── peripheral_test.adb
+│       └── peripheral_test.ads
+└── pu
     ├── ahb3
     │   ├── peripheral_test.adb
     │   └── peripheral_test.ads
@@ -32,4 +48,4 @@ application
         ├── peripheral_test.adb
         └── peripheral_test.ads
 
-12 directories, 20 files
+18 directories, 30 files

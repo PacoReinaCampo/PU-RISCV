@@ -15,7 +15,23 @@ application
 │   └── wb
 │       ├── peripheral_test.cpp
 │       └── peripheral_test.hpp
-└── core
+├── core
+│   ├── ahb3
+│   │   ├── peripheral_test.cpp
+│   │   └── peripheral_test.hpp
+│   ├── apb4
+│   │   ├── peripheral_test.cpp
+│   │   └── peripheral_test.hpp
+│   ├── axi4
+│   │   ├── peripheral_test.cpp
+│   │   └── peripheral_test.hpp
+│   ├── bb
+│   │   ├── peripheral_test.cpp
+│   │   └── peripheral_test.hpp
+│   └── wb
+│       ├── peripheral_test.cpp
+│       └── peripheral_test.hpp
+└── pu
     ├── ahb3
     │   ├── peripheral_test.cpp
     │   └── peripheral_test.hpp
@@ -32,4 +48,4 @@ application
         ├── peripheral_test.cpp
         └── peripheral_test.hpp
 
-12 directories, 20 files
+18 directories, 30 files

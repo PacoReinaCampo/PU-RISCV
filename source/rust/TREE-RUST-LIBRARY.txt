@@ -10,7 +10,18 @@ library
 │   │   └── peripheral.rs
 │   └── wb
 │       └── peripheral.rs
-└── core
+├── core
+│   ├── ahb3
+│   │   └── peripheral.rs
+│   ├── apb4
+│   │   └── peripheral.rs
+│   ├── axi4
+│   │   └── peripheral.rs
+│   ├── bb
+│   │   └── peripheral.rs
+│   └── wb
+│       └── peripheral.rs
+└── pu
     ├── ahb3
     │   └── peripheral.rs
     ├── apb4
@@ -22,4 +33,4 @@ library
     └── wb
         └── peripheral.rs
 
-12 directories, 10 files
+18 directories, 15 files
