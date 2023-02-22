@@ -8,8 +8,8 @@
 ../../../../../rtl/vhdl/core/execute/riscv_mul.vhd
 ../../../../../rtl/vhdl/core/memory/riscv_memmisaligned.vhd
 ../../../../../rtl/vhdl/core/memory/riscv_mmu.vhd
-../../../../../rtl/vhdl/core/riscv_memory.vhd
-../../../../../rtl/vhdl/core/riscv_wb.vhd
+../../../../../rtl/vhdl/core/main/riscv_memory.vhd
+../../../../../rtl/vhdl/core/main/riscv_wb.vhd
 ../../../../../rtl/vhdl/memory/riscv_ram_1r1w.vhd
 ../../../../../rtl/vhdl/memory/riscv_ram_1r1w_generic.vhd
 ../../../../../rtl/vhdl/memory/riscv_ram_1rw.vhd
