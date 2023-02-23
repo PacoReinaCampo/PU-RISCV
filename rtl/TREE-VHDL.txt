@@ -16,22 +16,23 @@ vhdl
 │   │   └── riscv_mul.vhd
 │   ├── fetch
 │   │   └── riscv_if.vhd
-│   ├── memory
-│   │   ├── riscv_dmem_ctrl.vhd
-│   │   ├── riscv_imem_ctrl.vhd
-│   │   ├── riscv_membuf.vhd
-│   │   ├── riscv_memmisaligned.vhd
-│   │   ├── riscv_mmu.vhd
-│   │   ├── riscv_mux.vhd
-│   │   ├── riscv_pmachk.vhd
-│   │   └── riscv_pmpchk.vhd
-│   ├── riscv_bp.vhd
-│   ├── riscv_core.vhd
-│   ├── riscv_du.vhd
-│   ├── riscv_memory.vhd
-│   ├── riscv_rf.vhd
-│   ├── riscv_state.vhd
-│   └── riscv_wb.vhd
+│   ├── main
+│   │   ├── riscv_bp.vhd
+│   │   ├── riscv_core.vhd
+│   │   ├── riscv_du.vhd
+│   │   ├── riscv_memory.vhd
+│   │   ├── riscv_rf.vhd
+│   │   ├── riscv_state.vhd
+│   │   └── riscv_wb.vhd
+│   └── memory
+│       ├── riscv_dmem_ctrl.vhd
+│       ├── riscv_imem_ctrl.vhd
+│       ├── riscv_membuf.vhd
+│       ├── riscv_memmisaligned.vhd
+│       ├── riscv_mmu.vhd
+│       ├── riscv_mux.vhd
+│       ├── riscv_pmachk.vhd
+│       └── riscv_pmpchk.vhd
 ├── memory
 │   ├── riscv_ram_1r1w_generic.vhd
 │   ├── riscv_ram_1r1w.vhd
@@ -59,4 +60,4 @@ vhdl
         ├── riscv_biu2wb.vhd
         └── riscv_pu_wb.vhd
 
-12 directories, 47 files
+13 directories, 47 files

@@ -1,7 +1,7 @@
 -- Converted from rtl/verilog/core/memory/riscv_pmachk.sv
 -- by verilog2vhdl - QueenField
 
---//////////////////////////////////////////////////////////////////////////////
+--------------------------------------------------------------------------------
 --                                            __ _      _     _               //
 --                                           / _(_)    | |   | |              //
 --                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
@@ -16,32 +16,32 @@
 --              Core - Physical Memory Attributes Checker                     //
 --              AMBA3 AHB-Lite Bus Interface                                  //
 --                                                                            //
---//////////////////////////////////////////////////////////////////////////////
+--------------------------------------------------------------------------------
 
 -- Copyright (c) 2017-2018 by the author(s)
--- *
--- * Permission is hereby granted, free of charge, to any person obtaining a copy
--- * of this software and associated documentation files (the "Software"), to deal
--- * in the Software without restriction, including without limitation the rights
--- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- * copies of the Software, and to permit persons to whom the Software is
--- * furnished to do so, subject to the following conditions:
--- *
--- * The above copyright notice and this permission notice shall be included in
--- * all copies or substantial portions of the Software.
--- *
--- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
--- * THE SOFTWARE.
--- *
--- * =============================================================================
--- * Author(s):
--- *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
--- */
+--
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+--
+-- The above copyright notice and this permission notice shall be included in
+-- all copies or substantial portions of the Software.
+--
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+-- THE SOFTWARE.
+--
+--------------------------------------------------------------------------------
+-- Author(s):
+--   Paco Reina Campo <pacoreinacampo@queenfield.tech>
+--
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -82,11 +82,10 @@ entity riscv_pmachk is
   );
 end riscv_pmachk;
 
-architecture RTL of riscv_pmachk is
-  --////////////////////////////////////////////////////////////////
-  --
+architecture rtl of riscv_pmachk is
+  ------------------------------------------------------------------------------
   -- Functions
-  --
+  ------------------------------------------------------------------------------
 
   --convert transfer size in number of bytes in transfer
   function size2bytes (
@@ -241,10 +240,9 @@ architecture RTL of riscv_pmachk is
     return highest_priority_match_return;
   end highest_priority_match;
 
-  --////////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Variables
-  --
+  ------------------------------------------------------------------------------
   signal access_ub         : std_logic_vector(PLEN-1 downto 0);
   signal access_lb         : std_logic_vector(PLEN-1 downto 0);
   signal pma_ub            : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 2);
@@ -260,10 +258,9 @@ architecture RTL of riscv_pmachk is
   signal misaligned        : std_logic;
 
 begin
-  --////////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Module Body
-  --
+  ------------------------------------------------------------------------------
 
   --PMA configurations
   generating_0 : for i in 0 to PMA_CNT - 1 generate
@@ -357,4 +354,4 @@ begin
   is_cache_access_o <= req_i and not exception and not misaligned and matched_pma(8);  --implies MEM_TYPE_MAIN
   is_ext_access_o   <= req_i and not exception and not misaligned and not matched_pma(8) and to_stdlogic(matched_pma(13 downto 12) /= MEM_TYPE_TCM(1 downto 0));
   is_tcm_access_o   <= req_i and not exception and not misaligned and to_stdlogic(matched_pma(13 downto 12) = MEM_TYPE_TCM(1 downto 0));
-end RTL;
+end rtl;

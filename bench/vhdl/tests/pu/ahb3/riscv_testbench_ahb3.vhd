@@ -1,7 +1,7 @@
 -- Converted from riscv_testbench_ahb3.sv
 -- by verilog2vhdl - QueenField
 
---//////////////////////////////////////////////////////////////////////////////
+--------------------------------------------------------------------------------
 --                                            __ _      _     _               //
 --                                           / _(_)    | |   | |              //
 --                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
@@ -16,32 +16,32 @@
 --              TestBench                                                     //
 --              AMBA3 AHB-Lite Bus Interface                                  //
 --                                                                            //
---//////////////////////////////////////////////////////////////////////////////
+--------------------------------------------------------------------------------
 
 -- Copyright (c) 2017-2018 by the author(s)
--- *
--- * Permission is hereby granted, free of charge, to any person obtaining a copy
--- * of this software and associated documentation files (the "Software"), to deal
--- * in the Software without restriction, including without limitation the rights
--- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- * copies of the Software, and to permit persons to whom the Software is
--- * furnished to do so, subject to the following conditions:
--- *
--- * The above copyright notice and this permission notice shall be included in
--- * all copies or substantial portions of the Software.
--- *
--- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
--- * THE SOFTWARE.
--- *
--- * =============================================================================
--- * Author(s):
--- *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
--- */
+--
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+--
+-- The above copyright notice and this permission notice shall be included in
+-- all copies or substantial portions of the Software.
+--
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+-- THE SOFTWARE.
+--
+--------------------------------------------------------------------------------
+-- Author(s):
+--   Paco Reina Campo <pacoreinacampo@queenfield.tech>
+--
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -54,11 +54,10 @@ use work.vhdl_pkg.all;
 entity riscv_testbench_ahb3 is
 end riscv_testbench_ahb3;
 
-architecture RTL of riscv_testbench_ahb3 is
-  --////////////////////////////////////////////////////////////////
-  --
+architecture rtl of riscv_testbench_ahb3 is
+  ------------------------------------------------------------------------------
   -- Constants
-  --
+  ------------------------------------------------------------------------------
   constant MULLAT : integer := MULT_LATENCY;
 
   --core parameters
@@ -138,10 +137,9 @@ architecture RTL of riscv_testbench_ahb3 is
 
   constant NODES                  : integer := X*Y*Z;
 
-  --////////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Components
-  --
+  ------------------------------------------------------------------------------
   component riscv_pu_ahb3
     generic (
       XLEN : integer := 64;
@@ -348,10 +346,9 @@ architecture RTL of riscv_testbench_ahb3 is
       );
   end component;
 
-  --////////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Variables
-  --
+  ------------------------------------------------------------------------------
   signal HCLK    : std_logic;
   signal HRESETn : std_logic;
 
@@ -417,10 +414,9 @@ architecture RTL of riscv_testbench_ahb3 is
 
   signal mem_array : std_logic_matrix(PLEN-1 downto 1)(XLEN-1 downto 1);
 
-  --//////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Procedures
-  --
+  ------------------------------------------------------------------------------
 
   --Stall CPU
   procedure stall (
@@ -507,18 +503,18 @@ architecture RTL of riscv_testbench_ahb3 is
 
   begin
 
-    -- * 1: start code
-    -- * 2: byte count  (2 hex digits)
-    -- * 3: address     (4 hex digits)
-    -- * 4: record type (2 hex digits)
-    -- *    00: data
-    -- *    01: end of file
-    -- *    02: extended segment address
-    -- *    03: start segment address
-    -- *    04: extended linear address (16lsbs of 32bit address)
-    -- *    05: start linear address
-    -- * 5: data
-    -- * 6: checksum    (2 hex digits)
+    -- 1: start code
+    -- 2: byte count  (2 hex digits)
+    -- 3: address     (4 hex digits)
+    -- 4: record type (2 hex digits)
+    --    00: data
+    --    01: end of file
+    --    02: extended segment address
+    --    03: start segment address
+    --    04: extended linear address (16lsbs of 32bit address)
+    --    05: start linear address
+    -- 5: data
+    -- 6: checksum    (2 hex digits)
 
     file_open(fstatus, fd, INIT_FILE, read_mode);  --open file
 
@@ -627,10 +623,9 @@ architecture RTL of riscv_testbench_ahb3 is
   end dump;
 
 begin
-  --//////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Module Body
-  --
+  ------------------------------------------------------------------------------
 
   --Define PMA regions
 
@@ -1028,4 +1023,4 @@ begin
       stall_cpu => dbg_stall
       );
   end process;
-end RTL;
+end rtl;

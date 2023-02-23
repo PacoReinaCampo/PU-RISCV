@@ -1,7 +1,7 @@
 -- Converted from riscv_ahb2axi.sv
 -- by verilog2vhdl - QueenField
 
---//////////////////////////////////////////////////////////////////////////////
+--------------------------------------------------------------------------------
 --                                            __ _      _     _               //
 --                                           / _(_)    | |   | |              //
 --                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
@@ -16,32 +16,32 @@
 --              AMBA3 AHB-Lite Bus Interface                                  //
 --              AMBA4 AXI-Lite Bus Interface                                  //
 --                                                                            //
---//////////////////////////////////////////////////////////////////////////////
+--------------------------------------------------------------------------------
 
 -- Copyright (c) 2017-2018 by the author(s)
--- *
--- * Permission is hereby granted, free of charge, to any person obtaining a copy
--- * of this software and associated documentation files (the "Software"), to deal
--- * in the Software without restriction, including without limitation the rights
--- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- * copies of the Software, and to permit persons to whom the Software is
--- * furnished to do so, subject to the following conditions:
--- *
--- * The above copyright notice and this permission notice shall be included in
--- * all copies or substantial portions of the Software.
--- *
--- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
--- * THE SOFTWARE.
--- *
--- * =============================================================================
--- * Author(s):
--- *   Francisco Javier Reina Campo <frareicam@gmail.com>
--- */
+--
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+--
+-- The above copyright notice and this permission notice shall be included in
+-- all copies or substantial portions of the Software.
+--
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+-- THE SOFTWARE.
+--
+--------------------------------------------------------------------------------
+-- Author(s):
+--   Francisco Javier Reina Campo <frareicam@gmail.com>
+--
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -131,13 +131,12 @@ entity riscv_ahb2axi is
   constant AHB_DATA_WIDTH : integer := 64;
 end riscv_ahb2axi;
 
-architecture RTL of riscv_ahb2axi is
+architecture rtl of riscv_ahb2axi is
 
 
-  --////////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Constants
-  --
+  ------------------------------------------------------------------------------
 
   constant RV_PIC_BASE_ADDR : std_logic_vector(AHB_ADDR_WIDTH-1 downto 0) := X"00000000f00c0000";
   constant RV_ICCM_SADR : std_logic_vector(AHB_ADDR_WIDTH-1 downto 0) := X"00000000ee000000";
@@ -153,10 +152,9 @@ architecture RTL of riscv_ahb2axi is
   constant REGION_BITS : integer := 4;
   constant MASK_BITS : integer := 10+(null)(RV_PIC_SIZE);
 
-  --////////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Variables
-  --
+  ------------------------------------------------------------------------------
 
   signal master_wstrb : std_logic_vector(7 downto 0);
 
@@ -198,10 +196,9 @@ architecture RTL of riscv_ahb2axi is
   signal bus_clk : std_logic;
 
 begin
-  --////////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Module Body
-  --
+  ------------------------------------------------------------------------------
 
   -- FSM to control the bus states and when to block the hready and load the command buffer
   processing_0 : process
@@ -527,4 +524,4 @@ begin
       bus_clk <= (bus_clk_en or scan_mode);      -- clk &
     end if;
   end process;
-end RTL;
+end rtl;

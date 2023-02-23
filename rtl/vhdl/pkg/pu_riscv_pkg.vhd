@@ -1,7 +1,7 @@
 -- Converted from pkg/pu_riscv_pkg.sv
 -- by verilog2vhdl - QueenField
 
---//////////////////////////////////////////////////////////////////////////////
+--------------------------------------------------------------------------------
 --                                            __ _      _     _               //
 --                                           / _(_)    | |   | |              //
 --                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
@@ -16,32 +16,32 @@
 --              RISC-V Package                                                //
 --              AMBA3 AHB-Lite Bus Interface                                  //
 --                                                                            //
---//////////////////////////////////////////////////////////////////////////////
+--------------------------------------------------------------------------------
 
 -- Copyright (c) 2017-2018 by the author(s)
--- *
--- * Permission is hereby granted, free of charge, to any person obtaining a copy
--- * of this software and associated documentation files (the "Software"), to deal
--- * in the Software without restriction, including without limitation the rights
--- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- * copies of the Software, and to permit persons to whom the Software is
--- * furnished to do so, subject to the following conditions:
--- *
--- * The above copyright notice and this permission notice shall be included in
--- * all copies or substantial portions of the Software.
--- *
--- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
--- * THE SOFTWARE.
--- *
--- * =============================================================================
--- * Author(s):
--- *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
--- */
+--
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+--
+-- The above copyright notice and this permission notice shall be included in
+-- all copies or substantial portions of the Software.
+--
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+-- THE SOFTWARE.
+--
+--------------------------------------------------------------------------------
+-- Author(s):
+--   Paco Reina Campo <pacoreinacampo@queenfield.tech>
+--
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -537,36 +537,36 @@ package pu_riscv_pkg is
 
   constant MAX_BREAKPOINTS : integer := 8;
 
-  -- * Debug Unit Memory Map
-  -- *
-  -- * addr_bits  Description
-  -- * ------------------------------
-  -- * 15-12      Debug bank
-  -- * 11- 0      Address inside bank
+  -- Debug Unit Memory Map
+  ------------------------------------------------------------------------------
+  -- addr_bits  Description
+  -- ------------------------------
+  -- 15-12      Debug bank
+  -- 11- 0      Address inside bank
 
-  -- * Bank0      Control & Status
-  -- * Bank1      GPRs
-  -- * Bank2      CSRs
-  -- * Bank3-15   reserved
+  -- Bank0      Control & Status
+  -- Bank1      GPRs
+  -- Bank2      CSRs
+  -- Bank3-15   reserved
 
   constant DBG_INTERNAL : std_logic_vector(15 downto 12) := X"0";
   constant DBG_GPRS     : std_logic_vector(15 downto 12) := X"1";
   constant DBG_CSRS     : std_logic_vector(15 downto 12) := X"2";
 
-  -- * Control registers
-  -- * 0 00 00 ctrl
-  -- * 0 00 01
-  -- * 0 00 10 ie
-  -- * 0 00 11 cause
-  -- *  reserved
-  -- *
-  -- * 1 0000 BP0 Ctrl
-  -- * 1 0001 BP0 Data
-  -- * 1 0010 BP1 Ctrl
-  -- * 1 0011 BP1 Data
-  -- * ...
-  -- * 1 1110 BP7 Ctrl
-  -- * 1 1111 BP7 Data
+  -- Control registers
+  -- 0 00 00 ctrl
+  -- 0 00 01
+  -- 0 00 10 ie
+  -- 0 00 11 cause
+  --  reserved
+  ------------------------------------------------------------------------------
+  -- 1 0000 BP0 Ctrl
+  -- 1 0001 BP0 Data
+  -- 1 0010 BP1 Ctrl
+  -- 1 0011 BP1 Data
+  -- ...
+  -- 1 1110 BP7 Ctrl
+  -- 1 1111 BP7 Data
 
   constant DBG_CTRL    : std_logic_vector(DU_ADDR_SIZE-1 downto 0) := X"000";  --debug control
   constant DBG_HIT     : std_logic_vector(DU_ADDR_SIZE-1 downto 0) := X"001";  --debug HIT register
@@ -600,20 +600,20 @@ package pu_riscv_pkg is
   constant BP_CTRL_CC_ST_ADR       : std_logic_vector(2 downto 0) := "010";
   constant BP_CTRL_CC_LDST_ADR     : std_logic_vector(2 downto 0) := "100";
 
-  -- * addr         Key  Description
-  -- * --------------------------------------------
-  -- * 0x000-0x01f  GPR  General Purpose Registers
-  -- * 0x100-0x11f  FPR  Floating Point Registers
-  -- * 0x200        PC   Program Counter
-  -- * 0x201        PPC  Previous Program Counter
+  -- addr         Key  Description
+  -- --------------------------------------------
+  -- 0x000-0x01f  GPR  General Purpose Registers
+  -- 0x100-0x11f  FPR  Floating Point Registers
+  -- 0x200        PC   Program Counter
+  -- 0x201        PPC  Previous Program Counter
 
   constant DBG_GPR : std_logic_vector(11 downto 0) := "0000000XXXXX";
   constant DBG_FPR : std_logic_vector(11 downto 0) := "0001000XXXXX";
   constant DBG_NPC : std_logic_vector(11 downto 0) := X"200";
   constant DBG_PPC : std_logic_vector(11 downto 0) := X"201";
 
-  -- * Bank2 - CSRs
-  -- *
-  -- * Direct mapping to the 12bit CSR address space
+  -- Bank2 - CSRs
+  ------------------------------------------------------------------------------
+  -- Direct mapping to the 12bit CSR address space
 
 end pu_riscv_pkg;

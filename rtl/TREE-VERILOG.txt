@@ -16,22 +16,23 @@ verilog
 │   │   └── riscv_mul.sv
 │   ├── fetch
 │   │   └── riscv_if.sv
-│   ├── memory
-│   │   ├── riscv_dmem_ctrl.sv
-│   │   ├── riscv_imem_ctrl.sv
-│   │   ├── riscv_membuf.sv
-│   │   ├── riscv_memmisaligned.sv
-│   │   ├── riscv_mmu.sv
-│   │   ├── riscv_mux.sv
-│   │   ├── riscv_pmachk.sv
-│   │   └── riscv_pmpchk.sv
-│   ├── riscv_bp.sv
-│   ├── riscv_core.sv
-│   ├── riscv_du.sv
-│   ├── riscv_memory.sv
-│   ├── riscv_rf.sv
-│   ├── riscv_state.sv
-│   └── riscv_wb.sv
+│   ├── main
+│   │   ├── riscv_bp.sv
+│   │   ├── riscv_core.sv
+│   │   ├── riscv_du.sv
+│   │   ├── riscv_memory.sv
+│   │   ├── riscv_rf.sv
+│   │   ├── riscv_state.sv
+│   │   └── riscv_wb.sv
+│   └── memory
+│       ├── riscv_dmem_ctrl.sv
+│       ├── riscv_imem_ctrl.sv
+│       ├── riscv_membuf.sv
+│       ├── riscv_memmisaligned.sv
+│       ├── riscv_mmu.sv
+│       ├── riscv_mux.sv
+│       ├── riscv_pmachk.sv
+│       └── riscv_pmpchk.sv
 ├── memory
 │   ├── riscv_ram_1r1w_generic.sv
 │   ├── riscv_ram_1r1w.sv
@@ -61,4 +62,4 @@ verilog
         ├── riscv_module_wb.sv
         └── riscv_pu_wb.sv
 
-12 directories, 49 files
+13 directories, 49 files

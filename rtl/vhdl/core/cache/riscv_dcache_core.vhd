@@ -1,7 +1,7 @@
 -- Converted from rtl/verilog/core/cache/riscv_dcache_core.sv
 -- by verilog2vhdl - QueenField
 
---//////////////////////////////////////////////////////////////////////////////
+--------------------------------------------------------------------------------
 --                                            __ _      _     _               //
 --                                           / _(_)    | |   | |              //
 --                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
@@ -16,32 +16,32 @@
 --              Core - Data Cache (Write Back)                                //
 --              AMBA3 AHB-Lite Bus Interface                                  //
 --                                                                            //
---//////////////////////////////////////////////////////////////////////////////
+--------------------------------------------------------------------------------
 
 -- Copyright (c) 2017-2018 by the author(s)
--- *
--- * Permission is hereby granted, free of charge, to any person obtaining a copy
--- * of this software and associated documentation files (the "Software"), to deal
--- * in the Software without restriction, including without limitation the rights
--- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- * copies of the Software, and to permit persons to whom the Software is
--- * furnished to do so, subject to the following conditions:
--- *
--- * The above copyright notice and this permission notice shall be included in
--- * all copies or substantial portions of the Software.
--- *
--- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
--- * THE SOFTWARE.
--- *
--- * =============================================================================
--- * Author(s):
--- *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
--- */
+--
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+--
+-- The above copyright notice and this permission notice shall be included in
+-- all copies or substantial portions of the Software.
+--
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+-- THE SOFTWARE.
+--
+--------------------------------------------------------------------------------
+-- Author(s):
+--   Paco Reina Campo <pacoreinacampo@queenfield.tech>
+--
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -101,7 +101,7 @@ entity riscv_dcache_core is
   );
 end riscv_dcache_core;
 
-architecture RTL of riscv_dcache_core is
+architecture rtl of riscv_dcache_core is
   component riscv_ram_1rw
     generic (
       ABITS      : integer := 10;
@@ -120,10 +120,9 @@ architecture RTL of riscv_dcache_core is
     );
   end component;
 
-  --////////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Constants
-  --
+  ------------------------------------------------------------------------------
 
   ------------------------------------------------------------------
   -- Cache
@@ -147,10 +146,9 @@ architecture RTL of riscv_dcache_core is
   --Memory FIFO
   constant MEM_FIFO_DEPTH : integer := 4;
 
-  --////////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Constants
-  --
+  ------------------------------------------------------------------------------
   constant ARMED        : std_logic_vector(4 downto 0) := "00000";
   constant FLUSH        : std_logic_vector(4 downto 0) := "00001";
   constant FLUSHWAYS    : std_logic_vector(4 downto 0) := "00010";
@@ -166,10 +164,9 @@ architecture RTL of riscv_dcache_core is
   constant WRITE_WAY : std_logic_vector(1 downto 0) := "01";
   constant READ_WAY  : std_logic_vector(1 downto 0) := "10";
 
-  --////////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Functions
-  --
+  ------------------------------------------------------------------------------
   function onehot2int (
     a : std_logic_vector(DCACHE_WAYS-1 downto 0)
     ) return integer is
@@ -257,10 +254,9 @@ architecture RTL of riscv_dcache_core is
     return reduce_mor_out;
   end reduce_mor;
 
-  --////////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Variables
-  --
+  ------------------------------------------------------------------------------
 
   --Memory Interface State Machine Section
   signal mem_vreq_dly : std_logic;
@@ -389,10 +385,9 @@ architecture RTL of riscv_dcache_core is
   signal biu_d    : std_logic_vector(XLEN-1 downto 0);  --write data
 
 begin
-  --////////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Module Body
-  --
+  ------------------------------------------------------------------------------
 
   ------------------------------------------------------------------
   -- Memory Interface State Machine
@@ -1313,4 +1308,4 @@ begin
   elsif (BURST_SIZE /= 16 and BURST_SIZE /= 8) generate
     biu_type_o <= WRAP4;
   end generate;
-end RTL;
+end rtl;
