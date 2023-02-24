@@ -55,11 +55,12 @@ verilog
     │   ├── riscv_biu2axi4.sv
     │   ├── riscv_module_axi4.sv
     │   └── riscv_pu_axi4.sv
-    ├── riscv_ahb2axi.sv
-    ├── riscv_axi2ahb.sv
+    ├── bridge
+    │   ├── riscv_ahb2axi.sv
+    │   └── riscv_axi2ahb.sv
     └── wb
         ├── riscv_biu2wb.sv
         ├── riscv_module_wb.sv
         └── riscv_pu_wb.sv
 
-13 directories, 49 files
+14 directories, 49 files

@@ -54,10 +54,11 @@ vhdl
     ├── axi4
     │   ├── riscv_biu2axi4.vhd
     │   └── riscv_pu_axi4.vhd
-    ├── riscv_ahb2axi.vhd
-    ├── riscv_axi2ahb.vhd
+    ├── bridge
+    │   ├── riscv_ahb2axi.vhd
+    │   └── riscv_axi2ahb.vhd
     └── wb
         ├── riscv_biu2wb.vhd
         └── riscv_pu_wb.vhd
 
-13 directories, 47 files
+14 directories, 47 files

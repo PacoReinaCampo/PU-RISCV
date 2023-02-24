@@ -39,8 +39,8 @@
 
 ../../../../../rtl/vhdl/pu/axi4/riscv_biu2axi4.vhd
 ../../../../../rtl/vhdl/pu/axi4/riscv_pu_axi4.vhd
-../../../../../rtl/vhdl/pu/riscv_ahb2axi.vhd
-../../../../../rtl/vhdl/pu/riscv_axi2ahb.vhd
+../../../../../rtl/vhdl/pu/bridge/riscv_ahb2axi.vhd
+../../../../../rtl/vhdl/pu/bridge/riscv_axi2ahb.vhd
 
 ../../../../../bench/vhdl/tests/pu/axi4/riscv_memory_model_axi4.vhd
 ../../../../../bench/vhdl/tests/pu/axi4/riscv_mmio_if_axi4.vhd
