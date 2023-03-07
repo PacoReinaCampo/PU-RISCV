@@ -2,20 +2,20 @@
 -- by verilog2vhdl - QueenField
 
 --------------------------------------------------------------------------------
---                                            __ _      _     _               //
---                                           / _(_)    | |   | |              //
---                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
---               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
---              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
---               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
---                  | |                                                       //
---                  |_|                                                       //
---                                                                            //
---                                                                            //
---              MPSoC-RISCV CPU                                               //
---              Single Port SRAM                                              //
---              AMBA4 AXI-Lite Bus Interface                                  //
---                                                                            //
+--                                            __ _      _     _               --
+--                                           / _(_)    | |   | |              --
+--                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              --
+--               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              --
+--              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              --
+--               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              --
+--                  | |                                                       --
+--                  |_|                                                       --
+--                                                                            --
+--                                                                            --
+--              MPSoC-RISCV CPU                                               --
+--              Single Port SRAM                                              --
+--              AMBA4 AXI-Lite Bus Interface                                  --
+--                                                                            --
 --------------------------------------------------------------------------------
 
 -- Copyright (c) 2018-2019 by the author(s)
@@ -117,7 +117,7 @@ entity mpsoc_axi4_spram is
   );
 end mpsoc_axi4_spram;
 
-architecture RTL of mpsoc_axi4_spram is
+architecture rtl of mpsoc_axi4_spram is
 
 
   -- AXI has the following rules governing the use of bursts:
@@ -346,4 +346,4 @@ begin
       cnt_q <= cnt_d;
     end if;
   end process;
-end RTL;
+end rtl;

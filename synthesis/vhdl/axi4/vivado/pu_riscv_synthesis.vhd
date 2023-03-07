@@ -2,20 +2,20 @@
 -- by verilog2vhdl - QueenField
 
 --------------------------------------------------------------------------------
---                                            __ _      _     _               //
---                                           / _(_)    | |   | |              //
---                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
---               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
---              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
---               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
---                  | |                                                       //
---                  |_|                                                       //
---                                                                            //
---                                                                            //
---              PU-RISCV                                                      //
---              Synthesis                                                     //
---              AMBA4 AXI-Lite Bus Interface                                  //
---                                                                            //
+--                                            __ _      _     _               --
+--                                           / _(_)    | |   | |              --
+--                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              --
+--               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              --
+--              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              --
+--               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              --
+--                  | |                                                       --
+--                  |_|                                                       --
+--                                                                            --
+--                                                                            --
+--              PU-RISCV                                                      --
+--              Synthesis                                                     --
+--              AMBA4 AXI-Lite Bus Interface                                  --
+--                                                                            --
 --------------------------------------------------------------------------------
 
 -- Copyright (c) 2017-2018 by the author(s)
@@ -138,7 +138,7 @@ entity pu_riscv_synthesis is
     );
 end pu_riscv_synthesis;
 
-architecture RTL of pu_riscv_synthesis is
+architecture rtl of pu_riscv_synthesis is
   component riscv_pu_axi4
     generic (
       AXI_ID_WIDTH   : integer := 10;
@@ -399,9 +399,8 @@ architecture RTL of pu_riscv_synthesis is
   end component;
 
   ------------------------------------------------------------------------------
-  --
-  -- Variables
-  --
+  -- Module Body
+  ------------------------------------------------------------------------------
 
   --PMA configuration
   signal pma_cfg : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
@@ -515,7 +514,7 @@ begin
   --/////////////////////////////////////////////////////////////
   --
   -- Module Body
-  --
+  ------------------------------------------------------------------------------
 
   --Define PMA regions
   pma_adr <= (others => (others => '0'));
@@ -837,4 +836,4 @@ begin
       data_o => open,
       data_i => (others => '0')
       );
-end RTL;
+end rtl;

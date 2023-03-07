@@ -2,20 +2,20 @@
 -- by verilog2vhdl - QueenField
 
 --------------------------------------------------------------------------------
---                                            __ _      _     _               //
---                                           / _(_)    | |   | |              //
---                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
---               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
---              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
---               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
---                  | |                                                       //
---                  |_|                                                       //
---                                                                            //
---                                                                            //
---              PU-RISCV                                                      //
---              Synthesis                                                     //
---              Wishbone Bus Interface                                        //
---                                                                            //
+--                                            __ _      _     _               --
+--                                           / _(_)    | |   | |              --
+--                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              --
+--               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              --
+--              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              --
+--               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              --
+--                  | |                                                       --
+--                  |_|                                                       --
+--                                                                            --
+--                                                                            --
+--              PU-RISCV                                                      --
+--              Synthesis                                                     --
+--              Wishbone Bus Interface                                        --
+--                                                                            --
 --------------------------------------------------------------------------------
 
 -- Copyright (c) 2017-2018 by the author(s)
@@ -131,7 +131,7 @@ entity pu_riscv_synthesis is
   );
 end pu_riscv_synthesis;
 
-architecture RTL of pu_riscv_synthesis is
+architecture rtl of pu_riscv_synthesis is
   component riscv_pu_wb
     generic (
       XLEN : integer := 64;
@@ -272,7 +272,6 @@ architecture RTL of pu_riscv_synthesis is
   end component;
 
   ------------------------------------------------------------------------------
-  --
   -- Constants
   --
 
@@ -281,9 +280,8 @@ architecture RTL of pu_riscv_synthesis is
   constant UART_TX : std_logic_vector(31 downto 0) := X"80001080";
 
   ------------------------------------------------------------------------------
-  --
-  -- Variables
-  --
+  -- Module Body
+  ------------------------------------------------------------------------------
 
   --PMA configuration
   signal pma_cfg : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
@@ -324,7 +322,7 @@ begin
   --/////////////////////////////////////////////////////////////
   --
   -- Module Body
-  --
+  ------------------------------------------------------------------------------
 
   --Define PMA regions
   pma_adr <= (others => (others => '0'));
@@ -492,4 +490,4 @@ begin
       wb_err_o => wb_dat_err_i,
       wb_dat_o => wb_dat_dat_i
     );
-end RTL;
+end rtl;

@@ -2,20 +2,20 @@
 -- by verilog2vhdl - QueenField
 
 --------------------------------------------------------------------------------
---                                            __ _      _     _               //
---                                           / _(_)    | |   | |              //
---                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
---               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
---              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
---               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
---                  | |                                                       //
---                  |_|                                                       //
---                                                                            //
---                                                                            //
---              MPSoC-RISCV CPU                                               //
---              Single Port SRAM                                              //
---              AMBA3 AHB-Lite Bus Interface                                  //
---                                                                            //
+--                                            __ _      _     _               --
+--                                           / _(_)    | |   | |              --
+--                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              --
+--               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              --
+--              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              --
+--               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              --
+--                  | |                                                       --
+--                  |_|                                                       --
+--                                                                            --
+--                                                                            --
+--              MPSoC-RISCV CPU                                               --
+--              Single Port SRAM                                              --
+--              AMBA3 AHB-Lite Bus Interface                                  --
+--                                                                            --
 --------------------------------------------------------------------------------
 
 -- Copyright (c) 2018-2019 by the author(s)
@@ -82,7 +82,7 @@ entity mpsoc_ahb3_spram is
     );
 end mpsoc_ahb3_spram;
 
-architecture RTL of mpsoc_ahb3_spram is
+architecture rtl of mpsoc_ahb3_spram is
   component mpsoc_ram_1r1w
     generic (
       ABITS      : integer := 10;
@@ -107,7 +107,6 @@ architecture RTL of mpsoc_ahb3_spram is
   end component;
 
   ------------------------------------------------------------------------------
-  --
   -- Constants
   --
   constant BE_SIZE : integer := (PLEN+7)/8;
@@ -118,9 +117,8 @@ architecture RTL of mpsoc_ahb3_spram is
   constant MEM_ABITS_LSB  : integer := integer(log2(real(BE_SIZE)));
 
   ------------------------------------------------------------------------------
-  --
-  -- Variables
-  --
+  -- Module Body
+  ------------------------------------------------------------------------------
   signal we         : std_logic;
   signal be         : std_logic_vector(BE_SIZE-1 downto 0);
   signal waddr      : std_logic_vector(PLEN-1 downto 0);
@@ -130,7 +128,6 @@ architecture RTL of mpsoc_ahb3_spram is
   signal dout : std_logic_vector(XLEN-1 downto 0);
 
   ------------------------------------------------------------------------------
-  --
   -- Functions
   --
   function gen_be (
@@ -194,9 +191,8 @@ architecture RTL of mpsoc_ahb3_spram is
 
 begin
   ------------------------------------------------------------------------------
-  --
   -- Module Body
-  --
+  ------------------------------------------------------------------------------
 
   --generate internal write signal
   --This causes read/write contention, which is handled by memory
@@ -296,4 +292,4 @@ begin
       end if;
     end if;
   end process;
-end RTL;
+end rtl;

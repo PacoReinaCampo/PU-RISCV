@@ -2,20 +2,20 @@
 -- by verilog2vhdl - QueenField
 
 --------------------------------------------------------------------------------
---                                            __ _      _     _               //
---                                           / _(_)    | |   | |              //
---                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
---               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
---              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
---               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
---                  | |                                                       //
---                  |_|                                                       //
---                                                                            //
---                                                                            //
---              MPSoC-RISCV CPU                                               //
---              Memory - Technology Independent (Inferrable) Memory Wrapper   //
---              AMBA3 AHB-Lite Bus Interface                                  //
---                                                                            //
+--                                            __ _      _     _               --
+--                                           / _(_)    | |   | |              --
+--                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              --
+--               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              --
+--              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              --
+--               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              --
+--                  | |                                                       --
+--                  |_|                                                       --
+--                                                                            --
+--                                                                            --
+--              MPSoC-RISCV CPU                                               --
+--              Memory - Technology Independent (Inferrable) Memory Wrapper   --
+--              AMBA3 AHB-Lite Bus Interface                                  --
+--                                                                            --
 --------------------------------------------------------------------------------
 
 -- Copyright (c) 2018-2019 by the author(s)
@@ -68,24 +68,21 @@ entity mpsoc_ram_1r1w_generic is
   );
 end mpsoc_ram_1r1w_generic;
 
-architecture RTL of mpsoc_ram_1r1w_generic is
+architecture rtl of mpsoc_ram_1r1w_generic is
   ------------------------------------------------------------------------------
-  --
   -- Types
   --
   type type_mem_array is array (2**ABITS-1 downto 0) of std_logic_vector(DBITS-1 downto 0);  --memory array
 
   ------------------------------------------------------------------------------
-  --
   -- Variables
-  --
+  ------------------------------------------------------------------------------
   signal mem_array : type_mem_array;  --memory array
 
 begin
   ------------------------------------------------------------------------------
-  --
   -- Module Body
-  --
+  ------------------------------------------------------------------------------
 
   --write side
   generating_0 : for i in 0 to (DBITS+7)/8 - 1 generate
@@ -120,4 +117,4 @@ begin
       dout_o <= mem_array(to_integer(unsigned(raddr_i)));
     end if;
   end process;
-end RTL;
+end rtl;

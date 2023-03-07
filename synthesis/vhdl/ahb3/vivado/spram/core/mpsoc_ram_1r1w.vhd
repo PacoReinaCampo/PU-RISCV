@@ -2,20 +2,20 @@
 -- by verilog2vhdl - QueenField
 
 --------------------------------------------------------------------------------
---                                            __ _      _     _               //
---                                           / _(_)    | |   | |              //
---                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
---               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
---              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
---               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
---                  | |                                                       //
---                  |_|                                                       //
---                                                                            //
---                                                                            //
---              MPSoC-RISCV CPU                                               //
---              Memory - 1R1W RAM Block                                       //
---              AMBA3 AHB-Lite Bus Interface                                  //
---                                                                            //
+--                                            __ _      _     _               --
+--                                           / _(_)    | |   | |              --
+--                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              --
+--               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              --
+--              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              --
+--               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              --
+--                  | |                                                       --
+--                  |_|                                                       --
+--                                                                            --
+--                                                                            --
+--              MPSoC-RISCV CPU                                               --
+--              Memory - 1R1W RAM Block                                       --
+--              AMBA3 AHB-Lite Bus Interface                                  --
+--                                                                            --
 --------------------------------------------------------------------------------
 
 -- Copyright (c) 2018-2019 by the author(s)
@@ -70,7 +70,7 @@ entity mpsoc_ram_1r1w is
   );
 end mpsoc_ram_1r1w;
 
-architecture RTL of mpsoc_ram_1r1w is
+architecture rtl of mpsoc_ram_1r1w is
   component mpsoc_ram_1r1w_generic
     generic (
       ABITS : integer := 10;
@@ -91,9 +91,8 @@ architecture RTL of mpsoc_ram_1r1w is
   end component;
 
   ------------------------------------------------------------------------------
-  --
-  -- Variables
-  --
+  -- Module Body
+  ------------------------------------------------------------------------------
   signal contention     : std_logic;
   signal contention_reg : std_logic;
   signal mem_dout       : std_logic_vector(DBITS-1 downto 0);
@@ -143,4 +142,4 @@ begin
 
   dout_o <= din_dly
             when (contention_reg = '1') else mem_dout;
-end RTL;
+end rtl;

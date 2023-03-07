@@ -2,20 +2,20 @@
 -- by verilog2vhdl - QueenField
 
 --------------------------------------------------------------------------------
---                                            __ _      _     _               //
---                                           / _(_)    | |   | |              //
---                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
---               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
---              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
---               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
---                  | |                                                       //
---                  |_|                                                       //
---                                                                            //
---                                                                            //
---              MPSoC-RISCV CPU                                               //
---              Single Port RAM                                               //
---              Wishbone Bus Interface                                        //
---                                                                            //
+--                                            __ _      _     _               --
+--                                           / _(_)    | |   | |              --
+--                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              --
+--               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              --
+--              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              --
+--               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              --
+--                  | |                                                       --
+--                  |_|                                                       --
+--                                                                            --
+--                                                                            --
+--              MPSoC-RISCV CPU                                               --
+--              Single Port RAM                                               --
+--              Wishbone Bus Interface                                        --
+--                                                                            --
 --------------------------------------------------------------------------------
 
 -- Copyright (c) 2018-2019 by the author(s)
@@ -77,7 +77,7 @@ entity mpsoc_wb_spram is
     );
 end mpsoc_wb_spram;
 
-architecture RTL of mpsoc_wb_spram is
+architecture rtl of mpsoc_wb_spram is
   component mpsoc_wb_ram_generic
     generic (
       DEPTH   : integer := 256;
@@ -97,7 +97,6 @@ architecture RTL of mpsoc_wb_spram is
   end component;
 
   ------------------------------------------------------------------------------
-  --
   -- Constants
   --
   constant CLASSIC_CYCLE : std_logic := '0';
@@ -117,7 +116,6 @@ architecture RTL of mpsoc_wb_spram is
   constant BTE_WRAP_16 : std_logic_vector(1 downto 0) := "11";
 
   ------------------------------------------------------------------------------
-  --
   -- Functions
   --
   function get_cycle_type (
@@ -216,9 +214,8 @@ architecture RTL of mpsoc_wb_spram is
 
 begin
   ------------------------------------------------------------------------------
-  --
   -- Module Body
-  --
+  ------------------------------------------------------------------------------
   valid <= wb_cyc_i and wb_stb_i;
 
   processing_0 : process (wb_clk_i)
@@ -274,4 +271,4 @@ begin
       );
 
   we_i <= (ram_we & ram_we & ram_we & ram_we) and wb_sel_i;
-end RTL;
+end rtl;
