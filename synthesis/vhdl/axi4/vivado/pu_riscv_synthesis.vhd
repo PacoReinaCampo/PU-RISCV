@@ -139,6 +139,11 @@ entity pu_riscv_synthesis is
 end pu_riscv_synthesis;
 
 architecture rtl of pu_riscv_synthesis is
+
+  ------------------------------------------------------------------------------
+  -- Components
+  ------------------------------------------------------------------------------
+
   component riscv_pu_axi4
     generic (
       AXI_ID_WIDTH   : integer := 10;

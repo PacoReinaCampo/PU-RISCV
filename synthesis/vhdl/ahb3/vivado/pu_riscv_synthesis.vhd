@@ -132,6 +132,11 @@ entity pu_riscv_synthesis is
 end pu_riscv_synthesis;
 
 architecture rtl of pu_riscv_synthesis is
+
+  ------------------------------------------------------------------------------
+  -- Components
+  ------------------------------------------------------------------------------
+
   component riscv_pu_ahb3
     generic (
       XLEN : integer := 64;
