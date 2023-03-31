@@ -42,7 +42,7 @@
 ::                                                                               ::
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-call ../../../../../settings64_vivado.bat
+call ../../../../../../../settings64_vivado.bat
 
 xvlog -prj system.verilog.prj
 xvhdl -prj system.vhdl.prj

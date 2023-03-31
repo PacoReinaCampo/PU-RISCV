@@ -42,7 +42,7 @@
 ::                                                                               ::
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-call ../../../../../settings64_vivado.bat
+call ../../../../../../../settings64_vivado.bat
 
 vlib work
 vlog -sv -f system.vc

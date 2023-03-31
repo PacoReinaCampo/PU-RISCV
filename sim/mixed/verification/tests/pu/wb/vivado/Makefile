@@ -45,7 +45,7 @@
 all: build simulate
 
 build:
-	xvlog -i ../../../../../rtl/verilog/pkg -prj system.verilog.prj
+	xvlog -i ../../../../../../../rtl/verilog/pkg -prj system.verilog.prj
 	xvhdl -prj system.verilog.prj
 
 simulate:
