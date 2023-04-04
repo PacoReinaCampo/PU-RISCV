@@ -5,7 +5,7 @@ build:
 	vcom -2008 -f system.vc
 
 simulate:
-	vsim -c -do run.do work.riscv_pu_axi4
+	vsim -c -do run.do work.pu_riscv_axi4
 
 clean:
 	rm -rf work transcript

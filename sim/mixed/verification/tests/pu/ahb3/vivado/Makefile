@@ -49,8 +49,8 @@ build:
 	xvhdl -prj system.vhdl.prj
 
 simulate:
-	xelab riscv_testbench_ahb3
-	xsim -R riscv_testbench_ahb3
+	xelab pu_riscv_testbench_ahb3
+	xsim -R pu_riscv_testbench_ahb3
 
 clean:
 	rm -rf *.dir *.jou *.log *.pb .Xil

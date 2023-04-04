@@ -45,5 +45,5 @@
 @echo off
 call ../../../../../../../settings64_verilator.bat
 
-verilator -Wno-lint -Wno-UNOPTFLAT -Wno-COMBDLY --cc -f system.vc --top-module riscv_pu_axi4
+verilator -Wno-lint -Wno-UNOPTFLAT -Wno-COMBDLY --cc -f system.vc --top-module pu_riscv_axi4
 pause

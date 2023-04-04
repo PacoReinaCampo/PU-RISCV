@@ -144,7 +144,7 @@ architecture rtl of pu_riscv_synthesis is
   -- Components
   ------------------------------------------------------------------------------
 
-  component riscv_pu_axi4
+  component pu_riscv_axi4
     generic (
       AXI_ID_WIDTH   : integer := 10;
       AXI_ADDR_WIDTH : integer := 64;
@@ -529,7 +529,7 @@ begin
   dbg_dato_s <= X"00000000" & dbg_dato;
 
   -- Processing Unit
-  dut : riscv_pu_axi4
+  dut : pu_riscv_axi4
     generic map (
       XLEN => XLEN,
       PLEN => PLEN,

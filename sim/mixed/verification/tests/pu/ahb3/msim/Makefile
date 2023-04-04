@@ -6,7 +6,7 @@ build:
 	vcom -2008 -f system.vhdl.vc
 
 simulate:
-	vsim -c -do run.do work.riscv_testbench_ahb3
+	vsim -c -do run.do work.pu_riscv_testbench_ahb3
 
 clean:
 	rm -rf work transcript

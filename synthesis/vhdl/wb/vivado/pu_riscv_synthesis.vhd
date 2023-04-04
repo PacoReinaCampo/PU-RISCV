@@ -137,7 +137,7 @@ architecture rtl of pu_riscv_synthesis is
   -- Components
   ------------------------------------------------------------------------------
 
-  component riscv_pu_wb
+  component pu_riscv_wb
     generic (
       XLEN : integer := 64;
       PLEN : integer := 64;
@@ -337,7 +337,7 @@ begin
   dbg_dato_s <= X"00000000" & dbg_dato;
 
   -- Processing Unit
-  dut : riscv_pu_wb
+  dut : pu_riscv_wb
     generic map (
       XLEN => XLEN,
       PLEN => PLEN,
