@@ -53,8 +53,8 @@ use work.vhdl_pkg.all;
 entity pu_riscv_dext is
   generic (
     XLEN  : integer := 64;
-    PLEN  : integer := 64;  --Physical address bus size
-    DEPTH : integer := 2    --number of instructions in flight
+    PLEN  : integer := 64;              --Physical address bus size
+    DEPTH : integer := 2                --number of instructions in flight
   );
   port (
     rst_ni : in std_logic;
@@ -70,11 +70,11 @@ entity pu_riscv_dext is
     mem_prot_i    : in  std_logic_vector(2 downto 0);
     mem_we_i      : in  std_logic;
     mem_d_i       : in  std_logic_vector(XLEN-1 downto 0);
-    mem_adr_ack_o : out std_logic;  --acknowledge address phase
+    mem_adr_ack_o : out std_logic;      --acknowledge address phase
     mem_adr_o     : out std_logic_vector(PLEN-1 downto 0);
     mem_q_o       : out std_logic_vector(XLEN-1 downto 0);
-    mem_ack_o     : out std_logic;  --acknowledge data transfer
-    mem_err_o     : out std_logic;  --data transfer error
+    mem_ack_o     : out std_logic;      --acknowledge data transfer
+    mem_err_o     : out std_logic;      --data transfer error
 
     --To BIU
     biu_stb_o     : out std_logic;
@@ -88,8 +88,8 @@ entity pu_riscv_dext is
     biu_we_o      : out std_logic;
     biu_d_o       : out std_logic_vector(XLEN-1 downto 0);
     biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);
-    biu_ack_i     : in  std_logic;  --data acknowledge, 1 per data
-    biu_err_i     : in  std_logic  --data error
+    biu_ack_i     : in  std_logic;      --data acknowledge, 1 per data
+    biu_err_i     : in  std_logic       --data error
   );
 end pu_riscv_dext;
 
@@ -146,7 +146,7 @@ begin
   end process;
 
   processing_2 : process (clk_i, rst_ni)
-    variable biu : std_logic_vector(1 downto 0); 
+    variable biu : std_logic_vector(1 downto 0);
   begin
     if (rst_ni = '0') then
       inflight <= (others => '0');

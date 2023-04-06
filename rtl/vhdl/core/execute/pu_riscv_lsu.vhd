@@ -137,7 +137,7 @@ begin
 
   xlen32 <= to_stdlogic(st_xlen = RV32I);
 
-  lsu_r <= (others => '0');  --for AMO
+  lsu_r <= (others => '0');             --for AMO
 
   --Decode Immediates
   immS <= ((XLEN-1 downto 11 => id_instr(31)) & id_instr(30 downto 25) & id_instr(11 downto 8) & id_instr(7));
@@ -145,7 +145,7 @@ begin
   --Access Statemachine
   processing_0 : process (clk, rstn)
   begin
-    if (rstn ='0') then
+    if (rstn = '0') then
       state       <= IDLE;
       lsu_stall_o <= '0';
       lsu_bubble  <= '1';
@@ -266,7 +266,7 @@ begin
       variable memory_byte_enable : std_logic_vector(15 downto 0);
     begin
       memory_byte_enable := 'X' & func7 & func3 & opcode;
-      case (memory_byte_enable) is  --func7 is don't care
+      case (memory_byte_enable) is        --func7 is don't care
         when LB =>
           size <= BYTE;
         when LH =>
@@ -295,11 +295,11 @@ begin
     end process;
 
     --memory write data
-    processing_4 : process (adr, func3, func7, opB,  opcode)
+    processing_4 : process (adr, func3, func7, opB, opcode)
       variable memory_write_data : std_logic_vector(15 downto 0);
     begin
       memory_write_data := 'X' & func7 & func3 & opcode;
-      case (memory_write_data) is  --func7 is don't care
+      case (memory_write_data) is       --func7 is don't care
         when SB =>
           d <= std_logic_vector(((XLEN-1 downto 8 => '0') & unsigned(opB(7 downto 0))) sll (8*to_integer(unsigned(adr(2 downto 0)))));
         when SH =>
@@ -312,12 +312,12 @@ begin
           d <= (others => 'X');
       end case;
     end process;
-  elsif (XLEN = 32) generate  --RV32
+  elsif (XLEN = 32) generate            --RV32
     processing_5 : process (func3, func7, opcode)
       variable memory_write_data : std_logic_vector(15 downto 0);
     begin
       memory_write_data := 'X' & func7 & func3 & opcode;
-      case (memory_write_data) is  --func7 is don't care
+      case (memory_write_data) is       --func7 is don't care
         when LB =>
           size <= BYTE;
         when LH =>
@@ -344,7 +344,7 @@ begin
       variable memory_write_data : std_logic_vector(15 downto 0);
     begin
       memory_write_data := 'X' & func7 & func3 & opcode;
-      case (memory_write_data) is  --func7 is don't care
+      case (memory_write_data) is       --func7 is don't care
         when SB =>
           d <= std_logic_vector(unsigned(opB(7 downto 0)) sll (8*to_integer(unsigned(adr(1 downto 0)))));
         when SH =>
@@ -363,10 +363,10 @@ begin
 
   processing_7 : process (clk, rstn)
   begin
-    if (rstn ='0') then
+    if (rstn = '0') then
       lsu_exception <= (others => '0');
     elsif (rising_edge(clk)) then
-      if (lsu_stall_o ='0') then
+      if (lsu_stall_o = '0') then
         lsu_exception <= id_exception;
       end if;
     end if;

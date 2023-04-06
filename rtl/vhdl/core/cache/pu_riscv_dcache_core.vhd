@@ -84,20 +84,20 @@ entity pu_riscv_dcache_core is
     flushrdy_o : out std_logic;
 
     --To BIU
-    biu_stb_o     : out std_logic;  --access request
-    biu_stb_ack_i : in  std_logic;  --access acknowledge
-    biu_d_ack_i   : in  std_logic;  --BIU needs new data (biu_d_o)
+    biu_stb_o     : out std_logic;      --access request
+    biu_stb_ack_i : in  std_logic;      --access acknowledge
+    biu_d_ack_i   : in  std_logic;      --BIU needs new data (biu_d_o)
     biu_adri_o    : out std_logic_vector(PLEN-1 downto 0);  --access start address
     biu_adro_i    : in  std_logic_vector(PLEN-1 downto 0);
-    biu_size_o    : out std_logic_vector(2 downto 0);  --transfer size
-    biu_type_o    : out std_logic_vector(2 downto 0);  --burst type
-    biu_lock_o    : out std_logic;  --locked transfer
-    biu_prot_o    : out std_logic_vector(2 downto 0);  --protection bits
-    biu_we_o      : out std_logic;  --write enable
+    biu_size_o    : out std_logic_vector(2 downto 0);       --transfer size
+    biu_type_o    : out std_logic_vector(2 downto 0);       --burst type
+    biu_lock_o    : out std_logic;      --locked transfer
+    biu_prot_o    : out std_logic_vector(2 downto 0);       --protection bits
+    biu_we_o      : out std_logic;      --write enable
     biu_d_o       : out std_logic_vector(XLEN-1 downto 0);  --write data
     biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --read data
-    biu_ack_i     : in  std_logic;  --transfer acknowledge
-    biu_err_i     : in  std_logic  --transfer error
+    biu_ack_i     : in  std_logic;      --transfer acknowledge
+    biu_err_i     : in  std_logic       --transfer error
   );
 end pu_riscv_dcache_core;
 
@@ -106,7 +106,7 @@ architecture rtl of pu_riscv_dcache_core is
     generic (
       ABITS      : integer := 10;
       DBITS      : integer := 32;
-      TECHNOLOGY : string := "GENERIC"
+      TECHNOLOGY : string  := "GENERIC"
     );
     port (
       rst_ni : in std_logic;
@@ -243,13 +243,13 @@ architecture rtl of pu_riscv_dcache_core is
 
   function reduce_mor (
     reduce_mor_in : std_logic_matrix(DCACHE_WAYS-1 downto 0)(SETS-1 downto 0)
-  ) return std_logic is
+    ) return std_logic is
     variable reduce_mor_out : std_logic := '0';
   begin
     for i in DCACHE_WAYS-1 downto 0 loop
-    for j in SETS-1 downto 0 loop
-      reduce_mor_out := reduce_mor_out or reduce_mor_in(i)(j);
-    end loop;
+      for j in SETS-1 downto 0 loop
+        reduce_mor_out := reduce_mor_out or reduce_mor_in(i)(j);
+      end loop;
     end loop;
     return reduce_mor_out;
   end reduce_mor;
@@ -380,7 +380,7 @@ architecture rtl of pu_riscv_dcache_core is
   signal mem_ack : std_logic;
 
   --To BIU
-  signal biu_we   : std_logic;  --write enable
+  signal biu_we   : std_logic;                          --write enable
   signal biu_adri : std_logic_vector(PLEN-1 downto 0);  --access start address
   signal biu_d    : std_logic_vector(XLEN-1 downto 0);  --write data
 
@@ -489,7 +489,7 @@ begin
               memfsm_state <= WAIT4BIUCMD1;
               biucmd       <= READ_WAY;
               filling      <= '1';
-            else  --selected way not dirty, overwrite
+            else                        --selected way not dirty, overwrite
               memfsm_state <= WAIT4BIUCMD0;
               biucmd       <= READ_WAY;
               filling      <= '1';
@@ -537,7 +537,7 @@ begin
             end if;
             biucmd  <= WRITE_WAY;
             filling <= '0';
-          elsif (biufsm_ack = '1') then       --wait for READ_WAY to complete
+          elsif (biufsm_ack = '1') then  --wait for READ_WAY to complete
             --if tag_idx already selected, go to ARMED
             --otherwise go to recover to read tag (1 cycle delay)
             if (idx /= tag_idx_hold) then
@@ -600,18 +600,18 @@ begin
 
   --return which SET has dirty WAYs
   --generating_0 : for set in 0 to SETS - 1 generate
-    --dirty_sets(set) <= reduce_or(tag_dirty(set) & tag_dirty(set));
+  --dirty_sets(set) <= reduce_or(tag_dirty(set) & tag_dirty(set));
   --end generate;
 
   --generating_1 : for set in 0 to SETS - 1 generate
-    --processing_7 : process (dirty_sets)
-    --begin
-      --if (dirty_sets(set) = '1') then
-        --get_dirty_set_idx(set) <= std_logic_vector(to_unsigned(set, IDX_BITS));
-      --else
-        --get_dirty_set_idx(set) <= std_logic_vector(to_unsigned(0, IDX_BITS));
-      --end if;
-    --end process;
+  --processing_7 : process (dirty_sets)
+  --begin
+  --if (dirty_sets(set) = '1') then
+  --get_dirty_set_idx(set) <= std_logic_vector(to_unsigned(set, IDX_BITS));
+  --else
+  --get_dirty_set_idx(set) <= std_logic_vector(to_unsigned(0, IDX_BITS));
+  --end if;
+  --end process;
   --end generate;
 
   --signal downstream that data is ready
@@ -720,12 +720,12 @@ begin
     --compare way-tag to TAG
     way_hit(way) <= tag_out_valid(way) and to_stdlogic(core_tag = way_compare(way));
 
-    --way_compare(way) <= tag_byp_tag(way)
-                     --when (tag_idx_dly = tag_byp_idx(way)) else tag_out_tag(way);
+  --way_compare(way) <= tag_byp_tag(way)
+  --when (tag_idx_dly = tag_byp_idx(way)) else tag_out_tag(way);
   end generate;
 
   -- Generate 'hit'
-  cache_hit <= reduce_or(way_hit);  -- & mem_vreq_dly;
+  cache_hit <= reduce_or(way_hit);      -- & mem_vreq_dly;
 
   --DATA
 
@@ -802,7 +802,7 @@ begin
   way_q <= std_logic_vector(unsigned(way_q_mux(DCACHE_WAYS-1)(XLEN-1 downto 0)) srl (to_integer(unsigned(dat_offset)*XLEN)));
 
   --in_biubuffer <= to_stdlogic(biu_adri_hold(PLEN-1 downto BLK_OFF_BITS) = (mem_padr_dly(PLEN-1 downto BLK_OFF_BITS) and std_logic_vector(unsigned(biu_buffer_valid(PLEN+BLK_OFF_BITS-1 downto 0)) srl to_integer(unsigned(dat_offset)))))
-                  --when mem_preq_dly = '1' else to_stdlogic(biu_adri_hold(PLEN-1 downto BLK_OFF_BITS) = (mem_padr_i(PLEN-1 downto BLK_OFF_BITS) and std_logic_vector(unsigned(biu_buffer_valid(PLEN+BLK_OFF_BITS-1 downto 0)) srl to_integer(unsigned(dat_offset)))));
+  --when mem_preq_dly = '1' else to_stdlogic(biu_adri_hold(PLEN-1 downto BLK_OFF_BITS) = (mem_padr_i(PLEN-1 downto BLK_OFF_BITS) and std_logic_vector(unsigned(biu_buffer_valid(PLEN+BLK_OFF_BITS-1 downto 0)) srl to_integer(unsigned(dat_offset)))));
 
   in_writebuffer <= to_stdlogic(mem_padr_i = write_buffer_adr) and reduce_or(write_buffer_hit);
 
@@ -942,8 +942,8 @@ begin
         when ARMED =>
           tag_we_dirty(way) <= way_hit(way) and ((mem_vreq_dly and mem_we_dly and mem_preq_i) or (mem_preq_dly and mem_we_dly));
         when others =>
-          tag_we_dirty(way) <= (filling and fill_way_select_hold(way) and biufsm_ack) or (flushing and write_evict_buffer and 
-                            to_stdlogic(unsigned(get_dirty_way_idx(DCACHE_WAYS-1)) = to_unsigned(way, integer(log2(real(DCACHE_WAYS))))));
+          tag_we_dirty(way) <= (filling and fill_way_select_hold(way) and biufsm_ack) or (flushing and write_evict_buffer and
+                                                                                          to_stdlogic(unsigned(get_dirty_way_idx(DCACHE_WAYS-1)) = to_unsigned(way, integer(log2(real(DCACHE_WAYS))))));
       end case;
     end process;
   end generate;
@@ -1054,7 +1054,7 @@ begin
     case (biufsm_ack) is
       when '1' =>
         --dat_in = biu_buffer
-        dat_in <= biu_buffer;
+        dat_in                                                                                                                                                                                              <= biu_buffer;
         dat_in(to_integer(unsigned(biu_adro_i(BLK_OFF_BITS+DAT_OFF_BITS-1 downto BLK_OFF_BITS)))*XLEN+XLEN-1 downto to_integer(unsigned(biu_adro_i(BLK_OFF_BITS+DAT_OFF_BITS-1 downto BLK_OFF_BITS)))*XLEN) <= biu_q;  --except for last transaction
       when '0' =>
         --dat_in = write-data over all words
@@ -1088,14 +1088,14 @@ begin
               null;
             when READ_WAY =>
               --read a way from main memory
-             if (biu_stb_ack_i = '1') then
+              if (biu_stb_ack_i = '1') then
                 biufsm_state <= BURST;
               else                 --BIU is not ready to start a new transfer
                 biufsm_state <= WAIT4BIU;
               end if;
             when WRITE_WAY =>
               --write way back to main memory
-             if (biu_stb_ack_i = '1') then
+              if (biu_stb_ack_i = '1') then
                 biufsm_state <= BURST;
               else                 --BIU is not ready to start a new transfer
                 biufsm_state <= WAIT4BIU;
@@ -1104,7 +1104,7 @@ begin
               null;
           end case;
         when WAIT4BIU =>
-         if (biu_stb_ack_i = '1') then
+          if (biu_stb_ack_i = '1') then
             --BIU acknowledged burst transfer
             biufsm_state <= BURST;
           end if;
@@ -1139,8 +1139,8 @@ begin
           if (biu_we_hold = '0') then
             if (biu_ack_i = '1') then  --latch incoming data when transfer-acknowledged
               biu_buffer(to_integer(unsigned(biu_adro_i(BLK_OFF_BITS+DAT_OFF_BITS-1 downto BLK_OFF_BITS)))*XLEN+XLEN-1 downto to_integer(unsigned(biu_adro_i(BLK_OFF_BITS+DAT_OFF_BITS-1 downto BLK_OFF_BITS)))*XLEN) <= biu_q;
-              biu_buffer_valid(to_integer(unsigned(biu_adro_i(BLK_OFF_BITS+DAT_OFF_BITS-1 downto BLK_OFF_BITS)))) <= '1';
-              biu_buffer_dirty <= biu_buffer_dirty or (mem_we_dly and biu_adro_eq_cache_adr_dly);
+              biu_buffer_valid(to_integer(unsigned(biu_adro_i(BLK_OFF_BITS+DAT_OFF_BITS-1 downto BLK_OFF_BITS))))                                                                                                     <= '1';
+              biu_buffer_dirty                                                                                                                                                                                        <= biu_buffer_dirty or (mem_we_dly and biu_adro_eq_cache_adr_dly);
             end if;
           elsif (biu_d_ack_i = '1') then  --present new data when previous transfer acknowledged
             biu_buffer       <= std_logic_vector(unsigned(biu_buffer) srl XLEN);
@@ -1244,39 +1244,39 @@ begin
       when IDLE =>
         case (biucmd) is
           when NOP =>
-            biu_stb_o  <= '0';
-            biu_we     <= 'X';
-            biu_adri   <= (others => 'X');
-            biu_d      <= (others => 'X');
+            biu_stb_o <= '0';
+            biu_we    <= 'X';
+            biu_adri  <= (others => 'X');
+            biu_d     <= (others => 'X');
           when READ_WAY =>
-            biu_stb_o  <= '1';
-            biu_we     <= '0';  --read
-            biu_adri   <= (mem_padr_dly(PLEN-1 downto BURST_LSB) & (BURST_LSB-1 downto 0 => '0'));
-            biu_d      <= (others => 'X');
+            biu_stb_o <= '1';
+            biu_we    <= '0';                             --read
+            biu_adri  <= (mem_padr_dly(PLEN-1 downto BURST_LSB) & (BURST_LSB-1 downto 0 => '0'));
+            biu_d     <= (others                                                        => 'X');
           when WRITE_WAY =>
-            biu_stb_o  <= '1';
-            biu_we     <= '1';
-            biu_adri   <= evict_buffer_adr;
-            biu_d    <= evict_buffer_data(XLEN-1 downto 0);
+            biu_stb_o <= '1';
+            biu_we    <= '1';
+            biu_adri  <= evict_buffer_adr;
+            biu_d     <= evict_buffer_data(XLEN-1 downto 0);
           when others =>
             null;
         end case;
       when WAIT4BIU =>
         --stretch biu_*_o signals until BIU acknowledges strobe
-        biu_stb_o  <= '1';
-        biu_we     <= biu_we_hold;
-        biu_adri   <= biu_adri_hold;
-        biu_d      <= evict_buffer_data(XLEN-1 downto 0);  --retain same data
+        biu_stb_o <= '1';
+        biu_we    <= biu_we_hold;
+        biu_adri  <= biu_adri_hold;
+        biu_d     <= evict_buffer_data(XLEN-1 downto 0);  --retain same data
       when BURST =>
-        biu_stb_o  <= '0';
-        biu_we     <= 'X';  --don't care
-        biu_adri   <= (others => 'X');  --don't care
-        biu_d      <= biu_buffer(XLEN-1 downto 0);
+        biu_stb_o <= '0';
+        biu_we    <= 'X';                                 --don't care
+        biu_adri  <= (others => 'X');                     --don't care
+        biu_d     <= biu_buffer(XLEN-1 downto 0);
       when others =>
-        biu_stb_o  <= '0';
-        biu_we     <= 'X';  --don't care
-        biu_adri   <= (others => 'X');  --don't care
-        biu_d      <= (others => 'X');  --don't care
+        biu_stb_o <= '0';
+        biu_we    <= 'X';                                 --don't care
+        biu_adri  <= (others => 'X');                     --don't care
+        biu_d     <= (others => 'X');                     --don't care
     end case;
   end process;
 

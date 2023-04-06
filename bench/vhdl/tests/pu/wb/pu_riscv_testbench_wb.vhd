@@ -130,11 +130,11 @@ architecture rtl of pu_riscv_testbench_wb is
   constant BURST   : integer := 8;
 
   --mpsoc parameters
-  constant X                      : integer := 1;
-  constant Y                      : integer := 1;
-  constant Z                      : integer := 1;
+  constant X : integer := 1;
+  constant Y : integer := 1;
+  constant Z : integer := 1;
 
-  constant NODES                  : integer := X*Y*Z;
+  constant NODES : integer := X*Y*Z;
 
   ------------------------------------------------------------------------------
   -- Components
@@ -196,7 +196,7 @@ architecture rtl of pu_riscv_testbench_wb is
       HARTID : integer := 0;
 
       PARCEL_SIZE : integer := 64
-      );
+    );
     port (
       --AHB interfaces
       HRESETn : in std_logic;
@@ -246,14 +246,14 @@ architecture rtl of pu_riscv_testbench_wb is
       dbg_dato  : out std_logic_vector(XLEN-1 downto 0);
       dbg_ack   : out std_logic;
       dbg_bp    : out std_logic
-      );
+    );
   end component;
 
   component pu_riscv_dbg_bfm
     generic (
       XLEN : integer := 64;
       PLEN : integer := 64
-      );
+    );
     port (
       rstn : in std_logic;
       clk  : in std_logic;
@@ -267,7 +267,7 @@ architecture rtl of pu_riscv_testbench_wb is
       cpu_dat_o   : out std_logic_vector(XLEN-1 downto 0);
       cpu_dat_i   : in  std_logic_vector(XLEN-1 downto 0);
       cpu_ack_i   : in  std_logic
-      );
+    );
   end component;
 
   component pu_riscv_memory_model_wb
@@ -283,7 +283,7 @@ architecture rtl of pu_riscv_testbench_wb is
       BURST   : integer := 8;
 
       INIT_FILE : string := "test.hex"
-      );
+    );
     port (
       HCLK    : in std_logic;
       HRESETn : in std_logic;
@@ -298,14 +298,14 @@ architecture rtl of pu_riscv_testbench_wb is
       HBURST : in  std_logic_matrix(1 downto 0)(2 downto 0);
       HWDATA : in  std_logic_matrix(1 downto 0)(XLEN-1 downto 0);
       HRDATA : out std_logic_matrix(1 downto 0)(XLEN-1 downto 0)
-      );
+    );
   end component;
 
   --HTIF Interface
   component pu_riscv_htif
     generic (
       XLEN : integer := 32
-      );
+    );
     port (
       rstn : in std_logic;
       clk  : in std_logic;
@@ -315,7 +315,7 @@ architecture rtl of pu_riscv_testbench_wb is
       host_csr_we       : out std_logic;
       host_csr_tohost   : in  std_logic_vector(XLEN-1 downto 0);
       host_csr_fromhost : out std_logic_vector(XLEN-1 downto 0)
-      );
+    );
   end component;
 
   --MMIO Interface
@@ -326,7 +326,7 @@ architecture rtl of pu_riscv_testbench_wb is
 
       TOHOST  : std_logic_vector(63 downto 0) := X"0000000080001000";
       UART_TX : std_logic_vector(63 downto 0) := X"0000000080001080"
-      );
+    );
     port (
       HRESETn : in std_logic;
       HCLK    : in std_logic;
@@ -341,7 +341,7 @@ architecture rtl of pu_riscv_testbench_wb is
 
       HREADYOUT : out std_logic;
       HRESP     : out std_logic
-      );
+    );
   end component;
 
   ------------------------------------------------------------------------------
@@ -749,7 +749,7 @@ begin
       dbg_dato  => dbg_dato,
       dbg_ack   => dbg_ack,
       dbg_bp    => dbg_bp
-      );
+    );
 
   --Hookup Debug Unit
   dbg_ctrl : pu_riscv_dbg_bfm
@@ -769,7 +769,7 @@ begin
       cpu_dat_o   => dbg_dati,
       cpu_dat_i   => dbg_dato,
       cpu_ack_i   => dbg_ack
-      );
+    );
 
   --bus <-> memory model connections
   mem_htrans(0) <= ins_HTRANS;
@@ -819,7 +819,7 @@ begin
       HBURST  => mem_hburst,
       HWDATA  => mem_hwdata,
       HRDATA  => mem_hrdata
-      );
+    );
 
   --Front-End Server
   generating_0 : if (HTIF = '1') generate
@@ -837,7 +837,7 @@ begin
         host_csr_we       => host_csr_we,
         host_csr_tohost   => host_csr_tohost,
         host_csr_fromhost => host_csr_fromhost
-        );
+      );
   elsif (HTIF = '0') generate
     mmio_if : pu_riscv_mmio_if_wb
       generic map (
@@ -858,7 +858,7 @@ begin
         HRDATA    => open,
         HREADYOUT => open,
         HRESP     => open
-        );
+      );
   end generate;
 
   --Generate clock
@@ -906,7 +906,7 @@ begin
   begin
     read_ihex (
       mem_array => mem_array
-      );
+    );
 
     HCLK    <= '0';
     HRESETn <= '1';
@@ -929,7 +929,7 @@ begin
     stall (
       clk       => HCLK,
       stall_cpu => dbg_stall
-      );
+    );
 
     --Enable BREAKPOINT to call external debugger
     --write(X"0000000000000004", X"00000000000000008");
@@ -947,7 +947,7 @@ begin
       cpu_we_o  => dbg_we,
       cpu_dat_o => dbg_dato,
       cpu_adr_o => dbg_addr
-      );
+    );
 
     --single step through 10 instructions
     for repeat in 1 to 100 loop
@@ -972,12 +972,12 @@ begin
         cpu_we_o  => dbg_we,
         cpu_dat_o => dbg_dato,
         cpu_adr_o => dbg_addr
-        );
+      );
 
       unstall (
         clk       => HCLK,
         stall_cpu => dbg_stall
-        );
+      );
     end loop;
 
     --last time ...
@@ -1000,7 +1000,7 @@ begin
       cpu_we_o  => dbg_we,
       cpu_dat_o => dbg_dato,
       cpu_adr_o => dbg_addr
-      );
+    );
 
     write (
       clk => HCLK,
@@ -1014,11 +1014,11 @@ begin
       cpu_we_o  => dbg_we,
       cpu_dat_o => dbg_dato,
       cpu_adr_o => dbg_addr
-      );
+    );
 
     unstall (
       clk       => HCLK,
       stall_cpu => dbg_stall
-      );
+    );
   end process;
 end rtl;

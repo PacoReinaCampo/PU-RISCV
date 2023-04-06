@@ -126,7 +126,7 @@ architecture rtl of pu_riscv_imem_ctrl is
       rst_ni : in std_logic;
       clk_i  : in std_logic;
 
-      clr_i : in std_logic;            --clear pending requests
+      clr_i : in std_logic;             --clear pending requests
       ena_i : in std_logic;
 
       --CPU side
@@ -145,7 +145,7 @@ architecture rtl of pu_riscv_imem_ctrl is
 
   component pu_riscv_memmisaligned
     generic (
-      XLEN    : integer := 64;
+      XLEN    : integer   := 64;
       HAS_RVC : std_logic := '1'
     );
     port (
@@ -170,13 +170,13 @@ architecture rtl of pu_riscv_imem_ctrl is
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
-      clr_i  : in std_logic;           --clear pending request
+      clr_i  : in std_logic;            --clear pending request
 
       --Mode
       --input  logic [XLEN-1:0] st_satp;
 
       --CPU side
-      vreq_i  : in std_logic;          --Request from CPU
+      vreq_i  : in std_logic;                          --Request from CPU
       vadr_i  : in std_logic_vector(XLEN-1 downto 0);  --Virtual Memory Address
       vsize_i : in std_logic_vector(2 downto 0);
       vlock_i : in std_logic;
@@ -212,14 +212,14 @@ architecture rtl of pu_riscv_imem_ctrl is
       pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
       --Memory Access
-      instruction_i : in std_logic;    --This is an instruction access
-      req_i         : in std_logic;    --Memory access requested
+      instruction_i : in std_logic;     --This is an instruction access
+      req_i         : in std_logic;     --Memory access requested
       adr_i         : in std_logic_vector(PLEN-1 downto 0);  --Physical Memory address (i.e. after translation)
       size_i        : in std_logic_vector(2 downto 0);       --Transfer size
-      lock_i        : in std_logic;    --AMO : TODO: specify AMO type
+      lock_i        : in std_logic;     --AMO : TODO: specify AMO type
       we_i          : in std_logic;
 
-      misaligned_i : in std_logic;     --Misaligned access
+      misaligned_i : in std_logic;      --Misaligned access
 
       --Output
       pma_o             : out std_logic_vector(13 downto 0);
@@ -244,11 +244,11 @@ architecture rtl of pu_riscv_imem_ctrl is
       st_prv_i     : in std_logic_vector(1 downto 0);
 
       --Memory Access
-      instruction_i : in std_logic;    --This is an instruction access
-      req_i         : in std_logic;    --Memory access requested
+      instruction_i : in std_logic;     --This is an instruction access
+      req_i         : in std_logic;     --Memory access requested
       adr_i         : in std_logic_vector(PLEN-1 downto 0);  --Physical Memory address (i.e. after translation)
       size_i        : in std_logic_vector(2 downto 0);       --Transfer size
-      we_i          : in std_logic;    --Read/Write enable
+      we_i          : in std_logic;     --Read/Write enable
 
       --Output
       exception_o : out std_logic
@@ -270,7 +270,7 @@ architecture rtl of pu_riscv_imem_ctrl is
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
-      clr_i  : in std_logic;  --clear any pending request
+      clr_i  : in std_logic;            --clear any pending request
 
       --CPU side
       mem_vreq_i : in  std_logic;
@@ -287,28 +287,28 @@ architecture rtl of pu_riscv_imem_ctrl is
       flushrdy_i : in  std_logic;
 
       --To BIU
-      biu_stb_o     : out std_logic;  --access request
-      biu_stb_ack_i : in  std_logic;  --access acknowledge
-      biu_d_ack_i   : in  std_logic;  --BIU needs new data (biu_d_o)
+      biu_stb_o     : out std_logic;    --access request
+      biu_stb_ack_i : in  std_logic;    --access acknowledge
+      biu_d_ack_i   : in  std_logic;    --BIU needs new data (biu_d_o)
       biu_adri_o    : out std_logic_vector(PLEN-1 downto 0);  --access start address
       biu_adro_i    : in  std_logic_vector(PLEN-1 downto 0);
-      biu_size_o    : out std_logic_vector(2 downto 0);  --transfer size
-      biu_type_o    : out std_logic_vector(2 downto 0);  --burst type
-      biu_lock_o    : out std_logic;  --locked transfer
-      biu_prot_o    : out std_logic_vector(2 downto 0);  --protection bits
-      biu_we_o      : out std_logic;  --write enable
+      biu_size_o    : out std_logic_vector(2 downto 0);       --transfer size
+      biu_type_o    : out std_logic_vector(2 downto 0);       --burst type
+      biu_lock_o    : out std_logic;    --locked transfer
+      biu_prot_o    : out std_logic_vector(2 downto 0);       --protection bits
+      biu_we_o      : out std_logic;    --write enable
       biu_d_o       : out std_logic_vector(XLEN-1 downto 0);  --write data
       biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --read data
-      biu_ack_i     : in  std_logic;  --transfer acknowledge
-      biu_err_i     : in  std_logic  --transfer error
+      biu_ack_i     : in  std_logic;    --transfer acknowledge
+      biu_err_i     : in  std_logic     --transfer error
     );
   end component;
 
   component pu_riscv_dext
     generic (
       XLEN  : integer := 64;
-      PLEN  : integer := 64;  --Physical address bus size
-      DEPTH : integer := 2    --number of instructions in flight
+      PLEN  : integer := 64;            --Physical address bus size
+      DEPTH : integer := 2              --number of instructions in flight
     );
     port (
       rst_ni : in std_logic;
@@ -324,11 +324,11 @@ architecture rtl of pu_riscv_imem_ctrl is
       mem_prot_i    : in  std_logic_vector(2 downto 0);
       mem_we_i      : in  std_logic;
       mem_d_i       : in  std_logic_vector(XLEN-1 downto 0);
-      mem_adr_ack_o : out std_logic;   --acknowledge address phase
+      mem_adr_ack_o : out std_logic;    --acknowledge address phase
       mem_adr_o     : out std_logic_vector(PLEN-1 downto 0);
       mem_q_o       : out std_logic_vector(XLEN-1 downto 0);
-      mem_ack_o     : out std_logic;   --acknowledge data transfer
-      mem_err_o     : out std_logic;   --data transfer error
+      mem_ack_o     : out std_logic;    --acknowledge data transfer
+      mem_err_o     : out std_logic;    --data transfer error
 
       --To BIU
       biu_stb_o     : out std_logic;
@@ -342,8 +342,8 @@ architecture rtl of pu_riscv_imem_ctrl is
       biu_we_o      : out std_logic;
       biu_d_o       : out std_logic_vector(XLEN-1 downto 0);
       biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);
-      biu_ack_i     : in  std_logic;   --data acknowledge, 1 per data
-      biu_err_i     : in  std_logic    --data error
+      biu_ack_i     : in  std_logic;    --data acknowledge, 1 per data
+      biu_err_i     : in  std_logic     --data error
     );
   end component;
 
@@ -355,11 +355,11 @@ architecture rtl of pu_riscv_imem_ctrl is
       ALMOST_EMPTY_THRESHOLD : integer := 0
     );
     port (
-      rst_ni : in std_logic;  --asynchronous, active low reset
-      clk_i  : in std_logic;  --rising edge triggered clock
+      rst_ni : in std_logic;            --asynchronous, active low reset
+      clk_i  : in std_logic;            --rising edge triggered clock
 
       clr_i : in std_logic;  --clear all queue entries (synchronous reset)
-      ena_i : in std_logic;  --clock enable
+      ena_i : in std_logic;             --clock enable
 
       --Queue Write
       we_i : in std_logic;                           --Queue write enable
@@ -370,10 +370,10 @@ architecture rtl of pu_riscv_imem_ctrl is
       q_o  : out std_logic_vector(DBITS-1 downto 0);  --Queue read data
 
       --Status signals
-      empty_o        : out std_logic;  --Queue is empty
-      full_o         : out std_logic;  --Queue is full
-      almost_empty_o : out std_logic;  --Programmable almost empty
-      almost_full_o  : out std_logic   --Programmable almost full
+      empty_o        : out std_logic;   --Queue is empty
+      full_o         : out std_logic;   --Queue is full
+      almost_empty_o : out std_logic;   --Programmable almost empty
+      almost_full_o  : out std_logic    --Programmable almost full
     );
   end component;
 
@@ -404,20 +404,20 @@ architecture rtl of pu_riscv_imem_ctrl is
       biu_err_o     : out std_logic_vector(PORTS-1 downto 0);  --access error
 
       --Output (to BIU)
-      biu_req_o     : out std_logic;  --BIU access request
-      biu_req_ack_i : in  std_logic;  --BIU ackowledge
-      biu_d_ack_i   : in  std_logic;  --BIU early data acknowledge
+      biu_req_o     : out std_logic;    --BIU access request
+      biu_req_ack_i : in  std_logic;    --BIU ackowledge
+      biu_d_ack_i   : in  std_logic;    --BIU early data acknowledge
       biu_adri_o    : out std_logic_vector(PLEN-1 downto 0);  --address into BIU
       biu_adro_i    : in  std_logic_vector(PLEN-1 downto 0);  --address from BIU
-      biu_size_o    : out std_logic_vector(2 downto 0);  --transfer size
-      biu_type_o    : out std_logic_vector(2 downto 0);  --burst type
+      biu_size_o    : out std_logic_vector(2 downto 0);       --transfer size
+      biu_type_o    : out std_logic_vector(2 downto 0);       --burst type
       biu_lock_o    : out std_logic;
       biu_prot_o    : out std_logic_vector(2 downto 0);
       biu_we_o      : out std_logic;
       biu_d_o       : out std_logic_vector(XLEN-1 downto 0);  --data into BIU
       biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --data from BIU
-      biu_ack_i     : in  std_logic;  --data acknowledge, 1 per data
-      biu_err_i     : in  std_logic  --data error
+      biu_ack_i     : in  std_logic;    --data acknowledge, 1 per data
+      biu_err_i     : in  std_logic     --data error
     );
   end component;
 
@@ -488,8 +488,8 @@ architecture rtl of pu_riscv_imem_ctrl is
   --From IO
   signal ext_vadr       : std_logic_vector(XLEN-1 downto 0);
   signal ext_q          : std_logic_vector(XLEN-1 downto 0);
-  signal ext_access_ack : std_logic;   --address transfer acknowledge
-  signal ext_ack        : std_logic;   --data transfer acknowledge
+  signal ext_access_ack : std_logic;    --address transfer acknowledge
+  signal ext_ack        : std_logic;    --data transfer acknowledge
   signal ext_err        : std_logic;
 
   --BIU ports
@@ -573,7 +573,7 @@ begin
     generic map (
       DEPTH => 2,
       DBITS => XLEN
-    )
+      )
     port map (
       rst_ni => rst_ni,
       clk_i  => clk_i,
@@ -608,7 +608,7 @@ begin
     generic map (
       XLEN    => XLEN,
       HAS_RVC => HAS_RVC
-    )
+      )
     port map (
       clk_i         => clk_i,
       instruction_i => '1',             --instruction access
@@ -623,7 +623,7 @@ begin
     generic map (
       XLEN => XLEN,
       PLEN => PLEN
-    )
+      )
     port map (
       rst_ni => rst_ni,
       clk_i  => clk_i,
@@ -653,10 +653,10 @@ begin
   --Hookup Physical Memory Atrributes Unit
   pmachk_inst : pu_riscv_pmachk
     generic map (
-      XLEN => XLEN,
-      PLEN => PLEN,
+      XLEN    => XLEN,
+      PLEN    => PLEN,
       PMA_CNT => PMA_CNT
-    )
+      )
     port map (
       --Configuration
       pma_cfg_i => pma_cfg_i,
@@ -685,20 +685,20 @@ begin
   --Hookup Physical Memory Protection Unit
   pmpchk_inst : pu_riscv_pmpchk
     generic map (
-      XLEN => XLEN,
-      PLEN => PLEN,
+      XLEN    => XLEN,
+      PLEN    => PLEN,
       PMP_CNT => PMP_CNT
-    )
+      )
     port map (
       st_pmpcfg_i  => st_pmpcfg_i,
       st_pmpaddr_i => st_pmpaddr_i,
       st_prv_i     => st_prv_i,
 
-      instruction_i => '1',    --Instruction access
-      req_i         => preq,   --Memory access request
-      adr_i         => padr,   --Physical Memory address (i.e. after translation)
-      size_i        => psize,  --Transfer size
-      we_i          => '0',    --Read/Write enable
+      instruction_i => '1',             --Instruction access
+      req_i         => preq,            --Memory access request
+      adr_i         => padr,  --Physical Memory address (i.e. after translation)
+      size_i        => psize,           --Transfer size
+      we_i          => '0',             --Read/Write enable
 
       exception_o => pmp_exception
     );
@@ -717,7 +717,7 @@ begin
         ICACHE_REPLACE_ALG => ICACHE_REPLACE_ALG,
 
         TECHNOLOGY => TECHNOLOGY
-      )
+        )
       port map (
         --common signals
         rst_ni => rst_ni,
@@ -736,25 +736,25 @@ begin
         mem_ack_o  => cache_ack,
         mem_err_o  => cache_err,
         flush_i    => cache_flush_i,
-        flushrdy_i => '1',  --handled by stall_nxt_pc
+        flushrdy_i => '1',              --handled by stall_nxt_pc
 
         --To BIU
-        biu_stb_o     => biu_stb     (CACHE),
+        biu_stb_o     => biu_stb (CACHE),
         biu_stb_ack_i => biu_stb_ack (CACHE),
-        biu_d_ack_i   => biu_d_ack   (CACHE),
-        biu_adri_o    => biu_adri    (CACHE),
-        biu_adro_i    => biu_adro    (CACHE),
-        biu_size_o    => biu_size    (CACHE),
-        biu_type_o    => biu_type    (CACHE),
-        biu_lock_o    => biu_lock    (CACHE),
-        biu_prot_o    => biu_prot    (CACHE),
-        biu_we_o      => biu_we      (CACHE),
-        biu_d_o       => biu_d       (CACHE),
-        biu_q_i       => biu_q       (CACHE),
-        biu_ack_i     => biu_ack     (CACHE),
-        biu_err_i     => biu_err     (CACHE)
+        biu_d_ack_i   => biu_d_ack (CACHE),
+        biu_adri_o    => biu_adri (CACHE),
+        biu_adro_i    => biu_adro (CACHE),
+        biu_size_o    => biu_size (CACHE),
+        biu_type_o    => biu_type (CACHE),
+        biu_lock_o    => biu_lock (CACHE),
+        biu_prot_o    => biu_prot (CACHE),
+        biu_we_o      => biu_we (CACHE),
+        biu_d_o       => biu_d (CACHE),
+        biu_q_i       => biu_q (CACHE),
+        biu_ack_i     => biu_ack (CACHE),
+        biu_err_i     => biu_err (CACHE)
       );
-  elsif (ICACHE_SIZE <= 0) generate  --No cache
+  elsif (ICACHE_SIZE <= 0) generate     --No cache
     cache_q   <= (others => '0');
     cache_ack <= '0';
     cache_err <= '0';
@@ -781,10 +781,10 @@ begin
 
   dext_inst : pu_riscv_dext
     generic map (
-      XLEN => XLEN,
-      PLEN => PLEN,  --Physical address bus size
-      DEPTH => 2  --number of instructions in flight
-    )
+      XLEN  => XLEN,
+      PLEN  => PLEN,                    --Physical address bus size
+      DEPTH => 2                        --number of instructions in flight
+      )
     port map (
       rst_ni => rst_ni,
       clk_i  => clk_i,
@@ -804,29 +804,29 @@ begin
       mem_ack_o     => ext_ack,
       mem_err_o     => ext_err,
 
-      biu_stb_o     => biu_stb     (EXT),
+      biu_stb_o     => biu_stb (EXT),
       biu_stb_ack_i => biu_stb_ack (EXT),
-      biu_adri_o    => biu_adri    (EXT),
-      biu_adro_i    => biu_adro    (EXT),
-      biu_size_o    => biu_size    (EXT),
-      biu_type_o    => biu_type    (EXT),
-      biu_lock_o    => biu_lock    (EXT),
-      biu_prot_o    => biu_prot    (EXT),
-      biu_we_o      => biu_we      (EXT),
-      biu_d_o       => biu_d       (EXT),
-      biu_q_i       => biu_q       (EXT),
-      biu_ack_i     => biu_ack     (EXT),
-      biu_err_i     => biu_err     (EXT)
+      biu_adri_o    => biu_adri (EXT),
+      biu_adro_i    => biu_adro (EXT),
+      biu_size_o    => biu_size (EXT),
+      biu_type_o    => biu_type (EXT),
+      biu_lock_o    => biu_lock (EXT),
+      biu_prot_o    => biu_prot (EXT),
+      biu_we_o      => biu_we (EXT),
+      biu_d_o       => biu_d (EXT),
+      biu_q_i       => biu_q (EXT),
+      biu_ack_i     => biu_ack (EXT),
+      biu_err_i     => biu_err (EXT)
     );
 
   --store virtual addresses for external access
   ext_vadr_queue_inst : pu_riscv_ram_queue
     generic map (
-      DEPTH => 8,
-      DBITS => XLEN,
-      ALMOST_FULL_THRESHOLD => 4,
+      DEPTH                  => 8,
+      DBITS                  => XLEN,
+      ALMOST_FULL_THRESHOLD  => 4,
       ALMOST_EMPTY_THRESHOLD => 0
-    )
+      )
     port map (
       rst_ni => rst_ni,
       clk_i  => clk_i,
@@ -850,10 +850,10 @@ begin
   --Hookup BIU mux
   pu_riscv_mux_inst : riscv_mux
     generic map (
-      XLEN => XLEN,
-      PLEN => PLEN,
+      XLEN  => XLEN,
+      PLEN  => PLEN,
       PORTS => MUX_PORTS
-    )
+      )
     port map (
       rst_ni => rst_ni,
       clk_i  => clk_i,
@@ -931,11 +931,11 @@ begin
   --Add some extra words for inflight instructions
   parcel_queue_inst : pu_riscv_ram_queue
     generic map (
-      DEPTH                 => 4+4,
-      DBITS                 => XLEN+PARCEL_SIZE*(1+1/16)+3,
-      ALMOST_FULL_THRESHOLD => 4,
+      DEPTH                  => 4+4,
+      DBITS                  => XLEN+PARCEL_SIZE*(1+1/16)+3,
+      ALMOST_FULL_THRESHOLD  => 4,
       ALMOST_EMPTY_THRESHOLD => 0
-    )
+      )
     port map (
       rst_ni => rst_ni,
       clk_i  => clk_i,

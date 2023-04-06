@@ -58,7 +58,7 @@ entity pu_riscv_bu is
     EXCEPTION_SIZE : integer := 16;
     BP_GLOBAL_BITS : integer := 2;
 
-    HAS_RVC : std_logic := '1';
+    HAS_RVC : std_logic                     := '1';
     PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
   );
   port (
@@ -99,7 +99,7 @@ entity pu_riscv_bu is
     du_we_pc : in std_logic;
     du_dato  : in std_logic_vector(XLEN-1 downto 0);
     du_ie    : in std_logic_vector(31 downto 0)
-    );
+  );
 end pu_riscv_bu;
 
 architecture rtl of pu_riscv_bu is
@@ -154,15 +154,15 @@ begin
       bu_exception <= (others => '0');
     elsif (rising_edge(clk)) then
       if (ex_stall = '0') then
-        if (bu_flush_o               = '1' or
-            st_flush                 = '1' or
-            reduce_or(ex_exception)  = '1' or
+        if (bu_flush_o = '1' or
+            st_flush = '1' or
+            reduce_or(ex_exception) = '1' or
             reduce_or(mem_exception) = '1' or
-            reduce_or(wb_exception)  = '1') then
+            reduce_or(wb_exception) = '1') then
           bu_exception <= (others => '0');
         elsif (du_stall = '0') then
           bu_exception <= id_exception;
-          exceptions := id_bubble & opcode;
+          exceptions   := id_bubble & opcode;
           case (exceptions) is
             when (OPC0_JALR) =>
               if (id_exception(CAUSE_MISALIGNED_INSTRUCTION) = '1' or has_rvc_s = '1') then
@@ -227,7 +227,7 @@ begin
         --This is really only for the debug unit, such that NPC points to the correct address
         btaken     <= '1';
         bp_update  <= '0';
-        pipeflush  <= '0';  --Handled in IF, do NOT flush here!!
+        pipeflush  <= '0';              --Handled in IF, do NOT flush here!!
         cacheflush <= '0';
         nxt_pc     <= std_logic_vector(unsigned(id_pc)+unsigned(immJ));
       when (JALR) =>

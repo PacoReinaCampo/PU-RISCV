@@ -45,40 +45,38 @@ import peripheral_biu_pkg::*;
 module pu_riscv_memmisaligned #(
   parameter XLEN    = 64,
   parameter HAS_RVC = 1
-)
-  (
-    input  wire               clk_i,
+) (
+  input wire clk_i,
 
-    //CPU side
-    input  wire               instruction_i,
-    input  wire               req_i,
-    input  wire  [XLEN  -1:0] adr_i,
-    input  wire  [       2:0] size_i,
+  //CPU side
+  input wire              instruction_i,
+  input wire              req_i,
+  input wire [XLEN  -1:0] adr_i,
+  input wire [       2:0] size_i,
 
-    //To memory subsystem
-    output reg                misaligned_o
-  );
+  //To memory subsystem
+  output reg misaligned_o
+);
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
   logic misaligned;
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
   always @(*) begin
-    if (instruction_i)
-      misaligned = (HAS_RVC != 0) ? adr_i[0] : |adr_i[1:0];
+    if (instruction_i) misaligned = (HAS_RVC != 0) ? adr_i[0] : |adr_i[1:0];
     else begin
       case (size_i)
-        BYTE    : misaligned = 1'b0;
-        HWORD   : misaligned =  adr_i[  0];
-        WORD    : misaligned = |adr_i[1:0];
-        DWORD   : misaligned = |adr_i[2:0];
-        default : misaligned = 1'b1;
+        BYTE:    misaligned = 1'b0;
+        HWORD:   misaligned = adr_i[0];
+        WORD:    misaligned = |adr_i[1:0];
+        DWORD:   misaligned = |adr_i[2:0];
+        default: misaligned = 1'b1;
       endcase
     end
   end

@@ -53,8 +53,8 @@ entity pu_riscv_bp is
 
     HAS_BPU : std_logic := '1';
 
-    BP_GLOBAL_BITS : integer := 2;
-    BP_LOCAL_BITS : integer := 10;
+    BP_GLOBAL_BITS    : integer := 2;
+    BP_LOCAL_BITS     : integer := 10;
     BP_LOCAL_BITS_LSB : integer := 2;
 
     TECHNOLOGY : string := "GENERIC";
@@ -86,7 +86,7 @@ architecture rtl of pu_riscv_bp is
     generic (
       ABITS      : integer := 10;
       DBITS      : integer := 32;
-      TECHNOLOGY : string := "GENERIC"
+      TECHNOLOGY : string  := "GENERIC"
     );
     port (
       rst_ni : in std_logic;
@@ -152,7 +152,7 @@ begin
       ABITS      => ADR_BITS,
       DBITS      => 2,
       TECHNOLOGY => TECHNOLOGY
-    )
+      )
     port map (
       rst_ni => rst_ni,
       clk_i  => clk_i,
@@ -169,5 +169,5 @@ begin
       dout_o  => old_prediction
     );
 
- bp_bp_predict_o <= old_prediction;
+  bp_bp_predict_o <= old_prediction;
 end rtl;

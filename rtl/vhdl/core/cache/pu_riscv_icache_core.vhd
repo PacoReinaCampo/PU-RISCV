@@ -68,7 +68,7 @@ entity pu_riscv_icache_core is
   port (
     rst_ni : in std_logic;
     clk_i  : in std_logic;
-    clr_i  : in std_logic;  --clear any pending request
+    clr_i  : in std_logic;              --clear any pending request
 
     --CPU side
     mem_vreq_i : in  std_logic;
@@ -85,20 +85,20 @@ entity pu_riscv_icache_core is
     flushrdy_i : in  std_logic;
 
     --To BIU
-    biu_stb_o     : out std_logic;  --access request
-    biu_stb_ack_i : in  std_logic;  --access acknowledge
-    biu_d_ack_i   : in  std_logic;  --BIU needs new data (biu_d_o)
+    biu_stb_o     : out std_logic;      --access request
+    biu_stb_ack_i : in  std_logic;      --access acknowledge
+    biu_d_ack_i   : in  std_logic;      --BIU needs new data (biu_d_o)
     biu_adri_o    : out std_logic_vector(PLEN-1 downto 0);  --access start address
     biu_adro_i    : in  std_logic_vector(PLEN-1 downto 0);
-    biu_size_o    : out std_logic_vector(2 downto 0);  --transfer size
-    biu_type_o    : out std_logic_vector(2 downto 0);  --burst type
-    biu_lock_o    : out std_logic;  --locked transfer
-    biu_prot_o    : out std_logic_vector(2 downto 0);  --protection bits
-    biu_we_o      : out std_logic;  --write enable
+    biu_size_o    : out std_logic_vector(2 downto 0);       --transfer size
+    biu_type_o    : out std_logic_vector(2 downto 0);       --burst type
+    biu_lock_o    : out std_logic;      --locked transfer
+    biu_prot_o    : out std_logic_vector(2 downto 0);       --protection bits
+    biu_we_o      : out std_logic;      --write enable
     biu_d_o       : out std_logic_vector(XLEN-1 downto 0);  --write data
     biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --read data
-    biu_ack_i     : in  std_logic;  --transfer acknowledge
-    biu_err_i     : in  std_logic  --transfer error
+    biu_ack_i     : in  std_logic;      --transfer acknowledge
+    biu_err_i     : in  std_logic       --transfer error
   );
 end pu_riscv_icache_core;
 
@@ -107,7 +107,7 @@ architecture rtl of pu_riscv_icache_core is
     generic (
       ABITS      : integer := 10;
       DBITS      : integer := 32;
-      TECHNOLOGY : string := "GENERIC"
+      TECHNOLOGY : string  := "GENERIC"
     );
     port (
       rst_ni : in std_logic;
@@ -393,7 +393,7 @@ begin
           end if;
         when FLUSH =>
           if (flushrdy_i = '1') then
-            memfsm_state <= RECOVER;  --allow to read new tag_idx
+            memfsm_state <= RECOVER;    --allow to read new tag_idx
             flushing     <= '0';
           end if;
         when WAIT4BIUCMD0 =>
@@ -476,7 +476,7 @@ begin
         ABITS      => IDX_BITS,
         DBITS      => TAG_BITS,
         TECHNOLOGY => TECHNOLOGY
-      )
+        )
       port map (
         rst_ni => rst_ni,
         clk_i  => clk_i,
@@ -518,20 +518,20 @@ begin
     way_hit(way) <= tag_out_valid(way) and to_stdlogic(core_tag = way_compare(way));
 
     way_compare(way) <= tag_byp_tag(way)
-                     when (tag_idx_dly = tag_byp_idx(way)) else tag_out_tag(way);
+                        when (tag_idx_dly = tag_byp_idx(way)) else tag_out_tag(way);
   end generate;
 
   -- Generate 'hit'
-  cache_hit <= reduce_or(way_hit);  -- & mem_vreq_dly;
+  cache_hit <= reduce_or(way_hit);      -- & mem_vreq_dly;
 
   --DATA
   generating_1 : for way in 0 to ICACHE_WAYS - 1 generate
     data_ram : pu_riscv_ram_1rw
       generic map (
-        ABITS      =>IDX_BITS,
-        DBITS      =>BLK_BITS,
+        ABITS      => IDX_BITS,
+        DBITS      => BLK_BITS,
         TECHNOLOGY => TECHNOLOGY
-      )
+        )
       port map (
         rst_ni => rst_ni,
         clk_i  => clk_i,
@@ -553,7 +553,7 @@ begin
 
 --get requested data (XLEN-size) from way_q_mux(BLK_BITS-size)
   --in_biubuffer <= to_stdlogic(biu_adri_hold(PLEN-1 downto BLK_OFF_BITS) = (mem_padr_dly(PLEN-1 downto BLK_OFF_BITS) and std_logic_vector(unsigned(biu_buffer_valid(PLEN+BLK_OFF_BITS-1 downto 0)) srl to_integer(unsigned(dat_offset)))))
-                  --when mem_preq_dly = '1' else to_stdlogic(biu_adri_hold(PLEN-1 downto BLK_OFF_BITS) = (mem_padr_i(PLEN-1 downto BLK_OFF_BITS) and std_logic_vector(unsigned(biu_buffer_valid(PLEN+BLK_OFF_BITS-1 downto 0)) srl to_integer(unsigned(dat_offset)))));
+  --when mem_preq_dly = '1' else to_stdlogic(biu_adri_hold(PLEN-1 downto BLK_OFF_BITS) = (mem_padr_i(PLEN-1 downto BLK_OFF_BITS) and std_logic_vector(unsigned(biu_buffer_valid(PLEN+BLK_OFF_BITS-1 downto 0)) srl to_integer(unsigned(dat_offset)))));
 
   cache_biu <= biu_buffer
                when in_biubuffer = '1' else way_q_mux(ICACHE_WAYS-1);
@@ -586,14 +586,14 @@ begin
   --FILL / WRITE_WAYS use fill_way_select 1 cycle later
   --processing_12 : process (clk_i)
   --begin
-    --if (rising_edge(clk_i)) then
-      --case (memfsm_state) is
-        --when ARMED =>
-          --fill_way_select_hold <= fill_way_select;
-        --when others =>
-          --null;
-      --end case;
-    --end if;
+  --if (rising_edge(clk_i)) then
+  --case (memfsm_state) is
+  --when ARMED =>
+  --fill_way_select_hold <= fill_way_select;
+  --when others =>
+  --null;
+  --end case;
+  --end if;
   --end process;
 
   --TAG Index
@@ -722,7 +722,7 @@ begin
   --DAT Write Data
   processing_20 : process (biu_adro_i, biu_buffer, biu_q_i)
   begin
-    dat_in <= biu_buffer;  --dat_in = biu_buffer
+    dat_in                                                                                                                                                                                              <= biu_buffer;  --dat_in = biu_buffer
     dat_in(to_integer(unsigned(biu_adro_i(BLK_OFF_BITS+DAT_OFF_BITS-1 downto BLK_OFF_BITS)))*XLEN+XLEN-1 downto to_integer(unsigned(biu_adro_i(BLK_OFF_BITS+DAT_OFF_BITS-1 downto BLK_OFF_BITS)))*XLEN) <= biu_q_i;  --except for last transaction
   end process;
 
@@ -751,14 +751,14 @@ begin
               --read a way from main memory
               if (biu_stb_ack_i = '1') then
                 biufsm_state <= BURST;
-              else  --BIU is not ready to start a new transfer
+              else                 --BIU is not ready to start a new transfer
                 biufsm_state <= WAIT4BIU;
               end if;
             when WRITE_WAY =>
               --write way back to main memory
               if (biu_stb_ack_i = '1') then
                 biufsm_state <= BURST;
-              else  --BIU is not ready to start a new transfer
+              else                 --BIU is not ready to start a new transfer
                 biufsm_state <= WAIT4BIU;
               end if;
             when others =>
@@ -792,7 +792,7 @@ begin
           --latch incoming data when transfer-acknowledged
           if (biu_ack_i = '1') then
             biu_buffer(to_integer(unsigned(biu_adro_i(BLK_OFF_BITS+DAT_OFF_BITS-1 downto BLK_OFF_BITS)))*XLEN+XLEN-1 downto to_integer(unsigned(biu_adro_i(BLK_OFF_BITS+DAT_OFF_BITS-1 downto BLK_OFF_BITS)))*XLEN) <= biu_q_i;
-            biu_buffer_valid(to_integer(unsigned(biu_adro_i(BLK_OFF_BITS+DAT_OFF_BITS-1 downto BLK_OFF_BITS)))) <= '1';
+            biu_buffer_valid(to_integer(unsigned(biu_adro_i(BLK_OFF_BITS+DAT_OFF_BITS-1 downto BLK_OFF_BITS))))                                                                                                     <= '1';
           end if;
         when others =>
           null;
@@ -837,10 +837,10 @@ begin
   biufsm_err <= biu_err_i;
 
   --output BIU signals asynchronously for speed reasons. BIU will synchronize ...
-  biu_d  <= (others => '0');
+  biu_d    <= (others => '0');
   biu_we_o <= '0';
 
-  biu_d_o  <= biu_d;
+  biu_d_o <= biu_d;
 
   processing_25 : process (biu_adri_hold, biucmd, biufsm_state, mem_padr_dly)
   begin
@@ -848,24 +848,24 @@ begin
       when IDLE =>
         case ((biucmd)) is
           when NOP =>
-            biu_stb_o  <= '0';
-            biu_adri <= (others => 'X');
+            biu_stb_o <= '0';
+            biu_adri  <= (others => 'X');
           when READ_WAY =>
-            biu_stb_o  <= '1';
-            biu_adri <= (mem_padr_dly(PLEN-1 downto BURST_LSB) & (BURST_LSB-1 downto 0 => '0'));
+            biu_stb_o <= '1';
+            biu_adri  <= (mem_padr_dly(PLEN-1 downto BURST_LSB) & (BURST_LSB-1 downto 0 => '0'));
           when others =>
             null;
         end case;
       when WAIT4BIU =>
         --stretch biu_*_o signals until BIU acknowledges strobe
-        biu_stb_o  <= '1';
-        biu_adri <= biu_adri_hold;
+        biu_stb_o <= '1';
+        biu_adri  <= biu_adri_hold;
       when BURST =>
-        biu_stb_o  <= '0';
-        biu_adri <= (others => 'X');  --don't care
+        biu_stb_o <= '0';
+        biu_adri  <= (others => 'X');   --don't care
       when others =>
-        biu_stb_o  <= '0';
-        biu_adri <= (others => 'X');  --don't care
+        biu_stb_o <= '0';
+        biu_adri  <= (others => 'X');   --don't care
     end case;
   end process;
 

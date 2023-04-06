@@ -125,7 +125,7 @@ entity pu_riscv_id is
     --from MEM/WB
     mem_r : in std_logic_vector(XLEN-1 downto 0);
     wb_r  : in std_logic_vector(XLEN-1 downto 0)
-    );
+  );
 end pu_riscv_id;
 
 architecture rtl of pu_riscv_id is
@@ -150,9 +150,9 @@ architecture rtl of pu_riscv_id is
   signal if_func3 : std_logic_vector(2 downto 0);
   signal if_func7 : std_logic_vector(6 downto 0);
 
-  signal xlen_s     : std_logic;  --Current CPU state XLEN
-  signal xlen64     : std_logic;  --Is the CPU state set to RV64?
-  signal xlen32     : std_logic;  --Is the CPU state set to RV32?
+  signal xlen_s     : std_logic;        --Current CPU state XLEN
+  signal xlen64     : std_logic;        --Is the CPU state set to RV64?
+  signal xlen32     : std_logic;        --Is the CPU state set to RV32?
   signal has_fpu_s  : std_logic;
   signal has_muldiv : std_logic;
   signal has_amo    : std_logic;

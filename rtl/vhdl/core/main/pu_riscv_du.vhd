@@ -109,7 +109,7 @@ entity pu_riscv_du is
 
     --From state
     du_exceptions : in std_logic_vector(31 downto 0)
-    );
+  );
 end pu_riscv_du;
 
 architecture rtl of pu_riscv_du is
@@ -194,9 +194,9 @@ begin
       du_ack <= (others => '0');
     elsif (rising_edge(clk)) then
       if (ex_stall = '0') then
-        du_ack <= ( (du_access and not du_ack(0)) &
-                    (du_access and not du_ack(0)) &
-                    (du_access and not du_ack(0)) ) and ('1' & du_ack(2 downto 1));
+        du_ack <= ((du_access and not du_ack(0)) &
+                   (du_access and not du_ack(0)) &
+                   (du_access and not du_ack(0))) and ('1' & du_ack(2 downto 1));
       end if;
     end if;
   end process;
@@ -251,7 +251,7 @@ begin
 
   -- Return signals
   processing_5 : process (dbg_bp_hit, dbg_branch_break_ena, dbg_branch_break_hit, dbg_causes, dbg_cc, dbg_data, dbg_enabled, dbg_ies, dbg_implemented, dbg_instr_break_ena, dbg_instr_break_hit, du_addr_sgn)
-    begin
+  begin
     case (du_addr_sgn) is
       when DBG_CTRL =>
         du_internal_regs <= ((XLEN-1 downto 2 => '0') & dbg_branch_break_ena & dbg_instr_break_ena);

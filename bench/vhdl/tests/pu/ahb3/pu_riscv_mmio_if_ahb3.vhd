@@ -57,7 +57,7 @@ entity pu_riscv_mmio_if_ahb3 is
 
     TOHOST  : std_logic_vector(63 downto 0) := X"0000000080001000";
     UART_TX : std_logic_vector(63 downto 0) := X"0000000080001080"
-    );
+  );
   port (
     HRESETn : in std_logic;
     HCLK    : in std_logic;
@@ -72,7 +72,7 @@ entity pu_riscv_mmio_if_ahb3 is
 
     HREADYOUT : out std_logic;
     HRESP     : out std_logic
-    );
+  );
 end pu_riscv_mmio_if_ahb3;
 
 architecture rtl of pu_riscv_mmio_if_ahb3 is
@@ -145,7 +145,7 @@ begin
   begin
     if (rising_edge(HCLK)) then
       if (catch_uart_tx = '1') then
-        --write(data_reg);
+      --write(data_reg);
       end if;
     end if;
   end process;
@@ -163,7 +163,7 @@ begin
             report "* PASSED " & to_string(data_reg);
           else
             report "* FAILED: code: " & integer'image(to_integer(unsigned(data_reg) srl 1))
-                                      & integer'image(to_integer(unsigned(data_reg) srl 1));
+              & integer'image(to_integer(unsigned(data_reg) srl 1));
           end if;
         else
           report "* FAILED: watchdog count reached " & integer'image(watchdog_cnt);

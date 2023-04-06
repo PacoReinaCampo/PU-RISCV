@@ -47,43 +47,42 @@ module pu_riscv_memory #(
   parameter EXCEPTION_SIZE = 16,
 
   parameter [XLEN-1:0] PC_INIT = 'h8000_0000
-)
-  (
-    input                           rstn,
-    input                           clk,
+) (
+  input rstn,
+  input clk,
 
-    input                           wb_stall,
+  input wb_stall,
 
-    //Program counter
-    input      [XLEN          -1:0] ex_pc,
-    output reg [XLEN          -1:0] mem_pc,
+  //Program counter
+  input      [XLEN          -1:0] ex_pc,
+  output reg [XLEN          -1:0] mem_pc,
 
-    //Instruction
-    input                           ex_bubble,
-    input      [ILEN          -1:0] ex_instr,
-    output reg                      mem_bubble,
-    output reg [ILEN          -1:0] mem_instr,
+  //Instruction
+  input                           ex_bubble,
+  input      [ILEN          -1:0] ex_instr,
+  output reg                      mem_bubble,
+  output reg [ILEN          -1:0] mem_instr,
 
-    input      [EXCEPTION_SIZE-1:0] ex_exception,
-    input      [EXCEPTION_SIZE-1:0] wb_exception,
-    output reg [EXCEPTION_SIZE-1:0] mem_exception,
+  input      [EXCEPTION_SIZE-1:0] ex_exception,
+  input      [EXCEPTION_SIZE-1:0] wb_exception,
+  output reg [EXCEPTION_SIZE-1:0] mem_exception,
 
-    //From EX
-    input      [XLEN          -1:0] ex_r,
-                                  dmem_adr,
-    //To WB
-    output reg [XLEN          -1:0] mem_r,
-    output reg [XLEN          -1:0] mem_memadr
-  );
+  //From EX
+  input      [XLEN          -1:0] ex_r,
+  dmem_adr,
+  //To WB
+  output reg [XLEN          -1:0] mem_r,
+  output reg [XLEN          -1:0] mem_memadr
+);
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
 
   //Program Counter
   always @(posedge clk, negedge rstn) begin
-    if      (!rstn    ) mem_pc <= PC_INIT;
+    if (!rstn) mem_pc <= PC_INIT;
     else if (!wb_stall) mem_pc <= ex_pc;
   end
 
@@ -93,7 +92,7 @@ module pu_riscv_memory #(
   end
 
   always @(posedge clk, negedge rstn) begin
-    if      (!rstn    ) mem_bubble <= 1'b1;
+    if (!rstn) mem_bubble <= 1'b1;
     else if (!wb_stall) mem_bubble <= ex_bubble;
   end
 
@@ -108,9 +107,8 @@ module pu_riscv_memory #(
 
   //Exception
   always @(posedge clk, negedge rstn) begin
-    if      (!rstn    )     mem_exception <= 'h0;
-    else if (|mem_exception ||
-             |wb_exception) mem_exception <= 'h0;
-    else if (!wb_stall)     mem_exception <= ex_exception;
+    if (!rstn) mem_exception <= 'h0;
+    else if (|mem_exception || |wb_exception) mem_exception <= 'h0;
+    else if (!wb_stall) mem_exception <= ex_exception;
   end
 endmodule

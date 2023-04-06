@@ -63,14 +63,14 @@ entity pu_riscv_pmachk is
     pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
     --Memory Access
-    instruction_i : in std_logic;  --This is an instruction access
-    req_i         : in std_logic;  --Memory access requested
+    instruction_i : in std_logic;       --This is an instruction access
+    req_i         : in std_logic;       --Memory access requested
     adr_i         : in std_logic_vector(PLEN-1 downto 0);  --Physical Memory address (i.e. after translation)
-    size_i        : in std_logic_vector(2 downto 0);  --Transfer size
-    lock_i        : in std_logic;  --AMO : TODO: specify AMO type
+    size_i        : in std_logic_vector(2 downto 0);       --Transfer size
+    lock_i        : in std_logic;       --AMO : TODO: specify AMO type
     we_i          : in std_logic;
 
-    misaligned_i : in std_logic;  --Misaligned access
+    misaligned_i : in std_logic;        --Misaligned access
 
     --Output
     pma_o             : out std_logic_vector(13 downto 0);
@@ -112,7 +112,7 @@ architecture rtl of pu_riscv_pmachk is
 
   --Lower and Upper bounds for NA4/NAPOT
   function napot_lb (
-    na4    : std_logic;  --special case na4
+    na4    : std_logic;                 --special case na4
     pmaddr : std_logic_vector(PLEN-1 downto 2)
     ) return std_logic_vector is
     variable n               : integer;
@@ -145,9 +145,9 @@ architecture rtl of pu_riscv_pmachk is
   end napot_lb;
 
   function napot_ub (
-    na4    : std_logic;  --special case na4
+    na4    : std_logic;                 --special case na4
     pmaddr : std_logic_vector(PLEN-1 downto 2)
-  ) return std_logic_vector is
+    ) return std_logic_vector is
     variable n               : integer;
     variable truth           : std_logic;
     variable mask            : std_logic_vector(PLEN-1 downto 2);
@@ -195,7 +195,7 @@ architecture rtl of pu_riscv_pmachk is
     --  *   match_none = (access_lb >= pma_ub) OR (access_ub < pma_lb)  (1)
     --  *   match_any  = !match_none                                    (2)
 
-    if (access_lb >= pma_ub) or (access_ub <  pma_lb) then
+    if (access_lb >= pma_ub) or (access_ub < pma_lb) then
       match_any_return := '0';
     else
       match_any_return := '1';
@@ -214,7 +214,7 @@ architecture rtl of pu_riscv_pmachk is
     ) return std_logic is
     variable match_all_return : std_logic;
   begin
-    if (access_lb >= pma_lb) or (access_ub <  pma_ub) then
+    if (access_lb >= pma_lb) or (access_ub < pma_ub) then
       match_all_return := '0';
     else
       match_all_return := '1';
@@ -226,8 +226,8 @@ architecture rtl of pu_riscv_pmachk is
   --get highest priority (==lowest number) PMA that matches
   function highest_priority_match (
     m : std_logic_vector(PMA_CNT-1 downto 0)
-  ) return integer is
-    variable n : integer;
+    ) return integer is
+    variable n                             : integer;
     variable highest_priority_match_return : integer;
   begin
     highest_priority_match_return := 0;  --default value
@@ -243,19 +243,19 @@ architecture rtl of pu_riscv_pmachk is
   ------------------------------------------------------------------------------
   -- Variables
   ------------------------------------------------------------------------------
-  signal access_ub         : std_logic_vector(PLEN-1 downto 0);
-  signal access_lb         : std_logic_vector(PLEN-1 downto 0);
-  signal pma_ub            : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 2);
-  signal pma_lb            : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 2);
-  signal pma_match         : std_logic_vector(PMA_CNT-1 downto 0);
-  signal pma_match_all     : std_logic_vector(PMA_CNT-1 downto 0);
-  signal matched_pma_idx   : std_logic_vector(PLEN-1 downto 0);
-  signal pmacfg            : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
-  signal matched_pma       : std_logic_vector(13 downto 0);
+  signal access_ub       : std_logic_vector(PLEN-1 downto 0);
+  signal access_lb       : std_logic_vector(PLEN-1 downto 0);
+  signal pma_ub          : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 2);
+  signal pma_lb          : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 2);
+  signal pma_match       : std_logic_vector(PMA_CNT-1 downto 0);
+  signal pma_match_all   : std_logic_vector(PMA_CNT-1 downto 0);
+  signal matched_pma_idx : std_logic_vector(PLEN-1 downto 0);
+  signal pmacfg          : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
+  signal matched_pma     : std_logic_vector(13 downto 0);
 
   --Outputto 0);
-  signal exception         : std_logic;
-  signal misaligned        : std_logic;
+  signal exception  : std_logic;
+  signal misaligned : std_logic;
 
 begin
   ------------------------------------------------------------------------------
@@ -340,9 +340,9 @@ begin
 
   --Access/Misaligned Exception
   exception <= req_i and (reduce_nor(pma_match_all) or  -- no memory range matched
-            (instruction_i and not matched_pma(09)) or  -- not executable
-                     (we_i and not matched_pma(10)) or  -- not writeable
-                 (not we_i and not matched_pma(11)));   -- not readable
+                          (instruction_i and not matched_pma(09)) or  -- not executable
+                          (we_i and not matched_pma(10)) or  -- not writeable
+                          (not we_i and not matched_pma(11)));  -- not readable
 
   exception_o <= exception;
 

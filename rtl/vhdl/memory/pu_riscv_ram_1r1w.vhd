@@ -51,7 +51,7 @@ entity pu_riscv_ram_1r1w is
   generic (
     ABITS      : integer := 10;
     DBITS      : integer := 32;
-    TECHNOLOGY : string := "GENERIC"
+    TECHNOLOGY : string  := "GENERIC"
   );
   port (
     rst_ni : in std_logic;
@@ -111,7 +111,7 @@ begin
       generic map (
         ABITS => ABITS,
         DBITS => DBITS
-      )
+        )
       port map (
         rst_ni => rst_ni,
         clk_i  => clk_i,

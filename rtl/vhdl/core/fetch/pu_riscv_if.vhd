@@ -60,8 +60,8 @@ entity pu_riscv_if is
     PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
   );
   port (
-    rstn     : in std_logic;  --Reset
-    clk      : in std_logic;  --Clock
+    rstn     : in std_logic;            --Reset
+    clk      : in std_logic;            --Clock
     id_stall : in std_logic;
 
     if_stall_nxt_pc      : in std_logic;
@@ -79,9 +79,9 @@ entity pu_riscv_if is
     bp_bp_predict : in  std_logic_vector(1 downto 0);  --Branch Prediction bits
     if_bp_predict : out std_logic_vector(1 downto 0);  --push down the pipe
 
-    bu_flush : in std_logic;  --flush pipe & load new program counter
+    bu_flush : in std_logic;            --flush pipe & load new program counter
     st_flush : in std_logic;
-    du_flush : in std_logic;  --flush pipe after debug exit
+    du_flush : in std_logic;            --flush pipe after debug exit
 
     bu_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  --Branch Unit Next Program Counter
     st_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  --State Next Program Counter
@@ -90,7 +90,7 @@ entity pu_riscv_if is
     if_stall  : out std_logic;  --stall instruction fetch BIU (cache/bus-interface)
     if_flush  : out std_logic;  --flush instruction fetch BIU (cache/bus-interface)
     if_pc     : out std_logic_vector(XLEN-1 downto 0)   --Program Counter
-    );
+  );
 end pu_riscv_if;
 
 architecture rtl of pu_riscv_if is
@@ -105,7 +105,7 @@ architecture rtl of pu_riscv_if is
   --logic is_48bit_instruction;
   --logic is_64bit_instruction;
 
-  signal flushes : std_logic;  --OR all flush signals
+  signal flushes : std_logic;           --OR all flush signals
 
   signal parcel_shift_register : std_logic_vector(2*ILEN-1 downto 0);
   signal new_parcel            : std_logic_vector(ILEN-1 downto 0);
@@ -169,7 +169,7 @@ begin
       --else if (!id_stall)
       elsif (branch_taken = '1') then
         if_nxt_pc_o <= branch_pc;
-      elsif (if_stall_nxt_pc = '0') then   --if_stall_nxt_pc
+      elsif (if_stall_nxt_pc = '0') then             --if_stall_nxt_pc
         if_nxt_pc_o <= std_logic_vector(unsigned(if_nxt_pc_o)+X"0000000000000004");
       end if;
     end if;
@@ -321,7 +321,7 @@ begin
       when others =>
         if (is_32bit_instruction = '1') then
           pd_instr <= active_parcel;
-        else  --Illegal
+        else                            --Illegal
           pd_instr <= std_logic_vector(to_signed(-1, ILEN));
         end if;
     end case;

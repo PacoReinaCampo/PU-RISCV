@@ -47,36 +47,34 @@ module pu_riscv_mmio_if_ahb3 #(
   parameter HADDR_SIZE    = 32,
   parameter CATCH_TEST    = 80001000,
   parameter CATCH_UART_TX = 80001080
-)
-  (
-    input                       HRESETn,
-    input                       HCLK,
+) (
+  input HRESETn,
+  input HCLK,
 
-    input      [           1:0] HTRANS,
-    input      [HADDR_SIZE-1:0] HADDR,
-    input                       HWRITE,
-    input      [           2:0] HSIZE,
-    input      [           2:0] HBURST,
-    input      [HDATA_SIZE-1:0] HWDATA,
-    output reg [HDATA_SIZE-1:0] HRDATA,
+  input      [           1:0] HTRANS,
+  input      [HADDR_SIZE-1:0] HADDR,
+  input                       HWRITE,
+  input      [           2:0] HSIZE,
+  input      [           2:0] HBURST,
+  input      [HDATA_SIZE-1:0] HWDATA,
+  output reg [HDATA_SIZE-1:0] HRDATA,
 
-    output reg                  HREADYOUT,
-    output                      HRESP    
-  );
+  output reg HREADYOUT,
+  output     HRESP
+);
 
   ////////////////////////////////////////////////////////////////
   //
   // Variables
   //
   logic [HDATA_SIZE-1:0] data_reg;
-  logic                  catch_test,
-                         catch_uart_tx;
+  logic catch_test, catch_uart_tx;
 
-  logic [           1:0] dHTRANS;
-  logic [HADDR_SIZE-1:0] dHADDR;
-  logic                  dHWRITE;
+  logic   [           1:0] dHTRANS;
+  logic   [HADDR_SIZE-1:0] dHADDR;
+  logic                    dHWRITE;
 
-  integer watchdog_cnt;
+  integer                  watchdog_cnt;
 
   ////////////////////////////////////////////////////////////////
   //
@@ -96,9 +94,9 @@ module pu_riscv_mmio_if_ahb3 #(
   //
 
   //Generate watchdog counter
-  always @(posedge HCLK,negedge HRESETn) begin
+  always @(posedge HCLK, negedge HRESETn) begin
     if (!HRESETn) watchdog_cnt <= 0;
-    else          watchdog_cnt <= watchdog_cnt + 1;
+    else watchdog_cnt <= watchdog_cnt + 1;
   end
 
   //Catch write to host address
@@ -110,20 +108,18 @@ module pu_riscv_mmio_if_ahb3 #(
     dHWRITE <= HWRITE;
   end
 
-  always @(posedge HCLK,negedge HRESETn) begin
+  always @(posedge HCLK, negedge HRESETn) begin
     if (!HRESETn) begin
       HREADYOUT <= 1'b1;
-    end
-    else if (HTRANS == HTRANS_IDLE) begin
+    end else if (HTRANS == HTRANS_IDLE) begin
     end
   end
 
-  always @(posedge HCLK,negedge HRESETn) begin
+  always @(posedge HCLK, negedge HRESETn) begin
     if (!HRESETn) begin
       catch_test    <= 1'b0;
       catch_uart_tx <= 1'b0;
-    end
-    else begin
+    end else begin
       catch_test    <= dHTRANS == HTRANS_NONSEQ && dHWRITE && dHADDR == CATCH_TEST;
       catch_uart_tx <= dHTRANS == HTRANS_NONSEQ && dHWRITE && dHADDR == CATCH_UART_TX;
       data_reg      <= HWDATA;
@@ -133,7 +129,7 @@ module pu_riscv_mmio_if_ahb3 #(
 
   //Simulated UART Tx (prints characters on screen)
   always @(posedge HCLK) begin
-    if (catch_uart_tx) $write ("%0c", data_reg);
+    if (catch_uart_tx) $write("%0c", data_reg);
   end
   //Tests ...
   always @(posedge HCLK) begin
@@ -142,13 +138,9 @@ module pu_riscv_mmio_if_ahb3 #(
       $display("-------------------------------------------------------------");
       $display("* RISC-V test bench finished");
       if (data_reg[0] == 1'b1) begin
-        if (~|data_reg[HDATA_SIZE-1:1])
-          $display("* PASSED %0d", data_reg);
-        else
-          $display ("* FAILED: code: 0x%h (%0d: %s)", data_reg >> 1, data_reg >> 1, hostcode_to_string(data_reg >> 1) );
-      end
-      else
-        $display ("* FAILED: watchdog count reached (%0d) @%0t", watchdog_cnt, $time);
+        if (~|data_reg[HDATA_SIZE-1:1]) $display("* PASSED %0d", data_reg);
+        else $display("* FAILED: code: 0x%h (%0d: %s)", data_reg >> 1, data_reg >> 1, hostcode_to_string(data_reg >> 1));
+      end else $display("* FAILED: watchdog count reached (%0d) @%0t", watchdog_cnt, $time);
       $display("-------------------------------------------------------------");
       $display("\n");
 

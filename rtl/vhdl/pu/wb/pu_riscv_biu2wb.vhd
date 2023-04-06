@@ -75,7 +75,7 @@ entity pu_riscv_biu2wb is
     wb_rty_i : in  std_logic_vector(2 downto 0);
 
     --BIU Bus (Core ports)
-    biu_stb_i     : in  std_logic;  --strobe
+    biu_stb_i     : in  std_logic;      --strobe
     biu_stb_ack_o : out std_logic;  --strobe acknowledge; can send new strobe
     biu_d_ack_o   : out std_logic;  --data acknowledge (send new biu_d_i); for pipelined buses
     biu_adri_i    : in  std_logic_vector(PLEN-1 downto 0);
@@ -87,9 +87,9 @@ entity pu_riscv_biu2wb is
     biu_we_i      : in  std_logic;
     biu_d_i       : in  std_logic_vector(XLEN-1 downto 0);
     biu_q_o       : out std_logic_vector(XLEN-1 downto 0);
-    biu_ack_o     : out std_logic;  --transfer acknowledge
-    biu_err_o     : out std_logic  --transfer error
-    );
+    biu_ack_o     : out std_logic;      --transfer acknowledge
+    biu_err_o     : out std_logic       --transfer error
+  );
 end pu_riscv_biu2wb;
 
 architecture rtl of pu_riscv_biu2wb is
@@ -98,7 +98,7 @@ architecture rtl of pu_riscv_biu2wb is
   ------------------------------------------------------------------------------
   function biu_size2hsize (
     size : std_logic_vector(2 downto 0)
-  ) return std_logic_vector is
+    ) return std_logic_vector is
     variable biu_size2hsize_return : std_logic_vector (2 downto 0);
   begin
     case ((size)) is
@@ -120,7 +120,7 @@ architecture rtl of pu_riscv_biu2wb is
   --convert burst type to counter length (actually length -1)
   function biu_type2cnt (
     biu_type : std_logic_vector(2 downto 0)
-  ) return std_logic_vector is
+    ) return std_logic_vector is
     variable biu_type2cnt_return : std_logic_vector (3 downto 0);
   begin
     case ((biu_type)) is
@@ -150,7 +150,7 @@ architecture rtl of pu_riscv_biu2wb is
   --convert burst type to counter length (actually length -1)
   function biu_type2hburst (
     biu_type : std_logic_vector(2 downto 0)
-  ) return std_logic_vector is
+    ) return std_logic_vector is
     variable biu_type2hburst_return : std_logic_vector (2 downto 0);
   begin
     case ((biu_type)) is
@@ -180,7 +180,7 @@ architecture rtl of pu_riscv_biu2wb is
   --convert burst type to counter length (actually length -1)
   function biu_prot2hprot (
     biu_prot : std_logic_vector(2 downto 0)
-  ) return std_logic_vector is
+    ) return std_logic_vector is
     variable biu_prot2hprot_return     : std_logic_vector (3 downto 0);
     variable biu_prot2hprot_privileged : std_logic_vector (3 downto 0);
     variable biu_prot2hprot_cacheable  : std_logic_vector (3 downto 0);
@@ -213,8 +213,8 @@ architecture rtl of pu_riscv_biu2wb is
   --convert burst type to counter length (actually length -1)
   function nxt_addr (
     addr   : std_logic_vector(PLEN-1 downto 0);  --current address
-    hburst : std_logic_vector(2 downto 0)  --AHB HBURST
-  ) return std_logic_vector is
+    hburst : std_logic_vector(2 downto 0)        --AHB HBURST
+    ) return std_logic_vector is
     variable nxt_addr_return : std_logic_vector (PLEN-1 downto 0);
   begin
     --next linear address
@@ -275,7 +275,7 @@ begin
       wb_stb_o <= '0';
       wb_adr_o <= (others => '0');
       wb_we_o  <= '0';
-      wb_cti_o <= (others => '0');  --dont care
+      wb_cti_o <= (others => '0');      --dont care
       wb_sel_o <= HPROT_DATA or HPROT_PRIVILEGED or HPROT_NON_BUFFERABLE or HPROT_NON_CACHEABLE;
       wb_bte_o <= HTRANS_IDLE;
       wb_cyc_o <= '0';
@@ -299,19 +299,19 @@ begin
           else
             data_ena <= '0';
             wb_stb_o <= '0';
-            wb_bte_o <= HTRANS_IDLE;  --no new transfer
+            wb_bte_o <= HTRANS_IDLE;    --no new transfer
             wb_cyc_o <= biu_lock_i;
           end if;
-        else  --continue burst
+        else                            --continue burst
           data_ena  <= '1';
           burst_cnt <= std_logic_vector(unsigned(burst_cnt)-to_unsigned(1, 4));
 
-          wb_bte_o <= HTRANS_SEQ;  --continue burst
+          wb_bte_o <= HTRANS_SEQ;                    --continue burst
           wb_adr_o <= nxt_addr(wb_adr_o, wb_cti_o);  --next address
         end if;
       --error response
       elsif (wb_err_i = HRESP_ERROR) then
-        burst_cnt <= (others => '0');  --burst done (interrupted)
+        burst_cnt <= (others => '0');                --burst done (interrupted)
 
         wb_stb_o <= '0';
         wb_bte_o <= HTRANS_IDLE;

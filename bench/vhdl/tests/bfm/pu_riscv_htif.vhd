@@ -52,7 +52,7 @@ use work.vhdl_pkg.all;
 entity pu_riscv_htif is
   generic (
     XLEN : integer := 32
-    );
+  );
   port (
     rstn : in std_logic;
     clk  : in std_logic;
@@ -62,7 +62,7 @@ entity pu_riscv_htif is
     host_csr_we       : out std_logic;
     host_csr_tohost   : in  std_logic_vector(XLEN-1 downto 0);
     host_csr_fromhost : out std_logic_vector(XLEN-1 downto 0)
-    );
+  );
 end pu_riscv_htif;
 
 architecture rtl of pu_riscv_htif is
@@ -97,8 +97,7 @@ begin
           if (reduce_nor(host_csr_tohost(XLEN-1 downto 1)) = '1') then
             report "* PASSED " & to_string(host_csr_tohost);
           else
-            report "* FAILED: code: " & integer'image(to_integer(unsigned(host_csr_tohost) srl 1))
-                                      & integer'image(to_integer(unsigned(host_csr_tohost) srl 1));
+            report "* FAILED: code: " & integer'image(to_integer(unsigned(host_csr_tohost) srl 1)) & integer'image(to_integer(unsigned(host_csr_tohost) srl 1));
           end if;
         else
           report "* FAILED: watchdog count reached " & integer'image(watchdog_cnt);

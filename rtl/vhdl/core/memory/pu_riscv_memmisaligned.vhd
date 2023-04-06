@@ -53,7 +53,7 @@ use work.vhdl_pkg.all;
 
 entity pu_riscv_memmisaligned is
   generic (
-    XLEN    : integer := 64;
+    XLEN    : integer   := 64;
     HAS_RVC : std_logic := '1'
   );
   port (
@@ -67,7 +67,7 @@ entity pu_riscv_memmisaligned is
 
     --To memory subsystem
     misaligned_o : out std_logic
-    );
+  );
 end pu_riscv_memmisaligned;
 
 architecture rtl of pu_riscv_memmisaligned is

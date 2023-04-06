@@ -43,39 +43,39 @@
 package peripheral_biu_pkg;
 
   //BIU Constants Package
-  localparam BYTE       = 3'b000;
-  localparam HWORD      = 3'b001;
-  localparam WORD       = 3'b010;
-  localparam DWORD      = 3'b011;
-  localparam QWORD      = 3'b100;
+  localparam BYTE = 3'b000;
+  localparam HWORD = 3'b001;
+  localparam WORD = 3'b010;
+  localparam DWORD = 3'b011;
+  localparam QWORD = 3'b100;
   localparam UNDEF_SIZE = 3'bxxx;
 
-  localparam SINGLE      = 3'b000;
-  localparam INCR        = 3'b001;
-  localparam WRAP4       = 3'b010;
-  localparam INCR4       = 3'b011;
-  localparam WRAP8       = 3'b100;
-  localparam INCR8       = 3'b101;
-  localparam WRAP16      = 3'b110;
-  localparam INCR16      = 3'b111;
+  localparam SINGLE = 3'b000;
+  localparam INCR = 3'b001;
+  localparam WRAP4 = 3'b010;
+  localparam INCR4 = 3'b011;
+  localparam WRAP8 = 3'b100;
+  localparam INCR8 = 3'b101;
+  localparam WRAP16 = 3'b110;
+  localparam INCR16 = 3'b111;
   localparam UNDEF_BURST = 3'bxxx;
 
   //Enumeration Codes
-  localparam PROT_INSTRUCTION  = 3'b000;
-  localparam PROT_DATA         = 3'b001;
-  localparam PROT_USER         = 3'b000;
-  localparam PROT_PRIVILEGED   = 3'b010;
+  localparam PROT_INSTRUCTION = 3'b000;
+  localparam PROT_DATA = 3'b001;
+  localparam PROT_USER = 3'b000;
+  localparam PROT_PRIVILEGED = 3'b010;
   localparam PROT_NONCACHEABLE = 3'b000;
-  localparam PROT_CACHEABLE    = 3'b100;
+  localparam PROT_CACHEABLE = 3'b100;
 
   //Complex Enumerations
-  localparam NONCACHEABLE_USER_INSTRUCTION       = 3'b000;
-  localparam NONCACHEABLE_USER_DATA              = 3'b001;
+  localparam NONCACHEABLE_USER_INSTRUCTION = 3'b000;
+  localparam NONCACHEABLE_USER_DATA = 3'b001;
   localparam NONCACHEABLE_PRIVILEGED_INSTRUCTION = 3'b010;
-  localparam NONCACHEABLE_PRIVILEGED_DATA        = 3'b011;
-  localparam CACHEABLE_USER_INSTRUCTION          = 3'b100;
-  localparam CACHEABLE_USER_DATA                 = 3'b101;
-  localparam CACHEABLE_PRIVILEGED_INSTRUCTION    = 3'b110;
-  localparam CACHEABLE_PRIVILEGED_DATA           = 3'b111;
+  localparam NONCACHEABLE_PRIVILEGED_DATA = 3'b011;
+  localparam CACHEABLE_USER_INSTRUCTION = 3'b100;
+  localparam CACHEABLE_USER_DATA = 3'b101;
+  localparam CACHEABLE_PRIVILEGED_INSTRUCTION = 3'b110;
+  localparam CACHEABLE_PRIVILEGED_DATA = 3'b111;
 
 endpackage

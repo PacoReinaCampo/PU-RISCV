@@ -45,58 +45,57 @@ module pu_riscv_rf #(
   parameter AR_BITS = 5,
   parameter RDPORTS = 2,
   parameter WRPORTS = 1
-)
-  (
-    input                             rstn,
-    input                             clk,
+) (
+  input rstn,
+  input clk,
 
-    //Register File read
-    input  [RDPORTS-1:0][AR_BITS-1:0] rf_src1,
-    input  [RDPORTS-1:0][AR_BITS-1:0] rf_src2,
-    output [RDPORTS-1:0][XLEN   -1:0] rf_srcv1,
-    output [RDPORTS-1:0][XLEN   -1:0] rf_srcv2,
+  //Register File read
+  input  [RDPORTS-1:0][AR_BITS-1:0] rf_src1,
+  input  [RDPORTS-1:0][AR_BITS-1:0] rf_src2,
+  output [RDPORTS-1:0][XLEN   -1:0] rf_srcv1,
+  output [RDPORTS-1:0][XLEN   -1:0] rf_srcv2,
 
-    //Register File write
-    input  [WRPORTS-1:0][AR_BITS-1:0] rf_dst,
-    input  [WRPORTS-1:0][XLEN   -1:0] rf_dstv,
-    input  [WRPORTS-1:0]              rf_we,
+  //Register File write
+  input [WRPORTS-1:0][AR_BITS-1:0] rf_dst,
+  input [WRPORTS-1:0][XLEN   -1:0] rf_dstv,
+  input [WRPORTS-1:0]              rf_we,
 
-    //Debug Interface
-    input                             du_stall,
-    input                             du_we_rf,
-    input               [XLEN   -1:0] du_dato,   //output from debug unit
-    output              [XLEN   -1:0] du_dati_rf,
-    input               [       11:0] du_addr
-  );
+  //Debug Interface
+  input                du_stall,
+  input                du_we_rf,
+  input  [XLEN   -1:0] du_dato,     //output from debug unit
+  output [XLEN   -1:0] du_dati_rf,
+  input  [       11:0] du_addr
+);
 
-  /////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
 
   //Actual register file
-  logic [XLEN        -1:0] rf [32];
+  logic [XLEN        -1:0]           rf         [32];
 
   //read data from register file
-  logic [RDPORTS-1:0]           src1_is_x0;
-  logic [RDPORTS-1:0]           src2_is_x0;
-  logic [RDPORTS-1:0][XLEN-1:0] dout1;
-  logic [RDPORTS-1:0][XLEN-1:0] dout2;
+  logic [     RDPORTS-1:0]           src1_is_x0;
+  logic [     RDPORTS-1:0]           src2_is_x0;
+  logic [     RDPORTS-1:0][XLEN-1:0] dout1;
+  logic [     RDPORTS-1:0][XLEN-1:0] dout2;
 
   //variable for generates
   genvar i;
 
-  /////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
 
   //Reads are asynchronous
   generate
-    for(i=0; i<RDPORTS; i=i+1) begin: xreg_rd
+    for (i = 0; i < RDPORTS; i = i + 1) begin : xreg_rd
       //per Altera's recommendations. Prevents bypass logic
-      always @(posedge clk) dout1[i] <= rf[ rf_src1[i] ];
-      always @(posedge clk) dout2[i] <= rf[ rf_src2[i] ];
+      always @(posedge clk) dout1[i] <= rf[rf_src1[i]];
+      always @(posedge clk) dout2[i] <= rf[rf_src2[i]];
 
       //got data from RAM, now handle X0
       always @(posedge clk) src1_is_x0[i] <= ~|rf_src1[i];
@@ -108,14 +107,14 @@ module pu_riscv_rf #(
   endgenerate
 
   //TODO: For the Debug Unit ... mux with port0
-  assign du_dati_rf = |du_addr[AR_BITS-1:0] ? rf[ du_addr[AR_BITS-1:0] ] : {XLEN{1'b0}};
+  assign du_dati_rf = |du_addr[AR_BITS-1:0] ? rf[du_addr[AR_BITS-1:0]] : {XLEN{1'b0}};
 
   //Writes are synchronous
   generate
-    for(i=0; i<WRPORTS; i=i+1) begin: xreg_wr
+    for (i = 0; i < WRPORTS; i = i + 1) begin : xreg_wr
       always @(posedge clk) begin
-        if      ( du_we_rf ) rf[ du_addr[AR_BITS-1:0] ] <= du_dato;
-        else if ( rf_we[i] ) rf[ rf_dst [i] ]           <= rf_dstv[i];
+        if (du_we_rf) rf[du_addr[AR_BITS-1:0]] <= du_dato;
+        else if (rf_we[i]) rf[rf_dst[i]] <= rf_dstv[i];
       end
     end
   endgenerate

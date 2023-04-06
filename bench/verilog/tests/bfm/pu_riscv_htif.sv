@@ -41,18 +41,17 @@
  */
 
 module pu_riscv_htif #(
-  parameter XLEN=32
-)
-  (
-    input             rstn,
-    input             clk,
+  parameter XLEN = 32
+) (
+  input rstn,
+  input clk,
 
-    output            host_csr_req,
-    input             host_csr_ack,
-    output            host_csr_we,
-    input  [XLEN-1:0] host_csr_tohost,
-    output [XLEN-1:0] host_csr_fromhost
-  );
+  output            host_csr_req,
+  input             host_csr_ack,
+  output            host_csr_we,
+  input  [XLEN-1:0] host_csr_tohost,
+  output [XLEN-1:0] host_csr_fromhost
+);
 
   ////////////////////////////////////////////////////////////////
   //
@@ -78,9 +77,9 @@ module pu_riscv_htif #(
   //
 
   //Generate watchdog counter
-  always @(posedge clk,negedge rstn) begin
+  always @(posedge clk, negedge rstn) begin
     if (!rstn) watchdog_cnt <= 0;
-    else       watchdog_cnt <= watchdog_cnt + 1;
+    else watchdog_cnt <= watchdog_cnt + 1;
   end
 
   always @(posedge clk) begin
@@ -89,13 +88,9 @@ module pu_riscv_htif #(
       $display("*****************************************************");
       $display("* RISC-V test bench finished");
       if (host_csr_tohost[0] == 1'b1) begin
-        if (~|host_csr_tohost[XLEN-1:1])
-          $display("* PASSED %0d", host_csr_tohost);
-        else
-          $display ("* FAILED: code: 0x%h (%0d: %s)", host_csr_tohost >> 1, host_csr_tohost >> 1, hostcode_to_string(host_csr_tohost >> 1) );
-      end
-      else
-        $display ("* FAILED: watchdog count reached (%0d) @%0t", watchdog_cnt, $time);
+        if (~|host_csr_tohost[XLEN-1:1]) $display("* PASSED %0d", host_csr_tohost);
+        else $display("* FAILED: code: 0x%h (%0d: %s)", host_csr_tohost >> 1, host_csr_tohost >> 1, hostcode_to_string(host_csr_tohost >> 1));
+      end else $display("* FAILED: watchdog count reached (%0d) @%0t", watchdog_cnt, $time);
       $display("*****************************************************");
       $display("\n");
 

@@ -55,13 +55,13 @@ entity pu_riscv_mmu is
   port (
     rst_ni : in std_logic;
     clk_i  : in std_logic;
-    clr_i  : in std_logic;  --clear pending request
+    clr_i  : in std_logic;              --clear pending request
 
     --Mode
     --input  logic [XLEN-1:0] st_satp;
 
     --CPU side
-    vreq_i  : in std_logic;  --Request from CPU
+    vreq_i  : in std_logic;                          --Request from CPU
     vadr_i  : in std_logic_vector(XLEN-1 downto 0);  --Virtual Memory Address
     vsize_i : in std_logic_vector(2 downto 0);
     vlock_i : in std_logic;
@@ -93,7 +93,7 @@ begin
   processing_0 : process (clk_i)
   begin
     if (rising_edge(clk_i)) then
-      if (vreq_i = '1') then  --TODO: actual translation
+      if (vreq_i = '1') then            --TODO: actual translation
         padr_o <= vadr_i;
       end if;
     end if;

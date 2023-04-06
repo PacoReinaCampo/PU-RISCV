@@ -64,15 +64,15 @@ entity pu_riscv_pmpchk is
     st_prv_i     : in std_logic_vector(1 downto 0);
 
     --Memory Access
-    instruction_i : in std_logic;                          --This is an instruction access
-    req_i         : in std_logic;                          --Memory access requested
+    instruction_i : in std_logic;       --This is an instruction access
+    req_i         : in std_logic;       --Memory access requested
     adr_i         : in std_logic_vector(PLEN-1 downto 0);  --Physical Memory address (i.e. after translation)
     size_i        : in std_logic_vector(2 downto 0);       --Transfer size
-    we_i          : in std_logic;                          --Read/Write enable
+    we_i          : in std_logic;       --Read/Write enable
 
     --Output
     exception_o : out std_logic
-    );
+  );
 end pu_riscv_pmpchk;
 
 architecture rtl of pu_riscv_pmpchk is
@@ -138,7 +138,7 @@ architecture rtl of pu_riscv_pmpchk is
   end napot_lb;
 
   function napot_ub (
-    na4    : std_logic;  --special case na4
+    na4    : std_logic;                 --special case na4
     pmpddr : std_logic_vector(PLEN-1 downto 2)
     ) return std_logic_vector is
     variable n               : integer;
@@ -220,7 +220,7 @@ architecture rtl of pu_riscv_pmpchk is
   function highest_priority_match (
     m : std_logic_vector(PMP_CNT-1 downto 0)
     ) return integer is
-    variable n : integer;
+    variable n                             : integer;
     variable highest_priority_match_return : integer;
   begin
     highest_priority_match_return := 0;  --default value
@@ -300,15 +300,15 @@ begin
     end process;
 
     --match-any
-    pmp_match(i)     <= match_any( access_lb(PLEN-1 downto 2),
-                                   access_ub(PLEN-1 downto 2),
-                                   pmp_lb(i),
-                                   pmp_ub(i)) and to_stdlogic(st_pmpcfg_i(i)(4 downto 3) /= OFF);
+    pmp_match(i) <= match_any(access_lb(PLEN-1 downto 2),
+                              access_ub(PLEN-1 downto 2),
+                              pmp_lb(i),
+                              pmp_ub(i)) and to_stdlogic(st_pmpcfg_i(i)(4 downto 3) /= OFF);
 
-    pmp_match_all(i) <= match_all( access_lb(PLEN-1 downto 2),
-                                   access_ub(PLEN-1 downto 2),
-                                   pmp_lb(i),
-                                   pmp_ub(i));
+    pmp_match_all(i) <= match_all(access_lb(PLEN-1 downto 2),
+                                  access_ub(PLEN-1 downto 2),
+                                  pmp_lb(i),
+                                  pmp_ub(i));
   end generate;
 
   matched_pmp <= std_logic_vector(to_unsigned(highest_priority_match(pmp_match), 8));
@@ -323,9 +323,9 @@ begin
   exception_o <= (req_i and exception_matched) or exception_pmpcfg;
 
   exception_pmpcfg <= ((to_stdlogic(st_prv_i /= PRV_M) or matched_pmpcfg(7)) and  -- pmpcfg.l set or privilege level != M-mode
-                                  ((not matched_pmpcfg(0) and not we_i) or        -- read-access while not allowed          -> FAIL
-                                   (not matched_pmpcfg(1) and we_i) or            -- write-access while not allowed         -> FAIL 
-                                   (not matched_pmpcfg(2) and instruction_i)));   -- instruction read, but not instruction  -> FAIL
+                       ((not matched_pmpcfg(0) and not we_i) or  -- read-access while not allowed          -> FAIL
+                        (not matched_pmpcfg(1) and we_i) or  -- write-access while not allowed         -> FAIL 
+                        (not matched_pmpcfg(2) and instruction_i)));  -- instruction read, but not instruction  -> FAIL
 
   --Prv.Lvl != M-Mode, no PMP matched, but PMPs implemented -> FAIL
   exception_matched <= to_stdlogic(st_prv_i /= PRV_M) and to_stdlogic(PMP_CNT > 0)

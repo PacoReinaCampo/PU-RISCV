@@ -54,32 +54,31 @@ module pu_riscv_bp #(
   parameter AVOID_X = 0,
 
   parameter [XLEN-1:0] PC_INIT = 'h8000_0000
-)
-  (
-    input                       rst_ni,
-    input                       clk_i,
+) (
+  input rst_ni,
+  input clk_i,
 
-    //Read side
-    input                       id_stall_i,
-    input  [XLEN          -1:0] if_parcel_pc_i,
-    output [               1:0] bp_bp_predict_o,
+  //Read side
+  input                       id_stall_i,
+  input  [XLEN          -1:0] if_parcel_pc_i,
+  output [               1:0] bp_bp_predict_o,
 
-    //Write side
-    input  [XLEN          -1:0] ex_pc_i,
-    input  [BP_GLOBAL_BITS-1:0] bu_bp_history_i,      //branch history
-    input  [               1:0] bu_bp_predict_i,      //prediction bits for branch
-    input                       bu_bp_btaken_i,
-    input                       bu_bp_update_i
+  //Write side
+  input [XLEN          -1:0] ex_pc_i,
+  input [BP_GLOBAL_BITS-1:0] bu_bp_history_i,  //branch history
+  input [               1:0] bu_bp_predict_i,  //prediction bits for branch
+  input                      bu_bp_btaken_i,
+  input                      bu_bp_update_i
 );
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Constants
   //
-  localparam ADR_BITS     = BP_GLOBAL_BITS + BP_LOCAL_BITS;
+  localparam ADR_BITS = BP_GLOBAL_BITS + BP_LOCAL_BITS;
   localparam MEMORY_DEPTH = 1 << ADR_BITS;
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
@@ -91,18 +90,17 @@ module pu_riscv_bp #(
   logic [         1:0] new_prediction;
   bit   [         1:0] old_prediction;
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
-  always @(posedge clk_i,negedge rst_ni) begin
-    if      (!rst_ni    ) if_parcel_pc_dly <= PC_INIT;
+  always @(posedge clk_i, negedge rst_ni) begin
+    if (!rst_ni) if_parcel_pc_dly <= PC_INIT;
     else if (!id_stall_i) if_parcel_pc_dly <= if_parcel_pc_i;
   end
 
-  assign radr = id_stall_i ? {bu_bp_history_i, if_parcel_pc_dly[BP_LOCAL_BITS_LSB +: BP_LOCAL_BITS]}
-                           : {bu_bp_history_i, if_parcel_pc_i  [BP_LOCAL_BITS_LSB +: BP_LOCAL_BITS]};
-  assign wadr = {bu_bp_history_i, ex_pc_i[BP_LOCAL_BITS_LSB +: BP_LOCAL_BITS]};
+  assign radr              = id_stall_i ? {bu_bp_history_i, if_parcel_pc_dly[BP_LOCAL_BITS_LSB +: BP_LOCAL_BITS]} : {bu_bp_history_i, if_parcel_pc_i[BP_LOCAL_BITS_LSB +: BP_LOCAL_BITS]};
+  assign wadr              = {bu_bp_history_i, ex_pc_i[BP_LOCAL_BITS_LSB +: BP_LOCAL_BITS]};
 
   /*
    *  Calculate new prediction bits
@@ -115,30 +113,27 @@ module pu_riscv_bp #(
 
   // Hookup 1R1W memory
   pu_riscv_ram_1r1w #(
-    .ABITS      ( ADR_BITS   ),
-    .DBITS      ( 2          ),
-    .TECHNOLOGY ( TECHNOLOGY )
-  )
-  ram_1r1w (
-    .rst_ni  ( rst_ni         ),
-    .clk_i   ( clk_i          ),
+    .ABITS     (ADR_BITS),
+    .DBITS     (2),
+    .TECHNOLOGY(TECHNOLOGY)
+  ) ram_1r1w (
+    .rst_ni(rst_ni),
+    .clk_i (clk_i),
 
     //Write side
-    .waddr_i ( wadr           ),
-    .din_i   ( new_prediction ),
-    .we_i    ( bu_bp_update_i ),
-    .be_i    ( 1'b1           ),
+    .waddr_i(wadr),
+    .din_i  (new_prediction),
+    .we_i   (bu_bp_update_i),
+    .be_i   (1'b1),
 
     //Read side
-    .raddr_i ( radr           ),
-    .re_i    ( 1'b1           ),
-    .dout_o  ( old_prediction )
+    .raddr_i(radr),
+    .re_i   (1'b1),
+    .dout_o (old_prediction)
   );
 
   generate
-    if (AVOID_X)
-      assign bp_bp_predict_o = (old_prediction == 2'bxx) ? $random : old_prediction;
-    else
-      assign bp_bp_predict_o = old_prediction;
+    if (AVOID_X) assign bp_bp_predict_o = (old_prediction == 2'bxx) ? $random : old_prediction;
+    else assign bp_bp_predict_o = old_prediction;
   endgenerate
 endmodule

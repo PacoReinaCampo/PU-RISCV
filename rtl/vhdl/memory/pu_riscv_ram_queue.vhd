@@ -58,11 +58,11 @@ entity pu_riscv_ram_queue is
     ALMOST_EMPTY_THRESHOLD : integer := 0
   );
   port (
-    rst_ni : in std_logic;  --asynchronous, active low reset
-    clk_i  : in std_logic;  --rising edge triggered clock
+    rst_ni : in std_logic;              --asynchronous, active low reset
+    clk_i  : in std_logic;              --rising edge triggered clock
 
     clr_i : in std_logic;  --clear all queue entries (synchronous reset)
-    ena_i : in std_logic;  --clock enable
+    ena_i : in std_logic;               --clock enable
 
     --Queue Write
     we_i : in std_logic;                           --Queue write enable
@@ -73,10 +73,10 @@ entity pu_riscv_ram_queue is
     q_o  : out std_logic_vector(DBITS-1 downto 0);  --Queue read data
 
     --Status signals
-    empty_o        : out std_logic;  --Queue is empty
-    full_o         : out std_logic;  --Queue is full
-    almost_empty_o : out std_logic;  --Programmable almost empty
-    almost_full_o  : out std_logic   --Programmable almost full
+    empty_o        : out std_logic;     --Queue is empty
+    full_o         : out std_logic;     --Queue is full
+    almost_empty_o : out std_logic;     --Programmable almost empty
+    almost_full_o  : out std_logic      --Programmable almost full
   );
 end pu_riscv_ram_queue;
 

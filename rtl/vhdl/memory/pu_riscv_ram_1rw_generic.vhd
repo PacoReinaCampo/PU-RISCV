@@ -84,7 +84,7 @@ begin
       processing_0 : process (clk_i)
       begin
         if (rising_edge(clk_i)) then
-          if (we_i ='0' and be_i(i) ='0') then
+          if (we_i = '0' and be_i(i) = '0') then
             mem_array(to_integer(unsigned(addr_i)))(DBITS-1 downto i*8) <= din_i(DBITS-1 downto i*8);
           end if;
         end if;
@@ -95,7 +95,7 @@ begin
       processing_1 : process (clk_i)
       begin
         if (rising_edge(clk_i)) then
-          if (we_i ='0' and be_i(i) ='0') then
+          if (we_i = '0' and be_i(i) = '0') then
             mem_array(to_integer(unsigned(addr_i)))((i+1)*8-1 downto i*8) <= din_i((i+1)*8-1 downto i*8);
           end if;
         end if;

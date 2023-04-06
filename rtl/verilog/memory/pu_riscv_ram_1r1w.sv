@@ -44,24 +44,23 @@ module pu_riscv_ram_1r1w #(
   parameter ABITS      = 10,
   parameter DBITS      = 32,
   parameter TECHNOLOGY = "GENERIC"
-)
-  (
-    input                    rst_ni,
-    input                    clk_i,
+) (
+  input rst_ni,
+  input clk_i,
 
-    //Write side
-    input  [ ABITS     -1:0] waddr_i,
-    input  [ DBITS     -1:0] din_i,
-    input                    we_i,
-    input  [(DBITS+7)/8-1:0] be_i,
+  //Write side
+  input [ ABITS     -1:0] waddr_i,
+  input [ DBITS     -1:0] din_i,
+  input                   we_i,
+  input [(DBITS+7)/8-1:0] be_i,
 
-    //Read side
-    input  [ ABITS     -1:0] raddr_i,
-    input                    re_i,
-    output [ DBITS     -1:0] dout_o
-  );
+  //Read side
+  input  [ABITS     -1:0] raddr_i,
+  input                   re_i,
+  output [DBITS     -1:0] dout_o
+);
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
@@ -70,7 +69,7 @@ module pu_riscv_ram_1r1w #(
   logic [DBITS-1:0] mem_dout;
   logic [DBITS-1:0] din_dly;
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
@@ -78,62 +77,57 @@ module pu_riscv_ram_1r1w #(
     if (TECHNOLOGY == "N3XS" || TECHNOLOGY == "n3xs") begin
       //eASIC N3XS
       pu_riscv_ram_1r1w_easic_n3xs #(
-        .ABITS ( ABITS ),
-        .DBITS ( DBITS )
-      )
-      ram_inst (
-        .rst_ni  ( rst_ni     ),
-        .clk_i   ( clk_i      ),
+        .ABITS(ABITS),
+        .DBITS(DBITS)
+      ) ram_inst (
+        .rst_ni(rst_ni),
+        .clk_i (clk_i),
 
-        .waddr_i ( waddr_i    ),
-        .din_i   ( din_i      ),
-        .we_i    ( we_i       ),
-        .be_i    ( be_i       ),
+        .waddr_i(waddr_i),
+        .din_i  (din_i),
+        .we_i   (we_i),
+        .be_i   (be_i),
 
-        .raddr_i ( raddr_i    ),
-        .re_i    (~contention ),
-        .dout_o  ( mem_dout   )
+        .raddr_i(raddr_i),
+        .re_i   (~contention),
+        .dout_o (mem_dout)
       );
-    end
-    else if (TECHNOLOGY == "N3X" || TECHNOLOGY == "n3x") begin
+    end else if (TECHNOLOGY == "N3X" || TECHNOLOGY == "n3x") begin
       //eASIC N3X
       pu_riscv_ram_1r1w_easic_n3x #(
-        .ABITS ( ABITS ),
-        .DBITS ( DBITS )
-      )
-      ram_inst (
-        .rst_ni  ( rst_ni     ),
-        .clk_i   ( clk_i      ),
+        .ABITS(ABITS),
+        .DBITS(DBITS)
+      ) ram_inst (
+        .rst_ni(rst_ni),
+        .clk_i (clk_i),
 
-        .waddr_i ( waddr_i    ),
-        .din_i   ( din_i      ),
-        .we_i    ( we_i       ),
-        .be_i    ( be_i       ),
+        .waddr_i(waddr_i),
+        .din_i  (din_i),
+        .we_i   (we_i),
+        .be_i   (be_i),
 
-        .raddr_i ( raddr_i    ),
-        .re_i    (~contention ),
-        .dout_o  ( mem_dout   )
+        .raddr_i(raddr_i),
+        .re_i   (~contention),
+        .dout_o (mem_dout)
       );
-    end
-    else begin //(TECHNOLOGY == "GENERIC")
+    end else begin  //(TECHNOLOGY == "GENERIC")
       //GENERIC  -- inferrable memory
 
       //initial $display ("INFO   : No memory technology specified. Using generic inferred memory (%m)");
       pu_riscv_ram_1r1w_generic #(
-        .ABITS ( ABITS ),
-        .DBITS ( DBITS )
-      )
-      ram_inst (
-        .rst_ni  ( rst_ni   ),
-        .clk_i   ( clk_i    ),
+        .ABITS(ABITS),
+        .DBITS(DBITS)
+      ) ram_inst (
+        .rst_ni(rst_ni),
+        .clk_i (clk_i),
 
-        .waddr_i ( waddr_i  ),
-        .din_i   ( din_i    ),
-        .we_i    ( we_i     ),
-        .be_i    ( be_i     ),
+        .waddr_i(waddr_i),
+        .din_i  (din_i),
+        .we_i   (we_i),
+        .be_i   (be_i),
 
-        .raddr_i ( raddr_i  ),
-        .dout_o  ( mem_dout )
+        .raddr_i(raddr_i),
+        .dout_o (mem_dout)
       );
     end
   endgenerate
@@ -141,7 +135,7 @@ module pu_riscv_ram_1r1w #(
   //TODO Handle 'be' ... requires partial old, partial new data
 
   //now ... write-first; we'll still need some bypass logic
-  assign contention = we_i && (raddr_i == waddr_i) ? re_i : 1'b0; //prevent 'x' from propagating from eASIC memories
+  assign contention = we_i && (raddr_i == waddr_i) ? re_i : 1'b0;  //prevent 'x' from propagating from eASIC memories
 
   always @(posedge clk_i) begin
     contention_reg <= contention;

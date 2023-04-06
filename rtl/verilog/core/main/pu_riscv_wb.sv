@@ -50,42 +50,41 @@ module pu_riscv_wb #(
   parameter EXCEPTION_SIZE = 16,
 
   parameter [XLEN-1:0] PC_INIT = 'h8000_0000
-)
-  (
-  input  wire                       rst_ni,        //Reset
-  input  wire                       clk_i,         //Clock
+) (
+  input wire rst_ni,  //Reset
+  input wire clk_i,   //Clock
 
-  output reg                        wb_stall_o,    //Stall on memory-wait
+  output reg wb_stall_o,  //Stall on memory-wait
 
-  input  wire  [XLEN          -1:0] mem_pc_i,
-  output reg   [XLEN          -1:0] wb_pc_o,
+  input  wire [XLEN          -1:0] mem_pc_i,
+  output reg  [XLEN          -1:0] wb_pc_o,
 
-  input  wire  [ILEN          -1:0] mem_instr_i,
-  input  wire                       mem_bubble_i,
-  output reg   [ILEN          -1:0] wb_instr_o,
-  output reg                        wb_bubble_o,
+  input  wire [ILEN          -1:0] mem_instr_i,
+  input  wire                      mem_bubble_i,
+  output reg  [ILEN          -1:0] wb_instr_o,
+  output reg                       wb_bubble_o,
 
-  input  wire  [EXCEPTION_SIZE-1:0] mem_exception_i,
-  output reg   [EXCEPTION_SIZE-1:0] wb_exception_o,
-  output reg   [XLEN          -1:0] wb_badaddr_o,
+  input  wire [EXCEPTION_SIZE-1:0] mem_exception_i,
+  output reg  [EXCEPTION_SIZE-1:0] wb_exception_o,
+  output reg  [XLEN          -1:0] wb_badaddr_o,
 
-  input  wire  [XLEN          -1:0] mem_r_i,
-  input  wire  [XLEN          -1:0] mem_memadr_i,
+  input wire [XLEN          -1:0] mem_r_i,
+  input wire [XLEN          -1:0] mem_memadr_i,
 
   //From Memory System
-  input  wire                       dmem_ack_i,
-  input  wire                       dmem_err_i,
-  input  wire  [XLEN          -1:0] dmem_q_i,
-  input  wire                       dmem_misaligned_i,
-  input  wire                       dmem_page_fault_i,
+  input wire                      dmem_ack_i,
+  input wire                      dmem_err_i,
+  input wire [XLEN          -1:0] dmem_q_i,
+  input wire                      dmem_misaligned_i,
+  input wire                      dmem_page_fault_i,
 
   //To Register File
-  output reg   [               4:0] wb_dst_o,
-  output reg   [XLEN          -1:0] wb_r_o,
-  output reg                        wb_we_o
+  output reg [               4:0] wb_dst_o,
+  output reg [XLEN          -1:0] wb_r_o,
+  output reg                      wb_we_o
 );
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
@@ -104,113 +103,105 @@ module pu_riscv_wb #(
 
   logic [XLEN          -1:0] m_qd;
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
 
   //Program Counter
   always @(posedge clk_i, negedge rst_ni) begin
-    if      (!rst_ni    ) wb_pc_o <= PC_INIT;
+    if (!rst_ni) wb_pc_o <= PC_INIT;
     else if (!wb_stall_o) wb_pc_o <= mem_pc_i;
   end
 
   //Instruction
   always @(posedge clk_i, negedge rst_ni) begin
-    if      (!rst_ni    ) wb_instr_o <= INSTR_NOP;
+    if (!rst_ni) wb_instr_o <= INSTR_NOP;
     else if (!wb_stall_o) wb_instr_o <= mem_instr_i;
   end
 
   assign func7  = mem_instr_i[31:25];
   assign func3  = mem_instr_i[14:12];
-  assign opcode = mem_instr_i[ 6: 2];
-  assign dst    = mem_instr_i[11: 7];
+  assign opcode = mem_instr_i[6:2];
+  assign dst    = mem_instr_i[11:7];
 
   //Exception
   always @(*) begin
     exception = mem_exception_i;
 
-    if (opcode == OPC_LOAD && ~mem_bubble_i)
-      exception[CAUSE_MISALIGNED_LOAD   ] = dmem_misaligned_i;
+    if (opcode == OPC_LOAD && ~mem_bubble_i) exception[CAUSE_MISALIGNED_LOAD] = dmem_misaligned_i;
 
-    if (opcode == OPC_STORE && ~mem_bubble_i)
-      exception[CAUSE_MISALIGNED_STORE  ] = dmem_misaligned_i;
+    if (opcode == OPC_STORE && ~mem_bubble_i) exception[CAUSE_MISALIGNED_STORE] = dmem_misaligned_i;
 
-    if (opcode == OPC_LOAD & ~mem_bubble_i)
-      exception[CAUSE_LOAD_ACCESS_FAULT ] = dmem_err_i;
+    if (opcode == OPC_LOAD & ~mem_bubble_i) exception[CAUSE_LOAD_ACCESS_FAULT] = dmem_err_i;
 
-    if (opcode == OPC_STORE & ~mem_bubble_i)
-      exception[CAUSE_STORE_ACCESS_FAULT] = dmem_err_i;
+    if (opcode == OPC_STORE & ~mem_bubble_i) exception[CAUSE_STORE_ACCESS_FAULT] = dmem_err_i;
 
-    if (opcode == OPC_LOAD && ~mem_bubble_i)
-      exception[CAUSE_LOAD_PAGE_FAULT   ] = dmem_page_fault_i;
+    if (opcode == OPC_LOAD && ~mem_bubble_i) exception[CAUSE_LOAD_PAGE_FAULT] = dmem_page_fault_i;
 
-    if (opcode == OPC_STORE && ~mem_bubble_i)
-      exception[CAUSE_STORE_PAGE_FAULT  ] = dmem_page_fault_i;
+    if (opcode == OPC_STORE && ~mem_bubble_i) exception[CAUSE_STORE_PAGE_FAULT] = dmem_page_fault_i;
   end
 
   always @(posedge clk_i, negedge rst_ni) begin
-    if      (!rst_ni    ) wb_exception_o <= 'h0;
+    if (!rst_ni) wb_exception_o <= 'h0;
     else if (!wb_stall_o) wb_exception_o <= exception;
   end
 
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni)
-      wb_badaddr_o <= 'h0;
-    else if (exception[CAUSE_MISALIGNED_LOAD   ] ||
-             exception[CAUSE_MISALIGNED_STORE  ] ||
-             exception[CAUSE_LOAD_ACCESS_FAULT ] ||
-             exception[CAUSE_STORE_ACCESS_FAULT] ||
-             exception[CAUSE_LOAD_PAGE_FAULT   ] ||
-             exception[CAUSE_STORE_PAGE_FAULT  ] )
+    if (!rst_ni) wb_badaddr_o <= 'h0;
+    else if (exception[CAUSE_MISALIGNED_LOAD] || exception[CAUSE_MISALIGNED_STORE] || exception[CAUSE_LOAD_ACCESS_FAULT] || exception[CAUSE_STORE_ACCESS_FAULT] || exception[CAUSE_LOAD_PAGE_FAULT] || exception[CAUSE_STORE_PAGE_FAULT])
       wb_badaddr_o <= mem_memadr_i;
-    else
-      wb_badaddr_o <= mem_pc_i;
+    else wb_badaddr_o <= mem_pc_i;
   end
 
   //From Memory
   always @(*) begin
-    casex ( {mem_bubble_i,|mem_exception_i, opcode} )
-      {2'b00,OPC_LOAD } : wb_stall_o = ~(dmem_ack_i | dmem_err_i | dmem_misaligned_i | dmem_page_fault_i);
-      {2'b00,OPC_STORE} : wb_stall_o = ~(dmem_ack_i | dmem_err_i | dmem_misaligned_i | dmem_page_fault_i);
-      default           : wb_stall_o = 1'b0;
+    casex ({
+      mem_bubble_i, |mem_exception_i, opcode
+    })
+      {2'b00, OPC_LOAD} :  wb_stall_o = ~(dmem_ack_i | dmem_err_i | dmem_misaligned_i | dmem_page_fault_i);
+      {2'b00, OPC_STORE} : wb_stall_o = ~(dmem_ack_i | dmem_err_i | dmem_misaligned_i | dmem_page_fault_i);
+      default:             wb_stall_o = 1'b0;
     endcase
   end
 
   // data from memory
   generate
-    if (XLEN==64) begin
-      assign m_qb = dmem_q_i >> (8*mem_memadr_i[2:0]);
-      assign m_qh = dmem_q_i >> (8*mem_memadr_i[2:0]);
-      assign m_qw = dmem_q_i >> (8*mem_memadr_i[2:0]);
+    if (XLEN == 64) begin
+      assign m_qb = dmem_q_i >> (8 * mem_memadr_i[2:0]);
+      assign m_qh = dmem_q_i >> (8 * mem_memadr_i[2:0]);
+      assign m_qw = dmem_q_i >> (8 * mem_memadr_i[2:0]);
       assign m_qd = dmem_q_i;
 
       always @(*) begin
-        casex ( {func7,func3,opcode} )
-          LB      : m_data = { {XLEN- 8{m_qb[ 7]}},m_qb};
-          LH      : m_data = { {XLEN-16{m_qh[15]}},m_qh};
-          LW      : m_data = { {XLEN-32{m_qw[31]}},m_qw};
-          LD      : m_data = {                     m_qd};
-          LBU     : m_data = { {XLEN- 8{    1'b0}},m_qb};
-          LHU     : m_data = { {XLEN-16{    1'b0}},m_qh};
-          LWU     : m_data = { {XLEN-32{    1'b0}},m_qw};
-          default : m_data = 'hx;
+        casex ({
+          func7, func3, opcode
+        })
+          LB:      m_data = {{XLEN - 8{m_qb[7]}}, m_qb};
+          LH:      m_data = {{XLEN - 16{m_qh[15]}}, m_qh};
+          LW:      m_data = {{XLEN - 32{m_qw[31]}}, m_qw};
+          LD:      m_data = {m_qd};
+          LBU:     m_data = {{XLEN - 8{1'b0}}, m_qb};
+          LHU:     m_data = {{XLEN - 16{1'b0}}, m_qh};
+          LWU:     m_data = {{XLEN - 32{1'b0}}, m_qw};
+          default: m_data = 'hx;
         endcase
       end
-    end
-    else begin
-      assign m_qb = dmem_q_i >> (8* mem_memadr_i[1:0]);
-      assign m_qh = dmem_q_i >> (8* mem_memadr_i[1:0]);
+    end else begin
+      assign m_qb = dmem_q_i >> (8 * mem_memadr_i[1:0]);
+      assign m_qh = dmem_q_i >> (8 * mem_memadr_i[1:0]);
       assign m_qw = dmem_q_i;
 
       always @(*) begin
-        casex ( {func7,func3,opcode} )
-          LB      : m_data = { {XLEN- 8{m_qb[ 7]}},m_qb};
-          LH      : m_data = { {XLEN-16{m_qh[15]}},m_qh};
-          LW      : m_data = {                     m_qw};
-          LBU     : m_data = { {XLEN- 8{    1'b0}},m_qb};
-          LHU     : m_data = { {XLEN-16{    1'b0}},m_qh};
-          default : m_data = 'hx;
+        casex ({
+          func7, func3, opcode
+        })
+          LB:      m_data = {{XLEN - 8{m_qb[7]}}, m_qb};
+          LH:      m_data = {{XLEN - 16{m_qh[15]}}, m_qh};
+          LW:      m_data = {m_qw};
+          LBU:     m_data = {{XLEN - 8{1'b0}}, m_qb};
+          LHU:     m_data = {{XLEN - 16{1'b0}}, m_qh};
+          default: m_data = 'hx;
         endcase
       end
     end
@@ -227,29 +218,30 @@ module pu_riscv_wb #(
   always @(posedge clk_i) begin
     if (!wb_stall_o)
       casex (opcode)
-        OPC_LOAD : wb_r_o <= m_data;
-        default  : wb_r_o <= mem_r_i;
+        OPC_LOAD: wb_r_o <= m_data;
+        default:  wb_r_o <= mem_r_i;
       endcase
   end
 
   // Register File Write
   always @(posedge clk_i, negedge rst_ni) begin
-    if      (!rst_ni   ) wb_we_o <= 'b0;
+    if (!rst_ni) wb_we_o <= 'b0;
     else if (|exception) wb_we_o <= 'b0;
-    else casex (opcode)
-      OPC_MISC_MEM : wb_we_o <= 'b0;
-      OPC_LOAD     : wb_we_o <= ~mem_bubble_i & |dst & ~wb_stall_o;
-      OPC_STORE    : wb_we_o <= 'b0;
-      OPC_STORE_FP : wb_we_o <= 'b0;
-      OPC_BRANCH   : wb_we_o <= 'b0;
-    //OPC_SYSTEM   : wb_we_o <= 'b0;
-      default      : wb_we_o <= ~mem_bubble_i & |dst;
-    endcase
+    else
+      casex (opcode)
+        OPC_MISC_MEM: wb_we_o <= 'b0;
+        OPC_LOAD:     wb_we_o <= ~mem_bubble_i & |dst & ~wb_stall_o;
+        OPC_STORE:    wb_we_o <= 'b0;
+        OPC_STORE_FP: wb_we_o <= 'b0;
+        OPC_BRANCH:   wb_we_o <= 'b0;
+        //OPC_SYSTEM   : wb_we_o <= 'b0;
+        default:      wb_we_o <= ~mem_bubble_i & |dst;
+      endcase
   end
 
   // Write Back Bubble
   always @(posedge clk_i, negedge rst_ni) begin
-    if      (!rst_ni    ) wb_bubble_o <= 1'b1;
+    if (!rst_ni) wb_bubble_o <= 1'b1;
     else if (!wb_stall_o) wb_bubble_o <= mem_bubble_i;
   end
 endmodule

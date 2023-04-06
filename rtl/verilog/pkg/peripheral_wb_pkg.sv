@@ -44,19 +44,19 @@ package peripheral_wb_pkg;
 
   //WB Package
   localparam CLASSIC_CYCLE = 1'b0;
-  localparam BURST_CYCLE   = 1'b1;
+  localparam BURST_CYCLE = 1'b1;
 
-  localparam READ  = 1'b0;
+  localparam READ = 1'b0;
   localparam WRITE = 1'b1;
 
-  localparam CTI_CLASSIC      = 3'b000;
-  localparam CTI_CONST_BURST  = 3'b001;
-  localparam CTI_INC_BURST    = 3'b010;
+  localparam CTI_CLASSIC = 3'b000;
+  localparam CTI_CONST_BURST = 3'b001;
+  localparam CTI_INC_BURST = 3'b010;
   localparam CTI_END_OF_BURST = 3'b111;
 
-  localparam BTE_LINEAR  = 2'd0;
-  localparam BTE_WRAP_4  = 2'd1;
-  localparam BTE_WRAP_8  = 2'd2;
+  localparam BTE_LINEAR = 2'd0;
+  localparam BTE_WRAP_4 = 2'd1;
+  localparam BTE_WRAP_8 = 2'd2;
   localparam BTE_WRAP_16 = 2'd3;
 
 endpackage

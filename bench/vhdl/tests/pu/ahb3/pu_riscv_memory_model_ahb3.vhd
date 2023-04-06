@@ -64,7 +64,7 @@ entity pu_riscv_memory_model_ahb3 is
     BURST   : integer := 8;
 
     INIT_FILE : string := "test.hex"
-    );
+  );
   port (
     HCLK    : in std_logic;
     HRESETn : in std_logic;
@@ -79,7 +79,7 @@ entity pu_riscv_memory_model_ahb3 is
     HBURST : in  std_logic_matrix(1 downto 0)(2 downto 0);
     HWDATA : in  std_logic_matrix(1 downto 0)(XLEN-1 downto 0);
     HRDATA : out std_logic_matrix(1 downto 0)(XLEN-1 downto 0)
-    );
+  );
 end pu_riscv_memory_model_ahb3;
 
 architecture rtl of pu_riscv_memory_model_ahb3 is

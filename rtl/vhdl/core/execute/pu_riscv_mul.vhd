@@ -94,7 +94,7 @@ architecture rtl of pu_riscv_mul is
   function sext32 (
     operand : std_logic_vector(31 downto 0)
 
-  ) return std_logic_vector is
+    ) return std_logic_vector is
     variable sign          : std_logic;
     variable sext32_return : std_logic_vector (XLEN-1 downto 0);
   begin
@@ -390,7 +390,7 @@ begin
   begin
     if (rstn = '0') then
       state      <= ST_IDLE;
-      cnt        <= "11";  --LATENCY
+      cnt        <= "11";               --LATENCY
       mul_bubble <= '1';
       mul_stall  <= '0';
     elsif (rising_edge(clk)) then
@@ -415,7 +415,7 @@ begin
             cnt <= std_logic_vector(unsigned(cnt)-"01");
           else
             state      <= ST_IDLE;
-            cnt        <= "11";  --LATENCY
+            cnt        <= "11";         --LATENCY
             mul_bubble <= '0';
             mul_stall  <= '0';
           end if;

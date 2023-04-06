@@ -45,31 +45,30 @@ import pu_riscv_pkg::*;
 module pu_riscv_div #(
   parameter XLEN = 64,
   parameter ILEN = 64
-)
- (
-    input                 rstn,
-    input                 clk,
+) (
+  input rstn,
+  input clk,
 
-    input                 ex_stall,
-    output reg            div_stall,
+  input      ex_stall,
+  output reg div_stall,
 
-    //Instruction
-    input                 id_bubble,
-    input      [ILEN-1:0] id_instr,
+  //Instruction
+  input            id_bubble,
+  input [ILEN-1:0] id_instr,
 
-    //Operands
-    input      [XLEN-1:0] opA,
-    input      [XLEN-1:0] opB,
+  //Operands
+  input [XLEN-1:0] opA,
+  input [XLEN-1:0] opB,
 
-    //From State
-    input      [     1:0] st_xlen,
+  //From State
+  input [1:0] st_xlen,
 
-    //To WB
-    output reg            div_bubble,
-    output reg [XLEN-1:0] div_r
-  );
+  //To WB
+  output reg            div_bubble,
+  output reg [XLEN-1:0] div_r
+);
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // functions
   //
@@ -78,13 +77,13 @@ module pu_riscv_div #(
     logic sign;
 
     sign   = operand[31];
-    sext32 = { {XLEN-32{sign}}, operand};
+    sext32 = {{XLEN - 32{sign}}, operand};
   endfunction
 
   function [XLEN-1:0] twos;
     input [XLEN-1:0] a;
 
-    twos = ~a +'h1;
+    twos = ~a + 'h1;
   endfunction
 
   function [XLEN-1:0] abs;
@@ -93,7 +92,7 @@ module pu_riscv_div #(
     abs = a[XLEN-1] ? twos(a) : a;
   endfunction
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Constants
   //
@@ -102,7 +101,7 @@ module pu_riscv_div #(
   localparam ST_DIV = 2'b01;
   localparam ST_RES = 2'b10;
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
@@ -121,8 +120,8 @@ module pu_riscv_div #(
   logic [            31:0] opB32;
 
   logic [$clog2(XLEN)-1:0] cnt;
-  logic                    neg_q; //negate quotient
-  logic                    neg_s; //negate remainder
+  logic                    neg_q;  //negate quotient
+  logic                    neg_s;  //negate remainder
 
   //divider internals
   logic [XLEN        -1:0] pa_p;
@@ -130,13 +129,13 @@ module pu_riscv_div #(
   logic [XLEN        -1:0] pa_shifted_p;
   logic [XLEN        -1:0] pa_shifted_a;
 
-  logic [XLEN          :0] p_minus_b;
+  logic [        XLEN : 0] p_minus_b;
   logic [XLEN        -1:0] b;
 
   //FSM
   logic [             1:0] state;
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
@@ -144,11 +143,11 @@ module pu_riscv_div #(
   //Instruction
   assign func7      = id_instr[31:25];
   assign func3      = id_instr[14:12];
-  assign opcode     = id_instr[ 6: 2];
+  assign opcode     = id_instr[6:2];
 
   assign div_func7  = div_instr[31:25];
   assign div_func3  = div_instr[14:12];
-  assign div_opcode = div_instr[ 6: 2];
+  assign div_opcode = div_instr[6:2];
 
   assign xlen32     = st_xlen == RV32I;
 
@@ -158,12 +157,12 @@ module pu_riscv_div #(
   end
 
   //32bit operands
-  assign opA32   = opA[     31:0];
-  assign opB32   = opB[     31:0];
+  assign opA32                        = opA[31:0];
+  assign opB32                        = opB[31:0];
 
   //Divide operations
   assign {pa_shifted_p, pa_shifted_a} = {pa_p, pa_a} << 1;
-  assign p_minus_b  = pa_shifted_p - b;
+  assign p_minus_b                    = pa_shifted_p - b;
 
   //Division: bit-serial. Max XLEN cycles
   // q = z/d + s
@@ -171,21 +170,20 @@ module pu_riscv_div #(
   // d: Divisor
   // q: Quotient
   // s: Remainder
-  always @(posedge clk,negedge rstn) begin
+  always @(posedge clk, negedge rstn) begin
     if (!rstn) begin
       state      <= ST_CHK;
       div_bubble <= 1'b1;
       div_stall  <= 1'b0;
 
-      div_r      <=  'hx;
+      div_r      <= 'hx;
 
-      pa_p       <=  'hx;
-      pa_a       <=  'hx;
-      b          <=  'hx;
+      pa_p       <= 'hx;
+      pa_a       <= 'hx;
+      b          <= 'hx;
       neg_q      <= 1'bx;
       neg_s      <= 1'bx;
-    end
-    else begin
+    end else begin
       div_bubble <= 1'b1;
 
       case (state)
@@ -195,19 +193,22 @@ module pu_riscv_div #(
          * Setup dividor registers
          */
 
-        ST_CHK: if (!ex_stall && !id_bubble)
-          casex ( {xlen32,func7,func3,opcode} )
-            {1'b?,DIV  } :
-              if (~|opB) begin //signed divide by zero
-                div_r      <= {XLEN{1'b1}}; //=-1
-                div_bubble <= 1'b0;
-              end
-            else if (opA == {1'b1,{XLEN-1{1'b0}}} && &opB) begin // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
-              div_r      <= {1'b1,{XLEN-1{1'b0}}};
+        ST_CHK:
+        if (!ex_stall && !id_bubble)
+          casex ({
+            xlen32, func7, func3, opcode
+          })
+            {
+              1'b?, DIV
+            } :
+            if (~|opB) begin  //signed divide by zero
+              div_r      <= {XLEN{1'b1}};  //=-1
               div_bubble <= 1'b0;
-            end
-            else begin
-              cnt       <= {$bits(cnt){1'b1}};
+            end else if (opA == {1'b1, {XLEN - 1{1'b0}}} && &opB) begin  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
+              div_r      <= {1'b1, {XLEN - 1{1'b0}}};
+              div_bubble <= 1'b0;
+            end else begin
+              cnt       <= {$bits(cnt) {1'b1}};
               state     <= ST_DIV;
               div_stall <= 1'b1;
 
@@ -218,17 +219,17 @@ module pu_riscv_div #(
               pa_a      <= abs(opA);
               b         <= abs(opB);
             end
-            {1'b0,DIVW } :
-              if (~|opB32) begin //signed divide by zero
-                div_r      <= {XLEN{1'b1}}; //=-1
-                div_bubble <= 1'b0;
-              end
-            else if (opA32 == {1'b1,{31{1'b0}}} && &opB32) begin // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
-              div_r      <= sext32( {1'b1,{31{1'b0}}} );
+            {
+              1'b0, DIVW
+            } :
+            if (~|opB32) begin  //signed divide by zero
+              div_r      <= {XLEN{1'b1}};  //=-1
               div_bubble <= 1'b0;
-            end
-            else begin
-              cnt       <= {1'b0, {$bits(cnt)-1{1'b1}} };
+            end else if (opA32 == {1'b1, {31{1'b0}}} && &opB32) begin  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
+              div_r      <= sext32({1'b1, {31{1'b0}}});
+              div_bubble <= 1'b0;
+            end else begin
+              cnt       <= {1'b0, {$bits(cnt) - 1{1'b1}}};
               state     <= ST_DIV;
               div_stall <= 1'b1;
 
@@ -236,17 +237,18 @@ module pu_riscv_div #(
               neg_s     <= opA32[31];
 
               pa_p      <= 'h0;
-              pa_a      <= { abs( sext32(opA32) ), {XLEN-32{1'b0}} };
-              b         <= abs( sext32(opB32) );
+              pa_a      <= {abs(sext32(opA32)), {XLEN - 32{1'b0}}};
+              b         <= abs(sext32(opB32));
             end
 
-            {1'b?,DIVU } :
-              if (~|opB) begin //unsigned divide by zero
-                div_r      <= {XLEN{1'b1}}; //= 2^XLEN -1
-                div_bubble <= 1'b0;
-              end
-            else begin
-              cnt       <= {$bits(cnt){1'b1}};
+            {
+              1'b?, DIVU
+            } :
+            if (~|opB) begin  //unsigned divide by zero
+              div_r      <= {XLEN{1'b1}};  //= 2^XLEN -1
+              div_bubble <= 1'b0;
+            end else begin
+              cnt       <= {$bits(cnt) {1'b1}};
               state     <= ST_DIV;
               div_stall <= 1'b1;
 
@@ -257,13 +259,14 @@ module pu_riscv_div #(
               pa_a      <= opA;
               b         <= opB;
             end
-            {1'b0,DIVUW} :
-              if (~|opB32) begin //unsigned divide by zero
-                div_r      <= {XLEN{1'b1}}; //= 2^XLEN -1
-                div_bubble <= 1'b0;
-              end
-            else begin
-              cnt       <= {1'b0, {$bits(cnt)-1{1'b1}} };
+            {
+              1'b0, DIVUW
+            } :
+            if (~|opB32) begin  //unsigned divide by zero
+              div_r      <= {XLEN{1'b1}};  //= 2^XLEN -1
+              div_bubble <= 1'b0;
+            end else begin
+              cnt       <= {1'b0, {$bits(cnt) - 1{1'b1}}};
               state     <= ST_DIV;
               div_stall <= 1'b1;
 
@@ -271,20 +274,20 @@ module pu_riscv_div #(
               neg_s     <= 1'b0;
 
               pa_p      <= 'h0;
-              pa_a      <= { opA32, {XLEN-32{1'b0}} };
-              b         <= { {XLEN-32{1'b0}}, opB32 };
+              pa_a      <= {opA32, {XLEN - 32{1'b0}}};
+              b         <= {{XLEN - 32{1'b0}}, opB32};
             end
-            {1'b?,REM  } :
-              if (~|opB) begin //signed divide by zero
-                div_r      <= opA;
-                div_bubble <= 1'b0;
-              end
-            else if (opA == {1'b1,{XLEN-1{1'b0}}} && &opB) begin // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
-              div_r      <=  'h0;
+            {
+              1'b?, REM
+            } :
+            if (~|opB) begin  //signed divide by zero
+              div_r      <= opA;
               div_bubble <= 1'b0;
-            end
-            else begin
-              cnt       <= {$bits(cnt){1'b1}};
+            end else if (opA == {1'b1, {XLEN - 1{1'b0}}} && &opB) begin  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
+              div_r      <= 'h0;
+              div_bubble <= 1'b0;
+            end else begin
+              cnt       <= {$bits(cnt) {1'b1}};
               state     <= ST_DIV;
               div_stall <= 1'b1;
 
@@ -295,17 +298,17 @@ module pu_riscv_div #(
               pa_a      <= abs(opA);
               b         <= abs(opB);
             end
-            {1'b0,REMW } :
-              if (~|opB32) begin //signed divide by zero
-                div_r      <= sext32(opA32);
-                div_bubble <= 1'b0;
-              end
-            else if (opA32 == {1'b1,{31{1'b0}}} && &opB32) begin // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
-              div_r      <=  'h0;
+            {
+              1'b0, REMW
+            } :
+            if (~|opB32) begin  //signed divide by zero
+              div_r      <= sext32(opA32);
               div_bubble <= 1'b0;
-            end
-            else begin
-              cnt       <= {1'b0, {$bits(cnt)-1{1'b1}} };
+            end else if (opA32 == {1'b1, {31{1'b0}}} && &opB32) begin  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
+              div_r      <= 'h0;
+              div_bubble <= 1'b0;
+            end else begin
+              cnt       <= {1'b0, {$bits(cnt) - 1{1'b1}}};
               state     <= ST_DIV;
               div_stall <= 1'b1;
 
@@ -313,16 +316,17 @@ module pu_riscv_div #(
               neg_s     <= opA32[31];
 
               pa_p      <= 'h0;
-              pa_a      <= { abs( sext32(opA32) ), {XLEN-32{1'b0}} };
-              b         <= abs( sext32(opB32) );
+              pa_a      <= {abs(sext32(opA32)), {XLEN - 32{1'b0}}};
+              b         <= abs(sext32(opB32));
             end
-            {1'b?,REMU } :
-              if (~|opB) begin //unsigned divide by zero
-                div_r      <= opA;
-                div_bubble <= 1'b0;
-              end
-            else begin
-              cnt       <= {$bits(cnt){1'b1}};
+            {
+              1'b?, REMU
+            } :
+            if (~|opB) begin  //unsigned divide by zero
+              div_r      <= opA;
+              div_bubble <= 1'b0;
+            end else begin
+              cnt       <= {$bits(cnt) {1'b1}};
               state     <= ST_DIV;
               div_stall <= 1'b1;
 
@@ -333,13 +337,14 @@ module pu_riscv_div #(
               pa_a      <= opA;
               b         <= opB;
             end
-            {1'b0,REMUW} :
-              if (~|opB32) begin
-                div_r      <= sext32(opA32);
-                div_bubble <= 1'b0;
-              end
-            else begin
-              cnt       <= {1'b0, {$bits(cnt)-1{1'b1}} };
+            {
+              1'b0, REMUW
+            } :
+            if (~|opB32) begin
+              div_r      <= sext32(opA32);
+              div_bubble <= 1'b0;
+            end else begin
+              cnt       <= {1'b0, {$bits(cnt) - 1{1'b1}}};
               state     <= ST_DIV;
               div_stall <= 1'b1;
 
@@ -347,23 +352,22 @@ module pu_riscv_div #(
               neg_s     <= 1'b0;
 
               pa_p      <= 'h0;
-              pa_a      <= { opA32, {XLEN-32{1'b0}} };
-              b         <= { {XLEN-32{1'b0}}, opB32 };
+              pa_a      <= {opA32, {XLEN - 32{1'b0}}};
+              b         <= {{XLEN - 32{1'b0}}, opB32};
             end
             default: ;
           endcase
 
         //actual division loop
         ST_DIV: begin
-          cnt <= cnt -1;
-          if (~| cnt) state <= ST_RES;
+          cnt <= cnt - 1;
+          if (~|cnt) state <= ST_RES;
           //restoring divider section
-          if (p_minus_b[XLEN]) begin //sub gave negative result
-            pa_p <=  pa_shifted_p;                   //restore
+          if (p_minus_b[XLEN]) begin  //sub gave negative result
+            pa_p <= pa_shifted_p;  //restore
             pa_a <= {pa_shifted_a[XLEN-1:1], 1'b0};  //shift in '0' for Q
-          end
-          else begin //sub gave positive result
-            pa_p <=  p_minus_b[XLEN-1:0];            //store sub result
+          end else begin  //sub gave positive result
+            pa_p <= p_minus_b[XLEN-1:0];  //store sub result
             pa_a <= {pa_shifted_a[XLEN-1:1], 1'b1};  //shift in '1' for Q
           end
         end
@@ -372,16 +376,18 @@ module pu_riscv_div #(
           state      <= ST_CHK;
           div_bubble <= 1'b0;
           div_stall  <= 1'b0;
-          casex ( {div_func7,div_func3,div_opcode} )
-            DIV     : div_r <=         neg_q ? twos(pa_a) : pa_a; 
-            DIVW    : div_r <= sext32( neg_q ? twos(pa_a) : pa_a );
-            DIVU    : div_r <=                              pa_a;
-            DIVUW   : div_r <= sext32(                      pa_a );
-            REM     : div_r <=         neg_s ? twos(pa_p) : pa_p;
-            REMW    : div_r <= sext32( neg_s ? twos(pa_p) : pa_p );
-            REMU    : div_r <=                              pa_p;
-            REMUW   : div_r <= sext32(                      pa_p );
-            default : div_r <= 'hx;
+          casex ({
+            div_func7, div_func3, div_opcode
+          })
+            DIV:     div_r <= neg_q ? twos(pa_a) : pa_a;
+            DIVW:    div_r <= sext32(neg_q ? twos(pa_a) : pa_a);
+            DIVU:    div_r <= pa_a;
+            DIVUW:   div_r <= sext32(pa_a);
+            REM:     div_r <= neg_s ? twos(pa_p) : pa_p;
+            REMW:    div_r <= sext32(neg_s ? twos(pa_p) : pa_p);
+            REMU:    div_r <= pa_p;
+            REMUW:   div_r <= sext32(pa_p);
+            default: div_r <= 'hx;
           endcase
         end
       endcase

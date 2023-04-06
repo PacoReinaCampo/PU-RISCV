@@ -61,10 +61,10 @@ entity pu_riscv_wb is
     PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
   );
   port (
-    rst_ni : in std_logic;  --Reset
-    clk_i  : in std_logic;  --Clock
+    rst_ni : in std_logic;              --Reset
+    clk_i  : in std_logic;              --Clock
 
-    wb_stall_o : out std_logic;  --Stall on memory-wait
+    wb_stall_o : out std_logic;         --Stall on memory-wait
 
     mem_pc_i : in  std_logic_vector(XLEN-1 downto 0);
     wb_pc_o  : out std_logic_vector(XLEN-1 downto 0);
@@ -195,12 +195,12 @@ begin
     if (rst_ni = '0') then
       wb_badaddr_o <= (others => '0');
     elsif (rising_edge(clk_i) or falling_edge(rst_ni)) then
-      if ( exception(CAUSE_MISALIGNED_LOAD)    = '1' or
-           exception(CAUSE_MISALIGNED_STORE)   = '1' or
-           exception(CAUSE_LOAD_ACCESS_FAULT)  = '1' or
-           exception(CAUSE_STORE_ACCESS_FAULT) = '1' or
-           exception(CAUSE_LOAD_PAGE_FAULT)    = '1' or
-           exception(CAUSE_STORE_PAGE_FAULT)   = '1') then
+      if (exception(CAUSE_MISALIGNED_LOAD) = '1' or
+          exception(CAUSE_MISALIGNED_STORE) = '1' or
+          exception(CAUSE_LOAD_ACCESS_FAULT) = '1' or
+          exception(CAUSE_STORE_ACCESS_FAULT) = '1' or
+          exception(CAUSE_LOAD_PAGE_FAULT) = '1' or
+          exception(CAUSE_STORE_PAGE_FAULT) = '1') then
         wb_badaddr_o <= mem_memadr_i;
       else
         wb_badaddr_o <= mem_pc_i;

@@ -44,59 +44,55 @@ module pu_riscv_ram_1rw #(
   parameter ABITS      = 10,
   parameter DBITS      = 32,
   parameter TECHNOLOGY = "GENERIC"
-)
-  (
-    input                    rst_ni,
-    input                    clk_i,
+) (
+  input rst_ni,
+  input clk_i,
 
-    input  [ ABITS     -1:0] addr_i,
-    input                    we_i,
-    input  [(DBITS+7)/8-1:0] be_i,
-    input  [ DBITS     -1:0] din_i,
-    output [ DBITS     -1:0] dout_o
-  );
+  input  [ ABITS     -1:0] addr_i,
+  input                    we_i,
+  input  [(DBITS+7)/8-1:0] be_i,
+  input  [ DBITS     -1:0] din_i,
+  output [ DBITS     -1:0] dout_o
+);
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
   generate
-    if (TECHNOLOGY == "N3X" || TECHNOLOGY == "n3x" ) begin
+    if (TECHNOLOGY == "N3X" || TECHNOLOGY == "n3x") begin
       //eASIC N3X
       pu_riscv_ram_1rw_easic_n3x #(
-        .ABITS ( ABITS ),
-        .DBITS ( DBITS )
-      )
-      ram_inst (
-        .rst_ni ( rst_ni ),
-        .clk_i  ( clk_i  ),
+        .ABITS(ABITS),
+        .DBITS(DBITS)
+      ) ram_inst (
+        .rst_ni(rst_ni),
+        .clk_i (clk_i),
 
-        .addr_i ( addr_i ),
-        .we_i   ( we_i   ),
-        .be_i   ( be_i   ),
-        .din_i  ( din_i  ),
-        .dout_o ( dout_o )
+        .addr_i(addr_i),
+        .we_i  (we_i),
+        .be_i  (be_i),
+        .din_i (din_i),
+        .dout_o(dout_o)
       );
-    end
-    else begin // (TECHNOLOGY == "GENERIC")
+    end else begin  // (TECHNOLOGY == "GENERIC")
 
       //GENERIC -- inferrable memory
 
       //initial $display ("INFO   : No memory technology specified. Using generic inferred memory (%m)");
 
       pu_riscv_ram_1rw_generic #(
-        .ABITS ( ABITS ),
-        .DBITS ( DBITS )
-      )
-      ram_inst (
-        .rst_ni ( rst_ni ),
-        .clk_i  ( clk_i  ),
+        .ABITS(ABITS),
+        .DBITS(DBITS)
+      ) ram_inst (
+        .rst_ni(rst_ni),
+        .clk_i (clk_i),
 
-        .addr_i ( addr_i ),
-        .we_i   ( we_i   ),
-        .be_i   ( be_i   ),
-        .din_i  ( din_i  ),
-        .dout_o ( dout_o )
+        .addr_i(addr_i),
+        .we_i  (we_i),
+        .be_i  (be_i),
+        .din_i (din_i),
+        .dout_o(dout_o)
       );
     end
   endgenerate

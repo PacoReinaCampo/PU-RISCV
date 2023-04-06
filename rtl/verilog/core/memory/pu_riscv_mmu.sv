@@ -41,59 +41,58 @@
  */
 
 module pu_riscv_mmu #(
-  parameter XLEN  = 64,
-  parameter PLEN  = 64
-)
-  (
-    input  wire             rst_ni,
-    input  wire             clk_i,
-    input  wire             clr_i,   //clear pending request
+  parameter XLEN = 64,
+  parameter PLEN = 64
+) (
+  input wire rst_ni,
+  input wire clk_i,
+  input wire clr_i,   //clear pending request
 
   //Mode
-//input  wire  [XLEN-1:0] st_satp;
+  //input  wire  [XLEN-1:0] st_satp;
 
   //CPU side
-    input  wire             vreq_i,  //Request from CPU
-    input  wire  [XLEN-1:0] vadr_i,  //Virtual Memory Address
-    input  wire  [     2:0] vsize_i,
-    input  wire             vlock_i,
-    input  wire  [     2:0] vprot_i,
-    input  wire             vwe_i,
-    input  wire  [XLEN-1:0] vd_i,
+  input wire            vreq_i,   //Request from CPU
+  input wire [XLEN-1:0] vadr_i,   //Virtual Memory Address
+  input wire [     2:0] vsize_i,
+  input wire            vlock_i,
+  input wire [     2:0] vprot_i,
+  input wire            vwe_i,
+  input wire [XLEN-1:0] vd_i,
 
   //Memory system side
-    output reg              preq_o,
-    output reg   [PLEN-1:0] padr_o,  //Physical Memory Address
-    output reg   [     2:0] psize_o,
-    output reg              plock_o,
-    output reg   [     2:0] pprot_o,
-    output reg              pwe_o,
-    output reg   [XLEN-1:0] pd_o,
-    input  wire  [XLEN-1:0] pq_i,
-    input  wire             pack_i,
+  output reg             preq_o,
+  output reg  [PLEN-1:0] padr_o,   //Physical Memory Address
+  output reg  [     2:0] psize_o,
+  output reg             plock_o,
+  output reg  [     2:0] pprot_o,
+  output reg             pwe_o,
+  output reg  [XLEN-1:0] pd_o,
+  input  wire [XLEN-1:0] pq_i,
+  input  wire            pack_i,
 
   //Exception
-    output reg              page_fault_o
-  );
+  output reg page_fault_o
+);
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
 
   always @(posedge clk_i) begin
-    if (vreq_i) padr_o <= vadr_i; //TODO: actual translation
+    if (vreq_i) padr_o <= vadr_i;  //TODO: actual translation
   end
 
   //Insert state machine here
   always @(posedge clk_i) begin
     if (clr_i) preq_o <= 1'b0;
-    else       preq_o <= vreq_i;
+    else preq_o <= vreq_i;
   end
 
   always @(posedge clk_i) begin

@@ -57,7 +57,7 @@ entity pu_riscv_noicache_core is
     PLEN        : integer := 64;
     PARCEL_SIZE : integer := 64
   );
-  
+
   port (
     rstn : in std_logic;
     clk  : in std_logic;
@@ -86,8 +86,8 @@ entity pu_riscv_noicache_core is
     biu_we      : out std_logic;
     biu_di      : out std_logic_vector(XLEN-1 downto 0);
     biu_do      : in  std_logic_vector(XLEN-1 downto 0);
-    biu_ack     : in  std_logic;  --data acknowledge, 1 per data
-    biu_err     : in  std_logic;  --data error
+    biu_ack     : in  std_logic;        --data acknowledge, 1 per data
+    biu_err     : in  std_logic;        --data error
 
     biu_is_cacheable   : out std_logic;
     biu_is_instruction : out std_logic;
@@ -139,7 +139,7 @@ begin
   -- To CPU
   if_stall_nxt_pc  <= not dcflush_rdy or not biu_stb_ack or biu_fifo_valid(1);
   if_parcel_signal <= dcflush_rdy and not (if_flush or if_flush_dly) and not if_stall and biu_fifo_valid(0);
-  if_parcel_pc_o <= biu_fifo_adr(0);
+  if_parcel_pc_o   <= biu_fifo_adr(0);
   if_parcel_pc     <= if_parcel_pc_o;
   if_parcel        <= biu_fifo_dat(0)(to_integer(unsigned(if_parcel_pc_o(integer(log2(real(XLEN/32)))+1 downto 1)))*16+PARCEL_SIZE downto PARCEL_SIZE);
 
@@ -149,9 +149,9 @@ begin
   biu_size <= DWORD
               when XLEN = 64 else WORD;
   biu_lock <= '0';
-  biu_we   <= '0';  --no writes
+  biu_we   <= '0';                      --no writes
   biu_di   <= (others => '0');
-  biu_type <= SINGLE;  --single access
+  biu_type <= SINGLE;                   --single access
 
   --Instruction cache..
   biu_is_instruction <= '1';

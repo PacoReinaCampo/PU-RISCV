@@ -106,7 +106,7 @@ entity pu_riscv_ahb3 is
     HARTID : integer := 0;
 
     PARCEL_SIZE : integer := 64
-    );
+  );
   port (
     --AHB interfaces
     HRESETn : in std_logic;
@@ -156,7 +156,7 @@ entity pu_riscv_ahb3 is
     dbg_dato  : out std_logic_vector(XLEN-1 downto 0);
     dbg_ack   : out std_logic;
     dbg_bp    : out std_logic
-    );
+  );
 end pu_riscv_ahb3;
 
 architecture rtl of pu_riscv_ahb3 is
@@ -207,7 +207,7 @@ architecture rtl of pu_riscv_ahb3 is
       HARTID : integer := 0;
 
       PARCEL_SIZE : integer := 64
-      );
+    );
     port (
       rstn : in std_logic;              --Reset
       clk  : in std_logic;              --Clock
@@ -257,7 +257,7 @@ architecture rtl of pu_riscv_ahb3 is
       dbg_dato  : out std_logic_vector(XLEN-1 downto 0);
       dbg_ack   : out std_logic;
       dbg_bp    : out std_logic
-      );
+    );
   end component;
 
   component pu_riscv_imem_ctrl
@@ -279,7 +279,7 @@ architecture rtl of pu_riscv_ahb3 is
       ITCM_SIZE          : integer := 0;
 
       TECHNOLOGY : string := "GENERIC"
-      );
+    );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -321,7 +321,7 @@ architecture rtl of pu_riscv_ahb3 is
       biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);
       biu_ack_i     : in  std_logic;
       biu_err_i     : in  std_logic
-      );
+    );
   end component;
 
   component pu_riscv_dmem_ctrl
@@ -341,7 +341,7 @@ architecture rtl of pu_riscv_ahb3 is
       DTCM_SIZE          : integer := 0;
 
       TECHNOLOGY : string := "GENERIC"
-      );
+    );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -384,14 +384,14 @@ architecture rtl of pu_riscv_ahb3 is
       biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);
       biu_ack_i     : in  std_logic;
       biu_err_i     : in  std_logic
-      );
+    );
   end component;
 
   component pu_riscv_biu2ahb3
     generic (
       XLEN : integer := 64;
       PLEN : integer := 64
-      );
+    );
     port (
       HRESETn : in std_logic;
       HCLK    : in std_logic;
@@ -425,7 +425,7 @@ architecture rtl of pu_riscv_ahb3 is
       biu_q_o       : out std_logic_vector(XLEN-1 downto 0);
       biu_ack_o     : out std_logic;    --transfer acknowledge
       biu_err_o     : out std_logic     --transfer error
-      );
+    );
   end component;
 
   ------------------------------------------------------------------------------
@@ -581,7 +581,7 @@ begin
       dbg_dato  => dbg_dato,
       dbg_ack   => dbg_ack,
       dbg_bp    => dbg_bp
-      );
+    );
 
   --Instantiate bus interfaces and optional caches
 
@@ -645,7 +645,7 @@ begin
       biu_q_i       => ibiu_q,
       biu_ack_i     => ibiu_ack,
       biu_err_i     => ibiu_err
-      );
+    );
 
   --Data Memory Access Block
   dmem_ctrl : pu_riscv_dmem_ctrl
@@ -706,7 +706,7 @@ begin
       biu_q_i       => dbiu_q,
       biu_ack_i     => dbiu_ack,
       biu_err_i     => dbiu_err
-      );
+    );
 
   --Instantiate BIU
   ibiu : pu_riscv_biu2ahb3
@@ -744,7 +744,7 @@ begin
       biu_q_o       => ibiu_q,
       biu_ack_o     => ibiu_ack,
       biu_err_o     => ibiu_err
-      );
+    );
 
   dbiu : pu_riscv_biu2ahb3
     generic map (
@@ -781,5 +781,5 @@ begin
       biu_q_o       => dbiu_q,
       biu_ack_o     => dbiu_ack,
       biu_err_o     => dbiu_err
-      );
+    );
 end rtl;

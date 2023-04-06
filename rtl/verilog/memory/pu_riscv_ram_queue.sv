@@ -45,94 +45,95 @@ module pu_riscv_ram_queue #(
   parameter DBITS                  = 64,
   parameter ALMOST_FULL_THRESHOLD  = 4,
   parameter ALMOST_EMPTY_THRESHOLD = 0
-)
-  (
-    input  wire              rst_ni,         //asynchronous, active low reset
-    input  wire              clk_i,          //rising edge triggered clock
+) (
+  input wire rst_ni,  //asynchronous, active low reset
+  input wire clk_i,   //rising edge triggered clock
 
-    input  wire              clr_i,          //clear all queue entries (synchronous reset)
-    input  wire              ena_i,          //clock enable
+  input wire clr_i,  //clear all queue entries (synchronous reset)
+  input wire ena_i,  //clock enable
 
-    //Queue Write
-    input  wire              we_i,           //Queue write enable
-    input  wire  [DBITS-1:0] d_i,            //Queue write data
+  //Queue Write
+  input wire             we_i,  //Queue write enable
+  input wire [DBITS-1:0] d_i,   //Queue write data
 
-    //Queue Read
-    input  wire              re_i,           //Queue read enable
-    output reg   [DBITS-1:0] q_o,            //Queue read data
+  //Queue Read
+  input  wire             re_i,  //Queue read enable
+  output reg  [DBITS-1:0] q_o,   //Queue read data
 
-    //Status signals
-    output reg               empty_o,        //Queue is empty
-    output reg               full_o,         //Queue is full
-    output reg               almost_empty_o, //Programmable almost empty
-    output reg               almost_full_o   //Programmable almost full
-  );
+  //Status signals
+  output reg empty_o,         //Queue is empty
+  output reg full_o,          //Queue is full
+  output reg almost_empty_o,  //Programmable almost empty
+  output reg almost_full_o    //Programmable almost full
+);
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Constants
   //
   localparam EMPTY_THRESHOLD = 1;
-  localparam FULL_THRESHOLD  = DEPTH - 2;
-  localparam ALMOST_EMPTY_THRESHOLD_CHECK = ALMOST_EMPTY_THRESHOLD <= 0     ? EMPTY_THRESHOLD : ALMOST_EMPTY_THRESHOLD + 1;
-  localparam ALMOST_FULL_THRESHOLD_CHECK  = ALMOST_FULL_THRESHOLD  >= DEPTH ? FULL_THRESHOLD  : ALMOST_FULL_THRESHOLD - 2;
+  localparam FULL_THRESHOLD = DEPTH - 2;
+  localparam ALMOST_EMPTY_THRESHOLD_CHECK = ALMOST_EMPTY_THRESHOLD <= 0 ? EMPTY_THRESHOLD : ALMOST_EMPTY_THRESHOLD + 1;
+  localparam ALMOST_FULL_THRESHOLD_CHECK = ALMOST_FULL_THRESHOLD >= DEPTH ? FULL_THRESHOLD : ALMOST_FULL_THRESHOLD - 2;
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
-  logic [DBITS        -1:0] queue_data[DEPTH];
+  logic [DBITS        -1:0] queue_data [DEPTH];
   logic [$clog2(DEPTH)-1:0] queue_xadr;
   logic [$clog2(DEPTH)-1:0] queue_wadr;
 
   genvar n;
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
 
   //Write Address
-  always @(posedge clk_i,negedge rst_ni) begin
-    if      (!rst_ni) queue_wadr <= 'h0;
-    else if ( clr_i ) queue_wadr <= 'h0;
-    else if ( ena_i )
-      case ({we_i,re_i})
-        2'b01   : queue_wadr <= queue_wadr - 1;
-        2'b10   : queue_wadr <= queue_wadr + 1;
-        default : ;
+  always @(posedge clk_i, negedge rst_ni) begin
+    if (!rst_ni) queue_wadr <= 'h0;
+    else if (clr_i) queue_wadr <= 'h0;
+    else if (ena_i)
+      case ({
+        we_i, re_i
+      })
+        2'b01:   queue_wadr <= queue_wadr - 1;
+        2'b10:   queue_wadr <= queue_wadr + 1;
+        default: ;
       endcase
   end
 
-  assign queue_xadr = ~|queue_wadr ? DEPTH-1 : queue_wadr-1;
+  assign queue_xadr = ~|queue_wadr ? DEPTH - 1 : queue_wadr - 1;
 
   //Queue Data
   generate
-    for (n=0; n<DEPTH-1; n=n+1) begin
-      always @(posedge clk_i,negedge rst_ni) begin
+    for (n = 0; n < DEPTH - 1; n = n + 1) begin
+      always @(posedge clk_i, negedge rst_ni) begin
         if (!rst_ni) begin
           queue_data[n]       <= 'h0;
           queue_data[DEPTH-1] <= 'h0;
-        end
-        else if (clr_i) begin
+        end else if (clr_i) begin
           queue_data[n]       <= 'h0;
           queue_data[DEPTH-1] <= 'h0;
-        end
-        else if (ena_i)
-          case ({we_i,re_i})
-            2'b01  : begin
+        end else if (ena_i)
+          case ({
+            we_i, re_i
+          })
+            2'b01: begin
               queue_data[n]       <= queue_data[n+1];
               queue_data[DEPTH-1] <= 'h0;
             end
-            2'b10  : begin
+            2'b10: begin
               queue_data[queue_wadr] <= d_i;
             end
-            2'b11  : begin
+            2'b11: begin
               queue_data[n]          <= queue_data[n+1];
               queue_data[DEPTH-1]    <= 'h0;
               queue_data[queue_xadr] <= d_i;
             end
-            default : ;
+            default: ;
           endcase
       end
     end
@@ -140,59 +141,67 @@ module pu_riscv_ram_queue #(
 
   //Queue Almost Empty
   always @(posedge clk_i, negedge rst_ni) begin
-    if      (!rst_ni) almost_empty_o <= 1'b1;
-    else if ( clr_i ) almost_empty_o <= 1'b1;
-    else if ( ena_i )
-      case ({we_i,re_i})
-        2'b01   : almost_empty_o <= (queue_wadr <= ALMOST_EMPTY_THRESHOLD_CHECK);
-        2'b10   : almost_empty_o <=~(queue_wadr >  ALMOST_EMPTY_THRESHOLD_CHECK);
-        default : ;
+    if (!rst_ni) almost_empty_o <= 1'b1;
+    else if (clr_i) almost_empty_o <= 1'b1;
+    else if (ena_i)
+      case ({
+        we_i, re_i
+      })
+        2'b01:   almost_empty_o <= (queue_wadr <= ALMOST_EMPTY_THRESHOLD_CHECK);
+        2'b10:   almost_empty_o <= ~(queue_wadr > ALMOST_EMPTY_THRESHOLD_CHECK);
+        default: ;
       endcase
   end
 
   //Queue Empty
   always @(posedge clk_i, negedge rst_ni) begin
-    if      (!rst_ni) empty_o <= 1'b1;
-    else if ( clr_i ) empty_o <= 1'b1;
-    else if ( ena_i )
-      case ({we_i,re_i})
-        2'b01   : empty_o <= (queue_wadr == EMPTY_THRESHOLD);
-        2'b10   : empty_o <= 1'b0;
-        default : ;
+    if (!rst_ni) empty_o <= 1'b1;
+    else if (clr_i) empty_o <= 1'b1;
+    else if (ena_i)
+      case ({
+        we_i, re_i
+      })
+        2'b01:   empty_o <= (queue_wadr == EMPTY_THRESHOLD);
+        2'b10:   empty_o <= 1'b0;
+        default: ;
       endcase
   end
 
   //Queue Almost Full
   always @(posedge clk_i, negedge rst_ni) begin
-    if      (!rst_ni) almost_full_o <= 1'b0;
-    else if ( clr_i ) almost_full_o <= 1'b0;
-    else if ( ena_i )
-      case ({we_i,re_i})
-        2'b01   : almost_full_o <=~(queue_wadr <  ALMOST_FULL_THRESHOLD_CHECK);
-        2'b10   : almost_full_o <= (queue_wadr >= ALMOST_FULL_THRESHOLD_CHECK);
-        default : ;
+    if (!rst_ni) almost_full_o <= 1'b0;
+    else if (clr_i) almost_full_o <= 1'b0;
+    else if (ena_i)
+      case ({
+        we_i, re_i
+      })
+        2'b01:   almost_full_o <= ~(queue_wadr < ALMOST_FULL_THRESHOLD_CHECK);
+        2'b10:   almost_full_o <= (queue_wadr >= ALMOST_FULL_THRESHOLD_CHECK);
+        default: ;
       endcase
   end
 
   //Queue Full
   always @(posedge clk_i, negedge rst_ni) begin
-    if      (!rst_ni) full_o <= 1'b0;
-    else if ( clr_i ) full_o <= 1'b0;
-    else if ( ena_i )
-      case ({we_i,re_i})
-        2'b01   : full_o <= 1'b0;
-        2'b10   : full_o <= (queue_wadr == FULL_THRESHOLD);
-        default : ;
+    if (!rst_ni) full_o <= 1'b0;
+    else if (clr_i) full_o <= 1'b0;
+    else if (ena_i)
+      case ({
+        we_i, re_i
+      })
+        2'b01:   full_o <= 1'b0;
+        2'b10:   full_o <= (queue_wadr == FULL_THRESHOLD);
+        default: ;
       endcase
   end
 
   //Queue output data
   assign q_o = queue_data[0];
 
-  `ifdef rl_ram_queue_WARNINGS
+`ifdef rl_ram_queue_WARNINGS
   always @(posedge clk_i) begin
-    if (empty_o && !we_i &&  re_i) $display("rl_ram_queue (%m): underflow @%0t", $time);
-    if (full_o  &&  we_i && !re_i) $display("rl_ram_queue (%m): overflow @%0t", $time);
+    if (empty_o && !we_i && re_i) $display("rl_ram_queue (%m): underflow @%0t", $time);
+    if (full_o && we_i && !re_i) $display("rl_ram_queue (%m): overflow @%0t", $time);
   end
-  `endif
+`endif
 endmodule

@@ -78,20 +78,20 @@ entity pu_riscv_mux is
     biu_err_o     : out std_logic_vector(PORTS-1 downto 0);  --access error
 
     --Output (to BIU)
-    biu_req_o     : out std_logic;  --BIU access request
-    biu_req_ack_i : in  std_logic;  --BIU ackowledge
-    biu_d_ack_i   : in  std_logic;  --BIU early data acknowledge
+    biu_req_o     : out std_logic;      --BIU access request
+    biu_req_ack_i : in  std_logic;      --BIU ackowledge
+    biu_d_ack_i   : in  std_logic;      --BIU early data acknowledge
     biu_adri_o    : out std_logic_vector(PLEN-1 downto 0);  --address into BIU
     biu_adro_i    : in  std_logic_vector(PLEN-1 downto 0);  --address from BIU
-    biu_size_o    : out std_logic_vector(2 downto 0);  --transfer size
-    biu_type_o    : out std_logic_vector(2 downto 0);  --burst type
+    biu_size_o    : out std_logic_vector(2 downto 0);       --transfer size
+    biu_type_o    : out std_logic_vector(2 downto 0);       --burst type
     biu_lock_o    : out std_logic;
     biu_prot_o    : out std_logic_vector(2 downto 0);
     biu_we_o      : out std_logic;
     biu_d_o       : out std_logic_vector(XLEN-1 downto 0);  --data into BIU
     biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --data from BIU
-    biu_ack_i     : in  std_logic;  --data acknowledge, 1 per data
-    biu_err_i     : in  std_logic  --data error
+    biu_ack_i     : in  std_logic;      --data acknowledge, 1 per data
+    biu_err_i     : in  std_logic       --data error
   );
 end pu_riscv_mux;
 
@@ -235,15 +235,15 @@ begin
         biu_size_o <= biu_size_i (to_integer(unsigned(pending_port)));
         biu_type_o <= biu_type_i (to_integer(unsigned(pending_port)));
         biu_lock_o <= biu_lock_i (to_integer(unsigned(pending_port)));
-        biu_we_o   <= biu_we_i   (to_integer(unsigned(pending_port)));
-        biu_d_o    <= biu_d_i    (to_integer(unsigned(pending_port)));
+        biu_we_o   <= biu_we_i (to_integer(unsigned(pending_port)));
+        biu_d_o    <= biu_d_i (to_integer(unsigned(pending_port)));
       when BURST =>
         biu_req_o  <= biu_ack_i and reduce_nor(burst_cnt) and pending_req;
         biu_adri_o <= biu_adri_i (to_integer(unsigned(pending_port)));
         biu_size_o <= biu_size_i (to_integer(unsigned(pending_port)));
         biu_type_o <= biu_type_i (to_integer(unsigned(pending_port)));
         biu_lock_o <= biu_lock_i (to_integer(unsigned(pending_port)));
-        biu_we_o   <= biu_we_i   (to_integer(unsigned(pending_port)));
+        biu_we_o   <= biu_we_i (to_integer(unsigned(pending_port)));
         if (biu_ack_i = '1' and reduce_nor(burst_cnt) = '1') then
           biu_d_o <= biu_d_i(to_integer(unsigned(pending_port)));
         else
@@ -273,14 +273,14 @@ begin
   generating_0 : for p in 0 to PORTS - 1 generate
     biu_req_ack_o(p) <= biu_req_ack_i
                         when (to_unsigned(p, integer(log2(real(PORTS)))) = unsigned(pending_port)) else '0';
-    biu_d_ack_o(p)   <= biu_d_ack_i
-                        when (to_unsigned(p, integer(log2(real(PORTS)))) = unsigned(pending_port)) else '0';
-    biu_adro_o(p)    <= biu_adro_i;
-    biu_q_o(p)       <= biu_q_i;
-    biu_ack_o(p)     <= biu_ack_i
-                        when (to_unsigned(p, integer(log2(real(PORTS)))) = unsigned(pending_port)) else '0';
-    biu_err_o(p)     <= biu_err_i
-                        when (to_unsigned(p, integer(log2(real(PORTS)))) = unsigned(pending_port)) else '0';
+    biu_d_ack_o(p) <= biu_d_ack_i
+                      when (to_unsigned(p, integer(log2(real(PORTS)))) = unsigned(pending_port)) else '0';
+    biu_adro_o(p) <= biu_adro_i;
+    biu_q_o(p)    <= biu_q_i;
+    biu_ack_o(p)  <= biu_ack_i
+                    when (to_unsigned(p, integer(log2(real(PORTS)))) = unsigned(pending_port)) else '0';
+    biu_err_o(p) <= biu_err_i
+                    when (to_unsigned(p, integer(log2(real(PORTS)))) = unsigned(pending_port)) else '0';
   end generate;
 
   biu_prot_o <= (others => '0');

@@ -55,95 +55,95 @@ package pu_riscv_pkg is
   ------------------------------------------------------------------
 
   --Core Parameters
-  constant XLEN                   : integer := 64;
-  constant PLEN                   : integer := 64;
-  constant FLEN                   : integer := 64;
+  constant XLEN : integer := 64;
+  constant PLEN : integer := 64;
+  constant FLEN : integer := 64;
 
-  constant PC_INIT                : std_logic_vector(XLEN-1 downto 0) := X"0000000080000000";  --Start here after reset
-  constant BASE                   : std_logic_vector(XLEN-1 downto 0) := PC_INIT;  --offset where to load program in memory
+  constant PC_INIT : std_logic_vector(XLEN-1 downto 0) := X"0000000080000000";  --Start here after reset
+  constant BASE    : std_logic_vector(XLEN-1 downto 0) := PC_INIT;  --offset where to load program in memory
 
-  constant INIT_FILE              : string    := "test.hex";
+  constant INIT_FILE : string := "test.hex";
 
-  constant MEM_LATENCY            : std_logic := '1';
-  constant HAS_USER               : std_logic := '1';
-  constant HAS_SUPER              : std_logic := '1';
-  constant HAS_HYPER              : std_logic := '1';
-  constant HAS_BPU                : std_logic := '1';
-  constant HAS_FPU                : std_logic := '1';
-  constant HAS_MMU                : std_logic := '1';
-  constant HAS_RVM                : std_logic := '1';
-  constant HAS_RVA                : std_logic := '1';
-  constant HAS_RVC                : std_logic := '1';
-  constant HAS_RVN                : std_logic := '1';
-  constant HAS_RVB                : std_logic := '1';
-  constant HAS_RVT                : std_logic := '1';
-  constant HAS_RVP                : std_logic := '1';
-  constant HAS_EXT                : std_logic := '1';
+  constant MEM_LATENCY : std_logic := '1';
+  constant HAS_USER    : std_logic := '1';
+  constant HAS_SUPER   : std_logic := '1';
+  constant HAS_HYPER   : std_logic := '1';
+  constant HAS_BPU     : std_logic := '1';
+  constant HAS_FPU     : std_logic := '1';
+  constant HAS_MMU     : std_logic := '1';
+  constant HAS_RVM     : std_logic := '1';
+  constant HAS_RVA     : std_logic := '1';
+  constant HAS_RVC     : std_logic := '1';
+  constant HAS_RVN     : std_logic := '1';
+  constant HAS_RVB     : std_logic := '1';
+  constant HAS_RVT     : std_logic := '1';
+  constant HAS_RVP     : std_logic := '1';
+  constant HAS_EXT     : std_logic := '1';
 
-  constant IS_RV32E               : std_logic := '1';
+  constant IS_RV32E : std_logic := '1';
 
-  constant MULT_LATENCY           : integer := 1;
+  constant MULT_LATENCY : integer := 1;
 
-  constant HTIF                   : std_logic := '0';  --Host-interface
+  constant HTIF : std_logic := '0';     --Host-interface
 
-  constant TOHOST                 : std_logic_vector(XLEN-1 downto 0) := X"0000000080001000";
-  constant UART_TX                : std_logic_vector(XLEN-1 downto 0) := X"0000000080001080";
+  constant TOHOST  : std_logic_vector(XLEN-1 downto 0) := X"0000000080001000";
+  constant UART_TX : std_logic_vector(XLEN-1 downto 0) := X"0000000080001080";
 
-  constant BREAKPOINTS            : integer := 8;  --Number of hardware breakpoints
+  constant BREAKPOINTS : integer := 8;  --Number of hardware breakpoints
 
-  constant PMA_CNT                : integer := 4;
-  constant PMP_CNT                : integer := 16;  --Number of Physical Memory Protection entries
+  constant PMA_CNT : integer := 4;
+  constant PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
 
-  constant BP_GLOBAL_BITS         : integer := 2;
-  constant BP_LOCAL_BITS          : integer := 10;
-  constant BP_LOCAL_BITS_LSB      : integer := 2; 
+  constant BP_GLOBAL_BITS    : integer := 2;
+  constant BP_LOCAL_BITS     : integer := 10;
+  constant BP_LOCAL_BITS_LSB : integer := 2;
 
-  constant ICACHE_SIZE            : integer := 64;  --in KBytes
-  constant ICACHE_BLOCK_SIZE      : integer := 64;  --in Bytes
-  constant ICACHE_WAYS            : integer := 2;  --'n'-way set associative
+  constant ICACHE_SIZE       : integer := 64;  --in KBytes
+  constant ICACHE_BLOCK_SIZE : integer := 64;  --in Bytes
+  constant ICACHE_WAYS       : integer := 2;   --'n'-way set associative
 
-  constant ICACHE_REPLACE_ALG     : std_logic := '0';
-  constant ITCM_SIZE              : integer := 0;
+  constant ICACHE_REPLACE_ALG : std_logic := '0';
+  constant ITCM_SIZE          : integer   := 0;
 
-  constant DCACHE_SIZE            : integer := 64;  --in KBytes
-  constant DCACHE_BLOCK_SIZE      : integer := 64;  --in Bytes
-  constant DCACHE_WAYS            : integer := 2;  --'n'-way set associative
-  constant WRITEBUFFER_SIZE       : integer := 8;
+  constant DCACHE_SIZE       : integer := 64;  --in KBytes
+  constant DCACHE_BLOCK_SIZE : integer := 64;  --in Bytes
+  constant DCACHE_WAYS       : integer := 2;   --'n'-way set associative
+  constant WRITEBUFFER_SIZE  : integer := 8;
 
-  constant DCACHE_REPLACE_ALG     : std_logic := '0';
-  constant DTCM_SIZE              : integer := 0;
+  constant DCACHE_REPLACE_ALG : std_logic := '0';
+  constant DTCM_SIZE          : integer   := 0;
 
-  constant TECHNOLOGY             : string    := "GENERIC";
+  constant TECHNOLOGY : string := "GENERIC";
 
-  constant AVOID_X                : std_logic := '0';
+  constant AVOID_X : std_logic := '0';
 
-  constant MNMIVEC_DEFAULT        : std_logic_vector(XLEN-1 downto 0) := X"0000000000000004";
-  constant MTVEC_DEFAULT          : std_logic_vector(XLEN-1 downto 0) := X"0000000000000040";
-  constant HTVEC_DEFAULT          : std_logic_vector(XLEN-1 downto 0) := X"0000000000000080";
-  constant STVEC_DEFAULT          : std_logic_vector(XLEN-1 downto 0) := X"00000000000000C0";
-  constant UTVEC_DEFAULT          : std_logic_vector(XLEN-1 downto 0) := X"0000000000000100";
+  constant MNMIVEC_DEFAULT : std_logic_vector(XLEN-1 downto 0) := X"0000000000000004";
+  constant MTVEC_DEFAULT   : std_logic_vector(XLEN-1 downto 0) := X"0000000000000040";
+  constant HTVEC_DEFAULT   : std_logic_vector(XLEN-1 downto 0) := X"0000000000000080";
+  constant STVEC_DEFAULT   : std_logic_vector(XLEN-1 downto 0) := X"00000000000000C0";
+  constant UTVEC_DEFAULT   : std_logic_vector(XLEN-1 downto 0) := X"0000000000000100";
 
-  constant JEDEC_BANK             : integer := 10;
+  constant JEDEC_BANK : integer := 10;
 
-  constant JEDEC_MANUFACTURER_ID  : std_logic_vector(7 downto 0) := X"6E";
+  constant JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
 
-  constant HARTID                 : integer := 0;
+  constant HARTID : integer := 0;
 
-  constant PARCEL_SIZE            : integer := 64;
+  constant PARCEL_SIZE : integer := 64;
 
-  constant HADDR_SIZE             : integer := XLEN;
-  constant HDATA_SIZE             : integer := PLEN;
-  constant PADDR_SIZE             : integer := PLEN;
-  constant PDATA_SIZE             : integer := XLEN;
+  constant HADDR_SIZE : integer := XLEN;
+  constant HDATA_SIZE : integer := PLEN;
+  constant PADDR_SIZE : integer := PLEN;
+  constant PDATA_SIZE : integer := XLEN;
 
-  constant SYNC_DEPTH             : integer := 3;
+  constant SYNC_DEPTH : integer := 3;
 
-  constant BUFFER_DEPTH           : integer := 4;
+  constant BUFFER_DEPTH : integer := 4;
 
   --RF Access
-  constant RDPORTS                : integer := 2;
-  constant WRPORTS                : integer := 1;
-  constant AR_BITS                : integer := 5;
+  constant RDPORTS : integer := 2;
+  constant WRPORTS : integer := 1;
+  constant AR_BITS : integer := 5;
 
   --Definitions Package
   constant ARCHID       : integer := 12;
@@ -157,7 +157,7 @@ package pu_riscv_pkg is
   ------------------------------------------------------------------
 
   --RISCV Opcodes Package
-  constant ILEN      : integer := 64;
+  constant ILEN      : integer                           := 64;
   constant INSTR_NOP : std_logic_vector(ILEN-1 downto 0) := X"0000000000000013";
 
   --Opcodes
@@ -183,12 +183,12 @@ package pu_riscv_pkg is
   constant OPC_JAL      : std_logic_vector(6 downto 2) := "11011";
   constant OPC_SYSTEM   : std_logic_vector(6 downto 2) := "11100";
 
-  constant OPC00_LOAD   : std_logic_vector(6 downto 0) := "0000000";
-  constant OPC00_STORE  : std_logic_vector(6 downto 0) := "0001000";
+  constant OPC00_LOAD  : std_logic_vector(6 downto 0) := "0000000";
+  constant OPC00_STORE : std_logic_vector(6 downto 0) := "0001000";
 
-  constant OPC0_BRANCH  : std_logic_vector(7 downto 2) := "011000";
-  constant OPC0_JAL     : std_logic_vector(7 downto 2) := "001011";
-  constant OPC0_JALR    : std_logic_vector(7 downto 2) := "011001";
+  constant OPC0_BRANCH : std_logic_vector(7 downto 2) := "011000";
+  constant OPC0_JAL    : std_logic_vector(7 downto 2) := "001011";
+  constant OPC0_JALR   : std_logic_vector(7 downto 2) := "011001";
 
   --RV32/RV64 Base instructions
   constant LUI   : std_logic_vector(15 downto 0) := "XXXXXXXXXXX01101";
@@ -259,7 +259,7 @@ package pu_riscv_pkg is
   constant MRTH      : std_logic_vector(63 downto 0) := "0000000000000000000000000000000000110000011000000000000001110011";
   constant HRTS      : std_logic_vector(63 downto 0) := "0000000000000000000000000000000000100000010100000000000001110011";
 
-  constant WFI       : std_logic_vector(63 downto 0) := "0000000000000000000000000000000000010000010100000000000001110011";
+  constant WFI : std_logic_vector(63 downto 0) := "0000000000000000000000000000000000010000010100000000000001110011";
 
   constant CSRRW  : std_logic_vector(15 downto 0) := "0XXXXXXX00111100";
   constant CSRRS  : std_logic_vector(15 downto 0) := "0XXXXXXX01011100";
@@ -382,17 +382,17 @@ package pu_riscv_pkg is
 
   --Hypervisor
   --Hypervisor trap setup
-  constant HSTATUS    : std_logic_vector(11 downto 0) := X"200";
-  constant HEDELEG    : std_logic_vector(11 downto 0) := X"202";
-  constant HIDELEG    : std_logic_vector(11 downto 0) := X"203";
-  constant HIE        : std_logic_vector(11 downto 0) := X"204";
-  constant HTVEC      : std_logic_vector(11 downto 0) := X"205";
+  constant HSTATUS  : std_logic_vector(11 downto 0) := X"200";
+  constant HEDELEG  : std_logic_vector(11 downto 0) := X"202";
+  constant HIDELEG  : std_logic_vector(11 downto 0) := X"203";
+  constant HIE      : std_logic_vector(11 downto 0) := X"204";
+  constant HTVEC    : std_logic_vector(11 downto 0) := X"205";
   --Hypervisor Trap Handling
-  constant HSCRATCH   : std_logic_vector(11 downto 0) := X"240";
-  constant HEPC       : std_logic_vector(11 downto 0) := X"241";
-  constant HCAUSE     : std_logic_vector(11 downto 0) := X"242";
-  constant HTVAL      : std_logic_vector(11 downto 0) := X"243";
-  constant HIP        : std_logic_vector(11 downto 0) := X"244";
+  constant HSCRATCH : std_logic_vector(11 downto 0) := X"240";
+  constant HEPC     : std_logic_vector(11 downto 0) := X"241";
+  constant HCAUSE   : std_logic_vector(11 downto 0) := X"242";
+  constant HTVAL    : std_logic_vector(11 downto 0) := X"243";
+  constant HIP      : std_logic_vector(11 downto 0) := X"244";
 
   --Machine
   --Machine Information
@@ -595,10 +595,10 @@ package pu_riscv_pkg is
   constant BP_CTRL_IMP             : integer := 0;
   constant BP_CTRL_ENA             : integer := 1;
 
-  constant BP_CTRL_CC_FETCH        : std_logic_vector(2 downto 0) := "000";
-  constant BP_CTRL_CC_LD_ADR       : std_logic_vector(2 downto 0) := "001";
-  constant BP_CTRL_CC_ST_ADR       : std_logic_vector(2 downto 0) := "010";
-  constant BP_CTRL_CC_LDST_ADR     : std_logic_vector(2 downto 0) := "100";
+  constant BP_CTRL_CC_FETCH    : std_logic_vector(2 downto 0) := "000";
+  constant BP_CTRL_CC_LD_ADR   : std_logic_vector(2 downto 0) := "001";
+  constant BP_CTRL_CC_ST_ADR   : std_logic_vector(2 downto 0) := "010";
+  constant BP_CTRL_CC_LDST_ADR : std_logic_vector(2 downto 0) := "100";
 
   -- addr         Key  Description
   -- --------------------------------------------

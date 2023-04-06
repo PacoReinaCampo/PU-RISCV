@@ -51,7 +51,7 @@ entity pu_riscv_dbg_bfm is
   generic (
     XLEN : integer := 64;
     PLEN : integer := 64
-    );
+  );
   port (
     rstn : in std_logic;
     clk  : in std_logic;
@@ -65,7 +65,7 @@ entity pu_riscv_dbg_bfm is
     cpu_dat_o   : out std_logic_vector(XLEN-1 downto 0);
     cpu_dat_i   : in  std_logic_vector(XLEN-1 downto 0);
     cpu_ack_i   : in  std_logic
-    );
+  );
 end pu_riscv_dbg_bfm;
 
 architecture rtl of pu_riscv_dbg_bfm is
@@ -86,7 +86,8 @@ begin
     if (rstn = '0') then
       stall_cpu <= '0';
     elsif (rising_edge(clk)) then
-      if (cpu_bp_i = '1') then  --gets cleared by task unstall_cpu
+      -- gets cleared by task unstall_cpu
+      if (cpu_bp_i = '1') then
         stall_cpu <= '1';
       end if;
     end if;

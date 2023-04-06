@@ -41,47 +41,43 @@
  */
 
 module pu_riscv_ram_1rw_generic #(
-  parameter ABITS      = 10,
-  parameter DBITS      = 32
-)
-  (
-    input                        rst_ni,
-    input                        clk_i,
+  parameter ABITS = 10,
+  parameter DBITS = 32
+) (
+  input rst_ni,
+  input clk_i,
 
-    input      [ ABITS     -1:0] addr_i,
-    input                        we_i,
-    input      [(DBITS+7)/8-1:0] be_i,
-    input      [ DBITS     -1:0] din_i,
-    output reg [ DBITS     -1:0] dout_o
-  );
+  input      [ ABITS     -1:0] addr_i,
+  input                        we_i,
+  input      [(DBITS+7)/8-1:0] be_i,
+  input      [ DBITS     -1:0] din_i,
+  output reg [ DBITS     -1:0] dout_o
+);
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
   genvar i;
 
-  reg [DBITS-1:0] mem_array [2**ABITS -1:0];  //memory array
-  reg [ABITS-1:0] addr_reg;                   //latched read address
+  reg [DBITS-1:0] mem_array                        [2**ABITS -1:0];  //memory array
+  reg [ABITS-1:0] addr_reg;  //latched read address
 
-  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
 
   //write side
   generate
-    for (i=0; i<(DBITS+7)/8; i=i+1) begin: write
-      if (i*8 + 8 > DBITS) begin
+    for (i = 0; i < (DBITS + 7) / 8; i = i + 1) begin : write
+      if (i * 8 + 8 > DBITS) begin
         always @(posedge clk_i) begin
-          if (we_i && be_i[i])
-            mem_array[ addr_i ] [DBITS-1:i*8] <= din_i[DBITS-1:i*8];
+          if (we_i && be_i[i]) mem_array[addr_i][DBITS-1:i*8] <= din_i[DBITS-1:i*8];
         end
-      end
-      else begin
+      end else begin
         always @(posedge clk_i) begin
-          if (we_i && be_i[i])
-            mem_array[ addr_i ][i*8+:8] <= din_i[i*8+:8];
+          if (we_i && be_i[i]) mem_array[addr_i][i*8+:8] <= din_i[i*8+:8];
         end
       end
     end
@@ -90,6 +86,6 @@ module pu_riscv_ram_1rw_generic #(
   //read side
   //per Altera's recommendations; avoids bypass logic
   always @(posedge clk_i) begin
-    dout_o <= mem_array[ addr_i ];
+    dout_o <= mem_array[addr_i];
   end
 endmodule

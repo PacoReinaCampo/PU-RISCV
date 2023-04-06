@@ -52,55 +52,55 @@ use work.vhdl_pkg.all;
 
 entity pu_riscv_core is
   generic (
-    XLEN                  : integer := 64;
-    PLEN                  : integer := 64;
-    ILEN                  : integer := 64;
-    EXCEPTION_SIZE        : integer := 16;
-    HAS_USER              : std_logic := '1';
-    HAS_SUPER             : std_logic := '1';
-    HAS_HYPER             : std_logic := '1';
-    HAS_BPU               : std_logic := '1';
-    HAS_FPU               : std_logic := '1';
-    HAS_MMU               : std_logic := '1';
-    HAS_RVA               : std_logic := '1';
-    HAS_RVM               : std_logic := '1';
-    HAS_RVC               : std_logic := '1';
-    IS_RV32E              : std_logic := '1';
+    XLEN           : integer   := 64;
+    PLEN           : integer   := 64;
+    ILEN           : integer   := 64;
+    EXCEPTION_SIZE : integer   := 16;
+    HAS_USER       : std_logic := '1';
+    HAS_SUPER      : std_logic := '1';
+    HAS_HYPER      : std_logic := '1';
+    HAS_BPU        : std_logic := '1';
+    HAS_FPU        : std_logic := '1';
+    HAS_MMU        : std_logic := '1';
+    HAS_RVA        : std_logic := '1';
+    HAS_RVM        : std_logic := '1';
+    HAS_RVC        : std_logic := '1';
+    IS_RV32E       : std_logic := '1';
 
-    MULT_LATENCY          : std_logic := '1';
+    MULT_LATENCY : std_logic := '1';
 
-    BREAKPOINTS           : integer := 8;
+    BREAKPOINTS : integer := 8;
 
-    PMA_CNT               : integer := 4;
-    PMP_CNT               : integer := 16;
+    PMA_CNT : integer := 4;
+    PMP_CNT : integer := 16;
 
-    BP_GLOBAL_BITS        : integer := 2;
-    BP_LOCAL_BITS         : integer := 10;
-    BP_LOCAL_BITS_LSB     : integer := 2;
+    BP_GLOBAL_BITS    : integer := 2;
+    BP_LOCAL_BITS     : integer := 10;
+    BP_LOCAL_BITS_LSB : integer := 2;
 
-    DU_ADDR_SIZE          : integer := 12;
-    MAX_BREAKPOINTS       : integer := 8;
+    DU_ADDR_SIZE    : integer := 12;
+    MAX_BREAKPOINTS : integer := 8;
 
-    TECHNOLOGY            : string := "GENERIC";
+    TECHNOLOGY : string := "GENERIC";
 
-    PC_INIT               : std_logic_vector(63 downto 0) := X"0000000080000000";
+    PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000";
 
-    MNMIVEC_DEFAULT       : std_logic_vector(63 downto 0) := X"0000000000000004";
-    MTVEC_DEFAULT         : std_logic_vector(63 downto 0) := X"0000000000000040";
-    HTVEC_DEFAULT         : std_logic_vector(63 downto 0) := X"0000000000000080";
-    STVEC_DEFAULT         : std_logic_vector(63 downto 0) := X"00000000000000C0";
-    UTVEC_DEFAULT         : std_logic_vector(63 downto 0) := X"0000000000000100";
+    MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
+    MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
+    HTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000080";
+    STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
+    UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
 
-    JEDEC_BANK            : integer := 10;
+    JEDEC_BANK            : integer                      := 10;
     JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
 
-    HARTID                : integer := 0;
+    HARTID : integer := 0;
 
-    PARCEL_SIZE           : integer := 64
+    PARCEL_SIZE : integer := 64
   );
   port (
-    rstn : in std_logic;  --Reset
-    clk  : in std_logic;  --Clock
+    rstn : in std_logic;                --Reset
+    clk  : in std_logic;                --Clock
 
     --Instruction Memory Access bus
     if_stall_nxt_pc      : in  std_logic;
@@ -114,16 +114,16 @@ entity pu_riscv_core is
     if_parcel_page_fault : in  std_logic;
 
     --Data Memory Access bus
-    dmem_adr         : out std_logic_vector(XLEN-1 downto 0);
-    dmem_d           : out std_logic_vector(XLEN-1 downto 0);
-    dmem_q           : in  std_logic_vector(XLEN-1 downto 0);
-    dmem_we          : out std_logic;
-    dmem_size        : out std_logic_vector(2 downto 0);
-    dmem_req         : out std_logic;
-    dmem_ack         : in  std_logic;
-    dmem_err         : in  std_logic;
-    dmem_misaligned  : in  std_logic;
-    dmem_page_fault  : in  std_logic;
+    dmem_adr        : out std_logic_vector(XLEN-1 downto 0);
+    dmem_d          : out std_logic_vector(XLEN-1 downto 0);
+    dmem_q          : in  std_logic_vector(XLEN-1 downto 0);
+    dmem_we         : out std_logic;
+    dmem_size       : out std_logic_vector(2 downto 0);
+    dmem_req        : out std_logic;
+    dmem_ack        : in  std_logic;
+    dmem_err        : in  std_logic;
+    dmem_misaligned : in  std_logic;
+    dmem_page_fault : in  std_logic;
 
     --cpu state
     st_prv     : out std_logic_vector(1 downto 0);
@@ -161,8 +161,8 @@ architecture rtl of pu_riscv_core is
       PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
     );
     port (
-      rstn     : in std_logic;  --Reset
-      clk      : in std_logic;  --Clock
+      rstn     : in std_logic;          --Reset
+      clk      : in std_logic;          --Clock
       id_stall : in std_logic;
 
       if_stall_nxt_pc      : in std_logic;
@@ -180,9 +180,9 @@ architecture rtl of pu_riscv_core is
       bp_bp_predict : in  std_logic_vector(1 downto 0);  --Branch Prediction bits
       if_bp_predict : out std_logic_vector(1 downto 0);  --push down the pipe
 
-      bu_flush : in std_logic;  --flush pipe & load new program counter
+      bu_flush : in std_logic;          --flush pipe & load new program counter
       st_flush : in std_logic;
-      du_flush : in std_logic;  --flush pipe after debug exit
+      du_flush : in std_logic;          --flush pipe after debug exit
 
       bu_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  --Branch Unit Next Program Counter
       st_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  --State Next Program Counter
@@ -274,10 +274,10 @@ architecture rtl of pu_riscv_core is
 
   component pu_riscv_execution
     generic (
-      XLEN           : integer := 64;
-      ILEN           : integer := 64;
-      EXCEPTION_SIZE : integer := 16;
-      BP_GLOBAL_BITS : integer := 2;
+      XLEN           : integer   := 64;
+      ILEN           : integer   := 64;
+      EXCEPTION_SIZE : integer   := 16;
+      BP_GLOBAL_BITS : integer   := 2;
       HAS_RVC        : std_logic := '1';
       HAS_RVA        : std_logic := '1';
       HAS_RVM        : std_logic := '1';
@@ -400,8 +400,8 @@ architecture rtl of pu_riscv_core is
       mem_exception : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
       --From EX
-      ex_r     : in  std_logic_vector(XLEN-1 downto 0);
-      dmem_adr : in  std_logic_vector(XLEN-1 downto 0);
+      ex_r     : in std_logic_vector(XLEN-1 downto 0);
+      dmem_adr : in std_logic_vector(XLEN-1 downto 0);
 
       --To WB
       mem_r      : out std_logic_vector(XLEN-1 downto 0);
@@ -419,10 +419,10 @@ architecture rtl of pu_riscv_core is
       PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
     );
     port (
-      rst_ni : in std_logic;  --Reset
-      clk_i  : in std_logic;  --Clock
+      rst_ni : in std_logic;            --Reset
+      clk_i  : in std_logic;            --Clock
 
-      wb_stall_o : out std_logic;  --Stall on memory-wait
+      wb_stall_o : out std_logic;       --Stall on memory-wait
 
       mem_pc_i : in  std_logic_vector(XLEN-1 downto 0);
       wb_pc_o  : out std_logic_vector(XLEN-1 downto 0);
@@ -455,28 +455,28 @@ architecture rtl of pu_riscv_core is
 
   component pu_riscv_state
     generic (
-      XLEN            : integer := 64;
-      FLEN            : integer := 64;
-      ILEN            : integer := 64;
-      EXCEPTION_SIZE  : integer := 16;
+      XLEN           : integer := 64;
+      FLEN           : integer := 64;
+      ILEN           : integer := 64;
+      EXCEPTION_SIZE : integer := 16;
 
-      IS_RV32E        : std_logic := '0';
-      HAS_RVN         : std_logic := '1';
-      HAS_RVC         : std_logic := '1';
-      HAS_FPU         : std_logic := '1';
-      HAS_MMU         : std_logic := '1';
-      HAS_RVM         : std_logic := '1';
-      HAS_RVA         : std_logic := '1';
-      HAS_RVB         : std_logic := '1';
-      HAS_RVT         : std_logic := '1';
-      HAS_RVP         : std_logic := '1';
-      HAS_EXT         : std_logic := '1';
+      IS_RV32E : std_logic := '0';
+      HAS_RVN  : std_logic := '1';
+      HAS_RVC  : std_logic := '1';
+      HAS_FPU  : std_logic := '1';
+      HAS_MMU  : std_logic := '1';
+      HAS_RVM  : std_logic := '1';
+      HAS_RVA  : std_logic := '1';
+      HAS_RVB  : std_logic := '1';
+      HAS_RVT  : std_logic := '1';
+      HAS_RVP  : std_logic := '1';
+      HAS_EXT  : std_logic := '1';
 
-      HAS_USER        : std_logic := '1';
-      HAS_SUPER       : std_logic := '1';
-      HAS_HYPER       : std_logic := '1';
+      HAS_USER  : std_logic := '1';
+      HAS_SUPER : std_logic := '1';
+      HAS_HYPER : std_logic := '1';
 
-      PC_INIT         : std_logic_vector(63 downto 0) := X"0000000080000000";
+      PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000";
 
       MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
       MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
@@ -484,64 +484,64 @@ architecture rtl of pu_riscv_core is
       STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
       UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
 
-      JEDEC_BANK            : integer := 10;
+      JEDEC_BANK            : integer                      := 10;
       JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
 
-      PMP_CNT               : integer := 16;
-      HARTID                : integer := 0
+      PMP_CNT : integer := 16;
+      HARTID  : integer := 0
     );
     port (
-    rstn : in std_logic;
-    clk  : in std_logic;
+      rstn : in std_logic;
+      clk  : in std_logic;
 
-    id_pc     : in std_logic_vector(XLEN-1 downto 0);
-    id_bubble : in std_logic;
-    id_instr  : in std_logic_vector(ILEN-1 downto 0);
-    id_stall  : in std_logic;
+      id_pc     : in std_logic_vector(XLEN-1 downto 0);
+      id_bubble : in std_logic;
+      id_instr  : in std_logic_vector(ILEN-1 downto 0);
+      id_stall  : in std_logic;
 
-    bu_flush  : in  std_logic;
-    bu_nxt_pc : in  std_logic_vector(XLEN-1 downto 0);
-    st_flush  : out std_logic;
-    st_nxt_pc : out std_logic_vector(XLEN-1 downto 0);
+      bu_flush  : in  std_logic;
+      bu_nxt_pc : in  std_logic_vector(XLEN-1 downto 0);
+      st_flush  : out std_logic;
+      st_nxt_pc : out std_logic_vector(XLEN-1 downto 0);
 
-    wb_pc        : in std_logic_vector(XLEN-1 downto 0);
-    wb_bubble    : in std_logic;
-    wb_instr     : in std_logic_vector(ILEN-1 downto 0);
-    wb_exception : in std_logic_vector(EXCEPTION_SIZE-1 downto 0);
-    wb_badaddr   : in std_logic_vector(XLEN-1 downto 0);
+      wb_pc        : in std_logic_vector(XLEN-1 downto 0);
+      wb_bubble    : in std_logic;
+      wb_instr     : in std_logic_vector(ILEN-1 downto 0);
+      wb_exception : in std_logic_vector(EXCEPTION_SIZE-1 downto 0);
+      wb_badaddr   : in std_logic_vector(XLEN-1 downto 0);
 
-    st_interrupt  : out std_logic;
-    st_prv        : out std_logic_vector(1 downto 0);  --Privilege level
-    st_xlen       : out std_logic_vector(1 downto 0);  --Active Architecture
-    st_tvm        : out std_logic;      --trap on satp access or SFENCE.VMA
-    st_tw         : out std_logic;      --trap on WFI (after time >=0)
-    st_tsr        : out std_logic;      --trap SRET
-    st_mcounteren : out std_logic_vector(XLEN-1 downto 0);
-    st_scounteren : out std_logic_vector(XLEN-1 downto 0);
-    st_pmpcfg     : out std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
-    st_pmpaddr    : out std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
+      st_interrupt  : out std_logic;
+      st_prv        : out std_logic_vector(1 downto 0);  --Privilege level
+      st_xlen       : out std_logic_vector(1 downto 0);  --Active Architecture
+      st_tvm        : out std_logic;    --trap on satp access or SFENCE.VMA
+      st_tw         : out std_logic;    --trap on WFI (after time >=0)
+      st_tsr        : out std_logic;    --trap SRET
+      st_mcounteren : out std_logic_vector(XLEN-1 downto 0);
+      st_scounteren : out std_logic_vector(XLEN-1 downto 0);
+      st_pmpcfg     : out std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
+      st_pmpaddr    : out std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
 
 
-    --interrupts (3=M-mode, 0=U-mode)
-    ext_int  : in std_logic_vector(3 downto 0);  --external interrupt (per privilege mode; determined by PIC)
-    ext_tint : in std_logic;            --machine timer interrupt
-    ext_sint : in std_logic;            --machine software interrupt (for ipi)
-    ext_nmi  : in std_logic;            --non-maskable interrupt
+      --interrupts (3=M-mode, 0=U-mode)
+      ext_int  : in std_logic_vector(3 downto 0);  --external interrupt (per privilege mode; determined by PIC)
+      ext_tint : in std_logic;          --machine timer interrupt
+      ext_sint : in std_logic;          --machine software interrupt (for ipi)
+      ext_nmi  : in std_logic;          --non-maskable interrupt
 
-    --CSR interface
-    ex_csr_reg  : in  std_logic_vector(11 downto 0);
-    ex_csr_we   : in  std_logic;
-    ex_csr_wval : in  std_logic_vector(XLEN-1 downto 0);
-    st_csr_rval : out std_logic_vector(XLEN-1 downto 0);
+      --CSR interface
+      ex_csr_reg  : in  std_logic_vector(11 downto 0);
+      ex_csr_we   : in  std_logic;
+      ex_csr_wval : in  std_logic_vector(XLEN-1 downto 0);
+      st_csr_rval : out std_logic_vector(XLEN-1 downto 0);
 
-    --Debug interface
-    du_stall      : in  std_logic;
-    du_flush      : in  std_logic;
-    du_we_csr     : in  std_logic;
-    du_dato       : in  std_logic_vector(XLEN-1 downto 0);  --output from debug unit
-    du_addr       : in  std_logic_vector(11 downto 0);
-    du_ie         : in  std_logic_vector(31 downto 0);
-    du_exceptions : out std_logic_vector(31 downto 0)
+      --Debug interface
+      du_stall      : in  std_logic;
+      du_flush      : in  std_logic;
+      du_we_csr     : in  std_logic;
+      du_dato       : in  std_logic_vector(XLEN-1 downto 0);  --output from debug unit
+      du_addr       : in  std_logic_vector(11 downto 0);
+      du_ie         : in  std_logic_vector(31 downto 0);
+      du_exceptions : out std_logic_vector(31 downto 0)
     );
   end component;
 
@@ -582,8 +582,8 @@ architecture rtl of pu_riscv_core is
 
       HAS_BPU : std_logic := '1';
 
-      BP_GLOBAL_BITS : integer := 2;
-      BP_LOCAL_BITS : integer := 10;
+      BP_GLOBAL_BITS    : integer := 2;
+      BP_LOCAL_BITS     : integer := 10;
       BP_LOCAL_BITS_LSB : integer := 2;
 
       TECHNOLOGY : string := "GENERIC";
@@ -806,7 +806,7 @@ begin
       EXCEPTION_SIZE => EXCEPTION_SIZE,
 
       PC_INIT => PC_INIT
-    )
+      )
     port map (
       rstn                 => rstn,
       clk                  => clk,
@@ -842,7 +842,7 @@ begin
       XLEN           => XLEN,
       ILEN           => ILEN,
       EXCEPTION_SIZE => EXCEPTION_SIZE
-    )
+      )
     port map (
       rstn          => rstn,
       clk           => clk,
@@ -911,7 +911,7 @@ begin
       MULT_LATENCY   => MULT_LATENCY,
 
       PC_INIT => PC_INIT
-    )
+      )
     port map (
       rstn          => rstn,
       clk           => clk,
@@ -985,7 +985,7 @@ begin
       EXCEPTION_SIZE => EXCEPTION_SIZE,
 
       PC_INIT => PC_INIT
-    )
+      )
     port map (
       rstn          => rstn,
       clk           => clk,
@@ -1016,7 +1016,7 @@ begin
       EXCEPTION_SIZE => EXCEPTION_SIZE,
 
       PC_INIT => PC_INIT
-    )
+      )
     port map (
       rst_ni            => rstn,
       clk_i             => clk,
@@ -1042,35 +1042,35 @@ begin
       wb_we_o           => wb_we
     );
 
-  rf_dst  (0) <= wb_dst;
+  rf_dst (0)  <= wb_dst;
   rf_dstv (0) <= wb_r;
-  rf_we   (0) <= wb_we;
+  rf_we (0)   <= wb_we;
 
   --Thread state
   cpu_state : pu_riscv_state
     generic map (
-      XLEN            => XLEN,
-      FLEN            => 64,
-      ILEN            => ILEN,
-      EXCEPTION_SIZE  => EXCEPTION_SIZE,
+      XLEN           => XLEN,
+      FLEN           => 64,
+      ILEN           => ILEN,
+      EXCEPTION_SIZE => EXCEPTION_SIZE,
 
-      IS_RV32E        => IS_RV32E,
-      HAS_RVN         => HAS_RVN,
-      HAS_RVC         => HAS_RVC,
-      HAS_FPU         => HAS_FPU,
-      HAS_MMU         => HAS_MMU,
-      HAS_RVM         => HAS_RVM,
-      HAS_RVA         => HAS_RVA,
-      HAS_RVB         => HAS_RVB,
-      HAS_RVT         => HAS_RVT,
-      HAS_RVP         => HAS_RVP,
-      HAS_EXT         => HAS_EXT,
+      IS_RV32E => IS_RV32E,
+      HAS_RVN  => HAS_RVN,
+      HAS_RVC  => HAS_RVC,
+      HAS_FPU  => HAS_FPU,
+      HAS_MMU  => HAS_MMU,
+      HAS_RVM  => HAS_RVM,
+      HAS_RVA  => HAS_RVA,
+      HAS_RVB  => HAS_RVB,
+      HAS_RVT  => HAS_RVT,
+      HAS_RVP  => HAS_RVP,
+      HAS_EXT  => HAS_EXT,
 
-      HAS_USER        => HAS_USER,
-      HAS_SUPER       => HAS_SUPER,
-      HAS_HYPER       => HAS_HYPER,
+      HAS_USER  => HAS_USER,
+      HAS_SUPER => HAS_SUPER,
+      HAS_HYPER => HAS_HYPER,
 
-      PC_INIT         => PC_INIT,
+      PC_INIT => PC_INIT,
 
       MNMIVEC_DEFAULT => MNMIVEC_DEFAULT,
       MTVEC_DEFAULT   => MTVEC_DEFAULT,
@@ -1081,28 +1081,28 @@ begin
       JEDEC_BANK            => JEDEC_BANK,
       JEDEC_MANUFACTURER_ID => JEDEC_MANUFACTURER_ID,
 
-      PMP_CNT               => PMP_CNT,
-      HARTID                => HARTID
-    )
+      PMP_CNT => PMP_CNT,
+      HARTID  => HARTID
+      )
     port map (
-      rstn          => rstn,
-      clk           => clk,
+      rstn => rstn,
+      clk  => clk,
 
-      id_pc         => id_pc,
-      id_bubble     => id_bubble,
-      id_instr      => id_instr,
-      id_stall      => id_stall,
+      id_pc     => id_pc,
+      id_bubble => id_bubble,
+      id_instr  => id_instr,
+      id_stall  => id_stall,
 
-      bu_flush      => bu_flush,
-      bu_nxt_pc     => bu_nxt_pc,
-      st_flush      => st_flush,
-      st_nxt_pc     => st_nxt_pc,
+      bu_flush  => bu_flush,
+      bu_nxt_pc => bu_nxt_pc,
+      st_flush  => st_flush,
+      st_nxt_pc => st_nxt_pc,
 
-      wb_pc         => wb_pc,
-      wb_bubble     => wb_bubble,
-      wb_instr      => wb_instr,
-      wb_exception  => wb_exception,
-      wb_badaddr    => wb_badaddr,
+      wb_pc        => wb_pc,
+      wb_bubble    => wb_bubble,
+      wb_instr     => wb_instr,
+      wb_exception => wb_exception,
+      wb_badaddr   => wb_badaddr,
 
       st_interrupt  => st_interrupt,
       st_prv        => st_prv_sgn,
@@ -1115,20 +1115,20 @@ begin
       st_pmpcfg     => st_pmpcfg,
       st_pmpaddr    => st_pmpaddr,
 
-      ext_int       => ext_int,
-      ext_tint      => ext_tint,
-      ext_sint      => ext_sint,
-      ext_nmi       => ext_nmi,
+      ext_int  => ext_int,
+      ext_tint => ext_tint,
+      ext_sint => ext_sint,
+      ext_nmi  => ext_nmi,
 
-      ex_csr_reg    => ex_csr_reg,
-      ex_csr_we     => ex_csr_we,
-      ex_csr_wval   => ex_csr_wval,
-      st_csr_rval   => st_csr_rval,
+      ex_csr_reg  => ex_csr_reg,
+      ex_csr_we   => ex_csr_we,
+      ex_csr_wval => ex_csr_wval,
+      st_csr_rval => st_csr_rval,
 
-      du_stall      => du_stall,
-      du_flush      => du_flush,
-      du_we_csr     => du_we_csr,
-      du_dato       => du_dato,
+      du_stall  => du_stall,
+      du_flush  => du_flush,
+      du_we_csr => du_we_csr,
+      du_dato   => du_dato,
 
       du_addr       => du_addr,
       du_ie         => du_ie,
@@ -1142,7 +1142,7 @@ begin
       AR_BITS => AR_BITS,
       RDPORTS => RDPORTS,
       WRPORTS => WRPORTS
-    )
+      )
     port map (
       rstn       => rstn,
       clk        => clk,
@@ -1181,7 +1181,7 @@ begin
         AVOID_X => '0',
 
         PC_INIT => PC_INIT
-      )
+        )
       port map (
         rst_ni => rstn,
         clk_i  => clk,
@@ -1211,7 +1211,7 @@ begin
       MAX_BREAKPOINTS => MAX_BREAKPOINTS,
 
       BREAKPOINTS => BREAKPOINTS
-    )
+      )
     port map (
       rstn          => rstn,
       clk           => clk,

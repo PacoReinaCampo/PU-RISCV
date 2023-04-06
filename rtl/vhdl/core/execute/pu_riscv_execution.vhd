@@ -49,10 +49,10 @@ use ieee.numeric_std.all;
 
 entity pu_riscv_execution is
   generic (
-    XLEN           : integer := 64;
-    ILEN           : integer := 64;
-    EXCEPTION_SIZE : integer := 64;
-    BP_GLOBAL_BITS : integer := 64;
+    XLEN           : integer   := 64;
+    ILEN           : integer   := 64;
+    EXCEPTION_SIZE : integer   := 64;
+    BP_GLOBAL_BITS : integer   := 64;
     HAS_RVC        : std_logic := '1';
     HAS_RVA        : std_logic := '1';
     HAS_RVM        : std_logic := '1';
@@ -148,8 +148,8 @@ end pu_riscv_execution;
 architecture rtl of pu_riscv_execution is
   component pu_riscv_alu
     generic (
-      XLEN    : integer := 64;
-      ILEN    : integer := 64;
+      XLEN    : integer   := 64;
+      ILEN    : integer   := 64;
       HAS_RVC : std_logic := '1'
     );
     port (
@@ -237,7 +237,7 @@ architecture rtl of pu_riscv_execution is
       EXCEPTION_SIZE : integer := 16;
       BP_GLOBAL_BITS : integer := 2;
 
-      HAS_RVC : std_logic := '1';
+      HAS_RVC : std_logic                     := '1';
       PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
     );
     port (
@@ -392,7 +392,7 @@ begin
   processing_1 : process (clk)
   begin
     if (rising_edge(clk)) then
-       if (ex_stall_sgn = '0') then
+      if (ex_stall_sgn = '0') then
         ex_instr <= id_instr;
       end if;
     end if;
@@ -469,7 +469,7 @@ begin
       XLEN    => XLEN,
       ILEN    => ILEN,
       HAS_RVC => HAS_RVC
-    )
+      )
     port map (
       rstn        => rstn,
       clk         => clk,
@@ -494,7 +494,7 @@ begin
       XLEN           => XLEN,
       ILEN           => ILEN,
       EXCEPTION_SIZE => EXCEPTION_SIZE
-    )
+      )
     port map (
       rstn            => rstn,
       clk             => clk,
@@ -533,7 +533,7 @@ begin
 
       HAS_RVC => HAS_RVC,
       PC_INIT => PC_INIT
-    )
+      )
     port map (
       rstn          => rstn,
       clk           => clk,
@@ -571,7 +571,7 @@ begin
       generic map (
         XLEN => XLEN,
         ILEN => ILEN
-      )
+        )
       port map (
         rstn       => rstn,
         clk        => clk,
@@ -590,7 +590,7 @@ begin
       generic map (
         XLEN => XLEN,
         ILEN => ILEN
-      )
+        )
       port map (
         rstn       => rstn,
         clk        => clk,
@@ -615,8 +615,8 @@ begin
   end generate;
 
   --Combine outputs into 1 single EX output
-  ex_bubble     <= alu_bubble and lsu_bubble and mul_bubble and div_bubble;
-  ex_stall_sgn  <= wb_stall or lsu_stall or mul_stall or div_stall;
+  ex_bubble    <= alu_bubble and lsu_bubble and mul_bubble and div_bubble;
+  ex_stall_sgn <= wb_stall or lsu_stall or mul_stall or div_stall;
 
   ex_stall <= ex_stall_sgn;
 

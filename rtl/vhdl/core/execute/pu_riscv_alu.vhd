@@ -53,8 +53,8 @@ use work.vhdl_pkg.all;
 
 entity pu_riscv_alu is
   generic (
-    XLEN    : integer := 64;
-    ILEN    : integer := 64;
+    XLEN    : integer   := 64;
+    ILEN    : integer   := 64;
     HAS_RVC : std_logic := '1'
   );
   port (
@@ -96,7 +96,7 @@ architecture rtl of pu_riscv_alu is
   function sext32 (
     operand : std_logic_vector(31 downto 0)
 
-  ) return std_logic_vector is
+    ) return std_logic_vector is
     variable sign          : std_logic;
     variable sext32_return : std_logic_vector (XLEN-1 downto 0);
   begin

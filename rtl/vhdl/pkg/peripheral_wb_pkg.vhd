@@ -55,7 +55,7 @@ package peripheral_wb_pkg is
 
   constant READ  : std_logic := '0';
   constant WRITE : std_logic := '1';
-  
+
   constant CTI_CLASSIC      : std_logic_vector(2 downto 0) := "000";
   constant CTI_CONST_BURST  : std_logic_vector(2 downto 0) := "001";
   constant CTI_INC_BURST    : std_logic_vector(2 downto 0) := "010";

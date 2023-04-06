@@ -52,28 +52,28 @@ use work.vhdl_pkg.all;
 
 entity pu_riscv_state is
   generic (
-    XLEN            : integer := 64;
-    FLEN            : integer := 64;
-    ILEN            : integer := 64;
-    EXCEPTION_SIZE  : integer := 16;
+    XLEN           : integer := 64;
+    FLEN           : integer := 64;
+    ILEN           : integer := 64;
+    EXCEPTION_SIZE : integer := 16;
 
-    IS_RV32E        : std_logic := '0';
-    HAS_RVN         : std_logic := '1';
-    HAS_RVC         : std_logic := '1';
-    HAS_FPU         : std_logic := '1';
-    HAS_MMU         : std_logic := '1';
-    HAS_RVM         : std_logic := '1';
-    HAS_RVA         : std_logic := '1';
-    HAS_RVB         : std_logic := '1';
-    HAS_RVT         : std_logic := '1';
-    HAS_RVP         : std_logic := '1';
-    HAS_EXT         : std_logic := '1';
+    IS_RV32E : std_logic := '0';
+    HAS_RVN  : std_logic := '1';
+    HAS_RVC  : std_logic := '1';
+    HAS_FPU  : std_logic := '1';
+    HAS_MMU  : std_logic := '1';
+    HAS_RVM  : std_logic := '1';
+    HAS_RVA  : std_logic := '1';
+    HAS_RVB  : std_logic := '1';
+    HAS_RVT  : std_logic := '1';
+    HAS_RVP  : std_logic := '1';
+    HAS_EXT  : std_logic := '1';
 
-    HAS_USER        : std_logic := '1';
-    HAS_SUPER       : std_logic := '1';
-    HAS_HYPER       : std_logic := '1';
+    HAS_USER  : std_logic := '1';
+    HAS_SUPER : std_logic := '1';
+    HAS_HYPER : std_logic := '1';
 
-    PC_INIT         : std_logic_vector(63 downto 0) := X"0000000080000000";
+    PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000";
 
     MNMIVEC_DEFAULT : std_logic_vector(63 downto 0) := X"0000000000000004";
     MTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000040";
@@ -81,11 +81,11 @@ entity pu_riscv_state is
     STVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"00000000000000C0";
     UTVEC_DEFAULT   : std_logic_vector(63 downto 0) := X"0000000000000100";
 
-    JEDEC_BANK            : integer := 10;
+    JEDEC_BANK            : integer                      := 10;
     JEDEC_MANUFACTURER_ID : std_logic_vector(7 downto 0) := X"6E";
 
-    PMP_CNT               : integer := 16;
-    HARTID                : integer := 0
+    PMP_CNT : integer := 16;
+    HARTID  : integer := 0
   );
   port (
     rstn : in std_logic;
@@ -138,7 +138,7 @@ entity pu_riscv_state is
     du_addr       : in  std_logic_vector(11 downto 0);
     du_ie         : in  std_logic_vector(31 downto 0);
     du_exceptions : out std_logic_vector(31 downto 0)
-    );
+  );
 end pu_riscv_state;
 
 architecture rtl of pu_riscv_state is
@@ -337,9 +337,9 @@ architecture rtl of pu_riscv_state is
   signal has_h      : std_logic;
   signal has_ext_s  : std_logic;
 
-  signal mstatus_s  : std_logic_vector(127 downto 0);  --mstatus_s is special (can be larger than 32bits)
-  signal uxl_wval : std_logic_vector(1 downto 0);  --u/sxl are taken from bits 35:32
-  signal sxl_wval : std_logic_vector(1 downto 0);  --and can only have limited values
+  signal mstatus_s : std_logic_vector(127 downto 0);  --mstatus_s is special (can be larger than 32bits)
+  signal uxl_wval  : std_logic_vector(1 downto 0);  --u/sxl are taken from bits 35:32
+  signal sxl_wval  : std_logic_vector(1 downto 0);  --and can only have limited values
 
   signal soft_seip : std_logic;  --software supervisor-external-interrupt
   signal soft_ueip : std_logic;         --software user-external-interrupt
@@ -363,14 +363,14 @@ begin
 
   csr_mvendorid <= (csr_mvendorid_bank & csr_mvendorid_offset);
 
-  is_rv32      <= to_stdlogic(XLEN = 32);
-  is_rv64      <= to_stdlogic(XLEN = 64);
-  is_rv128     <= to_stdlogic(XLEN = 128);
-  is_rv32e_s   <= to_stdlogic(IS_RV32E /= '0') and is_rv32;
-  has_n        <= to_stdlogic(HAS_RVN /= '0') and has_u;
-  has_u        <= to_stdlogic(HAS_USER /= '0');
-  has_s        <= to_stdlogic(HAS_SUPER /= '0') and has_u;
-  has_h        <= '0';  --(HAS_HYPER  !=   0) & has_s;   //No Hypervisor
+  is_rv32    <= to_stdlogic(XLEN = 32);
+  is_rv64    <= to_stdlogic(XLEN = 64);
+  is_rv128   <= to_stdlogic(XLEN = 128);
+  is_rv32e_s <= to_stdlogic(IS_RV32E /= '0') and is_rv32;
+  has_n      <= to_stdlogic(HAS_RVN /= '0') and has_u;
+  has_u      <= to_stdlogic(HAS_USER /= '0');
+  has_s      <= to_stdlogic(HAS_SUPER /= '0') and has_u;
+  has_h      <= '0';  --(HAS_HYPER  !=   0) & has_s;   //No Hypervisor
 
   has_rvc_s  <= to_stdlogic(HAS_RVC /= '0');
   has_fpu_s  <= to_stdlogic(HAS_FPU /= '0');
@@ -442,7 +442,7 @@ begin
         end if;
       when UIP =>
         if (has_n = '1') then
-          st_csr_rval <=  (XLEN-1 downto 12 => '0') & (csr_mip and csr_mideleg(11 downto 0) and X"111");
+          st_csr_rval <= (XLEN-1 downto 12 => '0') & (csr_mip and csr_mideleg(11 downto 0) and X"111");
         else
           st_csr_rval <= (others => '0');
         end if;
@@ -541,7 +541,7 @@ begin
         end if;
       when SIP =>
         if (has_s = '1') then
-          st_csr_rval <= (XLEN-1 downto 12 => '0') &  (csr_mip and csr_mideleg(11 downto 0) and X"333");
+          st_csr_rval <= (XLEN-1 downto 12 => '0') & (csr_mip and csr_mideleg(11 downto 0) and X"333");
         else
           st_csr_rval <= (others => '0');
         end if;
@@ -749,9 +749,9 @@ begin
   processing_2 : process (clk, rstn, csr_misa_base, has_ext_s, has_s, has_u)
   begin
     if (rstn = '0') then
-      st_prv_sgn          <= PRV_M;         --start in machine mode
-      st_nxt_pc       <= PC_INIT;
-      st_flush        <= '1';
+      st_prv_sgn <= PRV_M;              --start in machine mode
+      st_nxt_pc  <= PC_INIT;
+      st_flush   <= '1';
       --csr_mstatus_vm   <= VM_MBARE;
       if (has_s = '1') then
         csr_mstatus_sxl <= csr_misa_base;
@@ -775,14 +775,14 @@ begin
       csr_mstatus_fs   <= "00";
 
       csr_mstatus_mpp  <= "11";
-      csr_mstatus_hpp  <= (others => '0');                     --reserved
+      csr_mstatus_hpp  <= (others => '0');  --reserved
       csr_mstatus_spp  <= has_s;
       csr_mstatus_mpie <= '0';
-      csr_mstatus_hpie <= '0';                                 --reserved
+      csr_mstatus_hpie <= '0';              --reserved
       csr_mstatus_spie <= '0';
       csr_mstatus_upie <= '0';
       csr_mstatus_mie  <= '0';
-      csr_mstatus_hie  <= '0';                                 --reserved
+      csr_mstatus_hie  <= '0';              --reserved
       csr_mstatus_sie  <= '0';
       csr_mstatus_uie  <= '0';
     elsif (rising_edge(clk)) then
@@ -852,7 +852,7 @@ begin
         end if;
 
         csr_mstatus_mpp <= csr_wval(12 downto 11);
-        csr_mstatus_hpp <= (others => '0');                    --reserved
+        csr_mstatus_hpp <= (others => '0');  --reserved
 
         if (has_s = '1') then
           csr_mstatus_spp <= csr_wval(8);
@@ -861,7 +861,7 @@ begin
         end if;
 
         csr_mstatus_mpie <= csr_wval(7);
-        csr_mstatus_hpie <= '0';                               --reserved
+        csr_mstatus_hpie <= '0';        --reserved
 
         if (has_s = '1') then
           csr_mstatus_spie <= csr_wval(5);
@@ -876,7 +876,7 @@ begin
         end if;
 
         csr_mstatus_mie <= csr_wval(3);
-        csr_mstatus_hie <= '0';                                --reserved
+        csr_mstatus_hie <= '0';         --reserved
 
         if (has_s = '1') then
           csr_mstatus_sie <= csr_wval(1);
@@ -928,7 +928,7 @@ begin
           --pop privilege stack
           when MRET =>
             --set privilege level
-            st_prv_sgn           <= csr_mstatus_mpp;
+            st_prv_sgn       <= csr_mstatus_mpp;
             st_nxt_pc        <= csr_mepc;
             st_flush         <= '1';
             --set MIE
@@ -954,7 +954,7 @@ begin
 --          end
           when SRET =>
             --set privilege level
-            st_prv_sgn           <= ('0' & csr_mstatus_spp);
+            st_prv_sgn       <= ('0' & csr_mstatus_spp);
             st_nxt_pc        <= csr_sepc;
             st_flush         <= '1';
             --set SIE
@@ -976,7 +976,7 @@ begin
       --push privilege stack
       if (ext_nmi = '1') then
         --NMI always at Machine-mode
-        st_prv_sgn           <= PRV_M;
+        st_prv_sgn       <= PRV_M;
         st_nxt_pc        <= csr_mnmivec;
         st_flush         <= '1';
         --store current state
@@ -989,7 +989,7 @@ begin
         --Check if interrupts are delegated
         if (has_n = '1' and st_prv_sgn = PRV_U and (st_int and csr_mideleg(11 downto 0) and X"111") = X"111") then
           st_prv_sgn <= PRV_U;
-          st_nxt_pc <= std_logic_vector(unsigned(csr_utvec and not std_logic_vector(to_unsigned(3, XLEN))) + unsigned(csr_utvec_we));
+          st_nxt_pc  <= std_logic_vector(unsigned(csr_utvec and not std_logic_vector(to_unsigned(3, XLEN))) + unsigned(csr_utvec_we));
 
           if (csr_utvec(0) = '1') then
             csr_utvec_we <= (XLEN-1 downto 4 => '0') & std_logic_vector(unsigned(interrupt_cause) sll 2);
@@ -1001,7 +1001,7 @@ begin
           csr_mstatus_uie  <= '0';
         elsif (has_s = '1' and st_prv_sgn >= PRV_S and (st_int and csr_mideleg(11 downto 0) and X"333") = X"111") then
           st_prv_sgn <= PRV_S;
-          st_nxt_pc <= std_logic_vector(unsigned(csr_stvec and not std_logic_vector(to_unsigned(3, XLEN))) + unsigned(csr_stvec_we));
+          st_nxt_pc  <= std_logic_vector(unsigned(csr_stvec and not std_logic_vector(to_unsigned(3, XLEN))) + unsigned(csr_stvec_we));
 
           if (csr_stvec(0) = '1') then
             csr_stvec_we <= (XLEN-1 downto 4 => '0') & std_logic_vector(unsigned(interrupt_cause) sll 2);
@@ -1022,10 +1022,10 @@ begin
 --          csr_mstatus_hpp  <= st_prv_sgn;
 --        end
           st_prv_sgn <= PRV_M;
-          st_nxt_pc <= std_logic_vector(unsigned(csr_mtvec and not std_logic_vector(to_unsigned(3, XLEN))) + unsigned(csr_mtvec_we));
+          st_nxt_pc  <= std_logic_vector(unsigned(csr_mtvec and not std_logic_vector(to_unsigned(3, XLEN))) + unsigned(csr_mtvec_we));
 
           if (csr_mtvec(0) = '1') then
-            csr_mtvec_we <=  (XLEN-1 downto 4 => '0') & std_logic_vector(unsigned(interrupt_cause) sll 2);
+            csr_mtvec_we <= (XLEN-1 downto 4 => '0') & std_logic_vector(unsigned(interrupt_cause) sll 2);
           else
             csr_mtvec_we <= (others => '0');
           end if;
@@ -1037,12 +1037,12 @@ begin
       elsif (reduce_or(wb_exception and not du_ie(15 downto 0)) = '1') then
         st_flush <= '1';
         if (has_n = '1' and st_prv_sgn = PRV_U and reduce_or(wb_exception and csr_medeleg(EXCEPTION_SIZE-1 downto 0)) = '1') then
-          st_prv_sgn           <= PRV_U;
+          st_prv_sgn       <= PRV_U;
           st_nxt_pc        <= csr_utvec;
           csr_mstatus_upie <= csr_mstatus_uie;
           csr_mstatus_uie  <= '0';
         elsif (has_s = '1' and st_prv_sgn >= PRV_S and reduce_or(wb_exception and csr_medeleg(EXCEPTION_SIZE-1 downto 0)) = '1') then
-          st_prv_sgn           <= PRV_S;
+          st_prv_sgn       <= PRV_S;
           st_nxt_pc        <= csr_stvec;
           csr_mstatus_spie <= csr_mstatus_sie;
           csr_mstatus_sie  <= '0';
@@ -1058,7 +1058,7 @@ begin
 --          csr_mstatus_hpp  <= st_prv_sgn;
 --        end
 
-          st_prv_sgn           <= PRV_M;
+          st_prv_sgn       <= PRV_M;
           st_nxt_pc        <= csr_mtvec and not X"0000000000000003";
           csr_mstatus_mpie <= csr_mstatus_mie;
           csr_mstatus_mie  <= '0';
@@ -1096,28 +1096,28 @@ begin
         end if;
       end if;
     end process;
-  elsif (XLEN > 32) generate  --(XLEN > 32) begin
-      processing_4 : process (clk, rstn)
-      begin
-        if (rstn = '0') then
-          csr_mcycle   <= (others => '0');
-          csr_minstret <= (others => '0');
-        elsif (rising_edge(clk)) then
-          --cycle always counts (thread active time)
-          if ((ex_csr_we = '1' and ex_csr_reg = MCYCLE and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MCYCLE)) then
-            csr_mcycle <= csr_wval(63 downto 0);
-          else
-            csr_mcycle <= std_logic_vector(unsigned(csr_mcycle)+X"0000000000000001");
-          end if;
-          --instruction retire counter
-          if ((ex_csr_we = '1' and ex_csr_reg = MINSTRET and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MINSTRET)) then
-            csr_minstret <= csr_wval(63 downto 0);
-          elsif (wb_bubble = '0') then
-            csr_minstret <= std_logic_vector(unsigned(csr_minstret)+X"0000000000000001");
-          end if;
+  elsif (XLEN > 32) generate            --(XLEN > 32) begin
+    processing_4 : process (clk, rstn)
+    begin
+      if (rstn = '0') then
+        csr_mcycle   <= (others => '0');
+        csr_minstret <= (others => '0');
+      elsif (rising_edge(clk)) then
+        --cycle always counts (thread active time)
+        if ((ex_csr_we = '1' and ex_csr_reg = MCYCLE and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MCYCLE)) then
+          csr_mcycle <= csr_wval(63 downto 0);
+        else
+          csr_mcycle <= std_logic_vector(unsigned(csr_mcycle)+X"0000000000000001");
         end if;
-      end process;
-    end generate;
+        --instruction retire counter
+        if ((ex_csr_we = '1' and ex_csr_reg = MINSTRET and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MINSTRET)) then
+          csr_minstret <= csr_wval(63 downto 0);
+        elsif (wb_bubble = '0') then
+          csr_minstret <= std_logic_vector(unsigned(csr_minstret)+X"0000000000000001");
+        end if;
+      end if;
+    end process;
+  end generate;
 
   --mnmivec - RoaLogic Extension
   processing_5 : process (clk, rstn)
@@ -1159,8 +1159,8 @@ begin
 
   --medeleg, mideleg
   generating_5 : if ((HAS_HYPER and HAS_SUPER and HAS_USER) = '0') generate
-    --csr_medeleg <= (others => '0');
-    --csr_mideleg <= (others => '0');
+  --csr_medeleg <= (others => '0');
+  --csr_mideleg <= (others => '0');
   elsif ((HAS_HYPER or HAS_SUPER or HAS_USER) = '1') generate  --medeleg
     processing_8 : process (clk, rstn)
     begin
@@ -1489,15 +1489,15 @@ begin
 
           if (wb_exception(CAUSE_ILLEGAL_INSTRUCTION) = '1') then
             csr_stval <= wb_instr;
-          elsif ( wb_exception(CAUSE_MISALIGNED_INSTRUCTION) = '1' or
-                  wb_exception(CAUSE_INSTRUCTION_ACCESS_FAULT) = '1' or
-                  wb_exception(CAUSE_INSTRUCTION_PAGE_FAULT) = '1' or
-                  wb_exception(CAUSE_MISALIGNED_LOAD) = '1' or
-                  wb_exception(CAUSE_LOAD_ACCESS_FAULT) = '1' or
-                  wb_exception(CAUSE_LOAD_PAGE_FAULT) = '1' or
-                  wb_exception(CAUSE_MISALIGNED_STORE) = '1' or
-                  wb_exception(CAUSE_STORE_ACCESS_FAULT) = '1' or
-                  wb_exception(CAUSE_STORE_PAGE_FAULT) = '1') then
+          elsif (wb_exception(CAUSE_MISALIGNED_INSTRUCTION) = '1' or
+                 wb_exception(CAUSE_INSTRUCTION_ACCESS_FAULT) = '1' or
+                 wb_exception(CAUSE_INSTRUCTION_PAGE_FAULT) = '1' or
+                 wb_exception(CAUSE_MISALIGNED_LOAD) = '1' or
+                 wb_exception(CAUSE_LOAD_ACCESS_FAULT) = '1' or
+                 wb_exception(CAUSE_LOAD_PAGE_FAULT) = '1' or
+                 wb_exception(CAUSE_MISALIGNED_STORE) = '1' or
+                 wb_exception(CAUSE_STORE_ACCESS_FAULT) = '1' or
+                 wb_exception(CAUSE_STORE_PAGE_FAULT) = '1') then
             csr_stval <= wb_badaddr;
           end if;
         else
@@ -1517,15 +1517,15 @@ begin
           csr_mcause <= (XLEN -1 downto 4 => '0') & trap_cause;
           if (wb_exception(CAUSE_ILLEGAL_INSTRUCTION) = '1') then
             csr_mtval <= (XLEN-1 downto ILEN => '0') & wb_instr;
-          elsif ( wb_exception(CAUSE_MISALIGNED_INSTRUCTION) = '1' or
-                  wb_exception(CAUSE_INSTRUCTION_ACCESS_FAULT) = '1' or
-                  wb_exception(CAUSE_INSTRUCTION_PAGE_FAULT) = '1' or
-                  wb_exception(CAUSE_MISALIGNED_LOAD) = '1' or
-                  wb_exception(CAUSE_LOAD_ACCESS_FAULT) = '1' or
-                  wb_exception(CAUSE_LOAD_PAGE_FAULT) = '1' or
-                  wb_exception(CAUSE_MISALIGNED_STORE) = '1' or
-                  wb_exception(CAUSE_STORE_ACCESS_FAULT) = '1' or
-                  wb_exception(CAUSE_STORE_PAGE_FAULT) = '1') then
+          elsif (wb_exception(CAUSE_MISALIGNED_INSTRUCTION) = '1' or
+                 wb_exception(CAUSE_INSTRUCTION_ACCESS_FAULT) = '1' or
+                 wb_exception(CAUSE_INSTRUCTION_PAGE_FAULT) = '1' or
+                 wb_exception(CAUSE_MISALIGNED_LOAD) = '1' or
+                 wb_exception(CAUSE_LOAD_ACCESS_FAULT) = '1' or
+                 wb_exception(CAUSE_LOAD_PAGE_FAULT) = '1' or
+                 wb_exception(CAUSE_MISALIGNED_STORE) = '1' or
+                 wb_exception(CAUSE_STORE_ACCESS_FAULT) = '1' or
+                 wb_exception(CAUSE_STORE_PAGE_FAULT) = '1') then
             csr_mtval <= wb_badaddr;
           end if;
         end if;
@@ -1534,7 +1534,7 @@ begin
   end process;
 
   --Physical Memory Protection & Translation registers
-  generating_7 : if (XLEN > 64) generate               --RV128
+  generating_7 : if (XLEN > 64) generate  --RV128
     generating_8 : for idx in 0 to 15 generate
       generating_9 : if (idx < PMP_CNT) generate
         processing_15 : process (clk, rstn)
@@ -1554,10 +1554,10 @@ begin
       end generate;
     end generate;
   end generate;
-    --next idx
+  --next idx
 
   --pmpaddr not defined for RV128 yet
-  generating_11 : if (XLEN > 32) generate            --RV64 
+  generating_11 : if (XLEN > 32) generate  --RV64 
     generating_12 : for idx in 0 to 7 generate
       processing_16 : process (clk, rstn)
       begin
@@ -1619,7 +1619,7 @@ begin
         csr_pmpaddr(idx) <= (others => '0');
       end generate;
     end generate;
-  end generate;                        --next idx
+  end generate;  --next idx
   generating_19 : if (XLEN <= 32) generate
     --RV32
     generating_20 : for idx in 0 to 3 generate

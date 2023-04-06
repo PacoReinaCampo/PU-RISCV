@@ -59,7 +59,7 @@ entity pu_riscv_membuf is
     rst_ni : in std_logic;
     clk_i  : in std_logic;
 
-    clr_i : in std_logic;  --clear pending requests
+    clr_i : in std_logic;               --clear pending requests
     ena_i : in std_logic;
 
     --CPU side
@@ -85,11 +85,11 @@ architecture rtl of pu_riscv_membuf is
       ALMOST_FULL_THRESHOLD  : integer := 2
     );
     port (
-      rst_ni : in std_logic;  --asynchronous, active low reset
-      clk_i  : in std_logic;  --rising edge triggered clock
+      rst_ni : in std_logic;            --asynchronous, active low reset
+      clk_i  : in std_logic;            --rising edge triggered clock
 
       clr_i : in std_logic;  --clear all queue entries (synchronous reset)
-      ena_i : in std_logic;  --clock enable
+      ena_i : in std_logic;             --clock enable
 
       we_i : in std_logic;                           --Queue write enable
       d_i  : in std_logic_vector(DBITS-1 downto 0);  --Queue write data
@@ -123,11 +123,11 @@ begin
   -- Instantiate Queue 
   ram_queue : pu_riscv_ram_queue
     generic map (
-      DEPTH => DEPTH,
-      DBITS => DBITS,
+      DEPTH                  => DEPTH,
+      DBITS                  => DBITS,
       ALMOST_EMPTY_THRESHOLD => 0,
-      ALMOST_FULL_THRESHOLD => DEPTH
-    )
+      ALMOST_FULL_THRESHOLD  => DEPTH
+      )
     port map (
       rst_ni         => rst_ni,
       clk_i          => clk_i,
@@ -141,7 +141,7 @@ begin
       full_o         => full_o,
       almost_empty_o => open,
       almost_full_o  => open
-      );
+    );
 
   --control signals
   processing_0 : process (clk_i, rst_ni)

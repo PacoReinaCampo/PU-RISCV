@@ -87,7 +87,7 @@ architecture rtl of pu_riscv_div is
   function sext32 (
     operand : std_logic_vector(31 downto 0)
 
-  ) return std_logic_vector is
+    ) return std_logic_vector is
     variable sign          : std_logic;
     variable sext32_return : std_logic_vector (XLEN-1 downto 0);
   begin
@@ -98,7 +98,7 @@ architecture rtl of pu_riscv_div is
 
   function twos (
     a : std_logic_vector(XLEN-1 downto 0)
-  ) return std_logic_vector is
+    ) return std_logic_vector is
     variable twos_return : std_logic_vector (XLEN-1 downto 0);
   begin
     twos_return := std_logic_vector(unsigned(not a)+X"0000000000000001");
@@ -107,7 +107,7 @@ architecture rtl of pu_riscv_div is
 
   function absolute (
     a : std_logic_vector(XLEN-1 downto 0)
-  ) return std_logic_vector is
+    ) return std_logic_vector is
     variable abs_return : std_logic_vector (XLEN-1 downto 0);
   begin
     if (a(XLEN-1) = '1') then
@@ -146,8 +146,8 @@ architecture rtl of pu_riscv_div is
   signal opB32 : std_logic_vector(31 downto 0);
 
   signal cnt   : std_logic_vector(CNT_SIZE-1 downto 0);
-  signal neg_q : std_logic;  --negate quotient
-  signal neg_s : std_logic;  --negate remainder
+  signal neg_q : std_logic;             --negate quotient
+  signal neg_s : std_logic;             --negate remainder
 
   --divider internals
   signal pa_p         : std_logic_vector(XLEN-1 downto 0);
@@ -256,7 +256,7 @@ begin
                   div_r      <= sext32((31 => '1', 30 downto 0 => '0'));
                   div_bubble <= '0';
                 else
-                  cnt       <= (others => '1');  --minus 1000...000
+                  cnt       <= (others => '1');   --minus 1000...000
                   state     <= ST_DIV;
                   div_stall <= '1';
 
@@ -290,16 +290,16 @@ begin
                   div_r      <= (others => '1');  --= 2^XLEN -1
                   div_bubble <= '0';
                 else
-                  cnt       <= (others => '1');  --minus 1000...000
+                  cnt       <= (others => '1');   --minus 1000...000
                   state     <= ST_DIV;
                   div_stall <= '1';
 
                   neg_q <= '0';
                   neg_s <= '0';
 
-                  pa_p <= (others => '0');
+                  pa_p <= (others                    => '0');
                   pa_a <= (opA32 & (XLEN-33 downto 0 => '0'));
-                  b    <= ((XLEN-1 downto 32 => '0') & opB32);
+                  b    <= ((XLEN-1 downto 32         => '0') & opB32);
                 end if;
               when (REMX) =>
                 --signed divide by zero
@@ -370,9 +370,9 @@ begin
                   neg_q <= '0';
                   neg_s <= '0';
 
-                  pa_p <= (others => '0');
+                  pa_p <= (others                      => '0');
                   pa_a <= (opA32 & (XLEN-32-1 downto 0 => '0'));
-                  b    <= ((XLEN-1 downto 32 => '0') & opB32);
+                  b    <= ((XLEN-1 downto 32           => '0') & opB32);
                 end if;
               when others =>
                 null;
@@ -386,7 +386,7 @@ begin
           end if;
           --restoring divider section
           if (p_minus_b(XLEN) = '1') then  --sub gave negative result
-            pa_p <= pa_shifted_p;  --restore
+            pa_p <= pa_shifted_p;       --restore
             pa_a <= (pa_shifted_a(XLEN-1 downto 1) & '0');  --shift in '0' for Q
           else                          --sub gave positive result
             --store sub result
@@ -398,7 +398,7 @@ begin
           state      <= ST_CHK;
           div_bubble <= '0';
           div_stall  <= '0';
-          result_st := 'X' & div_func7 & div_func3 & div_opcode;
+          result_st  := 'X' & div_func7 & div_func3 & div_opcode;
           case (result_st) is
             when DIV =>
               if (neg_q = '1') then
@@ -408,36 +408,36 @@ begin
               end if;
             when DIVW =>
               if (neg_q = '1') then
-                --div_r <= sext32(twos(pa_a));
+              --div_r <= sext32(twos(pa_a));
               else
                 div_r <= pa_a;
-              end if;
-            when DIVU =>
-              div_r <= pa_a;
-            when DIVUW =>
-              div_r <= pa_a;
-            when REMX =>
-              if (neg_s = '1') then
-                div_r <= pa_p;
-              else
-                div_r <= pa_p;
-              end if;
-            when REMW =>
-              if (neg_s = '1') then
-                --div_r <= sext32(twos(pa_p));
-              else
-                div_r <= pa_p;
-              end if;
-            when REMU =>
-              div_r <= pa_p;
-            when REMUW =>
-              div_r <= pa_p;
-            when others =>
-              div_r <= (others => 'X');
-          end case;
-        when others =>
-          null;
-      end case;
-    end if;
-  end process;
+          end if;
+        when DIVU =>
+          div_r <= pa_a;
+        when DIVUW =>
+          div_r <= pa_a;
+        when REMX =>
+          if (neg_s = '1') then
+            div_r <= pa_p;
+          else
+            div_r <= pa_p;
+          end if;
+        when REMW =>
+          if (neg_s = '1') then
+          --div_r <= sext32(twos(pa_p));
+          else
+            div_r <= pa_p;
+      end if;
+    when REMU =>
+    div_r <= pa_p;
+    when REMUW =>
+    div_r <= pa_p;
+    when others =>
+    div_r <= (others => 'X');
+  end case;
+  when others =>
+  null;
+end case;
+end if;
+end process;
 end rtl;
