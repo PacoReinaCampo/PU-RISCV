@@ -48,13 +48,13 @@ verilog
 │   └── pu_riscv_pkg.sv
 └── pu
     ├── ahb3
+    │   ├── pu_riscv_ahb3.sv
     │   ├── pu_riscv_biu2ahb3.sv
-    │   ├── pu_riscv_module_ahb3.sv
-    │   └── pu_riscv_ahb3.sv
+    │   └── pu_riscv_module_ahb3.sv
     ├── axi4
+    │   ├── pu_riscv_axi4.sv
     │   ├── pu_riscv_biu2axi4.sv
-    │   ├── pu_riscv_module_axi4.sv
-    │   └── pu_riscv_axi4.sv
+    │   └── pu_riscv_module_axi4.sv
     ├── bridge
     │   ├── riscv_ahb2axi.sv
     │   └── riscv_axi2ahb.sv

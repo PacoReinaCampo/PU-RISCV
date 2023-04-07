@@ -49,11 +49,11 @@ vhdl
 │   └── vhdl_pkg.vhd
 └── pu
     ├── ahb3
-    │   ├── pu_riscv_biu2ahb3.vhd
-    │   └── pu_riscv_ahb3.vhd
+    │   ├── pu_riscv_ahb3.vhd
+    │   └── pu_riscv_biu2ahb3.vhd
     ├── axi4
-    │   ├── pu_riscv_biu2axi4.vhd
-    │   └── pu_riscv_axi4.vhd
+    │   ├── pu_riscv_axi4.vhd
+    │   └── pu_riscv_biu2axi4.vhd
     ├── bridge
     │   ├── riscv_ahb2axi.vhd
     │   └── riscv_axi2ahb.vhd

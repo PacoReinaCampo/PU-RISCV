@@ -37,7 +37,7 @@
  *
  * =============================================================================
  * Author(s):
- *   Francisco Javier Reina Campo <frareicam@gmail.com>
+ *   Francisco Javier Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
 import peripheral_wb_pkg::*;
