@@ -1,0 +1,3 @@
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/user/GitHub/code/Architecture/PU-RISCV/verification/uvm/library/core/apb4/peripheral_uvm_testbench.sv" into library work
+ERROR: [VRFC 10-4982] syntax error near 'input' [/home/user/GitHub/code/Architecture/PU-RISCV/verification/uvm/library/core/apb4/peripheral_uvm_interface.sv:42]
+ERROR: [VRFC 10-2790] SystemVerilog keyword input used in incorrect context [/home/user/GitHub/code/Architecture/PU-RISCV/verification/uvm/library/core/apb4/peripheral_uvm_interface.sv:42]

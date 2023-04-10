@@ -56,16 +56,19 @@ module peripheral_uvm_testbench;
     rst = 0;
   end
 
-  peripheral_adder_if vif(clk, rst);
+  peripheral_adder_if vif (
+    clk,
+    rst
+  );
 
-  peripheral_adder dut(
+  peripheral_adder dut (
     .clk(vif.clk),
     .rst(vif.rst),
 
-    .in1 (vif.ip1),
-    .in2 (vif.ip2),
+    .in1(vif.ip1),
+    .in2(vif.ip2),
 
-  .out (vif.out)
+    .out(vif.out)
   );
 
   initial begin
@@ -77,6 +80,6 @@ module peripheral_uvm_testbench;
   end
 
   initial begin
-    run_test("base test");
+    run_test("base_test");
   end
 endmodule

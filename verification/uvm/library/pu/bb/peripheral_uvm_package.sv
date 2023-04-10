@@ -37,13 +37,11 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
-interface peripheral_adder_if (
-  input logic clk
-  input logic rst
-);
-
-  logic [7:0] ip1;
-  logic [7:0] ip2;
-
-  logic [8:0] out;
-endinterface
+`include "peripheral_uvm_sequence_item.sv"
+`include "peripheral_uvm_sequencer.sv"
+`include "peripheral_uvm_sequence.sv"
+`include "peripheral_uvm_driver.sv"
+`include "peripheral_uvm_monitor.sv"
+`include "peripheral_uvm_scoreboard.sv"
+`include "peripheral_uvm_agent.sv"
+`include "peripheral_uvm_environment.sv"

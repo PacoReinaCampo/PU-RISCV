@@ -41,24 +41,25 @@
 
 class peripheral_uvm_test extends uvm_test;
   peripheral_uvm_environment environment;
-  peripheral_uvm_sequence base_sequence;
+  peripheral_uvm_sequence   base_sequence;
   `uvm_component_utils(peripheral_uvm_test)
 
-  function new(string name = "base test", uvm_component parent = null);
+  function new(string name = "base_test", uvm_component parent = null);
     super.new(name, parent);
   endfunction
 
   function void build_phase(uvm_phase phase);
     super.build_phase(phase);
-    environment = ntm_matrix_arithmetic_uvm_environment::type_id::create("environment", this);
+    environment = peripheral_uvm_environment::type_id::create("environment", this);
   endfunction
 
   task run_phase(uvm_phase phase);
     phase.raise_objection(this);
-    base_sequence = peripheral_uvm_sequence::type_id::create("base sequence");
+    base_sequence = peripheral_uvm_sequence::type_id::create("base_sequence");
 
-    repeat(10) begin 
-      #5; base_sequence.start(environment.agent.sequencer);
+    repeat (10) begin
+      #5;
+      base_sequence.start(environment.agent.sequencer);
     end
 
     phase.drop_objection(this);
