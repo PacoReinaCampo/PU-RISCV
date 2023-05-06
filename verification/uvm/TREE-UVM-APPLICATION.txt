@@ -2,80 +2,50 @@ application
 ├── bfm
 │   ├── ahb3
 │   │   ├── peripheral_design.sv
-│   │   ├── peripheral_testbench.sv
-│   │   ├── peripheral_uvm_interface.sv
-│   │   └── peripheral_uvm_package.sv
+│   │   └── peripheral_testbench.sv
 │   ├── apb4
 │   │   ├── peripheral_design.sv
-│   │   ├── peripheral_testbench.sv
-│   │   ├── peripheral_uvm_interface.sv
-│   │   └── peripheral_uvm_package.sv
+│   │   └── peripheral_testbench.sv
 │   ├── axi4
 │   │   ├── peripheral_design.sv
-│   │   ├── peripheral_testbench.sv
-│   │   ├── peripheral_uvm_interface.sv
-│   │   └── peripheral_uvm_package.sv
+│   │   └── peripheral_testbench.sv
 │   ├── bb
 │   │   ├── peripheral_design.sv
-│   │   ├── peripheral_testbench.sv
-│   │   ├── peripheral_uvm_interface.sv
-│   │   └── peripheral_uvm_package.sv
+│   │   └── peripheral_testbench.sv
 │   └── wb
 │       ├── peripheral_design.sv
-│       ├── peripheral_testbench.sv
-│       ├── peripheral_uvm_interface.sv
-│       └── peripheral_uvm_package.sv
+│       └── peripheral_testbench.sv
 ├── core
 │   ├── ahb3
 │   │   ├── peripheral_design.sv
-│   │   ├── peripheral_testbench.sv
-│   │   ├── peripheral_uvm_interface.sv
-│   │   └── peripheral_uvm_package.sv
+│   │   └── peripheral_testbench.sv
 │   ├── apb4
 │   │   ├── peripheral_design.sv
-│   │   ├── peripheral_testbench.sv
-│   │   ├── peripheral_uvm_interface.sv
-│   │   └── peripheral_uvm_package.sv
+│   │   └── peripheral_testbench.sv
 │   ├── axi4
 │   │   ├── peripheral_design.sv
-│   │   ├── peripheral_testbench.sv
-│   │   ├── peripheral_uvm_interface.sv
-│   │   └── peripheral_uvm_package.sv
+│   │   └── peripheral_testbench.sv
 │   ├── bb
 │   │   ├── peripheral_design.sv
-│   │   ├── peripheral_testbench.sv
-│   │   ├── peripheral_uvm_interface.sv
-│   │   └── peripheral_uvm_package.sv
+│   │   └── peripheral_testbench.sv
 │   └── wb
 │       ├── peripheral_design.sv
-│       ├── peripheral_testbench.sv
-│       ├── peripheral_uvm_interface.sv
-│       └── peripheral_uvm_package.sv
+│       └── peripheral_testbench.sv
 └── pu
     ├── ahb3
     │   ├── peripheral_design.sv
-    │   ├── peripheral_testbench.sv
-    │   ├── peripheral_uvm_interface.sv
-    │   └── peripheral_uvm_package.sv
+    │   └── peripheral_testbench.sv
     ├── apb4
     │   ├── peripheral_design.sv
-    │   ├── peripheral_testbench.sv
-    │   ├── peripheral_uvm_interface.sv
-    │   └── peripheral_uvm_package.sv
+    │   └── peripheral_testbench.sv
     ├── axi4
     │   ├── peripheral_design.sv
-    │   ├── peripheral_testbench.sv
-    │   ├── peripheral_uvm_interface.sv
-    │   └── peripheral_uvm_package.sv
+    │   └── peripheral_testbench.sv
     ├── bb
     │   ├── peripheral_design.sv
-    │   ├── peripheral_testbench.sv
-    │   ├── peripheral_uvm_interface.sv
-    │   └── peripheral_uvm_package.sv
+    │   └── peripheral_testbench.sv
     └── wb
         ├── peripheral_design.sv
-        ├── peripheral_testbench.sv
-        ├── peripheral_uvm_interface.sv
-        └── peripheral_uvm_package.sv
+        └── peripheral_testbench.sv
 
-18 directories, 60 files
+18 directories, 30 files
