@@ -9,14 +9,14 @@
 ##                  |_|                                                          ##
 ##                                                                               ##
 ##                                                                               ##
-##              Peripheral-NTM for MPSoC                                         ##
-##              Neural Turing Machine for MPSoC                                  ##
+##              Architecture                                                     ##
+##              QueenField                                                       ##
 ##                                                                               ##
 ###################################################################################
 
 ###################################################################################
 ##                                                                               ##
-## Copyright (c) 2022-2023 by the author(s)                                      ##
+## Copyright (c) 2019-2020 by the author(s)                                      ##
 ##                                                                               ##
 ## Permission is hereby granted, free of charge, to any person obtaining a copy  ##
 ## of this software and associated documentation files (the "Software"), to deal ##
@@ -42,4 +42,18 @@
 ##                                                                               ##
 ###################################################################################
 
-print('Hello, world!')
+python3 library/bfm/ahb3/peripheral_design.py
+python3 library/bfm/apb4/peripheral_design.py
+python3 library/bfm/axi4/peripheral_design.py
+python3 library/bfm/bb/peripheral_design.py
+python3 library/bfm/wb/peripheral_design.py
+python3 library/core/ahb3/peripheral_design.py
+python3 library/core/apb4/peripheral_design.py
+python3 library/core/axi4/peripheral_design.py
+python3 library/core/bb/peripheral_design.py
+python3 library/core/wb/peripheral_design.py
+python3 library/pu/ahb3/peripheral_design.py
+python3 library/pu/apb4/peripheral_design.py
+python3 library/pu/axi4/peripheral_design.py
+python3 library/pu/bb/peripheral_design.py
+python3 library/pu/wb/peripheral_design.py

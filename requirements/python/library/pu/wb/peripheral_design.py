@@ -44,32 +44,19 @@
 
 import random
 
-from scalar import ntm_scalar_adder as scalar_adder
-from scalar import ntm_scalar_multiplier as scalar_multiplier
-from scalar import ntm_scalar_divider as scalar_divider
+class ScalarArithmetic:
+  def __init__(self, data_a_in, data_b_in):
+    self.data_a_in = data_a_in
+    self.data_b_in = data_b_in
 
-def test_scalar_adder():
+  def ntm_scalar_adder(self):
+    # calculating addition
+    return (self.data_a_in + self.data_b_in)
 
-  data_a_in = random.random()
-  data_b_in = random.random()
+  def ntm_scalar_multiplier(self):
+    # calculating multiplication
+    return (self.data_a_in * self.data_b_in)
 
-  assert scalar_adder.ntm_scalar_adder(data_a_in, data_b_in) == data_a_in + data_b_in
-
-def test_scalar_multiplier():
-  
-  data_a_in = random.random()
-  data_b_in = random.random()
-
-  assert scalar_multiplier.ntm_scalar_multiplier(data_a_in, data_b_in) == data_a_in * data_b_in
-
-def test_scalar_divider():
-  
-  data_a_in = random.random()
-  data_b_in = random.random()
-
-  assert scalar_divider.ntm_scalar_divider(data_a_in, data_b_in) == data_a_in / data_b_in
-
-
-test_scalar_adder()
-test_scalar_multiplier()
-test_scalar_divider()
+  def ntm_scalar_divider(self):
+    # calculating division
+    return (self.data_a_in / self.data_b_in)
