@@ -1,36 +1,81 @@
 library
 ├── bfm
 │   ├── ahb3
-│   │   └── peripheral_design.rs
+│   │   └── src
+│   │       ├── ahb3
+│   │       │   └── mod.rs
+│   │       └── lib.rs
 │   ├── apb4
-│   │   └── peripheral_design.rs
+│   │   └── src
+│   │       ├── ahb3
+│   │       │   └── mod.rs
+│   │       └── lib.rs
 │   ├── axi4
-│   │   └── peripheral_design.rs
+│   │   └── src
+│   │       ├── ahb3
+│   │       │   └── mod.rs
+│   │       └── lib.rs
 │   ├── bb
-│   │   └── peripheral_design.rs
+│   │   └── src
+│   │       ├── ahb3
+│   │       │   └── mod.rs
+│   │       └── lib.rs
 │   └── wb
-│       └── peripheral_design.rs
+│       └── src
+│           ├── ahb3
+│           │   └── mod.rs
+│           └── lib.rs
 ├── core
 │   ├── ahb3
-│   │   └── peripheral_design.rs
+│   │   └── src
+│   │       ├── ahb3
+│   │       │   └── mod.rs
+│   │       └── lib.rs
 │   ├── apb4
-│   │   └── peripheral_design.rs
+│   │   └── src
+│   │       ├── ahb3
+│   │       │   └── mod.rs
+│   │       └── lib.rs
 │   ├── axi4
-│   │   └── peripheral_design.rs
+│   │   └── src
+│   │       ├── ahb3
+│   │       │   └── mod.rs
+│   │       └── lib.rs
 │   ├── bb
-│   │   └── peripheral_design.rs
+│   │   └── src
+│   │       ├── ahb3
+│   │       │   └── mod.rs
+│   │       └── lib.rs
 │   └── wb
-│       └── peripheral_design.rs
+│       └── src
+│           ├── ahb3
+│           │   └── mod.rs
+│           └── lib.rs
 └── pu
     ├── ahb3
-    │   └── peripheral_design.rs
+    │   └── src
+    │       ├── ahb3
+    │       │   └── mod.rs
+    │       └── lib.rs
     ├── apb4
-    │   └── peripheral_design.rs
+    │   └── src
+    │       ├── ahb3
+    │       │   └── mod.rs
+    │       └── lib.rs
     ├── axi4
-    │   └── peripheral_design.rs
+    │   └── src
+    │       ├── ahb3
+    │       │   └── mod.rs
+    │       └── lib.rs
     ├── bb
-    │   └── peripheral_design.rs
+    │   └── src
+    │       ├── ahb3
+    │       │   └── mod.rs
+    │       └── lib.rs
     └── wb
-        └── peripheral_design.rs
+        └── src
+            ├── ahb3
+            │   └── mod.rs
+            └── lib.rs
 
-18 directories, 15 files
+48 directories, 30 files

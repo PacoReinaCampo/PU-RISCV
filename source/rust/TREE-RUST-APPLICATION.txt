@@ -1,36 +1,51 @@
 application
 ├── bfm
 │   ├── ahb3
-│   │   └── peripheral_test.rs
+│   │   └── src
+│   │       └── main.rs
 │   ├── apb4
-│   │   └── peripheral_test.rs
+│   │   └── src
+│   │       └── main.rs
 │   ├── axi4
-│   │   └── peripheral_test.rs
+│   │   └── src
+│   │       └── main.rs
 │   ├── bb
-│   │   └── peripheral_test.rs
+│   │   └── src
+│   │       └── main.rs
 │   └── wb
-│       └── peripheral_test.rs
+│       └── src
+│           └── main.rs
 ├── core
 │   ├── ahb3
-│   │   └── peripheral_test.rs
+│   │   └── src
+│   │       └── main.rs
 │   ├── apb4
-│   │   └── peripheral_test.rs
+│   │   └── src
+│   │       └── main.rs
 │   ├── axi4
-│   │   └── peripheral_test.rs
+│   │   └── src
+│   │       └── main.rs
 │   ├── bb
-│   │   └── peripheral_test.rs
+│   │   └── src
+│   │       └── main.rs
 │   └── wb
-│       └── peripheral_test.rs
+│       └── src
+│           └── main.rs
 └── pu
     ├── ahb3
-    │   └── peripheral_test.rs
+    │   └── src
+    │       └── main.rs
     ├── apb4
-    │   └── peripheral_test.rs
+    │   └── src
+    │       └── main.rs
     ├── axi4
-    │   └── peripheral_test.rs
+    │   └── src
+    │       └── main.rs
     ├── bb
-    │   └── peripheral_test.rs
+    │   └── src
+    │       └── main.rs
     └── wb
-        └── peripheral_test.rs
+        └── src
+            └── main.rs
 
-18 directories, 15 files
+33 directories, 15 files
