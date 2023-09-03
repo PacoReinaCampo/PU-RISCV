@@ -52,4 +52,4 @@ simulate:
 	xsim -R pu_riscv_testbench_ahb3
 
 clean:
-	rm -rf *.dir *.jou *.log *.pb .Xil
+	rm -rf *.dir *.jou *.log *.pb *.vcd .Xil
