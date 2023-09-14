@@ -39,11 +39,13 @@
 
 `include "peripheral_package.sv"
 
-program peripheral_test(add_if vif);
+program peripheral_test (
+  add_if vif
+);
   peripheral_environment environment;
-  
+
   initial begin
-    environment = new(vif);
+    environment                       = new(vif);
     environment.agent.generator.count = 5;
     environment.run();
   end
