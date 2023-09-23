@@ -89,6 +89,6 @@ ghdl -a --std=08 ../../../../../../../bench/vhdl/tests/pu/wb/pu_riscv_testbench_
 ghdl -a --std=08 ../../../../../../../bench/vhdl/tests/bfm/pu_riscv_dbg_bfm.vhd
 ghdl -a --std=08 ../../../../../../../bench/vhdl/tests/bfm/pu_riscv_htif.vhd
 
-ghdl -m --std=08 pu_riscv_testbench_wb
-ghdl -r --std=08 pu_riscv_testbench_wb --ieee-asserts=disable-at-0 --disp-tree=inst > riscv_testbench_wb.tree
+ghdl -e --std=08 pu_riscv_testbench_wb
+ghdl -r --std=08 pu_riscv_testbench_wb --ieee-asserts=disable-at-0 --vcd=riscv_testbench_wb.vcd --wave=system.ghw --stop-time=1ms
 pause
