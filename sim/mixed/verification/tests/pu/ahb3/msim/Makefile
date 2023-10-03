@@ -2,8 +2,8 @@ all: build simulate
 
 build:
 	if [ ! -e work ]; then vlib work; fi
-	vlog -sv -f system.verilog.vc
-	vcom -2008 -f system.vhdl.vc
+	vlog -sv -f system.verilog.f
+	vcom -2008 -f system.vhdl.f
 
 simulate:
 	vsim -c -do run.do work.pu_riscv_testbench_ahb3

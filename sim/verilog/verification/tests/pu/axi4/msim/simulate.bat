@@ -45,6 +45,6 @@
 call ../../../../../../../settings64_msim.bat
 
 vlib work
-vlog -sv -f system.vc
+vlog -sv -f system.f
 vsim -c -do run.do work.pu_riscv_testbench_axi4
 pause
