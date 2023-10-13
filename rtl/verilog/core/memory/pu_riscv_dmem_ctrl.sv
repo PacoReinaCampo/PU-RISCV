@@ -197,31 +197,27 @@ module pu_riscv_dmem_ctrl #(
   // Module Body
   //
 
-  /*
+//  //For debugging
+//  int fd;
+//  initial fd = $fopen("memtrace.dat");
 
-  //For debugging
-  int fd;
-  initial fd = $fopen("memtrace.dat");
+//  logic [XLEN-1:0] adr_dly, d_dly;
+//  logic            we_dly;
+//  int n = 0;
 
-  logic [XLEN-1:0] adr_dly, d_dly;
-  logic            we_dly;
-  int n = 0;
+//  always @(posedge clk_i) begin
+//    if (buf_req) begin
+//      adr_dly <= buf_adr;
+//      d_dly   <= buf_d;
+//      we_dly  <= buf_we;
+//    end
 
-  always @(posedge clk_i) begin
-    if (buf_req) begin
-      adr_dly <= buf_adr;
-      d_dly   <= buf_d;
-      we_dly  <= buf_we;
-    end
-
-    else if (mem_ack_o) begin
-      n++;
-      if (we_dly) $fdisplay (fd, "%0d, [%0x] <= %x", n, adr_dly, d_dly);
-      else        $fdisplay (fd, "%0d, [%0x] == %x", n, adr_dly, mem_q_o);
-    end
-  end
-
-   */
+//    else if (mem_ack_o) begin
+//      n++;
+//      if (we_dly) $fdisplay (fd, "%0d, [%0x] <= %x", n, adr_dly, d_dly);
+//      else        $fdisplay (fd, "%0d, [%0x] == %x", n, adr_dly, mem_q_o);
+//    end
+//  end
 
   //Hookup Access Buffer
 

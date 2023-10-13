@@ -175,36 +175,52 @@ module pu_riscv_if #(
   always @(posedge clk, negedge rstn) begin
     if (!rstn) parcel_shift_register <= {INSTR_NOP, INSTR_NOP};
     else if (flushes) parcel_shift_register <= {INSTR_NOP, INSTR_NOP};
-    else if (!id_stall)
+    else if (!id_stall) begin
       if (branch_taken) parcel_shift_register <= {INSTR_NOP, INSTR_NOP};
-      else
+      else begin
         case (parcel_sr_valid)
           3'b000: parcel_shift_register <= {INSTR_NOP, new_parcel};
-          3'b001: if (is_16bit_instruction) parcel_shift_register <= {INSTR_NOP, new_parcel};
- else parcel_shift_register <= {new_parcel, parcel_shift_register[15:0]};
-          3'b011: if (is_16bit_instruction) parcel_shift_register <= {new_parcel, parcel_shift_register[16 +: ILEN]};
- else parcel_shift_register <= {INSTR_NOP, new_parcel};
-          3'b111: if (is_16bit_instruction) parcel_shift_register <= {INSTR_NOP, parcel_shift_register[16 +: ILEN]};
- else parcel_shift_register <= {new_parcel, parcel_shift_register[32 +: 16]};
+          3'b001: begin
+            if (is_16bit_instruction) parcel_shift_register <= {INSTR_NOP, new_parcel};
+            else parcel_shift_register <= {new_parcel, parcel_shift_register[15:0]};
+          end
+          3'b011: begin
+            if (is_16bit_instruction) parcel_shift_register <= {new_parcel, parcel_shift_register[16 +: ILEN]};
+            else parcel_shift_register <= {INSTR_NOP, new_parcel};
+          end
+          3'b111: begin
+            if (is_16bit_instruction) parcel_shift_register <= {INSTR_NOP, parcel_shift_register[16 +: ILEN]};
+            else parcel_shift_register <= {new_parcel, parcel_shift_register[32 +: 16]};
+          end
         endcase
+      end
+    end
   end
 
   always @(posedge clk, negedge rstn) begin
     if (!rstn) parcel_sr_valid <= 'h0;
     else if (flushes) parcel_sr_valid <= 'h0;
-    else if (!id_stall)
+    else if (!id_stall) begin
       if (branch_taken) parcel_sr_valid <= 'h0;
-      else
+      else begin
         case (parcel_sr_valid)
           //branch to 16bit address would yield 3'b010
           3'b000: parcel_sr_valid <= {1'b0, if_parcel_valid};  //3'b011;
-          3'b001: if (is_16bit_instruction) parcel_sr_valid <= {1'b0, if_parcel_valid};  //3'b011;
- else parcel_sr_valid <= {if_parcel_valid, 1'b1};  //3'b111;
-          3'b011: if (is_16bit_instruction) parcel_sr_valid <= {if_parcel_valid, 1'b1};  //3'b111;
- else parcel_sr_valid <= {1'b0, if_parcel_valid};  //3'b011;
-          3'b111: if (is_16bit_instruction) parcel_sr_valid <= {1'b0, 1'b1, 1'b1};  //3'b011;
- else parcel_sr_valid <= {if_parcel_valid, 1'b1};  //3'b111;
+          3'b001: begin
+            if (is_16bit_instruction) parcel_sr_valid <= {1'b0, if_parcel_valid};  //3'b011;
+            else parcel_sr_valid <= {if_parcel_valid, 1'b1};  //3'b111;
+          end
+          3'b011: begin
+            if (is_16bit_instruction) parcel_sr_valid <= {if_parcel_valid, 1'b1};  //3'b111;
+            else parcel_sr_valid <= {1'b0, if_parcel_valid};  //3'b011;
+          end
+          3'b111: begin
+            if (is_16bit_instruction) parcel_sr_valid <= {1'b0, 1'b1, 1'b1};  //3'b011;
+            else parcel_sr_valid <= {if_parcel_valid, 1'b1};  //3'b111;
+          end
         endcase
+      end
+    end
   end
 
   assign active_parcel        = parcel_shift_register[ILEN-1:0];

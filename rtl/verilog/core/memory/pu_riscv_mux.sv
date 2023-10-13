@@ -204,17 +204,17 @@ module pu_riscv_mux #(
         biu_we_o   = biu_we_i[pending_port];
         biu_d_o    = biu_ack_i & ~|burst_cnt ? biu_d_i[pending_port] : biu_d_i[selected_port];  //TODO ~|burst_cnt & biu_ack_i ??
       end
-      /*
-      WAIT4BIU: begin
-        biu_req_o  = 1'b1;
-        biu_adri_o = biu_adri_i [ selected_port ];
-        biu_size_o = biu_size_i [ selected_port ];
-        biu_type_o = biu_type_i [ selected_port ];
-        biu_lock_o = biu_lock_i [ selected_port ];
-        biu_we_o   = biu_we_i   [ selected_port ];
-        biu_d_o    = biu_d      [ selected_port ];
-      end
- */
+
+//      WAIT4BIU: begin
+//        biu_req_o  = 1'b1;
+//        biu_adri_o = biu_adri_i [ selected_port ];
+//        biu_size_o = biu_size_i [ selected_port ];
+//        biu_type_o = biu_type_i [ selected_port ];
+//        biu_lock_o = biu_lock_i [ selected_port ];
+//        biu_we_o   = biu_we_i   [ selected_port ];
+//        biu_d_o    = biu_d      [ selected_port ];
+//      end
+
       default: begin
         biu_req_o  = 'bx;
         biu_adri_o = 'hx;

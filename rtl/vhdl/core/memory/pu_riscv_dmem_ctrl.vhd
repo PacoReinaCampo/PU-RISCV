@@ -774,7 +774,7 @@ begin
     );
 
   --Hookup BIU mux
-  pu_riscv_mux_inst : riscv_mux
+  pu_riscv_mux_inst : pu_riscv_mux
     generic map (
       XLEN  => XLEN,
       PLEN  => PLEN,

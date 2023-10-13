@@ -267,10 +267,9 @@ module pu_riscv_pmachk #(
 
   //Access/Misaligned Exception
   assign exception_o       = req_i & (~|pma_match_all |  // no memory range matched
- (instruction_i & ~matched_pma[09]) |  // not executable
- (we_i & ~matched_pma[10]) |  // not writeable
- (~we_i & ~matched_pma[11])  // not readable
-);
+                   (instruction_i & ~matched_pma[09]) |  // not executable
+                            (we_i & ~matched_pma[10]) |  // not writeable
+                           (~we_i & ~matched_pma[11]));  // not readable
 
   assign misaligned_o      = misaligned_i & ~matched_pma[4];
 
