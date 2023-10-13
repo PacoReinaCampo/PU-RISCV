@@ -1,0 +1,8 @@
+* Main: Base Integer Instructions: RV32I and RV64I
+* Main: RV Privileged Instructions
+* Optional: Compressed (16-bit) Instruction Extension: RV32C
+* Optional: Compressed Extention: RV64C
+* Optional: Multiply-Divide Instruction Extension: RVM
+* Optional: Atomic Instruction Extension: RVA
+* Optional: Floating-Point Instruction Extensions: RVF & RVD
+* Optional: Vector Extension: RVV
