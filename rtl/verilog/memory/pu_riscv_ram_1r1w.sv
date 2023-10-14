@@ -111,6 +111,7 @@ module pu_riscv_ram_1r1w #(
         .dout_o (mem_dout)
       );
     end else begin  //(TECHNOLOGY == "GENERIC")
+
       //GENERIC  -- inferrable memory
 
       //initial $display ("INFO   : No memory technology specified. Using generic inferred memory (%m)");

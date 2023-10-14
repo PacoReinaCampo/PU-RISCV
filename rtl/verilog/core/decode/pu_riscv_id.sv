@@ -235,7 +235,7 @@ module pu_riscv_id #(
   always @(posedge clk, negedge rstn) begin
     if (!rstn) id_exception <= 'h0;
     else if (bu_flush || st_flush) id_exception <= 'h0;
-    else if (!stall)
+    else if (!stall) begin
       if (id_stall) id_exception <= 'h0;
       else begin
         id_exception                            <= if_exception;
@@ -246,6 +246,7 @@ module pu_riscv_id #(
         id_exception[CAUSE_HMODE_ECALL]         <= ~if_bubble & (if_instr == ECALL) & (st_prv == PRV_H) & has_h;
         id_exception[CAUSE_MMODE_ECALL]         <= ~if_bubble & (if_instr == ECALL) & (st_prv == PRV_M);
       end
+    end
   end
 
   //To Register File
@@ -632,22 +633,20 @@ module pu_riscv_id #(
         default:      id_stall = 'b0;
       endcase
 
-      /*
-    end else if (mem_opcode == OPC_LOAD) begin
-      casex (if_opcode)
-        OPC_OP_IMM  : id_stall = (if_src1 == mem_dst);
-        OPC_OP_IMM32: id_stall = (if_src1 == mem_dst);
-        OPC_OP      : id_stall = (if_src1 == mem_dst) | (if_src2 == mem_dst);
-        OPC_OP32    : id_stall = (if_src1 == mem_dst) | (if_src2 == mem_dst);
-        OPC_BRANCH  : id_stall = (if_src1 == mem_dst) | (if_src2 == mem_dst);
-        OPC_JALR    : id_stall = (if_src1 == mem_dst);
-        OPC_LOAD    : id_stall = (if_src1 == mem_dst);
-        OPC_STORE   : id_stall = (if_src1 == mem_dst) | (if_src2 == mem_dst);
-        OPC_SYSTEM  : id_stall = (if_src1 == mem_dst);
-        default     : id_stall = 'b0;
-      endcase
-    end
- */
+//    end else if (mem_opcode == OPC_LOAD) begin
+//      casex (if_opcode)
+//        OPC_OP_IMM  : id_stall = (if_src1 == mem_dst);
+//        OPC_OP_IMM32: id_stall = (if_src1 == mem_dst);
+//        OPC_OP      : id_stall = (if_src1 == mem_dst) | (if_src2 == mem_dst);
+//        OPC_OP32    : id_stall = (if_src1 == mem_dst) | (if_src2 == mem_dst);
+//        OPC_BRANCH  : id_stall = (if_src1 == mem_dst) | (if_src2 == mem_dst);
+//        OPC_JALR    : id_stall = (if_src1 == mem_dst);
+//        OPC_LOAD    : id_stall = (if_src1 == mem_dst);
+//        OPC_STORE   : id_stall = (if_src1 == mem_dst) | (if_src2 == mem_dst);
+//        OPC_SYSTEM  : id_stall = (if_src1 == mem_dst);
+//        default     : id_stall = 'b0;
+//      endcase
+//    end
 
     end else begin
       id_stall = 'b0;
@@ -809,19 +808,18 @@ module pu_riscv_id #(
       SIP:      illegal_csr_rd = ~has_s | (st_prv < PRV_S);
       SATP:     illegal_csr_rd = ~has_s | (st_prv < PRV_S) | (st_prv == PRV_S && st_tvm);
 
-      //Hypervisor
-      /*
-      HSTATUS   : illegal_csr_rd = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HEDELEG   : illegal_csr_rd = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HIDELEG   : illegal_csr_rd = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HIE       : illegal_csr_rd = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HTVEC     : illegal_csr_rd = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HSCRATCH  : illegal_csr_rd = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HEPC      : illegal_csr_rd = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HCAUSE    : illegal_csr_rd = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HTVAL     : illegal_csr_rd = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HIP       : illegal_csr_rd = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      */
+//      //Hypervisor
+//      HSTATUS   : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HEDELEG   : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HIDELEG   : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HIE       : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HTVEC     : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HSCRATCH  : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HEPC      : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HCAUSE    : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HTVAL     : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HIP       : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+
       //Machine
       MVENDORID:  illegal_csr_rd = (st_prv < PRV_M);
       MARCHID:    illegal_csr_rd = (st_prv < PRV_M);
@@ -903,19 +901,18 @@ module pu_riscv_id #(
       SIP:        illegal_csr_wr = ~has_s | (st_prv < PRV_S);
       SATP:       illegal_csr_wr = ~has_s | (st_prv < PRV_S) | (st_prv == PRV_S && st_tvm);
 
-      //Hypervisor
-      /*
-      HSTATUS   : illegal_csr_wr = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HEDELEG   : illegal_csr_wr = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HIDELEG   : illegal_csr_wr = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HIE       : illegal_csr_wr = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HTVEC     : illegal_csr_wr = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HSCRATCH  : illegal_csr_wr = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HEPC      : illegal_csr_wr = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HCAUSE    : illegal_csr_wr = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HBADADDR  : illegal_csr_wr = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      HIP       : illegal_csr_wr = (HAS_HYPER == 0)               | (st_prv < PRV_H);
-      */
+//      //Hypervisor
+//      HSTATUS   : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HEDELEG   : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HIDELEG   : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HIE       : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HTVEC     : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HSCRATCH  : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HEPC      : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HCAUSE    : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HBADADDR  : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+//      HIP       : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+
       //Machine
       MVENDORID:  illegal_csr_wr = 1'b1;
       MARCHID:    illegal_csr_wr = 1'b1;

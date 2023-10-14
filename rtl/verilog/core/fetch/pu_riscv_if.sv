@@ -235,8 +235,10 @@ module pu_riscv_if #(
   always @(*) begin
     case (active_parcel)
       WFI:     pd_instr = INSTR_NOP;  //Implement WFI as a nop 
-      default: if (is_32bit_instruction) pd_instr = active_parcel;
- else pd_instr = -1;  //Illegal
+      default: begin
+        if (is_32bit_instruction) pd_instr = active_parcel;
+        else pd_instr = -1;  //Illegal
+      end
     endcase
   end
 
