@@ -133,10 +133,12 @@ module pu_riscv_bu #(
 
   //Exceptions
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) bu_exception <= 'h0;
-    else if (!ex_stall) begin
-      if (bu_flush || st_flush || |ex_exception || |mem_exception || |wb_exception) bu_exception <= 'h0;
-      else if (!du_stall) begin
+    if (!rstn) begin
+      bu_exception <= 'h0;
+    end else if (!ex_stall) begin
+      if (bu_flush || st_flush || |ex_exception || |mem_exception || |wb_exception) begin
+        bu_exception <= 'h0;
+      end else if (!du_stall) begin
         bu_exception <= id_exception;
 
         casex ({
@@ -166,12 +168,17 @@ module pu_riscv_bu #(
   end
 
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) du_wrote_pc <= 1'b0;
-    else du_wrote_pc <= du_we_pc | (du_wrote_pc & du_stall);
+    if (!rstn) begin
+      du_wrote_pc <= 1'b0;
+    end else begin
+      du_wrote_pc <= du_we_pc | (du_wrote_pc & du_stall);
+    end
   end
 
   always @(posedge clk) begin
-    if (du_we_pc) du_nxt_pc <= du_dato;
+    if (du_we_pc) begin
+      du_nxt_pc <= du_dato;
+    end
   end
 
   always @(*) begin

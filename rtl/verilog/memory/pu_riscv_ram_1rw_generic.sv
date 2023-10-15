@@ -73,11 +73,15 @@ module pu_riscv_ram_1rw_generic #(
     for (i = 0; i < (DBITS + 7) / 8; i = i + 1) begin : write
       if (i * 8 + 8 > DBITS) begin
         always @(posedge clk_i) begin
-          if (we_i && be_i[i]) mem_array[addr_i][DBITS-1:i*8] <= din_i[DBITS-1:i*8];
+          if (we_i && be_i[i]) begin
+            mem_array[addr_i][DBITS-1:i*8] <= din_i[DBITS-1:i*8];
+          end
         end
       end else begin
         always @(posedge clk_i) begin
-          if (we_i && be_i[i]) mem_array[addr_i][i*8+:8] <= din_i[i*8+:8];
+          if (we_i && be_i[i]) begin
+            mem_array[addr_i][i*8+:8] <= din_i[i*8+:8];
+          end
         end
       end
     end

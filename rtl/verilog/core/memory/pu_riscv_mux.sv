@@ -109,7 +109,9 @@ module pu_riscv_mux #(
     integer n;
 
     busor = 0;
-    for (n = 0; n < PORTS; n = n + 1) busor = busor | req[n];
+    for (n = 0; n < PORTS; n = n + 1) begin
+      busor = busor | req[n];
+    end
   endfunction
 
   function automatic [$clog2(PORTS)-1:0] port_select;
@@ -160,7 +162,7 @@ module pu_riscv_mux #(
     if (!rst_ni) begin
       fsm_state <= IDLE;
       burst_cnt <= 'h0;
-    end else
+    end else begin
       case (fsm_state)
         IDLE:
         if (pending_req && |pending_burst_cnt) begin
@@ -171,7 +173,8 @@ module pu_riscv_mux #(
         BURST:
         if (biu_ack_i) begin
           burst_cnt <= burst_cnt - 1;
-          if (~|burst_cnt)  //Burst done
+          if (~|burst_cnt) begin
+            //Burst done
             if (pending_req && |pending_burst_cnt) begin
               burst_cnt     <= pending_burst_cnt;
               selected_port <= pending_port;
@@ -179,8 +182,10 @@ module pu_riscv_mux #(
               fsm_state     <= IDLE;
               selected_port <= pending_port;
             end
+          end
         end
       endcase
+    end
   end
 
   //Mux BIU ports
@@ -205,15 +210,15 @@ module pu_riscv_mux #(
         biu_d_o    = biu_ack_i & ~|burst_cnt ? biu_d_i[pending_port] : biu_d_i[selected_port];  //TODO ~|burst_cnt & biu_ack_i ??
       end
 
-//      WAIT4BIU: begin
-//        biu_req_o  = 1'b1;
-//        biu_adri_o = biu_adri_i [ selected_port ];
-//        biu_size_o = biu_size_i [ selected_port ];
-//        biu_type_o = biu_type_i [ selected_port ];
-//        biu_lock_o = biu_lock_i [ selected_port ];
-//        biu_we_o   = biu_we_i   [ selected_port ];
-//        biu_d_o    = biu_d      [ selected_port ];
-//      end
+      //      WAIT4BIU: begin
+      //        biu_req_o  = 1'b1;
+      //        biu_adri_o = biu_adri_i [ selected_port ];
+      //        biu_size_o = biu_size_i [ selected_port ];
+      //        biu_type_o = biu_type_i [ selected_port ];
+      //        biu_lock_o = biu_lock_i [ selected_port ];
+      //        biu_we_o   = biu_we_i   [ selected_port ];
+      //        biu_d_o    = biu_d      [ selected_port ];
+      //      end
 
       default: begin
         biu_req_o  = 'bx;

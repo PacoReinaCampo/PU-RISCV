@@ -69,8 +69,9 @@ module pu_riscv_memmisaligned #(
   // Module Body
   //
   always @(*) begin
-    if (instruction_i) misaligned = (HAS_RVC != 0) ? adr_i[0] : |adr_i[1:0];
-    else begin
+    if (instruction_i) begin
+      misaligned = (HAS_RVC != 0) ? adr_i[0] : |adr_i[1:0];
+    end else begin
       case (size_i)
         BYTE:    misaligned = 1'b0;
         HWORD:   misaligned = adr_i[0];

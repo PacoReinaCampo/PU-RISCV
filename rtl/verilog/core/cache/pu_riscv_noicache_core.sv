@@ -111,8 +111,11 @@ module pu_riscv_noicache_core #(
 
   //delay IF-flush
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) if_flush_dly <= 1'b0;
-    else if_flush_dly <= if_flush;
+    if (!rstn) begin
+      if_flush_dly <= 1'b0;
+    end else begin
+      if_flush_dly <= if_flush;
+    end
   end
 
   // To CPU
@@ -137,9 +140,13 @@ module pu_riscv_noicache_core #(
 
   //FIFO
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) biu_stb_cnt <= 2'h0;
-    else if (if_flush) biu_stb_cnt <= 2'h0;
-    else if (biu_stb_ack) biu_stb_cnt <= {1'b1, biu_stb_cnt[1]};
+    if (!rstn) begin
+      biu_stb_cnt <= 2'h0;
+    end else if (if_flush) begin
+      biu_stb_cnt <= 2'h0;
+    end else if (biu_stb_ack) begin
+      biu_stb_cnt <= {1'b1, biu_stb_cnt[1]};
+    end
   end
 
   //valid bits

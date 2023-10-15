@@ -643,9 +643,17 @@ module pu_riscv_icache_core #(
 
   always @(posedge clk_i) begin
     case (biufsm_state)
-      IDLE:  case (biucmd)                              READ_WAY: burst_cnt <= {BURST_BITS{1'b1}}; WRITE_WAY: burst_cnt <= {BURST_BITS{1'b1}};
- endcase
-      BURST: if (biu_ack_i) burst_cnt <= burst_cnt - 1;
+      IDLE: begin
+        case (biucmd)
+          READ_WAY: burst_cnt <= {BURST_BITS{1'b1}};
+          WRITE_WAY: burst_cnt <= {BURST_BITS{1'b1}};
+        endcase
+      end  
+      BURST: begin
+        if (biu_ack_i) begin
+          burst_cnt <= burst_cnt - 1;
+        end
+      end
     endcase
   end
 

@@ -95,8 +95,11 @@ module pu_riscv_bp #(
   // Module Body
   //
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) if_parcel_pc_dly <= PC_INIT;
-    else if (!id_stall_i) if_parcel_pc_dly <= if_parcel_pc_i;
+    if (!rst_ni) begin
+      if_parcel_pc_dly <= PC_INIT;
+    end else if (!id_stall_i) begin
+      if_parcel_pc_dly <= if_parcel_pc_i;
+    end
   end
 
   assign radr              = id_stall_i ? {bu_bp_history_i, if_parcel_pc_dly[BP_LOCAL_BITS_LSB +: BP_LOCAL_BITS]} : {bu_bp_history_i, if_parcel_pc_i[BP_LOCAL_BITS_LSB +: BP_LOCAL_BITS]};
@@ -133,7 +136,10 @@ module pu_riscv_bp #(
   );
 
   generate
-    if (AVOID_X) assign bp_bp_predict_o = (old_prediction == 2'bxx) ? $random : old_prediction;
-    else assign bp_bp_predict_o = old_prediction;
+    if (AVOID_X) begin
+      assign bp_bp_predict_o = (old_prediction == 2'bxx) ? $random : old_prediction;
+    end else begin
+      assign bp_bp_predict_o = old_prediction;
+    end
   endgenerate
 endmodule

@@ -127,7 +127,10 @@ module pu_riscv_dbg_bfm #(
   assign cpu_stall_o = cpu_bp_i | stall_cpu;
 
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) stall_cpu <= 1'b0;
-    else if (cpu_bp_i) stall_cpu <= 1'b1;  //gets cleared by task unstall_cpu
+    if (!rstn) begin
+      stall_cpu <= 1'b0;
+    end else if (cpu_bp_i) begin
+      stall_cpu <= 1'b1;  //gets cleared by task unstall_cpu
+    end
   end
 endmodule

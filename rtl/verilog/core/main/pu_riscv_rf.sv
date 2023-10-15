@@ -94,12 +94,22 @@ module pu_riscv_rf #(
   generate
     for (i = 0; i < RDPORTS; i = i + 1) begin : xreg_rd
       //per Altera's recommendations. Prevents bypass logic
-      always @(posedge clk) dout1[i] <= rf[rf_src1[i]];
-      always @(posedge clk) dout2[i] <= rf[rf_src2[i]];
+      always @(posedge clk) begin
+        dout1[i] <= rf[rf_src1[i]];
+      end
+
+      always @(posedge clk) begin
+        dout2[i] <= rf[rf_src2[i]];
+      end
 
       //got data from RAM, now handle X0
-      always @(posedge clk) src1_is_x0[i] <= ~|rf_src1[i];
-      always @(posedge clk) src2_is_x0[i] <= ~|rf_src2[i];
+      always @(posedge clk) begin
+        src1_is_x0[i] <= ~|rf_src1[i];
+      end
+
+      always @(posedge clk) begin
+        src2_is_x0[i] <= ~|rf_src2[i];
+      end
 
       assign rf_srcv1[i] = src1_is_x0[i] ? {XLEN{1'b0}} : dout1[i];
       assign rf_srcv2[i] = src2_is_x0[i] ? {XLEN{1'b0}} : dout2[i];
@@ -113,8 +123,11 @@ module pu_riscv_rf #(
   generate
     for (i = 0; i < WRPORTS; i = i + 1) begin : xreg_wr
       always @(posedge clk) begin
-        if (du_we_rf) rf[du_addr[AR_BITS-1:0]] <= du_dato;
-        else if (rf_we[i]) rf[rf_dst[i]] <= rf_dstv[i];
+        if (du_we_rf) begin
+          rf[du_addr[AR_BITS-1:0]] <= du_dato;
+        end else if (rf_we[i]) begin
+          rf[rf_dst[i]] <= rf_dstv[i];
+        end
       end
     end
   endgenerate

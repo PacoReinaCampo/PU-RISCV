@@ -256,7 +256,9 @@ module pu_riscv_mul #(
 
       //Register holding instruction for multiplier-output-selector
       always @(posedge clk) begin
-        if (!ex_stall) mul_instr <= id_instr;
+        if (!ex_stall) begin
+          mul_instr <= id_instr;
+        end
       end
 
       //Registers holding multiplier operands

@@ -86,13 +86,18 @@ module pu_riscv_mmu #(
   //
 
   always @(posedge clk_i) begin
-    if (vreq_i) padr_o <= vadr_i;  //TODO: actual translation
+    if (vreq_i) begin
+      padr_o <= vadr_i;  //TODO: actual translation
+    end
   end
 
   //Insert state machine here
   always @(posedge clk_i) begin
-    if (clr_i) preq_o <= 1'b0;
-    else preq_o <= vreq_i;
+    if (clr_i) begin
+      preq_o <= 1'b0;
+    end else begin
+      preq_o <= vreq_i;
+    end
   end
 
   always @(posedge clk_i) begin

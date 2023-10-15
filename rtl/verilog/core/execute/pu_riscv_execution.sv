@@ -171,13 +171,18 @@ module pu_riscv_execution #(
 
   //Program Counter
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) ex_pc <= PC_INIT;
-    else if (!ex_stall && !du_stall) ex_pc <= id_pc;  //stall during DBG to retain PPC
+    if (!rstn) begin
+      ex_pc <= PC_INIT;
+    end else if (!ex_stall && !du_stall) begin
+      ex_pc <= id_pc;  //stall during DBG to retain PPC
+    end
   end
 
   //Instruction
   always @(posedge clk) begin
-    if (!ex_stall) ex_instr <= id_instr;
+    if (!ex_stall) begin
+      ex_instr <= id_instr;
+    end
   end
 
   //Bypasses

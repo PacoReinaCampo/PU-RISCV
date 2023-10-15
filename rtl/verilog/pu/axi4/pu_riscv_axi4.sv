@@ -212,8 +212,8 @@ module pu_riscv_axi4 #(
 
   //Interrupts
   input       ext_nmi,
-  ext_tint,
-  ext_sint,
+  input       ext_tint,
+  input       ext_sint,
   input [3:0] ext_int,
 
   //Debug Interface
@@ -231,56 +231,65 @@ module pu_riscv_axi4 #(
   //
   // Variables
   //
-  logic                      if_stall_nxt_pc;
-  logic [XLEN          -1:0] if_nxt_pc;
-  logic if_stall, if_flush;
-  logic [PARCEL_SIZE   -1:0] if_parcel;
-  logic [XLEN          -1:0] if_parcel_pc;
-  logic [PARCEL_SIZE/16-1:0] if_parcel_valid;
-  logic                      if_parcel_misaligned;
-  logic                      if_parcel_page_fault;
+  logic                                if_stall_nxt_pc;
+  logic [XLEN          -1:0]           if_nxt_pc;
+  logic                                if_stall;
+  logic                                if_flush;
+  logic [PARCEL_SIZE   -1:0]           if_parcel;
+  logic [XLEN          -1:0]           if_parcel_pc;
+  logic [PARCEL_SIZE/16-1:0]           if_parcel_valid;
+  logic                                if_parcel_misaligned;
+  logic                                if_parcel_page_fault;
 
-  logic                      dmem_req;
-  logic [XLEN          -1:0] dmem_adr;
-  logic [               2:0] dmem_size;
-  logic                      dmem_we;
-  logic [XLEN          -1:0] dmem_d, dmem_q;
-  logic dmem_ack, dmem_err;
-  logic                         dmem_misaligned;
-  logic                         dmem_page_fault;
+  logic                                dmem_req;
+  logic [XLEN          -1:0]           dmem_adr;
+  logic [               2:0]           dmem_size;
+  logic                                dmem_we;
+  logic [XLEN          -1:0]           dmem_d;
+  logic [XLEN          -1:0]           dmem_q;
+  logic                                dmem_ack;
+  logic                                dmem_err;
+  logic                                dmem_misaligned;
+  logic                                dmem_page_fault;
 
-  logic [        1:0]           st_prv;
-  logic [PMP_CNT-1:0][     7:0] st_pmpcfg;
-  logic [PMP_CNT-1:0][XLEN-1:0] st_pmpaddr;
+  logic [               1:0]           st_prv;
+  logic [       PMP_CNT-1:0][     7:0] st_pmpcfg;
+  logic [       PMP_CNT-1:0][XLEN-1:0] st_pmpaddr;
 
-  logic cacheflush, dcflush_rdy;
+  logic                                cacheflush;
+  logic                                dcflush_rdy;
 
   //Instruction Memory BIU connections
-  logic ibiu_stb;
-  logic ibiu_stb_ack;
-  logic ibiu_d_ack;
-  logic [PLEN          -1:0] ibiu_adri, ibiu_adro;
-  logic [               2:0] ibiu_size;
-  logic [               2:0] ibiu_type;
-  logic                      ibiu_we;
-  logic                      ibiu_lock;
-  logic [               2:0] ibiu_prot;
-  logic [XLEN          -1:0] ibiu_d;
-  logic [XLEN          -1:0] ibiu_q;
-  logic ibiu_ack, ibiu_err;
+  logic                                ibiu_stb;
+  logic                                ibiu_stb_ack;
+  logic                                ibiu_d_ack;
+  logic [PLEN          -1:0]           ibiu_adri;
+  logic [PLEN          -1:0]           ibiu_adro;
+  logic [               2:0]           ibiu_size;
+  logic [               2:0]           ibiu_type;
+  logic                                ibiu_we;
+  logic                                ibiu_lock;
+  logic [               2:0]           ibiu_prot;
+  logic [XLEN          -1:0]           ibiu_d;
+  logic [XLEN          -1:0]           ibiu_q;
+  logic                                ibiu_ack;
+  logic                                ibiu_err;
+
   //Data Memory BIU connections
-  logic dbiu_stb;
-  logic dbiu_stb_ack;
-  logic dbiu_d_ack;
-  logic [PLEN          -1:0] dbiu_adri, dbiu_adro;
-  logic [               2:0] dbiu_size;
-  logic [               2:0] dbiu_type;
-  logic                      dbiu_we;
-  logic                      dbiu_lock;
-  logic [               2:0] dbiu_prot;
-  logic [XLEN          -1:0] dbiu_d;
-  logic [XLEN          -1:0] dbiu_q;
-  logic dbiu_ack, dbiu_err;
+  logic                                dbiu_stb;
+  logic                                dbiu_stb_ack;
+  logic                                dbiu_d_ack;
+  logic [PLEN          -1:0]           dbiu_adri;
+  logic [PLEN          -1:0]           dbiu_adro;
+  logic [               2:0]           dbiu_size;
+  logic [               2:0]           dbiu_type;
+  logic                                dbiu_we;
+  logic                                dbiu_lock;
+  logic [               2:0]           dbiu_prot;
+  logic [XLEN          -1:0]           dbiu_d;
+  logic [XLEN          -1:0]           dbiu_q;
+  logic                                dbiu_ack;
+  logic                                dbiu_err;
 
   //////////////////////////////////////////////////////////////////////////////
   //

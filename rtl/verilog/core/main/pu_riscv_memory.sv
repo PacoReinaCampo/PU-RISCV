@@ -82,33 +82,49 @@ module pu_riscv_memory #(
 
   //Program Counter
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) mem_pc <= PC_INIT;
-    else if (!wb_stall) mem_pc <= ex_pc;
+    if (!rstn) begin
+      mem_pc <= PC_INIT;
+    end else if (!wb_stall) begin
+      mem_pc <= ex_pc;
+    end
   end
 
   //Instruction
   always @(posedge clk) begin
-    if (!wb_stall) mem_instr <= ex_instr;
+    if (!wb_stall) begin
+      mem_instr <= ex_instr;
+    end
   end
 
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) mem_bubble <= 1'b1;
-    else if (!wb_stall) mem_bubble <= ex_bubble;
+    if (!rstn) begin
+      mem_bubble <= 1'b1;
+    end else if (!wb_stall) begin
+      mem_bubble <= ex_bubble;
+    end
   end
 
   //Data
   always @(posedge clk) begin
-    if (!wb_stall) mem_r <= ex_r;
+    if (!wb_stall) begin
+      mem_r <= ex_r;
+    end
   end
 
   always @(posedge clk) begin
-    if (!wb_stall) mem_memadr <= dmem_adr;
+    if (!wb_stall) begin
+      mem_memadr <= dmem_adr;
+    end
   end
 
   //Exception
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) mem_exception <= 'h0;
-    else if (|mem_exception || |wb_exception) mem_exception <= 'h0;
-    else if (!wb_stall) mem_exception <= ex_exception;
+    if (!rstn) begin
+      mem_exception <= 'h0;
+    end else if (|mem_exception || |wb_exception) begin
+      mem_exception <= 'h0;
+    end else if (!wb_stall) begin
+      mem_exception <= ex_exception;
+    end
   end
 endmodule

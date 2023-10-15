@@ -92,21 +92,23 @@ module pu_riscv_memory_model_wb #(
   integer m, n;
   genvar u, i, j, k, p;
 
-  logic [XLEN         -1:0] mem_array[addr_type];
+  logic [XLEN         -1:0] mem_array  [addr_type];
 
-  logic [PLEN         -1:0] iaddr[2], raddr[2], waddr[2];
-  logic [  RADRCNT_MSB : 0] radrcnt    [2];
+  logic [PLEN         -1:0] iaddr      [        2];
+  logic [PLEN         -1:0] raddr      [        2];
+  logic [PLEN         -1:0] waddr      [        2];
+  logic [  RADRCNT_MSB : 0] radrcnt    [        2];
 
-  logic                     wreq       [2];
-  logic [XLEN/8       -1:0] dbe        [2];
+  logic                     wreq       [        2];
+  logic [XLEN/8       -1:0] dbe        [        2];
 
-  logic [  MEM_LATENCY : 1] ack_latency[2];
+  logic [  MEM_LATENCY : 1] ack_latency[        2];
 
 
-  logic [              1:0] dHTRANS    [2];
-  logic                     dHWRITE    [2];
-  logic [              2:0] dHSIZE     [2];
-  logic [              2:0] dHBURST    [2];
+  logic [              1:0] dHTRANS    [        2];
+  logic                     dHWRITE    [        2];
+  logic [              2:0] dHSIZE     [        2];
+  logic [              2:0] dHBURST    [        2];
 
   ////////////////////////////////////////////////////////////////
   //
@@ -153,21 +155,29 @@ module pu_riscv_memory_model_wb #(
 
     eof = 0;
     while (eof == 0) begin
-      if ($fscanf(fd, ":%2h%4h%2h", byte_cnt, address, record_type) != 3) $display("ERROR  : Read error while processing %s", INIT_FILE);
+      if ($fscanf(fd, ":%2h%4h%2h", byte_cnt, address, record_type) != 3) begin
+        $display("ERROR  : Read error while processing %s", INIT_FILE);
+      end
 
       //initial CRC value
       crc = byte_cnt + address[1] + address[0] + record_type;
 
       for (m = 0; m < byte_cnt; m = m + 1) begin
-        if ($fscanf(fd, "%2h", data[m]) != 1) $display("ERROR  : Read error while processing %s", INIT_FILE);
+        if ($fscanf(fd, "%2h", data[m]) != 1) begin
+          $display("ERROR  : Read error while processing %s", INIT_FILE);
+        end
 
         //update CRC
         crc = crc + data[m];
       end
 
-      if ($fscanf(fd, "%2h", checksum) != 1) $display("ERROR  : Read error while processing %s", INIT_FILE);
+      if ($fscanf(fd, "%2h", checksum) != 1) begin
+        $display("ERROR  : Read error while processing %s", INIT_FILE);
+      end
 
-      if (checksum + crc) $display("ERROR  : CRC error while processing %s", INIT_FILE);
+      if (checksum + crc) begin
+        $display("ERROR  : CRC error while processing %s", INIT_FILE);
+      end
 
       case (record_type)
         8'h00: begin
@@ -305,15 +315,19 @@ module pu_riscv_memory_model_wb #(
       assign iaddr[u] = wb_adr_i[u] & ({XLEN{1'b1}} << $clog2(XLEN / 8));
 
       always @(posedge HCLK) begin
-        if (wb_ack_o[u] && (wb_bte_i[u] != `HTRANS_IDLE) && (wb_bte_i[u] != `HTRANS_BUSY) && !wb_we_i[u])
+        if (wb_ack_o[u] && (wb_bte_i[u] != `HTRANS_IDLE) && (wb_bte_i[u] != `HTRANS_BUSY) && !wb_we_i[u]) begin
           if (iaddr[u] == waddr[u] && wreq[u]) begin
             for (n = 0; n < XLEN / 8; n++) begin
-              if (dbe[u]) wb_dat_o[u][n*8+:8] <= wb_dat_i[u][n*8+:8];
-              else wb_dat_o[u][n*8+:8] <= mem_array[iaddr[u]][n*8+:8];
+              if (dbe[u]) begin
+                wb_dat_o[u][n*8+:8] <= wb_dat_i[u][n*8+:8];
+              end else begin
+                wb_dat_o[u][n*8+:8] <= mem_array[iaddr[u]][n*8+:8];
+              end
             end
           end else begin
             wb_dat_o[u] <= mem_array[iaddr[u]];
           end
+        end
       end
     end
   endgenerate

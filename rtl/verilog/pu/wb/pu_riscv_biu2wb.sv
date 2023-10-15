@@ -148,8 +148,11 @@ module pu_riscv_biu2wb #(
     input [2:0] hburst;  //AHB wb_cti_o
 
     //next linear address
-    if (XLEN == 32) nxt_addr = (addr + 'h4) & ~'h3;
-    else nxt_addr = (addr + 'h8) & ~'h7;
+    if (XLEN == 32) begin
+      nxt_addr = (addr + 'h4) & ~'h3;
+    end else begin
+      nxt_addr = (addr + 'h8) & ~'h7;
+    end
 
     //wrap?
     case (hburst)
@@ -235,7 +238,9 @@ module pu_riscv_biu2wb #(
 
   //Data section
   always @(posedge HCLK) begin
-    if (wb_ack_i) biu_di_dly <= biu_d_i;
+    if (wb_ack_i) begin
+      biu_di_dly <= biu_d_i;
+    end
   end
 
   always @(posedge HCLK) begin
@@ -246,8 +251,11 @@ module pu_riscv_biu2wb #(
   end
 
   always @(posedge HCLK, negedge HRESETn) begin
-    if (!HRESETn) data_ena_d <= 1'b0;
-    else if (wb_ack_i) data_ena_d <= data_ena;
+    if (!HRESETn) begin
+      data_ena_d <= 1'b0;
+    end else if (wb_ack_i) begin
+      data_ena_d <= data_ena;
+    end
   end
 
   assign biu_q_o       = wb_dat_i;

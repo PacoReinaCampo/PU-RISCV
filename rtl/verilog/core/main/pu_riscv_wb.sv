@@ -110,14 +110,20 @@ module pu_riscv_wb #(
 
   //Program Counter
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) wb_pc_o <= PC_INIT;
-    else if (!wb_stall_o) wb_pc_o <= mem_pc_i;
+    if (!rst_ni) begin
+      wb_pc_o <= PC_INIT;
+    end else if (!wb_stall_o) begin
+      wb_pc_o <= mem_pc_i;
+    end
   end
 
   //Instruction
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) wb_instr_o <= INSTR_NOP;
-    else if (!wb_stall_o) wb_instr_o <= mem_instr_i;
+    if (!rst_ni) begin
+      wb_instr_o <= INSTR_NOP;
+    end else if (!wb_stall_o) begin
+      wb_instr_o <= mem_instr_i;
+    end
   end
 
   assign func7  = mem_instr_i[31:25];
@@ -129,29 +135,47 @@ module pu_riscv_wb #(
   always @(*) begin
     exception = mem_exception_i;
 
-    if (opcode == OPC_LOAD && ~mem_bubble_i) exception[CAUSE_MISALIGNED_LOAD] = dmem_misaligned_i;
+    if (opcode == OPC_LOAD && ~mem_bubble_i) begin
+      exception[CAUSE_MISALIGNED_LOAD] = dmem_misaligned_i;
+    end
 
-    if (opcode == OPC_STORE && ~mem_bubble_i) exception[CAUSE_MISALIGNED_STORE] = dmem_misaligned_i;
+    if (opcode == OPC_STORE && ~mem_bubble_i) begin
+      exception[CAUSE_MISALIGNED_STORE] = dmem_misaligned_i;
+    end
 
-    if (opcode == OPC_LOAD & ~mem_bubble_i) exception[CAUSE_LOAD_ACCESS_FAULT] = dmem_err_i;
+    if (opcode == OPC_LOAD & ~mem_bubble_i) begin
+      exception[CAUSE_LOAD_ACCESS_FAULT] = dmem_err_i;
+    end
 
-    if (opcode == OPC_STORE & ~mem_bubble_i) exception[CAUSE_STORE_ACCESS_FAULT] = dmem_err_i;
+    if (opcode == OPC_STORE & ~mem_bubble_i) begin
+      exception[CAUSE_STORE_ACCESS_FAULT] = dmem_err_i;
+    end
 
-    if (opcode == OPC_LOAD && ~mem_bubble_i) exception[CAUSE_LOAD_PAGE_FAULT] = dmem_page_fault_i;
+    if (opcode == OPC_LOAD && ~mem_bubble_i) begin
+      exception[CAUSE_LOAD_PAGE_FAULT] = dmem_page_fault_i;
+    end
 
-    if (opcode == OPC_STORE && ~mem_bubble_i) exception[CAUSE_STORE_PAGE_FAULT] = dmem_page_fault_i;
+    if (opcode == OPC_STORE && ~mem_bubble_i) begin
+      exception[CAUSE_STORE_PAGE_FAULT] = dmem_page_fault_i;
+    end
   end
 
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) wb_exception_o <= 'h0;
-    else if (!wb_stall_o) wb_exception_o <= exception;
+    if (!rst_ni) begin
+      wb_exception_o <= 'h0;
+    end else if (!wb_stall_o) begin
+      wb_exception_o <= exception;
+    end
   end
 
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) wb_badaddr_o <= 'h0;
-    else if (exception[CAUSE_MISALIGNED_LOAD] || exception[CAUSE_MISALIGNED_STORE] || exception[CAUSE_LOAD_ACCESS_FAULT] || exception[CAUSE_STORE_ACCESS_FAULT] || exception[CAUSE_LOAD_PAGE_FAULT] || exception[CAUSE_STORE_PAGE_FAULT])
+    if (!rst_ni) begin
+      wb_badaddr_o <= 'h0;
+    end else if (exception[CAUSE_MISALIGNED_LOAD] || exception[CAUSE_MISALIGNED_STORE] || exception[CAUSE_LOAD_ACCESS_FAULT] || exception[CAUSE_STORE_ACCESS_FAULT] || exception[CAUSE_LOAD_PAGE_FAULT] || exception[CAUSE_STORE_PAGE_FAULT]) begin
       wb_badaddr_o <= mem_memadr_i;
-    else wb_badaddr_o <= mem_pc_i;
+    end else begin
+      wb_badaddr_o <= mem_pc_i;
+    end
   end
 
   //From Memory
@@ -211,37 +235,46 @@ module pu_riscv_wb #(
 
   // Destination register
   always @(posedge clk_i) begin
-    if (!wb_stall_o) wb_dst_o <= dst;
+    if (!wb_stall_o) begin
+      wb_dst_o <= dst;
+    end
   end
 
   // Result
   always @(posedge clk_i) begin
-    if (!wb_stall_o)
+    if (!wb_stall_o) begin
       casex (opcode)
         OPC_LOAD: wb_r_o <= m_data;
         default:  wb_r_o <= mem_r_i;
       endcase
+    end
   end
 
   // Register File Write
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) wb_we_o <= 'b0;
-    else if (|exception) wb_we_o <= 'b0;
-    else
+    if (!rst_ni) begin
+      wb_we_o <= 'b0;
+    end else if (|exception) begin
+      wb_we_o <= 'b0;
+    end else begin
       casex (opcode)
         OPC_MISC_MEM: wb_we_o <= 'b0;
         OPC_LOAD:     wb_we_o <= ~mem_bubble_i & |dst & ~wb_stall_o;
         OPC_STORE:    wb_we_o <= 'b0;
         OPC_STORE_FP: wb_we_o <= 'b0;
         OPC_BRANCH:   wb_we_o <= 'b0;
-        //OPC_SYSTEM   : wb_we_o <= 'b0;
+        //OPC_SYSTEM:   wb_we_o <= 'b0;
         default:      wb_we_o <= ~mem_bubble_i & |dst;
       endcase
+    end
   end
 
   // Write Back Bubble
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) wb_bubble_o <= 1'b1;
-    else if (!wb_stall_o) wb_bubble_o <= mem_bubble_i;
+    if (!rst_ni) begin
+      wb_bubble_o <= 1'b1;
+    end else if (!wb_stall_o) begin
+      wb_bubble_o <= mem_bubble_i;
+    end
   end
 endmodule

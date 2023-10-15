@@ -130,8 +130,8 @@ module pu_riscv_module_ahb3 #(
 
   //Interrupts
   input       ext_nmi,
-  ext_tint,
-  ext_sint,
+  input       ext_tint,
+  input       ext_sint,
   input [3:0] ext_int,
 
   //Debug Interface

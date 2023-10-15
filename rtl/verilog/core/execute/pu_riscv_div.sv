@@ -153,7 +153,9 @@ module pu_riscv_div #(
 
   //retain instruction
   always @(posedge clk) begin
-    if (!ex_stall) div_instr <= id_instr;
+    if (!ex_stall) begin
+      div_instr <= id_instr;
+    end
   end
 
   //32bit operands
@@ -361,7 +363,9 @@ module pu_riscv_div #(
         //actual division loop
         ST_DIV: begin
           cnt <= cnt - 1;
-          if (~|cnt) state <= ST_RES;
+          if (~|cnt) begin
+            state <= ST_RES;
+          end
           //restoring divider section
           if (p_minus_b[XLEN]) begin  //sub gave negative result
             pa_p <= pa_shifted_p;  //restore

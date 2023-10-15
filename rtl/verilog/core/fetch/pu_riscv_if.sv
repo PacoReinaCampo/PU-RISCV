@@ -234,7 +234,7 @@ module pu_riscv_if #(
   //Convert 16bit instructions to 32bit instructions here.
   always @(*) begin
     case (active_parcel)
-      WFI:     pd_instr = INSTR_NOP;  //Implement WFI as a nop 
+      WFI: pd_instr = INSTR_NOP;  //Implement WFI as a nop 
       default: begin
         if (is_32bit_instruction) pd_instr = active_parcel;
         else pd_instr = -1;  //Illegal

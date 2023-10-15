@@ -147,8 +147,11 @@ module pu_riscv_biu2ahb3 #(
     input [2:0] hburst;  //AHB HBURST
 
     //next linear address
-    if (XLEN == 32) nxt_addr = (addr + 'h4) & ~'h3;
-    else nxt_addr = (addr + 'h8) & ~'h7;
+    if (XLEN == 32) begin
+      nxt_addr = (addr + 'h4) & ~'h3;
+    end else begin
+      nxt_addr = (addr + 'h8) & ~'h7;
+    end
 
     //wrap?
     case (hburst)
@@ -236,7 +239,9 @@ module pu_riscv_biu2ahb3 #(
 
   //Data section
   always @(posedge HCLK) begin
-    if (HREADY) biu_di_dly <= biu_d_i;
+    if (HREADY) begin
+      biu_di_dly <= biu_d_i;
+    end
   end
 
   always @(posedge HCLK) begin
@@ -247,8 +252,11 @@ module pu_riscv_biu2ahb3 #(
   end
 
   always @(posedge HCLK, negedge HRESETn) begin
-    if (!HRESETn) data_ena_d <= 1'b0;
-    else if (HREADY) data_ena_d <= data_ena;
+    if (!HRESETn) begin
+      data_ena_d <= 1'b0;
+    end else if (HREADY) begin
+      data_ena_d <= data_ena;
+    end
   end
 
   assign biu_q_o       = HRDATA;

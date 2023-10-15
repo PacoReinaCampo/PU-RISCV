@@ -185,8 +185,9 @@ module pu_riscv_alu #(
   end
 
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) alu_bubble <= 1'b1;
-    else if (!ex_stall) begin
+    if (!rstn) begin
+      alu_bubble <= 1'b1;
+    end else if (!ex_stall) begin
       casex ({
         xlen32, func7, func3, opcode
       })

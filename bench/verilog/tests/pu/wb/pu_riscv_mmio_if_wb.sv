@@ -98,8 +98,11 @@ module pu_riscv_mmio_if_wb #(
 
   //Generate watchdog counter
   always @(posedge HCLK, negedge HRESETn) begin
-    if (!HRESETn) watchdog_cnt <= 0;
-    else watchdog_cnt <= watchdog_cnt + 1;
+    if (!HRESETn) begin
+      watchdog_cnt <= 0;
+    end else begin
+      watchdog_cnt <= watchdog_cnt + 1;
+    end
   end
 
   //Catch write to host address
@@ -128,12 +131,16 @@ module pu_riscv_mmio_if_wb #(
       data_reg      <= wb_dat_i;
     end
   end
+
   //Generate output
 
   //Simulated UART Tx (prints characters on screen)
   always @(posedge HCLK) begin
-    if (catch_uart_tx) $write("%0c", data_reg);
+    if (catch_uart_tx) begin
+      $write("%0c", data_reg);
+    end
   end
+
   //Tests ...
   always @(posedge HCLK) begin
     if (watchdog_cnt > 1000_000 || catch_test) begin
@@ -141,9 +148,14 @@ module pu_riscv_mmio_if_wb #(
       $display("-------------------------------------------------------------");
       $display("* RISC-V test bench finished");
       if (data_reg[0] == 1'b1) begin
-        if (~|data_reg[HDATA_SIZE-1:1]) $display("* PASSED %0d", data_reg);
-        else $display("* FAILED: code: 0x%h (%0d: %s)", data_reg >> 1, data_reg >> 1, hostcode_to_string(data_reg >> 1));
-      end else $display("* FAILED: watchdog count reached (%0d) @%0t", watchdog_cnt, $time);
+        if (~|data_reg[HDATA_SIZE-1:1]) begin
+          $display("* PASSED %0d", data_reg);
+        end else begin
+          $display("* FAILED: code: 0x%h (%0d: %s)", data_reg >> 1, data_reg >> 1, hostcode_to_string(data_reg >> 1));
+        end
+      end else begin
+        $display("* FAILED: watchdog count reached (%0d) @%0t", watchdog_cnt, $time);
+      end
       $display("-------------------------------------------------------------");
       $display("\n");
 

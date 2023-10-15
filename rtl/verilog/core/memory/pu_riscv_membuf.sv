@@ -99,9 +99,11 @@ module pu_riscv_membuf #(
 
   //control signals
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) access_pending <= 'h0;
-    else if (clr_i) access_pending <= 'h0;
-    else if (ena_i) begin
+    if (!rst_ni) begin
+      access_pending <= 'h0;
+    end else if (clr_i) begin
+      access_pending <= 'h0;
+    end else if (ena_i) begin
       case ({
         req_i, ack_i
       })

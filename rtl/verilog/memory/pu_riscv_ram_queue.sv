@@ -93,9 +93,11 @@ module pu_riscv_ram_queue #(
 
   //Write Address
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) queue_wadr <= 'h0;
-    else if (clr_i) queue_wadr <= 'h0;
-    else if (ena_i)
+    if (!rst_ni) begin
+      queue_wadr <= 'h0;
+    end else if (clr_i) begin
+      queue_wadr <= 'h0;
+    end else if (ena_i) begin
       case ({
         we_i, re_i
       })
@@ -103,6 +105,7 @@ module pu_riscv_ram_queue #(
         2'b10:   queue_wadr <= queue_wadr + 1;
         default: ;
       endcase
+    end
   end
 
   assign queue_xadr = ~|queue_wadr ? DEPTH - 1 : queue_wadr - 1;
@@ -117,7 +120,7 @@ module pu_riscv_ram_queue #(
         end else if (clr_i) begin
           queue_data[n]       <= 'h0;
           queue_data[DEPTH-1] <= 'h0;
-        end else if (ena_i)
+        end else if (ena_i) begin
           case ({
             we_i, re_i
           })
@@ -135,15 +138,18 @@ module pu_riscv_ram_queue #(
             end
             default: ;
           endcase
+        end
       end
     end
   endgenerate
 
   //Queue Almost Empty
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) almost_empty_o <= 1'b1;
-    else if (clr_i) almost_empty_o <= 1'b1;
-    else if (ena_i)
+    if (!rst_ni) begin
+      almost_empty_o <= 1'b1;
+    end else if (clr_i) begin
+      almost_empty_o <= 1'b1;
+    end else if (ena_i) begin
       case ({
         we_i, re_i
       })
@@ -151,13 +157,16 @@ module pu_riscv_ram_queue #(
         2'b10:   almost_empty_o <= ~(queue_wadr > ALMOST_EMPTY_THRESHOLD_CHECK);
         default: ;
       endcase
+    end
   end
 
   //Queue Empty
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) empty_o <= 1'b1;
-    else if (clr_i) empty_o <= 1'b1;
-    else if (ena_i)
+    if (!rst_ni) begin
+      empty_o <= 1'b1;
+    end else if (clr_i) begin
+      empty_o <= 1'b1;
+    end else if (ena_i) begin
       case ({
         we_i, re_i
       })
@@ -165,13 +174,16 @@ module pu_riscv_ram_queue #(
         2'b10:   empty_o <= 1'b0;
         default: ;
       endcase
+    end
   end
 
   //Queue Almost Full
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) almost_full_o <= 1'b0;
-    else if (clr_i) almost_full_o <= 1'b0;
-    else if (ena_i)
+    if (!rst_ni) begin
+      almost_full_o <= 1'b0;
+    end else if (clr_i) begin
+      almost_full_o <= 1'b0;
+    end else if (ena_i) begin
       case ({
         we_i, re_i
       })
@@ -179,13 +191,16 @@ module pu_riscv_ram_queue #(
         2'b10:   almost_full_o <= (queue_wadr >= ALMOST_FULL_THRESHOLD_CHECK);
         default: ;
       endcase
+    end
   end
 
   //Queue Full
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) full_o <= 1'b0;
-    else if (clr_i) full_o <= 1'b0;
-    else if (ena_i)
+    if (!rst_ni) begin
+      full_o <= 1'b0;
+    end else if (clr_i) begin
+      full_o <= 1'b0;
+    end else if (ena_i) begin
       case ({
         we_i, re_i
       })
@@ -193,6 +208,7 @@ module pu_riscv_ram_queue #(
         2'b10:   full_o <= (queue_wadr == FULL_THRESHOLD);
         default: ;
       endcase
+    end
   end
 
   //Queue output data
@@ -200,8 +216,12 @@ module pu_riscv_ram_queue #(
 
 `ifdef rl_ram_queue_WARNINGS
   always @(posedge clk_i) begin
-    if (empty_o && !we_i && re_i) $display("rl_ram_queue (%m): underflow @%0t", $time);
-    if (full_o && we_i && !re_i) $display("rl_ram_queue (%m): overflow @%0t", $time);
+    if (empty_o && !we_i && re_i) begin
+      $display("rl_ram_queue (%m): underflow @%0t", $time);
+    end
+    if (full_o && we_i && !re_i) begin
+      $display("rl_ram_queue (%m): overflow @%0t", $time);
+    end
   end
 `endif
 endmodule

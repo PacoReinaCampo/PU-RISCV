@@ -56,19 +56,19 @@ module pu_riscv_ram_1r1w_generic_testbench;
   //
 
   // Global
-  reg rst_ni,
-  reg clk_i,
+  reg                   rst_ni;
+  reg                   clk_i;
 
   // Write side
-  reg [ ABITS     -1:0] waddr_i,
-  reg [ DBITS     -1:0] din_i,
-  reg                   we_i,
-  reg [(DBITS+7)/8-1:0] be_i,
+  reg [ ABITS     -1:0] waddr_i;
+  reg [ DBITS     -1:0] din_i;
+  reg                   we_i;
+  reg [(DBITS+7)/8-1:0] be_i;
 
   // Read side
-  reg [ABITS     -1:0] raddr_i,
-  reg                  re_i,
-  reg [DBITS     -1:0] dout_o
+  reg [ ABITS     -1:0] raddr_i;
+  reg                   re_i;
+  reg [ DBITS     -1:0] dout_o;
 
   //////////////////////////////////////////////////////////////////////////////
   //

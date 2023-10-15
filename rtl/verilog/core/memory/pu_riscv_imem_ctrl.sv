@@ -226,25 +226,25 @@ module pu_riscv_imem_ctrl #(
   // Module Body
   //
 
-//  // For debugging
-//  int fd;
-//  initial fd = $fopen("memtrace.dat");
+  //  // For debugging
+  //  int fd;
+  //  initial fd = $fopen("memtrace.dat");
 
-//  logic [XLEN-1:0] adr_dly, d_dly;
-//  logic            we_dly;
-//  int n = 0;
+  //  logic [XLEN-1:0] adr_dly, d_dly;
+  //  logic            we_dly;
+  //  int n = 0;
 
-//  always @(posedge clk_i) begin
-//    if (buf_req) begin
-//      adr_dly <= buf_adr;
-//    end
+  //  always @(posedge clk_i) begin
+  //    if (buf_req) begin
+  //      adr_dly <= buf_adr;
+  //    end
 
-//    else if (mem_ack_o) begin
-//      n++;
-//      if (we_dly) $fdisplay (fd, "%0d, [%0x] <= %x", n, adr_dly, d_dly);
-//      else        $fdisplay (fd, "%0d, [%0x] == %x", n, adr_dly, mem_q_o);
-//    end
-//  end
+  //    else if (mem_ack_o) begin
+  //      n++;
+  //      if (we_dly) $fdisplay (fd, "%0d, [%0x] <= %x", n, adr_dly, d_dly);
+  //      else        $fdisplay (fd, "%0d, [%0x] == %x", n, adr_dly, mem_q_o);
+  //    end
+  //  end
 
   //Hookup Access Buffer
   pu_riscv_membuf #(
@@ -438,11 +438,17 @@ module pu_riscv_imem_ctrl #(
 
     //Instantiate EXT block
     if (ICACHE_SIZE > 0) begin
-      if (ITCM_SIZE > 0) assign ext_access_req = is_ext_access;
-      else assign ext_access_req = is_ext_access | is_tcm_access;
+      if (ITCM_SIZE > 0) begin
+        assign ext_access_req = is_ext_access;
+      end else begin
+        assign ext_access_req = is_ext_access | is_tcm_access;
+      end
     end else begin
-      if (ITCM_SIZE > 0) assign ext_access_req = is_ext_access | is_cache_access;
-      else assign ext_access_req = is_ext_access | is_cache_access | is_tcm_access;
+      if (ITCM_SIZE > 0) begin
+        assign ext_access_req = is_ext_access | is_cache_access;
+      end else begin
+        assign ext_access_req = is_ext_access | is_cache_access | is_tcm_access;
+      end
     end
 
     pu_riscv_dext #(
@@ -554,7 +560,9 @@ module pu_riscv_imem_ctrl #(
 
   //Instruction Queue
   always @(posedge clk_i) begin
-    if (buf_req) buf_adr_dly <= buf_adr;
+    if (buf_req) begin
+      buf_adr_dly <= buf_adr;
+    end
   end
 
   assign parcel_queue_d_pc = ext_ack ? ext_vadr : buf_adr_dly;
