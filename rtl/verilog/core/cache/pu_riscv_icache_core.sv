@@ -187,28 +187,28 @@ module pu_riscv_icache_core #(
 
   logic   [ICACHE_WAYS           -1:0]               tag_we;
 
-  logic   [           ICACHE_WAYS-1:0]               tag_in_valid;
-  logic   [           ICACHE_WAYS-1:0][TAG_BITS-1:0] tag_in_tag;
+  logic   [ICACHE_WAYS           -1:0]               tag_in_valid;
+  logic   [ICACHE_WAYS           -1:0][TAG_BITS-1:0] tag_in_tag;
 
-  logic   [           ICACHE_WAYS-1:0]               tag_out_valid;
-  logic   [           ICACHE_WAYS-1:0][TAG_BITS-1:0] tag_out_tag;
+  logic   [ICACHE_WAYS           -1:0]               tag_out_valid;
+  logic   [ICACHE_WAYS           -1:0][TAG_BITS-1:0] tag_out_tag;
 
-  logic   [           ICACHE_WAYS-1:0][IDX_BITS-1:0] tag_byp_idx;
-  logic   [           ICACHE_WAYS-1:0][TAG_BITS-1:0] tag_byp_tag;
-  logic   [           ICACHE_WAYS-1:0][    SETS-1:0] tag_valid;
+  logic   [ICACHE_WAYS           -1:0][IDX_BITS-1:0] tag_byp_idx;
+  logic   [ICACHE_WAYS           -1:0][TAG_BITS-1:0] tag_byp_tag;
+  logic   [ICACHE_WAYS           -1:0][SETS    -1:0] tag_valid;
 
   logic   [IDX_BITS              -1:0]               dat_idx;
   logic   [IDX_BITS              -1:0]               dat_idx_dly;
   logic   [ICACHE_WAYS           -1:0]               dat_we;
   logic   [BLK_BITS/8            -1:0]               dat_be;
   logic   [BLK_BITS              -1:0]               dat_in;
-  logic   [           ICACHE_WAYS-1:0][BLK_BITS-1:0] dat_out;
+  logic   [ICACHE_WAYS           -1:0][BLK_BITS-1:0] dat_out;
 
-  logic   [           ICACHE_WAYS-1:0][BLK_BITS-1:0] way_q_mux;
-  logic   [           ICACHE_WAYS-1:0]               way_hit;
+  logic   [ICACHE_WAYS           -1:0][BLK_BITS-1:0] way_q_mux;
+  logic   [ICACHE_WAYS           -1:0]               way_hit;
 
   logic   [DAT_OFF_BITS          -1:0]               dat_offset;
-  logic   [       PARCEL_OFF_BITS : 0]               parcel_offset;
+  logic   [PARCEL_OFF_BITS         :0]               parcel_offset;
 
   logic                                              cache_hit;
   logic   [XLEN                  -1:0]               cache_q;
@@ -494,9 +494,13 @@ module pu_riscv_icache_core #(
   //hold tag-idx; prevent new mem_vreq_i from messing up tag during filling
   always @(posedge clk_i) begin
     case (memfsm_state)
-      ARMED:   if (mem_vreq_dly && !cache_hit) tag_idx_hold <= vadr_dly_idx;
-      RECOVER: tag_idx_hold <= mem_vreq_dly ? vadr_dly_idx  //pending access
- : vadr_idx;  //current access
+      ARMED: begin
+        if (mem_vreq_dly && !cache_hit) begin
+          tag_idx_hold <= vadr_dly_idx;
+        end
+      end
+      //pending access or current access
+      RECOVER: tag_idx_hold <= mem_vreq_dly ? vadr_dly_idx : vadr_idx;
       default: ;
     endcase
   end
@@ -531,8 +535,8 @@ module pu_riscv_icache_core #(
   always @(*) begin
     case (memfsm_state)
       ARMED:   dat_idx = vadr_idx;  //read access
-      RECOVER: dat_idx = mem_vreq_dly ? vadr_dly_idx  //read pending cycle
- : vadr_idx;  //read new access
+      //read pending cycle or read new access
+      RECOVER: dat_idx = mem_vreq_dly ? vadr_dly_idx : vadr_idx;
       default: dat_idx = tag_idx_hold;
     endcase
   end
@@ -645,10 +649,10 @@ module pu_riscv_icache_core #(
     case (biufsm_state)
       IDLE: begin
         case (biucmd)
-          READ_WAY: burst_cnt <= {BURST_BITS{1'b1}};
+          READ_WAY:  burst_cnt <= {BURST_BITS{1'b1}};
           WRITE_WAY: burst_cnt <= {BURST_BITS{1'b1}};
         endcase
-      end  
+      end
       BURST: begin
         if (biu_ack_i) begin
           burst_cnt <= burst_cnt - 1;

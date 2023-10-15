@@ -90,6 +90,7 @@ module pu_riscv_htif #(
       $display("\n");
       $display("*****************************************************");
       $display("* RISC-V test bench finished");
+
       if (host_csr_tohost[0] == 1'b1) begin
         if (~|host_csr_tohost[XLEN-1:1]) begin
           $display("* PASSED %0d", host_csr_tohost);
@@ -99,6 +100,7 @@ module pu_riscv_htif #(
       end else begin
         $display("* FAILED: watchdog count reached (%0d) @%0t", watchdog_cnt, $time);
       end
+
       $display("*****************************************************");
       $display("\n");
 

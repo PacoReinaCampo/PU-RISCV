@@ -127,7 +127,11 @@ module pu_riscv_dcache_core #(
 
     onehot2int = 0;
 
-    for (i = 0; i < DCACHE_WAYS; i = i + 1) if (a[i]) onehot2int = i;
+    for (i = 0; i < DCACHE_WAYS; i = i + 1) begin
+      if (a[i]) begin
+        onehot2int = i;
+      end
+    end
   endfunction
 
   function automatic [XLEN/8-1:0] size2be;
@@ -214,18 +218,18 @@ module pu_riscv_dcache_core #(
   logic [DCACHE_WAYS          -1:0]               tag_we;
   logic [DCACHE_WAYS          -1:0]               tag_we_dirty;
 
-  logic [          DCACHE_WAYS-1:0]               tag_in_valid;
-  logic [          DCACHE_WAYS-1:0]               tag_in_dirty;
-  logic [          DCACHE_WAYS-1:0][TAG_BITS-1:0] tag_in_tag;
+  logic [DCACHE_WAYS          -1:0]               tag_in_valid;
+  logic [DCACHE_WAYS          -1:0]               tag_in_dirty;
+  logic [DCACHE_WAYS          -1:0][TAG_BITS-1:0] tag_in_tag;
 
-  logic [          DCACHE_WAYS-1:0]               tag_out_valid;
-  logic [          DCACHE_WAYS-1:0]               tag_out_dirty;
-  logic [          DCACHE_WAYS-1:0][TAG_BITS-1:0] tag_out_tag;
+  logic [DCACHE_WAYS          -1:0]               tag_out_valid;
+  logic [DCACHE_WAYS          -1:0]               tag_out_dirty;
+  logic [DCACHE_WAYS          -1:0][TAG_BITS-1:0] tag_out_tag;
 
-  logic [          DCACHE_WAYS-1:0][IDX_BITS-1:0] tag_byp_idx;
-  logic [          DCACHE_WAYS-1:0][TAG_BITS-1:0] tag_byp_tag;
-  logic [          DCACHE_WAYS-1:0][    SETS-1:0] tag_valid;
-  logic [          DCACHE_WAYS-1:0][    SETS-1:0] tag_dirty;
+  logic [DCACHE_WAYS          -1:0][IDX_BITS-1:0] tag_byp_idx;
+  logic [DCACHE_WAYS          -1:0][TAG_BITS-1:0] tag_byp_tag;
+  logic [DCACHE_WAYS          -1:0][SETS    -1:0] tag_valid;
+  logic [DCACHE_WAYS          -1:0][SETS    -1:0] tag_dirty;
 
   logic [IDX_BITS             -1:0]               write_buffer_idx;
   logic [PLEN                 -1:0]               write_buffer_adr;  //physical address
@@ -242,9 +246,9 @@ module pu_riscv_dcache_core #(
   logic                                           dat_we_enable;
   logic [BLK_BITS/8           -1:0]               dat_be;
   logic [BLK_BITS             -1:0]               dat_in;
-  logic [          DCACHE_WAYS-1:0][BLK_BITS-1:0] dat_out;
+  logic [DCACHE_WAYS          -1:0][BLK_BITS-1:0] dat_out;
 
-  logic [          DCACHE_WAYS-1:0][BLK_BITS-1:0] way_q_mux;
+  logic [DCACHE_WAYS          -1:0][BLK_BITS-1:0] way_q_mux;
   logic [XLEN                 -1:0]               way_q;  //Only use XLEN bits from way_q
   logic [DCACHE_WAYS          -1:0]               way_hit;
   logic [DCACHE_WAYS          -1:0]               way_dirty;
@@ -671,9 +675,13 @@ module pu_riscv_dcache_core #(
   //hold tag-idx; prevent new mem_vreq_i from messing up tag during filling
   always @(posedge clk_i) begin
     case (memfsm_state)
-      ARMED:   if (mem_vreq_dly && !cache_hit) tag_idx_hold <= vadr_dly_idx;
-      RECOVER: tag_idx_hold <= mem_vreq_dly ? vadr_dly_idx  //pending access
- : vadr_idx;  //current access
+      ARMED: begin
+        if (mem_vreq_dly && !cache_hit) begin
+          tag_idx_hold <= vadr_dly_idx;
+        end
+      end
+      //pending access or current access
+      RECOVER: tag_idx_hold <= mem_vreq_dly ? vadr_dly_idx : vadr_idx;
       default: ;
     endcase
   end
@@ -732,10 +740,10 @@ module pu_riscv_dcache_core #(
   //DAT Index
   always @(*) begin
     case (memfsm_state)
-      ARMED:     dat_idx = dat_we_enable ? write_buffer_idx  //write old 'write-data'
- : vadr_idx;  //read access
-      RECOVER:   dat_idx = mem_vreq_dly ? vadr_dly_idx  //read pending cycle
- : vadr_idx;  //read new access
+      //write old 'write-data' or read access
+      ARMED:     dat_idx = dat_we_enable ? write_buffer_idx : vadr_idx;
+      //read pending cycle or read new access
+      RECOVER:   dat_idx = mem_vreq_dly ? vadr_dly_idx : vadr_idx;
       FLUSH:     dat_idx = flush_idx;
       FLUSHWAYS: dat_idx = flush_idx;
       default:   dat_idx = tag_idx_hold;
@@ -903,7 +911,7 @@ module pu_riscv_dcache_core #(
     case (biufsm_state)
       IDLE: begin
         case (biucmd)
-          READ_WAY: burst_cnt <= {BURST_BITS{1'b1}};
+          READ_WAY:  burst_cnt <= {BURST_BITS{1'b1}};
           WRITE_WAY: burst_cnt <= {BURST_BITS{1'b1}};
         endcase
       end

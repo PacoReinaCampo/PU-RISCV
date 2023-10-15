@@ -84,6 +84,7 @@ module pu_riscv_dbg_bfm #(
   task write;
     input [PLEN-1:0] addr;  //address to write to
     input [XLEN-1:0] data;  //data to write
+
     //setup DBG bus
     @(posedge clk);
     cpu_stb_o <= 1'b1;
@@ -103,6 +104,7 @@ module pu_riscv_dbg_bfm #(
   task read;
     input [PLEN-1:0] addr;  //address to read from
     output [XLEN-1:0] data;  //data read from CPU
+
     //setup DBG bus
     @(posedge clk);
     cpu_stb_o <= 1'b1;
