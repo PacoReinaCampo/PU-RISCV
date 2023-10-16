@@ -158,44 +158,56 @@ module riscv_ahb2axi #(
   // Variables
   //
 
-  logic [7:0] master_wstrb;
+  logic   [               7:0] master_wstrb;
 
-  state_t buf_state, buf_nxtstate;
-  logic buf_state_en;
+  state_t                      buf_state;
+  state_t                      buf_nxtstate;
+  logic                        buf_state_en;
 
   // Buffer signals (one entry buffer)
-  logic buf_read_error_in, buf_read_error;
-  logic [AHB_DATA_WIDTH-1:0] buf_rdata;
+  logic                        buf_read_error_in;
+  logic                        buf_read_error;
+  logic   [AHB_DATA_WIDTH-1:0] buf_rdata;
 
-  logic                      ahb3_hready;
-  logic                      ahb3_hready_q;
-  logic [1:0] ahb3_htrans_in, ahb3_htrans_q;
-  logic [               2:0] ahb3_hsize_q;
-  logic                      ahb3_hwrite_q;
-  logic [AHB_ADDR_WIDTH-1:0] ahb3_haddr_q;
-  logic [AHB_DATA_WIDTH-1:0] ahb3_hwdata_q;
-  logic                      ahb3_hresp_q;
+  logic                        ahb3_hready;
+  logic                        ahb3_hready_q;
+  logic   [               1:0] ahb3_htrans_in;
+  logic   [               1:0] ahb3_htrans_q;
+  logic   [               2:0] ahb3_hsize_q;
+  logic                        ahb3_hwrite_q;
+  logic   [AHB_ADDR_WIDTH-1:0] ahb3_haddr_q;
+  logic   [AHB_DATA_WIDTH-1:0] ahb3_hwdata_q;
+  logic                        ahb3_hresp_q;
 
   //Miscellaneous signals
-  logic ahb3_addr_in_dccm, ahb3_addr_in_iccm, ahb3_addr_in_pic;
-  logic ahb3_addr_in_dccm_region_nc, ahb3_addr_in_iccm_region_nc, ahb3_addr_in_pic_region_nc;
+  logic                        ahb3_addr_in_dccm;
+  logic                        ahb3_addr_in_iccm;
+  logic                        ahb3_addr_in_pic;
+  logic                        ahb3_addr_in_dccm_region_nc;
+  logic                        ahb3_addr_in_iccm_region_nc;
+  logic                        ahb3_addr_in_pic_region_nc;
 
   // signals needed for the read data coming back from the core and to block any further commands as AHB is a blocking bus
-  logic buf_rdata_en;
+  logic                        buf_rdata_en;
 
-  logic ahb3_bus_addr_clk_en, buf_rdata_clk_en;
-  logic ahb3_clk, ahb3_addr_clk, buf_rdata_clk;
+  logic                        ahb3_bus_addr_clk_en;
+  logic                        buf_rdata_clk_en;
+  logic                        ahb3_clk;
+  logic                        ahb3_addr_clk;
+  logic                        buf_rdata_clk;
 
   // Command buffer is the holding station where we convert to AXI and send to core
-  logic cmdbuf_wr_en, cmdbuf_rst;
-  logic cmdbuf_full;
-  logic cmdbuf_vld, cmdbuf_write;
-  logic [               1:0] cmdbuf_size;
-  logic [AXI_STRB_WIDTH-1:0] cmdbuf_wstrb;
-  logic [AXI_ADDR_WIDTH-1:0] cmdbuf_addr;
-  logic [AXI_DATA_WIDTH-1:0] cmdbuf_wdata;
+  logic                        cmdbuf_wr_en;
+  logic                        cmdbuf_rst;
+  logic                        cmdbuf_full;
+  logic                        cmdbuf_vld;
+  logic                        cmdbuf_write;
+  logic   [               1:0] cmdbuf_size;
+  logic   [AXI_STRB_WIDTH-1:0] cmdbuf_wstrb;
+  logic   [AXI_ADDR_WIDTH-1:0] cmdbuf_addr;
+  logic   [AXI_DATA_WIDTH-1:0] cmdbuf_wdata;
 
-  logic                      bus_clk;
+  logic                        bus_clk;
 
   //////////////////////////////////////////////////////////////////////////////
   //
@@ -235,8 +247,11 @@ module riscv_ahb2axi #(
   end
 
   always_ff @(posedge ahb3_clk or negedge rst_l) begin
-    if (rst_l == 0) buf_state <= IDLE;
-    else buf_state <= buf_state_en ? buf_nxtstate : buf_state;
+    if (rst_l == 0) begin
+      buf_state <= IDLE;
+    end else begin
+      buf_state <= buf_state_en ? buf_nxtstate : buf_state;
+    end
   end
 
   assign master_wstrb[7:0]   = ({8{ahb3_hsize_q == 3'b000}} & (8'b0000_0001 << ahb3_haddr_q[2:0])) |
@@ -268,46 +283,70 @@ module riscv_ahb2axi #(
 
   // Buffer signals - needed for the read data and ECC error response
   always_ff @(posedge buf_rdata_clk or negedge rst_l) begin
-    if (rst_l == 0) buf_rdata <= 0;
-    else buf_rdata <= axi4_r_data;
+    if (rst_l == 0) begin
+      buf_rdata <= 0;
+    end else begin
+      buf_rdata <= axi4_r_data;
+    end
   end
 
   // buf_read_error will be high only one cycle
   always_ff @(posedge ahb3_clk or negedge rst_l) begin
-    if (rst_l == 0) buf_read_error <= 0;
-    else buf_read_error <= buf_read_error_in;
+    if (rst_l == 0) begin
+      buf_read_error <= 0;
+    end else begin
+      buf_read_error <= buf_read_error_in;
+    end
   end
 
   // All the Master signals are captured before presenting it to the command buffer.
   // We check for Hresp before sending it to the cmd buffer.
   always_ff @(posedge ahb3_clk or negedge rst_l) begin
-    if (rst_l == 0) ahb3_hresp_q <= 0;
-    else ahb3_hresp_q <= ahb3_hresp;
+    if (rst_l == 0) begin
+      ahb3_hresp_q <= 0;
+    end else begin
+      ahb3_hresp_q <= ahb3_hresp;
+    end
   end
 
   always_ff @(posedge ahb3_clk or negedge rst_l) begin
-    if (rst_l == 0) ahb3_hready_q <= 0;
-    else ahb3_hready_q <= ahb3_hready;
+    if (rst_l == 0) begin
+      ahb3_hready_q <= 0;
+    end else begin
+      ahb3_hready_q <= ahb3_hready;
+    end
   end
 
   always_ff @(posedge ahb3_clk or negedge rst_l) begin
-    if (rst_l == 0) ahb3_htrans_q <= 0;
-    else ahb3_htrans_q <= ahb3_htrans_in;
+    if (rst_l == 0) begin
+      ahb3_htrans_q <= 0;
+    end else begin
+      ahb3_htrans_q <= ahb3_htrans_in;
+    end
   end
 
   always_ff @(posedge ahb3_addr_clk or negedge rst_l) begin
-    if (rst_l == 0) ahb3_hsize_q <= 0;
-    else ahb3_hsize_q <= ahb3_hsize;
+    if (rst_l == 0) begin
+      ahb3_hsize_q <= 0;
+    end else begin
+      ahb3_hsize_q <= ahb3_hsize;
+    end
   end
 
   always_ff @(posedge ahb3_addr_clk or negedge rst_l) begin
-    if (rst_l == 0) ahb3_hwrite_q <= 0;
-    else ahb3_hwrite_q <= ahb3_hwrite;
+    if (rst_l == 0) begin
+      ahb3_hwrite_q <= 0;
+    end else begin
+      ahb3_hwrite_q <= ahb3_hwrite;
+    end
   end
 
   always_ff @(posedge ahb3_addr_clk or negedge rst_l) begin
-    if (rst_l == 0) ahb3_haddr_q <= 0;
-    else ahb3_haddr_q <= ahb3_haddr;
+    if (rst_l == 0) begin
+      ahb3_haddr_q <= 0;
+    end else begin
+      ahb3_haddr_q <= ahb3_haddr;
+    end
   end
 
   // Clock header logic
@@ -358,33 +397,51 @@ module riscv_ahb2axi #(
   assign cmdbuf_full = (cmdbuf_vld & ~((axi4_aw_valid & axi4_aw_ready) | (axi4_ar_valid & axi4_ar_ready)));
 
   always_ff @(posedge bus_clk or negedge rst_l) begin
-    if (rst_l == 0) cmdbuf_vld <= 0;
-    else cmdbuf_vld <= ~cmdbuf_rst & (cmdbuf_wr_en ? 1'b1 : cmdbuf_vld);
+    if (rst_l == 0) begin
+      cmdbuf_vld <= 0;
+    end else begin
+      cmdbuf_vld <= ~cmdbuf_rst & (cmdbuf_wr_en ? 1'b1 : cmdbuf_vld);
+    end
   end
 
   always_ff @(posedge bus_clk or negedge rst_l) begin
-    if (rst_l == 0) cmdbuf_write <= 0;
-    else cmdbuf_write <= cmdbuf_wr_en ? ahb3_hwrite_q : cmdbuf_write;
+    if (rst_l == 0) begin
+      cmdbuf_write <= 0;
+    end else begin
+      cmdbuf_write <= cmdbuf_wr_en ? ahb3_hwrite_q : cmdbuf_write;
+    end
   end
 
   always_ff @(posedge bus_clk or negedge rst_l) begin
-    if (rst_l == 0) cmdbuf_size <= 0;
-    else cmdbuf_size <= cmdbuf_wr_en ? ahb3_hsize_q[1:0] : cmdbuf_size;
+    if (rst_l == 0) begin
+      cmdbuf_size <= 0;
+    end else begin
+      cmdbuf_size <= cmdbuf_wr_en ? ahb3_hsize_q[1:0] : cmdbuf_size;
+    end
   end
 
   always_ff @(posedge bus_clk or negedge rst_l) begin
-    if (rst_l == 0) cmdbuf_wstrb <= 0;
-    else cmdbuf_wstrb <= cmdbuf_wr_en ? master_wstrb : cmdbuf_wstrb;
+    if (rst_l == 0) begin
+      cmdbuf_wstrb <= 0;
+    end else begin
+      cmdbuf_wstrb <= cmdbuf_wr_en ? master_wstrb : cmdbuf_wstrb;
+    end
   end
 
   always_ff @(posedge bus_clk or negedge rst_l) begin
-    if (rst_l == 0) cmdbuf_addr <= 0;
-    else cmdbuf_addr <= cmdbuf_wr_en ? ahb3_haddr_q : cmdbuf_addr;
+    if (rst_l == 0) begin
+      cmdbuf_addr <= 0;
+    end else begin
+      cmdbuf_addr <= cmdbuf_wr_en ? ahb3_haddr_q : cmdbuf_addr;
+    end
   end
 
   always_ff @(posedge bus_clk or negedge rst_l) begin
-    if (rst_l == 0) cmdbuf_wdata <= 0;
-    else cmdbuf_wdata <= cmdbuf_wr_en ? ahb3_hwdata : cmdbuf_wdata;
+    if (rst_l == 0) begin
+      cmdbuf_wdata <= 0;
+    end else begin
+      cmdbuf_wdata <= cmdbuf_wr_en ? ahb3_hwdata : cmdbuf_wdata;
+    end
   end
 
   // AXI Write Command Channel

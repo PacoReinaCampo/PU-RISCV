@@ -175,10 +175,15 @@ module pu_riscv_id #(
 
   //Program Counter
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) id_pc <= PC_INIT;
-    else if (st_flush) id_pc <= st_nxt_pc;
-    else if (bu_flush || du_flush) id_pc <= bu_nxt_pc;  //Is this required?! 
-    else if (!stall && !id_stall) id_pc <= if_pc;
+    if (!rstn) begin
+      id_pc <= PC_INIT;
+    end else if (st_flush) begin
+      id_pc <= st_nxt_pc;
+    end else if (bu_flush || du_flush) begin
+      id_pc <= bu_nxt_pc;  //Is this required?! 
+    end else if (!stall && !id_stall) begin
+      id_pc <= if_pc;
+    end
   end
 
   /*
@@ -188,15 +193,22 @@ module pu_riscv_id #(
    */
 
   always @(posedge clk) begin
-    if (!stall) id_instr <= if_instr;
+    if (!stall) begin
+      id_instr <= if_instr;
+    end
   end
 
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) id_bubble_r <= 1'b1;
-    else if (bu_flush || st_flush || du_flush) id_bubble_r <= 1'b1;
-    else if (!stall) begin
-      if (id_stall) id_bubble_r <= 1'b1;
-      else id_bubble_r <= if_bubble;
+    if (!rstn) begin
+      id_bubble_r <= 1'b1;
+    end else if (bu_flush || st_flush || du_flush) begin
+      id_bubble_r <= 1'b1;
+    end else if (!stall) begin
+      if (id_stall) begin
+        id_bubble_r <= 1'b1;
+      end else begin
+        id_bubble_r <= if_bubble;
+      end
     end
   end
 
@@ -228,16 +240,21 @@ module pu_riscv_id #(
   assign xlen32     = st_xlen == RV32I;
 
   always @(posedge clk) begin
-    if (!stall && !id_stall) id_bp_predict <= if_bp_predict;
+    if (!stall && !id_stall) begin
+      id_bp_predict <= if_bp_predict;
+    end
   end
 
   //Exceptions
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) id_exception <= 'h0;
-    else if (bu_flush || st_flush) id_exception <= 'h0;
-    else if (!stall) begin
-      if (id_stall) id_exception <= 'h0;
-      else begin
+    if (!rstn) begin
+      id_exception <= 'h0;
+    end else if (bu_flush || st_flush) begin
+      id_exception <= 'h0;
+    end else if (!stall) begin
+      if (id_stall) begin
+        id_exception <= 'h0;
+      end else begin
         id_exception                            <= if_exception;
         id_exception[CAUSE_ILLEGAL_INSTRUCTION] <= ~if_bubble & illegal_instr;
         id_exception[CAUSE_BREAKPOINT]          <= ~if_bubble & (if_instr == EBREAK);

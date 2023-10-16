@@ -152,7 +152,8 @@ module riscv_axi2ahb #(
   // Variables
   //
 
-  logic [2:0] buf_state, buf_nxtstate;
+  logic [               2:0] buf_state;
+  logic [               2:0] buf_nxtstate;
 
   logic                      slave_valid;
   logic                      slave_ready;
@@ -160,8 +161,10 @@ module riscv_axi2ahb #(
   logic [AXI_DATA_WIDTH-1:0] slave_rdata;
   logic [               3:0] slave_opc;
 
-  logic wrbuf_en, wrbuf_data_en;
-  logic wrbuf_cmd_sent, wrbuf_rst;
+  logic                      wrbuf_en;
+  logic                      wrbuf_data_en;
+  logic                      wrbuf_cmd_sent;
+  logic                      wrbuf_rst;
   logic                      wrbuf_vld;
   logic                      wrbuf_data_vld;
   logic [AXI_ID_WIDTH  -1:0] wrbuf_tag;
@@ -171,7 +174,8 @@ module riscv_axi2ahb #(
   logic [               7:0] wrbuf_byteen;
 
   logic                      bus_write_clk_en;
-  logic bus_clk, bus_write_clk;
+  logic                      bus_clk;
+  logic                      bus_write_clk;
 
   logic                      master_valid;
   logic                      master_ready;
@@ -206,9 +210,13 @@ module riscv_axi2ahb #(
   logic                      slvbuf_error_en;
   logic                      wr_cmd_vld;
 
-  logic cmd_done_rst, cmd_done, cmd_doneQ;
-  logic trxn_done;
-  logic [2:0] buf_cmd_byte_ptr, buf_cmd_byte_ptrQ, buf_cmd_nxtbyte_ptr;
+  logic                      cmd_done_rst;
+  logic                      cmd_done;
+  logic                      cmd_doneQ;
+  logic                      trxn_done;
+  logic [               2:0] buf_cmd_byte_ptr;
+  logic [               2:0] buf_cmd_byte_ptrQ;
+  logic [               2:0] buf_cmd_nxtbyte_ptr;
   logic                      buf_cmd_byte_ptr_en;
   logic                      found;
 
@@ -233,14 +241,16 @@ module riscv_axi2ahb #(
   logic [AXI_ADDR_WIDTH-1:0] last_bus_addr;
 
   // Clocks
-  logic buf_clken, slvbuf_clken;
-  logic ahbm_addr_clken;
-  logic ahbm_data_clken;
+  logic                      buf_clken;
+  logic                      slvbuf_clken;
+  logic                      ahbm_addr_clken;
+  logic                      ahbm_data_clken;
 
-  logic buf_clk, slvbuf_clk;
-  logic ahbm_clk;
-  logic ahbm_addr_clk;
-  logic ahbm_data_clk;
+  logic                      buf_clk;
+  logic                      slvbuf_clk;
+  logic                      ahbm_clk;
+  logic                      ahbm_addr_clk;
+  logic                      ahbm_data_clk;
 
   //////////////////////////////////////////////////////////////////////////////
   //
@@ -374,8 +384,10 @@ module riscv_axi2ahb #(
       end
       STREAM_RD: begin
         master_ready     = (ahb3_hready_q & ~ahb3_hresp_q) & ~(master_valid & master_opc[2:1] == 2'b01);
+
         // update the fifo if we are streaming the read commands
         buf_wr_en        = (master_valid & master_ready & (master_opc == 3'b000));
+
         // assuming that the master accpets the slave response right away.
         buf_nxtstate     = ahb3_hresp_q ? STREAM_ERR_RD : (buf_wr_en ? STREAM_RD : DATA_RD);
         buf_state_en     = (ahb3_hready_q | ahb3_hresp_q);
@@ -475,128 +487,203 @@ module riscv_axi2ahb #(
   assign last_addr_en = (ahb3_htrans != 2'b0) & ahb3_hreadyout & ahb3_hwrite;
 
   always_ff @(posedge bus_clk or negedge rst_l) begin
-    if (rst_l == 0) wrbuf_vld <= 0;
-    else wrbuf_vld <= ~wrbuf_rst & (wrbuf_en ? 1'b1 : wrbuf_vld);
+    if (rst_l == 0) begin
+      wrbuf_vld <= 0;
+    end else begin
+      wrbuf_vld <= ~wrbuf_rst & (wrbuf_en ? 1'b1 : wrbuf_vld);
+    end
   end
 
   always_ff @(posedge bus_clk or negedge rst_l) begin
-    if (rst_l == 0) wrbuf_data_vld <= 0;
-    else wrbuf_data_vld <= ~wrbuf_rst & (wrbuf_data_en ? 1'b1 : wrbuf_data_vld);
+    if (rst_l == 0) begin
+      wrbuf_data_vld <= 0;
+    end else begin
+      wrbuf_data_vld <= ~wrbuf_rst & (wrbuf_data_en ? 1'b1 : wrbuf_data_vld);
+    end
   end
 
   always_ff @(posedge buf_clk or negedge rst_l) begin
-    if (rst_l == 0) slvbuf_write <= 0;
-    else slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    if (rst_l == 0) begin
+      slvbuf_write <= 0;
+    end else begin
+      slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    end
   end
 
   always_ff @(posedge buf_clk or negedge rst_l) begin
-    if (rst_l == 0) slvbuf_write <= 0;
-    else slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    if (rst_l == 0) begin
+      slvbuf_write <= 0;
+    end else begin
+      slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    end
   end
 
   always_ff @(posedge bus_clk or negedge rst_l) begin
-    if (rst_l == 0) wrbuf_addr <= 0;
-    else wrbuf_addr <= wrbuf_en ? axi4_aw_addr : wrbuf_addr;
+    if (rst_l == 0) begin
+      wrbuf_addr <= 0;
+    end else begin
+      wrbuf_addr <= wrbuf_en ? axi4_aw_addr : wrbuf_addr;
+    end
   end
 
   always_ff @(posedge buf_clk or negedge bus_clk) begin
-    if (rst_l == 0) wrbuf_data <= 0;
-    else wrbuf_data <= wrbuf_data_en ? axi4_w_data : wrbuf_data;
+    if (rst_l == 0) begin
+      wrbuf_data <= 0;
+    end else begin
+      wrbuf_data <= wrbuf_data_en ? axi4_w_data : wrbuf_data;
+    end
   end
 
   always_ff @(posedge buf_clk or negedge rst_l) begin
-    if (rst_l == 0) slvbuf_write <= 0;
-    else slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    if (rst_l == 0) begin
+      slvbuf_write <= 0;
+    end else begin
+      slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    end
   end
 
   always_ff @(posedge buf_clk or negedge rst_l) begin
-    if (rst_l == 0) slvbuf_write <= 0;
-    else slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    if (rst_l == 0) begin
+      slvbuf_write <= 0;
+    end else begin
+      slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    end
   end
 
   always_ff @(posedge ahbm_clk or negedge rst_l) begin
-    if (rst_l == 0) buf_state <= IDLE;
-    else buf_state <= {3{~buf_rst}} & (buf_state_en ? buf_nxtstate : buf_state);
+    if (rst_l == 0) begin
+      buf_state <= IDLE;
+    end else begin
+      buf_state <= {3{~buf_rst}} & (buf_state_en ? buf_nxtstate : buf_state);
+    end
   end
 
   always_ff @(posedge buf_clk or negedge rst_l) begin
-    if (rst_l == 0) slvbuf_write <= 0;
-    else slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    if (rst_l == 0) begin
+      slvbuf_write <= 0;
+    end else begin
+      slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    end
   end
 
   always_ff @(posedge buf_clk or negedge rst_l) begin
-    if (rst_l == 0) slvbuf_write <= 0;
-    else slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    if (rst_l == 0) begin
+      slvbuf_write <= 0;
+    end else begin
+      slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    end
   end
 
   always_ff @(posedge buf_clk or negedge rst_l) begin
-    if (rst_l == 0) buf_addr <= 0;
-    else buf_addr <= (buf_wr_en & bus_clk_en) ? buf_addr_in : buf_addr;
+    if (rst_l == 0) begin
+      buf_addr <= 0;
+    end else begin
+      buf_addr <= (buf_wr_en & bus_clk_en) ? buf_addr_in : buf_addr;
+    end
   end
 
   always_ff @(posedge buf_clk or negedge rst_l) begin
-    if (rst_l == 0) slvbuf_write <= 0;
-    else slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    if (rst_l == 0) begin
+      slvbuf_write <= 0;
+    end else begin
+      slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    end
   end
 
   always_ff @(posedge buf_clk or negedge rst_l) begin
-    if (rst_l == 0) slvbuf_write <= 0;
-    else slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    if (rst_l == 0) begin
+      slvbuf_write <= 0;
+    end else begin
+      slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    end
   end
 
   always_ff @(posedge buf_clk or negedge rst_l) begin
-    if (rst_l == 0) slvbuf_write <= 0;
-    else slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    if (rst_l == 0) begin
+      slvbuf_write <= 0;
+    end else begin
+      slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    end
   end
 
   always_ff @(posedge buf_clk or negedge rst_l) begin
-    if (rst_l == 0) buf_data <= 0;
-    else buf_data <= (buf_data_wr_en & bus_clk_en) ? buf_data_in : buf_data;
+    if (rst_l == 0) begin
+      buf_data <= 0;
+    end else begin
+      buf_data <= (buf_data_wr_en & bus_clk_en) ? buf_data_in : buf_data;
+    end
   end
 
   always_ff @(posedge buf_clk or negedge rst_l) begin
-    if (rst_l == 0) slvbuf_write <= 0;
-    else slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    if (rst_l == 0) begin
+      slvbuf_write <= 0;
+    end else begin
+      slvbuf_write <= slvbuf_wr_en ? buf_write : slvbuf_write;
+    end
   end
 
   always_ff @(posedge buf_clk or negedge rst_l) begin
-    if (rst_l == 0) slvbuf_tag <= 0;
-    else slvbuf_tag <= slvbuf_wr_en ? buf_tag : slvbuf_tag;
+    if (rst_l == 0) begin
+      slvbuf_tag <= 0;
+    end else begin
+      slvbuf_tag <= slvbuf_wr_en ? buf_tag : slvbuf_tag;
+    end
   end
 
   always_ff @(posedge ahbm_clk or negedge rst_l) begin
-    if (rst_l == 0) slvbuf_error <= 0;
-    else slvbuf_error <= slvbuf_error_en ? slvbuf_error_in : slvbuf_error;
+    if (rst_l == 0) begin
+      slvbuf_error <= 0;
+    end else begin
+      slvbuf_error <= slvbuf_error_en ? slvbuf_error_in : slvbuf_error;
+    end
   end
 
   always_ff @(posedge ahbm_clk or negedge rst_l) begin
-    if (rst_l == 0) cmd_doneQ <= 0;
-    else cmd_doneQ <= ~cmd_done_rst & (cmd_done ? 1'b1 : cmd_doneQ);
+    if (rst_l == 0) begin
+      cmd_doneQ <= 0;
+    end else begin
+      cmd_doneQ <= ~cmd_done_rst & (cmd_done ? 1'b1 : cmd_doneQ);
+    end
   end
 
   always_ff @(posedge ahbm_clk or negedge rst_l) begin
-    if (rst_l == 0) ahb3_hready_q <= 0;
-    else ahb3_hready_q <= ahb3_hreadyout;
+    if (rst_l == 0) begin
+      ahb3_hready_q <= 0;
+    end else begin
+      ahb3_hready_q <= ahb3_hreadyout;
+    end
   end
 
   always_ff @(posedge ahbm_clk or negedge rst_l) begin
-    if (rst_l == 0) ahb3_htrans_q <= 0;
-    else ahb3_htrans_q <= ahb3_htrans;
+    if (rst_l == 0) begin
+      ahb3_htrans_q <= 0;
+    end else begin
+      ahb3_htrans_q <= ahb3_htrans;
+    end
   end
 
   always_ff @(posedge ahbm_addr_clk or negedge rst_l) begin
-    if (rst_l == 0) ahb3_hwrite_q <= 0;
-    else ahb3_hwrite_q <= ahb3_hwrite;
+    if (rst_l == 0) begin
+      ahb3_hwrite_q <= 0;
+    end else begin
+      ahb3_hwrite_q <= ahb3_hwrite;
+    end
   end
 
   always_ff @(posedge ahbm_clk or negedge rst_l) begin
-    if (rst_l == 0) ahb3_hresp_q <= 0;
-    else ahb3_hresp_q <= ahb3_hresp;
+    if (rst_l == 0) begin
+      ahb3_hresp_q <= 0;
+    end else begin
+      ahb3_hresp_q <= ahb3_hresp;
+    end
   end
 
   always_ff @(posedge ahbm_data_clk or negedge rst_l) begin
-    if (rst_l == 0) ahb3_hrdata_q <= 0;
-    else ahb3_hrdata_q <= ahb3_hrdata;
+    if (rst_l == 0) begin
+      ahb3_hrdata_q <= 0;
+    end else begin
+      ahb3_hrdata_q <= ahb3_hrdata;
+    end
   end
 
   // Clock headers
