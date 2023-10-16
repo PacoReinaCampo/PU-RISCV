@@ -134,19 +134,28 @@ module pu_riscv_if #(
 
   //parcel is valid when bus-interface says so AND when received PC is requested PC
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) parcel_valid <= 1'b0;
-    else parcel_valid <= if_parcel_valid;
+    if (!rstn) begin
+      parcel_valid <= 1'b0;
+    end else begin
+      parcel_valid <= if_parcel_valid;
+    end
   end
 
   //Next Program Counter
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) if_nxt_pc <= PC_INIT;
-    else if (st_flush) if_nxt_pc <= st_nxt_pc;
-    else if (bu_flush || du_flush) if_nxt_pc <= bu_nxt_pc;  //flush takes priority
-    //else if (!id_stall)
-    else begin
-      if (branch_taken) if_nxt_pc <= branch_pc;
-      else if (!if_stall_nxt_pc) if_nxt_pc <= if_nxt_pc + 4;  //if_stall_nxt_pc
+    if (!rstn) begin
+      if_nxt_pc <= PC_INIT;
+    end else if (st_flush) begin
+      if_nxt_pc <= st_nxt_pc;
+    end else if (bu_flush || du_flush) begin
+      if_nxt_pc <= bu_nxt_pc;  //flush takes priority
+    // end else if (!id_stall)
+    end else begin
+      if (branch_taken) begin
+        if_nxt_pc <= branch_pc;
+      end else if (!if_stall_nxt_pc) begin
+        if_nxt_pc <= if_nxt_pc + 4;  //if_stall_nxt_pc
+      end
     end
   end
 
@@ -154,18 +163,29 @@ module pu_riscv_if #(
   //TODO: handle if_stall and 16bit instructions
 
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) pd_pc <= PC_INIT;
-    else if (st_flush) pd_pc <= st_nxt_pc;
-    else if (bu_flush || du_flush) pd_pc <= bu_nxt_pc;
-    else if (branch_taken && !id_stall) pd_pc <= branch_pc;
-    else if (if_parcel_valid && !id_stall) pd_pc <= if_parcel_pc;
+    if (!rstn) begin
+      pd_pc <= PC_INIT;
+    end else if (st_flush) begin
+      pd_pc <= st_nxt_pc;
+    end else if (bu_flush || du_flush) begin
+      pd_pc <= bu_nxt_pc;
+    end else if (branch_taken && !id_stall) begin
+      pd_pc <= branch_pc;
+    end else if (if_parcel_valid && !id_stall) begin
+      pd_pc <= if_parcel_pc;
+    end
   end
 
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) if_pc <= PC_INIT;
-    else if (st_flush) if_pc <= st_nxt_pc;
-    else if (bu_flush || du_flush) if_pc <= bu_nxt_pc;
-    else if (!id_stall) if_pc <= pd_pc;
+    if (!rstn) begin
+      if_pc <= PC_INIT;
+    end else if (st_flush) begin
+      if_pc <= st_nxt_pc;
+    end else if (bu_flush || du_flush) begin
+      if_pc <= bu_nxt_pc;
+    end else if (!id_stall) begin
+      if_pc <= pd_pc;
+    end
   end
 
   //Instruction
@@ -173,24 +193,36 @@ module pu_riscv_if #(
   //instruction shift register, for 16bit instruction support
   assign new_parcel = if_parcel;
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) parcel_shift_register <= {INSTR_NOP, INSTR_NOP};
-    else if (flushes) parcel_shift_register <= {INSTR_NOP, INSTR_NOP};
-    else if (!id_stall) begin
-      if (branch_taken) parcel_shift_register <= {INSTR_NOP, INSTR_NOP};
-      else begin
+    if (!rstn) begin
+      parcel_shift_register <= {INSTR_NOP, INSTR_NOP};
+    end else if (flushes) begin
+      parcel_shift_register <= {INSTR_NOP, INSTR_NOP};
+    end else if (!id_stall) begin
+      if (branch_taken) begin
+        parcel_shift_register <= {INSTR_NOP, INSTR_NOP};
+      end else begin
         case (parcel_sr_valid)
           3'b000: parcel_shift_register <= {INSTR_NOP, new_parcel};
           3'b001: begin
-            if (is_16bit_instruction) parcel_shift_register <= {INSTR_NOP, new_parcel};
-            else parcel_shift_register <= {new_parcel, parcel_shift_register[15:0]};
+            if (is_16bit_instruction) 
+              parcel_shift_register <= {INSTR_NOP, new_parcel};
+            else begin
+              parcel_shift_register <= {new_parcel, parcel_shift_register[15:0]};
+            end
           end
           3'b011: begin
-            if (is_16bit_instruction) parcel_shift_register <= {new_parcel, parcel_shift_register[16 +: ILEN]};
-            else parcel_shift_register <= {INSTR_NOP, new_parcel};
+            if (is_16bit_instruction) begin
+              parcel_shift_register <= {new_parcel, parcel_shift_register[16 +: ILEN]};
+            end else begin
+              parcel_shift_register <= {INSTR_NOP, new_parcel};
+            end
           end
           3'b111: begin
-            if (is_16bit_instruction) parcel_shift_register <= {INSTR_NOP, parcel_shift_register[16 +: ILEN]};
-            else parcel_shift_register <= {new_parcel, parcel_shift_register[32 +: 16]};
+            if (is_16bit_instruction) begin
+              parcel_shift_register <= {INSTR_NOP, parcel_shift_register[16 +: ILEN]};
+            end else begin
+              parcel_shift_register <= {new_parcel, parcel_shift_register[32 +: 16]};
+            end
           end
         endcase
       end
@@ -198,25 +230,37 @@ module pu_riscv_if #(
   end
 
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) parcel_sr_valid <= 'h0;
-    else if (flushes) parcel_sr_valid <= 'h0;
-    else if (!id_stall) begin
-      if (branch_taken) parcel_sr_valid <= 'h0;
-      else begin
+    if (!rstn) begin
+      parcel_sr_valid <= 'h0;
+    end else if (flushes) begin
+      parcel_sr_valid <= 'h0;
+    end else if (!id_stall) begin
+      if (branch_taken) begin
+        parcel_sr_valid <= 'h0;
+      end else begin
         case (parcel_sr_valid)
           //branch to 16bit address would yield 3'b010
           3'b000: parcel_sr_valid <= {1'b0, if_parcel_valid};  //3'b011;
           3'b001: begin
-            if (is_16bit_instruction) parcel_sr_valid <= {1'b0, if_parcel_valid};  //3'b011;
-            else parcel_sr_valid <= {if_parcel_valid, 1'b1};  //3'b111;
+            if (is_16bit_instruction) begin
+              parcel_sr_valid <= {1'b0, if_parcel_valid};  //3'b011;
+            end else begin
+              parcel_sr_valid <= {if_parcel_valid, 1'b1};  //3'b111;
+            end
           end
           3'b011: begin
-            if (is_16bit_instruction) parcel_sr_valid <= {if_parcel_valid, 1'b1};  //3'b111;
-            else parcel_sr_valid <= {1'b0, if_parcel_valid};  //3'b011;
+            if (is_16bit_instruction) begin
+              parcel_sr_valid <= {if_parcel_valid, 1'b1};  //3'b111;
+            end else begin
+              parcel_sr_valid <= {1'b0, if_parcel_valid};  //3'b011;
+            end
           end
           3'b111: begin
-            if (is_16bit_instruction) parcel_sr_valid <= {1'b0, 1'b1, 1'b1};  //3'b011;
-            else parcel_sr_valid <= {if_parcel_valid, 1'b1};  //3'b111;
+            if (is_16bit_instruction) begin
+              parcel_sr_valid <= {1'b0, 1'b1, 1'b1};  //3'b011;
+            end else begin
+              parcel_sr_valid <= {if_parcel_valid, 1'b1};  //3'b111;
+            end
           end
         endcase
       end
@@ -236,22 +280,33 @@ module pu_riscv_if #(
     case (active_parcel)
       WFI: pd_instr = INSTR_NOP;  //Implement WFI as a nop 
       default: begin
-        if (is_32bit_instruction) pd_instr = active_parcel;
-        else pd_instr = -1;  //Illegal
+        if (is_32bit_instruction) begin
+          pd_instr = active_parcel;
+        end else begin
+          pd_instr = -1;  //Illegal
+        end
       end
     endcase
   end
 
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) if_instr <= INSTR_NOP;
-    else if (flushes) if_instr <= INSTR_NOP;
-    else if (!id_stall) if_instr <= pd_instr;
+    if (!rstn) begin
+      if_instr <= INSTR_NOP;
+    end else if (flushes) begin
+      if_instr <= INSTR_NOP;
+    end else if (!id_stall) begin
+      if_instr <= pd_instr;
+    end
   end
 
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) if_bubble <= 1'b1;
-    else if (flushes) if_bubble <= 1'b1;
-    else if (!id_stall) if_bubble <= pd_bubble;
+    if (!rstn) begin
+      if_bubble <= 1'b1;
+    end else if (flushes) begin
+      if_bubble <= 1'b1;
+    end else if (!id_stall) begin
+      if_bubble <= pd_bubble;
+    end
   end
 
   //Branches & Jump
@@ -287,17 +342,22 @@ module pu_riscv_if #(
   end
 
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) if_bp_predict <= 2'b00;
-    else if (!id_stall) if_bp_predict <= (HAS_BPU) ? bp_bp_predict : {branch_taken, 1'b0};
+    if (!rstn) begin
+      if_bp_predict <= 2'b00;
+    end else if (!id_stall) begin
+      if_bp_predict <= (HAS_BPU) ? bp_bp_predict : {branch_taken, 1'b0};
+    end
   end
 
   //Exceptions
 
   //parcel-fetch
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) parcel_exception <= 'h0;
-    else if (flushes) parcel_exception <= 'h0;
-    else if (parcel_valid && !id_stall) begin
+    if (!rstn) begin
+      parcel_exception <= 'h0;
+    end else if (flushes) begin
+      parcel_exception <= 'h0;
+    end else if (parcel_valid && !id_stall) begin
       parcel_exception                                 <= 'h0;
       parcel_exception[CAUSE_MISALIGNED_INSTRUCTION]   <= if_parcel_misaligned;
       parcel_exception[CAUSE_INSTRUCTION_ACCESS_FAULT] <= if_parcel_page_fault;
@@ -306,15 +366,23 @@ module pu_riscv_if #(
 
   //pre-decode
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) pd_exception <= 'h0;
-    else if (flushes) pd_exception <= 'h0;
-    else if (parcel_valid && !id_stall) pd_exception <= parcel_exception;
+    if (!rstn) begin
+      pd_exception <= 'h0;
+    end else if (flushes) begin
+      pd_exception <= 'h0;
+    end else if (parcel_valid && !id_stall) begin
+      pd_exception <= parcel_exception;
+    end
   end
 
   //instruction-fetch
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) if_exception <= 'h0;
-    else if (flushes) if_exception <= 'h0;
-    else if (parcel_valid && !id_stall) if_exception <= pd_exception;
+    if (!rstn) begin
+      if_exception <= 'h0;
+    end else if (flushes) begin
+      if_exception <= 'h0;
+    end else if (parcel_valid && !id_stall) begin
+      if_exception <= pd_exception;
+    end
   end
 endmodule

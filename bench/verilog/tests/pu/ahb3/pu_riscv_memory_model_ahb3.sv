@@ -125,7 +125,8 @@ module pu_riscv_memory_model_ahb3 #(
     bit     [  1:0][7:0] address;
     bit     [  7:0]      record_type;
     bit     [255:0][7:0] data;
-    bit [7:0] checksum, crc;
+    bit            [7:0] checksum;
+    bit            [7:0] crc;
 
     logic [PLEN-1:0] base_addr = BASE;
 

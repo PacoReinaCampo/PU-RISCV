@@ -333,28 +333,31 @@ module pu_riscv_mul #(
     end else begin
       mul_bubble <= 1'b1;
       case (state)
-        ST_IDLE:
-        if (!ex_stall)
-          if (!id_bubble && is_mul) begin
-            if (LATENCY == 0) begin
-              mul_bubble <= 1'b0;
-              mul_stall  <= 1'b0;
-            end else begin
-              state      <= ST_WAIT;
-              cnt        <= cnt - 1;
+        ST_IDLE: begin
+          if (!ex_stall)
+            if (!id_bubble && is_mul) begin
+              if (LATENCY == 0) begin
+                mul_bubble <= 1'b0;
+                mul_stall  <= 1'b0;
+              end else begin
+                state      <= ST_WAIT;
+                cnt        <= cnt - 1;
 
-              mul_bubble <= 1'b1;
-              mul_stall  <= 1'b1;
+                mul_bubble <= 1'b1;
+                mul_stall  <= 1'b1;
+              end
             end
-          end
-        ST_WAIT:
-        if (|cnt) cnt <= cnt - 1;
-        else begin
-          state      <= ST_IDLE;
-          cnt        <= LATENCY;
+        end
+        ST_WAIT: begin
+          if (|cnt) begin
+            cnt <= cnt - 1;
+          end else begin
+            state      <= ST_IDLE;
+            cnt        <= LATENCY;
 
-          mul_bubble <= 1'b0;
-          mul_stall  <= 1'b0;
+            mul_bubble <= 1'b0;
+            mul_stall  <= 1'b0;
+          end
         end
       endcase
     end

@@ -71,7 +71,8 @@ module pu_riscv_mmio_if_wb #(
   // Variables
   //
   logic [HDATA_SIZE-1:0] data_reg;
-  logic catch_test, catch_uart_tx;
+  logic                  catch_test;
+  logic                  catch_uart_tx;
 
   logic   [           1:0] dHTRANS;
   logic   [HADDR_SIZE-1:0] dHADDR;

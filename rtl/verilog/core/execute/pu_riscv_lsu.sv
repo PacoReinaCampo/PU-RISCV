@@ -185,24 +185,25 @@ module pu_riscv_lsu #(
   //Memory Control Signals
   always @(posedge clk) begin
     case (state)
-      IDLE:
-      if (!id_bubble)
-        case (opcode)
-          OPC_LOAD: begin
-            dmem_we   <= 1'b0;
-            dmem_size <= size;
-            dmem_adr  <= adr;
-            dmem_d    <= 'hx;
-          end
-          OPC_STORE: begin
-            dmem_we   <= 1'b1;
-            dmem_size <= size;
-            dmem_adr  <= adr;
-            dmem_d    <= d;
-          end
-          default: ;  //do nothing
-        endcase
-
+      IDLE: begin
+        if (!id_bubble) begin
+          case (opcode)
+            OPC_LOAD: begin
+              dmem_we   <= 1'b0;
+              dmem_size <= size;
+              dmem_adr  <= adr;
+              dmem_d    <= 'hx;
+            end
+            OPC_STORE: begin
+              dmem_we   <= 1'b1;
+              dmem_size <= size;
+              dmem_adr  <= adr;
+              dmem_d    <= d;
+            end
+            default: ;  //do nothing
+          endcase
+        end
+      end
       default: begin
         dmem_we   <= 1'bx;
         dmem_size <= UNDEF_SIZE;

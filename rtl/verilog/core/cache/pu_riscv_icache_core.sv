@@ -208,7 +208,7 @@ module pu_riscv_icache_core #(
   logic   [ICACHE_WAYS           -1:0]               way_hit;
 
   logic   [DAT_OFF_BITS          -1:0]               dat_offset;
-  logic   [PARCEL_OFF_BITS         :0]               parcel_offset;
+  logic   [       PARCEL_OFF_BITS : 0]               parcel_offset;
 
   logic                                              cache_hit;
   logic   [XLEN                  -1:0]               cache_q;
@@ -253,15 +253,23 @@ module pu_riscv_icache_core #(
 
   //generate delayed mem_* signals
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) mem_vreq_dly <= 1'b0;
-    else if (clr_i) mem_vreq_dly <= 1'b0;
-    else mem_vreq_dly <= mem_vreq_i | (mem_vreq_dly & ~mem_ack_o);
+    if (!rst_ni) begin
+      mem_vreq_dly <= 1'b0;
+    end else if (clr_i) begin
+      mem_vreq_dly <= 1'b0;
+    end else begin
+      mem_vreq_dly <= mem_vreq_i | (mem_vreq_dly & ~mem_ack_o);
+    end
   end
 
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) mem_preq_dly <= 1'b0;
-    else if (clr_i) mem_preq_dly <= 1'b0;
-    else mem_preq_dly <= (mem_preq_i | mem_preq_dly) & ~mem_ack_o;
+    if (!rst_ni) begin
+      mem_preq_dly <= 1'b0;
+    end else if (clr_i) begin
+      mem_preq_dly <= 1'b0;
+    end else begin
+      mem_preq_dly <= (mem_preq_i | mem_preq_dly) & ~mem_ack_o;
+    end
   end
 
   //register memory signals
@@ -273,7 +281,9 @@ module pu_riscv_icache_core #(
   end
 
   always @(posedge clk_i) begin
-    if (mem_preq_i) mem_padr_dly <= mem_padr_i;
+    if (mem_preq_i) begin
+      mem_padr_dly <= mem_padr_i;
+    end
   end
 
   //extract index bits from virtual address(es)
@@ -287,13 +297,18 @@ module pu_riscv_icache_core #(
 
   //hold core_tag during filling. Prevents new mem_req (during fill) to mess up the 'tag' value
   always @(posedge clk_i) begin
-    if (!filling) core_tag_hold <= core_tag;
+    if (!filling) begin
+      core_tag_hold <= core_tag;
+    end
   end
 
   //hold flush until ready to service it
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) hold_flush <= 1'b0;
-    else hold_flush <= ~flushing & (flush_i | hold_flush);
+    if (!rst_ni) begin
+      hold_flush <= 1'b0;
+    end else begin
+      hold_flush <= ~flushing & (flush_i | hold_flush);
+    end
   end
 
   //State Machine
@@ -305,32 +320,35 @@ module pu_riscv_icache_core #(
       biucmd       <= NOP;
     end else begin
       case (memfsm_state)
-        ARMED:
-        if (flush_i || hold_flush) begin
-          memfsm_state <= FLUSH;
-          flushing     <= 1'b1;
-        end else if (mem_vreq_dly && !cache_hit && (mem_preq_i || mem_preq_dly)) begin  //it takes 1 cycle to read TAG
-          //Load way
-          memfsm_state <= WAIT4BIUCMD0;
-          biucmd       <= READ_WAY;
-          filling      <= 1'b1;
-        end else begin
-          biucmd <= NOP;
+        ARMED: begin
+          if (flush_i || hold_flush) begin
+            memfsm_state <= FLUSH;
+            flushing     <= 1'b1;
+          end else if (mem_vreq_dly && !cache_hit && (mem_preq_i || mem_preq_dly)) begin  //it takes 1 cycle to read TAG
+            //Load way
+            memfsm_state <= WAIT4BIUCMD0;
+            biucmd       <= READ_WAY;
+            filling      <= 1'b1;
+          end else begin
+            biucmd <= NOP;
+          end
         end
-        FLUSH:
-        if (flushrdy_i) begin
-          memfsm_state <= RECOVER;  //allow to read new tag_idx
-          flushing     <= 1'b0;
+        FLUSH: begin
+          if (flushrdy_i) begin
+            memfsm_state <= RECOVER;  //allow to read new tag_idx
+            flushing     <= 1'b0;
+          end
         end
-        WAIT4BIUCMD0:
-        if (biufsm_err) begin
-          memfsm_state <= vadr_idx != tag_idx_hold ? RECOVER : ARMED;
-          biucmd       <= NOP;
-          filling      <= 1'b0;
-        end else if (biufsm_ack) begin
-          memfsm_state <= vadr_idx != tag_idx_hold ? RECOVER : ARMED;
-          biucmd       <= NOP;
-          filling      <= 1'b0;
+        WAIT4BIUCMD0: begin
+          if (biufsm_err) begin
+            memfsm_state <= vadr_idx != tag_idx_hold ? RECOVER : ARMED;
+            biucmd       <= NOP;
+            filling      <= 1'b0;
+          end else if (biufsm_ack) begin
+            memfsm_state <= vadr_idx != tag_idx_hold ? RECOVER : ARMED;
+            biucmd       <= NOP;
+            filling      <= 1'b0;
+          end
         end
         RECOVER: begin
           //Allow DATA memory read after writing/filling
@@ -404,9 +422,13 @@ module pu_riscv_icache_core #(
 
       //Valid is stored in DFF
       always @(posedge clk_i, negedge rst_ni) begin
-        if (!rst_ni) tag_valid[way] <= 'h0;
-        else if (flush_i) tag_valid[way] <= 'h0;
-        else if (tag_we[way]) tag_valid[way] <= tag_in_valid[way];
+        if (!rst_ni) begin
+          tag_valid[way] <= 'h0;
+        end else if (flush_i) begin
+          tag_valid[way] <= 'h0;
+        end else if (tag_we[way]) begin
+          tag_valid[way] <= tag_in_valid[way];
+        end
       end
 
       assign tag_out_valid[way] = tag_valid[way][tag_idx_dly];
@@ -437,8 +459,11 @@ module pu_riscv_icache_core #(
       );
 
       //assign way_q; Build MUX (AND/OR) structure
-      if (way == 0) assign way_q_mux[way] = dat_out[way] & {BLK_BITS{way_hit[way]}};
-      else assign way_q_mux[way] = (dat_out[way] & {BLK_BITS{way_hit[way]}}) | way_q_mux[way - 1];
+      if (way == 0) begin
+        assign way_q_mux[way] = dat_out[way] & {BLK_BITS{way_hit[way]}};
+      end else begin
+        assign way_q_mux[way] = (dat_out[way] & {BLK_BITS{way_hit[way]}}) | way_q_mux[way - 1];
+      end
     end
   endgenerate
 
@@ -458,8 +483,11 @@ module pu_riscv_icache_core #(
 
   //Random generator for RANDOM replacement algorithm
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) way_random <= 'h0;
-    else if (!filling) way_random <= {way_random, way_random[19] ~^ way_random[16]};
+    if (!rst_ni) begin
+      way_random <= 'h0;
+    end else if (!filling) begin
+      way_random <= {way_random, way_random[19] ~^ way_random[16]};
+    end
   end
 
   //select which way to fill
@@ -480,8 +508,8 @@ module pu_riscv_icache_core #(
       WAIT4BIUCMD0: tag_idx = tag_idx_hold;
       //TAG read
       FLUSH:        tag_idx = flush_idx;
-      RECOVER:      tag_idx = mem_vreq_dly ? vadr_dly_idx  //pending access
- : vadr_idx;  //new access
+      //pending access or new access
+      RECOVER:      tag_idx = mem_vreq_dly ? vadr_dly_idx : vadr_idx;
       default:      tag_idx = vadr_idx;  //current access
     endcase
   end
@@ -604,16 +632,18 @@ module pu_riscv_icache_core #(
           end
         endcase
 
-        WAIT4BIU:
-        if (biu_stb_ack_i) begin
-          //BIU acknowledged burst transfer
-          biufsm_state <= BURST;
+        WAIT4BIU: begin
+          if (biu_stb_ack_i) begin
+            //BIU acknowledged burst transfer
+            biufsm_state <= BURST;
+          end
         end
 
-        BURST:
-        if (biu_err_i || (~|burst_cnt && biu_ack_i)) begin
-          //write complete
-          biufsm_state <= IDLE;  //TODO: detect if another BURST request is pending, skip IDLE
+        BURST: begin
+          if (biu_err_i || (~|burst_cnt && biu_ack_i)) begin
+            //write complete
+            biufsm_state <= IDLE;  //TODO: detect if another BURST request is pending, skip IDLE
+          end
         end
       endcase
     end

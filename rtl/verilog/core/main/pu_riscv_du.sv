@@ -97,9 +97,9 @@ module pu_riscv_du #(
   input [XLEN          -1:0] mem_memadr,
   input                      dmem_ack,
   input                      ex_stall,
-  //                                mem_req,
-  //                                mem_we,
-  //input      [XLEN          -1:0] mem_adr,
+//input                      mem_req,
+//input                      mem_we,
+//input [XLEN          -1:0] mem_adr,
 
   //From state
   input [31:0] du_exceptions
@@ -167,16 +167,22 @@ module pu_riscv_du #(
 
   // generate ACK
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) du_ack <= 'h0;
-    else if (!ex_stall) du_ack <= {3{du_access & ~dbg_ack}} & {1'b1, du_ack[2:1]};
+    if (!rstn) begin
+      du_ack <= 'h0;
+    end else if (!ex_stall) begin
+      du_ack <= {3{du_access & ~dbg_ack}} & {1'b1, du_ack[2:1]};
+    end
   end
 
   assign dbg_ack = du_ack[0];
 
   //actual BreakPoint signal
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) dbg_bp <= 'b0;
-    else dbg_bp <= ~ex_stall & ~du_stall & ~du_flush & ~bu_flush & ~st_flush & (|du_exceptions | |{dbg_bp_hit, dbg_branch_break_hit, dbg_instr_break_hit});
+    if (!rstn) begin
+      dbg_bp <= 'b0;
+    end else begin
+      dbg_bp <= ~ex_stall & ~du_stall & ~du_flush & ~bu_flush & ~st_flush & (|du_exceptions | |{dbg_bp_hit, dbg_branch_break_hit, dbg_instr_break_hit});
+    end
   end
 
   //CPU Interface
@@ -185,8 +191,11 @@ module pu_riscv_du #(
   assign du_stall = dbg_stall;
 
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) du_stall_dly <= 1'b0;
-    else du_stall_dly <= du_stall;
+    if (!rstn) begin
+      du_stall_dly <= 1'b0;
+    end else begin
+      du_stall_dly <= du_stall;
+    end
   end
 
   assign du_flush = du_stall_dly & ~dbg_stall & |du_exceptions;
@@ -272,8 +281,12 @@ module pu_riscv_du #(
       dbg_instr_break_hit  <= du_dato[0];
       dbg_branch_break_hit <= du_dato[1];
     end else begin
-      if (bp_instr_hit) dbg_instr_break_hit <= 1'b1;
-      if (bp_branch_hit) dbg_branch_break_hit <= 1'b1;
+      if (bp_instr_hit) begin
+        dbg_instr_break_hit <= 1'b1;
+      end
+      if (bp_branch_hit) begin
+        dbg_branch_break_hit <= 1'b1;
+      end
     end
   end
 
@@ -293,8 +306,11 @@ module pu_riscv_du #(
 
   //DBG IE
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) dbg_ie <= 'h0;
-    else if (du_we_internal && du_addr == DBG_IE) dbg_ie <= du_dato[31:0];
+    if (!rstn) begin
+      dbg_ie <= 'h0;
+    end else if (du_we_internal && du_addr == DBG_IE) begin
+      dbg_ie <= du_dato[31:0];
+    end
   end
 
   //send to Thread-State
@@ -363,8 +379,11 @@ module pu_riscv_du #(
           end
         end
         always @(posedge clk, negedge rstn) begin
-          if (!rstn) dbg_data[n] <= 'h0;
-          else if (du_we_internal && du_addr == (DBG_BPDATA0 + 2 * n)) dbg_data[n] <= du_dato;
+          if (!rstn) begin
+            dbg_data[n] <= 'h0;
+          end else if (du_we_internal && du_addr == (DBG_BPDATA0 + 2 * n)) begin
+            dbg_data[n] <= du_dato;
+          end
         end
       end else begin
         //assign dbg_cc          [n] = 'h0;
@@ -393,8 +412,9 @@ module pu_riscv_du #(
     for (n = 0; n < MAX_BREAKPOINTS; n = n + 1) begin : gen_bp_hit
       if (n < BREAKPOINTS) begin : gen_hit_logic
         always @(*) begin
-          if (!dbg_enabled[n] || !dbg_implemented[n]) bp_hit[n] = 1'b0;
-          else
+          if (!dbg_enabled[n] || !dbg_implemented[n]) begin
+            bp_hit[n] = 1'b0;
+          end else begin
             case (dbg_cc[n])
               BP_CTRL_CC_FETCH:    bp_hit[n] = (if_pc == dbg_data[n]) & ~bu_flush & ~st_flush;
               BP_CTRL_CC_LD_ADR:   bp_hit[n] = (mem_memadr == dbg_data[n]) & dmem_ack & mem_read;
@@ -405,6 +425,7 @@ module pu_riscv_du #(
               //BP_CTRL_CC_LDST_ADR : bp_hit[n] = (mem_adr    == dbg_data[n]) & mem_req;
               default:             bp_hit[n] = 1'b0;
             endcase
+          end
         end
       end else begin  //n >= BREAKPOINTS
         //assign bp_hit[n] = 1'b0;

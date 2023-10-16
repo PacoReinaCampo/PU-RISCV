@@ -122,7 +122,11 @@ module pu_riscv_mux #(
     port_select = 0;
 
     //check other ports
-    for (n = PORTS - 1; n > 0; n = n - 1) if (req[n]) port_select = n;
+    for (n = PORTS - 1; n > 0; n = n - 1) begin
+      if (req[n]) begin
+        port_select = n;
+      end
+    end
   endfunction
 
   //////////////////////////////////////////////////////////////////////////////
@@ -164,23 +168,25 @@ module pu_riscv_mux #(
       burst_cnt <= 'h0;
     end else begin
       case (fsm_state)
-        IDLE:
-        if (pending_req && |pending_burst_cnt) begin
-          fsm_state     <= BURST;
-          burst_cnt     <= pending_burst_cnt;
-          selected_port <= pending_port;
-        end else selected_port <= pending_port;
-        BURST:
-        if (biu_ack_i) begin
-          burst_cnt <= burst_cnt - 1;
-          if (~|burst_cnt) begin
-            //Burst done
-            if (pending_req && |pending_burst_cnt) begin
-              burst_cnt     <= pending_burst_cnt;
-              selected_port <= pending_port;
-            end else begin
-              fsm_state     <= IDLE;
-              selected_port <= pending_port;
+        IDLE: begin
+          if (pending_req && |pending_burst_cnt) begin
+            fsm_state     <= BURST;
+            burst_cnt     <= pending_burst_cnt;
+            selected_port <= pending_port;
+          end else selected_port <= pending_port;
+        end
+        BURST: begin
+          if (biu_ack_i) begin
+            burst_cnt <= burst_cnt - 1;
+            if (~|burst_cnt) begin
+              //Burst done
+              if (pending_req && |pending_burst_cnt) begin
+                burst_cnt     <= pending_burst_cnt;
+                selected_port <= pending_port;
+              end else begin
+                fsm_state     <= IDLE;
+                selected_port <= pending_port;
+              end
             end
           end
         end

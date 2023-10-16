@@ -74,13 +74,13 @@ module pu_riscv_rf #(
   //
 
   //Actual register file
-  logic [XLEN        -1:0]           rf         [32];
+  logic              [XLEN-1:0] rf         [32];
 
   //read data from register file
-  logic [     RDPORTS-1:0]           src1_is_x0;
-  logic [     RDPORTS-1:0]           src2_is_x0;
-  logic [     RDPORTS-1:0][XLEN-1:0] dout1;
-  logic [     RDPORTS-1:0][XLEN-1:0] dout2;
+  logic [RDPORTS-1:0]           src1_is_x0;
+  logic [RDPORTS-1:0]           src2_is_x0;
+  logic [RDPORTS-1:0][XLEN-1:0] dout1;
+  logic [RDPORTS-1:0][XLEN-1:0] dout2;
 
   //variable for generates
   genvar i;

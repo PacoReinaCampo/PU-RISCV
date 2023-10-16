@@ -145,7 +145,11 @@ module pu_riscv_state #(
 
     get_trap_cause = 0;
 
-    for (n = 0; n < EXCEPTION_SIZE; n = n + 1) if (exception[n]) get_trap_cause = n;
+    for (n = 0; n < EXCEPTION_SIZE; n = n + 1) begin
+      if (exception[n]) begin
+        get_trap_cause = n;
+      end
+    end
   endfunction
 
   //////////////////////////////////////////////////////////////////////////////
@@ -183,21 +187,19 @@ module pu_riscv_state #(
   //Supervisor protection and Translation
   logic [  XLEN -1:0]           csr_satp;  //Address translation & protection
 
-  /*
-  //Hypervisor
-  //Hypervisor Trap Setup
-  logic  [XLEN-1:0] csr_htvec;    //trap handler base address
-  logic  [XLEN-1:0] csr_hedeleg;  //trap delegation register
+//  //Hypervisor
+//  //Hypervisor Trap Setup
+//  logic  [XLEN-1:0] csr_htvec;    //trap handler base address
+//  logic  [XLEN-1:0] csr_hedeleg;  //trap delegation register
 
-  //Hypervisor trap handler
-  logic  [XLEN-1:0] csr_hscratch; //scratch register
-  logic  [XLEN-1:0] csr_hepc;     //exception program counter
-  logic  [XLEN-1:0] csr_hcause;   //trap cause
-  logic  [XLEN-1:0] csr_htval;    //bad address
+//  //Hypervisor trap handler
+//  logic  [XLEN-1:0] csr_hscratch; //scratch register
+//  logic  [XLEN-1:0] csr_hepc;     //exception program counter
+//  logic  [XLEN-1:0] csr_hcause;   //trap cause
+//  logic  [XLEN-1:0] csr_htval;    //bad address
 
   //Hypervisor protection and Translation
   //TBD per spec v1.7, somewhat defined in 1.9, removed in 1.10
- */
 
   // Machine
   logic [      7 : 0]           csr_mvendorid_bank;  //Vendor-ID
@@ -213,7 +215,7 @@ module pu_riscv_state #(
   logic                         csr_mstatus_sd;
   logic [      1 : 0]           csr_mstatus_sxl;  //S-Mode XLEN
   logic [      1 : 0]           csr_mstatus_uxl;  //U-Mode XLEN
-  //logic  [4      :0] csr_mstatus_vm;   //virtualisation management
+//logic [      4 : 0]           csr_mstatus_vm;   //virtualisation management
   logic                         csr_mstatus_tsr;
   logic                         csr_mstatus_tw;
   logic                         csr_mstatus_tvm;
@@ -441,19 +443,19 @@ module pu_riscv_state #(
       STVAL:      st_csr_rval = has_s ? csr_stval : 'h0;
       SIP:        st_csr_rval = has_s ? csr_mip & csr_mideleg & 12'h333 : 'h0;
       SATP:       st_csr_rval = has_s && has_mmu ? csr_satp : 'h0;
-      /*
-      //Hypervisor
-      HSTATUS   : st_csr_rval = {mstatus[127],mstatus[XLEN-2:0] & (1 << XLEN-1 | 2'b11 << 32 | 'hde133);
-      HTVEC     : st_csr_rval = has_h ? csr_htvec                       : 'h0;
-      HIE       : st_csr_rval = has_h ? csr_mie & 12'h777               : 'h0;
-      HEDELEG   : st_csr_rval = has_h ? csr_hedeleg                     : 'h0;
-      HIDELEG   : st_csr_rval = has_h ? csr_mideleg & 12'h333           : 'h0;
-      HSCRATCH  : st_csr_rval = has_h ? csr_hscratch                    : 'h0;
-      HEPC      : st_csr_rval = has_h ? csr_hepc                        : 'h0;
-      HCAUSE    : st_csr_rval = has_h ? csr_hcause                      : 'h0;
-      HTVAL     : st_csr_rval = has_h ? csr_htval                       : 'h0;
-      HIP       : st_csr_rval = has_h ? csr_mip & csr_mideleg & 12'h777 : 'h0;
- */
+
+//      //Hypervisor
+//      HSTATUS   : st_csr_rval = {mstatus[127],mstatus[XLEN-2:0] & (1 << XLEN-1 | 2'b11 << 32 | 'hde133);
+//      HTVEC     : st_csr_rval = has_h ? csr_htvec                       : 'h0;
+//      HIE       : st_csr_rval = has_h ? csr_mie & 12'h777               : 'h0;
+//      HEDELEG   : st_csr_rval = has_h ? csr_hedeleg                     : 'h0;
+//      HIDELEG   : st_csr_rval = has_h ? csr_mideleg & 12'h333           : 'h0;
+//      HSCRATCH  : st_csr_rval = has_h ? csr_hscratch                    : 'h0;
+//      HEPC      : st_csr_rval = has_h ? csr_hepc                        : 'h0;
+//      HCAUSE    : st_csr_rval = has_h ? csr_hcause                      : 'h0;
+//      HTVAL     : st_csr_rval = has_h ? csr_htval                       : 'h0;
+//      HIP       : st_csr_rval = has_h ? csr_mip & csr_mideleg & 12'h777 : 'h0;
+
       //Machine
       MISA:       st_csr_rval = {csr_misa_base, {XLEN - $bits(csr_misa) {1'b0}}, csr_misa_extensions};
       MVENDORID:  st_csr_rval = {{XLEN - $bits(csr_mvendorid) {1'b0}}, csr_mvendorid};

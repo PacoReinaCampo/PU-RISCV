@@ -114,7 +114,8 @@ module pu_riscv_mmio_if_axi4 #(
   // Variables
   //
   logic [AHB_DATA_WIDTH-1:0] data_reg;
-  logic catch_test, catch_uart_tx;
+  logic                      catch_test;
+  logic                      catch_uart_tx;
 
   logic   [               1:0] dHTRANS;
   logic   [AHB_ADDR_WIDTH-1:0] dHADDR;

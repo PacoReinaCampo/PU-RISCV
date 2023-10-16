@@ -108,8 +108,11 @@ module pu_riscv_pmachk #(
       true = 1'b1;
       for (i = 0; i < $bits(pmaddr); i = i + 1) begin
         if (true) begin
-          if (pmaddr[i+2]) n = n + 1;
-          else true = 1'b0;
+          if (pmaddr[i+2]) begin
+            n = n + 1;
+          end else begin
+            true = 1'b0;
+          end
         end
       end
       n = n + 1;
@@ -137,8 +140,11 @@ module pu_riscv_pmachk #(
       true = 1'b1;
       for (i = 0; i < $bits(pmaddr); i = i + 1) begin
         if (true) begin
-          if (pmaddr[i+2]) n = n + 1;
-          else true = 1'b0;
+          if (pmaddr[i+2]) begin
+            n = n + 1;
+          end else begin
+            true = 1'b0;
+          end
         end
       end
       n = n + 1;
@@ -187,7 +193,11 @@ module pu_riscv_pmachk #(
 
     highest_priority_match = 0;  //default value
 
-    for (n = PMA_CNT - 1; n >= 0; n = n - 1) if (m[n]) highest_priority_match = n;
+    for (n = PMA_CNT - 1; n >= 0; n = n - 1) begin
+      if (m[n]) begin
+        highest_priority_match = n;
+      end
+    end
   endfunction
 
   //////////////////////////////////////////////////////////////////////////////

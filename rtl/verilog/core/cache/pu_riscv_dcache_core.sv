@@ -317,13 +317,19 @@ module pu_riscv_dcache_core #(
 
   //generate delayed mem_* signals
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) mem_vreq_dly <= 'b0;
-    else mem_vreq_dly <= mem_vreq_i | (mem_vreq_dly & ~mem_ack_o);
+    if (!rst_ni) begin
+      mem_vreq_dly <= 'b0;
+    end else begin
+      mem_vreq_dly <= mem_vreq_i | (mem_vreq_dly & ~mem_ack_o);
+    end
   end
 
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) mem_preq_dly <= 'b0;
-    else mem_preq_dly <= (mem_preq_i | mem_preq_dly) & ~mem_ack_o;
+    if (!rst_ni) begin
+      mem_preq_dly <= 'b0;
+    end else begin
+      mem_preq_dly <= (mem_preq_i | mem_preq_dly) & ~mem_ack_o;
+    end
   end
 
   //register memory signals
@@ -337,7 +343,9 @@ module pu_riscv_dcache_core #(
   end
 
   always @(posedge clk_i) begin
-    if (mem_preq_i) mem_padr_dly <= mem_padr_i;
+    if (mem_preq_i) begin
+      mem_padr_dly <= mem_padr_i;
+    end
   end
 
   //extract index bits from virtual address(es)
@@ -351,13 +359,18 @@ module pu_riscv_dcache_core #(
 
   //hold core_tag during filling. Prevents new mem_req (during fill) to mess up the 'tag' value
   always @(posedge clk_i) begin
-    if (!filling) core_tag_hold <= core_tag;
+    if (!filling) begin
+      core_tag_hold <= core_tag;
+    end
   end
 
   //hold flush until ready to service it
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) hold_flush <= 1'b0;
-    else hold_flush <= ~flushing & (flush_i | hold_flush);
+    if (!rst_ni) begin
+      hold_flush <= 1'b0;
+    end else begin
+      hold_flush <= ~flushing & (flush_i | hold_flush);
+    end
   end
 
   //signal Instruction Cache when FLUSH is done
@@ -372,38 +385,39 @@ module pu_riscv_dcache_core #(
       biucmd       <= NOP;
     end else begin
       case (memfsm_state)
-        ARMED:
-        if ((flush_i || hold_flush) && !(mem_vreq_i && mem_we_i) && !(mem_vreq_dly && mem_we_dly && (mem_preq_i || mem_preq_dly))) begin
-          memfsm_state <= FLUSH;
-          flushing     <= 1'b1;
-        end else if (mem_vreq_dly && !cache_hit && (mem_preq_i || mem_preq_dly)) begin  //it takes 1 cycle to read TAG
-          if (tag_out_valid[onehot2int(fill_way_select)] && tag_out_dirty[onehot2int(fill_way_select)]) begin
-            //selected way is dirty, write back to upstream
-            memfsm_state <= WAIT4BIUCMD1;
-            biucmd       <= READ_WAY;
-            filling      <= 1'b1;
+        ARMED: begin
+          if ((flush_i || hold_flush) && !(mem_vreq_i && mem_we_i) && !(mem_vreq_dly && mem_we_dly && (mem_preq_i || mem_preq_dly))) begin
+            memfsm_state <= FLUSH;
+            flushing     <= 1'b1;
+          end else if (mem_vreq_dly && !cache_hit && (mem_preq_i || mem_preq_dly)) begin  //it takes 1 cycle to read TAG
+            if (tag_out_valid[onehot2int(fill_way_select)] && tag_out_dirty[onehot2int(fill_way_select)]) begin
+              //selected way is dirty, write back to upstream
+              memfsm_state <= WAIT4BIUCMD1;
+              biucmd       <= READ_WAY;
+              filling      <= 1'b1;
+            end else begin
+              //selected way not dirty, overwrite
+              memfsm_state <= WAIT4BIUCMD0;
+              biucmd       <= READ_WAY;
+              filling      <= 1'b1;
+            end
           end else begin
-            //selected way not dirty, overwrite
-            memfsm_state <= WAIT4BIUCMD0;
-            biucmd       <= READ_WAY;
-            filling      <= 1'b1;
+            biucmd <= NOP;
           end
-        end else begin
-          biucmd <= NOP;
         end
-
-        FLUSH:
-        if (|tag_dirty) begin
-          //There are dirty ways in this set
-          //TODO
-          //First determine dat_idx; this reads all ways for that index (FLUSH)
-          //then check which ways are dirty (FLUSHWAYS)
-          //write dirty way
-          //clear dirty bit
-          memfsm_state <= FLUSHWAYS;
-        end else begin
-          memfsm_state <= RECOVER;  //allow to read new tag_idx
-          flushing     <= 1'b0;
+        FLUSH: begin
+          if (|tag_dirty) begin
+            //There are dirty ways in this set
+            //TODO
+            //First determine dat_idx; this reads all ways for that index (FLUSH)
+            //then check which ways are dirty (FLUSHWAYS)
+            //write dirty way
+            //clear dirty bit
+            memfsm_state <= FLUSHWAYS;
+          end else begin
+            memfsm_state <= RECOVER;  //allow to read new tag_idx
+            flushing     <= 1'b0;
+          end
         end
         FLUSHWAYS: begin
           //assert WRITE_WAY here (instead of in FLUSH) to allow time to load evict_buffer
@@ -418,29 +432,31 @@ module pu_riscv_dcache_core #(
           end
         end
         //TODO: Can we merge WAIT4BIUCMD0 and WAIT4BIUCMD1?
-        WAIT4BIUCMD1:
-        if (biufsm_err) begin
-          //if tag_idx already selected, go to ARMED
-          //otherwise go to RECOVER to read tag (1 cycle delay)
-          memfsm_state <= ((mem_preq_dly && mem_we_dly) ? write_buffer_idx : vadr_idx) != tag_idx_hold ? RECOVER : ARMED;
-          biucmd       <= WRITE_WAY;
-          filling      <= 1'b0;
-        end else if (biufsm_ack) begin  //wait for READ_WAY to complete
-          //if tag_idx already selected, go to ARMED
-          //otherwise go to recover to read tag (1 cycle delay)
-          memfsm_state <= ((mem_preq_dly && mem_we_dly) ? write_buffer_idx : vadr_idx) != tag_idx_hold ? RECOVER : ARMED;
-          biucmd       <= WRITE_WAY;
-          filling      <= 1'b0;
+        WAIT4BIUCMD1: begin
+          if (biufsm_err) begin
+            //if tag_idx already selected, go to ARMED
+            //otherwise go to RECOVER to read tag (1 cycle delay)
+            memfsm_state <= ((mem_preq_dly && mem_we_dly) ? write_buffer_idx : vadr_idx) != tag_idx_hold ? RECOVER : ARMED;
+            biucmd       <= WRITE_WAY;
+            filling      <= 1'b0;
+          end else if (biufsm_ack) begin  //wait for READ_WAY to complete
+            //if tag_idx already selected, go to ARMED
+            //otherwise go to recover to read tag (1 cycle delay)
+            memfsm_state <= ((mem_preq_dly && mem_we_dly) ? write_buffer_idx : vadr_idx) != tag_idx_hold ? RECOVER : ARMED;
+            biucmd       <= WRITE_WAY;
+            filling      <= 1'b0;
+          end
         end
-        WAIT4BIUCMD0:
-        if (biufsm_err) begin
-          memfsm_state <= ((mem_preq_dly && mem_we_dly) ? write_buffer_idx : vadr_idx) != tag_idx_hold ? RECOVER : ARMED;
-          biucmd       <= NOP;
-          filling      <= 1'b0;
-        end else if (biufsm_ack) begin
-          memfsm_state <= ((mem_preq_dly && mem_we_dly) ? write_buffer_idx : vadr_idx) != tag_idx_hold ? RECOVER : ARMED;
-          biucmd       <= NOP;
-          filling      <= 1'b0;
+        WAIT4BIUCMD0: begin
+          if (biufsm_err) begin
+            memfsm_state <= ((mem_preq_dly && mem_we_dly) ? write_buffer_idx : vadr_idx) != tag_idx_hold ? RECOVER : ARMED;
+            biucmd       <= NOP;
+            filling      <= 1'b0;
+          end else if (biufsm_ack) begin
+            memfsm_state <= ((mem_preq_dly && mem_we_dly) ? write_buffer_idx : vadr_idx) != tag_idx_hold ? RECOVER : ARMED;
+            biucmd       <= NOP;
+            filling      <= 1'b0;
+          end
         end
         RECOVER: begin
           //Allow DATA memory read after writing/filling
@@ -468,8 +484,11 @@ module pu_riscv_dcache_core #(
   generate
     for (set = 0; set < SETS; set = set + 1) begin
       always @(*) begin
-        if (dirty_sets[set]) get_dirty_set_idx <= set;
-        else get_dirty_set_idx <= 0;
+        if (dirty_sets[set]) begin
+          get_dirty_set_idx <= set;
+        end else begin
+          get_dirty_set_idx <= 0;
+        end
       end
     end
   endgenerate
@@ -532,16 +551,22 @@ module pu_riscv_dcache_core #(
 
       //Valid is stored in DFF
       always @(posedge clk_i, negedge rst_ni) begin
-        if (!rst_ni) tag_valid[way][tag_idx] <= 1'h0;
-        else if (tag_we[way]) tag_valid[way][tag_idx] <= tag_in_valid[way];
+        if (!rst_ni) begin
+          tag_valid[way][tag_idx] <= 1'h0;
+        end else if (tag_we[way]) begin
+          tag_valid[way][tag_idx] <= tag_in_valid[way];
+        end
       end
 
       assign tag_out_valid[way] = tag_valid[way][tag_idx_dly];
 
       //Dirty is stored in DFF
       always @(posedge clk_i, negedge rst_ni) begin
-        if (!rst_ni) tag_dirty[way][tag_dirty_write_idx] <= 1'h0;
-        else if (tag_we_dirty[way]) tag_dirty[way][tag_dirty_write_idx] <= tag_in_dirty[way];
+        if (!rst_ni) begin
+          tag_dirty[way][tag_dirty_write_idx] <= 1'h0;
+        end else if (tag_we_dirty[way]) begin
+          tag_dirty[way][tag_dirty_write_idx] <= tag_in_dirty[way];
+        end
       end
 
       assign tag_out_dirty[way] = tag_dirty[way][tag_idx_dly];
@@ -575,13 +600,19 @@ module pu_riscv_dcache_core #(
   end
 
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) write_buffer_hit <= 'h0;
-    else if (write_buffer_was_write) write_buffer_hit <= way_hit & {DCACHE_WAYS{mem_preq_i}};  //store current transaction's hit, qualify with preq
-    else if (dat_we_enable) write_buffer_hit <= 'h0;  //data written into RAM
+    if (!rst_ni) begin
+      write_buffer_hit <= 'h0;
+    end else if (write_buffer_was_write) begin
+      write_buffer_hit <= way_hit & {DCACHE_WAYS{mem_preq_i}};  //store current transaction's hit, qualify with preq
+    end else if (dat_we_enable) begin
+      write_buffer_hit <= 'h0;  //data written into RAM
+    end
   end
 
   always @(posedge clk_i) begin
-    if (write_buffer_was_write && mem_preq_i) write_buffer_adr <= mem_padr_i;
+    if (write_buffer_was_write && mem_preq_i) begin
+      write_buffer_adr <= mem_padr_i;
+    end
   end
 
   generate
@@ -601,8 +632,11 @@ module pu_riscv_dcache_core #(
       );
 
       //assign way_q; Build MUX (AND/OR) structure
-      if (way == 0) assign way_q_mux[way] = dat_out[way] & {BLK_BITS{way_hit[way]}};
-      else assign way_q_mux[way] = (dat_out[way] & {BLK_BITS{way_hit[way]}}) | way_q_mux[way - 1];
+      if (way == 0) begin
+        assign way_q_mux[way] = dat_out[way] & {BLK_BITS{way_hit[way]}};
+      end else begin
+        assign way_q_mux[way] = (dat_out[way] & {BLK_BITS{way_hit[way]}}) | way_q_mux[way - 1];
+      end
     end
   endgenerate
 
@@ -627,8 +661,11 @@ module pu_riscv_dcache_core #(
 
   //Random generator for RANDOM replacement algorithm
   always @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni) way_random <= 'h0;
-    else if (!filling) way_random <= {way_random, way_random[19] ~^ way_random[16]};
+    if (!rst_ni) begin
+      way_random <= 'h0;
+    end else if (!filling) begin
+      way_random <= {way_random, way_random[19] ~^ way_random[16]};
+    end
   end
 
   //select which way to fill
@@ -652,8 +689,8 @@ module pu_riscv_dcache_core #(
       //TAG read
       FLUSH:     tag_idx = flush_idx;
       FLUSHWAYS: tag_idx = flush_idx;
-      RECOVER:   tag_idx = mem_vreq_dly ? vadr_dly_idx  //pending access
- : vadr_idx;  //new access
+      //pending access or new access
+      RECOVER:   tag_idx = mem_vreq_dly ? vadr_dly_idx : vadr_idx;
       default:   tag_idx = vadr_idx;  //current access
     endcase
   end
@@ -893,8 +930,11 @@ module pu_riscv_dcache_core #(
   generate
     for (way = 0; way < DCACHE_WAYS; way = way + 1) begin
       always @(*) begin
-        if (tag_dirty[way][flush_idx]) get_dirty_way_idx = way;
-        else get_dirty_way_idx = 0;
+        if (tag_dirty[way][flush_idx]) begin
+          get_dirty_way_idx = way;
+        end else begin
+          get_dirty_way_idx = 0;
+        end
       end
     end
   endgenerate
