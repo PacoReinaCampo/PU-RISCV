@@ -427,7 +427,8 @@ module pu_riscv_du #(
             endcase
           end
         end
-      end else begin  //n >= BREAKPOINTS
+      end else begin
+        //n >= BREAKPOINTS
         //assign bp_hit[n] = 1'b0;
       end
     end

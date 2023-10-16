@@ -102,7 +102,7 @@ module pu_riscv_core #(
 
   //Data Memory Access bus
   output [XLEN         -1:0] dmem_adr,
-  dmem_d,
+  output [XLEN         -1:0] dmem_d,
   input  [XLEN         -1:0] dmem_q,
   output                     dmem_we,
   output [              2:0] dmem_size,
@@ -135,6 +135,16 @@ module pu_riscv_core #(
   output                     dbg_ack,
   output                     dbg_bp
 );
+
+  //////////////////////////////////////////////////////////////////////////////
+  //
+  // Constants
+  //
+
+  //RF access
+  parameter AR_BITS = 5;
+  parameter RDPORTS = 2;
+  parameter WRPORTS = 1;
 
   //////////////////////////////////////////////////////////////////////////////
   //
@@ -188,11 +198,6 @@ module pu_riscv_core #(
   logic [EXCEPTION_SIZE -1:0] ex_exception;
   logic [EXCEPTION_SIZE -1:0] mem_exception;
   logic [EXCEPTION_SIZE -1:0] wb_exception;
-
-  //RF access
-  parameter AR_BITS = 5;
-  parameter RDPORTS = 2;
-  parameter WRPORTS = 1;
 
   logic [        XLEN   -1:0]              id_srcv2;
   logic [        RDPORTS-1:0][AR_BITS-1:0] rf_src1;

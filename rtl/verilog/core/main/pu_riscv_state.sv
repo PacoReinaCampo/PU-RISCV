@@ -504,6 +504,7 @@ module pu_riscv_state #(
   end
 
   //////////////////////////////////////////////////////////////////////////////
+  //
   // Machine registers
   //
   assign csr_misa_base = is_rv128 ? RV128I : is_rv64 ? RV64I : RV32I;
@@ -664,19 +665,19 @@ module pu_riscv_state #(
             csr_mstatus_mpie <= 1'b1;
             csr_mstatus_mpp  <= has_u ? PRV_U : PRV_M;
           end
-          /*
-          HRET : begin
-            //set privilege level
-            st_prv    <= csr_mstatus_hpp;
-            st_nxt_pc <= csr_hepc;
-            st_flush  <= 1'b1;
 
-            //set HIE
-            csr_mstatus_hie  <= csr_mstatus_hpie;
-            csr_mstatus_hpie <= 1'b1;
-            csr_mstatus_hpp  <= has_u ? PRV_U : PRV_M;
-          end
- */
+//          HRET : begin
+//            //set privilege level
+//            st_prv    <= csr_mstatus_hpp;
+//            st_nxt_pc <= csr_hepc;
+//            st_flush  <= 1'b1;
+
+//            //set HIE
+//            csr_mstatus_hie  <= csr_mstatus_hpie;
+//            csr_mstatus_hpie <= 1'b1;
+//            csr_mstatus_hpp  <= has_u ? PRV_U : PRV_M;
+//          end
+
           SRET: begin
             //set privilege level
             st_prv           <= {1'b0, csr_mstatus_spp};
@@ -729,16 +730,15 @@ module pu_riscv_state #(
           csr_mstatus_spie <= csr_mstatus_sie;
           csr_mstatus_sie  <= 1'b0;
           csr_mstatus_spp  <= st_prv[0];
-        end/*
-        else if (has_h && st_prv >= PRV_H && (st_int & csr_mideleg & 12'h777) ) begin
-          st_prv    <= PRV_H;
-          st_nxt_pc <= csr_htvec;
-
-          csr_mstatus_hpie <= csr_mstatus_hie;
-          csr_mstatus_hie  <= 1'b0;
-          csr_mstatus_hpp  <= st_prv;
         end
- */
+//        else if (has_h && st_prv >= PRV_H && (st_int & csr_mideleg & 12'h777) ) begin
+//          st_prv    <= PRV_H;
+//          st_nxt_pc <= csr_htvec;
+
+//          csr_mstatus_hpie <= csr_mstatus_hie;
+//          csr_mstatus_hie  <= 1'b0;
+//          csr_mstatus_hpp  <= st_prv;
+//        end
         else begin
           st_prv           <= PRV_M;
           st_nxt_pc        <= csr_mtvec & ~'h3 + (csr_mtvec[0] ? interrupt_cause << 2 : 0);
@@ -764,16 +764,16 @@ module pu_riscv_state #(
           csr_mstatus_sie  <= 1'b0;
           csr_mstatus_spp  <= st_prv[0];
 
-        end/*
-        else if (has_h && st_prv >= PRV_H && |(wb_exception & csr_medeleg)) begin
-          st_prv    <= PRV_H;
-          st_nxt_pc <= csr_htvec;
-
-          csr_mstatus_hpie <= csr_mstatus_hie;
-          csr_mstatus_hie  <= 1'b0;
-          csr_mstatus_hpp  <= st_prv;
         end
- */
+//        else if (has_h && st_prv >= PRV_H && |(wb_exception & csr_medeleg)) begin
+//          st_prv    <= PRV_H;
+//          st_nxt_pc <= csr_htvec;
+
+//          csr_mstatus_hpie <= csr_mstatus_hie;
+//          csr_mstatus_hie  <= 1'b0;
+//          csr_mstatus_hpp  <= st_prv;
+//        end
+
         else begin
           st_prv           <= PRV_M;
           st_nxt_pc        <= csr_mtvec & ~'h3;
@@ -795,14 +795,22 @@ module pu_riscv_state #(
           csr_minstret <= 'h0;
         end else begin
           //cycle always counts (thread active time)
-          if ((ex_csr_we && ex_csr_reg == MCYCLE && st_prv == PRV_M) || (du_we_csr && du_addr == MCYCLE)) csr_mcycle_l <= csr_wval;
-          else if ((ex_csr_we && ex_csr_reg == MCYCLEH && st_prv == PRV_M) || (du_we_csr && du_addr == MCYCLEH)) csr_mcycle_h <= csr_wval;
-          else csr_mcycle <= csr_mcycle + 'h1;
+          if ((ex_csr_we && ex_csr_reg == MCYCLE && st_prv == PRV_M) || (du_we_csr && du_addr == MCYCLE)) begin
+            csr_mcycle_l <= csr_wval;
+          end else if ((ex_csr_we && ex_csr_reg == MCYCLEH && st_prv == PRV_M) || (du_we_csr && du_addr == MCYCLEH)) begin
+            csr_mcycle_h <= csr_wval;
+          end else begin
+            csr_mcycle <= csr_mcycle + 'h1;
+          end
 
           //instruction retire counter
-          if ((ex_csr_we && ex_csr_reg == MINSTRET && st_prv == PRV_M) || (du_we_csr && du_addr == MINSTRET)) csr_minstret_l <= csr_wval;
-          else if ((ex_csr_we && ex_csr_reg == MINSTRETH && st_prv == PRV_M) || (du_we_csr && du_addr == MINSTRETH)) csr_minstret_h <= csr_wval;
-          else if (!wb_bubble) csr_minstret <= csr_minstret + 'h1;
+          if ((ex_csr_we && ex_csr_reg == MINSTRET && st_prv == PRV_M) || (du_we_csr && du_addr == MINSTRET)) begin
+            csr_minstret_l <= csr_wval;
+          end else if ((ex_csr_we && ex_csr_reg == MINSTRETH && st_prv == PRV_M) || (du_we_csr && du_addr == MINSTRETH)) begin
+            csr_minstret_h <= csr_wval;
+          end else if (!wb_bubble) begin
+            csr_minstret <= csr_minstret + 'h1;
+          end
         end
       end
     end else  //(XLEN > 32) begin
@@ -812,32 +820,47 @@ module pu_riscv_state #(
           csr_minstret <= 'h0;
         end else begin
           //cycle always counts (thread active time)
-          if ((ex_csr_we && ex_csr_reg == MCYCLE && st_prv == PRV_M) || (du_we_csr && du_addr == MCYCLE)) csr_mcycle <= csr_wval[63:0];
-          else csr_mcycle <= csr_mcycle + 'h1;
+          if ((ex_csr_we && ex_csr_reg == MCYCLE && st_prv == PRV_M) || (du_we_csr && du_addr == MCYCLE)) begin
+            csr_mcycle <= csr_wval[63:0];
+          end else begin
+            csr_mcycle <= csr_mcycle + 'h1;
+          end
 
           //instruction retire counter
-          if ((ex_csr_we && ex_csr_reg == MINSTRET && st_prv == PRV_M) || (du_we_csr && du_addr == MINSTRET)) csr_minstret <= csr_wval[63:0];
-          else if (!wb_bubble) csr_minstret <= csr_minstret + 'h1;
+          if ((ex_csr_we && ex_csr_reg == MINSTRET && st_prv == PRV_M) || (du_we_csr && du_addr == MINSTRET)) begin
+            csr_minstret <= csr_wval[63:0];
+          end else if (!wb_bubble) begin
+            csr_minstret <= csr_minstret + 'h1;
+          end
         end
       end
   endgenerate
 
   //mnmivec - RoaLogic Extension
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) csr_mnmivec <= MNMIVEC_DEFAULT;
-    else if ((ex_csr_we && ex_csr_reg == MNMIVEC && st_prv == PRV_M) || (du_we_csr && du_addr == MNMIVEC)) csr_mnmivec <= {csr_wval[XLEN-1:2], 2'b00};
+    if (!rstn) begin
+      csr_mnmivec <= MNMIVEC_DEFAULT;
+    end else if ((ex_csr_we && ex_csr_reg == MNMIVEC && st_prv == PRV_M) || (du_we_csr && du_addr == MNMIVEC)) begin
+      csr_mnmivec <= {csr_wval[XLEN-1:2], 2'b00};
+    end
   end
 
   //mtvec
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) csr_mtvec <= MTVEC_DEFAULT;
-    else if ((ex_csr_we && ex_csr_reg == MTVEC && st_prv == PRV_M) || (du_we_csr && du_addr == MTVEC)) csr_mtvec <= csr_wval & ~'h2;
+    if (!rstn) begin
+      csr_mtvec <= MTVEC_DEFAULT;
+    end else if ((ex_csr_we && ex_csr_reg == MTVEC && st_prv == PRV_M) || (du_we_csr && du_addr == MTVEC)) begin
+      csr_mtvec <= csr_wval & ~'h2;
+    end
   end
 
   //mcounteren
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) csr_mcounteren <= 'h0;
-    else if ((ex_csr_we && ex_csr_reg == MCOUNTEREN && st_prv == PRV_M) || (du_we_csr && du_addr == MCOUNTEREN)) csr_mcounteren <= csr_wval & 'h7;
+    if (!rstn) begin
+      csr_mcounteren <= 'h0;
+    end else if ((ex_csr_we && ex_csr_reg == MCOUNTEREN && st_prv == PRV_M) || (du_we_csr && du_addr == MCOUNTEREN)) begin
+      csr_mcounteren <= csr_wval & 'h7;
+    end
   end
 
   assign st_mcounteren = csr_mcounteren;
@@ -850,25 +873,27 @@ module pu_riscv_state #(
     end else begin
       //medeleg
       always @(posedge clk, negedge rstn) begin
-        if (!rstn) csr_medeleg <= 'h0;
-        else if ((ex_csr_we && ex_csr_reg == MEDELEG && st_prv == PRV_M) || (du_we_csr && du_addr == MEDELEG)) csr_medeleg <= csr_wval & {EXCEPTION_SIZE{1'b1}};
+        if (!rstn) begin
+          csr_medeleg <= 'h0;
+        end else if ((ex_csr_we && ex_csr_reg == MEDELEG && st_prv == PRV_M) || (du_we_csr && du_addr == MEDELEG)) begin
+          csr_medeleg <= csr_wval & {EXCEPTION_SIZE{1'b1}};
+        end
       end
 
       //mideleg
       always @(posedge clk, negedge rstn) begin
-        if (!rstn) csr_mideleg <= 'h0;
-        else if ((ex_csr_we && ex_csr_reg == MIDELEG && st_prv == PRV_M) || (du_we_csr && du_addr == MIDELEG)) begin
+        if (!rstn) begin
+          csr_mideleg <= 'h0;
+        end else if ((ex_csr_we && ex_csr_reg == MIDELEG && st_prv == PRV_M) || (du_we_csr && du_addr == MIDELEG)) begin
           csr_mideleg[SSI] <= has_s & csr_wval[SSI];
           csr_mideleg[USI] <= has_n & csr_wval[USI];
-        end/*
-        else if (has_h) begin
-          if ( (ex_csr_we && ex_csr_reg == HIDELEG && st_prv >= PRV_H) ||
-               (du_we_csr && du_addr    == HIDELEG)                  ) begin
-            csr_mideleg[SSI] <= has_s & csr_wval[SSI];
-            csr_mideleg[USI] <= has_n & csr_wval[USI];
-          end
         end
- */
+//        else if (has_h) begin
+//          if ((ex_csr_we && ex_csr_reg == HIDELEG && st_prv >= PRV_H) || (du_we_csr && du_addr    == HIDELEG)) begin
+//            csr_mideleg[SSI] <= has_s & csr_wval[SSI];
+//            csr_mideleg[USI] <= has_n & csr_wval[USI];
+//          end
+//        end
         else if (has_s) begin
           if ((ex_csr_we && ex_csr_reg == SIDELEG && st_prv >= PRV_S) || (du_we_csr && du_addr == SIDELEG)) begin
             csr_mideleg[USI] <= has_n & csr_wval[USI];
@@ -914,17 +939,15 @@ module pu_riscv_state #(
         csr_mip_hsip <= csr_wval[HSI] & has_h;
         csr_mip_ssip <= csr_wval[SSI] & has_s;
         csr_mip_usip <= csr_wval[USI] & has_n;
-      end/*
-        else if (has_h) begin
-          //Hypervisor Mode write
-          if ( (ex_csr_we && ex_csr_reg == HIP && st_prv >= PRV_H) ||
-               (du_we_csr && du_addr    == HIP)                  ) begin
-              csr_mip_hsip <= csr_wval[HSI] & csr_mideleg[HSI];
-              csr_mip_ssip <= csr_wval[SSI] & csr_mideleg[SSI] & has_s;
-              csr_mip_usip <= csr_wval[USI] & csr_mideleg[USI] & has_n;
-            end
-        end
- */
+      end
+//        else if (has_h) begin
+//          //Hypervisor Mode write
+//          if ((ex_csr_we && ex_csr_reg == HIP && st_prv >= PRV_H) || (du_we_csr && du_addr == HIP)) begin
+//            csr_mip_hsip <= csr_wval[HSI] & csr_mideleg[HSI];
+//            csr_mip_ssip <= csr_wval[SSI] & csr_mideleg[SSI] & has_s;
+//            csr_mip_usip <= csr_wval[USI] & csr_mideleg[USI] & has_n;
+//          end
+//        end
       else if (has_s) begin
         //Supervisor Mode write
         if ((ex_csr_we && ex_csr_reg == SIP && st_prv >= PRV_S) || (du_we_csr && du_addr == SIP)) begin
@@ -942,8 +965,9 @@ module pu_riscv_state #(
 
   //mie
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) csr_mie <= 'h0;
-    else if ((ex_csr_we && ex_csr_reg == MIE && st_prv == PRV_M) || (du_we_csr && du_addr == MIE)) begin
+    if (!rstn) begin
+      csr_mie <= 'h0;
+    end else if ((ex_csr_we && ex_csr_reg == MIE && st_prv == PRV_M) || (du_we_csr && du_addr == MIE)) begin
       csr_mie_meie <= csr_wval[MEI];
       csr_mie_heie <= csr_wval[HEI] & has_h;
       csr_mie_seie <= csr_wval[SEI] & has_s;
@@ -956,22 +980,20 @@ module pu_riscv_state #(
       csr_mie_hsie <= csr_wval[HSI] & has_h;
       csr_mie_ssie <= csr_wval[SSI] & has_s;
       csr_mie_usie <= csr_wval[USI] & has_n;
-    end/*
-    else if (has_h) begin
-      if ( (ex_csr_we && ex_csr_reg == HIE && st_prv >= PRV_H) ||
-           (du_we_csr && du_addr    == HIE)                  ) begin
-        csr_mie_heie <= csr_wval[HEI];
-        csr_mie_seie <= csr_wval[SEI] & has_s;
-        csr_mie_ueie <= csr_wval[UEI] & has_n;
-        csr_mie_htie <= csr_wval[HTI];
-        csr_mie_stie <= csr_wval[STI] & has_s;
-        csr_mie_utie <= csr_wval[UTI] & has_n;
-        csr_mie_hsie <= csr_wval[HSI];
-        csr_mie_ssie <= csr_wval[SSI] & has_s;
-        csr_mie_usie <= csr_wval[USI] & has_n;
-      end
     end
- */
+//    else if (has_h) begin
+//      if ((ex_csr_we && ex_csr_reg == HIE && st_prv >= PRV_H) || (du_we_csr && du_addr == HIE)) begin
+//        csr_mie_heie <= csr_wval[HEI];
+//        csr_mie_seie <= csr_wval[SEI] & has_s;
+//        csr_mie_ueie <= csr_wval[UEI] & has_n;
+//        csr_mie_htie <= csr_wval[HTI];
+//        csr_mie_stie <= csr_wval[STI] & has_s;
+//        csr_mie_utie <= csr_wval[UTI] & has_n;
+//        csr_mie_hsie <= csr_wval[HSI];
+//        csr_mie_ssie <= csr_wval[SSI] & has_s;
+//        csr_mie_usie <= csr_wval[USI] & has_n;
+//      end
+//    end
     else if (has_s) begin
       if ((ex_csr_we && ex_csr_reg == SIE && st_prv >= PRV_S) || (du_we_csr && du_addr == SIE)) begin
         csr_mie_seie <= csr_wval[SEI];
@@ -992,8 +1014,11 @@ module pu_riscv_state #(
 
   //mscratch
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) csr_mscratch <= 'h0;
-    else if ((ex_csr_we && ex_csr_reg == MSCRATCH && st_prv == PRV_M) || (du_we_csr && du_addr == MSCRATCH)) csr_mscratch <= csr_wval;
+    if (!rstn) begin
+      csr_mscratch <= 'h0;
+    end else if ((ex_csr_we && ex_csr_reg == MSCRATCH && st_prv == PRV_M) || (du_we_csr && du_addr == MSCRATCH)) begin
+      csr_mscratch <= csr_wval;
+    end
   end
 
   assign trap_cause          = get_trap_cause(wb_exception & ~du_ie[15:0]);
@@ -1060,37 +1085,53 @@ module pu_riscv_state #(
       csr_utval    <= 'h0;
     end else begin
       //Write access to regs (lowest priority)
-      if ((ex_csr_we && ex_csr_reg == MEPC && st_prv == PRV_M) || (du_we_csr && du_addr == MEPC)) csr_mepc <= {csr_wval[XLEN-1:2], csr_wval[1] & has_rvc, 1'b0};
-      /*
-      if ( (ex_csr_we && ex_csr_reg == HEPC && st_prv >= PRV_H) ||
-           (du_we_csr && du_addr    == HEPC)                  )
-        csr_hepc <= {csr_wval[XLEN-1:2], csr_wval[1] & has_rvc, 1'b0};
- */
-      if ((ex_csr_we && ex_csr_reg == SEPC && st_prv >= PRV_S) || (du_we_csr && du_addr == SEPC)) csr_sepc <= {csr_wval[XLEN-1:2], csr_wval[1] & has_rvc, 1'b0};
+      if ((ex_csr_we && ex_csr_reg == MEPC && st_prv == PRV_M) || (du_we_csr && du_addr == MEPC)) begin
+        csr_mepc <= {csr_wval[XLEN-1:2], csr_wval[1] & has_rvc, 1'b0};
+      end
 
-      if ((ex_csr_we && ex_csr_reg == UEPC && st_prv >= PRV_U) || (du_we_csr && du_addr == UEPC)) csr_uepc <= {csr_wval[XLEN-1:2], csr_wval[1] & has_rvc, 1'b0};
+//      if ((ex_csr_we && ex_csr_reg == HEPC && st_prv >= PRV_H) || (du_we_csr && du_addr == HEPC)) begin
+//        csr_hepc <= {csr_wval[XLEN-1:2], csr_wval[1] & has_rvc, 1'b0};
+//      end
 
+      if ((ex_csr_we && ex_csr_reg == SEPC && st_prv >= PRV_S) || (du_we_csr && du_addr == SEPC)) begin
+        csr_sepc <= {csr_wval[XLEN-1:2], csr_wval[1] & has_rvc, 1'b0};
+      end
 
-      if ((ex_csr_we && ex_csr_reg == MCAUSE && st_prv == PRV_M) || (du_we_csr && du_addr == MCAUSE)) csr_mcause <= csr_wval;
-      /*
-      if ( (ex_csr_we && ex_csr_reg == HCAUSE && st_prv >= PRV_H) ||
-           (du_we_csr && du_addr    == HCAUSE)                  )
-        csr_hcause <= csr_wval;
- */
-      if ((ex_csr_we && ex_csr_reg == SCAUSE && st_prv >= PRV_S) || (du_we_csr && du_addr == SCAUSE)) csr_scause <= csr_wval;
+      if ((ex_csr_we && ex_csr_reg == UEPC && st_prv >= PRV_U) || (du_we_csr && du_addr == UEPC)) begin
+        csr_uepc <= {csr_wval[XLEN-1:2], csr_wval[1] & has_rvc, 1'b0};
+      end
 
-      if ((ex_csr_we && ex_csr_reg == UCAUSE && st_prv >= PRV_U) || (du_we_csr && du_addr == UCAUSE)) csr_ucause <= csr_wval;
+      if ((ex_csr_we && ex_csr_reg == MCAUSE && st_prv == PRV_M) || (du_we_csr && du_addr == MCAUSE)) begin
+        csr_mcause <= csr_wval;
+      end
 
+//      if  (ex_csr_we && ex_csr_reg == HCAUSE && st_prv >= PRV_H) || (du_we_csr && du_addr == HCAUSE)) begin
+//        csr_hcause <= csr_wval;
+//      end
 
-      if ((ex_csr_we && ex_csr_reg == MTVAL && st_prv == PRV_M) || (du_we_csr && du_addr == MTVAL)) csr_mtval <= csr_wval;
-      /*
-      if ( (ex_csr_we && ex_csr_reg == HTVAL && st_prv >= PRV_H) ||
-           (du_we_csr && du_addr    == HTVAL)                  )
-        csr_htval <= csr_wval;
- */
-      if ((ex_csr_we && ex_csr_reg == STVAL && st_prv >= PRV_S) || (du_we_csr && du_addr == STVAL)) csr_stval <= csr_wval;
+      if ((ex_csr_we && ex_csr_reg == SCAUSE && st_prv >= PRV_S) || (du_we_csr && du_addr == SCAUSE)) begin
+        csr_scause <= csr_wval;
+      end
 
-      if ((ex_csr_we && ex_csr_reg == UTVAL && st_prv >= PRV_U) || (du_we_csr && du_addr == UTVAL)) csr_utval <= csr_wval;
+      if ((ex_csr_we && ex_csr_reg == UCAUSE && st_prv >= PRV_U) || (du_we_csr && du_addr == UCAUSE)) begin
+        csr_ucause <= csr_wval;
+      end
+
+      if ((ex_csr_we && ex_csr_reg == MTVAL && st_prv == PRV_M) || (du_we_csr && du_addr == MTVAL)) begin
+        csr_mtval <= csr_wval;
+      end
+
+//      if ((ex_csr_we && ex_csr_reg == HTVAL && st_prv >= PRV_H) || (du_we_csr && du_addr == HTVAL)) begin
+//        csr_htval <= csr_wval;
+//      end
+ 
+      if ((ex_csr_we && ex_csr_reg == STVAL && st_prv >= PRV_S) || (du_we_csr && du_addr == STVAL)) begin
+        csr_stval <= csr_wval;
+      end
+
+      if ((ex_csr_we && ex_csr_reg == UTVAL && st_prv >= PRV_U) || (du_we_csr && du_addr == UTVAL)) begin
+        csr_utval <= csr_wval;
+      end
 
       //Handle exceptions
       st_interrupt <= 1'b0;
@@ -1111,12 +1152,11 @@ module pu_riscv_state #(
         end else if (has_s && st_prv >= PRV_S && (st_int & csr_mideleg & 12'h333)) begin
           csr_scause <= (1 << (XLEN - 1)) | interrupt_cause;
           csr_sepc   <= id_pc;
-        end/*
-        else if (has_h && st_prv >= PRV_H && (st_int & csr_mideleg & 12'h777) ) begin
-          csr_hcause <= (1 << (XLEN-1)) | interrupt_cause;
-          csr_hepc   <= id_pc;
         end
- */
+//        else if(has_h && st_prv >= PRV_H && (st_int & csr_mideleg & 12'h777)) begin
+//          csr_hcause <= (1 << (XLEN-1)) | interrupt_cause;
+//          csr_hepc   <= id_pc;
+//        end
         else begin
           csr_mcause <= (1 << (XLEN - 1)) | interrupt_cause;
           csr_mepc   <= id_pc;
@@ -1131,33 +1171,34 @@ module pu_riscv_state #(
           csr_sepc   <= wb_pc;
           csr_scause <= trap_cause;
 
-          if (wb_exception[CAUSE_ILLEGAL_INSTRUCTION]) csr_stval <= wb_instr;
-          else if (wb_exception[CAUSE_MISALIGNED_INSTRUCTION] || wb_exception[CAUSE_INSTRUCTION_ACCESS_FAULT] || wb_exception[CAUSE_INSTRUCTION_PAGE_FAULT] ||
-                   wb_exception[CAUSE_MISALIGNED_LOAD       ] || wb_exception[CAUSE_LOAD_ACCESS_FAULT       ] || wb_exception[CAUSE_LOAD_PAGE_FAULT       ] ||
-                   wb_exception[CAUSE_MISALIGNED_STORE      ] || wb_exception[CAUSE_STORE_ACCESS_FAULT      ] || wb_exception[CAUSE_STORE_PAGE_FAULT      ] )
-            csr_stval <= wb_badaddr;
-        end/*
-        else if (has_h && st_prv >= PRV_H && |(wb_exception & csr_medeleg)) begin
-          csr_hepc   <= wb_pc;
-          csr_hcause <= trap_cause;
-
           if (wb_exception[CAUSE_ILLEGAL_INSTRUCTION]) begin
-            csr_htval <= wb_instr;
-          else if (wb_exception[CAUSE_MISALIGNED_INSTRUCTION] || wb_exception[CAUSE_INSTRUCTION_ACCESS_FAULT] || wb_exception[CAUSE_INSTRUCTION_PAGE_FAULT] ||
-                   wb_exception[CAUSE_MISALIGNED_LOAD       ] || wb_exception[CAUSE_LOAD_ACCESS_FAULT       ] || wb_exception[CAUSE_LOAD_PAGE_FAULT       ] ||
-                   wb_exception[CAUSE_MISALIGNED_STORE      ] || wb_exception[CAUSE_STORE_ACCESS_FAULT      ] || wb_exception[CAUSE_STORE_PAGE_FAULT      ] )
-            csr_htval <= wb_badaddr;
-          end
+            csr_stval <= wb_instr;
+          end else if (wb_exception[CAUSE_MISALIGNED_INSTRUCTION] || wb_exception[CAUSE_INSTRUCTION_ACCESS_FAULT] || wb_exception[CAUSE_INSTRUCTION_PAGE_FAULT] ||
+                       wb_exception[CAUSE_MISALIGNED_LOAD       ] || wb_exception[CAUSE_LOAD_ACCESS_FAULT       ] || wb_exception[CAUSE_LOAD_PAGE_FAULT       ] ||
+                       wb_exception[CAUSE_MISALIGNED_STORE      ] || wb_exception[CAUSE_STORE_ACCESS_FAULT      ] || wb_exception[CAUSE_STORE_PAGE_FAULT      ] )
+            csr_stval <= wb_badaddr;
         end
- */
+//        else if (has_h && st_prv >= PRV_H && |(wb_exception & csr_medeleg)) begin
+//          csr_hepc   <= wb_pc;
+//          csr_hcause <= trap_cause;
+
+//          if (wb_exception[CAUSE_ILLEGAL_INSTRUCTION]) begin
+//            csr_htval <= wb_instr;
+//          end else if (wb_exception[CAUSE_MISALIGNED_INSTRUCTION] || wb_exception[CAUSE_INSTRUCTION_ACCESS_FAULT] || wb_exception[CAUSE_INSTRUCTION_PAGE_FAULT] ||
+//                       wb_exception[CAUSE_MISALIGNED_LOAD       ] || wb_exception[CAUSE_LOAD_ACCESS_FAULT       ] || wb_exception[CAUSE_LOAD_PAGE_FAULT       ] ||
+//                       wb_exception[CAUSE_MISALIGNED_STORE      ] || wb_exception[CAUSE_STORE_ACCESS_FAULT      ] || wb_exception[CAUSE_STORE_PAGE_FAULT      ] )
+//            csr_htval <= wb_badaddr;
+//          end
+//        end
         else begin
           csr_mepc   <= wb_pc;
           csr_mcause <= trap_cause;
 
-          if (wb_exception[CAUSE_ILLEGAL_INSTRUCTION]) csr_mtval <= wb_instr;
-          else if (wb_exception[CAUSE_MISALIGNED_INSTRUCTION] || wb_exception[CAUSE_INSTRUCTION_ACCESS_FAULT] || wb_exception[CAUSE_INSTRUCTION_PAGE_FAULT] ||
-                   wb_exception[CAUSE_MISALIGNED_LOAD       ] || wb_exception[CAUSE_LOAD_ACCESS_FAULT       ] || wb_exception[CAUSE_LOAD_PAGE_FAULT       ] ||
-                   wb_exception[CAUSE_MISALIGNED_STORE      ] || wb_exception[CAUSE_STORE_ACCESS_FAULT      ] || wb_exception[CAUSE_STORE_PAGE_FAULT      ] )
+          if (wb_exception[CAUSE_ILLEGAL_INSTRUCTION]) begin
+            csr_mtval <= wb_instr;
+          end else if (wb_exception[CAUSE_MISALIGNED_INSTRUCTION] || wb_exception[CAUSE_INSTRUCTION_ACCESS_FAULT] || wb_exception[CAUSE_INSTRUCTION_PAGE_FAULT] ||
+                       wb_exception[CAUSE_MISALIGNED_LOAD       ] || wb_exception[CAUSE_LOAD_ACCESS_FAULT       ] || wb_exception[CAUSE_LOAD_PAGE_FAULT       ] ||
+                       wb_exception[CAUSE_MISALIGNED_STORE      ] || wb_exception[CAUSE_STORE_ACCESS_FAULT      ] || wb_exception[CAUSE_STORE_PAGE_FAULT      ] )
             csr_mtval <= wb_badaddr;
         end
       end
@@ -1170,25 +1211,42 @@ module pu_riscv_state #(
       for (idx = 0; idx < 16; idx = idx + 1) begin : gen_pmpcfg0
         if (idx < PMP_CNT) begin
           always @(posedge clk, negedge rstn) begin
-            if (!rstn) csr_pmpcfg[idx] <= 'h0;
-            else if ((ex_csr_we && ex_csr_reg == PMPCFG0 && st_prv == PRV_M) || (du_we_csr && du_addr == PMPCFG0)) if (!csr_pmpcfg[idx][7]) csr_pmpcfg[idx] <= csr_wval[idx*8 +: 8] & PMPCFG_MASK;
+            if (!rstn) begin
+              csr_pmpcfg[idx] <= 'h0;
+            end else if ((ex_csr_we && ex_csr_reg == PMPCFG0 && st_prv == PRV_M) || (du_we_csr && du_addr == PMPCFG0)) begin
+              if (!csr_pmpcfg[idx][7]) begin
+                csr_pmpcfg[idx] <= csr_wval[idx*8 +: 8] & PMPCFG_MASK;
+              end
+            end  
           end
-        end else assign csr_pmpcfg[idx] = 'h0;
+        end else begin
+          assign csr_pmpcfg[idx] = 'h0;
+        end  
       end  //next idx
 
       //pmpaddr not defined for RV128 yet
     end else if (XLEN > 32) begin  //RV64 
       for (idx = 0; idx < 8; idx = idx + 1) begin : gen_pmpcfg0
         always @(posedge clk, negedge rstn) begin
-          if (!rstn) csr_pmpcfg[idx] <= 'h0;
-          else if ((ex_csr_we && ex_csr_reg == PMPCFG0 && st_prv == PRV_M) || (du_we_csr && du_addr == PMPCFG0)) if (idx < PMP_CNT && !csr_pmpcfg[idx][7]) csr_pmpcfg[idx] <= csr_wval[0 + idx*8 +: 8] & PMPCFG_MASK;
+          if (!rstn) begin
+            csr_pmpcfg[idx] <= 'h0;
+          end else if ((ex_csr_we && ex_csr_reg == PMPCFG0 && st_prv == PRV_M) || (du_we_csr && du_addr == PMPCFG0)) begin
+            if (idx < PMP_CNT && !csr_pmpcfg[idx][7]) begin
+              csr_pmpcfg[idx] <= csr_wval[0 + idx*8 +: 8] & PMPCFG_MASK;
+            end
+          end  
         end
       end  //next idx
 
       for (idx = 8; idx < 16; idx = idx + 1) begin : gen_pmpcfg2
         always @(posedge clk, negedge rstn) begin
-          if (!rstn) csr_pmpcfg[idx] <= 'h0;
-          else if ((ex_csr_we && ex_csr_reg == PMPCFG2 && st_prv == PRV_M) || (du_we_csr && du_addr == PMPCFG2)) if (idx < PMP_CNT && !csr_pmpcfg[idx][7]) csr_pmpcfg[idx] <= csr_wval[(idx-8)*8 +: 8] & PMPCFG_MASK;
+          if (!rstn) begin
+            csr_pmpcfg[idx] <= 'h0;
+          end else if ((ex_csr_we && ex_csr_reg == PMPCFG2 && st_prv == PRV_M) || (du_we_csr && du_addr == PMPCFG2)) begin
+            if (idx < PMP_CNT && !csr_pmpcfg[idx][7]) begin
+              csr_pmpcfg[idx] <= csr_wval[(idx-8)*8 +: 8] & PMPCFG_MASK;
+            end
+          end
         end
       end  //next idx
 
@@ -1196,14 +1254,19 @@ module pu_riscv_state #(
         if (idx < PMP_CNT) begin
           if (idx == 15) begin
             always @(posedge clk, negedge rstn) begin
-              if (!rstn) csr_pmpaddr[idx] <= 'h0;
-              else if ((ex_csr_we && ex_csr_reg == (PMPADDR0 + idx) && st_prv == PRV_M && !csr_pmpcfg[idx][7]) || (du_we_csr && du_addr == (PMPADDR0 + idx))) csr_pmpaddr[idx] <= {10'h0, csr_wval[53:0]};
+              if (!rstn) begin
+                csr_pmpaddr[idx] <= 'h0;
+              end else if ((ex_csr_we && ex_csr_reg == (PMPADDR0 + idx) && st_prv == PRV_M && !csr_pmpcfg[idx][7]) || (du_we_csr && du_addr == (PMPADDR0 + idx))) begin
+                csr_pmpaddr[idx] <= {10'h0, csr_wval[53:0]};
+              end  
             end
           end else begin
             always @(posedge clk, negedge rstn) begin
-              if (!rstn) csr_pmpaddr[idx] <= 'h0;
-              else if ((ex_csr_we && ex_csr_reg == (PMPADDR0 + idx) && st_prv == PRV_M && !csr_pmpcfg[idx][7] && !(csr_pmpcfg[idx+1][4:3] == TOR && csr_pmpcfg[idx+1][7])) || (du_we_csr && du_addr == (PMPADDR0 + idx)))
+              if (!rstn) begin
+                csr_pmpaddr[idx] <= 'h0;
+              end else if ((ex_csr_we && ex_csr_reg == (PMPADDR0 + idx) && st_prv == PRV_M && !csr_pmpcfg[idx][7] && !(csr_pmpcfg[idx+1][4:3] == TOR && csr_pmpcfg[idx+1][7])) || (du_we_csr && du_addr == (PMPADDR0 + idx))) begin
                 csr_pmpaddr[idx] <= {10'h0, csr_wval[53:0]};
+              end  
             end
           end
         end else begin
@@ -1213,29 +1276,49 @@ module pu_riscv_state #(
     end else begin  //RV32
       for (idx = 0; idx < 4; idx = idx + 1) begin : gen_pmpcfg0
         always @(posedge clk, negedge rstn) begin
-          if (!rstn) csr_pmpcfg[idx] <= 'h0;
-          else if ((ex_csr_we && ex_csr_reg == PMPCFG0 && st_prv == PRV_M) || (du_we_csr && du_addr == PMPCFG0)) if (idx < PMP_CNT && !csr_pmpcfg[idx][7]) csr_pmpcfg[idx] <= csr_wval[idx*8 +: 8] & PMPCFG_MASK;
+          if (!rstn) begin
+            csr_pmpcfg[idx] <= 'h0;
+          end else if ((ex_csr_we && ex_csr_reg == PMPCFG0 && st_prv == PRV_M) || (du_we_csr && du_addr == PMPCFG0)) begin
+            if (idx < PMP_CNT && !csr_pmpcfg[idx][7]) begin
+              csr_pmpcfg[idx] <= csr_wval[idx*8 +: 8] & PMPCFG_MASK;
+            end
+          end
         end
       end  //next idx
 
       for (idx = 4; idx < 8; idx = idx + 1) begin : gen_pmpcfg1
         always @(posedge clk, negedge rstn) begin
-          if (!rstn) csr_pmpcfg[idx] <= 'h0;
-          else if ((ex_csr_we && ex_csr_reg == PMPCFG1 && st_prv == PRV_M) || (du_we_csr && du_addr == PMPCFG1)) if (idx < PMP_CNT && !csr_pmpcfg[idx][7]) csr_pmpcfg[idx] <= csr_wval[(idx-4)*8 +: 8] & PMPCFG_MASK;
+          if (!rstn) begin
+            csr_pmpcfg[idx] <= 'h0;
+          end else if ((ex_csr_we && ex_csr_reg == PMPCFG1 && st_prv == PRV_M) || (du_we_csr && du_addr == PMPCFG1)) begin
+            if (idx < PMP_CNT && !csr_pmpcfg[idx][7]) begin
+              csr_pmpcfg[idx] <= csr_wval[(idx-4)*8 +: 8] & PMPCFG_MASK;
+            end
+          end
         end
       end  //next idx
 
       for (idx = 8; idx < 12; idx = idx + 1) begin : gen_pmpcfg2
         always @(posedge clk, negedge rstn) begin
-          if (!rstn) csr_pmpcfg[idx] <= 'h0;
-          else if ((ex_csr_we && ex_csr_reg == PMPCFG2 && st_prv == PRV_M) || (du_we_csr && du_addr == PMPCFG2)) if (idx < PMP_CNT && !csr_pmpcfg[idx][7]) csr_pmpcfg[idx] <= csr_wval[(idx-8)*8 +: 8] & PMPCFG_MASK;
+          if (!rstn) begin
+            csr_pmpcfg[idx] <= 'h0;
+          end else if ((ex_csr_we && ex_csr_reg == PMPCFG2 && st_prv == PRV_M) || (du_we_csr && du_addr == PMPCFG2)) begin
+            if (idx < PMP_CNT && !csr_pmpcfg[idx][7]) begin
+              csr_pmpcfg[idx] <= csr_wval[(idx-8)*8 +: 8] & PMPCFG_MASK;
+            end
+          end    
         end
       end  //next idx
 
       for (idx = 12; idx < 16; idx = idx + 1) begin : gen_pmpcfg3
         always @(posedge clk, negedge rstn) begin
-          if (!rstn) csr_pmpcfg[idx] <= 'h0;
-          else if ((ex_csr_we && ex_csr_reg == PMPCFG3 && st_prv == PRV_M) || (du_we_csr && du_addr == PMPCFG3)) if (idx < PMP_CNT && !csr_pmpcfg[idx][7]) csr_pmpcfg[idx] <= csr_wval[(idx-12)*8 +: 8] & PMPCFG_MASK;
+          if (!rstn) begin
+            csr_pmpcfg[idx] <= 'h0;
+          end else if ((ex_csr_we && ex_csr_reg == PMPCFG3 && st_prv == PRV_M) || (du_we_csr && du_addr == PMPCFG3)) begin
+            if (idx < PMP_CNT && !csr_pmpcfg[idx][7]) begin
+              csr_pmpcfg[idx] <= csr_wval[(idx-12)*8 +: 8] & PMPCFG_MASK;
+            end
+          end
         end
       end  //next idx
 
@@ -1243,13 +1326,19 @@ module pu_riscv_state #(
         if (idx < PMP_CNT) begin
           if (idx == 15) begin
             always @(posedge clk, negedge rstn) begin
-              if (!rstn) csr_pmpaddr[idx] <= 'h0;
-              else if ((ex_csr_we && ex_csr_reg == (PMPADDR0 + idx) && st_prv == PRV_M && !csr_pmpcfg[idx][7]) || (du_we_csr && du_addr == (PMPADDR0 + idx))) csr_pmpaddr[idx] <= csr_wval;
+              if (!rstn) begin
+                csr_pmpaddr[idx] <= 'h0;
+              end else if ((ex_csr_we && ex_csr_reg == (PMPADDR0 + idx) && st_prv == PRV_M && !csr_pmpcfg[idx][7]) || (du_we_csr && du_addr == (PMPADDR0 + idx))) begin
+                csr_pmpaddr[idx] <= csr_wval;
+              end
             end
           end else begin
             always @(posedge clk, negedge rstn) begin
-              if (!rstn) csr_pmpaddr[idx] <= 'h0;
-              else if ((ex_csr_we && ex_csr_reg == (PMPADDR0 + idx) && st_prv == PRV_M && !csr_pmpcfg[idx][7] && !(csr_pmpcfg[idx+1][4:3] == TOR && csr_pmpcfg[idx+1][7])) || (du_we_csr && du_addr == (PMPADDR0 + idx))) csr_pmpaddr[idx] <= csr_wval;
+              if (!rstn) begin
+                csr_pmpaddr[idx] <= 'h0;
+              end else if ((ex_csr_we && ex_csr_reg == (PMPADDR0 + idx) && st_prv == PRV_M && !csr_pmpcfg[idx][7] && !(csr_pmpcfg[idx+1][4:3] == TOR && csr_pmpcfg[idx+1][7])) || (du_we_csr && du_addr == (PMPADDR0 + idx))) begin
+                csr_pmpaddr[idx] <= csr_wval;
+              end  
             end
           end
         end else begin
@@ -1270,32 +1359,47 @@ module pu_riscv_state #(
     if (HAS_SUPER) begin
       //stvec
       always @(posedge clk, negedge rstn) begin
-        if (!rstn) csr_stvec <= STVEC_DEFAULT;
-        else if ((ex_csr_we && ex_csr_reg == STVEC && st_prv >= PRV_S) || (du_we_csr && du_addr == STVEC)) csr_stvec <= csr_wval & ~'h2;
+        if (!rstn) begin
+          csr_stvec <= STVEC_DEFAULT;
+        end else if ((ex_csr_we && ex_csr_reg == STVEC && st_prv >= PRV_S) || (du_we_csr && du_addr == STVEC)) begin
+          csr_stvec <= csr_wval & ~'h2;
+        end
       end
 
       //scounteren
       always @(posedge clk, negedge rstn) begin
-        if (!rstn) csr_scounteren <= 'h0;
-        else if ((ex_csr_we && ex_csr_reg == SCOUNTEREN && st_prv == PRV_M) || (du_we_csr && du_addr == SCOUNTEREN)) csr_scounteren <= csr_wval & 'h7;
+        if (!rstn) begin
+          csr_scounteren <= 'h0;
+        end else if ((ex_csr_we && ex_csr_reg == SCOUNTEREN && st_prv == PRV_M) || (du_we_csr && du_addr == SCOUNTEREN)) begin
+          csr_scounteren <= csr_wval & 'h7;
+        end
       end
 
       //sedeleg
       always @(posedge clk, negedge rstn) begin
-        if (!rstn) csr_sedeleg <= 'h0;
-        else if ((ex_csr_we && ex_csr_reg == SEDELEG && st_prv >= PRV_S) || (du_we_csr && du_addr == SEDELEG)) csr_sedeleg <= csr_wval & ((1 << CAUSE_UMODE_ECALL) | (1 << CAUSE_SMODE_ECALL));
+        if (!rstn) begin
+          csr_sedeleg <= 'h0;
+        end else if ((ex_csr_we && ex_csr_reg == SEDELEG && st_prv >= PRV_S) || (du_we_csr && du_addr == SEDELEG)) begin
+          csr_sedeleg <= csr_wval & ((1 << CAUSE_UMODE_ECALL) | (1 << CAUSE_SMODE_ECALL));
+        end
       end
 
       //sscratch
       always @(posedge clk, negedge rstn) begin
-        if (!rstn) csr_sscratch <= 'h0;
-        else if ((ex_csr_we && ex_csr_reg == SSCRATCH && st_prv >= PRV_S) || (du_we_csr && du_addr == SSCRATCH)) csr_sscratch <= csr_wval;
+        if (!rstn) begin
+          csr_sscratch <= 'h0;
+        end else if ((ex_csr_we && ex_csr_reg == SSCRATCH && st_prv >= PRV_S) || (du_we_csr && du_addr == SSCRATCH)) begin
+          csr_sscratch <= csr_wval;
+        end
       end
 
       //satp
       always @(posedge clk, negedge rstn) begin
-        if (!rstn) csr_satp <= 'h0;
-        else if ((ex_csr_we && ex_csr_reg == SATP && st_prv >= PRV_S) || (du_we_csr && du_addr == SATP)) csr_satp <= ex_csr_wval;
+        if (!rstn) begin
+          csr_satp <= 'h0;
+        end else if ((ex_csr_we && ex_csr_reg == SATP && st_prv >= PRV_S) || (du_we_csr && du_addr == SATP)) begin
+          csr_satp <= ex_csr_wval;
+        end
       end
     end else begin  //NO SUPERVISOR MODE
       assign csr_stvec      = 'h0;
@@ -1316,14 +1420,20 @@ module pu_riscv_state #(
     if (HAS_USER) begin
       //utvec
       always @(posedge clk, negedge rstn) begin
-        if (!rstn) csr_utvec <= UTVEC_DEFAULT;
-        else if ((ex_csr_we && ex_csr_reg == UTVEC) || (du_we_csr && du_addr == UTVEC)) csr_utvec <= {csr_wval[XLEN-1:2], 2'b00};
+        if (!rstn) begin
+          csr_utvec <= UTVEC_DEFAULT;
+        end else if ((ex_csr_we && ex_csr_reg == UTVEC) || (du_we_csr && du_addr == UTVEC)) begin
+          csr_utvec <= {csr_wval[XLEN-1:2], 2'b00};
+        end
       end
 
       //uscratch
       always @(posedge clk, negedge rstn) begin
-        if (!rstn) csr_uscratch <= 'h0;
-        else if ((ex_csr_we && ex_csr_reg == USCRATCH) || (du_we_csr && du_addr == USCRATCH)) csr_uscratch <= csr_wval;
+        if (!rstn) begin
+          csr_uscratch <= 'h0;
+        end else if ((ex_csr_we && ex_csr_reg == USCRATCH) || (du_we_csr && du_addr == USCRATCH)) begin
+          csr_uscratch <= csr_wval;
+        end
       end
 
       //Floating point registers
