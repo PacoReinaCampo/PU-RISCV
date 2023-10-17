@@ -56,7 +56,7 @@ entity pu_riscv_lsu is
     XLEN           : integer := 64;
     ILEN           : integer := 64;
     EXCEPTION_SIZE : integer := 16
-  );
+    );
   port (
     rstn : in std_logic;
     clk  : in std_logic;
@@ -96,7 +96,7 @@ entity pu_riscv_lsu is
     dmem_q          : in std_logic_vector(XLEN-1 downto 0);
     dmem_misaligned : in std_logic;
     dmem_page_fault : in std_logic
-  );
+    );
 end pu_riscv_lsu;
 
 architecture rtl of pu_riscv_lsu is

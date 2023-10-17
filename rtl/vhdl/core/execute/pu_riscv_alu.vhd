@@ -56,7 +56,7 @@ entity pu_riscv_alu is
     XLEN    : integer   := 64;
     ILEN    : integer   := 64;
     HAS_RVC : std_logic := '1'
-  );
+    );
   port (
     rstn : in std_logic;
     clk  : in std_logic;
@@ -86,7 +86,7 @@ entity pu_riscv_alu is
     --From State
     st_csr_rval : in std_logic_vector(XLEN-1 downto 0);
     st_xlen     : in std_logic_vector(1 downto 0)
-  );
+    );
 end pu_riscv_alu;
 
 architecture rtl of pu_riscv_alu is

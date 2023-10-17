@@ -58,7 +58,7 @@ entity pu_riscv_if is
     EXCEPTION_SIZE : integer := 16;
 
     PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
-  );
+    );
   port (
     rstn     : in std_logic;            --Reset
     clk      : in std_logic;            --Clock
@@ -90,7 +90,7 @@ entity pu_riscv_if is
     if_stall  : out std_logic;  --stall instruction fetch BIU (cache/bus-interface)
     if_flush  : out std_logic;  --flush instruction fetch BIU (cache/bus-interface)
     if_pc     : out std_logic_vector(XLEN-1 downto 0)   --Program Counter
-  );
+    );
 end pu_riscv_if;
 
 architecture rtl of pu_riscv_if is

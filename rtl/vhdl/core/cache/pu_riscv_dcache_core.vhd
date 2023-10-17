@@ -62,7 +62,7 @@ entity pu_riscv_dcache_core is
     DCACHE_REPLACE_ALG : integer := 0;
 
     TECHNOLOGY : string := "GENERIC"
-  );
+    );
   port (
     rst_ni : in std_logic;
     clk_i  : in std_logic;
@@ -98,7 +98,7 @@ entity pu_riscv_dcache_core is
     biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --read data
     biu_ack_i     : in  std_logic;      --transfer acknowledge
     biu_err_i     : in  std_logic       --transfer error
-  );
+    );
 end pu_riscv_dcache_core;
 
 architecture rtl of pu_riscv_dcache_core is
@@ -107,7 +107,7 @@ architecture rtl of pu_riscv_dcache_core is
       ABITS      : integer := 10;
       DBITS      : integer := 32;
       TECHNOLOGY : string  := "GENERIC"
-    );
+      );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -117,7 +117,7 @@ architecture rtl of pu_riscv_dcache_core is
       be_i   : in  std_logic_vector((DBITS+7)/8-1 downto 0);
       din_i  : in  std_logic_vector(DBITS-1 downto 0);
       dout_o : out std_logic_vector(DBITS-1 downto 0)
-    );
+      );
   end component;
 
   ------------------------------------------------------------------------------
@@ -673,7 +673,7 @@ begin
         be_i   => (others => '1'),
         din_i  => tag_in_tag(way),
         dout_o => tag_out_tag(way)
-      );
+        );
 
     --tag-register for bypass (RAW hazard)
     processing_10 : process (clk_i)
@@ -787,7 +787,7 @@ begin
         be_i   => dat_be,
         din_i  => dat_in,
         dout_o => dat_out(way)
-      );
+        );
 
     --assign way_q; Build MUX (AND/OR) structure
     generating_4 : if (way = 0) generate

@@ -59,7 +59,7 @@ entity pu_riscv_execution is
     MULT_LATENCY   : std_logic := '1';
 
     PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
-  );
+    );
   port (
     rstn : in std_logic;
     clk  : in std_logic;
@@ -142,7 +142,7 @@ entity pu_riscv_execution is
     du_we_pc     : in std_logic;
     du_dato      : in std_logic_vector(XLEN-1 downto 0);
     du_ie        : in std_logic_vector(31 downto 0)
-  );
+    );
 end pu_riscv_execution;
 
 architecture rtl of pu_riscv_execution is
@@ -151,7 +151,7 @@ architecture rtl of pu_riscv_execution is
       XLEN    : integer   := 64;
       ILEN    : integer   := 64;
       HAS_RVC : std_logic := '1'
-    );
+      );
     port (
       rstn : in std_logic;
       clk  : in std_logic;
@@ -181,7 +181,7 @@ architecture rtl of pu_riscv_execution is
       --From State
       st_csr_rval : in std_logic_vector(XLEN-1 downto 0);
       st_xlen     : in std_logic_vector(1 downto 0)
-    );
+      );
   end component;
 
   component pu_riscv_lsu
@@ -189,7 +189,7 @@ architecture rtl of pu_riscv_execution is
       XLEN           : integer := 64;
       ILEN           : integer := 64;
       EXCEPTION_SIZE : integer := 16
-    );
+      );
     port (
       rstn : in std_logic;
       clk  : in std_logic;
@@ -227,7 +227,7 @@ architecture rtl of pu_riscv_execution is
       dmem_q          : in std_logic_vector(XLEN-1 downto 0);
       dmem_misaligned : in std_logic;
       dmem_page_fault : in std_logic
-    );
+      );
   end component;
 
   component pu_riscv_bu
@@ -239,7 +239,7 @@ architecture rtl of pu_riscv_execution is
 
       HAS_RVC : std_logic                     := '1';
       PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
-    );
+      );
     port (
       rstn : in std_logic;
       clk  : in std_logic;
@@ -278,14 +278,14 @@ architecture rtl of pu_riscv_execution is
       du_we_pc : in std_logic;
       du_dato  : in std_logic_vector(XLEN-1 downto 0);
       du_ie    : in std_logic_vector(31 downto 0)
-    );
+      );
   end component;
 
   component pu_riscv_mul
     generic (
       XLEN : integer := 64;
       ILEN : integer := 64
-    );
+      );
     port (
       rstn : in std_logic;
       clk  : in std_logic;
@@ -307,14 +307,14 @@ architecture rtl of pu_riscv_execution is
       --to WB
       mul_bubble : out std_logic;
       mul_r      : out std_logic_vector(XLEN-1 downto 0)
-    );
+      );
   end component;
 
   component pu_riscv_div
     generic (
       XLEN : integer := 64;
       ILEN : integer := 64
-    );
+      );
     port (
       rstn : in std_logic;
       clk  : in std_logic;
@@ -336,7 +336,7 @@ architecture rtl of pu_riscv_execution is
       --To WB
       div_bubble : out std_logic;
       div_r      : out std_logic_vector(XLEN-1 downto 0)
-    );
+      );
   end component;
 
   ------------------------------------------------------------------------------
@@ -486,7 +486,7 @@ begin
       ex_csr_we   => ex_csr_we,
       st_csr_rval => st_csr_rval,
       st_xlen     => st_xlen
-    );
+      );
 
   -- Load-Store Unit
   lsu : pu_riscv_lsu
@@ -521,7 +521,7 @@ begin
       dmem_q          => dmem_q,
       dmem_misaligned => dmem_misaligned,
       dmem_page_fault => dmem_page_fault
-    );
+      );
 
   -- Branch Unit
   bu : pu_riscv_bu
@@ -562,7 +562,7 @@ begin
       du_we_pc      => du_we_pc,
       du_dato       => du_dato,
       du_ie         => du_ie
-    );
+      );
 
   ex_exception <= ex_exception_sgn;
 
@@ -584,7 +584,7 @@ begin
         st_xlen    => st_xlen,
         mul_bubble => mul_bubble,
         mul_r      => mul_r
-      );
+        );
 
     div : pu_riscv_div
       generic map (
@@ -603,7 +603,7 @@ begin
         st_xlen    => st_xlen,
         div_bubble => div_bubble,
         div_r      => div_r
-      );
+        );
   elsif (HAS_RVM = '0') generate
     mul_bubble <= '1';
     mul_r      <= (others => '0');

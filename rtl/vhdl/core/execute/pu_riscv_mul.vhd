@@ -54,7 +54,7 @@ entity pu_riscv_mul is
   generic (
     XLEN : integer := 64;
     ILEN : integer := 64
-  );
+    );
   port (
     rstn : in std_logic;
     clk  : in std_logic;
@@ -76,7 +76,7 @@ entity pu_riscv_mul is
     --to WB
     mul_bubble : out std_logic;
     mul_r      : out std_logic_vector(XLEN-1 downto 0)
-  );
+    );
 end pu_riscv_mul;
 
 architecture rtl of pu_riscv_mul is

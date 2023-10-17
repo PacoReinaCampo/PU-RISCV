@@ -55,7 +55,7 @@ entity pu_riscv_rf is
     AR_BITS : integer := 5;
     RDPORTS : integer := 2;
     WRPORTS : integer := 1
-  );
+    );
   port (
     rstn : in std_logic;
     clk  : in std_logic;
@@ -77,7 +77,7 @@ entity pu_riscv_rf is
     du_dato    : in  std_logic_vector(XLEN-1 downto 0);  --output from debug unit
     du_dati_rf : out std_logic_vector(XLEN-1 downto 0);
     du_addr    : in  std_logic_vector(11 downto 0)
-  );
+    );
 end pu_riscv_rf;
 
 architecture rtl of pu_riscv_rf is

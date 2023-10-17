@@ -56,7 +56,7 @@ entity pu_riscv_pmachk is
     XLEN    : integer := 64;
     PLEN    : integer := 64;
     PMA_CNT : integer := 4
-  );
+    );
   port (
     --PMA  configuration
     pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
@@ -79,7 +79,7 @@ entity pu_riscv_pmachk is
     is_cache_access_o : out std_logic;
     is_ext_access_o   : out std_logic;
     is_tcm_access_o   : out std_logic
-  );
+    );
 end pu_riscv_pmachk;
 
 architecture rtl of pu_riscv_pmachk is

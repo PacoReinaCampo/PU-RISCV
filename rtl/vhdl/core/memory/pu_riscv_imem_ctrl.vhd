@@ -71,7 +71,7 @@ entity pu_riscv_imem_ctrl is
     ITCM_SIZE          : integer := 0;
 
     TECHNOLOGY : string := "GENERIC"
-  );
+    );
   port (
     rst_ni : in std_logic;
     clk_i  : in std_logic;
@@ -113,7 +113,7 @@ entity pu_riscv_imem_ctrl is
     biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);
     biu_ack_i     : in  std_logic;
     biu_err_i     : in  std_logic
-  );
+    );
 end pu_riscv_imem_ctrl;
 
 architecture rtl of pu_riscv_imem_ctrl is
@@ -121,7 +121,7 @@ architecture rtl of pu_riscv_imem_ctrl is
     generic (
       DEPTH : integer := 2;
       DBITS : integer := 32
-    );
+      );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -140,14 +140,14 @@ architecture rtl of pu_riscv_imem_ctrl is
 
       empty_o : out std_logic;
       full_o  : out std_logic
-    );
+      );
   end component;
 
   component pu_riscv_memmisaligned
     generic (
       XLEN    : integer   := 64;
       HAS_RVC : std_logic := '1'
-    );
+      );
     port (
       clk_i : in std_logic;
 
@@ -159,14 +159,14 @@ architecture rtl of pu_riscv_imem_ctrl is
 
       --To memory subsystem
       misaligned_o : out std_logic
-    );
+      );
   end component;
 
   component pu_riscv_mmu
     generic (
       XLEN : integer := 64;
       PLEN : integer := 64
-    );
+      );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -197,7 +197,7 @@ architecture rtl of pu_riscv_imem_ctrl is
 
       --Exception
       page_fault_o : out std_logic
-    );
+      );
   end component;
 
   component pu_riscv_pmachk
@@ -205,7 +205,7 @@ architecture rtl of pu_riscv_imem_ctrl is
       XLEN    : integer := 64;
       PLEN    : integer := 64;
       PMA_CNT : integer := 4
-    );
+      );
     port (
       --PMA  configuration
       pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
@@ -228,7 +228,7 @@ architecture rtl of pu_riscv_imem_ctrl is
       is_cache_access_o : out std_logic;
       is_ext_access_o   : out std_logic;
       is_tcm_access_o   : out std_logic
-    );
+      );
   end component;
 
   component pu_riscv_pmpchk
@@ -236,7 +236,7 @@ architecture rtl of pu_riscv_imem_ctrl is
       XLEN    : integer := 64;
       PLEN    : integer := 64;
       PMP_CNT : integer := 16
-    );
+      );
     port (
       --From State
       st_pmpcfg_i  : in std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
@@ -252,7 +252,7 @@ architecture rtl of pu_riscv_imem_ctrl is
 
       --Output
       exception_o : out std_logic
-    );
+      );
   end component;
 
   component pu_riscv_icache_core
@@ -266,7 +266,7 @@ architecture rtl of pu_riscv_imem_ctrl is
       ICACHE_REPLACE_ALG : integer := 0;
 
       TECHNOLOGY : string := "GENERIC"
-    );
+      );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -301,7 +301,7 @@ architecture rtl of pu_riscv_imem_ctrl is
       biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --read data
       biu_ack_i     : in  std_logic;    --transfer acknowledge
       biu_err_i     : in  std_logic     --transfer error
-    );
+      );
   end component;
 
   component pu_riscv_dext
@@ -309,7 +309,7 @@ architecture rtl of pu_riscv_imem_ctrl is
       XLEN  : integer := 64;
       PLEN  : integer := 64;            --Physical address bus size
       DEPTH : integer := 2              --number of instructions in flight
-    );
+      );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -344,7 +344,7 @@ architecture rtl of pu_riscv_imem_ctrl is
       biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);
       biu_ack_i     : in  std_logic;    --data acknowledge, 1 per data
       biu_err_i     : in  std_logic     --data error
-    );
+      );
   end component;
 
   component pu_riscv_ram_queue
@@ -353,7 +353,7 @@ architecture rtl of pu_riscv_imem_ctrl is
       DBITS                  : integer := 64;
       ALMOST_FULL_THRESHOLD  : integer := 4;
       ALMOST_EMPTY_THRESHOLD : integer := 0
-    );
+      );
     port (
       rst_ni : in std_logic;            --asynchronous, active low reset
       clk_i  : in std_logic;            --rising edge triggered clock
@@ -374,7 +374,7 @@ architecture rtl of pu_riscv_imem_ctrl is
       full_o         : out std_logic;   --Queue is full
       almost_empty_o : out std_logic;   --Programmable almost empty
       almost_full_o  : out std_logic    --Programmable almost full
-    );
+      );
   end component;
 
   component pu_riscv_mux
@@ -382,7 +382,7 @@ architecture rtl of pu_riscv_imem_ctrl is
       XLEN  : integer := 64;
       PLEN  : integer := 64;
       PORTS : integer := 2
-    );
+      );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -418,7 +418,7 @@ architecture rtl of pu_riscv_imem_ctrl is
       biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --data from BIU
       biu_ack_i     : in  std_logic;    --data acknowledge, 1 per data
       biu_err_i     : in  std_logic     --data error
-    );
+      );
   end component;
 
   ------------------------------------------------------------------------------
@@ -590,7 +590,7 @@ begin
 
       empty_o => open,
       full_o  => nxt_pc_queue_full
-    );
+      );
 
   --stall nxt_pc when queues full, or when DCACHE is flushing
   stall_nxt_pc_o <= nxt_pc_queue_full or parcel_queue_full or not dcflush_rdy_i;
@@ -616,7 +616,7 @@ begin
       adr_i         => buf_adr,
       size_i        => buf_size,
       misaligned_o  => misaligned
-    );
+      );
 
   -- Hookup MMU
   mmu_inst : pu_riscv_mmu
@@ -648,7 +648,7 @@ begin
       pack_i  => '0',
 
       page_fault_o => page_fault
-    );
+      );
 
   --Hookup Physical Memory Atrributes Unit
   pmachk_inst : pu_riscv_pmachk
@@ -680,7 +680,7 @@ begin
       is_cache_access_o => is_cache_access,
       is_ext_access_o   => is_ext_access,
       is_tcm_access_o   => is_tcm_access
-    );
+      );
 
   --Hookup Physical Memory Protection Unit
   pmpchk_inst : pu_riscv_pmpchk
@@ -701,7 +701,7 @@ begin
       we_i          => '0',             --Read/Write enable
 
       exception_o => pmp_exception
-    );
+      );
 
   --Hookup Cache, TCM, external-interface
   generating_0 : if (ICACHE_SIZE > 0) generate
@@ -753,7 +753,7 @@ begin
         biu_q_i       => biu_q (CACHE),
         biu_ack_i     => biu_ack (CACHE),
         biu_err_i     => biu_err (CACHE)
-      );
+        );
   elsif (ICACHE_SIZE <= 0) generate     --No cache
     cache_q   <= (others => '0');
     cache_ack <= '0';
@@ -817,7 +817,7 @@ begin
       biu_q_i       => biu_q (EXT),
       biu_ack_i     => biu_ack (EXT),
       biu_err_i     => biu_err (EXT)
-    );
+      );
 
   --store virtual addresses for external access
   ext_vadr_queue_inst : pu_riscv_ram_queue
@@ -844,7 +844,7 @@ begin
       almost_full_o  => open,
       empty_o        => open,
       full_o         => open
-    );
+      );
   --stall access requests when full (AXI bus ...)
 
   --Hookup BIU mux
@@ -887,7 +887,7 @@ begin
       biu_q_i       => biu_q_i,
       biu_ack_i     => biu_ack_i,
       biu_err_i     => biu_err_i
-    );
+      );
 
   --Results back to CPU
   parcel_valid <= (ext_ack or cache_ack or tcm_ack) &
@@ -953,7 +953,7 @@ begin
       almost_full_o  => parcel_queue_full,
       empty_o        => parcel_queue_empty,
       full_o         => open
-    );
+      );
 
   re_i_queue <= not parcel_queue_empty and not stall_i;
 

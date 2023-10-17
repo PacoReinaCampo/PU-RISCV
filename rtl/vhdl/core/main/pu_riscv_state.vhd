@@ -86,7 +86,7 @@ entity pu_riscv_state is
 
     PMP_CNT : integer := 16;
     HARTID  : integer := 0
-  );
+    );
   port (
     rstn : in std_logic;
     clk  : in std_logic;
@@ -138,7 +138,7 @@ entity pu_riscv_state is
     du_addr       : in  std_logic_vector(11 downto 0);
     du_ie         : in  std_logic_vector(31 downto 0);
     du_exceptions : out std_logic_vector(31 downto 0)
-  );
+    );
 end pu_riscv_state;
 
 architecture rtl of pu_riscv_state is

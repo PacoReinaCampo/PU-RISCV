@@ -120,7 +120,7 @@ entity riscv_ahb2axi is
     ahb3_hreadyin  : in  std_logic;
     ahb3_hreadyout : out std_logic
     ahb3_hresp     : out std_logic
-  );
+    );
   constant AXI_ID_WIDTH   : integer := 10;
   constant AXI_ADDR_WIDTH : integer := 64;
   constant AXI_DATA_WIDTH : integer := 64;

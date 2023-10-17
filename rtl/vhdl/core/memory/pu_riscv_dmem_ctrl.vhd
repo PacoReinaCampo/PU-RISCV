@@ -68,7 +68,7 @@ entity pu_riscv_dmem_ctrl is
     DTCM_SIZE          : integer := 0;
 
     TECHNOLOGY : string := "GENERIC"
-  );
+    );
   port (
     rst_ni : in std_logic;
     clk_i  : in std_logic;
@@ -111,7 +111,7 @@ entity pu_riscv_dmem_ctrl is
     biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);
     biu_ack_i     : in  std_logic;
     biu_err_i     : in  std_logic
-  );
+    );
 end pu_riscv_dmem_ctrl;
 
 architecture rtl of pu_riscv_dmem_ctrl is
@@ -119,7 +119,7 @@ architecture rtl of pu_riscv_dmem_ctrl is
     generic (
       DEPTH : integer := 2;
       DBITS : integer := 32
-    );
+      );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -138,14 +138,14 @@ architecture rtl of pu_riscv_dmem_ctrl is
 
       empty_o : out std_logic;
       full_o  : out std_logic
-    );
+      );
   end component;
 
   component pu_riscv_memmisaligned
     generic (
       XLEN    : integer   := 64;
       HAS_RVC : std_logic := '1'
-    );
+      );
     port (
       clk_i : in std_logic;
 
@@ -157,14 +157,14 @@ architecture rtl of pu_riscv_dmem_ctrl is
 
       --To memory subsystem
       misaligned_o : out std_logic
-    );
+      );
   end component;
 
   component pu_riscv_mmu
     generic (
       XLEN : integer := 64;
       PLEN : integer := 64
-    );
+      );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -195,7 +195,7 @@ architecture rtl of pu_riscv_dmem_ctrl is
 
       --Exception
       page_fault_o : out std_logic
-    );
+      );
   end component;
 
   component pu_riscv_pmachk
@@ -203,7 +203,7 @@ architecture rtl of pu_riscv_dmem_ctrl is
       XLEN    : integer := 64;
       PLEN    : integer := 64;
       PMA_CNT : integer := 4
-    );
+      );
     port (
       --PMA  configuration
       pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
@@ -226,7 +226,7 @@ architecture rtl of pu_riscv_dmem_ctrl is
       is_cache_access_o : out std_logic;
       is_ext_access_o   : out std_logic;
       is_tcm_access_o   : out std_logic
-    );
+      );
   end component;
 
   component pu_riscv_pmpchk
@@ -234,7 +234,7 @@ architecture rtl of pu_riscv_dmem_ctrl is
       XLEN    : integer := 64;
       PLEN    : integer := 64;
       PMP_CNT : integer := 16
-    );
+      );
     port (
       --From State
       st_pmpcfg_i  : in std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
@@ -250,7 +250,7 @@ architecture rtl of pu_riscv_dmem_ctrl is
 
       --Output
       exception_o : out std_logic
-    );
+      );
   end component;
 
   component pu_riscv_dcache_core
@@ -264,7 +264,7 @@ architecture rtl of pu_riscv_dmem_ctrl is
       DCACHE_REPLACE_ALG : integer := 0;
 
       TECHNOLOGY : string := "GENERIC"
-    );
+      );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -300,7 +300,7 @@ architecture rtl of pu_riscv_dmem_ctrl is
       biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --read data
       biu_ack_i     : in  std_logic;    --transfer acknowledge
       biu_err_i     : in  std_logic     --transfer error
-    );
+      );
   end component;
 
   component pu_riscv_dext
@@ -308,7 +308,7 @@ architecture rtl of pu_riscv_dmem_ctrl is
       XLEN  : integer := 64;
       PLEN  : integer := 64;            --Physical address bus size
       DEPTH : integer := 2              --number of instructions in flight
-    );
+      );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -343,7 +343,7 @@ architecture rtl of pu_riscv_dmem_ctrl is
       biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);
       biu_ack_i     : in  std_logic;    --data acknowledge, 1 per data
       biu_err_i     : in  std_logic     --data error
-    );
+      );
   end component;
 
   component pu_riscv_mux
@@ -351,7 +351,7 @@ architecture rtl of pu_riscv_dmem_ctrl is
       XLEN  : integer := 64;
       PLEN  : integer := 64;
       PORTS : integer := 2
-    );
+      );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -387,7 +387,7 @@ architecture rtl of pu_riscv_dmem_ctrl is
       biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --data from BIU
       biu_ack_i     : in  std_logic;    --data acknowledge, 1 per data
       biu_err_i     : in  std_logic     --data error
-    );
+      );
   end component;
 
   ------------------------------------------------------------------------------
@@ -538,7 +538,7 @@ begin
 
       empty_o => open,
       full_o  => open
-    );
+      );
 
   buf_adr  <= queue_q(2*XLEN+4 downto XLEN+5);
   buf_size <= queue_q(XLEN+4 downto XLEN+2);
@@ -561,7 +561,7 @@ begin
       adr_i         => buf_adr,
       size_i        => buf_size,
       misaligned_o  => misaligned
-    );
+      );
 
   -- Hookup MMU
   mmu_inst : pu_riscv_mmu
@@ -593,7 +593,7 @@ begin
       pack_i  => '0',
 
       page_fault_o => mem_page_fault
-    );
+      );
 
   mem_page_fault_o <= mem_page_fault;
 
@@ -627,7 +627,7 @@ begin
       is_cache_access_o => is_cache_access,
       is_ext_access_o   => is_ext_access,
       is_tcm_access_o   => is_tcm_access
-    );
+      );
 
   mem_misaligned_o <= mem_misaligned;
 
@@ -650,7 +650,7 @@ begin
       we_i          => pwe,             --Read/Write enable
 
       exception_o => pmp_exception
-    );
+      );
 
   --Hookup Cache, TCM, external-interface
   generating_0 : if (DCACHE_SIZE > 0) generate
@@ -703,7 +703,7 @@ begin
         biu_q_i       => biu_q (CACHE),
         biu_ack_i     => biu_ack (CACHE),
         biu_err_i     => biu_err (CACHE)
-      );
+        );
   elsif (DCACHE_SIZE <= 0) generate     --No cache
     cache_q       <= (others => '0');
     cache_ack     <= '0';
@@ -771,7 +771,7 @@ begin
       biu_q_i       => biu_q (EXT),
       biu_ack_i     => biu_ack (EXT),
       biu_err_i     => biu_err (EXT)
-    );
+      );
 
   --Hookup BIU mux
   pu_riscv_mux_inst : pu_riscv_mux
@@ -813,7 +813,7 @@ begin
       biu_q_i       => biu_q_i,
       biu_ack_i     => biu_ack_i,
       biu_err_i     => biu_err_i
-    );
+      );
 
   --Results back to CPU
   mem_ack <= ext_ack or cache_ack or tcm_ack;

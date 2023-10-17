@@ -62,7 +62,7 @@ entity pu_riscv_du is
     MAX_BREAKPOINTS : integer := 8;
 
     BREAKPOINTS : integer := 3
-  );
+    );
   port (
     rstn : in std_logic;
     clk  : in std_logic;
@@ -109,7 +109,7 @@ entity pu_riscv_du is
 
     --From state
     du_exceptions : in std_logic_vector(31 downto 0)
-  );
+    );
 end pu_riscv_du;
 
 architecture rtl of pu_riscv_du is

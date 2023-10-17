@@ -57,7 +57,7 @@ entity pu_riscv_memory is
     EXCEPTION_SIZE : integer := 16;
 
     PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
-  );
+    );
   port (
     rstn : in std_logic;
     clk  : in std_logic;
@@ -85,7 +85,7 @@ entity pu_riscv_memory is
     --To WB
     mem_r      : out std_logic_vector(XLEN-1 downto 0);
     mem_memadr : out std_logic_vector(XLEN-1 downto 0)
-  );
+    );
 end pu_riscv_memory;
 
 architecture rtl of pu_riscv_memory is

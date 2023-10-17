@@ -56,7 +56,7 @@ entity pu_riscv_ram_queue is
     DBITS                  : integer := 64;
     ALMOST_FULL_THRESHOLD  : integer := 4;
     ALMOST_EMPTY_THRESHOLD : integer := 0
-  );
+    );
   port (
     rst_ni : in std_logic;              --asynchronous, active low reset
     clk_i  : in std_logic;              --rising edge triggered clock
@@ -77,7 +77,7 @@ entity pu_riscv_ram_queue is
     full_o         : out std_logic;     --Queue is full
     almost_empty_o : out std_logic;     --Programmable almost empty
     almost_full_o  : out std_logic      --Programmable almost full
-  );
+    );
 end pu_riscv_ram_queue;
 
 architecture rtl of pu_riscv_ram_queue is

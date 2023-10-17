@@ -62,7 +62,7 @@ entity pu_riscv_bp is
     AVOID_X : std_logic := '0';
 
     PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
-  );
+    );
   port (
     rst_ni : in std_logic;
     clk_i  : in std_logic;
@@ -78,7 +78,7 @@ entity pu_riscv_bp is
     bu_bp_predict_i : in std_logic_vector(1 downto 0);  --prediction bits for branch
     bu_bp_btaken_i  : in std_logic;
     bu_bp_update_i  : in std_logic
-  );
+    );
 end pu_riscv_bp;
 
 architecture rtl of pu_riscv_bp is
@@ -87,7 +87,7 @@ architecture rtl of pu_riscv_bp is
       ABITS      : integer := 10;
       DBITS      : integer := 32;
       TECHNOLOGY : string  := "GENERIC"
-    );
+      );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -100,7 +100,7 @@ architecture rtl of pu_riscv_bp is
       raddr_i : in  std_logic_vector(ABITS-1 downto 0);
       re_i    : in  std_logic;
       dout_o  : out std_logic_vector(DBITS-1 downto 0)
-    );
+      );
   end component;
 
   ------------------------------------------------------------------------------
@@ -167,7 +167,7 @@ begin
       raddr_i => radr,
       re_i    => '1',
       dout_o  => old_prediction
-    );
+      );
 
   bp_bp_predict_o <= old_prediction;
 end rtl;

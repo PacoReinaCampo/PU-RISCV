@@ -56,7 +56,7 @@ entity pu_riscv_mux is
     XLEN  : integer := 64;
     PLEN  : integer := 64;
     PORTS : integer := 2
-  );
+    );
   port (
     rst_ni : in std_logic;
     clk_i  : in std_logic;
@@ -92,7 +92,7 @@ entity pu_riscv_mux is
     biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --data from BIU
     biu_ack_i     : in  std_logic;      --data acknowledge, 1 per data
     biu_err_i     : in  std_logic       --data error
-  );
+    );
 end pu_riscv_mux;
 
 architecture rtl of pu_riscv_mux is

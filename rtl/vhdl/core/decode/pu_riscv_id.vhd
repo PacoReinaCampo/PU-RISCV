@@ -55,7 +55,7 @@ entity pu_riscv_id is
     XLEN           : integer := 64;
     ILEN           : integer := 64;
     EXCEPTION_SIZE : integer := 16
-  );
+    );
   port (
     rstn : in std_logic;
     clk  : in std_logic;
@@ -125,7 +125,7 @@ entity pu_riscv_id is
     --from MEM/WB
     mem_r : in std_logic_vector(XLEN-1 downto 0);
     wb_r  : in std_logic_vector(XLEN-1 downto 0)
-  );
+    );
 end pu_riscv_id;
 
 architecture rtl of pu_riscv_id is

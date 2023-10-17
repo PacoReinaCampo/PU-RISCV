@@ -54,7 +54,7 @@ entity pu_riscv_membuf is
   generic (
     DEPTH : integer := 2;
     DBITS : integer := 64
-  );
+    );
   port (
     rst_ni : in std_logic;
     clk_i  : in std_logic;
@@ -73,7 +73,7 @@ entity pu_riscv_membuf is
 
     empty_o : out std_logic;
     full_o  : out std_logic
-  );
+    );
 end pu_riscv_membuf;
 
 architecture rtl of pu_riscv_membuf is
@@ -83,7 +83,7 @@ architecture rtl of pu_riscv_membuf is
       DBITS                  : integer := 32;
       ALMOST_EMPTY_THRESHOLD : integer := 0;
       ALMOST_FULL_THRESHOLD  : integer := 2
-    );
+      );
     port (
       rst_ni : in std_logic;            --asynchronous, active low reset
       clk_i  : in std_logic;            --rising edge triggered clock
@@ -101,7 +101,7 @@ architecture rtl of pu_riscv_membuf is
       full_o         : out std_logic;   --Queue is full
       almost_empty_o : out std_logic;   --Programmable almost empty
       almost_full_o  : out std_logic    --Programmable almost full
-    );
+      );
   end component;
 
   ------------------------------------------------------------------------------
@@ -141,7 +141,7 @@ begin
       full_o         => full_o,
       almost_empty_o => open,
       almost_full_o  => open
-    );
+      );
 
   --control signals
   processing_0 : process (clk_i, rst_ni)

@@ -55,7 +55,7 @@ entity pu_riscv_div is
   generic (
     XLEN : integer := 64;
     ILEN : integer := 64
-  );
+    );
   port (
     rstn : in std_logic;
     clk  : in std_logic;
@@ -77,7 +77,7 @@ entity pu_riscv_div is
     --To WB
     div_bubble : out std_logic;
     div_r      : out std_logic_vector(XLEN-1 downto 0)
-  );
+    );
 end pu_riscv_div;
 
 architecture rtl of pu_riscv_div is
@@ -408,36 +408,36 @@ begin
               end if;
             when DIVW =>
               if (neg_q = '1') then
-              --div_r <= sext32(twos(pa_a));
+                div_r <= sext32(twos(pa_a));
               else
                 div_r <= pa_a;
-          end if;
-        when DIVU =>
-          div_r <= pa_a;
-        when DIVUW =>
-          div_r <= pa_a;
-        when REMX =>
-          if (neg_s = '1') then
-            div_r <= pa_p;
-          else
-            div_r <= pa_p;
-          end if;
-        when REMW =>
-          if (neg_s = '1') then
-          --div_r <= sext32(twos(pa_p));
-          else
-            div_r <= pa_p;
-      end if;
-    when REMU =>
-    div_r <= pa_p;
-    when REMUW =>
-    div_r <= pa_p;
-    when others =>
-    div_r <= (others => 'X');
-  end case;
-  when others =>
-  null;
-end case;
-end if;
-end process;
+              end if;
+            when DIVU =>
+              div_r <= pa_a;
+            when DIVUW =>
+              div_r <= pa_a;
+            when REMX =>
+              if (neg_s = '1') then
+                div_r <= pa_p;
+              else
+                div_r <= pa_p;
+              end if;
+            when REMW =>
+              if (neg_s = '1') then
+                div_r <= sext32(twos(pa_p));
+              else
+                div_r <= pa_p;
+              end if;
+            when REMU =>
+              div_r <= pa_p;
+            when REMUW =>
+              div_r <= pa_p;
+            when others =>
+              div_r <= (others => 'X');
+          end case;
+        when others =>
+          null;
+      end case;
+    end if;
+  end process;
 end rtl;

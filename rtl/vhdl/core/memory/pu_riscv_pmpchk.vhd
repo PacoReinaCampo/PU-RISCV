@@ -56,7 +56,7 @@ entity pu_riscv_pmpchk is
     XLEN    : integer := 64;
     PLEN    : integer := 64;
     PMP_CNT : integer := 16
-  );
+    );
   port (
     --From State
     st_pmpcfg_i  : in std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
@@ -72,7 +72,7 @@ entity pu_riscv_pmpchk is
 
     --Output
     exception_o : out std_logic
-  );
+    );
 end pu_riscv_pmpchk;
 
 architecture rtl of pu_riscv_pmpchk is

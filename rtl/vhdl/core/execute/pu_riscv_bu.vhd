@@ -60,7 +60,7 @@ entity pu_riscv_bu is
 
     HAS_RVC : std_logic                     := '1';
     PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
-  );
+    );
   port (
     rstn : in std_logic;
     clk  : in std_logic;
@@ -99,7 +99,7 @@ entity pu_riscv_bu is
     du_we_pc : in std_logic;
     du_dato  : in std_logic_vector(XLEN-1 downto 0);
     du_ie    : in std_logic_vector(31 downto 0)
-  );
+    );
 end pu_riscv_bu;
 
 architecture rtl of pu_riscv_bu is

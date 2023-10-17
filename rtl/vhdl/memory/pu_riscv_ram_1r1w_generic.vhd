@@ -53,7 +53,7 @@ entity pu_riscv_ram_1r1w_generic is
   generic (
     ABITS : integer := 10;
     DBITS : integer := 32
-  );
+    );
   port (
     rst_ni : in std_logic;
     clk_i  : in std_logic;
@@ -67,7 +67,7 @@ entity pu_riscv_ram_1r1w_generic is
     --Read side
     raddr_i : in  std_logic_vector(ABITS-1 downto 0);
     dout_o  : out std_logic_vector(DBITS-1 downto 0)
-  );
+    );
 end pu_riscv_ram_1r1w_generic;
 
 architecture rtl of pu_riscv_ram_1r1w_generic is

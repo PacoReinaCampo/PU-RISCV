@@ -52,13 +52,13 @@
 ../../../../../../../rtl/vhdl/core/cache/pu_riscv_icache_core.vhd
 ../../../../../../../rtl/vhdl/core/cache/pu_riscv_noicache_core.vhd
 ../../../../../../../rtl/vhdl/core/decode/pu_riscv_id.vhd
-../../../../../../../rtl/vhdl/core/decode/pu_riscv_if.vhd
 ../../../../../../../rtl/vhdl/core/execute/pu_riscv_alu.vhd
 ../../../../../../../rtl/vhdl/core/execute/pu_riscv_bu.vhd
 ../../../../../../../rtl/vhdl/core/execute/pu_riscv_div.vhd
 ../../../../../../../rtl/vhdl/core/execute/pu_riscv_execution.vhd
 ../../../../../../../rtl/vhdl/core/execute/pu_riscv_lsu.vhd
 ../../../../../../../rtl/vhdl/core/execute/pu_riscv_mul.vhd
+../../../../../../../rtl/vhdl/core/fetch/pu_riscv_if.vhd
 ../../../../../../../rtl/vhdl/core/memory/pu_riscv_dmem_ctrl.vhd
 ../../../../../../../rtl/vhdl/core/memory/pu_riscv_imem_ctrl.vhd
 ../../../../../../../rtl/vhdl/core/memory/pu_riscv_membuf.vhd

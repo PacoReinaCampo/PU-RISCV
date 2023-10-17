@@ -62,7 +62,7 @@ entity pu_riscv_biu2axi4 is
     AXI_USER_WIDTH : integer := 10;
     AHB_ADDR_WIDTH : integer := 64;
     AHB_DATA_WIDTH : integer := 64
-  );
+    );
   port (
     HRESETn : in std_logic;
     HCLK    : in std_logic;
@@ -132,7 +132,7 @@ entity pu_riscv_biu2axi4 is
     biu_q_o       : out std_logic_vector(XLEN-1 downto 0);
     biu_ack_o     : out std_logic       --transfer acknowledge
     biu_err_o     : out std_logic       --transfer error
-  );
+    );
 end pu_riscv_biu2axi4;
 
 architecture rtl of pu_riscv_biu2axi4 is
@@ -144,7 +144,7 @@ architecture rtl of pu_riscv_biu2axi4 is
       ? : std_logic_vector(? downto 0) := ?;
       ? : std_logic_vector(? downto 0) := ?;
       ? : std_logic_vector(? downto 0) := ?
-    );
+      );
     port (
       clk            : std_logic_vector(? downto 0);
       rst_l          : std_logic_vector(? downto 0);
@@ -207,7 +207,7 @@ architecture rtl of pu_riscv_biu2axi4 is
       ahb3_hreadyin  : std_logic_vector(? downto 0);
       ahb3_hreadyout : std_logic_vector(? downto 0);
       ahb3_hresp     : std_logic_vector(? downto 0)
-    );
+      );
   end component;
 
 
@@ -562,5 +562,5 @@ begin
       ahb3_hreadyin  => hreadyin,
       ahb3_hreadyout => hreadyout,
       ahb3_hresp     => hresp
-    );
+      );
 end rtl;

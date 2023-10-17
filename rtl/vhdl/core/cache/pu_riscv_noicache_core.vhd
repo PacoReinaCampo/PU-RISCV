@@ -56,7 +56,7 @@ entity pu_riscv_noicache_core is
     XLEN        : integer := 64;
     PLEN        : integer := 64;
     PARCEL_SIZE : integer := 64
-  );
+    );
 
   port (
     rstn : in std_logic;
@@ -92,7 +92,7 @@ entity pu_riscv_noicache_core is
     biu_is_cacheable   : out std_logic;
     biu_is_instruction : out std_logic;
     biu_prv            : out std_logic_vector(1 downto 0)
-  );
+    );
 end pu_riscv_noicache_core;
 
 architecture rtl of pu_riscv_noicache_core is

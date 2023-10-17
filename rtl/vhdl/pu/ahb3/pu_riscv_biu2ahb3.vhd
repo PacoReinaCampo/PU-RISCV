@@ -55,7 +55,7 @@ entity pu_riscv_biu2ahb3 is
   generic (
     XLEN : integer := 64;
     PLEN : integer := 64
-  );
+    );
   port (
     HRESETn : in std_logic;
     HCLK    : in std_logic;
@@ -89,7 +89,7 @@ entity pu_riscv_biu2ahb3 is
     biu_q_o       : out std_logic_vector(XLEN-1 downto 0);
     biu_ack_o     : out std_logic;      --transfer acknowledge
     biu_err_o     : out std_logic       --transfer error
-  );
+    );
 end pu_riscv_biu2ahb3;
 
 architecture rtl of pu_riscv_biu2ahb3 is

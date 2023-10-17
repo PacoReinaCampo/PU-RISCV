@@ -51,7 +51,7 @@ entity pu_riscv_mmu is
   generic (
     XLEN : integer := 64;
     PLEN : integer := 64
-  );
+    );
   port (
     rst_ni : in std_logic;
     clk_i  : in std_logic;
@@ -82,7 +82,7 @@ entity pu_riscv_mmu is
 
     --Exception
     page_fault_o : out std_logic
-  );
+    );
 end pu_riscv_mmu;
 
 architecture rtl of pu_riscv_mmu is

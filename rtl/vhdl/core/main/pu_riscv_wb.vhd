@@ -59,7 +59,7 @@ entity pu_riscv_wb is
     EXCEPTION_SIZE : integer := 16;
 
     PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
-  );
+    );
   port (
     rst_ni : in std_logic;              --Reset
     clk_i  : in std_logic;              --Clock
@@ -92,7 +92,7 @@ entity pu_riscv_wb is
     wb_dst_o : out std_logic_vector(4 downto 0);
     wb_r_o   : out std_logic_vector(XLEN-1 downto 0);
     wb_we_o  : out std_logic
-  );
+    );
 end pu_riscv_wb;
 
 architecture rtl of pu_riscv_wb is

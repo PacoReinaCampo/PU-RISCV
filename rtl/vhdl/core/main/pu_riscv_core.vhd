@@ -97,7 +97,7 @@ entity pu_riscv_core is
     HARTID : integer := 0;
 
     PARCEL_SIZE : integer := 64
-  );
+    );
   port (
     rstn : in std_logic;                --Reset
     clk  : in std_logic;                --Clock
@@ -147,7 +147,7 @@ entity pu_riscv_core is
     dbg_dato  : out std_logic_vector(XLEN-1 downto 0);
     dbg_ack   : out std_logic;
     dbg_bp    : out std_logic
-  );
+    );
 end pu_riscv_core;
 
 architecture rtl of pu_riscv_core is
@@ -159,7 +159,7 @@ architecture rtl of pu_riscv_core is
       EXCEPTION_SIZE : integer := 16;
 
       PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
-    );
+      );
     port (
       rstn     : in std_logic;          --Reset
       clk      : in std_logic;          --Clock
@@ -191,7 +191,7 @@ architecture rtl of pu_riscv_core is
       if_stall  : out std_logic;  --stall instruction fetch BIU (cache/bus-interface)
       if_flush  : out std_logic;  --flush instruction fetch BIU (cache/bus-interface)
       if_pc     : out std_logic_vector(XLEN-1 downto 0)   --Program Counter
-    );
+      );
   end component;
 
   component pu_riscv_id
@@ -199,7 +199,7 @@ architecture rtl of pu_riscv_core is
       XLEN           : integer := 64;
       ILEN           : integer := 64;
       EXCEPTION_SIZE : integer := 16
-    );
+      );
     port (
       rstn : in std_logic;
       clk  : in std_logic;
@@ -269,7 +269,7 @@ architecture rtl of pu_riscv_core is
       --from MEM/WB
       mem_r : in std_logic_vector(XLEN-1 downto 0);
       wb_r  : in std_logic_vector(XLEN-1 downto 0)
-    );
+      );
   end component;
 
   component pu_riscv_execution
@@ -284,7 +284,7 @@ architecture rtl of pu_riscv_core is
       MULT_LATENCY   : std_logic := '1';
 
       PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
-    );
+      );
     port (
       rstn : in std_logic;
       clk  : in std_logic;
@@ -367,7 +367,7 @@ architecture rtl of pu_riscv_core is
       du_we_pc     : in std_logic;
       du_dato      : in std_logic_vector(XLEN-1 downto 0);
       du_ie        : in std_logic_vector(31 downto 0)
-    );
+      );
   end component;
 
   component pu_riscv_memory
@@ -378,7 +378,7 @@ architecture rtl of pu_riscv_core is
       EXCEPTION_SIZE : integer := 16;
 
       PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
-    );
+      );
     port (
       rstn : in std_logic;
       clk  : in std_logic;
@@ -406,7 +406,7 @@ architecture rtl of pu_riscv_core is
       --To WB
       mem_r      : out std_logic_vector(XLEN-1 downto 0);
       mem_memadr : out std_logic_vector(XLEN-1 downto 0)
-    );
+      );
   end component;
 
   component pu_riscv_wb
@@ -417,7 +417,7 @@ architecture rtl of pu_riscv_core is
       EXCEPTION_SIZE : integer := 16;
 
       PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
-    );
+      );
     port (
       rst_ni : in std_logic;            --Reset
       clk_i  : in std_logic;            --Clock
@@ -450,7 +450,7 @@ architecture rtl of pu_riscv_core is
       wb_dst_o : out std_logic_vector(4 downto 0);
       wb_r_o   : out std_logic_vector(XLEN-1 downto 0);
       wb_we_o  : out std_logic
-    );
+      );
   end component;
 
   component pu_riscv_state
@@ -489,7 +489,7 @@ architecture rtl of pu_riscv_core is
 
       PMP_CNT : integer := 16;
       HARTID  : integer := 0
-    );
+      );
     port (
       rstn : in std_logic;
       clk  : in std_logic;
@@ -542,7 +542,7 @@ architecture rtl of pu_riscv_core is
       du_addr       : in  std_logic_vector(11 downto 0);
       du_ie         : in  std_logic_vector(31 downto 0);
       du_exceptions : out std_logic_vector(31 downto 0)
-    );
+      );
   end component;
 
   component pu_riscv_rf
@@ -551,7 +551,7 @@ architecture rtl of pu_riscv_core is
       AR_BITS : integer := 5;
       RDPORTS : integer := 2;
       WRPORTS : integer := 1
-    );
+      );
     port (
       rstn : in std_logic;
       clk  : in std_logic;
@@ -573,7 +573,7 @@ architecture rtl of pu_riscv_core is
       du_dato    : in  std_logic_vector(XLEN-1 downto 0);  --output from debug unit
       du_dati_rf : out std_logic_vector(XLEN-1 downto 0);
       du_addr    : in  std_logic_vector(11 downto 0)
-    );
+      );
   end component;
 
   component pu_riscv_bp
@@ -591,7 +591,7 @@ architecture rtl of pu_riscv_core is
       AVOID_X : std_logic := '0';
 
       PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
-    );
+      );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -607,7 +607,7 @@ architecture rtl of pu_riscv_core is
       bu_bp_predict_i : in std_logic_vector(1 downto 0);  --prediction bits for branch
       bu_bp_btaken_i  : in std_logic;
       bu_bp_update_i  : in std_logic
-    );
+      );
   end component;
 
   component pu_riscv_du
@@ -622,7 +622,7 @@ architecture rtl of pu_riscv_core is
       MAX_BREAKPOINTS : integer := 8;
 
       BREAKPOINTS : integer := 3
-    );
+      );
     port (
       rstn : in std_logic;
       clk  : in std_logic;
@@ -669,7 +669,7 @@ architecture rtl of pu_riscv_core is
 
       --From state
       du_exceptions : in std_logic_vector(31 downto 0)
-    );
+      );
   end component;
 
   ------------------------------------------------------------------------------
@@ -831,7 +831,7 @@ begin
       if_stall             => if_stall,
       if_flush             => if_flush,
       if_pc                => if_pc
-    );
+      );
 
   --  * Instruction Decoder
   --  *
@@ -896,7 +896,7 @@ begin
       id_bypwb_opB  => id_bypwb_opB,
       mem_r         => mem_r,
       wb_r          => wb_r
-    );
+      );
 
   --Execution units
   execution_unit : pu_riscv_execution
@@ -974,7 +974,7 @@ begin
       du_we_pc        => du_we_pc,
       du_dato         => du_dato,
       du_ie           => du_ie
-    );
+      );
 
   --Memory access
   memory_unit : pu_riscv_memory
@@ -1003,7 +1003,7 @@ begin
       dmem_adr      => dmem_adr_sgn,
       mem_r         => mem_r,
       mem_memadr    => mem_memadr
-    );
+      );
 
   dmem_adr <= dmem_adr_sgn;
 
@@ -1040,7 +1040,7 @@ begin
       wb_dst_o          => wb_dst,
       wb_r_o            => wb_r,
       wb_we_o           => wb_we
-    );
+      );
 
   rf_dst (0)  <= wb_dst;
   rf_dstv (0) <= wb_r;
@@ -1133,7 +1133,7 @@ begin
       du_addr       => du_addr,
       du_ie         => du_ie,
       du_exceptions => du_exceptions
-    );
+      );
 
   --Integer Register File
   rf_unit : pu_riscv_rf
@@ -1158,7 +1158,7 @@ begin
       du_dato    => du_dato,
       du_dati_rf => du_dati_rf,
       du_addr    => du_addr
-    );
+      );
 
   --Branch Prediction Unit
 
@@ -1195,7 +1195,7 @@ begin
         bu_bp_predict_i => bu_bp_predict,  --prediction bits for branch
         bu_bp_btaken_i  => bu_bp_btaken,
         bu_bp_update_i  => bu_bp_update
-      );
+        );
   end generate;
 
   --Debug Unit
@@ -1251,7 +1251,7 @@ begin
       dmem_ack      => dmem_ack,
       ex_stall      => ex_stall,
       du_exceptions => du_exceptions
-    );
+      );
 
   st_prv <= st_prv_sgn;
 end rtl;

@@ -52,7 +52,7 @@ entity pu_riscv_ram_1r1w is
     ABITS      : integer := 10;
     DBITS      : integer := 32;
     TECHNOLOGY : string  := "GENERIC"
-  );
+    );
   port (
     rst_ni : in std_logic;
     clk_i  : in std_logic;
@@ -67,7 +67,7 @@ entity pu_riscv_ram_1r1w is
     raddr_i : in  std_logic_vector(ABITS-1 downto 0);
     re_i    : in  std_logic;
     dout_o  : out std_logic_vector(DBITS-1 downto 0)
-  );
+    );
 end pu_riscv_ram_1r1w;
 
 architecture rtl of pu_riscv_ram_1r1w is
@@ -75,7 +75,7 @@ architecture rtl of pu_riscv_ram_1r1w is
     generic (
       ABITS : integer := 10;
       DBITS : integer := 32
-    );
+      );
     port (
       rst_ni : in std_logic;
       clk_i  : in std_logic;
@@ -87,7 +87,7 @@ architecture rtl of pu_riscv_ram_1r1w is
 
       raddr_i : in  std_logic_vector(ABITS-1 downto 0);
       dout_o  : out std_logic_vector(DBITS-1 downto 0)
-    );
+      );
   end component;
 
   ------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ begin
 
         raddr_i => raddr_i,
         dout_o  => mem_dout
-      );
+        );
   end generate;
 
   --TODO Handle 'be' ... requires partial old, partial new data
