@@ -40,12 +40,12 @@ vhdl
 │   ├── pu_riscv_ram_1rw.vhd
 │   └── pu_riscv_ram_queue.vhd
 ├── pkg
-│   ├── peripheral_ahb3_pkg.vhd
-│   ├── peripheral_apb4_pkg.vhd
-│   ├── peripheral_axi4_pkg.vhd
-│   ├── peripheral_biu_pkg.vhd
-│   ├── peripheral_wb_pkg.vhd
-│   ├── pu_riscv_pkg.vhd
+│   ├── peripheral_ahb3_vhdl_pkg.vhd
+│   ├── peripheral_apb4_vhdl_pkg.vhd
+│   ├── peripheral_axi4_vhdl_pkg.vhd
+│   ├── peripheral_biu_vhdl_pkg.vhd
+│   ├── peripheral_wb_vhdl_pkg.vhd
+│   ├── pu_riscv_vhdl_pkg.vhd
 │   └── vhdl_pkg.vhd
 └── pu
     ├── ahb3

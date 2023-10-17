@@ -48,7 +48,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-use work.pu_riscv_pkg.all;
+use work.pu_riscv_vhdl_pkg.all;
 use work.vhdl_pkg.all;
 
 entity pu_riscv_div is

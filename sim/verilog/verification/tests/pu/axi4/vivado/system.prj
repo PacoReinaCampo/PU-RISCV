@@ -42,9 +42,9 @@
 //                                                                               //
 ///////////////////////////////////////////////////////////////////////////////////
 
-sv work ../../../../../../../rtl/verilog/pkg/peripheral_axi4_pkg.sv
-sv work ../../../../../../../rtl/verilog/pkg/peripheral_biu_pkg.sv
-sv work ../../../../../../../rtl/verilog/pkg/pu_riscv_pkg.sv
+sv work ../../../../../../../rtl/verilog/pkg/peripheral_axi4_verilog_pkg.sv
+sv work ../../../../../../../rtl/verilog/pkg/peripheral_biu_verilog_pkg.sv
+sv work ../../../../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
 
 sv work ../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
 sv work ../../../../../../../rtl/verilog/core/cache/pu_riscv_dext.sv

@@ -46,14 +46,14 @@
 # Package Sources
 #####################################################################
 PACKAGE_SRC_VLOG=$(ROOT_DIR)/rtl/verilog
-PACKAGE_VLOG = $(PACKAGE_SRC_VLOG)/pkg/peripheral_axi4_pkg.sv \
-               $(PACKAGE_SRC_VLOG)/pkg/peripheral_biu_pkg.sv \
-               $(PACKAGE_SRC_VLOG)/pkg/pu_riscv_pkg.sv
+PACKAGE_VLOG = $(PACKAGE_SRC_VLOG)/pkg/peripheral_axi4_verilog_pkg.sv \
+               $(PACKAGE_SRC_VLOG)/pkg/peripheral_biu_verilog_pkg.sv \
+               $(PACKAGE_SRC_VLOG)/pkg/pu_riscv_verilog_pkg.sv
 
 PACKAGE_SRC_VHDL=$(ROOT_DIR)/rtl/vhdl
-PACKAGE_VHDL = $(PACKAGE_SRC_VHDL)/pkg/peripheral_axi4_pkg.vhd \
-               $(PACKAGE_SRC_VHDL)/pkg/peripheral_biu_pkg.vhd \
-               $(PACKAGE_SRC_VHDL)/pkg/pu_riscv_pkg.vhd \
+PACKAGE_VHDL = $(PACKAGE_SRC_VHDL)/pkg/peripheral_axi4_vhdl_pkg.vhd \
+               $(PACKAGE_SRC_VHDL)/pkg/peripheral_biu_vhdl_pkg.vhd \
+               $(PACKAGE_SRC_VHDL)/pkg/pu_riscv_vhdl_pkg.vhd \
                $(PACKAGE_SRC_VHDL)/pkg/vhdl_pkg.vhd
 
 #####################################################################

@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-import peripheral_ahb3_pkg::*;
+import peripheral_ahb3_verilog_pkg::*;
 
 module pu_riscv_mmio_if_ahb3 #(
   parameter HDATA_SIZE    = 32,

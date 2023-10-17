@@ -40,8 +40,8 @@
  *   Francisco Javier Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-import peripheral_wb_pkg::*;
-import peripheral_biu_pkg::*;
+import peripheral_wb_verilog_pkg::*;
+import peripheral_biu_verilog_pkg::*;
 
 module pu_riscv_biu2wb #(
   parameter XLEN = 64,

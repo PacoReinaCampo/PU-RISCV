@@ -42,9 +42,9 @@
 ##                                                                               ##
 ###################################################################################
 
-../../../../../../../rtl/vhdl/pkg/peripheral_axi4_pkg.vhd
-../../../../../../../rtl/vhdl/pkg/peripheral_biu_pkg.vhd
-../../../../../../../rtl/vhdl/pkg/pu_riscv_pkg.vhd
+../../../../../../../rtl/vhdl/pkg/peripheral_axi4_vhdl_pkg.vhd
+../../../../../../../rtl/vhdl/pkg/peripheral_biu_vhdl_pkg.vhd
+../../../../../../../rtl/vhdl/pkg/pu_riscv_vhdl_pkg.vhd
 ../../../../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
 
 ../../../../../../../rtl/vhdl/core/cache/pu_riscv_dcache_core.vhd

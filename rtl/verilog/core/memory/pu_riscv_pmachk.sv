@@ -40,8 +40,8 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-import pu_riscv_pkg::*;
-import peripheral_biu_pkg::*;
+import pu_riscv_verilog_pkg::*;
+import peripheral_biu_verilog_pkg::*;
 
 module pu_riscv_pmachk #(
   parameter XLEN    = 64,

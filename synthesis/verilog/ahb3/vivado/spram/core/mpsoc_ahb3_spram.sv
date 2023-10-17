@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-import peripheral_ahb3_pkg::*;
+import peripheral_ahb3_verilog_pkg::*;
 
 module mpsoc_ahb3_spram #(
   parameter MEM_SIZE          = 0,   //Memory in Bytes

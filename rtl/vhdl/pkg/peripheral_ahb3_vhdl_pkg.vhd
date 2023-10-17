@@ -1,4 +1,4 @@
--- Converted from pkg/peripheral_biu_pkg.sv
+-- Converted from pkg/peripheral_ahb3_vhdl_pkg.sv
 -- by verilog2vhdl - QueenField
 
 --------------------------------------------------------------------------------
@@ -48,42 +48,53 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-package peripheral_biu_pkg is
+package peripheral_ahb3_vhdl_pkg is
 
-  --BIU Constants Package
-  constant BYTE       : std_logic_vector(2 downto 0) := "000";
-  constant HWORD      : std_logic_vector(2 downto 0) := "001";
-  constant WORD       : std_logic_vector(2 downto 0) := "010";
-  constant DWORD      : std_logic_vector(2 downto 0) := "011";
-  constant QWORD      : std_logic_vector(2 downto 0) := "100";
-  constant UNDEF_SIZE : std_logic_vector(2 downto 0) := "XXX";
+  constant HADDR_SIZE : integer := 64;
+  constant HDATA_SIZE : integer := 64;
 
-  constant SINGLE      : std_logic_vector(2 downto 0) := "000";
-  constant INCR        : std_logic_vector(2 downto 0) := "001";
-  constant WRAP4       : std_logic_vector(2 downto 0) := "010";
-  constant INCR4       : std_logic_vector(2 downto 0) := "011";
-  constant WRAP8       : std_logic_vector(2 downto 0) := "100";
-  constant INCR8       : std_logic_vector(2 downto 0) := "101";
-  constant WRAP16      : std_logic_vector(2 downto 0) := "110";
-  constant INCR16      : std_logic_vector(2 downto 0) := "111";
-  constant UNDEF_BURST : std_logic_vector(2 downto 0) := "XXX";
+  --HTRANS
+  constant HTRANS_IDLE   : std_logic_vector(1 downto 0) := "00";
+  constant HTRANS_BUSY   : std_logic_vector(1 downto 0) := "01";
+  constant HTRANS_NONSEQ : std_logic_vector(1 downto 0) := "10";
+  constant HTRANS_SEQ    : std_logic_vector(1 downto 0) := "11";
 
-  --Enumeration Codes
-  constant PROT_INSTRUCTION  : std_logic_vector(2 downto 0) := "000";
-  constant PROT_DATA         : std_logic_vector(2 downto 0) := "001";
-  constant PROT_USER         : std_logic_vector(2 downto 0) := "000";
-  constant PROT_PRIVILEGED   : std_logic_vector(2 downto 0) := "010";
-  constant PROT_NONCACHEABLE : std_logic_vector(2 downto 0) := "000";
-  constant PROT_CACHEABLE    : std_logic_vector(2 downto 0) := "100";
+  --HSIZE
+  constant HSIZE_B8    : std_logic_vector(2 downto 0) := "000";
+  constant HSIZE_B16   : std_logic_vector(2 downto 0) := "001";
+  constant HSIZE_B32   : std_logic_vector(2 downto 0) := "010";
+  constant HSIZE_B64   : std_logic_vector(2 downto 0) := "011";
+  constant HSIZE_B128  : std_logic_vector(2 downto 0) := "100";  --4-word line
+  constant HSIZE_B256  : std_logic_vector(2 downto 0) := "101";  --8-word line
+  constant HSIZE_B512  : std_logic_vector(2 downto 0) := "110";
+  constant HSIZE_B1024 : std_logic_vector(2 downto 0) := "111";
+  constant HSIZE_BYTE  : std_logic_vector(2 downto 0) := HSIZE_B8;
+  constant HSIZE_HWORD : std_logic_vector(2 downto 0) := HSIZE_B16;
+  constant HSIZE_WORD  : std_logic_vector(2 downto 0) := HSIZE_B32;
+  constant HSIZE_DWORD : std_logic_vector(2 downto 0) := HSIZE_B64;
 
-  --Complex Enumerations
-  constant NONCACHEABLE_USER_INSTRUCTION       : std_logic_vector(2 downto 0) := "000";
-  constant NONCACHEABLE_USER_DATA              : std_logic_vector(2 downto 0) := "001";
-  constant NONCACHEABLE_PRIVILEGED_INSTRUCTION : std_logic_vector(2 downto 0) := "010";
-  constant NONCACHEABLE_PRIVILEGED_DATA        : std_logic_vector(2 downto 0) := "011";
-  constant CACHEABLE_USER_INSTRUCTION          : std_logic_vector(2 downto 0) := "100";
-  constant CACHEABLE_USER_DATA                 : std_logic_vector(2 downto 0) := "101";
-  constant CACHEABLE_PRIVILEGED_INSTRUCTION    : std_logic_vector(2 downto 0) := "110";
-  constant CACHEABLE_PRIVILEGED_DATA           : std_logic_vector(2 downto 0) := "111";
+  --HBURST
+  constant HBURST_SINGLE : std_logic_vector(2 downto 0) := "000";
+  constant HBURST_INCR   : std_logic_vector(2 downto 0) := "001";
+  constant HBURST_WRAP4  : std_logic_vector(2 downto 0) := "010";
+  constant HBURST_INCR4  : std_logic_vector(2 downto 0) := "011";
+  constant HBURST_WRAP8  : std_logic_vector(2 downto 0) := "100";
+  constant HBURST_INCR8  : std_logic_vector(2 downto 0) := "101";
+  constant HBURST_WRAP16 : std_logic_vector(2 downto 0) := "110";
+  constant HBURST_INCR16 : std_logic_vector(2 downto 0) := "111";
 
-end peripheral_biu_pkg;
+  --HPROT
+  constant HPROT_OPCODE         : std_logic_vector(3 downto 0) := "0000";
+  constant HPROT_DATA           : std_logic_vector(3 downto 0) := "0001";
+  constant HPROT_USER           : std_logic_vector(3 downto 0) := "0000";
+  constant HPROT_PRIVILEGED     : std_logic_vector(3 downto 0) := "0010";
+  constant HPROT_NON_BUFFERABLE : std_logic_vector(3 downto 0) := "0000";
+  constant HPROT_BUFFERABLE     : std_logic_vector(3 downto 0) := "0100";
+  constant HPROT_NON_CACHEABLE  : std_logic_vector(3 downto 0) := "0000";
+  constant HPROT_CACHEABLE      : std_logic_vector(3 downto 0) := "1000";
+
+  --HRESP
+  constant HRESP_OKAY  : std_logic := '0';
+  constant HRESP_ERROR : std_logic := '1';
+
+end peripheral_ahb3_vhdl_pkg;

@@ -1,4 +1,4 @@
--- Converted from pkg/pu_riscv_pkg.sv
+-- Converted from pkg/pu_riscv_vhdl_pkg.sv
 -- by verilog2vhdl - QueenField
 
 --------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-package pu_riscv_pkg is
+package pu_riscv_vhdl_pkg is
 
   ------------------------------------------------------------------
   -- Execution Unit
@@ -616,4 +616,4 @@ package pu_riscv_pkg is
   ------------------------------------------------------------------------------
   -- Direct mapping to the 12bit CSR address space
 
-end pu_riscv_pkg;
+end pu_riscv_vhdl_pkg;

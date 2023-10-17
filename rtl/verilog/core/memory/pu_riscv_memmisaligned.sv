@@ -40,7 +40,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-import peripheral_biu_pkg::*;
+import peripheral_biu_verilog_pkg::*;
 
 module pu_riscv_memmisaligned #(
   parameter XLEN    = 64,

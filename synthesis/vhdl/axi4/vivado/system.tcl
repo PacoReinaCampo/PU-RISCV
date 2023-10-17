@@ -42,49 +42,49 @@
 ##                                                                               ##
 ###################################################################################
 
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/peripheral_axi4_pkg.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/peripheral_biu_pkg.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/pu_riscv_pkg.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/peripheral_axi4_vhdl_pkg.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/peripheral_biu_vhdl_pkg.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/pu_riscv_vhdl_pkg.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
 
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/riscv_dcache_core.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/riscv_dext.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/riscv_icache_core.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/riscv_noicache_core.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/decode/riscv_id.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/riscv_alu.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/riscv_bu.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/riscv_div.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/riscv_execution.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/riscv_lsu.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/riscv_mul.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/fetch/riscv_if.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_dmem_ctrl.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_imem_ctrl.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_membuf.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_memmisaligned.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_mmu.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_mux.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_pmachk.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/riscv_pmpchk.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/riscv_bp.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/riscv_core.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/riscv_du.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/riscv_memory.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/riscv_rf.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/riscv_state.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/riscv_wb.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/pu_riscv_dcache_core.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/pu_riscv_dext.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/pu_riscv_icache_core.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/pu_riscv_noicache_core.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/decode/pu_riscv_id.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/pu_riscv_alu.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/pu_riscv_bu.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/pu_riscv_div.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/pu_riscv_execution.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/pu_riscv_lsu.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/pu_riscv_mul.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/fetch/pu_riscv_if.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/pu_riscv_dmem_ctrl.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/pu_riscv_imem_ctrl.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/pu_riscv_membuf.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/pu_riscv_memmisaligned.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/pu_riscv_mmu.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/pu_riscv_mux.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/pu_riscv_pmachk.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/pu_riscv_pmpchk.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/main/pu_riscv_bp.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/main/pu_riscv_core.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/main/pu_riscv_du.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/main/pu_riscv_memory.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/main/pu_riscv_rf.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/main/pu_riscv_state.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/main/pu_riscv_wb.vhd
 
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/riscv_ram_1r1w_generic.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/riscv_ram_1r1w.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/riscv_ram_1rw_generic.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/riscv_ram_1rw.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/riscv_ram_queue.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/pu_riscv_ram_1r1w_generic.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/pu_riscv_ram_1r1w.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/pu_riscv_ram_1rw_generic.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/pu_riscv_ram_1rw.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-read_verilog -sv ../../../../rtl/verilog/pu/axi4/riscv_biu2axi4.sv
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/pu/axi4/riscv_pu_axi4.vhd
-read_verilog -sv ../../../../rtl/verilog/pu/riscv_ahb2axi.sv
-read_verilog -sv ../../../../rtl/verilog/pu/riscv_axi2ahb.sv
+read_verilog -sv ../../../../rtl/verilog/pu/axi4/pu_riscv_biu2axi4.sv
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pu/axi4/pu_riscv_axi4.vhd
+read_verilog -sv ../../../../rtl/verilog/pu/pu_riscv_ahb2axi.sv
+read_verilog -sv ../../../../rtl/verilog/pu/pu_riscv_axi2ahb.sv
 
 read_verilog -sv ../../../verilog/axi4/vivado/spram/core/mpsoc_axi4_spram.sv
 

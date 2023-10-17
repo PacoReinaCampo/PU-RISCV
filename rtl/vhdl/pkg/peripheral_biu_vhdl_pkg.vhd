@@ -1,4 +1,4 @@
--- Converted from pkg/peripheral_apb4_pkg.sv
+-- Converted from pkg/peripheral_biu_vhdl_pkg.sv
 -- by verilog2vhdl - QueenField
 
 --------------------------------------------------------------------------------
@@ -48,9 +48,42 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-package peripheral_axi4_pkg is
+package peripheral_biu_vhdl_pkg is
 
-  constant AXI_ADDR_WIDTH : integer := 64;
-  constant AXI_DATA_WIDTH : integer := 64;
+  --BIU Constants Package
+  constant BYTE       : std_logic_vector(2 downto 0) := "000";
+  constant HWORD      : std_logic_vector(2 downto 0) := "001";
+  constant WORD       : std_logic_vector(2 downto 0) := "010";
+  constant DWORD      : std_logic_vector(2 downto 0) := "011";
+  constant QWORD      : std_logic_vector(2 downto 0) := "100";
+  constant UNDEF_SIZE : std_logic_vector(2 downto 0) := "XXX";
 
-end peripheral_axi4_pkg;
+  constant SINGLE      : std_logic_vector(2 downto 0) := "000";
+  constant INCR        : std_logic_vector(2 downto 0) := "001";
+  constant WRAP4       : std_logic_vector(2 downto 0) := "010";
+  constant INCR4       : std_logic_vector(2 downto 0) := "011";
+  constant WRAP8       : std_logic_vector(2 downto 0) := "100";
+  constant INCR8       : std_logic_vector(2 downto 0) := "101";
+  constant WRAP16      : std_logic_vector(2 downto 0) := "110";
+  constant INCR16      : std_logic_vector(2 downto 0) := "111";
+  constant UNDEF_BURST : std_logic_vector(2 downto 0) := "XXX";
+
+  --Enumeration Codes
+  constant PROT_INSTRUCTION  : std_logic_vector(2 downto 0) := "000";
+  constant PROT_DATA         : std_logic_vector(2 downto 0) := "001";
+  constant PROT_USER         : std_logic_vector(2 downto 0) := "000";
+  constant PROT_PRIVILEGED   : std_logic_vector(2 downto 0) := "010";
+  constant PROT_NONCACHEABLE : std_logic_vector(2 downto 0) := "000";
+  constant PROT_CACHEABLE    : std_logic_vector(2 downto 0) := "100";
+
+  --Complex Enumerations
+  constant NONCACHEABLE_USER_INSTRUCTION       : std_logic_vector(2 downto 0) := "000";
+  constant NONCACHEABLE_USER_DATA              : std_logic_vector(2 downto 0) := "001";
+  constant NONCACHEABLE_PRIVILEGED_INSTRUCTION : std_logic_vector(2 downto 0) := "010";
+  constant NONCACHEABLE_PRIVILEGED_DATA        : std_logic_vector(2 downto 0) := "011";
+  constant CACHEABLE_USER_INSTRUCTION          : std_logic_vector(2 downto 0) := "100";
+  constant CACHEABLE_USER_DATA                 : std_logic_vector(2 downto 0) := "101";
+  constant CACHEABLE_PRIVILEGED_INSTRUCTION    : std_logic_vector(2 downto 0) := "110";
+  constant CACHEABLE_PRIVILEGED_DATA           : std_logic_vector(2 downto 0) := "111";
+
+end peripheral_biu_vhdl_pkg;

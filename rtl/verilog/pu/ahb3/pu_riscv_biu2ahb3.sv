@@ -40,8 +40,8 @@
  *   Francisco Javier Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-import peripheral_ahb3_pkg::*;
-import peripheral_biu_pkg::*;
+import peripheral_ahb3_verilog_pkg::*;
+import peripheral_biu_verilog_pkg::*;
 
 module pu_riscv_biu2ahb3 #(
   parameter XLEN = 64,
