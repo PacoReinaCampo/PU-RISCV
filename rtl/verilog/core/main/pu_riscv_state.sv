@@ -187,16 +187,16 @@ module pu_riscv_state #(
   //Supervisor protection and Translation
   logic [  XLEN -1:0]           csr_satp;  //Address translation & protection
 
-//  //Hypervisor
-//  //Hypervisor Trap Setup
-//  logic  [XLEN-1:0] csr_htvec;    //trap handler base address
-//  logic  [XLEN-1:0] csr_hedeleg;  //trap delegation register
+  //Hypervisor
+  //Hypervisor Trap Setup
+  logic  [XLEN-1:0] csr_htvec;    //trap handler base address
+  logic  [XLEN-1:0] csr_hedeleg;  //trap delegation register
 
-//  //Hypervisor trap handler
-//  logic  [XLEN-1:0] csr_hscratch; //scratch register
-//  logic  [XLEN-1:0] csr_hepc;     //exception program counter
-//  logic  [XLEN-1:0] csr_hcause;   //trap cause
-//  logic  [XLEN-1:0] csr_htval;    //bad address
+  //Hypervisor trap handler
+  logic  [XLEN-1:0] csr_hscratch; //scratch register
+  logic  [XLEN-1:0] csr_hepc;     //exception program counter
+  logic  [XLEN-1:0] csr_hcause;   //trap cause
+  logic  [XLEN-1:0] csr_htval;    //bad address
 
   //Hypervisor protection and Translation
   //TBD per spec v1.7, somewhat defined in 1.9, removed in 1.10
@@ -215,7 +215,7 @@ module pu_riscv_state #(
   logic                         csr_mstatus_sd;
   logic [      1 : 0]           csr_mstatus_sxl;  //S-Mode XLEN
   logic [      1 : 0]           csr_mstatus_uxl;  //U-Mode XLEN
-//logic [      4 : 0]           csr_mstatus_vm;   //virtualisation management
+  logic [      4 : 0]           csr_mstatus_vm;   //virtualisation management
   logic                         csr_mstatus_tsr;
   logic                         csr_mstatus_tw;
   logic                         csr_mstatus_tvm;
@@ -424,10 +424,10 @@ module pu_riscv_state #(
       FRM:      st_csr_rval = has_fpu ? {{XLEN - $bits(csr_fcsr_rm) {1'b0}}, csr_fcsr_rm} : 'h0;
       FCSR:     st_csr_rval = has_fpu ? {{XLEN - $bits(csr_fcsr) {1'b0}}, csr_fcsr} : 'h0;
       CYCLE:    st_csr_rval = csr_mcycle[XLEN-1:0];
-      //TIME      : st_csr_rval = csr_timer[XLEN-1:0];
+    //TIME:     st_csr_rval = csr_timer[XLEN-1:0];
       INSTRET:  st_csr_rval = csr_minstret[XLEN-1:0];
       CYCLEH:   st_csr_rval = is_rv32 ? csr_mcycle_h : 'h0;
-      //TIMEH     : st_csr_rval = is_rv32 ? csr_timer_h    : 'h0;
+    //TIMEH:    st_csr_rval = is_rv32 ? csr_timer_h : 'h0;
       INSTRETH: st_csr_rval = is_rv32 ? csr_minstret_h : 'h0;
 
       //Supervisor
@@ -444,17 +444,17 @@ module pu_riscv_state #(
       SIP:        st_csr_rval = has_s ? csr_mip & csr_mideleg & 12'h333 : 'h0;
       SATP:       st_csr_rval = has_s && has_mmu ? csr_satp : 'h0;
 
-//      //Hypervisor
-//      HSTATUS   : st_csr_rval = {mstatus[127],mstatus[XLEN-2:0] & (1 << XLEN-1 | 2'b11 << 32 | 'hde133);
-//      HTVEC     : st_csr_rval = has_h ? csr_htvec                       : 'h0;
-//      HIE       : st_csr_rval = has_h ? csr_mie & 12'h777               : 'h0;
-//      HEDELEG   : st_csr_rval = has_h ? csr_hedeleg                     : 'h0;
-//      HIDELEG   : st_csr_rval = has_h ? csr_mideleg & 12'h333           : 'h0;
-//      HSCRATCH  : st_csr_rval = has_h ? csr_hscratch                    : 'h0;
-//      HEPC      : st_csr_rval = has_h ? csr_hepc                        : 'h0;
-//      HCAUSE    : st_csr_rval = has_h ? csr_hcause                      : 'h0;
-//      HTVAL     : st_csr_rval = has_h ? csr_htval                       : 'h0;
-//      HIP       : st_csr_rval = has_h ? csr_mip & csr_mideleg & 12'h777 : 'h0;
+      //Hypervisor
+      HSTATUS   : st_csr_rval = {mstatus[127] ,mstatus[XLEN-2:0]} & (1 << XLEN-1 | 2'b11 << 32 | 'hde133);
+      HTVEC     : st_csr_rval = has_h ? csr_htvec                       : 'h0;
+      HIE       : st_csr_rval = has_h ? csr_mie & 12'h777               : 'h0;
+      HEDELEG   : st_csr_rval = has_h ? csr_hedeleg                     : 'h0;
+      HIDELEG   : st_csr_rval = has_h ? csr_mideleg & 12'h333           : 'h0;
+      HSCRATCH  : st_csr_rval = has_h ? csr_hscratch                    : 'h0;
+      HEPC      : st_csr_rval = has_h ? csr_hepc                        : 'h0;
+      HCAUSE    : st_csr_rval = has_h ? csr_hcause                      : 'h0;
+      HTVAL     : st_csr_rval = has_h ? csr_htval                       : 'h0;
+      HIP       : st_csr_rval = has_h ? csr_mip & csr_mideleg & 12'h777 : 'h0;
 
       //Machine
       MISA:       st_csr_rval = {csr_misa_base, {XLEN - $bits(csr_misa) {1'b0}}, csr_misa_extensions};
@@ -665,19 +665,17 @@ module pu_riscv_state #(
             csr_mstatus_mpie <= 1'b1;
             csr_mstatus_mpp  <= has_u ? PRV_U : PRV_M;
           end
+          HRET : begin
+            //set privilege level
+            st_prv    <= csr_mstatus_hpp;
+            st_nxt_pc <= csr_hepc;
+            st_flush  <= 1'b1;
 
-//          HRET : begin
-//            //set privilege level
-//            st_prv    <= csr_mstatus_hpp;
-//            st_nxt_pc <= csr_hepc;
-//            st_flush  <= 1'b1;
-
-//            //set HIE
-//            csr_mstatus_hie  <= csr_mstatus_hpie;
-//            csr_mstatus_hpie <= 1'b1;
-//            csr_mstatus_hpp  <= has_u ? PRV_U : PRV_M;
-//          end
-
+            //set HIE
+            csr_mstatus_hie  <= csr_mstatus_hpie;
+            csr_mstatus_hpie <= 1'b1;
+            csr_mstatus_hpp  <= has_u ? PRV_U : PRV_M;
+          end
           SRET: begin
             //set privilege level
             st_prv           <= {1'b0, csr_mstatus_spp};
@@ -730,16 +728,14 @@ module pu_riscv_state #(
           csr_mstatus_spie <= csr_mstatus_sie;
           csr_mstatus_sie  <= 1'b0;
           csr_mstatus_spp  <= st_prv[0];
-        end
-//        else if (has_h && st_prv >= PRV_H && (st_int & csr_mideleg & 12'h777) ) begin
-//          st_prv    <= PRV_H;
-//          st_nxt_pc <= csr_htvec;
+        end else if (has_h && st_prv >= PRV_H && (st_int & csr_mideleg & 12'h777) ) begin
+          st_prv    <= PRV_H;
+          st_nxt_pc <= csr_htvec;
 
-//          csr_mstatus_hpie <= csr_mstatus_hie;
-//          csr_mstatus_hie  <= 1'b0;
-//          csr_mstatus_hpp  <= st_prv;
-//        end
-        else begin
+          csr_mstatus_hpie <= csr_mstatus_hie;
+          csr_mstatus_hie  <= 1'b0;
+          csr_mstatus_hpp  <= st_prv;
+        end else begin
           st_prv           <= PRV_M;
           st_nxt_pc        <= csr_mtvec & ~'h3 + (csr_mtvec[0] ? interrupt_cause << 2 : 0);
 
@@ -764,17 +760,14 @@ module pu_riscv_state #(
           csr_mstatus_sie  <= 1'b0;
           csr_mstatus_spp  <= st_prv[0];
 
-        end
-//        else if (has_h && st_prv >= PRV_H && |(wb_exception & csr_medeleg)) begin
-//          st_prv    <= PRV_H;
-//          st_nxt_pc <= csr_htvec;
+        end else if (has_h && st_prv >= PRV_H && |(wb_exception & csr_medeleg)) begin
+          st_prv    <= PRV_H;
+          st_nxt_pc <= csr_htvec;
 
-//          csr_mstatus_hpie <= csr_mstatus_hie;
-//          csr_mstatus_hie  <= 1'b0;
-//          csr_mstatus_hpp  <= st_prv;
-//        end
-
-        else begin
+          csr_mstatus_hpie <= csr_mstatus_hie;
+          csr_mstatus_hie  <= 1'b0;
+          csr_mstatus_hpp  <= st_prv;
+        end else begin
           st_prv           <= PRV_M;
           st_nxt_pc        <= csr_mtvec & ~'h3;
 
@@ -887,14 +880,12 @@ module pu_riscv_state #(
         end else if ((ex_csr_we && ex_csr_reg == MIDELEG && st_prv == PRV_M) || (du_we_csr && du_addr == MIDELEG)) begin
           csr_mideleg[SSI] <= has_s & csr_wval[SSI];
           csr_mideleg[USI] <= has_n & csr_wval[USI];
-        end
-//        else if (has_h) begin
-//          if ((ex_csr_we && ex_csr_reg == HIDELEG && st_prv >= PRV_H) || (du_we_csr && du_addr    == HIDELEG)) begin
-//            csr_mideleg[SSI] <= has_s & csr_wval[SSI];
-//            csr_mideleg[USI] <= has_n & csr_wval[USI];
-//          end
-//        end
-        else if (has_s) begin
+        end else if (has_h) begin
+          if ((ex_csr_we && ex_csr_reg == HIDELEG && st_prv >= PRV_H) || (du_we_csr && du_addr    == HIDELEG)) begin
+            csr_mideleg[SSI] <= has_s & csr_wval[SSI];
+            csr_mideleg[USI] <= has_n & csr_wval[USI];
+          end
+        end else if (has_s) begin
           if ((ex_csr_we && ex_csr_reg == SIDELEG && st_prv >= PRV_S) || (du_we_csr && du_addr == SIDELEG)) begin
             csr_mideleg[USI] <= has_n & csr_wval[USI];
           end
@@ -939,16 +930,14 @@ module pu_riscv_state #(
         csr_mip_hsip <= csr_wval[HSI] & has_h;
         csr_mip_ssip <= csr_wval[SSI] & has_s;
         csr_mip_usip <= csr_wval[USI] & has_n;
-      end
-//        else if (has_h) begin
-//          //Hypervisor Mode write
-//          if ((ex_csr_we && ex_csr_reg == HIP && st_prv >= PRV_H) || (du_we_csr && du_addr == HIP)) begin
-//            csr_mip_hsip <= csr_wval[HSI] & csr_mideleg[HSI];
-//            csr_mip_ssip <= csr_wval[SSI] & csr_mideleg[SSI] & has_s;
-//            csr_mip_usip <= csr_wval[USI] & csr_mideleg[USI] & has_n;
-//          end
-//        end
-      else if (has_s) begin
+      end else if (has_h) begin
+        //Hypervisor Mode write
+        if ((ex_csr_we && ex_csr_reg == HIP && st_prv >= PRV_H) || (du_we_csr && du_addr == HIP)) begin
+          csr_mip_hsip <= csr_wval[HSI] & csr_mideleg[HSI];
+          csr_mip_ssip <= csr_wval[SSI] & csr_mideleg[SSI] & has_s;
+          csr_mip_usip <= csr_wval[USI] & csr_mideleg[USI] & has_n;
+        end
+      end else if (has_s) begin
         //Supervisor Mode write
         if ((ex_csr_we && ex_csr_reg == SIP && st_prv >= PRV_S) || (du_we_csr && du_addr == SIP)) begin
           csr_mip_ssip <= csr_wval[SSI] & csr_mideleg[SSI];
@@ -980,21 +969,19 @@ module pu_riscv_state #(
       csr_mie_hsie <= csr_wval[HSI] & has_h;
       csr_mie_ssie <= csr_wval[SSI] & has_s;
       csr_mie_usie <= csr_wval[USI] & has_n;
-    end
-//    else if (has_h) begin
-//      if ((ex_csr_we && ex_csr_reg == HIE && st_prv >= PRV_H) || (du_we_csr && du_addr == HIE)) begin
-//        csr_mie_heie <= csr_wval[HEI];
-//        csr_mie_seie <= csr_wval[SEI] & has_s;
-//        csr_mie_ueie <= csr_wval[UEI] & has_n;
-//        csr_mie_htie <= csr_wval[HTI];
-//        csr_mie_stie <= csr_wval[STI] & has_s;
-//        csr_mie_utie <= csr_wval[UTI] & has_n;
-//        csr_mie_hsie <= csr_wval[HSI];
-//        csr_mie_ssie <= csr_wval[SSI] & has_s;
-//        csr_mie_usie <= csr_wval[USI] & has_n;
-//      end
-//    end
-    else if (has_s) begin
+    end else if (has_h) begin
+      if ((ex_csr_we && ex_csr_reg == HIE && st_prv >= PRV_H) || (du_we_csr && du_addr == HIE)) begin
+        csr_mie_heie <= csr_wval[HEI];
+        csr_mie_seie <= csr_wval[SEI] & has_s;
+        csr_mie_ueie <= csr_wval[UEI] & has_n;
+        csr_mie_htie <= csr_wval[HTI];
+        csr_mie_stie <= csr_wval[STI] & has_s;
+        csr_mie_utie <= csr_wval[UTI] & has_n;
+        csr_mie_hsie <= csr_wval[HSI];
+        csr_mie_ssie <= csr_wval[SSI] & has_s;
+        csr_mie_usie <= csr_wval[USI] & has_n;
+      end
+    end else if (has_s) begin
       if ((ex_csr_we && ex_csr_reg == SIE && st_prv >= PRV_S) || (du_we_csr && du_addr == SIE)) begin
         csr_mie_seie <= csr_wval[SEI];
         csr_mie_ueie <= csr_wval[UEI] & has_n;
@@ -1070,17 +1057,17 @@ module pu_riscv_state #(
       st_interrupt <= 'b0;
 
       csr_mepc     <= 'h0;
-      //csr_hepc     <= 'h0;
+      csr_hepc     <= 'h0;
       csr_sepc     <= 'h0;
       csr_uepc     <= 'h0;
 
       csr_mcause   <= 'h0;
-      //csr_hcause   <= 'h0;
+      csr_hcause   <= 'h0;
       csr_scause   <= 'h0;
       csr_ucause   <= 'h0;
 
       csr_mtval    <= 'h0;
-      //csr_htval    <= 'h0;
+      csr_htval    <= 'h0;
       csr_stval    <= 'h0;
       csr_utval    <= 'h0;
     end else begin
@@ -1089,9 +1076,9 @@ module pu_riscv_state #(
         csr_mepc <= {csr_wval[XLEN-1:2], csr_wval[1] & has_rvc, 1'b0};
       end
 
-//      if ((ex_csr_we && ex_csr_reg == HEPC && st_prv >= PRV_H) || (du_we_csr && du_addr == HEPC)) begin
-//        csr_hepc <= {csr_wval[XLEN-1:2], csr_wval[1] & has_rvc, 1'b0};
-//      end
+      if ((ex_csr_we && ex_csr_reg == HEPC && st_prv >= PRV_H) || (du_we_csr && du_addr == HEPC)) begin
+        csr_hepc <= {csr_wval[XLEN-1:2], csr_wval[1] & has_rvc, 1'b0};
+      end
 
       if ((ex_csr_we && ex_csr_reg == SEPC && st_prv >= PRV_S) || (du_we_csr && du_addr == SEPC)) begin
         csr_sepc <= {csr_wval[XLEN-1:2], csr_wval[1] & has_rvc, 1'b0};
@@ -1105,9 +1092,9 @@ module pu_riscv_state #(
         csr_mcause <= csr_wval;
       end
 
-//      if  (ex_csr_we && ex_csr_reg == HCAUSE && st_prv >= PRV_H) || (du_we_csr && du_addr == HCAUSE)) begin
-//        csr_hcause <= csr_wval;
-//      end
+      if ((ex_csr_we && ex_csr_reg == HCAUSE && st_prv >= PRV_H) || (du_we_csr && du_addr == HCAUSE)) begin
+        csr_hcause <= csr_wval;
+      end
 
       if ((ex_csr_we && ex_csr_reg == SCAUSE && st_prv >= PRV_S) || (du_we_csr && du_addr == SCAUSE)) begin
         csr_scause <= csr_wval;
@@ -1121,9 +1108,9 @@ module pu_riscv_state #(
         csr_mtval <= csr_wval;
       end
 
-//      if ((ex_csr_we && ex_csr_reg == HTVAL && st_prv >= PRV_H) || (du_we_csr && du_addr == HTVAL)) begin
-//        csr_htval <= csr_wval;
-//      end
+      if ((ex_csr_we && ex_csr_reg == HTVAL && st_prv >= PRV_H) || (du_we_csr && du_addr == HTVAL)) begin
+        csr_htval <= csr_wval;
+      end
  
       if ((ex_csr_we && ex_csr_reg == STVAL && st_prv >= PRV_S) || (du_we_csr && du_addr == STVAL)) begin
         csr_stval <= csr_wval;
@@ -1152,12 +1139,10 @@ module pu_riscv_state #(
         end else if (has_s && st_prv >= PRV_S && (st_int & csr_mideleg & 12'h333)) begin
           csr_scause <= (1 << (XLEN - 1)) | interrupt_cause;
           csr_sepc   <= id_pc;
-        end
-//        else if(has_h && st_prv >= PRV_H && (st_int & csr_mideleg & 12'h777)) begin
-//          csr_hcause <= (1 << (XLEN-1)) | interrupt_cause;
-//          csr_hepc   <= id_pc;
-//        end
-        else begin
+        end else if (has_h && st_prv >= PRV_H && (st_int & csr_mideleg & 12'h777)) begin
+          csr_hcause <= (1 << (XLEN-1)) | interrupt_cause;
+          csr_hepc   <= id_pc;
+        end else begin
           csr_mcause <= (1 << (XLEN - 1)) | interrupt_cause;
           csr_mepc   <= id_pc;
         end
@@ -1178,20 +1163,18 @@ module pu_riscv_state #(
                        wb_exception[CAUSE_MISALIGNED_STORE      ] || wb_exception[CAUSE_STORE_ACCESS_FAULT      ] || wb_exception[CAUSE_STORE_PAGE_FAULT      ] ) begin
             csr_stval <= wb_badaddr;
           end  
-        end
-//        else if (has_h && st_prv >= PRV_H && |(wb_exception & csr_medeleg)) begin
-//          csr_hepc   <= wb_pc;
-//          csr_hcause <= trap_cause;
+        end else if (has_h && st_prv >= PRV_H && |(wb_exception & csr_medeleg)) begin
+          csr_hepc   <= wb_pc;
+          csr_hcause <= trap_cause;
 
-//          if (wb_exception[CAUSE_ILLEGAL_INSTRUCTION]) begin
-//            csr_htval <= wb_instr;
-//          end else if (wb_exception[CAUSE_MISALIGNED_INSTRUCTION] || wb_exception[CAUSE_INSTRUCTION_ACCESS_FAULT] || wb_exception[CAUSE_INSTRUCTION_PAGE_FAULT] ||
-//                       wb_exception[CAUSE_MISALIGNED_LOAD       ] || wb_exception[CAUSE_LOAD_ACCESS_FAULT       ] || wb_exception[CAUSE_LOAD_PAGE_FAULT       ] ||
-//                       wb_exception[CAUSE_MISALIGNED_STORE      ] || wb_exception[CAUSE_STORE_ACCESS_FAULT      ] || wb_exception[CAUSE_STORE_PAGE_FAULT      ] ) begin
-//            csr_htval <= wb_badaddr;
-//          end
-//        end
-        else begin
+          if (wb_exception[CAUSE_ILLEGAL_INSTRUCTION]) begin
+            csr_htval <= wb_instr;
+          end else if (wb_exception[CAUSE_MISALIGNED_INSTRUCTION] || wb_exception[CAUSE_INSTRUCTION_ACCESS_FAULT] || wb_exception[CAUSE_INSTRUCTION_PAGE_FAULT] ||
+                       wb_exception[CAUSE_MISALIGNED_LOAD       ] || wb_exception[CAUSE_LOAD_ACCESS_FAULT       ] || wb_exception[CAUSE_LOAD_PAGE_FAULT       ] ||
+                       wb_exception[CAUSE_MISALIGNED_STORE      ] || wb_exception[CAUSE_STORE_ACCESS_FAULT      ] || wb_exception[CAUSE_STORE_PAGE_FAULT      ] ) begin
+            csr_htval <= wb_badaddr;
+          end
+        end else begin
           csr_mepc   <= wb_pc;
           csr_mcause <= trap_cause;
 

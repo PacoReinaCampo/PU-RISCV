@@ -362,7 +362,6 @@ package pu_riscv_verilog_pkg;
   //Supervisor Protection and Translation
   localparam SATP = 'h180;
 
-  /*
   //Hypervisor
   //Hypervisor trap setup
   localparam HSTATUS       = 'h200;
@@ -376,7 +375,6 @@ package pu_riscv_verilog_pkg;
   localparam HCAUSE        = 'h242;
   localparam HTVAL         = 'h243;
   localparam HIP           = 'h244;
-*/
 
   //Machine
   //Machine Information
