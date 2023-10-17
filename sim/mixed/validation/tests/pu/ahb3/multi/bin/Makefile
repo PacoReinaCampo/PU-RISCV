@@ -199,11 +199,10 @@ regression: $(logs)
 ##########################################################################
 .PHONY: $(SIMULATORS)
 $(SIMULATORS): % : %/Makefile
-	@$(MAKE) $(MS) -C $@ sim				\
-	VLOG="$(abspath $(RTL_VLOG) $(TB_VLOG))"		\
-	VHDL="$(abspath $(RTL_VHDL) $(TB_VHDL))"		\
-	INCDIRS="$(abspath $(INCDIRS))"				\
-	TOP=$(TB_TOP)						\
+	@$(MAKE) $(MS) -C $@ sim				 \
+	VLOG="$(abspath $(PACKAGE_VLOG) $(RTL_VLOG) $(TB_VLOG))" \
+	VHDL="$(abspath $(PACKAGE_VHDL) $(RTL_VHDL) $(TB_VHDL))" \
+	TOP=$(TB_TOP)						 \
 	LOG=$(LOG) PARAMETERS="$(PARAMETERS)"
 
 

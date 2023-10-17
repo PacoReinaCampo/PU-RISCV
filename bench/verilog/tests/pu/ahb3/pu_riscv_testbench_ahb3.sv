@@ -126,13 +126,21 @@ module pu_riscv_testbench_ahb3;
   logic                         dat_HRESP;
 
   //Debug Interface
-  logic dbp_bp, dbg_stall, dbg_strb, dbg_ack, dbg_we;
+  logic            dbp_bp;
+  logic            dbg_stall;
+  logic            dbg_strb;
+  logic            dbg_ack;
+  logic            dbg_we;
   logic [PLEN-1:0] dbg_addr;
-  logic [XLEN-1:0] dbg_dati, dbg_dato;
+  logic [XLEN-1:0] dbg_dati;
+  logic [XLEN-1:0] dbg_dato;
 
   //Host Interface
-  logic host_csr_req, host_csr_ack, host_csr_we;
-  logic [XLEN-1:0] host_csr_tohost, host_csr_fromhost;
+  logic            host_csr_req;
+  logic            host_csr_ack;
+  logic            host_csr_we;
+  logic [XLEN-1:0] host_csr_tohost;
+  logic [XLEN-1:0] host_csr_fromhost;
 
   //Unified memory interface
   logic [1:0][1:0] mem_htrans;
