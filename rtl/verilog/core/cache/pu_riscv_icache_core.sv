@@ -607,30 +607,31 @@ module pu_riscv_icache_core #(
       biufsm_state <= IDLE;
     end else begin
       case (biufsm_state)
-        IDLE:
-        case (biucmd)
-          NOP: ;  //do nothing
+        IDLE: begin
+          case (biucmd)
+            NOP: ;  //do nothing
 
-          READ_WAY: begin
-            //read a way from main memory
-            if (biu_stb_ack_i) begin
-              biufsm_state <= BURST;
-            end else begin
-              //BIU is not ready to start a new transfer
-              biufsm_state <= WAIT4BIU;
+            READ_WAY: begin
+              //read a way from main memory
+              if (biu_stb_ack_i) begin
+                biufsm_state <= BURST;
+              end else begin
+                //BIU is not ready to start a new transfer
+                biufsm_state <= WAIT4BIU;
+              end
             end
-          end
 
-          WRITE_WAY: begin
-            //write way back to main memory
-            if (biu_stb_ack_i) begin
-              biufsm_state <= BURST;
-            end else begin
-              //BIU is not ready to start a new transfer
-              biufsm_state <= WAIT4BIU;
+            WRITE_WAY: begin
+              //write way back to main memory
+              if (biu_stb_ack_i) begin
+                biufsm_state <= BURST;
+              end else begin
+                //BIU is not ready to start a new transfer
+                biufsm_state <= WAIT4BIU;
+              end
             end
-          end
-        endcase
+          endcase
+        end
 
         WAIT4BIU: begin
           if (biu_stb_ack_i) begin
@@ -699,18 +700,19 @@ module pu_riscv_icache_core #(
 
   always @(*) begin
     case (biufsm_state)
-      IDLE:
-      case (biucmd)
-        NOP: begin
-          biu_stb_o  = 1'b0;
-          biu_adri_o = 'hx;
-        end
+      IDLE: begin
+        case (biucmd)
+          NOP: begin
+            biu_stb_o  = 1'b0;
+            biu_adri_o = 'hx;
+          end
 
-        READ_WAY: begin
-          biu_stb_o  = 1'b1;
-          biu_adri_o = {mem_padr_dly[PLEN-1 : BURST_LSB], {BURST_LSB{1'b0}}};
-        end
-      endcase
+          READ_WAY: begin
+            biu_stb_o  = 1'b1;
+            biu_adri_o = {mem_padr_dly[PLEN-1 : BURST_LSB], {BURST_LSB{1'b0}}};
+          end
+        endcase
+      end
       WAIT4BIU: begin
         //stretch biu_*_o signals until BIU acknowledges strobe
         biu_stb_o  = 1'b1;

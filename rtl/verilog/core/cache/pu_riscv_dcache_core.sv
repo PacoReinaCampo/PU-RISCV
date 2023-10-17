@@ -836,38 +836,40 @@ module pu_riscv_dcache_core #(
       biufsm_state <= IDLE;
     end else begin
       case (biufsm_state)
-        IDLE:
-        case (biucmd)
-          NOP: ;  //do nothing
-          READ_WAY: begin
-            //read a way from main memory
-            if (biu_stb_ack_i) begin
-              biufsm_state <= BURST;
-            end else begin
-              //BIU is not ready to start a new transfer
-              biufsm_state <= WAIT4BIU;
+        IDLE: begin
+          case (biucmd)
+            NOP: ;  //do nothing
+            READ_WAY: begin
+              //read a way from main memory
+              if (biu_stb_ack_i) begin
+                biufsm_state <= BURST;
+              end else begin
+                //BIU is not ready to start a new transfer
+                biufsm_state <= WAIT4BIU;
+              end
             end
-          end
-
-          WRITE_WAY: begin
-            //write way back to main memory
-            if (biu_stb_ack_i) begin
-              biufsm_state <= BURST;
-            end else begin
-              //BIU is not ready to start a new transfer
-              biufsm_state <= WAIT4BIU;
+            WRITE_WAY: begin
+              //write way back to main memory
+              if (biu_stb_ack_i) begin
+                biufsm_state <= BURST;
+              end else begin
+                //BIU is not ready to start a new transfer
+                biufsm_state <= WAIT4BIU;
+              end
             end
-          end
-        endcase
-        WAIT4BIU:
-        if (biu_stb_ack_i) begin
-          //BIU acknowledged burst transfer
-          biufsm_state <= BURST;
+          endcase
         end
-        BURST:
-        if (biu_err_i || (~|burst_cnt && biu_ack_i)) begin
-          //write complete
-          biufsm_state <= IDLE;  //TODO: detect if another BURST request is pending, skip IDLE
+        WAIT4BIU: begin
+          if (biu_stb_ack_i) begin
+            //BIU acknowledged burst transfer
+            biufsm_state <= BURST;
+          end
+        end
+        BURST: begin
+          if (biu_err_i || (~|burst_cnt && biu_ack_i)) begin
+            //write complete
+            biufsm_state <= IDLE;  //TODO: detect if another BURST request is pending, skip IDLE
+          end
         end
       endcase
     end

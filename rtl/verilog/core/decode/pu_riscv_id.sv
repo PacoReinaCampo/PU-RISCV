@@ -825,17 +825,17 @@ module pu_riscv_id #(
       SIP:      illegal_csr_rd = ~has_s | (st_prv < PRV_S);
       SATP:     illegal_csr_rd = ~has_s | (st_prv < PRV_S) | (st_prv == PRV_S && st_tvm);
 
-      //      //Hypervisor
-      //      HSTATUS   : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HEDELEG   : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HIDELEG   : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HIE       : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HTVEC     : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HSCRATCH  : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HEPC      : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HCAUSE    : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HTVAL     : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HIP       : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      //Hypervisor
+      HSTATUS:  illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HEDELEG:  illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HIDELEG:  illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HIE:      illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HTVEC:    illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HSCRATCH: illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HEPC:     illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HCAUSE:   illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HTVAL:    illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HIP:      illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
 
       //Machine
       MVENDORID:  illegal_csr_rd = (st_prv < PRV_M);
@@ -918,17 +918,17 @@ module pu_riscv_id #(
       SIP:        illegal_csr_wr = ~has_s | (st_prv < PRV_S);
       SATP:       illegal_csr_wr = ~has_s | (st_prv < PRV_S) | (st_prv == PRV_S && st_tvm);
 
-      //      //Hypervisor
-      //      HSTATUS   : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HEDELEG   : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HIDELEG   : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HIE       : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HTVEC     : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HSCRATCH  : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HEPC      : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HCAUSE    : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HBADADDR  : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
-      //      HIP       : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      //Hypervisor
+      HSTATUS:  illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HEDELEG:  illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HIDELEG:  illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HIE:      illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HTVEC:    illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HSCRATCH: illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HEPC:     illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HCAUSE:   illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HTVAL:    illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
+      HIP:      illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
 
       //Machine
       MVENDORID:  illegal_csr_wr = 1'b1;
