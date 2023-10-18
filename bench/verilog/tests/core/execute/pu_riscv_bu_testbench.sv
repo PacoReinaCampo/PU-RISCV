@@ -39,3 +39,41 @@
  * Author(s):
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
+
+  // Branch Unit
+  pu_riscv_bu #(
+    .XLEN          (XLEN),
+    .ILEN          (ILEN),
+    .EXCEPTION_SIZE(EXCEPTION_SIZE),
+    .PC_INIT       (PC_INIT),
+    .BP_GLOBAL_BITS(BP_GLOBAL_BITS),
+    .HAS_RVC       (HAS_RVC)
+  ) bu (
+    .rstn         (rstn),
+    .clk          (clk),
+    .ex_stall     (ex_stall),
+    .st_flush     (st_flush),
+    .id_pc        (id_pc),
+    .bu_nxt_pc    (bu_nxt_pc),
+    .bu_flush     (bu_flush),
+    .bu_cacheflush(bu_cacheflush),
+    .id_bp_predict(id_bp_predict),
+    .bu_bp_predict(bu_bp_predict),
+    .bu_bp_history(bu_bp_history),
+    .bu_bp_btaken (bu_bp_btaken),
+    .bu_bp_update (bu_bp_update),
+    .id_bubble    (id_bubble),
+    .id_instr     (id_instr),
+    .id_exception (id_exception),
+    .ex_exception (ex_exception),
+    .mem_exception(mem_exception),
+    .wb_exception (wb_exception),
+    .bu_exception (ex_exception),
+    .opA          (opA),
+    .opB          (opB),
+    .du_stall     (du_stall),
+    .du_flush     (du_flush),
+    .du_we_pc     (du_we_pc),
+    .du_dato      (du_dato),
+    .du_ie        (du_ie)
+  );

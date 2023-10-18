@@ -39,3 +39,35 @@
  * Author(s):
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
+
+  pu_riscv_if #(
+    .XLEN(XLEN),
+    .ILEN(ILEN),
+
+    .PARCEL_SIZE   (PARCEL_SIZE),
+    .EXCEPTION_SIZE(EXCEPTION_SIZE)
+  ) if_unit (
+    .rstn                (rstn),
+    .clk                 (clk),
+    .id_stall            (id_stall),
+    .if_stall_nxt_pc     (if_stall_nxt_pc),
+    .if_parcel           (if_parcel),
+    .if_parcel_pc        (if_parcel_pc),
+    .if_parcel_valid     (if_parcel_valid),
+    .if_parcel_misaligned(if_parcel_misaligned),
+    .if_parcel_page_fault(if_parcel_page_fault),
+    .if_instr            (if_instr),
+    .if_bubble           (if_bubble),
+    .if_exception        (if_exception),
+    .bp_bp_predict       (bp_bp_predict),
+    .if_bp_predict       (if_bp_predict),
+    .bu_flush            (bu_flush),
+    .st_flush            (st_flush),
+    .du_flush            (du_flush),
+    .bu_nxt_pc           (bu_nxt_pc),
+    .st_nxt_pc           (st_nxt_pc),
+    .if_nxt_pc           (if_nxt_pc),
+    .if_stall            (if_stall),
+    .if_flush            (if_flush),
+    .if_pc               (if_pc)
+  );

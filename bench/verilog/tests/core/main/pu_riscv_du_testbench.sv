@@ -39,3 +39,56 @@
  * Author(s):
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
+
+  // Debug Unit
+  pu_riscv_du #(
+    .XLEN(XLEN),
+    .PLEN(PLEN),
+    .ILEN(ILEN),
+
+    .EXCEPTION_SIZE(EXCEPTION_SIZE),
+
+    .DU_ADDR_SIZE   (DU_ADDR_SIZE),
+    .MAX_BREAKPOINTS(MAX_BREAKPOINTS),
+
+    .BREAKPOINTS(BREAKPOINTS)
+  ) du_unit (
+    .rstn         (rstn),
+    .clk          (clk),
+    .dbg_stall    (dbg_stall),
+    .dbg_strb     (dbg_strb),
+    .dbg_we       (dbg_we),
+    .dbg_addr     (dbg_addr),
+    .dbg_dati     (dbg_dati),
+    .dbg_dato     (dbg_dato),
+    .dbg_ack      (dbg_ack),
+    .dbg_bp       (dbg_bp),
+    .du_stall     (du_stall),
+    .du_stall_dly (du_stall_dly),
+    .du_flush     (du_flush),
+    .du_we_rf     (du_we_rf),
+    .du_we_frf    (du_we_frf),
+    .du_we_csr    (du_we_csr),
+    .du_we_pc     (du_we_pc),
+    .du_addr      (du_addr),
+    .du_dato      (du_dato),
+    .du_ie        (du_ie),
+    .du_dati_rf   (du_dati_rf),
+    .du_dati_frf  (du_dati_frf),
+    .st_csr_rval  (st_csr_rval),
+    .if_pc        (if_pc),
+    .id_pc        (id_pc),
+    .ex_pc        (ex_pc),
+    .bu_nxt_pc    (bu_nxt_pc),
+    .bu_flush     (bu_flush),
+    .st_flush     (st_flush),
+    .if_instr     (if_instr),
+    .mem_instr    (mem_instr),
+    .if_bubble    (if_bubble),
+    .mem_bubble   (mem_bubble),
+    .mem_exception(mem_exception),
+    .mem_memadr   (mem_memadr),
+    .dmem_ack     (dmem_ack),
+    .ex_stall     (ex_stall),
+    .du_exceptions(du_exceptions)
+  );

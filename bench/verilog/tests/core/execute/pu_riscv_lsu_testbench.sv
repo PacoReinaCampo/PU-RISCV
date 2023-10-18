@@ -39,3 +39,36 @@
  * Author(s):
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
+
+  // Load-Store Unit
+  pu_riscv_lsu #(
+    .XLEN          (XLEN),
+    .ILEN          (ILEN),
+    .EXCEPTION_SIZE(EXCEPTION_SIZE)
+  ) lsu (
+    .rstn           (rstn),
+    .clk            (clk),
+    .ex_stall       (ex_stall),
+    .lsu_stall      (lsu_stall),
+    .id_bubble      (id_bubble),
+    .id_instr       (id_instr),
+    .lsu_bubble     (lsu_bubble),
+    .lsu_r          (lsu_r),
+    .id_exception   (id_exception),
+    .ex_exception   (ex_exception),
+    .mem_exception  (mem_exception),
+    .wb_exception   (wb_exception),
+    .lsu_exception  (lsu_exception),
+    .opA            (opA),
+    .opB            (opB),
+    .st_xlen        (st_xlen),
+    .dmem_adr       (dmem_adr),
+    .dmem_d         (dmem_d),
+    .dmem_req       (dmem_req),
+    .dmem_we        (dmem_we),
+    .dmem_size      (dmem_size),
+    .dmem_ack       (dmem_ack),
+    .dmem_q         (dmem_q),
+    .dmem_misaligned(dmem_misaligned),
+    .dmem_page_fault(dmem_page_fault)
+  );

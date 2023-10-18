@@ -141,37 +141,37 @@ module pu_riscv_lsu #(
       dmem_req <= 1'b0;
 
       case (state)
-        IDLE:
-        if (!ex_stall) begin
-          if (!id_bubble && ~(|id_exception || |ex_exception || |mem_exception || |wb_exception)) begin
-            case (opcode)
-              OPC_LOAD: begin
-                dmem_req   <= 1'b1;
-                lsu_stall  <= 1'b0;
-                lsu_bubble <= 1'b0;
-                state      <= IDLE;
-              end
-              OPC_STORE: begin
-                dmem_req   <= 1'b1;
-                lsu_stall  <= 1'b0;
-                lsu_bubble <= 1'b0;
-                state      <= IDLE;
-              end
-              default: begin
-                dmem_req   <= 1'b0;
-                lsu_stall  <= 1'b0;
-                lsu_bubble <= 1'b1;
-                state      <= IDLE;
-              end
-            endcase
-          end else begin
-            dmem_req   <= 1'b0;
-            lsu_stall  <= 1'b0;
-            lsu_bubble <= 1'b1;
-            state      <= IDLE;
+        IDLE: begin
+          if (!ex_stall) begin
+            if (!id_bubble && ~(|id_exception || |ex_exception || |mem_exception || |wb_exception)) begin
+              case (opcode)
+                OPC_LOAD: begin
+                  dmem_req   <= 1'b1;
+                  lsu_stall  <= 1'b0;
+                  lsu_bubble <= 1'b0;
+                  state      <= IDLE;
+                end
+                OPC_STORE: begin
+                  dmem_req   <= 1'b1;
+                  lsu_stall  <= 1'b0;
+                  lsu_bubble <= 1'b0;
+                  state      <= IDLE;
+                end
+                default: begin
+                  dmem_req   <= 1'b0;
+                  lsu_stall  <= 1'b0;
+                  lsu_bubble <= 1'b1;
+                  state      <= IDLE;
+                end
+              endcase
+            end else begin
+              dmem_req   <= 1'b0;
+              lsu_stall  <= 1'b0;
+              lsu_bubble <= 1'b1;
+              state      <= IDLE;
+            end
           end
         end
-
         default: begin
           dmem_req   <= 1'b0;
           lsu_stall  <= 1'b0;

@@ -39,3 +39,63 @@
  * Author(s):
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
+
+  pu_riscv_id #(
+    .XLEN(XLEN),
+    .ILEN(ILEN),
+
+    .EXCEPTION_SIZE(EXCEPTION_SIZE)
+  ) id_unit (
+    .rstn         (rstn),
+    .clk          (clk),
+    .id_stall     (id_stall),
+    .ex_stall     (ex_stall),
+    .du_stall     (du_stall),
+    .bu_flush     (bu_flush),
+    .st_flush     (st_flush),
+    .du_flush     (du_flush),
+    .bu_nxt_pc    (bu_nxt_pc),
+    .st_nxt_pc    (st_nxt_pc),
+    .if_pc        (if_pc),
+    .id_pc        (id_pc),
+    .if_bp_predict(if_bp_predict),
+    .id_bp_predict(id_bp_predict),
+    .if_instr     (if_instr),
+    .if_bubble    (if_bubble),
+    .id_instr     (id_instr),
+    .id_bubble    (id_bubble),
+    .ex_instr     (ex_instr),
+    .ex_bubble    (ex_bubble),
+    .mem_instr    (mem_instr),
+    .mem_bubble   (mem_bubble),
+    .wb_instr     (wb_instr),
+    .wb_bubble    (wb_bubble),
+    .if_exception (if_exception),
+    .ex_exception (ex_exception),
+    .mem_exception(mem_exception),
+    .wb_exception (wb_exception),
+    .id_exception (id_exception),
+    .st_prv       (st_prv),
+    .st_xlen      (st_xlen),
+    .st_tvm       (st_tvm),
+    .st_tw        (st_tw),
+    .st_tsr       (st_tsr),
+    .st_mcounteren(st_mcounteren),
+    .st_scounteren(st_scounteren),
+
+    .id_src1(rf_src1[0]),
+    .id_src2(rf_src2[0]),
+
+    .id_opA       (id_opA),
+    .id_opB       (id_opB),
+    .id_userf_opA (id_userf_opA),
+    .id_userf_opB (id_userf_opB),
+    .id_bypex_opA (id_bypex_opA),
+    .id_bypex_opB (id_bypex_opB),
+    .id_bypmem_opA(id_bypmem_opA),
+    .id_bypmem_opB(id_bypmem_opB),
+    .id_bypwb_opA (id_bypwb_opA),
+    .id_bypwb_opB (id_bypwb_opB),
+    .mem_r        (mem_r),
+    .wb_r         (wb_r)
+  );

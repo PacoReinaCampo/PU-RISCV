@@ -114,20 +114,20 @@ module pu_riscv_memory_model_ahb3 #(
 
   // Read Intel HEX
   task automatic read_ihex;
-    integer              m;
-    integer              fd;
-    integer              eof;
+    integer                 m;
+    integer                 fd;
+    integer                 eof;
 
-    reg     [ 31:0]      tmp;
+    reg     [    31:0]      tmp;
 
-    bit     [  7:0]      byte_cnt;
-    bit     [  1:0][7:0] address;
-    bit     [  7:0]      record_type;
-    bit     [255:0][7:0] data;
-    bit            [7:0] checksum;
-    bit            [7:0] crc;
+    bit     [     7:0]      byte_cnt;
+    bit     [     1:0][7:0] address;
+    bit     [     7:0]      record_type;
+    bit     [   255:0][7:0] data;
+    bit     [     7:0]      checksum;
+    bit     [     7:0]      crc;
 
-    logic [PLEN-1:0] base_addr = BASE;
+    logic   [PLEN-1:0]      base_addr = BASE;
 
     /*
      * 1: start code

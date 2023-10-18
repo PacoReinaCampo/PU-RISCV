@@ -39,3 +39,28 @@
  * Author(s):
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
+
+  // Integer Register File
+  pu_riscv_rf #(
+    .XLEN(XLEN),
+
+    .AR_BITS(AR_BITS),
+
+    .RDPORTS(RDPORTS),
+    .WRPORTS(WRPORTS)
+  ) rf_unit (
+    .rstn      (rstn),
+    .clk       (clk),
+    .rf_src1   (rf_src1),
+    .rf_src2   (rf_src2),
+    .rf_srcv1  (rf_srcv1),
+    .rf_srcv2  (rf_srcv2),
+    .rf_dst    (rf_dst),
+    .rf_dstv   (rf_dstv),
+    .rf_we     (rf_we),
+    .du_stall  (du_stall),
+    .du_we_rf  (du_we_rf),
+    .du_dato   (du_dato),
+    .du_dati_rf(du_dati_rf),
+    .du_addr   (du_addr)
+  );

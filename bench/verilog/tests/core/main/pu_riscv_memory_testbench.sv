@@ -39,3 +39,31 @@
  * Author(s):
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
+
+  // Memory access
+  pu_riscv_memory #(
+    .XLEN(XLEN),
+    .ILEN(ILEN),
+
+    .EXCEPTION_SIZE(EXCEPTION_SIZE),
+
+    .PC_INIT(PC_INIT)
+
+  ) memory_unit (
+    .rstn         (rstn),
+    .clk          (clk),
+    .wb_stall     (wb_stall),
+    .ex_pc        (ex_pc),
+    .mem_pc       (mem_pc),
+    .ex_bubble    (ex_bubble),
+    .ex_instr     (ex_instr),
+    .mem_bubble   (mem_bubble),
+    .mem_instr    (mem_instr),
+    .ex_exception (ex_exception),
+    .wb_exception (wb_exception),
+    .mem_exception(mem_exception),
+    .ex_r         (ex_r),
+    .dmem_adr     (dmem_adr),
+    .mem_r        (mem_r),
+    .mem_memadr   (mem_memadr)
+  );

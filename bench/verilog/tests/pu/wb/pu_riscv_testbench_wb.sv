@@ -91,8 +91,8 @@ module pu_riscv_testbench_wb;
   //
   genvar p;
 
-  logic HCLK;
-  logic HRESETn;
+  logic                         HCLK;
+  logic                         HRESETn;
 
   // PMA configuration
   logic [PMA_CNT-1:0][    13:0] pma_cfg;
@@ -127,35 +127,35 @@ module pu_riscv_testbench_wb;
   logic [        2:0]           wb_dat_rty_o;
 
   // Debug Interface
-  logic            dbp_bp;
-  logic            dbg_stall;
-  logic            dbg_strb;
-  logic            dbg_ack;
-  logic            dbg_we;
-  logic [PLEN-1:0] dbg_addr;
-  logic [XLEN-1:0] dbg_dati;
-  logic [XLEN-1:0] dbg_dato;
+  logic                         dbp_bp;
+  logic                         dbg_stall;
+  logic                         dbg_strb;
+  logic                         dbg_ack;
+  logic                         dbg_we;
+  logic [   PLEN-1:0]           dbg_addr;
+  logic [   XLEN-1:0]           dbg_dati;
+  logic [   XLEN-1:0]           dbg_dato;
 
   // Host Interface
-  logic            host_csr_req;
-  logic            host_csr_ack;
-  logic            host_csr_we;
-  logic [XLEN-1:0] host_csr_tohost;
-  logic [XLEN-1:0] host_csr_fromhost;
+  logic                         host_csr_req;
+  logic                         host_csr_ack;
+  logic                         host_csr_we;
+  logic [   XLEN-1:0]           host_csr_tohost;
+  logic [   XLEN-1:0]           host_csr_fromhost;
 
   // Unified memory interface
-  logic [1:0][PLEN-1:0] wb_mem_adr_i;
-  logic [1:0][XLEN-1:0] wb_mem_dat_i;
-  logic [1:0][     3:0] wb_mem_sel_i;
-  logic [1:0]           wb_mem_we_i;
-  logic [1:0]           wb_mem_cyc_i;
-  logic [1:0]           wb_mem_stb_i;
-  logic [1:0][     2:0] wb_mem_cti_i;
-  logic [1:0][     1:0] wb_mem_bte_i;
-  logic [1:0][XLEN-1:0] wb_mem_dat_o;
-  logic [1:0]           wb_mem_ack_o;
-  logic [1:0]           wb_mem_err_o;
-  logic [1:0][     2:0] wb_mem_rty_o;
+  logic [        1:0][PLEN-1:0] wb_mem_adr_i;
+  logic [        1:0][XLEN-1:0] wb_mem_dat_i;
+  logic [        1:0][     3:0] wb_mem_sel_i;
+  logic [        1:0]           wb_mem_we_i;
+  logic [        1:0]           wb_mem_cyc_i;
+  logic [        1:0]           wb_mem_stb_i;
+  logic [        1:0][     2:0] wb_mem_cti_i;
+  logic [        1:0][     1:0] wb_mem_bte_i;
+  logic [        1:0][XLEN-1:0] wb_mem_dat_o;
+  logic [        1:0]           wb_mem_ack_o;
+  logic [        1:0]           wb_mem_err_o;
+  logic [        1:0][     2:0] wb_mem_rty_o;
 
   //////////////////////////////////////////////////////////////////////////////
   //

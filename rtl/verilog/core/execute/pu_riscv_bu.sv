@@ -259,23 +259,24 @@ module pu_riscv_bu #(
       end
       {
         1'b0, MISCMEM
-      } :
-      case (id_instr)
-        FENCE_I: begin
-          btaken     = 'b0;
-          bp_update  = 'b0;
-          pipeflush  = 'b1;
-          cacheflush = 'b1;
-          nxt_pc     = id_pc + 'h4;
-        end
-        default: begin
-          btaken     = 'b0;
-          bp_update  = 'b0;
-          pipeflush  = 'b0;
-          cacheflush = 'b0;
-          nxt_pc     = id_pc + 'h4;
-        end
-      endcase
+      } : begin
+        case (id_instr)
+          FENCE_I: begin
+            btaken     = 'b0;
+            bp_update  = 'b0;
+            pipeflush  = 'b1;
+            cacheflush = 'b1;
+            nxt_pc     = id_pc + 'h4;
+          end
+          default: begin
+            btaken     = 'b0;
+            bp_update  = 'b0;
+            pipeflush  = 'b0;
+            cacheflush = 'b0;
+            nxt_pc     = id_pc + 'h4;
+          end
+        endcase
+      end
       default: begin
         btaken     = 'b0;
         bp_update  = 'b0;
@@ -314,7 +315,9 @@ module pu_riscv_bu #(
       bu_bp_btaken  <= btaken;
       bu_bp_update  <= bp_update;
 
-      if (bp_update) bp_history <= {bp_history[BP_GLOBAL_BITS-1:0], btaken};
+      if (bp_update) begin
+        bp_history <= {bp_history[BP_GLOBAL_BITS-1:0], btaken};
+      end
     end
   end
 

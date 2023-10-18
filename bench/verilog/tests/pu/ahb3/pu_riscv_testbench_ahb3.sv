@@ -91,8 +91,8 @@ module pu_riscv_testbench_ahb3;
   //
   genvar p;
 
-  logic HCLK;
-  logic HRESETn;
+  logic                         HCLK;
+  logic                         HRESETn;
 
   // PMA configuration
   logic [PMA_CNT-1:0][    13:0] pma_cfg;
@@ -127,32 +127,32 @@ module pu_riscv_testbench_ahb3;
   logic                         dat_HRESP;
 
   // Debug Interface
-  logic            dbp_bp;
-  logic            dbg_stall;
-  logic            dbg_strb;
-  logic            dbg_ack;
-  logic            dbg_we;
-  logic [PLEN-1:0] dbg_addr;
-  logic [XLEN-1:0] dbg_dati;
-  logic [XLEN-1:0] dbg_dato;
+  logic                         dbp_bp;
+  logic                         dbg_stall;
+  logic                         dbg_strb;
+  logic                         dbg_ack;
+  logic                         dbg_we;
+  logic [   PLEN-1:0]           dbg_addr;
+  logic [   XLEN-1:0]           dbg_dati;
+  logic [   XLEN-1:0]           dbg_dato;
 
   // Host Interface
-  logic            host_csr_req;
-  logic            host_csr_ack;
-  logic            host_csr_we;
-  logic [XLEN-1:0] host_csr_tohost;
-  logic [XLEN-1:0] host_csr_fromhost;
+  logic                         host_csr_req;
+  logic                         host_csr_ack;
+  logic                         host_csr_we;
+  logic [   XLEN-1:0]           host_csr_tohost;
+  logic [   XLEN-1:0]           host_csr_fromhost;
 
   // Unified memory interface
-  logic [1:0][     1:0] mem_htrans;
-  logic [1:0][     2:0] mem_hburst;
-  logic [1:0]           mem_hready;
-  logic [1:0]           mem_hresp;
-  logic [1:0][PLEN-1:0] mem_haddr;
-  logic [1:0][XLEN-1:0] mem_hwdata;
-  logic [1:0][XLEN-1:0] mem_hrdata;
-  logic [1:0][     2:0] mem_hsize;
-  logic [1:0]           mem_hwrite;
+  logic [        1:0][     1:0] mem_htrans;
+  logic [        1:0][     2:0] mem_hburst;
+  logic [        1:0]           mem_hready;
+  logic [        1:0]           mem_hresp;
+  logic [        1:0][PLEN-1:0] mem_haddr;
+  logic [        1:0][XLEN-1:0] mem_hwdata;
+  logic [        1:0][XLEN-1:0] mem_hrdata;
+  logic [        1:0][     2:0] mem_hsize;
+  logic [        1:0]           mem_hwrite;
 
   //////////////////////////////////////////////////////////////////////////////
   //

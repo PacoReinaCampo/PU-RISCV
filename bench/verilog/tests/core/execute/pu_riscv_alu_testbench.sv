@@ -39,3 +39,26 @@
  * Author(s):
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
+
+  // Arithmetic Logic Unit
+  pu_riscv_alu #(
+    .XLEN   (XLEN),
+    .ILEN   (ILEN),
+    .HAS_RVC(HAS_RVC)
+  ) alu (
+    .rstn       (rstn),
+    .clk        (clk),
+    .ex_stall   (ex_stall),
+    .id_pc      (id_pc),
+    .id_bubble  (id_bubble),
+    .id_instr   (id_instr),
+    .opA        (opA),
+    .opB        (opB),
+    .alu_bubble (alu_bubble),
+    .alu_r      (alu_r),
+    .ex_csr_reg (ex_csr_reg),
+    .ex_csr_wval(ex_csr_wval),
+    .ex_csr_we  (ex_csr_we),
+    .st_csr_rval(st_csr_rval),
+    .st_xlen    (st_xlen)
+  );

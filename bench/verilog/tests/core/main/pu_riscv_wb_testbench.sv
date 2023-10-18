@@ -39,3 +39,37 @@
  * Author(s):
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
+
+  // Memory acknowledge + Write Back unit
+  pu_riscv_wb #(
+    .XLEN(XLEN),
+    .ILEN(ILEN),
+
+    .EXCEPTION_SIZE(EXCEPTION_SIZE),
+
+    .PC_INIT(PC_INIT)
+
+  ) wb_unit (
+    .rst_ni           (rstn),
+    .clk_i            (clk),
+    .mem_pc_i         (mem_pc),
+    .mem_instr_i      (mem_instr),
+    .mem_bubble_i     (mem_bubble),
+    .mem_r_i          (mem_r),
+    .mem_exception_i  (mem_exception),
+    .mem_memadr_i     (mem_memadr),
+    .wb_pc_o          (wb_pc),
+    .wb_stall_o       (wb_stall),
+    .wb_instr_o       (wb_instr),
+    .wb_bubble_o      (wb_bubble),
+    .wb_exception_o   (wb_exception),
+    .wb_badaddr_o     (wb_badaddr),
+    .dmem_ack_i       (dmem_ack),
+    .dmem_err_i       (dmem_err),
+    .dmem_q_i         (dmem_q),
+    .dmem_misaligned_i(dmem_misaligned),
+    .dmem_page_fault_i(dmem_page_fault),
+    .wb_dst_o         (wb_dst),
+    .wb_r_o           (wb_r),
+    .wb_we_o          (wb_we)
+  );

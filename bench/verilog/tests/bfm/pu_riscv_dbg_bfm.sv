@@ -102,7 +102,7 @@ module pu_riscv_dbg_bfm #(
 
   // Read from CPU (via DBG interface)
   task read;
-    input  [PLEN-1:0] addr;  // address to read from
+    input [PLEN-1:0] addr;  // address to read from
     output [XLEN-1:0] data;  // data read from CPU
 
     // setup DBG bus
