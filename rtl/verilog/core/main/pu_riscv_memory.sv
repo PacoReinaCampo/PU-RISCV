@@ -68,12 +68,12 @@ module pu_riscv_memory #(
   output reg [EXCEPTION_SIZE-1:0] mem_exception,
 
   // From EX
-  input [XLEN          -1:0] ex_r,
-  input [XLEN          -1:0] dmem_adr,
+  input [XLEN-1:0] ex_r,
+  input [XLEN-1:0] dmem_adr,
 
   // To WB
-  output reg [XLEN          -1:0] mem_r,
-  output reg [XLEN          -1:0] mem_memadr
+  output reg [XLEN-1:0] mem_r,
+  output reg [XLEN-1:0] mem_memadr
 );
 
   //////////////////////////////////////////////////////////////////////////////

@@ -116,7 +116,6 @@ module pu_riscv_memory_model_ahb3 #(
   task automatic read_ihex;
     integer              m;
     integer              fd;
-    integer              cnt;
     integer              eof;
 
     reg     [ 31:0]      tmp;

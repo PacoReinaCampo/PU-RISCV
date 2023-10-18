@@ -109,37 +109,37 @@ module pu_riscv_du #(
   //
   // Variables
   //
-  logic                                          dbg_strb_dly;
-  logic [PLEN         -1:DU_ADDR_SIZE]           du_bank_addr;
-  logic                                          du_sel_internal;
-  logic                                          du_sel_gprs;
-  logic                                          du_sel_csrs;
-  logic                                          du_access;
-  logic                                          du_we;
-  logic [                         2:0]           du_ack;
+  logic                                 dbg_strb_dly;
+  logic [PLEN-1:DU_ADDR_SIZE]           du_bank_addr;
+  logic                                 du_sel_internal;
+  logic                                 du_sel_gprs;
+  logic                                 du_sel_csrs;
+  logic                                 du_access;
+  logic                                 du_we;
+  logic [                2:0]           du_ack;
 
-  logic                                          du_we_internal;
-  logic [                    XLEN-1:0]           du_internal_regs;
+  logic                                 du_we_internal;
+  logic [           XLEN-1:0]           du_internal_regs;
 
-  logic                                          dbg_branch_break_ena;
-  logic                                          dbg_instr_break_ena;
-  logic [                        31:0]           dbg_ie;
-  logic [                    XLEN-1:0]           dbg_cause;
+  logic                                 dbg_branch_break_ena;
+  logic                                 dbg_instr_break_ena;
+  logic [               31:0]           dbg_ie;
+  logic [           XLEN-1:0]           dbg_cause;
 
-  logic [         MAX_BREAKPOINTS-1:0]           dbg_bp_hit;
-  logic                                          dbg_branch_break_hit;
-  logic                                          dbg_instr_break_hit;
-  logic [         MAX_BREAKPOINTS-1:0][     2:0] dbg_cc;
-  logic [         MAX_BREAKPOINTS-1:0]           dbg_enabled;
-  logic [         MAX_BREAKPOINTS-1:0]           dbg_implemented;
-  logic [         MAX_BREAKPOINTS-1:0][XLEN-1:0] dbg_data;
+  logic [MAX_BREAKPOINTS-1:0]           dbg_bp_hit;
+  logic                                 dbg_branch_break_hit;
+  logic                                 dbg_instr_break_hit;
+  logic [MAX_BREAKPOINTS-1:0][     2:0] dbg_cc;
+  logic [MAX_BREAKPOINTS-1:0]           dbg_enabled;
+  logic [MAX_BREAKPOINTS-1:0]           dbg_implemented;
+  logic [MAX_BREAKPOINTS-1:0][XLEN-1:0] dbg_data;
 
-  logic                                          bp_instr_hit;
-  logic                                          bp_branch_hit;
-  logic [         MAX_BREAKPOINTS-1:0]           bp_hit;
+  logic                                 bp_instr_hit;
+  logic                                 bp_branch_hit;
+  logic [MAX_BREAKPOINTS-1:0]           bp_hit;
 
-  logic                                          mem_read;
-  logic                                          mem_write;
+  logic                                 mem_read;
+  logic                                 mem_write;
 
   genvar n;
 
@@ -426,9 +426,9 @@ module pu_riscv_du #(
               BP_CTRL_CC_LD_ADR:   bp_hit[n] = (mem_memadr == dbg_data[n]) & dmem_ack & mem_read;
               BP_CTRL_CC_ST_ADR:   bp_hit[n] = (mem_memadr == dbg_data[n]) & dmem_ack & mem_write;
               BP_CTRL_CC_LDST_ADR: bp_hit[n] = (mem_memadr == dbg_data[n]) & dmem_ack & (mem_read | mem_write);
-              // BP_CTRL_CC_LD_ADR   : bp_hit[n] = (mem_adr    == dbg_data[n]) & mem_req & ~mem_we;
-              // BP_CTRL_CC_ST_ADR   : bp_hit[n] = (mem_adr    == dbg_data[n]) & mem_req &  mem_we;
-              // BP_CTRL_CC_LDST_ADR : bp_hit[n] = (mem_adr    == dbg_data[n]) & mem_req;
+              // BP_CTRL_CC_LD_ADR:   bp_hit[n] = (mem_adr == dbg_data[n]) & mem_req & ~mem_we;
+              // BP_CTRL_CC_ST_ADR:   bp_hit[n] = (mem_adr == dbg_data[n]) & mem_req &  mem_we;
+              // BP_CTRL_CC_LDST_ADR: bp_hit[n] = (mem_adr == dbg_data[n]) & mem_req;
               default:             bp_hit[n] = 1'b0;
             endcase
           end
