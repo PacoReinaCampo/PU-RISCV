@@ -617,8 +617,8 @@ module pu_riscv_state #(
         csr_mstatus_mxr  <= has_s ? csr_wval[19] : 1'b0;
         csr_mstatus_sum  <= has_s ? csr_wval[18] : 1'b0;
         csr_mstatus_mprv <= has_u ? csr_wval[17] : 1'b0;
-        csr_mstatus_xs   <= has_ext ? csr_wval[16:15] : 2'b00;  //TODO
-        csr_mstatus_fs   <= has_s && has_fpu ? csr_wval[14:13] : 2'b00;  //TODO
+        csr_mstatus_xs   <= has_ext ? csr_wval[16:15] : 2'b00;  //TO-DO:
+        csr_mstatus_fs   <= has_s && has_fpu ? csr_wval[14:13] : 2'b00;  //TO-DO:
 
         csr_mstatus_mpp  <= csr_wval[12:11];
         csr_mstatus_hpp  <= 2'h0;  //reserved
@@ -639,8 +639,8 @@ module pu_riscv_state #(
           csr_mstatus_uxl  <= uxl_wval;
           csr_mstatus_mxr  <= csr_wval[19];
           csr_mstatus_sum  <= csr_wval[18];
-          csr_mstatus_xs   <= has_ext ? csr_wval[16:15] : 2'b00;  //TODO
-          csr_mstatus_fs   <= has_fpu ? csr_wval[14:13] : 2'b00;  //TODO
+          csr_mstatus_xs   <= has_ext ? csr_wval[16:15] : 2'b00;  //TO-DO:
+          csr_mstatus_fs   <= has_fpu ? csr_wval[14:13] : 2'b00;  //TO-DO:
 
           csr_mstatus_spp  <= csr_wval[7];
           csr_mstatus_spie <= csr_wval[5];
@@ -1124,7 +1124,7 @@ module pu_riscv_state #(
       st_interrupt <= 1'b0;
 
       //priority external interrupts, software interrupts, timer interrupts, traps
-      if (ext_nmi) begin  //TODO: doesn't this cause a deadlock? Need to hold of NMI once handled
+      if (ext_nmi) begin  //TO-DO: doesn't this cause a deadlock? Need to hold of NMI once handled
         //NMI always at Machine Level
         st_interrupt <= 1'b1;
         csr_mepc     <= bu_flush ? bu_nxt_pc : id_pc;
@@ -1423,7 +1423,7 @@ module pu_riscv_state #(
 
       //Floating point registers
       if (HAS_FPU) begin
-        //TODO
+        //TO-DO:
       end
     end else begin  //NO USER MODE
       assign csr_utvec      = 'h0;

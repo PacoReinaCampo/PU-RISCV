@@ -57,7 +57,7 @@ module pu_riscv_pmachk #(
   input wire            req_i,          //Memory access requested
   input wire [PLEN-1:0] adr_i,          //Physical Memory address (i.e. after translation)
   input wire [     2:0] size_i,         //Transfer size
-  input wire            lock_i,         //AMO : TODO: specify AMO type
+  input wire            lock_i,         //AMO : TO-DO: specify AMO type
   input wire            we_i,
 
   input wire misaligned_i,  //Misaligned access

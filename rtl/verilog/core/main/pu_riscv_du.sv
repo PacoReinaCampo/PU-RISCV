@@ -294,9 +294,13 @@ module pu_riscv_du #(
     for (n = 0; n < MAX_BREAKPOINTS; n = n + 1) begin : gen_bp_hits
       if (n < BREAKPOINTS) begin
         always @(posedge clk, negedge rstn) begin
-          if (!rstn) dbg_bp_hit[n] <= 1'b0;
-          else if (du_we_internal && du_addr == DBG_HIT) dbg_bp_hit[n] <= du_dato[n + 4];
-          else if (bp_hit[n]) dbg_bp_hit[n] <= 1'b1;
+          if (!rstn) begin
+            dbg_bp_hit[n] <= 1'b0;
+          end else if (du_we_internal && du_addr == DBG_HIT) begin
+            dbg_bp_hit[n] <= du_dato[n + 4];
+          end else if (bp_hit[n]) begin
+            dbg_bp_hit[n] <= 1'b1;
+          end
         end
       end
       //else //n >= BREAKPOINTS
@@ -318,9 +322,11 @@ module pu_riscv_du #(
 
   //DBG CAUSE
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) dbg_cause <= 'h0;
-    else if (du_we_internal && du_addr == DBG_CAUSE) dbg_cause <= du_dato;
-    else if (|du_exceptions[15:0]) begin  //traps
+    if (!rstn) begin
+      dbg_cause <= 'h0;
+    end else if (du_we_internal && du_addr == DBG_CAUSE) begin
+      dbg_cause <= du_dato;
+    end else if (|du_exceptions[15:0]) begin  //traps
       casex (du_exceptions[15:0])
         16'h???1: dbg_cause <= 0;
         16'h???2: dbg_cause <= 1;

@@ -215,6 +215,8 @@ module pu_riscv_execution #(
   end
 
   //Execution Units
+
+  //Arithmetic Logic Unit
   pu_riscv_alu #(
     .XLEN   (XLEN),
     .ILEN   (ILEN),

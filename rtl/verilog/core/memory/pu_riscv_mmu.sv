@@ -87,7 +87,7 @@ module pu_riscv_mmu #(
 
   always @(posedge clk_i) begin
     if (vreq_i) begin
-      padr_o <= vadr_i;  //TODO: actual translation
+      padr_o <= vadr_i;  //TO-DO: actual translation
     end
   end
 

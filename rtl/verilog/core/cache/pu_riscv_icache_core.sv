@@ -101,7 +101,7 @@ module pu_riscv_icache_core #(
   localparam PAGE_SIZE = 4 * 1024;  //4KB pages
   localparam MAX_IDX_BITS = $clog2(PAGE_SIZE) - $clog2(ICACHE_BLOCK_SIZE);  //Maximum IDX_BITS
 
-  localparam SETS = (ICACHE_SIZE * 1024) / ICACHE_BLOCK_SIZE / ICACHE_WAYS;  //Number of sets TODO:SETS=1 doesn't work
+  localparam SETS = (ICACHE_SIZE * 1024) / ICACHE_BLOCK_SIZE / ICACHE_WAYS;  //Number of sets TO-DO:SETS=1 doesn't work
   localparam BLK_OFF_BITS = $clog2(ICACHE_BLOCK_SIZE);  //Number of BlockOffset bits
   localparam IDX_BITS = $clog2(SETS);  //Number of Index-bits
   localparam TAG_BITS = XLEN - IDX_BITS - BLK_OFF_BITS;  //Number of TAG-bits
@@ -643,7 +643,7 @@ module pu_riscv_icache_core #(
         BURST: begin
           if (biu_err_i || (~|burst_cnt && biu_ack_i)) begin
             //write complete
-            biufsm_state <= IDLE;  //TODO: detect if another BURST request is pending, skip IDLE
+            biufsm_state <= IDLE;  //TO-DO: detect if another BURST request is pending, skip IDLE
           end
         end
       endcase

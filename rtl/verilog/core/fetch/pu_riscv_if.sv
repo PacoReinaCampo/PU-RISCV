@@ -76,10 +76,10 @@ module pu_riscv_if #(
   input [XLEN          -1:0] bu_nxt_pc,  //Branch Unit Next Program Counter
   input [XLEN          -1:0] st_nxt_pc,  //State Next Program Counter
 
-  output reg [XLEN          -1:0] if_nxt_pc,  //next Program Counter
-  output                          if_stall,   //stall instruction fetch BIU (cache/bus-interface)
-  output                          if_flush,   //flush instruction fetch BIU (cache/bus-interface)
-  output reg [XLEN          -1:0] if_pc       //Program Counter
+  output reg [XLEN-1:0] if_nxt_pc,  //next Program Counter
+  output                if_stall,   //stall instruction fetch BIU (cache/bus-interface)
+  output                if_flush,   //flush instruction fetch BIU (cache/bus-interface)
+  output reg [XLEN-1:0] if_pc       //Program Counter
 );
 
   //////////////////////////////////////////////////////////////////////////////
@@ -149,7 +149,7 @@ module pu_riscv_if #(
       if_nxt_pc <= st_nxt_pc;
     end else if (bu_flush || du_flush) begin
       if_nxt_pc <= bu_nxt_pc;  //flush takes priority
-    // end else if (!id_stall)
+    // end else if (!id_stall) begin
     end else begin
       if (branch_taken) begin
         if_nxt_pc <= branch_pc;
@@ -159,8 +159,10 @@ module pu_riscv_if #(
     end
   end
 
-  //      else if (!if_stall_nxt_pc && !id_stall) if_nxt_pc <= if_nxt_pc + 'h4;
-  //TODO: handle if_stall and 16bit instructions
+  // else if (!if_stall_nxt_pc && !id_stall) begin
+  //   if_nxt_pc <= if_nxt_pc + 'h4;
+
+  //TO-DO: handle if_stall and 16bit instructions
 
   always @(posedge clk, negedge rstn) begin
     if (!rstn) begin
@@ -240,7 +242,9 @@ module pu_riscv_if #(
       end else begin
         case (parcel_sr_valid)
           //branch to 16bit address would yield 3'b010
-          3'b000: parcel_sr_valid <= {1'b0, if_parcel_valid};  //3'b011;
+          3'b000: begin
+            parcel_sr_valid <= {1'b0, if_parcel_valid};  //3'b011;
+          end
           3'b001: begin
             if (is_16bit_instruction) begin
               parcel_sr_valid <= {1'b0, if_parcel_valid};  //3'b011;

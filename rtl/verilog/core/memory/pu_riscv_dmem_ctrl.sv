@@ -270,7 +270,7 @@ module pu_riscv_dmem_ctrl #(
   );
 
   /* Hookup MMU
-   * TODO
+   * TO-DO:
    */
 
   pu_riscv_mmu #(
@@ -373,7 +373,7 @@ module pu_riscv_dmem_ctrl #(
         //from MMU/PMA
         .mem_vreq_i(buf_req),
         .mem_preq_i(is_cache_access),
-        .mem_vadr_i(mem_adr_i),        //TODO Shouldn't this be buf_adr ??
+        .mem_vadr_i(mem_adr_i),        //TO-DO: Shouldn't this be buf_adr ??
         .mem_padr_i(padr),
         .mem_size_i(buf_size),
         .mem_lock_i(buf_lock),
@@ -410,7 +410,7 @@ module pu_riscv_dmem_ctrl #(
     end
 
     /* Instantiate TCM block
-     * TODO: speculative read (vmadr)
+     * TO-DO: speculative read (vmadr)
      *       needs write buffer (clear write when not qualified)
      */
 

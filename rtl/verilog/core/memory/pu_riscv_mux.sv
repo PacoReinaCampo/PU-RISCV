@@ -213,7 +213,7 @@ module pu_riscv_mux #(
         biu_type_o = biu_type_i[pending_port];
         biu_lock_o = biu_lock_i[pending_port];
         biu_we_o   = biu_we_i[pending_port];
-        biu_d_o    = biu_ack_i & ~|burst_cnt ? biu_d_i[pending_port] : biu_d_i[selected_port];  //TODO ~|burst_cnt & biu_ack_i ??
+        biu_d_o    = biu_ack_i & ~|burst_cnt ? biu_d_i[pending_port] : biu_d_i[selected_port];  //TO-DO: ~|burst_cnt & biu_ack_i ??
       end
 
       //      WAIT4BIU: begin

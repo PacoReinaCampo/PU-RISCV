@@ -116,7 +116,7 @@ module pu_riscv_rf #(
     end
   endgenerate
 
-  //TODO: For the Debug Unit ... mux with port0
+  //TO-DO: For the Debug Unit ... mux with port0
   assign du_dati_rf = |du_addr[AR_BITS-1:0] ? rf[du_addr[AR_BITS-1:0]] : {XLEN{1'b0}};
 
   //Writes are synchronous

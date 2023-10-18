@@ -189,7 +189,7 @@ module pu_riscv_id #(
   /*
    * Instruction
    *
-   * TODO: push if-instr upon illegal-instruction
+   * TO-DO: push if-instr upon illegal-instruction
    */
 
   always @(posedge clk) begin
@@ -301,7 +301,7 @@ module pu_riscv_id #(
       OPC_OP32:     can_ldwb = ~wb_bubble;
       OPC_JALR:     can_ldwb = ~wb_bubble;
       OPC_JAL:      can_ldwb = ~wb_bubble;
-      OPC_SYSTEM:   can_ldwb = ~wb_bubble;  //TODO not ALL SYSTEM
+      OPC_SYSTEM:   can_ldwb = ~wb_bubble;  //TO-DO: not ALL SYSTEM
       default:      can_ldwb = 'b0;
     endcase
   end
@@ -463,7 +463,7 @@ module pu_riscv_id #(
       OPC_OP32:     can_bypex = ~id_bubble;
       OPC_JALR:     can_bypex = ~id_bubble;
       OPC_JAL:      can_bypex = ~id_bubble;
-      OPC_SYSTEM:   can_bypex = ~id_bubble;  //TODO not ALL SYSTEM
+      OPC_SYSTEM:   can_bypex = ~id_bubble;  //TO-DO: not ALL SYSTEM
       default:      can_bypex = 1'b0;
     endcase
   end
@@ -480,7 +480,7 @@ module pu_riscv_id #(
       OPC_OP32:     can_bypmem = ~ex_bubble & ~multi_cycle_instruction;
       OPC_JALR:     can_bypmem = ~ex_bubble & ~multi_cycle_instruction;
       OPC_JAL:      can_bypmem = ~ex_bubble & ~multi_cycle_instruction;
-      OPC_SYSTEM:   can_bypmem = ~ex_bubble & ~multi_cycle_instruction;  //TODO not ALL SYSTEM
+      OPC_SYSTEM:   can_bypmem = ~ex_bubble & ~multi_cycle_instruction;  //TO-DO: not ALL SYSTEM
       default:      can_bypmem = 1'b0;
     endcase
   end
@@ -497,7 +497,7 @@ module pu_riscv_id #(
       OPC_OP32:     can_bypwb = ~mem_bubble & ~multi_cycle_instruction;
       OPC_JALR:     can_bypwb = ~mem_bubble & ~multi_cycle_instruction;
       OPC_JAL:      can_bypwb = ~mem_bubble & ~multi_cycle_instruction;
-      OPC_SYSTEM:   can_bypwb = ~mem_bubble & ~multi_cycle_instruction;  //TODO not ALL SYSTEM
+      OPC_SYSTEM:   can_bypwb = ~mem_bubble & ~multi_cycle_instruction;  //TO-DO: not ALL SYSTEM
       default:      can_bypwb = 1'b0;
     endcase
   end
@@ -810,7 +810,7 @@ module pu_riscv_id #(
       CYCLEH:   illegal_csr_rd = ~has_u | ~xlen32 | (~has_s & st_prv == PRV_U & ~st_mcounteren[CY]) | (has_s & st_prv == PRV_S & ~st_mcounteren[CY]) | (has_s & st_prv == PRV_U & st_mcounteren[CY] & st_scounteren[CY]);
       TIMEH:    illegal_csr_rd = 1'b1;  //trap on reading TIMEH. Machine mode must access external timer
       INSTRETH: illegal_csr_rd = ~has_u | ~xlen32 | (~has_s & st_prv == PRV_U & ~st_mcounteren[IR]) | (has_s & st_prv == PRV_S & ~st_mcounteren[IR]) | (has_s & st_prv == PRV_U & st_mcounteren[IR] & st_scounteren[IR]);
-      //TODO: hpmcounters
+      //TO-DO: hpmcounters
 
       //Supervisor
       SSTATUS:  illegal_csr_rd = ~has_s | (st_prv < PRV_S);
@@ -876,7 +876,8 @@ module pu_riscv_id #(
       PMPADDR15:  illegal_csr_rd = (st_prv < PRV_M);
       MCYCLE:     illegal_csr_rd = (st_prv < PRV_M);
       MINSTRET:   illegal_csr_rd = (st_prv < PRV_M);
-      //TODO: performance counters
+ 
+      //TO-DO: performance counters
       MCYCLEH:    illegal_csr_rd = (XLEN > 32) | (st_prv < PRV_M);
       MINSTRETH:  illegal_csr_rd = (XLEN > 32) | (st_prv < PRV_M);
 
@@ -900,10 +901,12 @@ module pu_riscv_id #(
       CYCLE:      illegal_csr_wr = 1'b1;
       TIMEX:      illegal_csr_wr = 1'b1;
       INSTRET:    illegal_csr_wr = 1'b1;
-      //TODO:hpmcounters
+
+      //TO-DO:hpmcounters
       CYCLEH:     illegal_csr_wr = 1'b1;
       TIMEH:      illegal_csr_wr = 1'b1;
       INSTRETH:   illegal_csr_wr = 1'b1;
+
       //Supervisor
       SSTATUS:    illegal_csr_wr = ~has_s | (st_prv < PRV_S);
       SEDELEG:    illegal_csr_wr = ~has_s | (st_prv < PRV_S);
@@ -970,7 +973,8 @@ module pu_riscv_id #(
       PMPADDR15:  illegal_csr_wr = (st_prv < PRV_M);
       MCYCLE:     illegal_csr_wr = (st_prv < PRV_M);
       MINSTRET:   illegal_csr_wr = (st_prv < PRV_M);
-      //TODO: performance counters
+
+      //TO-DO: performance counters
       MCYCLEH:    illegal_csr_wr = (XLEN > 32) | (st_prv < PRV_M);
       MINSTRETH:  illegal_csr_wr = (XLEN > 32) | (st_prv < PRV_M);
 

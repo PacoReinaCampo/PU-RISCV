@@ -290,7 +290,7 @@ module pu_riscv_imem_ctrl #(
   );
 
   /* Hookup MMU
-   * TODO
+   * TO-DO:
    */
 
   pu_riscv_mmu #(

@@ -134,8 +134,9 @@ module pu_riscv_alu #(
 
   //ALU operations
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) alu_r <= 'h0;
-    else if (!ex_stall) begin
+    if (!rstn) begin
+      alu_r <= 'h0;
+    end else if (!ex_stall) begin
       casex ({
         xlen32, func7, func3, opcode
       })
@@ -143,6 +144,7 @@ module pu_riscv_alu #(
         {1'b?, AUIPC} :  alu_r <= opA + opB;
         {1'b?, JAL} :    alu_r <= id_pc + 'h4;
         {1'b?, JALR} :   alu_r <= id_pc + 'h4;
+
         //logical operators
         {1'b?, ADDI} :   alu_r <= opA + opB;
         {1'b?, ADD} :    alu_r <= opA + opB;
@@ -172,6 +174,7 @@ module pu_riscv_alu #(
         {1'b?, SRAX} :   alu_r <= $signed(opA) >>> shamt;
         {1'b0, SRAIW} :  alu_r <= sext32($signed(opA32) >>> shamt32);
         {1'b?, SRAW} :   alu_r <= sext32($signed(opA32) >>> shamt32);
+
         //CSR access
         {1'b?, CSRRW} :  alu_r <= {XLEN{1'b0}} | st_csr_rval;
         {1'b?, CSRRWI} : alu_r <= {XLEN{1'b0}} | st_csr_rval;
@@ -195,6 +198,7 @@ module pu_riscv_alu #(
         {1'b?, AUIPC} :  alu_bubble <= id_bubble;
         {1'b?, JAL} :    alu_bubble <= id_bubble;
         {1'b?, JALR} :   alu_bubble <= id_bubble;
+
         //logical operators
         {1'b?, ADDI} :   alu_bubble <= id_bubble;
         {1'b?, ADD} :    alu_bubble <= id_bubble;
@@ -224,6 +228,7 @@ module pu_riscv_alu #(
         {1'b?, SRAX} :   alu_bubble <= id_bubble;
         {1'b0, SRAIW} :  alu_bubble <= id_bubble;
         {1'b?, SRAW} :   alu_bubble <= id_bubble;
+
         //CSR access
         {1'b?, CSRRW} :  alu_bubble <= id_bubble;
         {1'b?, CSRRWI} : alu_bubble <= id_bubble;

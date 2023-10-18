@@ -100,7 +100,7 @@ module pu_riscv_dcache_core #(
   localparam PAGE_SIZE = 4 * 1024;  //4KB pages
   localparam MAX_IDX_BITS = $clog2(PAGE_SIZE) - $clog2(DCACHE_BLOCK_SIZE);  //Maximum IDX_BITS
 
-  localparam SETS = (DCACHE_SIZE * 1024) / DCACHE_BLOCK_SIZE / DCACHE_WAYS;  //Number of sets TODO:SETS=1 doesn't work
+  localparam SETS = (DCACHE_SIZE * 1024) / DCACHE_BLOCK_SIZE / DCACHE_WAYS;  //Number of sets TO-DO:SETS=1 doesn't work
   localparam BLK_OFF_BITS = $clog2(DCACHE_BLOCK_SIZE);  //Number of BlockOffset bits
   localparam IDX_BITS = $clog2(SETS);  //Number of Index-bits
   localparam TAG_BITS = XLEN - IDX_BITS - BLK_OFF_BITS;  //Number of TAG-bits
@@ -408,7 +408,7 @@ module pu_riscv_dcache_core #(
         FLUSH: begin
           if (|tag_dirty) begin
             //There are dirty ways in this set
-            //TODO
+            //TO-DO:
             //First determine dat_idx; this reads all ways for that index (FLUSH)
             //then check which ways are dirty (FLUSHWAYS)
             //write dirty way
@@ -431,7 +431,7 @@ module pu_riscv_dcache_core #(
             end
           end
         end
-        //TODO: Can we merge WAIT4BIUCMD0 and WAIT4BIUCMD1?
+        //TO-DO: Can we merge WAIT4BIUCMD0 and WAIT4BIUCMD1?
         WAIT4BIUCMD1: begin
           if (biufsm_err) begin
             //if tag_idx already selected, go to ARMED
@@ -769,7 +769,7 @@ module pu_riscv_dcache_core #(
   //Riviera bug workaround
   assign pwb_adr        = write_buffer_adr;
   assign pwb_dat_offset = (write_buffer_was_write && mem_preq_i) ? mem_padr_i[BLK_OFF_BITS-1 -: DAT_OFF_BITS] : pwb_adr[BLK_OFF_BITS-1 -: DAT_OFF_BITS];
-  //TODO: Can't we use vadr?
+  //TO-DO: Can't we use vadr?
 
   //DAT Byte Enable
   assign dat_be         = biufsm_ack ? {BLK_BITS / 8{1'b1}} : write_buffer_be << (pwb_dat_offset * XLEN / 8);
@@ -868,7 +868,7 @@ module pu_riscv_dcache_core #(
         BURST: begin
           if (biu_err_i || (~|burst_cnt && biu_ack_i)) begin
             //write complete
-            biufsm_state <= IDLE;  //TODO: detect if another BURST request is pending, skip IDLE
+            biufsm_state <= IDLE;  //TO-DO: detect if another BURST request is pending, skip IDLE
           end
         end
       endcase
@@ -907,7 +907,7 @@ module pu_riscv_dcache_core #(
   end
 
   //store dirty line in evict buffer
-  //TODO: change name
+  //TO-DO: change name
   always @(posedge clk_i) begin
     is_read_way <= (biucmd == READ_WAY) || (memfsm_state == FLUSH) || (memfsm_state == FLUSHWAYS & biufsm_ack & |way_dirty);
   end

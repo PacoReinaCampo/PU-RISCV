@@ -281,7 +281,7 @@ module pu_riscv_bu #(
         bp_update  = 'b0;
         pipeflush  = 'b0;
         cacheflush = 'b0;
-        nxt_pc     = id_pc + 'h4;  //TODO: handle 16bit instructions
+        nxt_pc     = id_pc + 'h4;  //TO-DO: handle 16bit instructions
       end
     endcase
   end

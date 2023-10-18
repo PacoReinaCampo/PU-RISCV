@@ -125,7 +125,7 @@ module pu_riscv_noicache_core #(
   assign if_parcel          = biu_fifo_dat[0][if_parcel_pc[$clog2(XLEN/32)+1:1]*16 +: PARCEL_SIZE];
 
   //External Interface
-  assign biu_stb            = dcflush_rdy & ~if_flush & ~if_stall & ~biu_fifo_valid[1];  //TODO when is ~biu_fifo[1] required?
+  assign biu_stb            = dcflush_rdy & ~if_flush & ~if_stall & ~biu_fifo_valid[1];  //TO-DO: when is ~biu_fifo[1] required?
   assign biu_adri           = if_nxt_pc[PLEN - 1:0];
   assign biu_size           = XLEN == 64 ? DWORD : WORD;
   assign biu_lock           = 1'b0;

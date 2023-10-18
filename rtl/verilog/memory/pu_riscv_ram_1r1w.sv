@@ -133,7 +133,7 @@ module pu_riscv_ram_1r1w #(
     end
   endgenerate
 
-  //TODO Handle 'be' ... requires partial old, partial new data
+  //TO-DO: Handle 'be' ... requires partial old, partial new data
 
   //now ... write-first; we'll still need some bypass logic
   assign contention = we_i && (raddr_i == waddr_i) ? re_i : 1'b0;  //prevent 'x' from propagating from eASIC memories
