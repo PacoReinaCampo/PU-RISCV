@@ -1,17 +1,17 @@
 ////////////////////////////////////////////////////////////////////////////////
-//                                            __ _      _     _               //
-//                                           / _(_)    | |   | |              //
-//                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
-//               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
-//              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
-//               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
-//                  | |                                                       //
-//                  |_|                                                       //
+//                                           __ _      _     _                //
+//                                          / _(_)    | |   | |               //
+//               __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |               //
+//              / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |               //
+//             | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |               //
+//              \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|               //
+//                 | |                                                        //
+//                 |_|                                                        //
 //                                                                            //
 //                                                                            //
-//              MPSoC-RISCV CPU                                               //
-//              Debug Controller Simulation Model                             //
-//              Wishbone Bus Interface                                        //
+//             MPSoC-RISCV CPU                                                //
+//             Debug Controller Simulation Model                              //
+//             Wishbone Bus Interface                                         //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -66,7 +66,7 @@ module pu_riscv_mmio_if_wb #(
   output     [           2:0] wb_rty_o
 );
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
@@ -80,7 +80,7 @@ module pu_riscv_mmio_if_wb #(
 
   integer                  watchdog_cnt;
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Functions
   //
@@ -92,12 +92,12 @@ module pu_riscv_mmio_if_wb #(
     endcase
   endfunction
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module body
   //
 
-  //Generate watchdog counter
+  // Generate watchdog counter
   always @(posedge HCLK, negedge HRESETn) begin
     if (!HRESETn) begin
       watchdog_cnt <= 0;
@@ -106,7 +106,7 @@ module pu_riscv_mmio_if_wb #(
     end
   end
 
-  //Catch write to host address
+  // Catch write to host address
   assign wb_err_o = `HRESP_OKAY;
 
   always @(posedge HCLK) begin
@@ -133,16 +133,16 @@ module pu_riscv_mmio_if_wb #(
     end
   end
 
-  //Generate output
+  // Generate output
 
-  //Simulated UART Tx (prints characters on screen)
+  // Simulated UART Tx (prints characters on screen)
   always @(posedge HCLK) begin
     if (catch_uart_tx) begin
       $write("%0c", data_reg);
     end
   end
 
-  //Tests ...
+  // Tests ...
   always @(posedge HCLK) begin
     if (watchdog_cnt > 1000_000 || catch_test) begin
       $display("\n");

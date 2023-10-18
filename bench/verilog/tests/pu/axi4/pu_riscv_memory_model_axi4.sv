@@ -1,17 +1,17 @@
 ////////////////////////////////////////////////////////////////////////////////
-//                                            __ _      _     _               //
-//                                           / _(_)    | |   | |              //
-//                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
-//               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
-//              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
-//               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
-//                  | |                                                       //
-//                  |_|                                                       //
+//                                           __ _      _     _                //
+//                                          / _(_)    | |   | |               //
+//               __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |               //
+//              / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |               //
+//             | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |               //
+//              \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|               //
+//                 | |                                                        //
+//                 |_|                                                        //
 //                                                                            //
 //                                                                            //
-//              MPSoC-RISCV CPU                                               //
-//              Memory Model                                                  //
-//              AMBA3 AHB-Lite Bus Interface                                  //
+//             MPSoC-RISCV CPU                                                //
+//             Memory Model                                                   //
+//             AMBA3 AHB-Lite Bus Interface                                   //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -67,7 +67,7 @@ module pu_riscv_memory_model_axi4 #(
   input HRESETn,
   input HCLK,
 
-  //AXI4 instruction
+  // AXI4 instruction
   input  wire [1:0][AXI_ID_WIDTH    -1:0] axi4_aw_id,
   input  wire [1:0][AXI_ADDR_WIDTH  -1:0] axi4_aw_addr,
   input  wire [1:0][                 7:0] axi4_aw_len,
@@ -118,19 +118,19 @@ module pu_riscv_memory_model_axi4 #(
   input  wire [1:0]                       axi4_b_ready
 );
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Constants
   //
   localparam RADRCNT_MSB = $clog2(BURST) + $clog2(XLEN / 8) - 1;
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Typedefs
   //
   typedef logic [PLEN-1:0] addr_type;
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
@@ -169,12 +169,12 @@ module pu_riscv_memory_model_axi4 #(
   logic [              1:0]                     hreadyout;
   logic [              1:0]                     hresp;
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Tasks
   //
 
-  //Read Intel HEX
+  // Read Intel HEX
   task automatic read_ihex;
     integer              m;
     integer              fd;
@@ -207,7 +207,7 @@ module pu_riscv_memory_model_axi4 #(
      * 6: checksum    (2 hex digits)
      */
 
-    fd = $fopen(INIT_FILE, "r");  //open file
+    fd = $fopen(INIT_FILE, "r");  // open file
     if (fd < 32'h8000_0000) begin
       $display("ERROR  : Skip reading file %s. Reason file not found", INIT_FILE);
       $finish();
@@ -219,7 +219,7 @@ module pu_riscv_memory_model_axi4 #(
         $display("ERROR  : Read error while processing %s", INIT_FILE);
       end
 
-      //initial CRC value
+      // initial CRC value
       crc = byte_cnt + address[1] + address[0] + record_type;
 
       for (m = 0; m < byte_cnt; m = m + 1) begin
@@ -227,7 +227,7 @@ module pu_riscv_memory_model_axi4 #(
           $display("ERROR  : Read error while processing %s", INIT_FILE);
         end
 
-        //update CRC
+        // update CRC
         crc = crc + data[m];
       end
 
@@ -242,10 +242,10 @@ module pu_riscv_memory_model_axi4 #(
       case (record_type)
         8'h00: begin
           for (m = 0; m < byte_cnt; m = m + 1) begin
-            //mem_array[ base_addr + address + (m & ~(XLEN/8 -1)) ][ (m%(XLEN/8))*8+:8 ] = data[m];
+            // mem_array[ base_addr + address + (m & ~(XLEN/8 -1)) ][ (m%(XLEN/8))*8+:8 ] = data[m];
             mem_array[(base_addr + address + m) & ~(XLEN/8 - 1)][((base_addr + address + m) % (XLEN/8))*8+:8] = data[m];
-            //$display ("write %2h to %8h (base_addr=%8h, address=%4h, m=%2h)", data[m], base_addr+address+ (m & ~(XLEN/8 -1)), base_addr, address, m);
-            //$display ("(%8h)=%8h",base_addr+address+4*(m/4), mem_array[ base_addr+address+4*(m/4) ]);
+            // $display ("write %2h to %8h (base_addr=%8h, address=%4h, m=%2h)", data[m], base_addr+address+ (m & ~(XLEN/8 -1)), base_addr, address, m);
+            // $display ("(%8h)=%8h",base_addr+address+4*(m/4), mem_array[ base_addr+address+4*(m/4) ]);
           end
         end
         8'h01:   eof = 1;
@@ -257,10 +257,10 @@ module pu_riscv_memory_model_axi4 #(
       endcase
     end
 
-    $fclose(fd);  //close file
+    $fclose(fd);  // close file
   endtask
 
-  //Read HEX generated by RISC-V elf2hex
+  // Read HEX generated by RISC-V elf2hex
   task automatic read_elf2hex;
     integer            fd;
     integer            m;
@@ -270,7 +270,7 @@ module pu_riscv_memory_model_axi4 #(
 
     logic   [PLEN-1:0] base_addr = BASE;
 
-    fd = $fopen(INIT_FILE, "r");  //open file
+    fd = $fopen(INIT_FILE, "r");  // open file
     if (fd < 32'h8000_0000) begin
       $display("ERROR  : Skip reading file %s. File not found", INIT_FILE);
       $finish();
@@ -278,7 +278,7 @@ module pu_riscv_memory_model_axi4 #(
       $display("INFO   : Reading %s", INIT_FILE);
     end
 
-    //Read data from file
+    // Read data from file
     while (!$feof(
       fd
     )) begin
@@ -288,22 +288,22 @@ module pu_riscv_memory_model_axi4 #(
       end
 
       for (m = 0; m < 128 / XLEN; m = m + 1) begin
-        //$display("[%8h]:%8h",base_addr,data[m*XLEN +: XLEN]);
+        // $display("[%8h]:%8h",base_addr,data[m*XLEN +: XLEN]);
         mem_array[base_addr] = data[m*XLEN +: XLEN];
         base_addr            = base_addr + (XLEN / 8);
       end
     end
 
-    //close file
+    // close file
     $fclose(fd);
   endtask
 
-  //Dump memory
+  // Dump memory
   task dump;
     foreach (mem_array[m]) $display("[%8h]:%8h", m, mem_array[m]);
   endtask
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module body
   //
@@ -311,7 +311,7 @@ module pu_riscv_memory_model_axi4 #(
   generate
     for (u = 0; u < 2; u = u + 1) begin
 
-      //Generate ACK
+      // Generate ACK
 
       if (MEM_LATENCY > 0) begin
         always @(posedge HCLK, negedge HRESETn) begin
@@ -334,9 +334,9 @@ module pu_riscv_memory_model_axi4 #(
 
       assign hresp[u] = `HRESP_OKAY;
 
-      //Write Section
+      // Write Section
 
-      //delay control signals
+      // delay control signals
       always @(posedge HCLK) begin
         if (hreadyout[u]) begin
           dHTRANS[u] <= htrans[u];
@@ -375,7 +375,7 @@ module pu_riscv_memory_model_axi4 #(
         end
       end
 
-      //Read Section
+      // Read Section
       assign iaddr[u] = haddr[u] & ({XLEN{1'b1}} << $clog2(XLEN / 8));
 
       always @(posedge HCLK) begin

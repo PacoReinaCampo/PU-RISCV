@@ -1,17 +1,17 @@
 ////////////////////////////////////////////////////////////////////////////////
-//                                            __ _      _     _               //
-//                                           / _(_)    | |   | |              //
-//                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
-//               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
-//              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
-//               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
-//                  | |                                                       //
-//                  |_|                                                       //
+//                                           __ _      _     _                //
+//                                          / _(_)    | |   | |               //
+//               __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |               //
+//              / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |               //
+//             | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |               //
+//              \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|               //
+//                 | |                                                        //
+//                 |_|                                                        //
 //                                                                            //
 //                                                                            //
-//              MPSoC-RISCV CPU                                               //
-//              TestBench                                                     //
-//              Wishbone Bus Interface                                        //
+//             MPSoC-RISCV CPU                                                //
+//             TestBench                                                      //
+//             Wishbone Bus Interface                                         //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -44,11 +44,11 @@
 
 module pu_riscv_testbench_wb;
 
-  //core parameters
+  // core parameters
   parameter XLEN = 64;
-  parameter PLEN = 64;  //64bit address bus
-  parameter PC_INIT = 'h8000_0000;  //Start here after reset
-  parameter BASE = PC_INIT;  //offset where to load program in memory
+  parameter PLEN = 64;  // 64bit address bus
+  parameter PC_INIT = 'h8000_0000;  // Start here after reset
+  parameter BASE = PC_INIT;  // offset where to load program in memory
   parameter INIT_FILE = "test.hex";
   parameter MEM_LATENCY = 1;
   parameter WRITEBUFFER_SIZE = 4;
@@ -62,42 +62,43 @@ module pu_riscv_testbench_wb;
   parameter MULT_LATENCY = 1;
   parameter CORES = 1;
 
-  parameter HTIF = 0;  //Host-interface
+  parameter HTIF = 0;  // Host-interface
   parameter TOHOST = 32'h80001000;
   parameter UART_TX = 32'h80001080;
 
-  //caches
+  // caches
   parameter ICACHE_SIZE = 64;
   parameter DCACHE_SIZE = 64;
 
   parameter PMA_CNT = 4;
 
-  //MPSoC
+  // MPSoC
   parameter X = 1;
   parameter Y = 1;
   parameter Z = 1;
 
   parameter NODES = X * Y * Z;
 
-  //////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
   //
   // Constants
   //
   localparam MULLAT = MULT_LATENCY > 4 ? 4 : MULT_LATENCY;
 
-  //////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
   genvar p;
 
-  logic HCLK, HRESETn;
+  logic HCLK;
+  logic HRESETn;
 
-  //PMA configuration
+  // PMA configuration
   logic [PMA_CNT-1:0][    13:0] pma_cfg;
   logic [PMA_CNT-1:0][PLEN-1:0] pma_adr;
 
-  //Instruction interface
+  // Instruction interface
   logic [   PLEN-1:0]           wb_ins_adr_i;
   logic [   XLEN-1:0]           wb_ins_dat_i;
   logic [        3:0]           wb_ins_sel_i;
@@ -111,7 +112,7 @@ module pu_riscv_testbench_wb;
   logic                         wb_ins_err_o;
   logic [        2:0]           wb_ins_rty_o;
 
-  //Data interface
+  // Data interface
   logic [   PLEN-1:0]           wb_dat_adr_i;
   logic [   XLEN-1:0]           wb_dat_dat_i;
   logic [        3:0]           wb_dat_sel_i;
@@ -125,7 +126,7 @@ module pu_riscv_testbench_wb;
   logic                         wb_dat_err_o;
   logic [        2:0]           wb_dat_rty_o;
 
-  //Debug Interface
+  // Debug Interface
   logic            dbp_bp;
   logic            dbg_stall;
   logic            dbg_strb;
@@ -135,14 +136,14 @@ module pu_riscv_testbench_wb;
   logic [XLEN-1:0] dbg_dati;
   logic [XLEN-1:0] dbg_dato;
 
-  //Host Interface
+  // Host Interface
   logic            host_csr_req;
   logic            host_csr_ack;
   logic            host_csr_we;
   logic [XLEN-1:0] host_csr_tohost;
   logic [XLEN-1:0] host_csr_fromhost;
 
-  //Unified memory interface
+  // Unified memory interface
   logic [1:0][PLEN-1:0] wb_mem_adr_i;
   logic [1:0][XLEN-1:0] wb_mem_dat_i;
   logic [1:0][     3:0] wb_mem_sel_i;
@@ -156,30 +157,30 @@ module pu_riscv_testbench_wb;
   logic [1:0]           wb_mem_err_o;
   logic [1:0][     2:0] wb_mem_rty_o;
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
 
-  //Define PMA regions
+  // Define PMA regions
 
-  //crt.0 (ROM) region
+  // crt.0 (ROM) region
   assign pma_adr[0] = TOHOST >> 2;
   assign pma_cfg[0] = {`MEM_TYPE_MAIN, 8'b1111_1000, `AMO_TYPE_NONE, `TOR};
 
-  //TOHOST region
+  // TOHOST region
   assign pma_adr[1] = ((TOHOST >> 2) & ~'hf) | 'h7;
   assign pma_cfg[1] = {`MEM_TYPE_IO, 8'b0100_0000, `AMO_TYPE_NONE, `NAPOT};
 
-  //UART-Tx region
+  // UART-Tx region
   assign pma_adr[2] = UART_TX >> 2;
   assign pma_cfg[2] = {`MEM_TYPE_IO, 8'b0100_0000, `AMO_TYPE_NONE, `NA4};
 
-  //RAM region
+  // RAM region
   assign pma_adr[3] = 1 << 31;
   assign pma_cfg[3] = {`MEM_TYPE_MAIN, 8'b1111_0000, `AMO_TYPE_NONE, `TOR};
 
-  //Hookup Device Under Test
+  // Hookup Device Under Test
   pu_riscv_wb #(
     .XLEN        (XLEN),
     .PLEN        (PLEN),
@@ -214,7 +215,7 @@ module pu_riscv_testbench_wb;
     .*
   );
 
-  //Hookup Debug Unit
+  // Hookup Debug Unit
   pu_riscv_dbg_bfm #(
     .XLEN(XLEN),
     .PLEN(PLEN)
@@ -232,7 +233,7 @@ module pu_riscv_testbench_wb;
     .cpu_ack_i  (dbg_ack)
   );
 
-  //bus <-> memory model connections
+  // bus <-> memory model connections
   assign wb_mem_adr_i[0] = wb_ins_adr_i;
   assign wb_mem_dat_i[0] = wb_ins_dat_i;
   assign wb_mem_sel_i[0] = wb_ins_sel_i;
@@ -261,7 +262,7 @@ module pu_riscv_testbench_wb;
   assign wb_dat_err_o    = wb_mem_err_o[1];
   assign wb_dat_rty_o    = wb_mem_rty_o[1];
 
-  //hookup memory model
+  // hookup memory model
   pu_riscv_memory_model_wb #(
     .INIT_FILE(INIT_FILE)
   ) memory_model (
@@ -282,10 +283,10 @@ module pu_riscv_testbench_wb;
     .wb_rty_o(wb_mem_rty_o)
   );
 
-  //Front-End Server
+  // Front-End Server
   generate
     if (HTIF) begin
-      //Old HTIF interface
+      // Old HTIF interface
       pu_riscv_htif #(XLEN) htif_frontend (
         .rstn             (HRESETn),
         .clk              (HCLK),
@@ -296,7 +297,7 @@ module pu_riscv_testbench_wb;
         .host_csr_fromhost(host_csr_fromhost)
       );
     end else begin
-      //New MMIO interface
+      // New MMIO interface
       pu_riscv_mmio_if_wb #(
         .HDATA_SIZE   (XLEN),
         .HADDR_SIZE   (PLEN),
@@ -322,7 +323,7 @@ module pu_riscv_testbench_wb;
     end
   endgenerate
 
-  //Generate clock
+  // Generate clock
   always #1 HCLK = ~HCLK;
 
   initial begin
@@ -368,9 +369,9 @@ module pu_riscv_testbench_wb;
     $display("INFO: Signal dump enabled ...\n");
 `endif
 
-    //memory_model.read_elf2hex;
+    // memory_model.read_elf2hex;
     memory_model.read_ihex;
-    //memory_model.dump;
+    // memory_model.dump;
 
     HCLK    = 'b0;
 
@@ -381,27 +382,27 @@ module pu_riscv_testbench_wb;
     HRESETn = 'b1;
 
     #112;
-    //stall CPU
+    // stall CPU
     dbg_ctrl.stall;
 
-    //Enable BREAKPOINT to call external debugger
-    //dbg_ctrl.write('h0004,'h0008);
+    // Enable BREAKPOINT to call external debugger
+    // dbg_ctrl.write('h0004,'h0008);
 
-    //Enable Single Stepping
+    // Enable Single Stepping
     dbg_ctrl.write('h0000, 'h0001);
 
-    //single step through 10 instructions
+    // single step through 10 instructions
     repeat (100) begin
       while (!dbg_ctrl.stall_cpu) @(posedge HCLK);
       repeat (15) @(posedge HCLK);
-      dbg_ctrl.write('h0001, 'h0000);  //clear single-step-hit
+      dbg_ctrl.write('h0001, 'h0000);  // clear single-step-hit
       dbg_ctrl.unstall;
     end
 
-    //last time ...
+    // last time ...
     @(posedge HCLK);
     while (!dbg_ctrl.stall_cpu) @(posedge HCLK);
-    //disable Single Stepping
+    // disable Single Stepping
     dbg_ctrl.write('h0000, 'h0000);
     dbg_ctrl.write('h0001, 'h0000);
     dbg_ctrl.unstall;

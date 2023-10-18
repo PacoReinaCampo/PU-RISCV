@@ -1,17 +1,17 @@
 ////////////////////////////////////////////////////////////////////////////////
-//                                            __ _      _     _               //
-//                                           / _(_)    | |   | |              //
-//                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
-//               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
-//              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
-//               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
-//                  | |                                                       //
-//                  |_|                                                       //
+//                                           __ _      _     _                //
+//                                          / _(_)    | |   | |               //
+//               __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |               //
+//              / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |               //
+//             | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |               //
+//              \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|               //
+//                 | |                                                        //
+//                 |_|                                                        //
 //                                                                            //
 //                                                                            //
-//              MPSoC-RISCV CPU                                               //
-//              Memory Model                                                  //
-//              Wishbone Bus Interface                                        //
+//             MPSoC-RISCV CPU                                                //
+//             Memory Model                                                   //
+//             Wishbone Bus Interface                                         //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -73,19 +73,19 @@ module pu_riscv_memory_model_wb #(
   output     [1:0][        2:0] wb_rty_o
 );
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Constants
   //
   localparam RADRCNT_MSB = $clog2(BURST) + $clog2(XLEN / 8) - 1;
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Typedefs
   //
   typedef logic [PLEN-1:0] addr_type;
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
@@ -110,12 +110,12 @@ module pu_riscv_memory_model_wb #(
   logic [              2:0] dHSIZE     [        2];
   logic [              2:0] dHBURST    [        2];
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Tasks
   //
 
-  //Read Intel HEX
+  // Read Intel HEX
   task automatic read_ihex;
     integer              m;
     integer              fd;
@@ -148,7 +148,7 @@ module pu_riscv_memory_model_wb #(
      * 6: checksum    (2 hex digits)
      */
 
-    fd = $fopen(INIT_FILE, "r");  //open file
+    fd = $fopen(INIT_FILE, "r");  // open file
     if (fd < 32'h8000_0000) begin
       $display("ERROR  : Skip reading file %s. Reason file not found", INIT_FILE);
       $finish();
@@ -160,7 +160,7 @@ module pu_riscv_memory_model_wb #(
         $display("ERROR  : Read error while processing %s", INIT_FILE);
       end
 
-      //initial CRC value
+      // initial CRC value
       crc = byte_cnt + address[1] + address[0] + record_type;
 
       for (m = 0; m < byte_cnt; m = m + 1) begin
@@ -168,7 +168,7 @@ module pu_riscv_memory_model_wb #(
           $display("ERROR  : Read error while processing %s", INIT_FILE);
         end
 
-        //update CRC
+        // update CRC
         crc = crc + data[m];
       end
 
@@ -183,10 +183,10 @@ module pu_riscv_memory_model_wb #(
       case (record_type)
         8'h00: begin
           for (m = 0; m < byte_cnt; m = m + 1) begin
-            //mem_array[ base_addr + address + (m & ~(XLEN/8 -1)) ][ (m%(XLEN/8))*8+:8 ] = data[m];
+            // mem_array[ base_addr + address + (m & ~(XLEN/8 -1)) ][ (m%(XLEN/8))*8+:8 ] = data[m];
             mem_array[(base_addr + address + m) & ~(XLEN/8 - 1)][((base_addr + address + m) % (XLEN/8))*8+:8] = data[m];
-            //$display ("write %2h to %8h (base_addr=%8h, address=%4h, m=%2h)", data[m], base_addr+address+ (m & ~(XLEN/8 -1)), base_addr, address, m);
-            //$display ("(%8h)=%8h",base_addr+address+4*(m/4), mem_array[ base_addr+address+4*(m/4) ]);
+            // $display ("write %2h to %8h (base_addr=%8h, address=%4h, m=%2h)", data[m], base_addr+address+ (m & ~(XLEN/8 -1)), base_addr, address, m);
+            // $display ("(%8h)=%8h",base_addr+address+4*(m/4), mem_array[ base_addr+address+4*(m/4) ]);
           end
         end
         8'h01:   eof = 1;
@@ -198,10 +198,10 @@ module pu_riscv_memory_model_wb #(
       endcase
     end
 
-    $fclose(fd);  //close file
+    $fclose(fd);  // close file
   endtask
 
-  //Read HEX generated by RISC-V elf2hex
+  // Read HEX generated by RISC-V elf2hex
   task automatic read_elf2hex;
     integer            fd;
     integer            m;
@@ -211,13 +211,13 @@ module pu_riscv_memory_model_wb #(
 
     logic   [PLEN-1:0] base_addr = BASE;
 
-    fd = $fopen(INIT_FILE, "r");  //open file
+    fd = $fopen(INIT_FILE, "r");  // open file
     if (fd < 32'h8000_0000) begin
       $display("ERROR  : Skip reading file %s. File not found", INIT_FILE);
       $finish();
     end else $display("INFO   : Reading %s", INIT_FILE);
 
-    //Read data from file
+    // Read data from file
     while (!$feof(
       fd
     )) begin
@@ -225,22 +225,22 @@ module pu_riscv_memory_model_wb #(
       if ($fscanf(fd, "%32h", data) != 1) $display("ERROR  : Read error while processing %s (line %0d)", INIT_FILE, line);
 
       for (m = 0; m < 128 / XLEN; m = m + 1) begin
-        //$display("[%8h]:%8h",base_addr,data[m*XLEN +: XLEN]);
+        // $display("[%8h]:%8h",base_addr,data[m*XLEN +: XLEN]);
         mem_array[base_addr] = data[m*XLEN +: XLEN];
         base_addr            = base_addr + (XLEN / 8);
       end
     end
 
-    //close file
+    // close file
     $fclose(fd);
   endtask
 
-  //Dump memory
+  // Dump memory
   task dump;
     foreach (mem_array[m]) $display("[%8h]:%8h", m, mem_array[m]);
   endtask
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module body
   //
@@ -248,7 +248,7 @@ module pu_riscv_memory_model_wb #(
   generate
     for (u = 0; u < 2; u = u + 1) begin
 
-      //Generate ACK
+      // Generate ACK
 
       if (MEM_LATENCY > 0) begin
         always @(posedge HCLK, negedge HRESETn) begin
@@ -271,9 +271,9 @@ module pu_riscv_memory_model_wb #(
 
       assign wb_err_o[u] = `HRESP_OKAY;
 
-      //Write Section
+      // Write Section
 
-      //delay control signals
+      // delay control signals
       always @(posedge HCLK) begin
         if (wb_ack_o[u]) begin
           dHTRANS[u] <= wb_bte_i[u];
@@ -312,7 +312,7 @@ module pu_riscv_memory_model_wb #(
         end
       end
 
-      //Read Section
+      // Read Section
       assign iaddr[u] = wb_adr_i[u] & ({XLEN{1'b1}} << $clog2(XLEN / 8));
 
       always @(posedge HCLK) begin

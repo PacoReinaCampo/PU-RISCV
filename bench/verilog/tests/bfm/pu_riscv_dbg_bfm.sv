@@ -1,17 +1,17 @@
 ////////////////////////////////////////////////////////////////////////////////
-//                                            __ _      _     _               //
-//                                           / _(_)    | |   | |              //
-//                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
-//               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
-//              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
-//               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
-//                  | |                                                       //
-//                  |_|                                                       //
+//                                           __ _      _     _                //
+//                                          / _(_)    | |   | |               //
+//               __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |               //
+//              / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |               //
+//             | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |               //
+//              \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|               //
+//                 | |                                                        //
+//                 |_|                                                        //
 //                                                                            //
 //                                                                            //
-//              MPSoC-RISCV CPU                                               //
-//              Debug Controller Simulation Model                             //
-//              AMBA3 AHB-Lite Bus Interface                                  //
+//             MPSoC-RISCV CPU                                                //
+//             Debug Controller Simulation Model                              //
+//             AMBA3 AHB-Lite Bus Interface                                   //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -58,69 +58,69 @@ module pu_riscv_dbg_bfm #(
   input                  cpu_ack_i
 );
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
   logic stall_cpu;
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Tasks
   //
 
-  //Stall CPU
+  // Stall CPU
   task stall;
     @(posedge clk);
     stall_cpu <= 1'b1;
   endtask
 
-  //Unstall CPU
+  // Unstall CPU
   task unstall;
     @(posedge clk) stall_cpu <= 1'b0;
   endtask
 
-  //Write to CPU (via DBG interface)
+  // Write to CPU (via DBG interface)
   task write;
-    input [PLEN-1:0] addr;  //address to write to
-    input [XLEN-1:0] data;  //data to write
+    input [PLEN-1:0] addr;  // address to write to
+    input [XLEN-1:0] data;  // data to write
 
-    //setup DBG bus
+    // setup DBG bus
     @(posedge clk);
     cpu_stb_o <= 1'b1;
     cpu_we_o  <= 1'b1;
     cpu_dat_o <= data;
     cpu_adr_o <= addr;
 
-    //wait for ack
+    // wait for ack
     while (!cpu_ack_i) @(posedge clk);
 
-    //clear DBG bus
+    // clear DBG bus
     cpu_stb_o <= 1'b0;
     cpu_we_o  <= 1'b0;
   endtask
 
-  //Read from CPU (via DBG interface)
+  // Read from CPU (via DBG interface)
   task read;
-    input [PLEN-1:0] addr;  //address to read from
-    output [XLEN-1:0] data;  //data read from CPU
+    input  [PLEN-1:0] addr;  // address to read from
+    output [XLEN-1:0] data;  // data read from CPU
 
-    //setup DBG bus
+    // setup DBG bus
     @(posedge clk);
     cpu_stb_o <= 1'b1;
     cpu_we_o  <= 1'b0;
     cpu_adr_o <= addr;
 
-    //wait for ack
+    // wait for ack
     while (!cpu_ack_i) @(posedge clk);
     data = cpu_dat_i;
 
-    //clear DBG bus
+    // clear DBG bus
     cpu_stb_o <= 1'b0;
     cpu_we_o  <= 1'b0;
   endtask
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module body
   //
@@ -132,7 +132,7 @@ module pu_riscv_dbg_bfm #(
     if (!rstn) begin
       stall_cpu <= 1'b0;
     end else if (cpu_bp_i) begin
-      stall_cpu <= 1'b1;  //gets cleared by task unstall_cpu
+      stall_cpu <= 1'b1;  // gets cleared by task unstall_cpu
     end
   end
 endmodule

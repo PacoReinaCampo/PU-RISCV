@@ -1,17 +1,17 @@
 ////////////////////////////////////////////////////////////////////////////////
-//                                            __ _      _     _               //
-//                                           / _(_)    | |   | |              //
-//                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
-//               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
-//              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
-//               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
-//                  | |                                                       //
-//                  |_|                                                       //
+//                                           __ _      _     _                //
+//                                          / _(_)    | |   | |               //
+//               __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |               //
+//              / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |               //
+//             | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |               //
+//              \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|               //
+//                 | |                                                        //
+//                 |_|                                                        //
 //                                                                            //
 //                                                                            //
-//              MPSoC-RISCV CPU                                               //
-//              Debug Controller Simulation Model                             //
-//              AMBA3 AHB-Lite Bus Interface                                  //
+//             MPSoC-RISCV CPU                                                //
+//             Debug Controller Simulation Model                              //
+//             AMBA3 AHB-Lite Bus Interface                                   //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -58,7 +58,7 @@ module pu_riscv_mmio_if_axi4 #(
   input HRESETn,
   input HCLK,
 
-  //AXI4 instruction
+  // AXI4 instruction
   input  wire [AXI_ID_WIDTH    -1:0] axi4_aw_id,
   input  wire [AXI_ADDR_WIDTH  -1:0] axi4_aw_addr,
   input  wire [                 7:0] axi4_aw_len,
@@ -109,7 +109,7 @@ module pu_riscv_mmio_if_axi4 #(
   input  wire                        axi4_b_ready
 );
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Variables
   //
@@ -136,7 +136,7 @@ module pu_riscv_mmio_if_axi4 #(
   logic                        hreadyout;
   logic                        hresp;
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Functions
   //
@@ -148,12 +148,12 @@ module pu_riscv_mmio_if_axi4 #(
     endcase
   endfunction
 
-  ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
   //
   // Module body
   //
 
-  //Generate watchdog counter
+  // Generate watchdog counter
   always @(posedge HCLK, negedge HRESETn) begin
     if (!HRESETn) begin
       watchdog_cnt <= 0;
@@ -162,7 +162,7 @@ module pu_riscv_mmio_if_axi4 #(
     end
   end
 
-  //Catch write to host address
+  // Catch write to host address
   assign HRESP = `HRESP_OKAY;
 
   always @(posedge HCLK) begin
@@ -189,16 +189,16 @@ module pu_riscv_mmio_if_axi4 #(
     end
   end
 
-  //Generate output
+  // Generate output
 
-  //Simulated UART Tx (prints characters on screen)
+  // Simulated UART Tx (prints characters on screen)
   always @(posedge HCLK) begin
     if (catch_uart_tx) begin
       $write("%0c", data_reg);
     end
   end
 
-  //Tests ...
+  // Tests ...
   always @(posedge HCLK) begin
     if (watchdog_cnt > 1000_000 || catch_test) begin
       $display("\n");
