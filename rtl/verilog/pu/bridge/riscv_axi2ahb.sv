@@ -57,7 +57,7 @@ module riscv_axi2ahb #(
   input bus_clk_en,
   input clk_override,
 
-  //AXI4 instruction
+  // AXI4 instruction
   input  wire [AXI_ID_WIDTH  -1:0] axi4_aw_id,
   input  wire [AXI_ADDR_WIDTH-1:0] axi4_aw_addr,
   input  wire [               7:0] axi4_aw_len,
@@ -194,7 +194,7 @@ module riscv_axi2ahb #(
   logic [AXI_DATA_WIDTH-1:0] buf_data;
   logic [AXI_ID_WIDTH  -1:0] buf_tag;
 
-  //Miscellaneous signals
+  // Miscellaneous signals
   logic                      buf_rst;
   logic [AXI_ID_WIDTH  -1:0] buf_tag_in;
   logic [AXI_ADDR_WIDTH-1:0] buf_addr_in;

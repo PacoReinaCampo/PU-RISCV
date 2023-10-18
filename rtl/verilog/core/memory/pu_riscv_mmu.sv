@@ -46,23 +46,23 @@ module pu_riscv_mmu #(
 ) (
   input wire rst_ni,
   input wire clk_i,
-  input wire clr_i,   //clear pending request
+  input wire clr_i,   // clear pending request
 
-  //Mode
-  //input  wire  [XLEN-1:0] st_satp;
+  // Mode
+  // input  wire  [XLEN-1:0] st_satp;
 
-  //CPU side
-  input wire            vreq_i,   //Request from CPU
-  input wire [XLEN-1:0] vadr_i,   //Virtual Memory Address
+  // CPU side
+  input wire            vreq_i,   // Request from CPU
+  input wire [XLEN-1:0] vadr_i,   // Virtual Memory Address
   input wire [     2:0] vsize_i,
   input wire            vlock_i,
   input wire [     2:0] vprot_i,
   input wire            vwe_i,
   input wire [XLEN-1:0] vd_i,
 
-  //Memory system side
+  // Memory system side
   output reg             preq_o,
-  output reg  [PLEN-1:0] padr_o,   //Physical Memory Address
+  output reg  [PLEN-1:0] padr_o,   // Physical Memory Address
   output reg  [     2:0] psize_o,
   output reg             plock_o,
   output reg  [     2:0] pprot_o,
@@ -71,7 +71,7 @@ module pu_riscv_mmu #(
   input  wire [XLEN-1:0] pq_i,
   input  wire            pack_i,
 
-  //Exception
+  // Exception
   output reg page_fault_o
 );
 
@@ -87,11 +87,11 @@ module pu_riscv_mmu #(
 
   always @(posedge clk_i) begin
     if (vreq_i) begin
-      padr_o <= vadr_i;  //TO-DO: actual translation
+      padr_o <= vadr_i;  // TO-DO: actual translation
     end
   end
 
-  //Insert state machine here
+  // Insert state machine here
   always @(posedge clk_i) begin
     if (clr_i) begin
       preq_o <= 1'b0;
@@ -107,11 +107,11 @@ module pu_riscv_mmu #(
     pwe_o   <= vwe_i;
   end
 
-  //MMU does not write data
+  // MMU does not write data
   always @(posedge clk_i) begin
     pd_o <= vd_i;
   end
 
-  //No page fault yet
+  // No page fault yet
   assign page_fault_o = 1'b0;
 endmodule

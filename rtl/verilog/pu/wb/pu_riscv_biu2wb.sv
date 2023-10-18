@@ -50,7 +50,7 @@ module pu_riscv_biu2wb #(
   input wire HRESETn,
   input wire HCLK,
 
-  //WB Bus
+  // WB Bus
   output reg [PLEN -1:0] wb_adr_o,
   output reg [XLEN -1:0] wb_dat_o,
   output reg [      3:0] wb_sel_o,
@@ -65,21 +65,21 @@ module pu_riscv_biu2wb #(
   input wire             wb_err_i,
   input wire [      2:0] wb_rty_i,
 
-  //BIU Bus (Core ports)
-  input  wire             biu_stb_i,      //strobe
-  output reg              biu_stb_ack_o,  //strobe acknowledge; can send new strobe
-  output reg              biu_d_ack_o,    //data acknowledge (send new biu_d_i); for pipelined buses
+  // BIU Bus (Core ports)
+  input  wire             biu_stb_i,      // strobe
+  output reg              biu_stb_ack_o,  // strobe acknowledge; can send new strobe
+  output reg              biu_d_ack_o,    // data acknowledge (send new biu_d_i); for pipelined buses
   input  wire [PLEN -1:0] biu_adri_i,
   output reg  [PLEN -1:0] biu_adro_o,
-  input  wire [      2:0] biu_size_i,     //transfer size
-  input  wire [      2:0] biu_type_i,     //burst type
-  input  wire [      2:0] biu_prot_i,     //protection
+  input  wire [      2:0] biu_size_i,     // transfer size
+  input  wire [      2:0] biu_type_i,     // burst type
+  input  wire [      2:0] biu_prot_i,     // protection
   input  wire             biu_lock_i,
   input  wire             biu_we_i,
   input  wire [XLEN -1:0] biu_d_i,
   output reg  [XLEN -1:0] biu_q_o,
-  output reg              biu_ack_o,      //transfer acknowledge
-  output reg              biu_err_o       //transfer error
+  output reg              biu_ack_o,      // transfer acknowledge
+  output reg              biu_err_o       // transfer error
 );
 
   //////////////////////////////////////////////////////////////////////////////
@@ -95,11 +95,11 @@ module pu_riscv_biu2wb #(
       3'b001:  biu_size2hsize = `HSIZE_HWORD;
       3'b010:  biu_size2hsize = `HSIZE_WORD;
       3'b011:  biu_size2hsize = `HSIZE_DWORD;
-      default: biu_size2hsize = 3'hx;  //OOPSS
+      default: biu_size2hsize = 3'hx;  // OOPSS
     endcase
   endfunction
 
-  //convert burst type to counter length (actually length -1)
+  // convert burst type to counter length (actually length -1)
   function automatic [3:0] biu_type2cnt;
     input [2:0] biu_type;
 
@@ -112,11 +112,11 @@ module pu_riscv_biu2wb #(
       `INCR8:  biu_type2cnt = 7;
       `WRAP16: biu_type2cnt = 15;
       `INCR16: biu_type2cnt = 15;
-      default: biu_type2cnt = 4'hx;  //OOPS
+      default: biu_type2cnt = 4'hx;  // OOPS
     endcase
   endfunction
 
-  //convert burst type to counter length (actually length -1)
+  // convert burst type to counter length (actually length -1)
   function automatic [2:0] biu_type2hburst;
     input [2:0] biu_type;
 
@@ -129,11 +129,11 @@ module pu_riscv_biu2wb #(
       `INCR8:  biu_type2hburst = `HBURST_INCR8;
       `WRAP16: biu_type2hburst = `HBURST_WRAP16;
       `INCR16: biu_type2hburst = `HBURST_INCR16;
-      default: biu_type2hburst = 3'hx;  //OOPS
+      default: biu_type2hburst = 3'hx;  // OOPS
     endcase
   endfunction
 
-  //convert burst type to counter length (actually length -1)
+  // convert burst type to counter length (actually length -1)
   function automatic [3:0] biu_prot2hprot;
     input [2:0] biu_prot;
 
@@ -142,19 +142,19 @@ module pu_riscv_biu2wb #(
     biu_prot2hprot = biu_prot2hprot | (biu_prot & `PROT_CACHEABLE ? `HPROT_CACHEABLE : `HPROT_NON_CACHEABLE);
   endfunction
 
-  //convert burst type to counter length (actually length -1)
+  // convert burst type to counter length (actually length -1)
   function automatic [PLEN-1:0] nxt_addr;
-    input [PLEN -1:0] addr;  //current address
-    input [2:0] hburst;  //AHB wb_cti_o
+    input [PLEN -1:0] addr;  // current address
+    input [2:0] hburst;  // AHB wb_cti_o
 
-    //next linear address
+    // next linear address
     if (XLEN == 32) begin
       nxt_addr = (addr + 'h4) & ~'h3;
     end else begin
       nxt_addr = (addr + 'h8) & ~'h7;
     end
 
-    //wrap?
+    // wrap?
     case (hburst)
       `HBURST_WRAP4:  nxt_addr = (XLEN == 32) ? {addr[PLEN-1:4], nxt_addr[3:0]} : {addr[PLEN-1:5], nxt_addr[4:0]};
       `HBURST_WRAP8:  nxt_addr = (XLEN == 32) ? {addr[PLEN-1:5], nxt_addr[4:0]} : {addr[PLEN-1:6], nxt_addr[5:0]};
@@ -177,7 +177,7 @@ module pu_riscv_biu2wb #(
   // Module Body
   //
 
-  //State Machine
+  // State Machine
   always @(posedge HCLK, negedge HRESETn)
     if (!HRESETn) begin
       data_ena  <= 1'b0;
@@ -187,22 +187,22 @@ module pu_riscv_biu2wb #(
       wb_stb_o  <= 1'b0;
       wb_adr_o  <= 'h0;
       wb_we_o   <= 1'b0;
-      wb_cti_o  <= 'h0;  //dont care
+      wb_cti_o  <= 'h0;  // dont care
       wb_sel_o  <= `HPROT_DATA | `HPROT_PRIVILEGED | `HPROT_NON_BUFFERABLE | `HPROT_NON_CACHEABLE;
       wb_bte_o  <= `HTRANS_IDLE;
       wb_cyc_o  <= 1'b0;
     end else begin
-      //strobe/ack signals
+      // strobe/ack signals
       biu_err_o <= 1'b0;
 
       if (wb_ack_i) begin
-        if (~|burst_cnt) begin  //burst complete
+        if (~|burst_cnt) begin  // burst complete
           if (biu_stb_i && !biu_err_o) begin
             data_ena  <= 1'b1;
             burst_cnt <= biu_type2cnt(biu_type_i);
 
             wb_stb_o  <= 1'b1;
-            wb_bte_o  <= `HTRANS_NONSEQ;  //start of burst
+            wb_bte_o  <= `HTRANS_NONSEQ;  // start of burst
             wb_adr_o  <= biu_adri_i;
             wb_we_o   <= biu_we_i;
             wb_cti_o  <= biu_type2hburst(biu_type_i);
@@ -212,20 +212,20 @@ module pu_riscv_biu2wb #(
             data_ena <= 1'b0;
 
             wb_stb_o <= 1'b0;
-            wb_bte_o <= `HTRANS_IDLE;  //no new transfer
+            wb_bte_o <= `HTRANS_IDLE;  // no new transfer
             wb_cyc_o <= biu_lock_i;
           end
-        end else begin  //continue burst
+        end else begin  // continue burst
           data_ena  <= 1'b1;
           burst_cnt <= burst_cnt - 1;
 
-          wb_bte_o  <= `HTRANS_SEQ;  //continue burst
-          wb_adr_o  <= nxt_addr(wb_adr_o, wb_cti_o);  //next address
+          wb_bte_o  <= `HTRANS_SEQ;  // continue burst
+          wb_adr_o  <= nxt_addr(wb_adr_o, wb_cti_o);  // next address
         end
       end else begin
-        //error response
+        // error response
         if (wb_err_i == `HRESP_ERROR) begin
-          burst_cnt <= 'h0;  //burst done (interrupted)
+          burst_cnt <= 'h0;  // burst done (interrupted)
 
           wb_stb_o  <= 1'b0;
           wb_bte_o  <= `HTRANS_IDLE;
@@ -236,7 +236,7 @@ module pu_riscv_biu2wb #(
       end
     end
 
-  //Data section
+  // Data section
   always @(posedge HCLK) begin
     if (wb_ack_i) begin
       biu_di_dly <= biu_d_i;

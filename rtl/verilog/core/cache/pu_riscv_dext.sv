@@ -42,14 +42,14 @@
 
 module pu_riscv_dext #(
   parameter XLEN  = 64,
-  parameter PLEN  = 64,  //Physical address bus size
-  parameter DEPTH = 2    //number of instructions in flight
+  parameter PLEN  = 64,  // Physical address bus size
+  parameter DEPTH = 2    // number of instructions in flight
 ) (
   input wire rst_ni,
   input wire clk_i,
   input wire clr_i,
 
-  //CPU side
+  // CPU side
   input  wire             mem_req_i,
   input  wire [XLEN -1:0] mem_adr_i,
   input  wire [      2:0] mem_size_i,
@@ -58,26 +58,26 @@ module pu_riscv_dext #(
   input  wire [      2:0] mem_prot_i,
   input  wire             mem_we_i,
   input  wire [XLEN -1:0] mem_d_i,
-  output reg              mem_adr_ack_o,  //acknowledge address phase
+  output reg              mem_adr_ack_o,  // acknowledge address phase
   output reg  [PLEN -1:0] mem_adr_o,
   output reg  [XLEN -1:0] mem_q_o,
-  output reg              mem_ack_o,      //acknowledge data transfer
-  output reg              mem_err_o,      //data transfer error
+  output reg              mem_ack_o,      // acknowledge data transfer
+  output reg              mem_err_o,      // data transfer error
 
-  //To BIU
+  // To BIU
   output reg              biu_stb_o,
   input  wire             biu_stb_ack_i,
   output reg  [PLEN -1:0] biu_adri_o,
   input  wire [PLEN -1:0] biu_adro_i,
-  output reg  [      2:0] biu_size_o,     //transfer size
-  output reg  [      2:0] biu_type_o,     //burst type
+  output reg  [      2:0] biu_size_o,     // transfer size
+  output reg  [      2:0] biu_type_o,     // burst type
   output reg              biu_lock_o,
   output reg  [      2:0] biu_prot_o,
   output reg              biu_we_o,
   output reg  [XLEN -1:0] biu_d_o,
   input  wire [XLEN -1:0] biu_q_i,
-  input  wire             biu_ack_i,      //data acknowledge, 1 per data
-  input  wire             biu_err_i       //data error
+  input  wire             biu_ack_i,      // data acknowledge, 1 per data
+  input  wire             biu_err_i       // data error
 );
 
   //////////////////////////////////////////////////////////////////////////////
@@ -101,7 +101,7 @@ module pu_riscv_dext #(
   // Module Body
   //
 
-  //State Machine
+  // State Machine
   always @(posedge clk_i) begin
     if (mem_req_i) begin
       hold_mem_adr  <= mem_adr_i;
@@ -132,7 +132,7 @@ module pu_riscv_dext #(
       })
         2'b01:   inflight <= inflight - 1;
         2'b10:   inflight <= inflight + 1;
-        default: ;  //do nothing
+        default: ;  // do nothing
       endcase
     end
   end
@@ -151,7 +151,7 @@ module pu_riscv_dext #(
     end
   end
 
-  //External Interface
+  // External Interface
   assign biu_stb_o     = (mem_req_i | hold_mem_req) & ~clr_i;
   assign biu_adri_o    = hold_mem_req ? hold_mem_adr : mem_adr_i;
   assign biu_size_o    = hold_mem_req ? hold_mem_size : mem_size_i;

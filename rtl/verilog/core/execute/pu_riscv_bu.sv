@@ -56,7 +56,7 @@ module pu_riscv_bu #(
   input ex_stall,
   input st_flush,
 
-  //Program counter
+  // Program counter
   input      [XLEN          -1:0] id_pc,
   output reg [XLEN          -1:0] bu_nxt_pc,
   output reg                      bu_flush,
@@ -67,7 +67,7 @@ module pu_riscv_bu #(
   output reg                      bu_bp_btaken,
   output reg                      bu_bp_update,
 
-  //Instruction
+  // Instruction
   input                      id_bubble,
   input [ILEN          -1:0] id_instr,
 
@@ -77,11 +77,11 @@ module pu_riscv_bu #(
   input      [EXCEPTION_SIZE-1:0] wb_exception,
   output reg [EXCEPTION_SIZE-1:0] bu_exception,
 
-  //from ID
+  // from ID
   input [XLEN          -1:0] opA,
   input [XLEN          -1:0] opB,
 
-  //Debug Unit
+  // Debug Unit
   input                      du_stall,
   input                      du_flush,
   input                      du_we_pc,
@@ -104,11 +104,11 @@ module pu_riscv_bu #(
   logic [             6:0] func7;
   logic                    has_rvc;
 
-  //Operand generation
+  // Operand generation
   logic [XLEN        -1:0] immJ;
   logic [XLEN        -1:0] immB;
 
-  //Branch controls
+  // Branch controls
   logic                    pipeflush;
   logic                    cacheflush;
   logic                    btaken;
@@ -124,14 +124,14 @@ module pu_riscv_bu #(
   // Module Body
   //
 
-  //Instruction
+  // Instruction
   assign func7   = id_instr[31:25];
   assign func3   = id_instr[14:12];
   assign opcode  = id_instr[6:2];
 
   assign has_rvc = (HAS_RVC != 0);
 
-  //Exceptions
+  // Exceptions
   always @(posedge clk, negedge rstn) begin
     if (!rstn) begin
       bu_exception <= 'h0;
@@ -152,7 +152,7 @@ module pu_riscv_bu #(
     end
   end
 
-  //Decode Immediates
+  // Decode Immediates
   assign immJ = {{XLEN - 20{id_instr[31]}}, id_instr[19:12], id_instr[20], id_instr[30:25], id_instr[24:21], 1'b0};
   assign immB = {{XLEN - 12{id_instr[31]}}, id_instr[7], id_instr[30:25], id_instr[11:8], 1'b0};
 
@@ -187,10 +187,10 @@ module pu_riscv_bu #(
     })
       {
         1'b0, JAL
-      } : begin  //This is really only for the debug unit, such that NPC points to the correct address
+      } : begin  // This is really only for the debug unit, such that NPC points to the correct address
         btaken     = 'b1;
         bp_update  = 'b0;
-        pipeflush  = 'b0;  //Handled in IF, do NOT flush here!!
+        pipeflush  = 'b0;  // Handled in IF, do NOT flush here!!
         cacheflush = 'b0;
         nxt_pc     = id_pc + immJ;
       end
@@ -281,12 +281,12 @@ module pu_riscv_bu #(
         bp_update  = 'b0;
         pipeflush  = 'b0;
         cacheflush = 'b0;
-        nxt_pc     = id_pc + 'h4;  //TO-DO: handle 16bit instructions
+        nxt_pc     = id_pc + 'h4;  // TO-DO: handle 16bit instructions
       end
     endcase
   end
 
-  //Program Counter modifications (Branches/JALR)
+  // Program Counter modifications (Branches/JALR)
   always @(posedge clk, negedge rstn) begin
     if (!rstn) begin
       bu_flush      <= 'b1;
@@ -318,6 +318,6 @@ module pu_riscv_bu #(
     end
   end
 
-  //don't take myself (current branch) into account when updating branch history
+  // don't take myself (current branch) into account when updating branch history
   assign bu_bp_history = bp_history[BP_GLOBAL_BITS:1];
 endmodule

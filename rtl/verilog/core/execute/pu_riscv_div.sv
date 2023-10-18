@@ -52,18 +52,18 @@ module pu_riscv_div #(
   input      ex_stall,
   output reg div_stall,
 
-  //Instruction
+  // Instruction
   input            id_bubble,
   input [ILEN-1:0] id_instr,
 
-  //Operands
+  // Operands
   input [XLEN-1:0] opA,
   input [XLEN-1:0] opB,
 
-  //From State
+  // From State
   input [1:0] st_xlen,
 
-  //To WB
+  // To WB
   output reg            div_bubble,
   output reg [XLEN-1:0] div_r
 );
@@ -115,15 +115,15 @@ module pu_riscv_div #(
   logic [             6:0] func7;
   logic [             6:0] div_func7;
 
-  //Operand generation
+  // Operand generation
   logic [            31:0] opA32;
   logic [            31:0] opB32;
 
   logic [$clog2(XLEN)-1:0] cnt;
-  logic                    neg_q;  //negate quotient
-  logic                    neg_s;  //negate remainder
+  logic                    neg_q;  // negate quotient
+  logic                    neg_s;  // negate remainder
 
-  //divider internals
+  // divider internals
   logic [XLEN        -1:0] pa_p;
   logic [XLEN        -1:0] pa_a;
   logic [XLEN        -1:0] pa_shifted_p;
@@ -132,7 +132,7 @@ module pu_riscv_div #(
   logic [        XLEN : 0] p_minus_b;
   logic [XLEN        -1:0] b;
 
-  //FSM
+  // FSM
   logic [             1:0] state;
 
   //////////////////////////////////////////////////////////////////////////////
@@ -140,7 +140,7 @@ module pu_riscv_div #(
   // Module Body
   //
 
-  //Instruction
+  // Instruction
   assign func7      = id_instr[31:25];
   assign func3      = id_instr[14:12];
   assign opcode     = id_instr[6:2];
@@ -151,22 +151,22 @@ module pu_riscv_div #(
 
   assign xlen32     = st_xlen == RV32I;
 
-  //retain instruction
+  // retain instruction
   always @(posedge clk) begin
     if (!ex_stall) begin
       div_instr <= id_instr;
     end
   end
 
-  //32bit operands
+  // 32bit operands
   assign opA32                        = opA[31:0];
   assign opB32                        = opB[31:0];
 
-  //Divide operations
+  // Divide operations
   assign {pa_shifted_p, pa_shifted_a} = {pa_p, pa_a} << 1;
   assign p_minus_b                    = pa_shifted_p - b;
 
-  //Division: bit-serial. Max XLEN cycles
+  // Division: bit-serial. Max XLEN cycles
   // q = z/d + s
   // z: Dividend
   // d: Divisor
@@ -203,8 +203,8 @@ module pu_riscv_div #(
               {
                 1'b?, DIV
               } : begin
-                if (~|opB) begin  //signed divide by zero
-                  div_r      <= {XLEN{1'b1}};  //=-1
+                if (~|opB) begin  // signed divide by zero
+                  div_r      <= {XLEN{1'b1}};  // =-1
                   div_bubble <= 1'b0;
                 end else if (opA == {1'b1, {XLEN - 1{1'b0}}} && &opB) begin  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
                   div_r      <= {1'b1, {XLEN - 1{1'b0}}};
@@ -225,8 +225,8 @@ module pu_riscv_div #(
               {
                 1'b0, DIVW
               } : begin
-                if (~|opB32) begin  //signed divide by zero
-                  div_r      <= {XLEN{1'b1}};  //=-1
+                if (~|opB32) begin  // signed divide by zero
+                  div_r      <= {XLEN{1'b1}};  // =-1
                   div_bubble <= 1'b0;
                 end else if (opA32 == {1'b1, {31{1'b0}}} && &opB32) begin  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
                   div_r      <= sext32({1'b1, {31{1'b0}}});
@@ -247,8 +247,8 @@ module pu_riscv_div #(
               {
                 1'b?, DIVU
               } : begin
-                if (~|opB) begin  //unsigned divide by zero
-                  div_r      <= {XLEN{1'b1}};  //= 2^XLEN -1
+                if (~|opB) begin  // unsigned divide by zero
+                  div_r      <= {XLEN{1'b1}};  // = 2^XLEN -1
                   div_bubble <= 1'b0;
                 end else begin
                   cnt       <= {$bits(cnt) {1'b1}};
@@ -266,8 +266,8 @@ module pu_riscv_div #(
               {
                 1'b0, DIVUW
               } : begin
-                if (~|opB32) begin  //unsigned divide by zero
-                  div_r      <= {XLEN{1'b1}};  //= 2^XLEN -1
+                if (~|opB32) begin  // unsigned divide by zero
+                  div_r      <= {XLEN{1'b1}};  // = 2^XLEN -1
                   div_bubble <= 1'b0;
                 end else begin
                   cnt       <= {1'b0, {$bits(cnt) - 1{1'b1}}};
@@ -285,7 +285,7 @@ module pu_riscv_div #(
               {
                 1'b?, REM
               } : begin
-                if (~|opB) begin  //signed divide by zero
+                if (~|opB) begin  // signed divide by zero
                   div_r      <= opA;
                   div_bubble <= 1'b0;
                 end else if (opA == {1'b1, {XLEN - 1{1'b0}}} && &opB) begin  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
@@ -307,7 +307,7 @@ module pu_riscv_div #(
               {
                 1'b0, REMW
               } : begin
-                if (~|opB32) begin  //signed divide by zero
+                if (~|opB32) begin  // signed divide by zero
                   div_r      <= sext32(opA32);
                   div_bubble <= 1'b0;
                 end else if (opA32 == {1'b1, {31{1'b0}}} && &opB32) begin  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
@@ -329,7 +329,7 @@ module pu_riscv_div #(
               {
                 1'b?, REMU
               } : begin
-                if (~|opB) begin  //unsigned divide by zero
+                if (~|opB) begin  // unsigned divide by zero
                   div_r      <= opA;
                   div_bubble <= 1'b0;
                 end else begin
@@ -368,22 +368,22 @@ module pu_riscv_div #(
             endcase
           end
         end
-        //actual division loop
+        // actual division loop
         ST_DIV: begin
           cnt <= cnt - 1;
           if (~|cnt) begin
             state <= ST_RES;
           end
-          //restoring divider section
-          if (p_minus_b[XLEN]) begin  //sub gave negative result
-            pa_p <= pa_shifted_p;  //restore
-            pa_a <= {pa_shifted_a[XLEN-1:1], 1'b0};  //shift in '0' for Q
-          end else begin  //sub gave positive result
-            pa_p <= p_minus_b[XLEN-1:0];  //store sub result
-            pa_a <= {pa_shifted_a[XLEN-1:1], 1'b1};  //shift in '1' for Q
+          // restoring divider section
+          if (p_minus_b[XLEN]) begin  // sub gave negative result
+            pa_p <= pa_shifted_p;  // restore
+            pa_a <= {pa_shifted_a[XLEN-1:1], 1'b0};  // shift in '0' for Q
+          end else begin  // sub gave positive result
+            pa_p <= p_minus_b[XLEN-1:0];  // store sub result
+            pa_a <= {pa_shifted_a[XLEN-1:1], 1'b1};  // shift in '1' for Q
           end
         end
-        //Result
+        // Result
         ST_RES: begin
           state      <= ST_CHK;
           div_bubble <= 1'b0;

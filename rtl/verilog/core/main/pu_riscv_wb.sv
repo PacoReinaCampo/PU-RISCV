@@ -51,10 +51,10 @@ module pu_riscv_wb #(
 
   parameter [XLEN-1:0] PC_INIT = 'h8000_0000
 ) (
-  input wire rst_ni,  //Reset
-  input wire clk_i,   //Clock
+  input wire rst_ni,  // Reset
+  input wire clk_i,   // Clock
 
-  output reg wb_stall_o,  //Stall on memory-wait
+  output reg wb_stall_o,  // Stall on memory-wait
 
   input  wire [XLEN          -1:0] mem_pc_i,
   output reg  [XLEN          -1:0] wb_pc_o,
@@ -71,14 +71,14 @@ module pu_riscv_wb #(
   input wire [XLEN          -1:0] mem_r_i,
   input wire [XLEN          -1:0] mem_memadr_i,
 
-  //From Memory System
+  // From Memory System
   input wire                      dmem_ack_i,
   input wire                      dmem_err_i,
   input wire [XLEN          -1:0] dmem_q_i,
   input wire                      dmem_misaligned_i,
   input wire                      dmem_page_fault_i,
 
-  //To Register File
+  // To Register File
   output reg [               4:0] wb_dst_o,
   output reg [XLEN          -1:0] wb_r_o,
   output reg                      wb_we_o
@@ -108,7 +108,7 @@ module pu_riscv_wb #(
   // Module Body
   //
 
-  //Program Counter
+  // Program Counter
   always @(posedge clk_i, negedge rst_ni) begin
     if (!rst_ni) begin
       wb_pc_o <= PC_INIT;
@@ -117,7 +117,7 @@ module pu_riscv_wb #(
     end
   end
 
-  //Instruction
+  // Instruction
   always @(posedge clk_i, negedge rst_ni) begin
     if (!rst_ni) begin
       wb_instr_o <= INSTR_NOP;
@@ -131,7 +131,7 @@ module pu_riscv_wb #(
   assign opcode = mem_instr_i[6:2];
   assign dst    = mem_instr_i[11:7];
 
-  //Exception
+  // Exception
   always @(*) begin
     exception = mem_exception_i;
 
@@ -178,7 +178,7 @@ module pu_riscv_wb #(
     end
   end
 
-  //From Memory
+  // From Memory
   always @(*) begin
     casex ({
       mem_bubble_i, |mem_exception_i, opcode
@@ -231,7 +231,7 @@ module pu_riscv_wb #(
     end
   endgenerate
 
-  //Register File Write Back
+  // Register File Write Back
 
   // Destination register
   always @(posedge clk_i) begin
@@ -263,7 +263,7 @@ module pu_riscv_wb #(
         OPC_STORE:    wb_we_o <= 'b0;
         OPC_STORE_FP: wb_we_o <= 'b0;
         OPC_BRANCH:   wb_we_o <= 'b0;
-        //OPC_SYSTEM:   wb_we_o <= 'b0;
+        // OPC_SYSTEM:   wb_we_o <= 'b0;
         default:      wb_we_o <= ~mem_bubble_i & |dst;
       endcase
     end

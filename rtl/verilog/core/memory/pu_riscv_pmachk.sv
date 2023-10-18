@@ -48,21 +48,21 @@ module pu_riscv_pmachk #(
   parameter PLEN    = 64,
   parameter PMA_CNT = 4
 ) (
-  //PMA  configuration
+  // PMA  configuration
   input wire [PMA_CNT-1:0][    13:0] pma_cfg_i,
   input wire [PMA_CNT-1:0][XLEN-1:0] pma_adr_i,
 
-  //Memory Access
-  input wire            instruction_i,  //This is an instruction access
-  input wire            req_i,          //Memory access requested
-  input wire [PLEN-1:0] adr_i,          //Physical Memory address (i.e. after translation)
-  input wire [     2:0] size_i,         //Transfer size
-  input wire            lock_i,         //AMO : TO-DO: specify AMO type
+  // Memory Access
+  input wire            instruction_i,  // This is an instruction access
+  input wire            req_i,          // Memory access requested
+  input wire [PLEN-1:0] adr_i,          // Physical Memory address (i.e. after translation)
+  input wire [     2:0] size_i,         // Transfer size
+  input wire            lock_i,         // AMO : TO-DO: specify AMO type
   input wire            we_i,
 
-  input wire misaligned_i,  //Misaligned access
+  input wire misaligned_i,  // Misaligned access
 
-  //Output
+  // Output
   output     [13:0] pma_o,
   output reg        exception_o,
   output reg        misaligned_o,
@@ -76,7 +76,7 @@ module pu_riscv_pmachk #(
   // Functions
   //
 
-  //convert transfer size in number of bytes in transfer
+  // convert transfer size in number of bytes in transfer
   function automatic integer size2bytes;
     input [2:0] size;
 
@@ -88,21 +88,21 @@ module pu_riscv_pmachk #(
       QWORD: size2bytes = 16;
       default: begin
         size2bytes = -1;
-        //$error ("Illegal biu_size_t");
+        // $error ("Illegal biu_size_t");
       end
     endcase
   endfunction
 
-  //Lower and Upper bounds for NA4/NAPOT
+  // Lower and Upper bounds for NA4/NAPOT
   function automatic [PLEN-1:2] napot_lb;
-    input na4;  //special case na4
+    input na4;  // special case na4
     input [PLEN-1:2] pmaddr;
 
     integer n, i;
     bit              true;
     logic [PLEN-1:2] mask;
 
-    //find 'n' boundary = 2^(n+2) bytes
+    // find 'n' boundary = 2^(n+2) bytes
     n = 0;
     if (!na4) begin
       true = 1'b1;
@@ -118,15 +118,15 @@ module pu_riscv_pmachk #(
       n = n + 1;
     end
 
-    //create mask
+    // create mask
     mask     = {$bits(mask) {1'b1}} << n;
 
-    //lower bound address
+    // lower bound address
     napot_lb = pmaddr & mask;
   endfunction
 
   function automatic [PLEN-1:2] napot_ub;
-    input na4;  //special case na4
+    input na4;  // special case na4
     input [PLEN-1:2] pmaddr;
 
     integer n, i;
@@ -134,7 +134,7 @@ module pu_riscv_pmachk #(
     logic [PLEN-1:2] mask;
     logic [PLEN-1:2] incr;
 
-    //find 'n' boundary = 2^(n+2) bytes
+    // find 'n' boundary = 2^(n+2) bytes
     n = 0;
     if (!na4) begin
       true = 1'b1;
@@ -150,15 +150,15 @@ module pu_riscv_pmachk #(
       n = n + 1;
     end
 
-    //create mask and increment
+    // create mask and increment
     mask     = {$bits(mask) {1'b1}} << n;
     incr     = 1'h1 << n;
 
-    //upper bound address
+    // upper bound address
     napot_ub = (pmaddr + incr) & mask;
   endfunction
 
-  //Is ANY byte of 'access' in pma range?
+  // Is ANY byte of 'access' in pma range?
   function automatic match_any;
     input [PLEN-1:2] access_lb;
     input [PLEN-1:2] access_ub;
@@ -175,7 +175,7 @@ module pu_riscv_pmachk #(
     match_any = (access_lb >= pma_ub) || (access_ub < pma_lb) ? 1'b0 : 1'b1;
   endfunction
 
-  //Are ALL bytes of 'access' in PMA range?
+  // Are ALL bytes of 'access' in PMA range?
   function automatic match_all;
     input [PLEN-1:2] access_lb;
     input [PLEN-1:2] access_ub;
@@ -185,13 +185,13 @@ module pu_riscv_pmachk #(
     match_all = (access_lb >= pma_lb) && (access_ub < pma_ub) ? 1'b1 : 1'b0;
   endfunction
 
-  //get highest priority (==lowest number) PMP that matches
+  // get highest priority (==lowest number) PMP that matches
   function automatic integer highest_priority_match;
     input [PMA_CNT-1:0] m;
 
     integer n;
 
-    highest_priority_match = 0;  //default value
+    highest_priority_match = 0;  // default value
 
     for (n = PMA_CNT - 1; n >= 0; n = n - 1) begin
       if (m[n]) begin
@@ -221,7 +221,7 @@ module pu_riscv_pmachk #(
   // Module Body
   //
 
-  //PMA configurations
+  // PMA configurations
   generate
     for (i = 0; i < PMA_CNT; i = i + 1) begin : set_pmacfg
       assign pmacfg[i][13:12] = pma_cfg_i[i][13:12] == MEM_TYPE_EMPTY ? MEM_TYPE_IO : pma_cfg_i[i][13:12];
@@ -238,16 +238,16 @@ module pu_riscv_pmachk #(
     end
   endgenerate
 
-  //Address Range Matching
+  // Address Range Matching
   assign access_lb = adr_i;
   assign access_ub = adr_i + size2bytes(size_i) - 1;
 
   generate
     for (i = 0; i < PMA_CNT; i = i + 1) begin : gen_pma_bounds
-      //lower bounds
+      // lower bounds
       always @(*) begin
         case (pmacfg[i][1:0])
-          //TOR after NAPOT ...
+          // TOR after NAPOT ...
           TOR:     pma_lb[i] = (i == 0) ? {PLEN - 2{1'b0}} : pmacfg[i-1][1:0] != TOR ? pma_ub[i-1] : pma_adr_i[i-1][PLEN-2 - 1:0];
           NA4:     pma_lb[i] = napot_lb(1'b1, pma_adr_i[i]);
           NAPOT:   pma_lb[i] = napot_lb(1'b0, pma_adr_i[i]);
@@ -255,7 +255,7 @@ module pu_riscv_pmachk #(
         endcase
       end
 
-      //upper bounds
+      // upper bounds
       always @(*) begin
         case (pmacfg[i][1:0])
           TOR:     pma_ub[i] = pma_adr_i[i][PLEN-2 - 1:0];
@@ -265,7 +265,7 @@ module pu_riscv_pmachk #(
         endcase
       end
 
-      //match
+      // match
       assign pma_match[i]     = match_any(access_lb[PLEN-1:2], access_ub[PLEN-1:2], pma_lb[i], pma_ub[i]) & (pmacfg[i][1:0] != OFF);
       assign pma_match_all[i] = match_all(access_lb[PLEN-1:2], access_ub[PLEN-1:2], pma_lb[i], pma_ub[i]) & (pmacfg[i][1:0] != OFF);
     end
@@ -275,7 +275,7 @@ module pu_riscv_pmachk #(
   assign matched_pma       = pmacfg[matched_pma_idx];
   assign pma_o             = matched_pma;
 
-  //Access/Misaligned Exception
+  // Access/Misaligned Exception
   assign exception_o       = req_i & (~|pma_match_all |  // no memory range matched
  (instruction_i & ~matched_pma[09]) |  // not executable
  (we_i & ~matched_pma[10]) |  // not writeable
@@ -283,8 +283,8 @@ module pu_riscv_pmachk #(
 
   assign misaligned_o      = misaligned_i & ~matched_pma[4];
 
-  //Access Types
-  assign is_cache_access_o = req_i & ~exception_o & ~misaligned_o & matched_pma[8];  //implies MEM_TYPE_MAIN
+  // Access Types
+  assign is_cache_access_o = req_i & ~exception_o & ~misaligned_o & matched_pma[8];  // implies MEM_TYPE_MAIN
   assign is_ext_access_o   = req_i & ~exception_o & ~misaligned_o & ~matched_pma[8] & matched_pma[13:12] != MEM_TYPE_TCM;
   assign is_tcm_access_o   = req_i & ~exception_o & ~misaligned_o & (matched_pma[13:12] == MEM_TYPE_TCM);
 endmodule

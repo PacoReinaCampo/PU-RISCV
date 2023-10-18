@@ -52,18 +52,18 @@ module pu_riscv_mul #(
   input      ex_stall,
   output reg mul_stall,
 
-  //Instruction
+  // Instruction
   input            id_bubble,
   input [ILEN-1:0] id_instr,
 
-  //Operands
+  // Operands
   input [XLEN-1:0] opA,
   input [XLEN-1:0] opB,
 
-  //from State
+  // from State
   input [1:0] st_xlen,
 
-  //to WB
+  // to WB
   output reg            mul_bubble,
   output reg [XLEN-1:0] mul_r
 );
@@ -132,7 +132,7 @@ module pu_riscv_mul #(
   logic [       6:0] func7;
   logic [       6:0] mul_func7;
 
-  //Operand generation
+  // Operand generation
   logic [      31:0] opA32;
   logic [      31:0] opB32;
 
@@ -147,7 +147,7 @@ module pu_riscv_mul #(
   logic [DXLEN -1:0] mult_r_signed;
   logic [DXLEN -1:0] mult_r_signed_reg;
 
-  //FSM (bubble, stall generation)
+  // FSM (bubble, stall generation)
   logic              is_mul;
   logic [       1:0] cnt;
   logic              state;
@@ -157,7 +157,7 @@ module pu_riscv_mul #(
   // Module Body
   //
 
-  //Instruction
+  // Instruction
   assign func7      = id_instr[31:25];
   assign func3      = id_instr[14:12];
   assign opcode     = id_instr[6:2];
@@ -168,7 +168,7 @@ module pu_riscv_mul #(
 
   assign xlen32     = st_xlen == RV32I;
 
-  //32bit operands
+  // 32bit operands
   assign opA32      = opA[31:0];
   assign opB32      = opB[31:0];
 
@@ -180,30 +180,30 @@ module pu_riscv_mul #(
    *   at the expense of potentially making the path slower
    */
 
-  //multiplier operand-A
+  // multiplier operand-A
   always @(*) begin
     casex ({
       func7, func3, opcode
     })
-      MULW:    mult_opA = abs(sext32(opA32));  //RV64
+      MULW:    mult_opA = abs(sext32(opA32));  // RV64
       MULHU:   mult_opA = opA;
       default: mult_opA = abs(opA);
     endcase
   end
 
-  //multiplier operand-B
+  // multiplier operand-B
   always @(*) begin
     casex ({
       func7, func3, opcode
     })
-      MULW:    mult_opB = abs(sext32(opB32));  //RV64
+      MULW:    mult_opB = abs(sext32(opB32));  // RV64
       MULHSU:  mult_opB = opB;
       MULHU:   mult_opB = opB;
       default: mult_opB = abs(opB);
     endcase
   end
 
-  //negate multiplier output?
+  // negate multiplier output?
   always @(*) begin
     casex ({
       func7, func3, opcode
@@ -212,15 +212,15 @@ module pu_riscv_mul #(
       MULH:    mult_neg = opA[XLEN-1] ^ opB[XLEN-1];
       MULHSU:  mult_neg = opA[XLEN-1];
       MULHU:   mult_neg = 1'b0;
-      MULW:    mult_neg = opA32[31] ^ opB32[31];  //RV64
+      MULW:    mult_neg = opA32[31] ^ opB32[31];  // RV64
       default: mult_neg = 'hx;
     endcase
   end
 
-  //Actual multiplier
+  // Actual multiplier
   assign mult_r        = $unsigned(mult_opA_reg) * $unsigned(mult_opB_reg);
 
-  //Correct sign
+  // Correct sign
   assign mult_r_signed = mult_neg_reg ? twos_dxlen(mult_r_reg) : mult_r_reg;
 
   generate
@@ -232,18 +232,18 @@ module pu_riscv_mul #(
        * Registers at: - output
        */
 
-      //Register holding instruction for multiplier-output-selector
+      // Register holding instruction for multiplier-output-selector
       assign mul_instr         = id_instr;
 
-      //Registers holding multiplier operands
+      // Registers holding multiplier operands
       assign mult_opA_reg      = mult_opA;
       assign mult_opB_reg      = mult_opB;
       assign mult_neg_reg      = mult_neg;
 
-      //Register holding multiplier output
+      // Register holding multiplier output
       assign mult_r_reg        = mult_r;
 
-      //Register holding sign correction
+      // Register holding sign correction
       assign mult_r_signed_reg = mult_r_signed;
     end else begin
 
@@ -254,14 +254,14 @@ module pu_riscv_mul #(
        *               - output
        */
 
-      //Register holding instruction for multiplier-output-selector
+      // Register holding instruction for multiplier-output-selector
       always @(posedge clk) begin
         if (!ex_stall) begin
           mul_instr <= id_instr;
         end
       end
 
-      //Registers holding multiplier operands
+      // Registers holding multiplier operands
       always @(posedge clk) begin
         if (!ex_stall) begin
           mult_opA_reg <= mult_opA;
@@ -271,26 +271,26 @@ module pu_riscv_mul #(
       end
 
       if (LATENCY == 1) begin
-        //Register holding multiplier output
+        // Register holding multiplier output
         assign mult_r_reg        = mult_r;
 
-        //Register holding sign correction
+        // Register holding sign correction
         assign mult_r_signed_reg = mult_r_signed;
       end else if (LATENCY == 2) begin
-        //Register holding multiplier output
+        // Register holding multiplier output
         always @(posedge clk) begin
           mult_r_reg <= mult_r;
         end
 
-        //Register holding sign correction
+        // Register holding sign correction
         assign mult_r_signed_reg = mult_r_signed;
       end else begin
-        //Register holding multiplier output
+        // Register holding multiplier output
         always @(posedge clk) begin
           mult_r_reg <= mult_r;
         end
 
-        //Register holding sign correction
+        // Register holding sign correction
         always @(posedge clk) begin
           mult_r_signed_reg <= mult_r_signed;
         end
@@ -298,18 +298,18 @@ module pu_riscv_mul #(
     end
   endgenerate
 
-  //Final output register
+  // Final output register
   always @(posedge clk) begin
     casex ({
       mul_func7, mul_func3, mul_opcode
     })
       MUL:     mul_r <= mult_r_signed_reg[XLEN - 1:0];
-      MULW:    mul_r <= sext32(mult_r_signed_reg[31:0]);  //RV64
+      MULW:    mul_r <= sext32(mult_r_signed_reg[31:0]);  // RV64
       default: mul_r <= mult_r_signed_reg[DXLEN-1:XLEN];
     endcase
   end
 
-  //Stall / Bubble generation
+  // Stall / Bubble generation
   always @(*) begin
     casex ({
       func7, func3, opcode

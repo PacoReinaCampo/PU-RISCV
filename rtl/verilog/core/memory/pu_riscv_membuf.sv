@@ -47,14 +47,14 @@ module pu_riscv_membuf #(
   input wire rst_ni,
   input wire clk_i,
 
-  input wire clr_i,  //clear pending requests
+  input wire clr_i,  // clear pending requests
   input wire ena_i,
 
-  //CPU side
+  // CPU side
   input wire             req_i,
   input wire [DBITS-1:0] d_i,
 
-  //Memory system side
+  // Memory system side
   output reg              req_o,
   input  wire             ack_i,
   output reg  [DBITS-1:0] q_o,
@@ -97,7 +97,7 @@ module pu_riscv_membuf #(
     .almost_full_o ()
   );
 
-  //control signals
+  // control signals
   always @(posedge clk_i, negedge rst_ni) begin
     if (!rst_ni) begin
       access_pending <= 'h0;
@@ -109,7 +109,7 @@ module pu_riscv_membuf #(
       })
         2'b01:   access_pending <= access_pending - 1;
         2'b10:   access_pending <= access_pending + 1;
-        default: ;  //do nothing
+        default: ;  // do nothing
       endcase
     end
   end
@@ -117,7 +117,7 @@ module pu_riscv_membuf #(
   assign queue_we = |access_pending & (req_i & ~(empty_o & ack_i));
   assign queue_re = ack_i & ~empty_o;
 
-  //queue outputs
+  // queue outputs
   assign req_o    = ~|access_pending ? req_i & ~clr_i : (req_i | ~empty_o) & ack_i & ena_i & ~clr_i;
 
   assign q_o      = empty_o ? d_i : queue_q;

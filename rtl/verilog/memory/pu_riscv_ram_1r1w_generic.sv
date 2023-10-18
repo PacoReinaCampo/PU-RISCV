@@ -47,15 +47,15 @@ module pu_riscv_ram_1r1w_generic #(
   input rst_ni,
   input clk_i,
 
-  //Write side
+  // Write side
   input [ ABITS     -1:0] waddr_i,
   input [ DBITS     -1:0] din_i,
   input                   we_i,
   input [(DBITS+7)/8-1:0] be_i,
 
-  //Read side
-  input      [ABITS     -1:0] raddr_i,
-  output reg [DBITS     -1:0] dout_o
+  // Read side
+  input      [ABITS-1:0] raddr_i,
+  output reg [DBITS-1:0] dout_o
 );
 
   //////////////////////////////////////////////////////////////////////////////
@@ -64,14 +64,14 @@ module pu_riscv_ram_1r1w_generic #(
   //
   genvar i;
 
-  logic [DBITS-1:0] mem_array[2**ABITS -1:0];  //memory array
+  logic [DBITS-1:0] mem_array[2**ABITS -1:0];  // memory array
 
   //////////////////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
 
-  //write side
+  // write side
   generate
     for (i = 0; i < (DBITS + 7) / 8; i = i + 1) begin : write
       if (i * 8 + 8 > DBITS) begin
@@ -90,9 +90,9 @@ module pu_riscv_ram_1r1w_generic #(
     end
   endgenerate
 
-  //read side
+  // read side
 
-  //per Altera's recommendations. Prevents bypass logic
+  // per Altera's recommendations. Prevents bypass logic
   always @(posedge clk_i) begin
     dout_o <= mem_array[raddr_i];
   end

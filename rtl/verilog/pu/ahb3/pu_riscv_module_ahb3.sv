@@ -57,24 +57,24 @@ module pu_riscv_module_ahb3 #(
 
   parameter MULT_LATENCY = 1,
 
-  parameter BREAKPOINTS = 8,  //Number of hardware breakpoints
+  parameter BREAKPOINTS = 8,  // Number of hardware breakpoints
 
   parameter PMA_CNT = 4,
-  parameter PMP_CNT = 16, //Number of Physical Memory Protection entries
+  parameter PMP_CNT = 16, // Number of Physical Memory Protection entries
 
   parameter BP_GLOBAL_BITS    = 2,
   parameter BP_LOCAL_BITS     = 10,
   parameter BP_LOCAL_BITS_LSB = 2,
 
-  parameter ICACHE_SIZE        = 32,  //in KBytes
-  parameter ICACHE_BLOCK_SIZE  = 32,  //in Bytes
-  parameter ICACHE_WAYS        = 2,   //'n'-way set associative
+  parameter ICACHE_SIZE        = 32,  // in KBytes
+  parameter ICACHE_BLOCK_SIZE  = 32,  // in Bytes
+  parameter ICACHE_WAYS        = 2,   // 'n'-way set associative
   parameter ICACHE_REPLACE_ALG = 0,
   parameter ITCM_SIZE          = 0,
 
-  parameter DCACHE_SIZE        = 32,  //in KBytes
-  parameter DCACHE_BLOCK_SIZE  = 32,  //in Bytes
-  parameter DCACHE_WAYS        = 2,   //'n'-way set associative
+  parameter DCACHE_SIZE        = 32,  // in KBytes
+  parameter DCACHE_BLOCK_SIZE  = 32,  // in Bytes
+  parameter DCACHE_WAYS        = 2,   // 'n'-way set associative
   parameter DCACHE_REPLACE_ALG = 0,
   parameter DTCM_SIZE          = 0,
   parameter WRITEBUFFER_SIZE   = 8,
@@ -100,7 +100,7 @@ module pu_riscv_module_ahb3 #(
   input wire [PMA_CNT-1:0][    13:0] pma_cfg_i,
   input wire [PMA_CNT-1:0][XLEN-1:0] pma_adr_i,
 
-  //AHB3 instruction
+  // AHB3 instruction
   output                     ins_HSEL,
   output [PLEN         -1:0] ins_HADDR,
   output [XLEN         -1:0] ins_HWDATA,
@@ -114,7 +114,7 @@ module pu_riscv_module_ahb3 #(
   input                      ins_HREADY,
   input                      ins_HRESP,
 
-  //AHB3 data
+  // AHB3 data
   output                     dat_HSEL,
   output [PLEN         -1:0] dat_HADDR,
   output [XLEN         -1:0] dat_HWDATA,
@@ -128,13 +128,13 @@ module pu_riscv_module_ahb3 #(
   input                      dat_HREADY,
   input                      dat_HRESP,
 
-  //Interrupts
+  // Interrupts
   input       ext_nmi,
   input       ext_tint,
   input       ext_sint,
   input [3:0] ext_int,
 
-  //Debug Interface
+  // Debug Interface
   input                      dbg_stall,
   input                      dbg_strb,
   input                      dbg_we,
@@ -150,7 +150,7 @@ module pu_riscv_module_ahb3 #(
   // Module Body
   //
 
-  //Instantiate RISC-V PU
+  // Instantiate RISC-V PU
   pu_riscv_ahb3 #(
     .XLEN     (XLEN),
     .PLEN     (PLEN),
@@ -168,24 +168,24 @@ module pu_riscv_module_ahb3 #(
 
     .MULT_LATENCY(MULT_LATENCY),
 
-    .BREAKPOINTS(BREAKPOINTS),  //Number of hardware breakpoints
+    .BREAKPOINTS(BREAKPOINTS),  // Number of hardware breakpoints
 
     .PMA_CNT(PMA_CNT),
-    .PMP_CNT(PMP_CNT),  //Number of Physical Memory Protection entries
+    .PMP_CNT(PMP_CNT),  // Number of Physical Memory Protection entries
 
     .BP_GLOBAL_BITS   (BP_GLOBAL_BITS),
     .BP_LOCAL_BITS    (BP_LOCAL_BITS),
     .BP_LOCAL_BITS_LSB(BP_LOCAL_BITS_LSB),
 
-    .ICACHE_SIZE       (ICACHE_SIZE),         //in KBytes
-    .ICACHE_BLOCK_SIZE (ICACHE_BLOCK_SIZE),   //in Bytes
-    .ICACHE_WAYS       (ICACHE_WAYS),         //'n'-way set associative
+    .ICACHE_SIZE       (ICACHE_SIZE),         // in KBytes
+    .ICACHE_BLOCK_SIZE (ICACHE_BLOCK_SIZE),   // in Bytes
+    .ICACHE_WAYS       (ICACHE_WAYS),         // 'n'-way set associative
     .ICACHE_REPLACE_ALG(ICACHE_REPLACE_ALG),
     .ITCM_SIZE         (ITCM_SIZE),
 
-    .DCACHE_SIZE       (DCACHE_SIZE),         //in KBytes
-    .DCACHE_BLOCK_SIZE (DCACHE_BLOCK_SIZE),   //in Bytes
-    .DCACHE_WAYS       (DCACHE_WAYS),         //'n'-way set associative
+    .DCACHE_SIZE       (DCACHE_SIZE),         // in KBytes
+    .DCACHE_BLOCK_SIZE (DCACHE_BLOCK_SIZE),   // in Bytes
+    .DCACHE_WAYS       (DCACHE_WAYS),         // 'n'-way set associative
     .DCACHE_REPLACE_ALG(DCACHE_REPLACE_ALG),
     .DTCM_SIZE         (DTCM_SIZE),
     .WRITEBUFFER_SIZE  (WRITEBUFFER_SIZE),
@@ -211,7 +211,7 @@ module pu_riscv_module_ahb3 #(
     .pma_cfg_i(pma_cfg_i),
     .pma_adr_i(pma_adr_i),
 
-    //AHB3 instruction
+    // AHB3 instruction
     .ins_HSEL     (ins_HSEL),
     .ins_HADDR    (ins_HADDR),
     .ins_HWDATA   (ins_HWDATA),
@@ -225,7 +225,7 @@ module pu_riscv_module_ahb3 #(
     .ins_HREADY   (ins_HREADY),
     .ins_HRESP    (ins_HRESP),
 
-    //AHB3 data
+    // AHB3 data
     .dat_HSEL     (dat_HSEL),
     .dat_HADDR    (dat_HADDR),
     .dat_HWDATA   (dat_HWDATA),
@@ -239,13 +239,13 @@ module pu_riscv_module_ahb3 #(
     .dat_HREADY   (dat_HREADY),
     .dat_HRESP    (dat_HRESP),
 
-    //Interrupts
+    // Interrupts
     .ext_nmi (ext_nmi),
     .ext_tint(ext_tint),
     .ext_sint(ext_sint),
     .ext_int (ext_int),
 
-    //Debug Interface
+    // Debug Interface
     .dbg_stall(dbg_stall),
     .dbg_strb (dbg_strb),
     .dbg_we   (dbg_we),

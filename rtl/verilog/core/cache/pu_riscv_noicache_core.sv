@@ -50,7 +50,7 @@ module pu_riscv_noicache_core #(
   input rstn,
   input clk,
 
-  //CPU side
+  // CPU side
   output                    if_stall_nxt_pc,
   input                     if_stall,
   input                     if_flush,
@@ -63,19 +63,19 @@ module pu_riscv_noicache_core #(
   input                     dcflush_rdy,
   input  [             1:0] st_prv,
 
-  //To BIU
+  // To BIU
   output                        biu_stb,
   input                         biu_stb_ack,
   output     [PLEN        -1:0] biu_adri,
   input      [PLEN        -1:0] biu_adro,
-  output reg [             2:0] biu_size,     //transfer size
-  output reg [             2:0] biu_type,     //burst type -AHB style
+  output reg [             2:0] biu_size,     // transfer size
+  output reg [             2:0] biu_type,     // burst type -AHB style
   output                        biu_lock,
   output                        biu_we,
   output     [XLEN        -1:0] biu_di,
   input      [XLEN        -1:0] biu_do,
-  input                         biu_ack,      //data acknowledge, 1 per data
-  input                         biu_err,      //data error
+  input                         biu_ack,      // data acknowledge, 1 per data
+  input                         biu_err,      // data error
 
   output       biu_is_cacheable,
   output       biu_is_instruction,
@@ -101,15 +101,15 @@ module pu_riscv_noicache_core #(
   // Module Body
   //
 
-  //Is this a cacheable region?
-  //MSB=1 non-cacheable (IO region)
-  //MSB=0 cacheabel (instruction/data region)
+  // Is this a cacheable region?
+  // MSB=1 non-cacheable (IO region)
+  // MSB=0 cacheabel (instruction/data region)
   assign is_cacheable         = ~if_nxt_pc[PLEN-1];
 
-  //For now don't support 16bit accesses
-  assign if_parcel_misaligned = |if_nxt_pc[1:0];  //send out together with instruction
+  // For now don't support 16bit accesses
+  assign if_parcel_misaligned = |if_nxt_pc[1:0];  // send out together with instruction
 
-  //delay IF-flush
+  // delay IF-flush
   always @(posedge clk, negedge rstn) begin
     if (!rstn) begin
       if_flush_dly <= 1'b0;
@@ -124,21 +124,21 @@ module pu_riscv_noicache_core #(
   assign if_parcel_pc       = {{XLEN - PLEN{1'b0}}, biu_fifo_adr[0]};
   assign if_parcel          = biu_fifo_dat[0][if_parcel_pc[$clog2(XLEN/32)+1:1]*16 +: PARCEL_SIZE];
 
-  //External Interface
-  assign biu_stb            = dcflush_rdy & ~if_flush & ~if_stall & ~biu_fifo_valid[1];  //TO-DO: when is ~biu_fifo[1] required?
+  // External Interface
+  assign biu_stb            = dcflush_rdy & ~if_flush & ~if_stall & ~biu_fifo_valid[1];  // TO-DO: when is ~biu_fifo[1] required?
   assign biu_adri           = if_nxt_pc[PLEN - 1:0];
   assign biu_size           = XLEN == 64 ? DWORD : WORD;
   assign biu_lock           = 1'b0;
-  assign biu_we             = 1'b0;  //no writes
+  assign biu_we             = 1'b0;  // no writes
   assign biu_di             = 'h0;
-  assign biu_type           = SINGLE;  //single access
+  assign biu_type           = SINGLE;  // single access
 
-  //Instruction cache..
+  // Instruction cache..
   assign biu_is_instruction = 1'b1;
   assign biu_is_cacheable   = is_cacheable;
   assign biu_prv            = st_prv;
 
-  //FIFO
+  // FIFO
   always @(posedge clk, negedge rstn) begin
     if (!rstn) begin
       biu_stb_cnt <= 2'h0;
@@ -149,7 +149,7 @@ module pu_riscv_noicache_core #(
     end
   end
 
-  //valid bits
+  // valid bits
   always @(posedge clk, negedge rstn) begin
     if (!rstn) begin
       biu_fifo_valid[0] <= 1'b0;
@@ -163,38 +163,38 @@ module pu_riscv_noicache_core #(
       case ({
         biu_ack, if_parcel_valid
       })
-        2'b00: ;  //no action
-        2'b10:  //FIFO write
+        2'b00: ;  // no action
+        2'b10:  // FIFO write
         case ({
           biu_fifo_valid[1], biu_fifo_valid[0]
         })
           2'b11: begin
-            //entry 0,1 full. Fill entry2
+            // entry 0,1 full. Fill entry2
             biu_fifo_valid[2] <= 1'b1;
           end
           2'b01: begin
-            //entry 0 full. Fill entry1, clear entry2
+            // entry 0 full. Fill entry1, clear entry2
             biu_fifo_valid[1] <= 1'b1;
             biu_fifo_valid[2] <= 1'b0;
           end
           default: begin
-            //Fill entry0, clear entry1,2
+            // Fill entry0, clear entry1,2
             biu_fifo_valid[0] <= 1'b1;
             biu_fifo_valid[1] <= 1'b0;
             biu_fifo_valid[2] <= 1'b0;
           end
         endcase
-        2'b01: begin  //FIFO read
+        2'b01: begin  // FIFO read
           biu_fifo_valid[0] <= biu_fifo_valid[1];
           biu_fifo_valid[1] <= biu_fifo_valid[2];
           biu_fifo_valid[2] <= 1'b0;
         end
-        2'b11: ;  //FIFO read/write, no change
+        2'b11: ;  // FIFO read/write, no change
       endcase
     end
   end
 
-  //Address & Data
+  // Address & Data
   always @(posedge clk) begin
     case ({
       biu_ack, if_parcel_valid
@@ -205,17 +205,17 @@ module pu_riscv_noicache_core #(
         biu_fifo_valid[1], biu_fifo_valid[0]
       })
         2'b11: begin
-          //fill entry2
+          // fill entry2
           biu_fifo_dat[2] <= biu_do;
           biu_fifo_adr[2] <= biu_adro;
         end
         2'b01: begin
-          //fill entry1
+          // fill entry1
           biu_fifo_dat[1] <= biu_do;
           biu_fifo_adr[1] <= biu_adro;
         end
         default: begin
-          //fill entry0
+          // fill entry0
           biu_fifo_dat[0] <= biu_do;
           biu_fifo_adr[0] <= biu_adro;
         end
@@ -233,35 +233,35 @@ module pu_riscv_noicache_core #(
         biu_fifo_valid[2], biu_fifo_valid[1], biu_fifo_valid[0]
       })
         3'b1??: begin
-          //fill entry2
+          // fill entry2
           biu_fifo_dat[2] <= biu_do;
           biu_fifo_adr[2] <= biu_adro;
 
-          //push other entries
+          // push other entries
           biu_fifo_dat[0] <= biu_fifo_dat[1];
           biu_fifo_adr[0] <= biu_fifo_adr[1];
           biu_fifo_dat[1] <= biu_fifo_dat[2];
           biu_fifo_adr[1] <= biu_fifo_adr[2];
         end
         3'b01?: begin
-          //fill entry1
+          // fill entry1
           biu_fifo_dat[1] <= biu_do;
           biu_fifo_adr[1] <= biu_adro;
 
-          //push entry0
+          // push entry0
           biu_fifo_dat[0] <= biu_fifo_dat[1];
           biu_fifo_adr[0] <= biu_fifo_adr[1];
 
-          //don't care
+          // don't care
           biu_fifo_dat[2] <= 'hx;
           biu_fifo_adr[2] <= 'hx;
         end
         default: begin
-          //fill entry0
+          // fill entry0
           biu_fifo_dat[0] <= biu_do;
           biu_fifo_adr[0] <= biu_adro;
 
-          //don't care
+          // don't care
           biu_fifo_dat[1] <= 'hx;
           biu_fifo_adr[1] <= 'hx;
           biu_fifo_dat[2] <= 'hx;

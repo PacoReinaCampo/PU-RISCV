@@ -42,7 +42,7 @@
 
 package peripheral_biu_verilog_pkg;
 
-  //BIU Constants Package
+  // BIU Constants Package
   localparam BYTE = 3'b000;
   localparam HWORD = 3'b001;
   localparam WORD = 3'b010;
@@ -60,7 +60,7 @@ package peripheral_biu_verilog_pkg;
   localparam INCR16 = 3'b111;
   localparam UNDEF_BURST = 3'bxxx;
 
-  //Enumeration Codes
+  // Enumeration Codes
   localparam PROT_INSTRUCTION = 3'b000;
   localparam PROT_DATA = 3'b001;
   localparam PROT_USER = 3'b000;
@@ -68,7 +68,7 @@ package peripheral_biu_verilog_pkg;
   localparam PROT_NONCACHEABLE = 3'b000;
   localparam PROT_CACHEABLE = 3'b100;
 
-  //Complex Enumerations
+  // Complex Enumerations
   localparam NONCACHEABLE_USER_INSTRUCTION = 3'b000;
   localparam NONCACHEABLE_USER_DATA = 3'b001;
   localparam NONCACHEABLE_PRIVILEGED_INSTRUCTION = 3'b010;

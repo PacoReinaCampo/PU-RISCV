@@ -63,11 +63,11 @@ module pu_riscv_dmem_ctrl #(
   input wire rst_ni,
   input wire clk_i,
 
-  //Configuration
+  // Configuration
   input wire [PMA_CNT-1:0][    13:0] pma_cfg_i,
   input      [PMA_CNT-1:0][XLEN-1:0] pma_adr_i,
 
-  //CPU side
+  // CPU side
   input  wire            mem_req_i,
   input  wire [XLEN-1:0] mem_adr_i,
   input  wire [     2:0] mem_size_i,
@@ -86,7 +86,7 @@ module pu_riscv_dmem_ctrl #(
   input wire [PMP_CNT-1:0][XLEN-1:0] st_pmpaddr_i,
   input wire [        1:0]           st_prv_i,
 
-  //BIU ports
+  // BIU ports
   output reg             biu_stb_o,
   input  wire            biu_stb_ack_i,
   input  wire            biu_d_ack_i,
@@ -122,8 +122,8 @@ module pu_riscv_dmem_ctrl #(
   // Variables
   //
 
-  //Buffered memory request signals
-  //Virtual memory access signals
+  // Buffered memory request signals
+  // Virtual memory access signals
   logic [2*XLEN+5 -1:0]           queue_d;
   logic [2*XLEN+5 -1:0]           queue_q;
 
@@ -135,11 +135,11 @@ module pu_riscv_dmem_ctrl #(
   logic                           buf_we;
   logic [     XLEN-1:0]           buf_d;
 
-  //Misalignment check
+  // Misalignment check
   logic                           misaligned;
 
-  //MMU signals
-  //Physical memory access signals
+  // MMU signals
+  // Physical memory access signals
   logic                           preq;
   logic [     PLEN-1:0]           padr;
   logic [          2:0]           psize;
@@ -148,35 +148,35 @@ module pu_riscv_dmem_ctrl #(
   logic                           pwe;
   logic [     XLEN-1:0]           pd;
 
-  //from PMA check
+  // from PMA check
   logic                           pma_exception;
   logic                           is_cache_access;
   logic                           is_ext_access;
   logic                           ext_access_req;
   logic                           is_tcm_access;
 
-  //from PMP check
+  // from PMP check
   logic                           pmp_exception;
 
-  //all exceptions
+  // all exceptions
   logic                           exception;
 
 
-  //From Cache Controller Core
+  // From Cache Controller Core
   logic [     XLEN-1:0]           cache_q;
   logic                           cache_ack;
   logic                           cache_err;
 
-  //From TCM
+  // From TCM
   logic [     XLEN-1:0]           tcm_q;
   logic                           tcm_ack;
 
-  //From IO
+  // From IO
   logic [     XLEN-1:0]           ext_q;
   logic                           ext_ack;
   logic                           ext_err;
 
-  //BIU ports
+  // BIU ports
   logic [MUX_PORTS-1:0]           biu_stb;
   logic [MUX_PORTS-1:0]           biu_stb_ack;
   logic [MUX_PORTS-1:0]           biu_d_ack;
@@ -197,7 +197,7 @@ module pu_riscv_dmem_ctrl #(
   // Module Body
   //
 
-  //  //For debugging
+  //  // For debugging
   //  int fd;
   //  initial fd = $fopen("memtrace.dat");
 
@@ -219,9 +219,9 @@ module pu_riscv_dmem_ctrl #(
   //    end
   //  end
 
-  //Hookup Access Buffer
+  // Hookup Access Buffer
 
-  //Queue Input Data
+  // Queue Input Data
   assign queue_d[2*XLEN+4:XLEN+5] = mem_adr_i;
   assign queue_d[XLEN+4:XLEN+2]   = mem_size_i;
   assign queue_d[XLEN+1]          = mem_lock_i;
@@ -256,13 +256,13 @@ module pu_riscv_dmem_ctrl #(
   assign buf_d    = queue_q[XLEN-1:0];
   assign buf_prot = (PROT_DATA | st_prv_i == PRV_U ? PROT_USER : PROT_PRIVILEGED);
 
-  //Hookup misalignment check
+  // Hookup misalignment check
   pu_riscv_memmisaligned #(
     .XLEN   (XLEN),
     .HAS_RVC(HAS_RVC)
   ) misaligned_inst (
     .clk_i        (clk_i),
-    .instruction_i(1'b0),       //data cache
+    .instruction_i(1'b0),       // data cache
     .req_i        (buf_req),
     .adr_i        (buf_adr),
     .size_i       (buf_size),
@@ -302,28 +302,28 @@ module pu_riscv_dmem_ctrl #(
     .page_fault_o(mem_page_fault_o)
   );
 
-  //Hookup Physical Memory Atrributes Unit
+  // Hookup Physical Memory Atrributes Unit
   pu_riscv_pmachk #(
     .XLEN   (XLEN),
     .PLEN   (PLEN),
     .PMA_CNT(PMA_CNT)
   ) pmachk_inst (
-    //Configuration
+    // Configuration
     .pma_cfg_i(pma_cfg_i),
     .pma_adr_i(pma_adr_i),
 
-    //misaligned
+    // misaligned
     .misaligned_i(misaligned),
 
-    //Memory Access
-    .instruction_i(1'b0),   //Data access
+    // Memory Access
+    .instruction_i(1'b0),   // Data access
     .req_i        (preq),
     .adr_i        (padr),
     .size_i       (psize),
     .lock_i       (plock),
     .we_i         (pwe),
 
-    //Output
+    // Output
     .pma_o            (),
     .exception_o      (pma_exception),
     .misaligned_o     (mem_misaligned_o),
@@ -332,7 +332,7 @@ module pu_riscv_dmem_ctrl #(
     .is_tcm_access_o  (is_tcm_access)
   );
 
-  //Hookup Physical Memory Protection Unit
+  // Hookup Physical Memory Protection Unit
   pu_riscv_pmpchk #(
     .XLEN   (XLEN),
     .PLEN   (PLEN),
@@ -342,19 +342,19 @@ module pu_riscv_dmem_ctrl #(
     .st_pmpaddr_i(st_pmpaddr_i),
     .st_prv_i    (st_prv_i),
 
-    .instruction_i(1'b0),   //This is a data access
-    .req_i        (preq),   //Memory access request
-    .adr_i        (padr),   //Physical Memory address (i.e. after translation)
-    .size_i       (psize),  //Transfer size
-    .we_i         (pwe),    //Read/Write enable
+    .instruction_i(1'b0),   // This is a data access
+    .req_i        (preq),   // Memory access request
+    .adr_i        (padr),   // Physical Memory address (i.e. after translation)
+    .size_i       (psize),  // Transfer size
+    .we_i         (pwe),    // Read/Write enable
 
     .exception_o(pmp_exception)
   );
 
-  //Hookup Cache, TCM, external-interface
+  // Hookup Cache, TCM, external-interface
   generate
     if (DCACHE_SIZE > 0) begin
-      //Instantiate Data Cache Core
+      // Instantiate Data Cache Core
       pu_riscv_dcache_core #(
         .XLEN(XLEN),
         .PLEN(XLEN),
@@ -366,14 +366,14 @@ module pu_riscv_dmem_ctrl #(
 
         .TECHNOLOGY(TECHNOLOGY)
       ) dcache_inst (
-        //common signals
+        // common signals
         .rst_ni(rst_ni),
         .clk_i (clk_i),
 
-        //from MMU/PMA
+        // from MMU/PMA
         .mem_vreq_i(buf_req),
         .mem_preq_i(is_cache_access),
-        .mem_vadr_i(mem_adr_i),        //TO-DO: Shouldn't this be buf_adr ??
+        .mem_vadr_i(mem_adr_i),        // TO-DO: Shouldn't this be buf_adr ??
         .mem_padr_i(padr),
         .mem_size_i(buf_size),
         .mem_lock_i(buf_lock),
@@ -386,7 +386,7 @@ module pu_riscv_dmem_ctrl #(
         .flush_i   (cache_flush_i),
         .flushrdy_o(dcflush_rdy_o),
 
-        //To BIU
+        // To BIU
         .biu_stb_o    (biu_stb[CACHE]),
         .biu_stb_ack_i(biu_stb_ack[CACHE]),
         .biu_d_ack_i  (biu_d_ack[CACHE]),
@@ -402,7 +402,7 @@ module pu_riscv_dmem_ctrl #(
         .biu_ack_i    (biu_ack[CACHE]),
         .biu_err_i    (biu_err[CACHE])
       );
-    end else begin  //No cache
+    end else begin  // No cache
       assign cache_q       = 'h0;
       assign cache_ack     = 1'b0;
       assign cache_err     = 1'b0;
@@ -415,12 +415,12 @@ module pu_riscv_dmem_ctrl #(
      */
 
     if (DTCM_SIZE > 0) begin
-    end else begin  //No TCM
+    end else begin  // No TCM
       assign tcm_q   = 'h0;
       assign tcm_ack = 1'b0;
     end
 
-    //Instantiate EXT block
+    // Instantiate EXT block
     if (DCACHE_SIZE > 0) begin
       if (DTCM_SIZE > 0) begin
         assign ext_access_req = is_ext_access;
@@ -474,7 +474,7 @@ module pu_riscv_dmem_ctrl #(
     );
   endgenerate
 
-  //Hookup BIU mux
+  // Hookup BIU mux
   pu_riscv_mux #(
     .XLEN (XLEN),
     .PLEN (PLEN),
@@ -483,20 +483,20 @@ module pu_riscv_dmem_ctrl #(
     .rst_ni(rst_ni),
     .clk_i (clk_i),
 
-    .biu_req_i    (biu_stb),      //access request
-    .biu_req_ack_o(biu_stb_ack),  //access request acknowledge
+    .biu_req_i    (biu_stb),      // access request
+    .biu_req_ack_o(biu_stb_ack),  // access request acknowledge
     .biu_d_ack_o  (biu_d_ack),
-    .biu_adri_i   (biu_adri),     //access start address
-    .biu_adro_o   (biu_adro),     //transfer addresss
-    .biu_size_i   (biu_size),     //access data size
-    .biu_type_i   (biu_type),     //access burst type
-    .biu_lock_i   (biu_lock),     //access locked access
-    .biu_prot_i   (biu_prot),     //access protection bits
-    .biu_we_i     (biu_we),       //access write enable
-    .biu_d_i      (biu_d),        //access write data
-    .biu_q_o      (biu_q),        //access read data
-    .biu_ack_o    (biu_ack),      //transfer acknowledge
-    .biu_err_o    (biu_err),      //transfer error
+    .biu_adri_i   (biu_adri),     // access start address
+    .biu_adro_o   (biu_adro),     // transfer addresss
+    .biu_size_i   (biu_size),     // access data size
+    .biu_type_i   (biu_type),     // access burst type
+    .biu_lock_i   (biu_lock),     // access locked access
+    .biu_prot_i   (biu_prot),     // access protection bits
+    .biu_we_i     (biu_we),       // access write enable
+    .biu_d_i      (biu_d),        // access write data
+    .biu_q_o      (biu_q),        // access read data
+    .biu_ack_o    (biu_ack),      // transfer acknowledge
+    .biu_err_o    (biu_err),      // transfer error
 
     .biu_req_o    (biu_stb_o),
     .biu_req_ack_i(biu_stb_ack_i),
@@ -514,7 +514,7 @@ module pu_riscv_dmem_ctrl #(
     .biu_err_i    (biu_err_i)
   );
 
-  //Results back to CPU
+  // Results back to CPU
   assign mem_ack_o = ext_ack | cache_ack | tcm_ack;
   assign mem_err_o = ext_err | cache_err | pma_exception | pmp_exception;
 
@@ -528,6 +528,6 @@ module pu_riscv_dmem_ctrl #(
     endcase
   end
 
-  //All exceptions
+  // All exceptions
   assign exception = mem_misaligned_o | mem_err_o | mem_page_fault_o;
 endmodule

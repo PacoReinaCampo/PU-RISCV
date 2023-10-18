@@ -65,11 +65,11 @@ module pu_riscv_imem_ctrl #(
   input wire rst_ni,
   input wire clk_i,
 
-  //Configuration
-  input wire [PMA_CNT-1:0][              13:0] pma_cfg_i,
-  input      [PMA_CNT-1:0][XLEN          -1:0] pma_adr_i,
+  // Configuration
+  input wire [PMA_CNT-1:0][    13:0] pma_cfg_i,
+  input      [PMA_CNT-1:0][XLEN-1:0] pma_adr_i,
 
-  //CPU side
+  // CPU side
   input  wire [XLEN          -1:0] nxt_pc_i,
   output reg                       stall_nxt_pc_o,
   input  wire                      stall_i,
@@ -83,11 +83,11 @@ module pu_riscv_imem_ctrl #(
   input  wire                      cache_flush_i,
   input  wire                      dcflush_rdy_i,
 
-  input      [PMP_CNT-1:0][               7:0] st_pmpcfg_i,
-  input wire [PMP_CNT-1:0][XLEN          -1:0] st_pmpaddr_i,
-  input wire [        1:0]                     st_prv_i,
+  input      [PMP_CNT-1:0][     7:0] st_pmpcfg_i,
+  input wire [PMP_CNT-1:0][XLEN-1:0] st_pmpaddr_i,
+  input wire [        1:0]           st_prv_i,
 
-  //BIU ports
+  // BIU ports
   output reg                       biu_stb_o,
   input  wire                      biu_stb_ack_i,
   input  wire                      biu_d_ack_i,
@@ -125,8 +125,8 @@ module pu_riscv_imem_ctrl #(
   // Variables
   //
 
-  //Buffered memory request signals
-  //Virtual memory access signals
+  // Buffered memory request signals
+  // Virtual memory access signals
   logic                                              buf_req;
   logic                                              buf_ack;
   logic [                        XLEN-1:0]           buf_adr;
@@ -139,11 +139,11 @@ module pu_riscv_imem_ctrl #(
   logic                                              nxt_pc_queue_empty;
   logic                                              nxt_pc_queue_full;
 
-  //Misalignment check
+  // Misalignment check
   logic                                              misaligned;
 
-  //MMU signals
-  //Physical memory access signals
+  // MMU signals
+  // Physical memory access signals
   logic                                              preq;
   logic [                        PLEN-1:0]           padr;
   logic [                             2:0]           psize;
@@ -151,7 +151,7 @@ module pu_riscv_imem_ctrl #(
   logic [                             2:0]           pprot;
   logic                                              page_fault;
 
-  //from PMA check
+  // from PMA check
   logic                                              pma_exception;
   logic                                              pma_misaligned;
   logic                                              is_cache_access;
@@ -159,26 +159,26 @@ module pu_riscv_imem_ctrl #(
   logic                                              ext_access_req;
   logic                                              is_tcm_access;
 
-  //from PMP check
+  // from PMP check
   logic                                              pmp_exception;
 
-  //From Cache Controller Core
+  // From Cache Controller Core
   logic [                 PARCEL_SIZE-1:0]           cache_q;
   logic                                              cache_ack;
   logic                                              cache_err;
 
-  //From TCM
+  // From TCM
   logic [                        XLEN-1:0]           tcm_q;
   logic                                              tcm_ack;
 
-  //From IO
+  // From IO
   logic [                        XLEN-1:0]           ext_vadr;
   logic [                        XLEN-1:0]           ext_q;
-  logic                                              ext_access_ack;  //address transfer acknowledge
-  logic                                              ext_ack;  //data transfer acknowledge
+  logic                                              ext_access_ack;  // address transfer acknowledge
+  logic                                              ext_ack;  // data transfer acknowledge
   logic                                              ext_err;
 
-  //BIU ports
+  // BIU ports
   logic [                   MUX_PORTS-1:0]           biu_stb;
   logic [                   MUX_PORTS-1:0]           biu_stb_ack;
   logic [                   MUX_PORTS-1:0]           biu_d_ack;
@@ -194,7 +194,7 @@ module pu_riscv_imem_ctrl #(
   logic [                   MUX_PORTS-1:0]           biu_ack;
   logic [                   MUX_PORTS-1:0]           biu_err;
 
-  //to CPU
+  // to CPU
   logic [              PARCEL_SIZE/16-1:0]           parcel_valid;
 
   logic [              XLEN          -1:0]           parcel_queue_d_pc;
@@ -246,7 +246,7 @@ module pu_riscv_imem_ctrl #(
   //    end
   //  end
 
-  //Hookup Access Buffer
+  // Hookup Access Buffer
   pu_riscv_membuf #(
     .DEPTH(2),
     .DBITS(XLEN)
@@ -268,7 +268,7 @@ module pu_riscv_imem_ctrl #(
     .full_o (nxt_pc_queue_full)
   );
 
-  //stall nxt_pc when queues full, or when DCACHE is flushing
+  // stall nxt_pc when queues full, or when DCACHE is flushing
   assign stall_nxt_pc_o = nxt_pc_queue_full | parcel_queue_full | ~dcflush_rdy_i;
 
   assign buf_ack        = ext_access_ack | cache_ack | tcm_ack;
@@ -276,13 +276,13 @@ module pu_riscv_imem_ctrl #(
   assign buf_lock       = 1'b0;
   assign buf_prot       = (PROT_DATA | st_prv_i == PRV_U ? PROT_USER : PROT_PRIVILEGED);
 
-  //Hookup misalignment check
+  // Hookup misalignment check
   pu_riscv_memmisaligned #(
     .XLEN   (XLEN),
     .HAS_RVC(HAS_RVC)
   ) misaligned_inst (
     .clk_i        (clk_i),
-    .instruction_i(1'b1),       //instruction access
+    .instruction_i(1'b1),       // instruction access
     .req_i        (buf_req),
     .adr_i        (buf_adr),
     .size_i       (buf_size),
@@ -306,8 +306,8 @@ module pu_riscv_imem_ctrl #(
     .vsize_i(buf_size),
     .vlock_i(buf_lock),
     .vprot_i(buf_prot),
-    .vwe_i  (1'b0),         //instructions only read
-    .vd_i   ({XLEN{1'b0}}), //no write data
+    .vwe_i  (1'b0),         // instructions only read
+    .vd_i   ({XLEN{1'b0}}), // no write data
 
     .preq_o (preq),
     .padr_o (padr),
@@ -322,28 +322,28 @@ module pu_riscv_imem_ctrl #(
     .page_fault_o(page_fault)
   );
 
-  //Hookup Physical Memory Atrributes Unit
+  // Hookup Physical Memory Atrributes Unit
   pu_riscv_pmachk #(
     .XLEN   (XLEN),
     .PLEN   (PLEN),
     .PMA_CNT(PMA_CNT)
   ) pmachk_inst (
-    //Configuration
+    // Configuration
     .pma_cfg_i(pma_cfg_i),
     .pma_adr_i(pma_adr_i),
 
-    //misaligned
+    // misaligned
     .misaligned_i(misaligned),
 
-    //Memory Access
-    .instruction_i(1'b1),   //Instruction access
+    // Memory Access
+    .instruction_i(1'b1),   // Instruction access
     .req_i        (preq),
     .adr_i        (padr),
     .size_i       (psize),
     .lock_i       (plock),
     .we_i         (1'b0),
 
-    //Output
+    // Output
     .pma_o            (),
     .exception_o      (pma_exception),
     .misaligned_o     (pma_misaligned),
@@ -352,7 +352,7 @@ module pu_riscv_imem_ctrl #(
     .is_tcm_access_o  (is_tcm_access)
   );
 
-  //Hookup Physical Memory Protection Unit
+  // Hookup Physical Memory Protection Unit
   pu_riscv_pmpchk #(
     .XLEN   (XLEN),
     .PLEN   (PLEN),
@@ -362,19 +362,19 @@ module pu_riscv_imem_ctrl #(
     .st_pmpaddr_i(st_pmpaddr_i),
     .st_prv_i    (st_prv_i),
 
-    .instruction_i(1'b1),   //Instruction access
-    .req_i        (preq),   //Memory access request
-    .adr_i        (padr),   //Physical Memory address (i.e. after translation)
-    .size_i       (psize),  //Transfer size
-    .we_i         (1'b0),   //Read/Write enable
+    .instruction_i(1'b1),   // Instruction access
+    .req_i        (preq),   // Memory access request
+    .adr_i        (padr),   // Physical Memory address (i.e. after translation)
+    .size_i       (psize),  // Transfer size
+    .we_i         (1'b0),   // Read/Write enable
 
     .exception_o(pmp_exception)
   );
 
-  //Hookup Cache, TCM, external-interface
+  // Hookup Cache, TCM, external-interface
   generate
     if (ICACHE_SIZE > 0) begin
-      //Instantiate Data Cache Core
+      // Instantiate Data Cache Core
       pu_riscv_icache_core #(
         .XLEN(XLEN),
         .PLEN(XLEN),
@@ -388,12 +388,12 @@ module pu_riscv_imem_ctrl #(
 
         .TECHNOLOGY(TECHNOLOGY)
       ) icache_inst (
-        //common signals
+        // common signals
         .rst_ni(rst_ni),
         .clk_i (clk_i),
         .clr_i (flush_i),
 
-        //from MMU/PMA
+        // from MMU/PMA
         .mem_vreq_i(buf_req),
         .mem_preq_i(is_cache_access),
         .mem_vadr_i(buf_adr),
@@ -405,9 +405,9 @@ module pu_riscv_imem_ctrl #(
         .mem_ack_o (cache_ack),
         .mem_err_o (cache_err),
         .flush_i   (cache_flush_i),
-        .flushrdy_i(1'b1),             //handled by stall_nxt_pc
+        .flushrdy_i(1'b1),             // handled by stall_nxt_pc
 
-        //To BIU
+        // To BIU
         .biu_stb_o    (biu_stb[CACHE]),
         .biu_stb_ack_i(biu_stb_ack[CACHE]),
         .biu_d_ack_i  (biu_d_ack[CACHE]),
@@ -423,20 +423,20 @@ module pu_riscv_imem_ctrl #(
         .biu_ack_i    (biu_ack[CACHE]),
         .biu_err_i    (biu_err[CACHE])
       );
-    end else begin  //No cache
+    end else begin  // No cache
       assign cache_q   = 'h0;
       assign cache_ack = 1'b0;
       assign cache_err = 1'b0;
     end
 
-    //Instantiate TCM block
+    // Instantiate TCM block
     if (ITCM_SIZE > 0) begin
-    end else begin  //No TCM
+    end else begin  // No TCM
       assign tcm_q   = 'h0;
       assign tcm_ack = 1'b0;
     end
 
-    //Instantiate EXT block
+    // Instantiate EXT block
     if (ICACHE_SIZE > 0) begin
       if (ITCM_SIZE > 0) begin
         assign ext_access_req = is_ext_access;
@@ -489,7 +489,7 @@ module pu_riscv_imem_ctrl #(
       .biu_err_i    (biu_err[EXT])
     );
 
-    //store virtual addresses for external access
+    // store virtual addresses for external access
     pu_riscv_ram_queue #(
       .DEPTH                 (8),
       .DBITS                 (XLEN),
@@ -511,11 +511,11 @@ module pu_riscv_imem_ctrl #(
       .almost_empty_o(),
       .almost_full_o (),
       .empty_o       (),
-      .full_o        ()   //stall access requests when full (AXI bus ...)
+      .full_o        ()   // stall access requests when full (AXI bus ...)
     );
   endgenerate
 
-  //Hookup BIU mux
+  // Hookup BIU mux
   pu_riscv_mux #(
     .XLEN (XLEN),
     .PLEN (PLEN),
@@ -524,20 +524,20 @@ module pu_riscv_imem_ctrl #(
     .rst_ni(rst_ni),
     .clk_i (clk_i),
 
-    .biu_req_i    (biu_stb),      //access request
-    .biu_req_ack_o(biu_stb_ack),  //access request acknowledge
+    .biu_req_i    (biu_stb),      // access request
+    .biu_req_ack_o(biu_stb_ack),  // access request acknowledge
     .biu_d_ack_o  (biu_d_ack),
-    .biu_adri_i   (biu_adri),     //access start address
-    .biu_adro_o   (biu_adro),     //transfer addresss
-    .biu_size_i   (biu_size),     //access data size
-    .biu_type_i   (biu_type),     //access burst type
-    .biu_lock_i   (biu_lock),     //access locked access
-    .biu_prot_i   (biu_prot),     //access protection bits
-    .biu_we_i     (biu_we),       //access write enable
-    .biu_d_i      (biu_d),        //access write data
-    .biu_q_o      (biu_q),        //access read data
-    .biu_ack_o    (biu_ack),      //transfer acknowledge
-    .biu_err_o    (biu_err),      //transfer error
+    .biu_adri_i   (biu_adri),     // access start address
+    .biu_adro_o   (biu_adro),     // transfer addresss
+    .biu_size_i   (biu_size),     // access data size
+    .biu_type_i   (biu_type),     // access burst type
+    .biu_lock_i   (biu_lock),     // access locked access
+    .biu_prot_i   (biu_prot),     // access protection bits
+    .biu_we_i     (biu_we),       // access write enable
+    .biu_d_i      (biu_d),        // access write data
+    .biu_q_o      (biu_q),        // access read data
+    .biu_ack_o    (biu_ack),      // transfer acknowledge
+    .biu_err_o    (biu_err),      // transfer error
 
     .biu_req_o    (biu_stb_o),
     .biu_req_ack_i(biu_stb_ack_i),
@@ -555,10 +555,10 @@ module pu_riscv_imem_ctrl #(
     .biu_err_i    (biu_err_i)
   );
 
-  //Results back to CPU
+  // Results back to CPU
   assign parcel_valid = {2{ext_ack | cache_ack | tcm_ack}};
 
-  //Instruction Queue
+  // Instruction Queue
   always @(posedge clk_i) begin
     if (buf_req) begin
       buf_adr_dly <= buf_adr;
@@ -582,8 +582,8 @@ module pu_riscv_imem_ctrl #(
   assign parcel_queue_d_page_fault = page_fault;
   assign parcel_queue_d_error      = ext_err | cache_err | pma_exception | pmp_exception;
 
-  //Instruction queue
-  //Add some extra words for inflight instructions
+  // Instruction queue
+  // Add some extra words for inflight instructions
   pu_riscv_ram_queue #(
     .DEPTH                 (8),
     .DBITS                 (XLEN + PARCEL_SIZE * (1 + 1 / 16) + 3),
@@ -608,7 +608,7 @@ module pu_riscv_imem_ctrl #(
     .full_o        ()
   );
 
-  //CPU signals
+  // CPU signals
   assign parcel_pc_o    = parcel_queue_q_pc;
   assign parcel_o       = parcel_queue_q_parcel;
   assign parcel_valid_o = parcel_queue_q_valid & ~{PARCEL_SIZE / 16{parcel_queue_empty}};

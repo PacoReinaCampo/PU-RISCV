@@ -67,24 +67,24 @@ module pu_riscv_axi4 #(
 
   parameter MULT_LATENCY = 1,
 
-  parameter BREAKPOINTS = 8,  //Number of hardware breakpoints
+  parameter BREAKPOINTS = 8,  // Number of hardware breakpoints
 
   parameter PMA_CNT = 4,
-  parameter PMP_CNT = 16, //Number of Physical Memory Protection entries
+  parameter PMP_CNT = 16, // Number of Physical Memory Protection entries
 
   parameter BP_GLOBAL_BITS    = 2,
   parameter BP_LOCAL_BITS     = 10,
   parameter BP_LOCAL_BITS_LSB = 2,
 
-  parameter ICACHE_SIZE        = 64,  //in KBytes
-  parameter ICACHE_BLOCK_SIZE  = 64,  //in Bytes
-  parameter ICACHE_WAYS        = 2,   //'n'-way set associative
+  parameter ICACHE_SIZE        = 64,  // in KBytes
+  parameter ICACHE_BLOCK_SIZE  = 64,  // in Bytes
+  parameter ICACHE_WAYS        = 2,   // 'n'-way set associative
   parameter ICACHE_REPLACE_ALG = 0,
   parameter ITCM_SIZE          = 0,
 
-  parameter DCACHE_SIZE        = 64,  //in KBytes
-  parameter DCACHE_BLOCK_SIZE  = 64,  //in Bytes
-  parameter DCACHE_WAYS        = 2,   //'n'-way set associative
+  parameter DCACHE_SIZE        = 64,  // in KBytes
+  parameter DCACHE_BLOCK_SIZE  = 64,  // in Bytes
+  parameter DCACHE_WAYS        = 2,   // 'n'-way set associative
   parameter DCACHE_REPLACE_ALG = 0,
   parameter DTCM_SIZE          = 0,
   parameter WRITEBUFFER_SIZE   = 8,
@@ -110,7 +110,7 @@ module pu_riscv_axi4 #(
   input wire [PMA_CNT-1:0][    13:0] pma_cfg_i,
   input wire [PMA_CNT-1:0][XLEN-1:0] pma_adr_i,
 
-  //AXI4 instruction
+  // AXI4 instruction
   output reg  [AXI_ID_WIDTH    -1:0] axi4_ins_aw_id,
   output reg  [AXI_ADDR_WIDTH  -1:0] axi4_ins_aw_addr,
   output reg  [                 7:0] axi4_ins_aw_len,
@@ -160,7 +160,7 @@ module pu_riscv_axi4 #(
   input  wire                        axi4_ins_b_valid,
   output reg                         axi4_ins_b_ready,
 
-  //AXI4 data
+  // AXI4 data
   output reg  [AXI_ID_WIDTH    -1:0] axi4_dat_aw_id,
   output reg  [AXI_ADDR_WIDTH  -1:0] axi4_dat_aw_addr,
   output reg  [                 7:0] axi4_dat_aw_len,
@@ -210,13 +210,13 @@ module pu_riscv_axi4 #(
   input  wire                        axi4_dat_b_valid,
   output reg                         axi4_dat_b_ready,
 
-  //Interrupts
+  // Interrupts
   input       ext_nmi,
   input       ext_tint,
   input       ext_sint,
   input [3:0] ext_int,
 
-  //Debug Interface
+  // Debug Interface
   input             dbg_stall,
   input             dbg_strb,
   input             dbg_we,
@@ -259,7 +259,7 @@ module pu_riscv_axi4 #(
   logic                                cacheflush;
   logic                                dcflush_rdy;
 
-  //Instruction Memory BIU connections
+  // Instruction Memory BIU connections
   logic                                ibiu_stb;
   logic                                ibiu_stb_ack;
   logic                                ibiu_d_ack;
@@ -275,7 +275,7 @@ module pu_riscv_axi4 #(
   logic                                ibiu_ack;
   logic                                ibiu_err;
 
-  //Data Memory BIU connections
+  // Data Memory BIU connections
   logic                                dbiu_stb;
   logic                                dbiu_stb_ack;
   logic                                dbiu_d_ack;
@@ -296,7 +296,7 @@ module pu_riscv_axi4 #(
   // Module Body
   //
 
-  //Instantiate RISC-V core
+  // Instantiate RISC-V core
   pu_riscv_core #(
     .XLEN     (XLEN),
     .PLEN     (PLEN),
@@ -377,9 +377,9 @@ module pu_riscv_axi4 #(
     .dbg_bp   (dbg_bp)
   );
 
-  //Instantiate bus interfaces and optional caches
+  // Instantiate bus interfaces and optional caches
 
-  //Instruction Memory Access Block
+  // Instruction Memory Access Block
   pu_riscv_imem_ctrl #(
     .XLEN(XLEN),
     .PLEN(PLEN),
@@ -439,7 +439,7 @@ module pu_riscv_axi4 #(
     .biu_err_i    (ibiu_err)
   );
 
-  //Data Memory Access Block
+  // Data Memory Access Block
   pu_riscv_dmem_ctrl #(
     .XLEN(XLEN),
     .PLEN(PLEN),
@@ -498,7 +498,7 @@ module pu_riscv_axi4 #(
     .biu_err_i    (dbiu_err)
   );
 
-  //Instantiate BIU
+  // Instantiate BIU
   pu_riscv_biu2axi4 #(
     .XLEN(XLEN),
     .PLEN(PLEN),
@@ -515,7 +515,7 @@ module pu_riscv_axi4 #(
     .HRESETn(HRESETn),
     .HCLK   (HCLK),
 
-    //AXI4 instruction
+    // AXI4 instruction
     .axi4_aw_id    (axi4_ins_aw_id),
     .axi4_aw_addr  (axi4_ins_aw_addr),
     .axi4_aw_len   (axi4_ins_aw_len),
@@ -597,7 +597,7 @@ module pu_riscv_axi4 #(
     .HRESETn(HRESETn),
     .HCLK   (HCLK),
 
-    //AXI4 data
+    // AXI4 data
     .axi4_aw_id    (axi4_dat_aw_id),
     .axi4_aw_addr  (axi4_dat_aw_addr),
     .axi4_aw_len   (axi4_dat_aw_len),

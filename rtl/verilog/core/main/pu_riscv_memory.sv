@@ -53,11 +53,11 @@ module pu_riscv_memory #(
 
   input wb_stall,
 
-  //Program counter
+  // Program counter
   input      [XLEN          -1:0] ex_pc,
   output reg [XLEN          -1:0] mem_pc,
 
-  //Instruction
+  // Instruction
   input                           ex_bubble,
   input      [ILEN          -1:0] ex_instr,
   output reg                      mem_bubble,
@@ -67,11 +67,11 @@ module pu_riscv_memory #(
   input      [EXCEPTION_SIZE-1:0] wb_exception,
   output reg [EXCEPTION_SIZE-1:0] mem_exception,
 
-  //From EX
-  input      [XLEN          -1:0] ex_r,
-  input      [XLEN          -1:0] dmem_adr,
+  // From EX
+  input [XLEN          -1:0] ex_r,
+  input [XLEN          -1:0] dmem_adr,
 
-  //To WB
+  // To WB
   output reg [XLEN          -1:0] mem_r,
   output reg [XLEN          -1:0] mem_memadr
 );
@@ -81,7 +81,7 @@ module pu_riscv_memory #(
   // Module Body
   //
 
-  //Program Counter
+  // Program Counter
   always @(posedge clk, negedge rstn) begin
     if (!rstn) begin
       mem_pc <= PC_INIT;
@@ -90,7 +90,7 @@ module pu_riscv_memory #(
     end
   end
 
-  //Instruction
+  // Instruction
   always @(posedge clk) begin
     if (!wb_stall) begin
       mem_instr <= ex_instr;
@@ -105,7 +105,7 @@ module pu_riscv_memory #(
     end
   end
 
-  //Data
+  // Data
   always @(posedge clk) begin
     if (!wb_stall) begin
       mem_r <= ex_r;
@@ -118,7 +118,7 @@ module pu_riscv_memory #(
     end
   end
 
-  //Exception
+  // Exception
   always @(posedge clk, negedge rstn) begin
     if (!rstn) begin
       mem_exception <= 'h0;

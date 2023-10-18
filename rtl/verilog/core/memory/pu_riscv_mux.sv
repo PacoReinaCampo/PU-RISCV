@@ -50,37 +50,37 @@ module pu_riscv_mux #(
   input wire rst_ni,
   input wire clk_i,
 
-  //Input Ports
-  input  wire [PORTS-1:0]           biu_req_i,      //access request
-  output reg  [PORTS-1:0]           biu_req_ack_o,  //biu access acknowledge
-  output reg  [PORTS-1:0]           biu_d_ack_o,    //biu early data acknowledge
-  input  wire [PORTS-1:0][PLEN-1:0] biu_adri_i,     //access start address
-  output reg  [PORTS-1:0][PLEN-1:0] biu_adro_o,     //biu response address
-  input  wire [PORTS-1:0][     2:0] biu_size_i,     //access data size
-  input  wire [PORTS-1:0][     2:0] biu_type_i,     //access burst type
-  input  wire [PORTS-1:0]           biu_lock_i,     //access locked access
-  input  wire [PORTS-1:0][     2:0] biu_prot_i,     //access protection
-  input  wire [PORTS-1:0]           biu_we_i,       //access write enable
-  input  wire [PORTS-1:0][XLEN-1:0] biu_d_i,        //access write data
-  output reg  [PORTS-1:0][XLEN-1:0] biu_q_o,        //access read data
-  output reg  [PORTS-1:0]           biu_ack_o,      //access acknowledge
-  output reg  [PORTS-1:0]           biu_err_o,      //access error
+  // Input Ports
+  input  wire [PORTS-1:0]           biu_req_i,      // access request
+  output reg  [PORTS-1:0]           biu_req_ack_o,  // biu access acknowledge
+  output reg  [PORTS-1:0]           biu_d_ack_o,    // biu early data acknowledge
+  input  wire [PORTS-1:0][PLEN-1:0] biu_adri_i,     // access start address
+  output reg  [PORTS-1:0][PLEN-1:0] biu_adro_o,     // biu response address
+  input  wire [PORTS-1:0][     2:0] biu_size_i,     // access data size
+  input  wire [PORTS-1:0][     2:0] biu_type_i,     // access burst type
+  input  wire [PORTS-1:0]           biu_lock_i,     // access locked access
+  input  wire [PORTS-1:0][     2:0] biu_prot_i,     // access protection
+  input  wire [PORTS-1:0]           biu_we_i,       // access write enable
+  input  wire [PORTS-1:0][XLEN-1:0] biu_d_i,        // access write data
+  output reg  [PORTS-1:0][XLEN-1:0] biu_q_o,        // access read data
+  output reg  [PORTS-1:0]           biu_ack_o,      // access acknowledge
+  output reg  [PORTS-1:0]           biu_err_o,      // access error
 
-  //Output (to BIU)
-  output reg             biu_req_o,      //BIU access request
-  input  wire            biu_req_ack_i,  //BIU ackowledge
-  input  wire            biu_d_ack_i,    //BIU early data acknowledge
-  output reg  [PLEN-1:0] biu_adri_o,     //address into BIU
-  input  wire [PLEN-1:0] biu_adro_i,     //address from BIU
-  output reg  [     2:0] biu_size_o,     //transfer size
-  output reg  [     2:0] biu_type_o,     //burst type
+  // Output (to BIU)
+  output reg             biu_req_o,      // BIU access request
+  input  wire            biu_req_ack_i,  // BIU ackowledge
+  input  wire            biu_d_ack_i,    // BIU early data acknowledge
+  output reg  [PLEN-1:0] biu_adri_o,     // address into BIU
+  input  wire [PLEN-1:0] biu_adro_i,     // address from BIU
+  output reg  [     2:0] biu_size_o,     // transfer size
+  output reg  [     2:0] biu_type_o,     // burst type
   output reg             biu_lock_o,
   output reg  [     2:0] biu_prot_o,
   output reg             biu_we_o,
-  output reg  [XLEN-1:0] biu_d_o,        //data into BIU
-  input  wire [XLEN-1:0] biu_q_i,        //data from BIU
-  input  wire            biu_ack_i,      //data acknowledge, 1 per data
-  input  wire            biu_err_i       //data error
+  output reg  [XLEN-1:0] biu_d_o,        // data into BIU
+  input  wire [XLEN-1:0] biu_q_i,        // data from BIU
+  input  wire            biu_ack_i,      // data acknowledge, 1 per data
+  input  wire            biu_err_i       // data error
 );
 
   //////////////////////////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ module pu_riscv_mux #(
   // Functions
   //
 
-  //convert burst type to counter length (actually length -1)
+  // convert burst type to counter length (actually length -1)
   function [3:0] biu_type2cnt;
     input [2:0] biu_type;
 
@@ -118,10 +118,10 @@ module pu_riscv_mux #(
     input [PORTS-1:0] req;
     integer n;
 
-    //default port
+    // default port
     port_select = 0;
 
-    //check other ports
+    // check other ports
     for (n = PORTS - 1; n > 0; n = n - 1) begin
       if (req[n]) begin
         port_select = n;
@@ -161,7 +161,7 @@ module pu_riscv_mux #(
   assign pending_size      = biu_size_i[pending_port];
   assign pending_burst_cnt = biu_type2cnt(biu_type_i[pending_port]);
 
-  //Access Statemachine
+  // Access Statemachine
   always @(posedge clk_i, negedge rst_ni) begin
     if (!rst_ni) begin
       fsm_state <= IDLE;
@@ -179,7 +179,7 @@ module pu_riscv_mux #(
           if (biu_ack_i) begin
             burst_cnt <= burst_cnt - 1;
             if (~|burst_cnt) begin
-              //Burst done
+              // Burst done
               if (pending_req && |pending_burst_cnt) begin
                 burst_cnt     <= pending_burst_cnt;
                 selected_port <= pending_port;
@@ -194,7 +194,7 @@ module pu_riscv_mux #(
     end
   end
 
-  //Mux BIU ports
+  // Mux BIU ports
   always @(*) begin
     case (fsm_state)
       IDLE: begin
@@ -213,7 +213,7 @@ module pu_riscv_mux #(
         biu_type_o = biu_type_i[pending_port];
         biu_lock_o = biu_lock_i[pending_port];
         biu_we_o   = biu_we_i[pending_port];
-        biu_d_o    = biu_ack_i & ~|burst_cnt ? biu_d_i[pending_port] : biu_d_i[selected_port];  //TO-DO: ~|burst_cnt & biu_ack_i ??
+        biu_d_o    = biu_ack_i & ~|burst_cnt ? biu_d_i[pending_port] : biu_d_i[selected_port];  // TO-DO: ~|burst_cnt & biu_ack_i ??
       end
 
       //      WAIT4BIU: begin
@@ -238,7 +238,7 @@ module pu_riscv_mux #(
     endcase
   end
 
-  //Decode MEM ports
+  // Decode MEM ports
   generate
     for (p = 0; p < PORTS; p = p + 1) begin : decode_ports
       assign biu_req_ack_o[p] = (p == pending_port) ? biu_req_ack_i : 1'b0;

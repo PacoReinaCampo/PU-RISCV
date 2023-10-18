@@ -60,15 +60,15 @@ module pu_riscv_ram_1rw_generic #(
   //
   genvar i;
 
-  reg [DBITS-1:0] mem_array                        [2**ABITS -1:0];  //memory array
-  reg [ABITS-1:0] addr_reg;  //latched read address
+  reg [DBITS-1:0] mem_array                         [2**ABITS -1:0];  // memory array
+  reg [ABITS-1:0] addr_reg;  // latched read address
 
   //////////////////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
 
-  //write side
+  // write side
   generate
     for (i = 0; i < (DBITS + 7) / 8; i = i + 1) begin : write
       if (i * 8 + 8 > DBITS) begin
@@ -87,8 +87,8 @@ module pu_riscv_ram_1rw_generic #(
     end
   endgenerate
 
-  //read side
-  //per Altera's recommendations; avoids bypass logic
+  // read side
+  // per Altera's recommendations; avoids bypass logic
   always @(posedge clk_i) begin
     dout_o <= mem_array[addr_i];
   end

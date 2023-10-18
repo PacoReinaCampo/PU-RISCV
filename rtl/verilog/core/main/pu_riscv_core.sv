@@ -86,10 +86,10 @@ module pu_riscv_core #(
 
   parameter PARCEL_SIZE = 64
 ) (
-  input rstn,  //Reset
-  input clk,   //Clock
+  input rstn,  // Reset
+  input clk,   // Clock
 
-  //Instruction Memory Access bus
+  // Instruction Memory Access bus
   input                       if_stall_nxt_pc,
   output [XLEN          -1:0] if_nxt_pc,
   output                      if_stall,
@@ -100,7 +100,7 @@ module pu_riscv_core #(
   input                       if_parcel_misaligned,
   input                       if_parcel_page_fault,
 
-  //Data Memory Access bus
+  // Data Memory Access bus
   output [XLEN         -1:0] dmem_adr,
   output [XLEN         -1:0] dmem_d,
   input  [XLEN         -1:0] dmem_q,
@@ -112,20 +112,20 @@ module pu_riscv_core #(
   input                      dmem_misaligned,
   input                      dmem_page_fault,
 
-  //cpu state
+  // cpu state
   output [        1:0]           st_prv,
   output [PMP_CNT-1:0][     7:0] st_pmpcfg,
   output [PMP_CNT-1:0][XLEN-1:0] st_pmpaddr,
 
   output bu_cacheflush,
 
-  //Interrupts
+  // Interrupts
   input       ext_nmi,
   input       ext_tint,
   input       ext_sint,
   input [3:0] ext_int,
 
-  //Debug Interface
+  // Debug Interface
   input                      dbg_stall,
   input                      dbg_strb,
   input                      dbg_we,
@@ -141,7 +141,7 @@ module pu_riscv_core #(
   // Constants
   //
 
-  //RF access
+  // RF access
   parameter AR_BITS = 5;
   parameter RDPORTS = 2;
   parameter WRPORTS = 1;
@@ -151,53 +151,53 @@ module pu_riscv_core #(
   // Variables
   //
 
-  logic [XLEN           -1:0] bu_nxt_pc;
-  logic [XLEN           -1:0] st_nxt_pc;
-  logic [XLEN           -1:0] if_pc;
-  logic [XLEN           -1:0] id_pc;
-  logic [XLEN           -1:0] ex_pc;
-  logic [XLEN           -1:0] mem_pc;
-  logic [XLEN           -1:0] wb_pc;
+  logic [XLEN           -1:0]              bu_nxt_pc;
+  logic [XLEN           -1:0]              st_nxt_pc;
+  logic [XLEN           -1:0]              if_pc;
+  logic [XLEN           -1:0]              id_pc;
+  logic [XLEN           -1:0]              ex_pc;
+  logic [XLEN           -1:0]              mem_pc;
+  logic [XLEN           -1:0]              wb_pc;
 
-  logic [ILEN           -1:0] if_instr;
-  logic [ILEN           -1:0] id_instr;
-  logic [ILEN           -1:0] ex_instr;
-  logic [ILEN           -1:0] mem_instr;
-  logic [ILEN           -1:0] wb_instr;
+  logic [ILEN           -1:0]              if_instr;
+  logic [ILEN           -1:0]              id_instr;
+  logic [ILEN           -1:0]              ex_instr;
+  logic [ILEN           -1:0]              mem_instr;
+  logic [ILEN           -1:0]              wb_instr;
 
-  logic                       if_bubble;
-  logic                       id_bubble;
-  logic                       ex_bubble;
-  logic                       mem_bubble;
-  logic                       wb_bubble;
+  logic                                    if_bubble;
+  logic                                    id_bubble;
+  logic                                    ex_bubble;
+  logic                                    mem_bubble;
+  logic                                    wb_bubble;
 
-  logic                       bu_flush;
-  logic                       st_flush;
-  logic                       du_flush;
+  logic                                    bu_flush;
+  logic                                    st_flush;
+  logic                                    du_flush;
 
-  logic                       id_stall;
-  logic                       ex_stall;
-  logic                       wb_stall;
-  logic                       du_stall;
-  logic                       du_stall_dly;
+  logic                                    id_stall;
+  logic                                    ex_stall;
+  logic                                    wb_stall;
+  logic                                    du_stall;
+  logic                                    du_stall_dly;
 
-  //Branch Prediction
-  logic [                1:0] bp_bp_predict;
-  logic [                1:0] if_bp_predict;
-  logic [                1:0] id_bp_predict;
-  logic [                1:0] bu_bp_predict;
+  // Branch Prediction
+  logic [                1:0]              bp_bp_predict;
+  logic [                1:0]              if_bp_predict;
+  logic [                1:0]              id_bp_predict;
+  logic [                1:0]              bu_bp_predict;
 
-  logic [BP_GLOBAL_BITS -1:0] bu_bp_history;
-  logic                       bu_bp_btaken;
-  logic                       bu_bp_update;
+  logic [BP_GLOBAL_BITS -1:0]              bu_bp_history;
+  logic                                    bu_bp_btaken;
+  logic                                    bu_bp_update;
 
 
-  //Exceptions
-  logic [EXCEPTION_SIZE -1:0] if_exception;
-  logic [EXCEPTION_SIZE -1:0] id_exception;
-  logic [EXCEPTION_SIZE -1:0] ex_exception;
-  logic [EXCEPTION_SIZE -1:0] mem_exception;
-  logic [EXCEPTION_SIZE -1:0] wb_exception;
+  // Exceptions
+  logic [EXCEPTION_SIZE -1:0]              if_exception;
+  logic [EXCEPTION_SIZE -1:0]              id_exception;
+  logic [EXCEPTION_SIZE -1:0]              ex_exception;
+  logic [EXCEPTION_SIZE -1:0]              mem_exception;
+  logic [EXCEPTION_SIZE -1:0]              wb_exception;
 
   logic [        XLEN   -1:0]              id_srcv2;
   logic [        RDPORTS-1:0][AR_BITS-1:0] rf_src1;
@@ -208,7 +208,7 @@ module pu_riscv_core #(
   logic [        WRPORTS-1:0][XLEN   -1:0] rf_dstv;
   logic [        WRPORTS-1:0]              rf_we;
 
-  //ALU signals
+  // ALU signals
   logic [XLEN           -1:0]              id_opA;
   logic [XLEN           -1:0]              id_opB;
   logic [XLEN           -1:0]              ex_r;
@@ -225,7 +225,7 @@ module pu_riscv_core #(
   logic                                    id_bypwb_opA;
   logic                                    id_bypwb_opB;
 
-  //CPU state
+  // CPU state
   logic [                1:0]              st_xlen;
   logic                                    st_tvm;
   logic                                    st_tw;
@@ -238,13 +238,13 @@ module pu_riscv_core #(
   logic [XLEN           -1:0]              st_csr_rval;
   logic                                    ex_csr_we;
 
-  //Write back
+  // Write back
   logic [                4:0]              wb_dst;
   logic [XLEN           -1:0]              wb_r;
   logic [                0:0]              wb_we;
   logic [XLEN           -1:0]              wb_badaddr;
 
-  //Debug
+  // Debug
   logic                                    du_we_rf;
   logic                                    du_we_frf;
   logic                                    du_we_csr;
@@ -367,7 +367,7 @@ module pu_riscv_core #(
     .wb_r         (wb_r)
   );
 
-  //Execution units
+  // Execution units
   pu_riscv_execution #(
     .XLEN(XLEN),
     .ILEN(ILEN),
@@ -447,7 +447,7 @@ module pu_riscv_core #(
     .du_ie          (du_ie)
   );
 
-  //Memory access
+  // Memory access
   pu_riscv_memory #(
     .XLEN(XLEN),
     .ILEN(ILEN),
@@ -475,7 +475,7 @@ module pu_riscv_core #(
     .mem_memadr   (mem_memadr)
   );
 
-  //Memory acknowledge + Write Back unit
+  // Memory acknowledge + Write Back unit
   pu_riscv_wb #(
     .XLEN(XLEN),
     .ILEN(ILEN),
@@ -513,7 +513,7 @@ module pu_riscv_core #(
   assign rf_dstv[0] = wb_r;
   assign rf_we[0]   = wb_we;
 
-  //Thread state
+  // Thread state
   pu_riscv_state #(
     .XLEN     (XLEN),
     .PC_INIT  (PC_INIT),
@@ -577,7 +577,7 @@ module pu_riscv_core #(
     .du_exceptions(du_exceptions)
   );
 
-  //Integer Register File
+  // Integer Register File
   pu_riscv_rf #(
     .XLEN(XLEN),
 
@@ -602,9 +602,9 @@ module pu_riscv_core #(
     .du_addr   (du_addr)
   );
 
-  //Branch Prediction Unit
+  // Branch Prediction Unit
 
-  //Get Branch Prediction for Next Program Counter
+  // Get Branch Prediction for Next Program Counter
   generate
     if (HAS_BPU == 0) begin
       assign bp_bp_predict = 2'b00;
@@ -629,13 +629,13 @@ module pu_riscv_core #(
 
         .ex_pc_i        (ex_pc),
         .bu_bp_history_i(bu_bp_history),
-        .bu_bp_predict_i(bu_bp_predict),  //prediction bits for branch
+        .bu_bp_predict_i(bu_bp_predict),  // prediction bits for branch
         .bu_bp_btaken_i (bu_bp_btaken),
         .bu_bp_update_i (bu_bp_update)
       );
   endgenerate
 
-  //Debug Unit
+  // Debug Unit
   pu_riscv_du #(
     .XLEN(XLEN),
     .PLEN(PLEN),

@@ -45,19 +45,19 @@ package peripheral_ahb3_verilog_pkg;
   localparam HADDR_SIZE = 64;
   localparam HDATA_SIZE = 64;
 
-  //HTRANS
+  // HTRANS
   localparam HTRANS_IDLE = 2'b00;
   localparam HTRANS_BUSY = 2'b01;
   localparam HTRANS_NONSEQ = 2'b10;
   localparam HTRANS_SEQ = 2'b11;
 
-  //HSIZE
+  // HSIZE
   localparam HSIZE_B8 = 3'b000;
   localparam HSIZE_B16 = 3'b001;
   localparam HSIZE_B32 = 3'b010;
   localparam HSIZE_B64 = 3'b011;
-  localparam HSIZE_B128 = 3'b100;  //4-word line
-  localparam HSIZE_B256 = 3'b101;  //8-word line
+  localparam HSIZE_B128 = 3'b100;  // 4-word line
+  localparam HSIZE_B256 = 3'b101;  // 8-word line
   localparam HSIZE_B512 = 3'b110;
   localparam HSIZE_B1024 = 3'b111;
   localparam HSIZE_BYTE = HSIZE_B8;
@@ -65,7 +65,7 @@ package peripheral_ahb3_verilog_pkg;
   localparam HSIZE_WORD = HSIZE_B32;
   localparam HSIZE_DWORD = HSIZE_B64;
 
-  //HBURST
+  // HBURST
   localparam HBURST_SINGLE = 3'b000;
   localparam HBURST_INCR = 3'b001;
   localparam HBURST_WRAP4 = 3'b010;
@@ -75,7 +75,7 @@ package peripheral_ahb3_verilog_pkg;
   localparam HBURST_WRAP16 = 3'b110;
   localparam HBURST_INCR16 = 3'b111;
 
-  //HPROT
+  // HPROT
   localparam HPROT_OPCODE = 4'b0000;
   localparam HPROT_DATA = 4'b0001;
   localparam HPROT_USER = 4'b0000;
@@ -85,7 +85,7 @@ package peripheral_ahb3_verilog_pkg;
   localparam HPROT_NON_CACHEABLE = 4'b0000;
   localparam HPROT_CACHEABLE = 4'b1000;
 
-  //HRESP
+  // HRESP
   localparam HRESP_OKAY = 1'b0;
   localparam HRESP_ERROR = 1'b1;
 

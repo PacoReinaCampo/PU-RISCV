@@ -58,15 +58,15 @@ module pu_riscv_bp #(
   input rst_ni,
   input clk_i,
 
-  //Read side
-  input                       id_stall_i,
-  input  [XLEN          -1:0] if_parcel_pc_i,
-  output [               1:0] bp_bp_predict_o,
+  // Read side
+  input             id_stall_i,
+  input  [XLEN-1:0] if_parcel_pc_i,
+  output [     1:0] bp_bp_predict_o,
 
-  //Write side
+  // Write side
   input [XLEN          -1:0] ex_pc_i,
-  input [BP_GLOBAL_BITS-1:0] bu_bp_history_i,  //branch history
-  input [               1:0] bu_bp_predict_i,  //prediction bits for branch
+  input [BP_GLOBAL_BITS-1:0] bu_bp_history_i,  // branch history
+  input [               1:0] bu_bp_predict_i,  // prediction bits for branch
   input                      bu_bp_btaken_i,
   input                      bu_bp_update_i
 );
@@ -123,13 +123,13 @@ module pu_riscv_bp #(
     .rst_ni(rst_ni),
     .clk_i (clk_i),
 
-    //Write side
+    // Write side
     .waddr_i(wadr),
     .din_i  (new_prediction),
     .we_i   (bu_bp_update_i),
     .be_i   (1'b1),
 
-    //Read side
+    // Read side
     .raddr_i(radr),
     .re_i   (1'b1),
     .dout_o (old_prediction)

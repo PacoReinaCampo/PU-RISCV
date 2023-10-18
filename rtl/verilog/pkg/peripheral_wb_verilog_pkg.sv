@@ -42,7 +42,7 @@
 
 package peripheral_wb_verilog_pkg;
 
-  //WB Package
+  // WB Package
   localparam CLASSIC_CYCLE = 1'b0;
   localparam BURST_CYCLE = 1'b1;
 
