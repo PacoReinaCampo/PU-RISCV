@@ -1,6 +1,3 @@
--- Converted from pu_riscv_testbench_wb.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -59,7 +56,7 @@ architecture rtl of pu_riscv_testbench_wb is
   ------------------------------------------------------------------------------
   constant MULLAT : integer := MULT_LATENCY;
 
-  --core parameters
+  -- core parameters
   constant XLEN : integer := 64;
   constant PLEN : integer := 64;
 
@@ -76,24 +73,24 @@ architecture rtl of pu_riscv_testbench_wb is
 
   constant MULT_LATENCY : std_logic := '1';
 
-  constant BREAKPOINTS : integer := 8;  --Number of hardware breakpoints
+  constant BREAKPOINTS : integer := 8;  -- Number of hardware breakpoints
 
   constant PMA_CNT : integer := 4;
-  constant PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
+  constant PMP_CNT : integer := 16;  -- Number of Physical Memory Protection entries
 
   constant BP_GLOBAL_BITS    : integer := 2;
   constant BP_LOCAL_BITS     : integer := 10;
   constant BP_LOCAL_BITS_LSB : integer := 2;
 
-  constant ICACHE_SIZE        : integer := 64;  --in KBytes
-  constant ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
-  constant ICACHE_WAYS        : integer := 2;   --'n'-way set associative
+  constant ICACHE_SIZE        : integer := 64;  -- in KBytes
+  constant ICACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
+  constant ICACHE_WAYS        : integer := 2;   -- 'n'-way set associative
   constant ICACHE_REPLACE_ALG : integer := 0;
   constant ITCM_SIZE          : integer := 0;
 
-  constant DCACHE_SIZE        : integer := 64;  --in KBytes
-  constant DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
-  constant DCACHE_WAYS        : integer := 2;   --'n'-way set associative
+  constant DCACHE_SIZE        : integer := 64;  -- in KBytes
+  constant DCACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
+  constant DCACHE_WAYS        : integer := 2;   -- 'n'-way set associative
   constant DCACHE_REPLACE_ALG : integer := 0;
   constant DTCM_SIZE          : integer := 0;
   constant WRITEBUFFER_SIZE   : integer := 8;
@@ -116,7 +113,7 @@ architecture rtl of pu_riscv_testbench_wb is
 
   constant PARCEL_SIZE : integer := 64;
 
-  --Host-interface
+  -- Host-interface
   constant HTIF : std_logic := '0';
 
   constant TOHOST  : std_logic_vector(63 downto 0) := X"0000000080001000";
@@ -129,7 +126,7 @@ architecture rtl of pu_riscv_testbench_wb is
   constant LATENCY : integer := 1;
   constant BURST   : integer := 8;
 
-  --mpsoc parameters
+  -- mpsoc parameters
   constant X : integer := 1;
   constant Y : integer := 1;
   constant Z : integer := 1;
@@ -157,24 +154,24 @@ architecture rtl of pu_riscv_testbench_wb is
 
       MULT_LATENCY : std_logic := '1';
 
-      BREAKPOINTS : integer := 8;       --Number of hardware breakpoints
+      BREAKPOINTS : integer := 8;       -- Number of hardware breakpoints
 
       PMA_CNT : integer := 4;
-      PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
+      PMP_CNT : integer := 16;  -- Number of Physical Memory Protection entries
 
       BP_GLOBAL_BITS    : integer := 2;
       BP_LOCAL_BITS     : integer := 10;
       BP_LOCAL_BITS_LSB : integer := 2;
 
-      ICACHE_SIZE        : integer := 64;  --in KBytes
-      ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
-      ICACHE_WAYS        : integer := 2;   --'n'-way set associative
+      ICACHE_SIZE        : integer := 64;  -- in KBytes
+      ICACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
+      ICACHE_WAYS        : integer := 2;   -- 'n'-way set associative
       ICACHE_REPLACE_ALG : integer := 0;
       ITCM_SIZE          : integer := 0;
 
-      DCACHE_SIZE        : integer := 64;  --in KBytes
-      DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
-      DCACHE_WAYS        : integer := 2;   --'n'-way set associative
+      DCACHE_SIZE        : integer := 64;  -- in KBytes
+      DCACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
+      DCACHE_WAYS        : integer := 2;   -- 'n'-way set associative
       DCACHE_REPLACE_ALG : integer := 0;
       DTCM_SIZE          : integer := 0;
       WRITEBUFFER_SIZE   : integer := 8;
@@ -198,7 +195,7 @@ architecture rtl of pu_riscv_testbench_wb is
       PARCEL_SIZE : integer := 64
     );
     port (
-      --AHB interfaces
+      -- AHB interfaces
       HRESETn : in std_logic;
       HCLK    : in std_logic;
 
@@ -231,13 +228,13 @@ architecture rtl of pu_riscv_testbench_wb is
       dat_HREADY    : in  std_logic;
       dat_HRESP     : in  std_logic;
 
-      --Interrupts
+      -- Interrupts
       ext_nmi  : in std_logic;
       ext_tint : in std_logic;
       ext_sint : in std_logic;
       ext_int  : in std_logic_vector(3 downto 0);
 
-      --Debug Interface
+      -- Debug Interface
       dbg_stall : in  std_logic;
       dbg_strb  : in  std_logic;
       dbg_we    : in  std_logic;
@@ -301,7 +298,7 @@ architecture rtl of pu_riscv_testbench_wb is
     );
   end component;
 
-  --HTIF Interface
+  -- HTIF Interface
   component pu_riscv_htif
     generic (
       XLEN : integer := 32
@@ -318,7 +315,7 @@ architecture rtl of pu_riscv_testbench_wb is
     );
   end component;
 
-  --MMIO Interface
+  -- MMIO Interface
   component pu_riscv_mmio_if_wb
     generic (
       XLEN : integer := 32;
@@ -350,11 +347,11 @@ architecture rtl of pu_riscv_testbench_wb is
   signal HCLK    : std_logic;
   signal HRESETn : std_logic;
 
-  --PMA configuration
+  -- PMA configuration
   signal pma_cfg : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
   signal pma_adr : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
-  --Instruction interface
+  -- Instruction interface
   signal ins_HSEL      : std_logic;
   signal ins_HADDR     : std_logic_vector(PLEN-1 downto 0);
   signal ins_HRDATA    : std_logic_vector(XLEN-1 downto 0);
@@ -368,7 +365,7 @@ architecture rtl of pu_riscv_testbench_wb is
   signal ins_HREADY    : std_logic;
   signal ins_HRESP     : std_logic;
 
-  --Data interface
+  -- Data interface
   signal dat_HSEL      : std_logic;
   signal dat_HADDR     : std_logic_vector(PLEN-1 downto 0);
   signal dat_HWDATA    : std_logic_vector(XLEN-1 downto 0);
@@ -382,7 +379,7 @@ architecture rtl of pu_riscv_testbench_wb is
   signal dat_HREADY    : std_logic;
   signal dat_HRESP     : std_logic;
 
-  --Debug Interface
+  -- Debug Interface
   signal dbg_bp    : std_logic;
   signal dbg_stall : std_logic;
   signal dbg_strb  : std_logic;
@@ -392,14 +389,14 @@ architecture rtl of pu_riscv_testbench_wb is
   signal dbg_dati  : std_logic_vector(XLEN-1 downto 0);
   signal dbg_dato  : std_logic_vector(XLEN-1 downto 0);
 
-  --Host Interface
+  -- Host Interface
   signal host_csr_req      : std_logic;
   signal host_csr_ack      : std_logic;
   signal host_csr_we       : std_logic;
   signal host_csr_tohost   : std_logic_vector(XLEN-1 downto 0);
   signal host_csr_fromhost : std_logic_vector(XLEN-1 downto 0);
 
-  --Unified memory interface
+  -- Unified memory interface
   signal mem_htrans : std_logic_matrix(1 downto 0)(1 downto 0);
   signal mem_hburst : std_logic_matrix(1 downto 0)(2 downto 0);
   signal mem_hready : std_logic_vector(1 downto 0);
@@ -416,7 +413,7 @@ architecture rtl of pu_riscv_testbench_wb is
   -- Procedures
   ------------------------------------------------------------------------------
 
-  --Stall CPU
+  -- Stall CPU
   procedure stall (
     signal clk : in std_logic;
 
@@ -427,7 +424,7 @@ architecture rtl of pu_riscv_testbench_wb is
     stall_cpu <= '1';
   end stall;
 
-  --Unstall CPU
+  -- Unstall CPU
   procedure unstall (
     signal clk : in std_logic;
 
@@ -438,7 +435,7 @@ architecture rtl of pu_riscv_testbench_wb is
     stall_cpu <= '0';
   end unstall;
 
-  --Write to CPU (via DBG interface)
+  -- Write to CPU (via DBG interface)
   procedure write (
     constant DATA : in std_logic_vector(XLEN-1 downto 0);
     constant ADDR : in std_logic_vector(PLEN-1 downto 0);
@@ -454,29 +451,29 @@ architecture rtl of pu_riscv_testbench_wb is
     ) is
   begin
 
-    --setup DBG bus
+    -- setup DBG bus
     wait until rising_edge(clk);
     cpu_stb_o <= '1';
     cpu_we_o  <= '1';
     cpu_dat_o <= DATA;
     cpu_adr_o <= ADDR;
 
-    --wait for ack
+    -- wait for ack
     while (cpu_ack_i = '0') loop
       wait until rising_edge(clk);
     end loop;
 
-    --clear DBG bus
+    -- clear DBG bus
     cpu_stb_o <= '0';
     cpu_we_o  <= '0';
   end write;
 
-  --Read Intel HEX
+  -- Read Intel HEX
   procedure read_ihex (
     signal mem_array : out std_logic_matrix(PLEN-1 downto 1)(XLEN-1 downto 1)
     ) is
 
-    file fd : text open read_mode is INIT_FILE;  --open file
+    file fd : text open read_mode is INIT_FILE;  -- open file
 
     variable m      : integer;
     variable line_n : integer;
@@ -514,34 +511,34 @@ architecture rtl of pu_riscv_testbench_wb is
     -- 5: data
     -- 6: checksum    (2 hex digits)
 
-    file_open(fstatus, fd, INIT_FILE, read_mode);  --open file
+    file_open(fstatus, fd, INIT_FILE, read_mode);  -- open file
 
-    --if (fd < X"80000000") then
+    -- if (fd < X"80000000") then
     report "ERROR  : Skip reading file %s. Reason file not found" & INIT_FILE;
-    --end if;
+    -- end if;
 
     eof := '0';
 
     while (eof = '0') loop
-      --if ((null)(fd, ":%2h%4h%2h", byte_cnt, address, record_type) /= 3) then
+      -- if ((null)(fd, ":%2h%4h%2h", byte_cnt, address, record_type) /= 3) then
       report "ERROR  : Read error while processing " & INIT_FILE;
-      --end if;
+      -- end if;
 
-      --initial CRC value
+      -- initial CRC value
       crc := std_logic_vector(unsigned(byte_cnt)+unsigned(address(1))+unsigned(address(0))+unsigned(record_type));
 
       for m in 0 to to_integer(unsigned(byte_cnt)) - 1 loop
-        --if ((null)(fd, "%2h", data(m)) /= 1) then
+        -- if ((null)(fd, "%2h", data(m)) /= 1) then
         report "ERROR  : Read error while processing " & INIT_FILE;
-        --end if;
+        -- end if;
 
-        --update CRC
+        -- update CRC
         crc := std_logic_vector(unsigned(crc)+unsigned(data(m)));
       end loop;
 
-      --if ((null)(fd, "%2h", checksum) /= 1) then
+      -- if ((null)(fd, "%2h", checksum) /= 1) then
       report "ERROR  : Read error while processing " & INIT_FILE;
-      --end if;
+      -- end if;
 
       if (unsigned(checksum)+unsigned(crc) = X"ff") then
         report "ERROR  : CRC error while processing " & INIT_FILE;
@@ -550,16 +547,16 @@ architecture rtl of pu_riscv_testbench_wb is
       case (record_type) is
         when X"00" =>
           for m in 0 to to_integer(unsigned(byte_cnt)) - 1 loop
-          --mem_array((base_addr+address+m) and not (XLEN/8-1))(((base_addr+address+m) mod (XLEN/8))*8+8) <= data(m);
+          -- mem_array((base_addr+address+m) and not (XLEN/8-1))(((base_addr+address+m) mod (XLEN/8))*8+8) <= data(m);
           end loop;
         when X"01" =>
           eof := '1';
         when X"02" =>
-        --base_addr := std_logic_vector(unsigned(data(0) & data(1)) sll 4);
+        -- base_addr := std_logic_vector(unsigned(data(0) & data(1)) sll 4);
         when X"03" =>
           report "INFO   : Ignored record type %0d while processing " & to_string(record_type) & INIT_FILE;
         when X"04" =>
-        --base_addr := std_logic_vector(unsigned(data(0) & data(1)) sll 16);
+        -- base_addr := std_logic_vector(unsigned(data(0) & data(1)) sll 16);
         when X"05" =>
           base_addr := data(0) & data(1) & data(2) & data(3) & data(4) & data(5) & data(6) & data(7);
         when others =>
@@ -567,16 +564,16 @@ architecture rtl of pu_riscv_testbench_wb is
       end case;
     end loop;
 
-    --close file
+    -- close file
     file_close(fd);
   end read_ihex;
 
-  --Read HEX generated by RISC-V elf2hex
+  -- Read HEX generated by RISC-V elf2hex
   procedure read_elf2hex (
     signal mem_array : out std_logic_matrix(PLEN-1 downto 1)(XLEN-1 downto 1)
     ) is
 
-    file fd : text open read_mode is INIT_FILE;  --open file
+    file fd : text open read_mode is INIT_FILE;  -- open file
 
     variable m      : integer;
     variable line_n : integer;
@@ -593,9 +590,9 @@ architecture rtl of pu_riscv_testbench_wb is
     line_n    := 0;
     base_addr := BASE;
 
-    file_open(fstatus, fd, INIT_FILE, read_mode);  --open file
+    file_open(fstatus, fd, INIT_FILE, read_mode);  -- open file
 
-    --Read data from file
+    -- Read data from file
     while not endfile(fd) loop
       line_n := line_n+1;
 
@@ -609,11 +606,11 @@ architecture rtl of pu_riscv_testbench_wb is
       end loop;
     end loop;
 
-    --close file
+    -- close file
     file_close(fd);
   end read_elf2hex;
 
-  --Dump memory
+  -- Dump memory
   procedure dump (
     signal mem_array : in std_logic_matrix(PLEN-1 downto 1)(XLEN-1 downto 1)
     ) is
@@ -625,25 +622,25 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Define PMA regions
+  -- Define PMA regions
 
-  --crt.0 (ROM) region
+  -- crt.0 (ROM) region
   pma_adr(0) <= TOHOST srl 2;
   pma_cfg(0) <= (MEM_TYPE_MAIN & "11111000" & AMO_TYPE_NONE & TOR);
 
-  --TOHOST region
+  -- TOHOST region
   pma_adr(1) <= ((TOHOST srl 2) and not X"000000000000000f") or X"0000000000000007";
   pma_cfg(1) <= (MEM_TYPE_IO & "01000000" & AMO_TYPE_NONE & NAPOT);
 
-  --UART-Tx region
+  -- UART-Tx region
   pma_adr(2) <= UART_TX srl 2;
   pma_cfg(2) <= (MEM_TYPE_IO & "01000000" & AMO_TYPE_NONE & NA4);
 
-  --RAM region
+  -- RAM region
   pma_adr(3) <= X"0000000000000001" sll 63;
   pma_cfg(3) <= (MEM_TYPE_MAIN & "11110000" & AMO_TYPE_NONE & TOR);
 
-  --Hookup Device Under Test
+  -- Hookup Device Under Test
   dut : pu_riscv_wb
     generic map (
       XLEN => XLEN,
@@ -734,13 +731,13 @@ begin
       dat_HREADY    => dat_HREADY,
       dat_HRESP     => dat_HRESP,
 
-      --Interrupts
+      -- Interrupts
       ext_nmi  => '0',
       ext_tint => '0',
       ext_sint => '0',
       ext_int  => X"0",
 
-      --Debug Interface
+      -- Debug Interface
       dbg_stall => dbg_stall,
       dbg_strb  => dbg_strb,
       dbg_we    => dbg_we,
@@ -751,7 +748,7 @@ begin
       dbg_bp    => dbg_bp
     );
 
-  --Hookup Debug Unit
+  -- Hookup Debug Unit
   dbg_ctrl : pu_riscv_dbg_bfm
     generic map (
       XLEN => XLEN,
@@ -771,7 +768,7 @@ begin
       cpu_ack_i   => dbg_ack
     );
 
-  --bus <-> memory model connections
+  -- bus <-> memory model connections
   mem_htrans(0) <= ins_HTRANS;
   mem_hburst(0) <= ins_HBURST;
   mem_haddr(0)  <= ins_HADDR;
@@ -792,7 +789,7 @@ begin
   dat_HREADY    <= mem_hready(1);
   dat_HRESP     <= mem_hresp(1);
 
-  --hookup memory model
+  -- hookup memory model
   memory_model : pu_riscv_memory_model_wb
     generic map (
       XLEN => XLEN,
@@ -821,9 +818,9 @@ begin
       HRDATA  => mem_hrdata
     );
 
-  --Front-End Server
+  -- Front-End Server
   generating_0 : if (HTIF = '1') generate
-    --Old HTIF interface
+    -- Old HTIF interface
     htif_frontend : pu_riscv_htif
       generic map (
         XLEN => XLEN
@@ -861,7 +858,7 @@ begin
       );
   end generate;
 
-  --Generate clock
+  -- Generate clock
   -- always #1 HCLK = ~HCLK;
 
   processing_0 : process
@@ -887,17 +884,17 @@ begin
     report "       **                                                                                                ";
     report "       **                                                                                                ";
     report "        **                                                                                               ";
-    report "- RISC-V Regression TestBench ---------------------------------------------------------------------------";
+    report "- RISC-V Regression TestBench -------------------------------------------------------------------------- -";
     report "  XLEN | PRIV | MMU | FPU | RVA | RVM | MULLAT";
 
-    report "------------------------------------------------------------------------------";
+    report "------------------------------------------------------------------------------ ";
     report "  CORES | NODES | X | Y | Z | CORES_PER_TILE | CORES_PER_MISD | CORES_PER_SIMD";
     report "    1   | " & integer'image(NODES) & " | " & integer'image(X) & " | " & integer'image(Y) & " | " & integer'image(Z) & " |";
-    report "------------------------------------------------------------------------------";
+    report "------------------------------------------------------------------------------ ";
     report "  Test   = " & INIT_FILE;
     report "  ICache = %0dkB" & integer'image(ICACHE_SIZE);
     report "  DCache = %0dkB" & integer'image(DCACHE_SIZE);
-    report "------------------------------------------------------------------------------";
+    report "------------------------------------------------------------------------------ ";
 
     wait;
   end process;
@@ -925,16 +922,16 @@ begin
 
     wait for 112 ns;
 
-    --stall CPU
+    -- stall CPU
     stall (
       clk       => HCLK,
       stall_cpu => dbg_stall
     );
 
-    --Enable BREAKPOINT to call external debugger
-    --write(X"0000000000000004", X"00000000000000008");
+    -- Enable BREAKPOINT to call external debugger
+    -- write(X"0000000000000004", X"00000000000000008");
 
-    --Enable Single Stepping
+    -- Enable Single Stepping
     write (
       clk => HCLK,
 
@@ -949,7 +946,7 @@ begin
       cpu_adr_o => dbg_addr
     );
 
-    --single step through 10 instructions
+    -- single step through 10 instructions
     for repeat in 1 to 100 loop
       while (dbg_stall = '0') loop
         wait until rising_edge(HCLK);
@@ -959,7 +956,7 @@ begin
         wait until rising_edge(HCLK);
       end loop;
 
-      --clear single-step-hit
+      -- clear single-step-hit
       write (
         clk => HCLK,
 
@@ -980,14 +977,14 @@ begin
       );
     end loop;
 
-    --last time ...
+    -- last time ...
     wait until rising_edge(HCLK);
 
     while (dbg_stall = '0') loop
       wait until rising_edge(HCLK);
     end loop;
 
-    --disable Single Stepping
+    -- disable Single Stepping
     write (
       clk => HCLK,
 

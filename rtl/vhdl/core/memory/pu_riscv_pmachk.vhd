@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/core/memory/pu_riscv_pmachk.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -58,21 +55,21 @@ entity pu_riscv_pmachk is
     PMA_CNT : integer := 4
     );
   port (
-    --PMA  configuration
+    -- PMA  configuration
     pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
     pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
-    --Memory Access
-    instruction_i : in std_logic;       --This is an instruction access
-    req_i         : in std_logic;       --Memory access requested
-    adr_i         : in std_logic_vector(PLEN-1 downto 0);  --Physical Memory address (i.e. after translation)
-    size_i        : in std_logic_vector(2 downto 0);       --Transfer size
-    lock_i        : in std_logic;       --AMO : TODO: specify AMO type
+    -- Memory Access
+    instruction_i : in std_logic;       -- This is an instruction access
+    req_i         : in std_logic;       -- Memory access requested
+    adr_i         : in std_logic_vector(PLEN-1 downto 0);  -- Physical Memory address (i.e. after translation)
+    size_i        : in std_logic_vector(2 downto 0);       -- Transfer size
+    lock_i        : in std_logic;       -- AMO : TO-DO: specify AMO type
     we_i          : in std_logic;
 
-    misaligned_i : in std_logic;        --Misaligned access
+    misaligned_i : in std_logic;        -- Misaligned access
 
-    --Output
+    -- Output
     pma_o             : out std_logic_vector(13 downto 0);
     exception_o       : out std_logic;
     misaligned_o      : out std_logic;
@@ -87,7 +84,7 @@ architecture rtl of pu_riscv_pmachk is
   -- Functions
   ------------------------------------------------------------------------------
 
-  --convert transfer size in number of bytes in transfer
+  -- convert transfer size in number of bytes in transfer
   function size2bytes (
     size : std_logic_vector(2 downto 0)
     ) return integer is
@@ -110,9 +107,9 @@ architecture rtl of pu_riscv_pmachk is
     return size2bytes_return;
   end size2bytes;
 
-  --Lower and Upper bounds for NA4/NAPOT
+  -- Lower and Upper bounds for NA4/NAPOT
   function napot_lb (
-    na4    : std_logic;                 --special case na4
+    na4    : std_logic;                 -- special case na4
     pmaddr : std_logic_vector(PLEN-1 downto 2)
     ) return std_logic_vector is
     variable n               : integer;
@@ -120,7 +117,7 @@ architecture rtl of pu_riscv_pmachk is
     variable mask            : std_logic_vector(PLEN-1 downto 2);
     variable napot_lb_return : std_logic_vector(PLEN-1 downto 2);
   begin
-    --find 'n' boundary = 2^(n+2) bytes
+    -- find 'n' boundary = 2^(n+2) bytes
     n := 0;
     if (na4 = '0') then
       truth := '1';
@@ -136,16 +133,16 @@ architecture rtl of pu_riscv_pmachk is
       n := n+1;
     end if;
 
-    --create mask
+    -- create mask
     mask := std_logic_vector(to_unsigned(1, PLEN-2) sll n);
 
-    --lower bound address
+    -- lower bound address
     napot_lb_return := pmaddr and mask;
     return napot_lb_return;
   end napot_lb;
 
   function napot_ub (
-    na4    : std_logic;                 --special case na4
+    na4    : std_logic;                 -- special case na4
     pmaddr : std_logic_vector(PLEN-1 downto 2)
     ) return std_logic_vector is
     variable n               : integer;
@@ -154,7 +151,7 @@ architecture rtl of pu_riscv_pmachk is
     variable incr            : std_logic_vector(PLEN-1 downto 2);
     variable napot_ub_return : std_logic_vector(PLEN-1 downto 2);
   begin
-    --find 'n' boundary = 2^(n+2) bytes
+    -- find 'n' boundary = 2^(n+2) bytes
     n := 0;
     if (na4 = '0') then
       truth := '1';
@@ -170,16 +167,16 @@ architecture rtl of pu_riscv_pmachk is
       n := n+1;
     end if;
 
-    --create mask and increment
+    -- create mask and increment
     mask := std_logic_vector(to_unsigned(1, PLEN-2) sll n);
     incr := std_logic_vector(to_unsigned(1, PLEN-2) sll n);
 
-    --upper bound address
+    -- upper bound address
     napot_ub_return := std_logic_vector(unsigned(pmaddr)+unsigned(incr)) and mask;
     return napot_ub_return;
   end napot_ub;
 
-  --Is ANY byte of 'access' in pma range?
+  -- Is ANY byte of 'access' in pma range?
   function match_any (
     access_lb : std_logic_vector(PLEN-1 downto 2);
     access_ub : std_logic_vector(PLEN-1 downto 2);
@@ -204,7 +201,7 @@ architecture rtl of pu_riscv_pmachk is
     return match_any_return;
   end match_any;
 
-  --Are ALL bytes of 'access' in PMA range?
+  -- Are ALL bytes of 'access' in PMA range?
   function match_all (
     access_lb : std_logic_vector(PLEN-1 downto 2);
     access_ub : std_logic_vector(PLEN-1 downto 2);
@@ -223,14 +220,14 @@ architecture rtl of pu_riscv_pmachk is
     return match_all_return;
   end match_all;
 
-  --get highest priority (==lowest number) PMA that matches
+  -- get highest priority (==lowest number) PMA that matches
   function highest_priority_match (
     m : std_logic_vector(PMA_CNT-1 downto 0)
     ) return integer is
     variable n                             : integer;
     variable highest_priority_match_return : integer;
   begin
-    highest_priority_match_return := 0;  --default value
+    highest_priority_match_return := 0;  -- default value
 
     for n in PMA_CNT-1 downto 0 loop
       if (m(n) = '1') then
@@ -253,7 +250,7 @@ architecture rtl of pu_riscv_pmachk is
   signal pmacfg          : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
   signal matched_pma     : std_logic_vector(13 downto 0);
 
-  --Outputto 0);
+  -- Outputto 0);
   signal exception  : std_logic;
   signal misaligned : std_logic;
 
@@ -262,7 +259,7 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --PMA configurations
+  -- PMA configurations
   generating_0 : for i in 0 to PMA_CNT - 1 generate
     pmacfg(i)(13 downto 12) <= MEM_TYPE_IO(1 downto 0)
                                when pma_cfg_i(i)(13 downto 12) = MEM_TYPE_EMPTY(1 downto 0) else pma_cfg_i(i)(13 downto 12);
@@ -285,12 +282,12 @@ begin
     pmacfg(i)(1 downto 0) <= pma_cfg_i(i)(1 downto 0);
   end generate;
 
-  --Address Range Matching
+  -- Address Range Matching
   access_lb <= adr_i;
   access_ub <= std_logic_vector(unsigned(adr_i)+("0000000000000" & unsigned(size_i))-"0000000000000001");
 
   generating_1 : for i in 0 to PMA_CNT - 1 generate
-    --lower bounds
+    -- lower bounds
     processing_0 : process (pma_adr_i, pma_ub, pmacfg)
     begin
       case ((pmacfg(i)(1 downto 0))) is
@@ -314,7 +311,7 @@ begin
       end case;
     end process;
 
-    --upper bounds
+    -- upper bounds
     processing_1 : process (pma_adr_i, pmacfg)
     begin
       case ((pmacfg(i)(1 downto 0))) is
@@ -329,7 +326,7 @@ begin
       end case;
     end process;
 
-    --match
+    -- match
     pma_match(i)     <= match_any(access_lb(PLEN-1 downto 2), access_ub(PLEN-1 downto 2), pma_lb(i), pma_ub(i)) and to_stdlogic(pmacfg(i)(1 downto 0) /= OFF);
     pma_match_all(i) <= match_any(access_lb(PLEN-1 downto 2), access_ub(PLEN-1 downto 2), pma_lb(i), pma_ub(i)) and to_stdlogic(pmacfg(i)(1 downto 0) /= OFF);
   end generate;
@@ -338,7 +335,7 @@ begin
   matched_pma     <= pmacfg(to_integer(unsigned(matched_pma_idx)));
   pma_o           <= matched_pma;
 
-  --Access/Misaligned Exception
+  -- Access/Misaligned Exception
   exception <= req_i and (reduce_nor(pma_match_all) or  -- no memory range matched
                           (instruction_i and not matched_pma(09)) or  -- not executable
                           (we_i and not matched_pma(10)) or  -- not writeable
@@ -350,8 +347,8 @@ begin
 
   misaligned_o <= misaligned;
 
-  --Access Types
-  is_cache_access_o <= req_i and not exception and not misaligned and matched_pma(8);  --implies MEM_TYPE_MAIN
+  -- Access Types
+  is_cache_access_o <= req_i and not exception and not misaligned and matched_pma(8);  -- implies MEM_TYPE_MAIN
   is_ext_access_o   <= req_i and not exception and not misaligned and not matched_pma(8) and to_stdlogic(matched_pma(13 downto 12) /= MEM_TYPE_TCM(1 downto 0));
   is_tcm_access_o   <= req_i and not exception and not misaligned and to_stdlogic(matched_pma(13 downto 12) = MEM_TYPE_TCM(1 downto 0));
 end rtl;

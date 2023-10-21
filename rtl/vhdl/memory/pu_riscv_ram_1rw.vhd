@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/memory/pu_riscv_ram_1rw.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -88,9 +85,9 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
   generating_0 : if (TECHNOLOGY = "GENERIC") generate
-    --GENERIC -- inferrable memory
+    -- GENERIC -- inferrable memory
 
-    --initial $display ("INFO   : No memory technology specified. Using generic inferred memory (%m)");
+    -- initial $display ("INFO   : No memory technology specified. Using generic inferred memory (%m)");
 
     ram_inst : pu_riscv_ram_1rw_generic
       generic map (

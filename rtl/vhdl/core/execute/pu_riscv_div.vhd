@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/core/execution/pu_riscv_div.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -63,18 +60,18 @@ entity pu_riscv_div is
     ex_stall  : in  std_logic;
     div_stall : out std_logic;
 
-    --Instruction
+    -- Instruction
     id_bubble : in std_logic;
     id_instr  : in std_logic_vector(ILEN-1 downto 0);
 
-    --Operands
+    -- Operands
     opA : in std_logic_vector(XLEN-1 downto 0);
     opB : in std_logic_vector(XLEN-1 downto 0);
 
-    --From State
+    -- From State
     st_xlen : in std_logic_vector(1 downto 0);
 
-    --To WB
+    -- To WB
     div_bubble : out std_logic;
     div_r      : out std_logic_vector(XLEN-1 downto 0)
     );
@@ -141,15 +138,15 @@ architecture rtl of pu_riscv_div is
   signal func7      : std_logic_vector(6 downto 0);
   signal div_func7  : std_logic_vector(6 downto 0);
 
-  --Operand generation
+  -- Operand generation
   signal opA32 : std_logic_vector(31 downto 0);
   signal opB32 : std_logic_vector(31 downto 0);
 
   signal cnt   : std_logic_vector(CNT_SIZE-1 downto 0);
-  signal neg_q : std_logic;             --negate quotient
-  signal neg_s : std_logic;             --negate remainder
+  signal neg_q : std_logic;             -- negate quotient
+  signal neg_s : std_logic;             -- negate remainder
 
-  --divider internals
+  -- divider internals
   signal pa_p         : std_logic_vector(XLEN-1 downto 0);
   signal pa_a         : std_logic_vector(XLEN-1 downto 0);
   signal pa_shifted_p : std_logic_vector(XLEN-1 downto 0);
@@ -158,7 +155,7 @@ architecture rtl of pu_riscv_div is
   signal p_minus_b : std_logic_vector(XLEN downto 0);
   signal b         : std_logic_vector(XLEN-1 downto 0);
 
-  --FSM
+  -- FSM
   signal state : std_logic_vector(1 downto 0);
 
 begin
@@ -166,7 +163,7 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Instruction
+  -- Instruction
   func7  <= id_instr(31 downto 25);
   func3  <= id_instr(14 downto 12);
   opcode <= id_instr(6 downto 2);
@@ -177,7 +174,7 @@ begin
 
   xlen32 <= to_stdlogic(st_xlen = RV32I);
 
-  --retain instruction
+  -- retain instruction
   processing_0 : process (clk)
   begin
     if (rising_edge(clk)) then
@@ -187,16 +184,16 @@ begin
     end if;
   end process;
 
-  --32bit operands
+  -- 32bit operands
   opA32 <= opA(31 downto 0);
   opB32 <= opB(31 downto 0);
 
-  --Divide operations
+  -- Divide operations
   pa_shifted_p <= std_logic_vector(unsigned(pa_p) sll 1);
   pa_shifted_a <= std_logic_vector(unsigned(pa_a) sll 1);
   p_minus_b    <= std_logic_vector(('0' & unsigned(pa_shifted_p))-('0' & unsigned(b)));
 
-  --Division: bit-serial. Max XLEN cycles
+  -- Division: bit-serial. Max XLEN cycles
   -- q = z/d + s
   -- z: Dividend
   -- d: Divisor
@@ -228,9 +225,9 @@ begin
             dividor_register := xlen32 & func7 & func3 & opcode;
             case (dividor_register) is
               when (DIV) =>
-                --signed divide by zero
+                -- signed divide by zero
                 if (reduce_nor(opB) = '1') then
-                  div_r      <= (others => '1');  --=-1
+                  div_r      <= (others => '1');  -- =-1
                   div_bubble <= '0';
                 elsif (opA = X"1000000000000000" and reduce_and(opB) = '1') then  -- signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
                   div_r      <= X"1111111111111110";
@@ -248,15 +245,15 @@ begin
                   b    <= absolute(opB);
                 end if;
               when (DIVW) =>
-                --signed divide by zero
+                -- signed divide by zero
                 if (reduce_nor(opB32) = '1') then
-                  div_r      <= (others => '1');  --=-1
+                  div_r      <= (others => '1');  -- =-1
                   div_bubble <= '0';
                 elsif (opA32 = X"10000000" and reduce_and(opB32) = '1') then  -- signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
                   div_r      <= sext32((31 => '1', 30 downto 0 => '0'));
                   div_bubble <= '0';
                 else
-                  cnt       <= (others => '1');   --minus 1000...000
+                  cnt       <= (others => '1');   -- minus 1000...000
                   state     <= ST_DIV;
                   div_stall <= '1';
 
@@ -268,9 +265,9 @@ begin
                   b    <= absolute(sext32(opB32));
                 end if;
               when (DIVU) =>
-                --unsigned divide by zero
+                -- unsigned divide by zero
                 if (reduce_nor(opB) = '1') then
-                  div_r      <= (others => '1');  --= 2^XLEN -1
+                  div_r      <= (others => '1');  -- = 2^XLEN -1
                   div_bubble <= '0';
                 else
                   cnt       <= (others => '1');
@@ -285,12 +282,12 @@ begin
                   b    <= opB;
                 end if;
               when (DIVUW) =>
-                --unsigned divide by zero
+                -- unsigned divide by zero
                 if (reduce_nor(opB32) = '1') then
-                  div_r      <= (others => '1');  --= 2^XLEN -1
+                  div_r      <= (others => '1');  -- = 2^XLEN -1
                   div_bubble <= '0';
                 else
-                  cnt       <= (others => '1');   --minus 1000...000
+                  cnt       <= (others => '1');   -- minus 1000...000
                   state     <= ST_DIV;
                   div_stall <= '1';
 
@@ -302,7 +299,7 @@ begin
                   b    <= ((XLEN-1 downto 32         => '0') & opB32);
                 end if;
               when (REMX) =>
-                --signed divide by zero
+                -- signed divide by zero
                 if (reduce_nor(opB) = '1') then
                   div_r      <= opA;
                   div_bubble <= '0';
@@ -322,7 +319,7 @@ begin
                   b    <= absolute(opB);
                 end if;
               when (REMW) =>
-                --signed divide by zero
+                -- signed divide by zero
                 if (reduce_nor(opB32) = '1') then
                   div_r      <= sext32(opA32);
                   div_bubble <= '0';
@@ -330,7 +327,7 @@ begin
                   div_r      <= (others => '0');
                   div_bubble <= '0';
                 else
-                  cnt       <= (others => '1');  --minus 1000...000
+                  cnt       <= (others => '1');  -- minus 1000...000
                   state     <= ST_DIV;
                   div_stall <= '1';
 
@@ -342,7 +339,7 @@ begin
                   b    <= absolute(sext32(opB32));
                 end if;
               when (REMU) =>
-                --unsigned divide by zero
+                -- unsigned divide by zero
                 if (reduce_nor(opB) = '1') then
                   div_r      <= opA;
                   div_bubble <= '0';
@@ -363,7 +360,7 @@ begin
                   div_r      <= sext32(opA32);
                   div_bubble <= '0';
                 else
-                  cnt       <= (others => '1');  --minus 1000...000
+                  cnt       <= (others => '1');  -- minus 1000...000
                   state     <= ST_DIV;
                   div_stall <= '1';
 
@@ -378,22 +375,22 @@ begin
                 null;
             end case;
           end if;
-        --actual division loop
+        -- actual division loop
         when ST_DIV =>
           cnt <= std_logic_vector(unsigned(cnt) - "01");
           if (reduce_nor(cnt) = '1') then
             state <= ST_RES;
           end if;
-          --restoring divider section
-          if (p_minus_b(XLEN) = '1') then  --sub gave negative result
-            pa_p <= pa_shifted_p;       --restore
-            pa_a <= (pa_shifted_a(XLEN-1 downto 1) & '0');  --shift in '0' for Q
-          else                          --sub gave positive result
-            --store sub result
+          -- restoring divider section
+          if (p_minus_b(XLEN) = '1') then  -- sub gave negative result
+            pa_p <= pa_shifted_p;       -- restore
+            pa_a <= (pa_shifted_a(XLEN-1 downto 1) & '0');  -- shift in '0' for Q
+          else                          -- sub gave positive result
+            -- store sub result
             pa_p <= p_minus_b(XLEN-1 downto 0);
-            pa_a <= (pa_shifted_a(XLEN-1 downto 1) & '1');  --shift in '1' for Q
+            pa_a <= (pa_shifted_a(XLEN-1 downto 1) & '1');  -- shift in '1' for Q
           end if;
-        --Result
+        -- Result
         when ST_RES =>
           state      <= ST_CHK;
           div_bubble <= '0';

@@ -1,6 +1,3 @@
--- Converted from pu_riscv_mmio_if_ahb3.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -94,7 +91,7 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Generate watchdog counter
+  -- Generate watchdog counter
   processing_2 : process (HCLK, HRESETn)
   begin
     if (HRESETn = '0') then
@@ -104,7 +101,7 @@ begin
     end if;
   end process;
 
-  --Catch write to host address
+  -- Catch write to host address
   HRESP <= HRESP_OKAY;
 
   processing_3 : process (HCLK)
@@ -138,25 +135,25 @@ begin
       data_reg      <= HWDATA;
     end if;
   end process;
-  --Generate output
+  -- Generate output
 
-  --Simulated UART Tx (prints characters on screen)
+  -- Simulated UART Tx (prints characters on screen)
   processing_6 : process (HCLK)
   begin
     if (rising_edge(HCLK)) then
       if (catch_uart_tx = '1') then
-      --write(data_reg);
+      -- write(data_reg);
       end if;
     end if;
   end process;
 
-  --Tests ...
+  -- Tests ...
   processing_7 : process (HCLK)
   begin
     if (rising_edge(HCLK)) then
       if (watchdog_cnt > 1000000 or catch_test = '1') then
         report "\n";
-        report "-------------------------------------------------------------";
+        report "------------------------------------------------------------ -";
         report "* RISC-V test bench finished";
         if (data_reg(0) = '1') then
           if (reduce_nor(data_reg(XLEN-1 downto 1)) = '1') then
@@ -168,7 +165,7 @@ begin
         else
           report "* FAILED: watchdog count reached " & integer'image(watchdog_cnt);
         end if;
-        report "-------------------------------------------------------------";
+        report "------------------------------------------------------------ -";
         report "\n";
       end if;
     end if;

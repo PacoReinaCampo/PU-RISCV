@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/core/memory/pu_riscv_mux.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -61,37 +58,37 @@ entity pu_riscv_mux is
     rst_ni : in std_logic;
     clk_i  : in std_logic;
 
-    --Input Ports
-    biu_req_i     : in  std_logic_vector(PORTS-1 downto 0);  --access request
-    biu_req_ack_o : out std_logic_vector(PORTS-1 downto 0);  --biu access acknowledge
-    biu_d_ack_o   : out std_logic_vector(PORTS-1 downto 0);  --biu early data acknowledge
-    biu_adri_i    : in  std_logic_matrix(PORTS-1 downto 0)(PLEN-1 downto 0);  --access start address
-    biu_adro_o    : out std_logic_matrix(PORTS-1 downto 0)(PLEN-1 downto 0);  --biu response address
-    biu_size_i    : in  std_logic_matrix(PORTS-1 downto 0)(2 downto 0);  --access data size
-    biu_type_i    : in  std_logic_matrix(PORTS-1 downto 0)(2 downto 0);  --access burst type
-    biu_lock_i    : in  std_logic_vector(PORTS-1 downto 0);  --access locked access
-    biu_prot_i    : in  std_logic_matrix(PORTS-1 downto 0)(2 downto 0);  --access protection
-    biu_we_i      : in  std_logic_vector(PORTS-1 downto 0);  --access write enable
-    biu_d_i       : in  std_logic_matrix(PORTS-1 downto 0)(XLEN-1 downto 0);  --access write data
-    biu_q_o       : out std_logic_matrix(PORTS-1 downto 0)(XLEN-1 downto 0);  --access read data
-    biu_ack_o     : out std_logic_vector(PORTS-1 downto 0);  --access acknowledge
-    biu_err_o     : out std_logic_vector(PORTS-1 downto 0);  --access error
+    -- Input Ports
+    biu_req_i     : in  std_logic_vector(PORTS-1 downto 0);  -- access request
+    biu_req_ack_o : out std_logic_vector(PORTS-1 downto 0);  -- biu access acknowledge
+    biu_d_ack_o   : out std_logic_vector(PORTS-1 downto 0);  -- biu early data acknowledge
+    biu_adri_i    : in  std_logic_matrix(PORTS-1 downto 0)(PLEN-1 downto 0);  -- access start address
+    biu_adro_o    : out std_logic_matrix(PORTS-1 downto 0)(PLEN-1 downto 0);  -- biu response address
+    biu_size_i    : in  std_logic_matrix(PORTS-1 downto 0)(2 downto 0);  -- access data size
+    biu_type_i    : in  std_logic_matrix(PORTS-1 downto 0)(2 downto 0);  -- access burst type
+    biu_lock_i    : in  std_logic_vector(PORTS-1 downto 0);  -- access locked access
+    biu_prot_i    : in  std_logic_matrix(PORTS-1 downto 0)(2 downto 0);  -- access protection
+    biu_we_i      : in  std_logic_vector(PORTS-1 downto 0);  -- access write enable
+    biu_d_i       : in  std_logic_matrix(PORTS-1 downto 0)(XLEN-1 downto 0);  -- access write data
+    biu_q_o       : out std_logic_matrix(PORTS-1 downto 0)(XLEN-1 downto 0);  -- access read data
+    biu_ack_o     : out std_logic_vector(PORTS-1 downto 0);  -- access acknowledge
+    biu_err_o     : out std_logic_vector(PORTS-1 downto 0);  -- access error
 
-    --Output (to BIU)
-    biu_req_o     : out std_logic;      --BIU access request
-    biu_req_ack_i : in  std_logic;      --BIU ackowledge
-    biu_d_ack_i   : in  std_logic;      --BIU early data acknowledge
-    biu_adri_o    : out std_logic_vector(PLEN-1 downto 0);  --address into BIU
-    biu_adro_i    : in  std_logic_vector(PLEN-1 downto 0);  --address from BIU
-    biu_size_o    : out std_logic_vector(2 downto 0);       --transfer size
-    biu_type_o    : out std_logic_vector(2 downto 0);       --burst type
+    -- Output (to BIU)
+    biu_req_o     : out std_logic;      -- BIU access request
+    biu_req_ack_i : in  std_logic;      -- BIU ackowledge
+    biu_d_ack_i   : in  std_logic;      -- BIU early data acknowledge
+    biu_adri_o    : out std_logic_vector(PLEN-1 downto 0);  -- address into BIU
+    biu_adro_i    : in  std_logic_vector(PLEN-1 downto 0);  -- address from BIU
+    biu_size_o    : out std_logic_vector(2 downto 0);       -- transfer size
+    biu_type_o    : out std_logic_vector(2 downto 0);       -- burst type
     biu_lock_o    : out std_logic;
     biu_prot_o    : out std_logic_vector(2 downto 0);
     biu_we_o      : out std_logic;
-    biu_d_o       : out std_logic_vector(XLEN-1 downto 0);  --data into BIU
-    biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  --data from BIU
-    biu_ack_i     : in  std_logic;      --data acknowledge, 1 per data
-    biu_err_i     : in  std_logic       --data error
+    biu_d_o       : out std_logic_vector(XLEN-1 downto 0);  -- data into BIU
+    biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);  -- data from BIU
+    biu_ack_i     : in  std_logic;      -- data acknowledge, 1 per data
+    biu_err_i     : in  std_logic       -- data error
     );
 end pu_riscv_mux;
 
@@ -100,7 +97,7 @@ architecture rtl of pu_riscv_mux is
   -- Functions
   ------------------------------------------------------------------------------
 
-  --convert burst type to counter length (actually length -1)
+  -- convert burst type to counter length (actually length -1)
   function biu_type2cnt (
     biu_type : std_logic_vector(2 downto 0)
     ) return std_logic_vector is
@@ -134,10 +131,10 @@ architecture rtl of pu_riscv_mux is
     ) return std_logic is
     variable busor_return : std_logic;
   begin
-    --default port
+    -- default port
     busor_return := '0';
 
-    --check other ports
+    -- check other ports
     for n in PORTS-1 downto 0 loop
       busor_return := busor_return or req(n);
     end loop;
@@ -150,10 +147,10 @@ architecture rtl of pu_riscv_mux is
     ) return std_logic_vector is
     variable port_select_return : std_logic_vector(integer(log2(real(PORTS)))-1 downto 0);
   begin
-    --default port
+    -- default port
     port_select_return := (others => '0');
 
-    --check other ports
+    -- check other ports
     for n in PORTS-1 downto 0 loop
       if (req(n) = '1') then
         port_select_return := std_logic_vector(to_unsigned(n, integer(log2(real(PORTS)))));
@@ -190,7 +187,7 @@ begin
   pending_size      <= biu_size_i(to_integer(unsigned(pending_port)));
   pending_burst_cnt <= biu_type2cnt(biu_type_i(to_integer(unsigned(pending_port))));
 
-  --Access Statemachine
+  -- Access Statemachine
   processing_0 : process (clk_i, rst_ni)
   begin
     if (rst_ni = '0') then
@@ -209,7 +206,7 @@ begin
         when BURST =>
           if (biu_ack_i = '1') then
             burst_cnt <= std_logic_vector(unsigned(burst_cnt)-"0001");
-            if (reduce_nor(burst_cnt) = '1') then  --Burst done
+            if (reduce_nor(burst_cnt) = '1') then  -- Burst done
               if (pending_req = '1' and reduce_or(pending_burst_cnt) = '1') then
                 burst_cnt     <= pending_burst_cnt;
                 selected_port <= pending_port;
@@ -225,7 +222,7 @@ begin
     end if;
   end process;
 
-  --Mux BIU ports
+  -- Mux BIU ports
   processing_1 : process (biu_ack_i, biu_adri_i, biu_d_i, biu_lock_i, biu_size_i, biu_type_i, biu_we_i, burst_cnt, fsm_state, pending_port, pending_req, selected_port)
   begin
     case (fsm_state) is
@@ -269,7 +266,7 @@ begin
     end case;
   end process;
 
-  --Decode MEM ports
+  -- Decode MEM ports
   generating_0 : for p in 0 to PORTS - 1 generate
     biu_req_ack_o(p) <= biu_req_ack_i
                         when (to_unsigned(p, integer(log2(real(PORTS)))) = unsigned(pending_port)) else '0';

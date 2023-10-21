@@ -172,15 +172,14 @@ module pu_riscv_memory_model_ahb3 #(
         $display("ERROR  : Read error while processing %s", INIT_FILE);
       end
 
-      if (checksum + crc) $display("ERROR  : CRC error while processing %s", INIT_FILE);
+      if (checksum + crc) begin
+        $display("ERROR  : CRC error while processing %s", INIT_FILE);
+      end
 
       case (record_type)
         8'h00: begin
           for (m = 0; m < byte_cnt; m = m + 1) begin
-            // mem_array[ base_addr + address + (m & ~(XLEN/8 -1)) ][ (m%(XLEN/8))*8+:8 ] = data[m];
             mem_array[(base_addr + address + m) & ~(XLEN/8 - 1)][((base_addr + address + m) % (XLEN/8))*8+:8] = data[m];
-            // $display ("write %2h to %8h (base_addr=%8h, address=%4h, m=%2h)", data[m], base_addr+address+ (m & ~(XLEN/8 -1)), base_addr, address, m);
-            // $display ("(%8h)=%8h",base_addr+address+4*(m/4), mem_array[ base_addr+address+4*(m/4) ]);
           end
         end
         8'h01:   eof = 1;
@@ -223,7 +222,6 @@ module pu_riscv_memory_model_ahb3 #(
       end
 
       for (m = 0; m < 128 / XLEN; m = m + 1) begin
-        // $display("[%8h]:%8h",base_addr,data[m*XLEN +: XLEN]);
         mem_array[base_addr] = data[m*XLEN +: XLEN];
         base_addr            = base_addr + (XLEN / 8);
       end

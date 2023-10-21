@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/pu/pu_riscv_biu2ahb3.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -60,7 +57,7 @@ entity pu_riscv_biu2ahb3 is
     HRESETn : in std_logic;
     HCLK    : in std_logic;
 
-    --AHB3 Lite Bus
+    -- AHB3 Lite Bus
     HSEL      : out std_logic;
     HADDR     : out std_logic_vector(PLEN-1 downto 0);
     HRDATA    : in  std_logic_vector(XLEN-1 downto 0);
@@ -74,21 +71,21 @@ entity pu_riscv_biu2ahb3 is
     HREADY    : in  std_logic;
     HRESP     : in  std_logic;
 
-    --BIU Bus (Core ports)
-    biu_stb_i     : in  std_logic;      --strobe
-    biu_stb_ack_o : out std_logic;  --strobe acknowledge; can send new strobe
-    biu_d_ack_o   : out std_logic;  --data acknowledge (send new biu_d_i); for pipelined buses
+    -- BIU Bus (Core ports)
+    biu_stb_i     : in  std_logic;      -- strobe
+    biu_stb_ack_o : out std_logic;  -- strobe acknowledge; can send new strobe
+    biu_d_ack_o   : out std_logic;  -- data acknowledge (send new biu_d_i); for pipelined buses
     biu_adri_i    : in  std_logic_vector(PLEN-1 downto 0);
     biu_adro_o    : out std_logic_vector(PLEN-1 downto 0);
-    biu_size_i    : in  std_logic_vector(2 downto 0);  --transfer size
-    biu_type_i    : in  std_logic_vector(2 downto 0);  --burst type
-    biu_prot_i    : in  std_logic_vector(2 downto 0);  --protection
+    biu_size_i    : in  std_logic_vector(2 downto 0);  -- transfer size
+    biu_type_i    : in  std_logic_vector(2 downto 0);  -- burst type
+    biu_prot_i    : in  std_logic_vector(2 downto 0);  -- protection
     biu_lock_i    : in  std_logic;
     biu_we_i      : in  std_logic;
     biu_d_i       : in  std_logic_vector(XLEN-1 downto 0);
     biu_q_o       : out std_logic_vector(XLEN-1 downto 0);
-    biu_ack_o     : out std_logic;      --transfer acknowledge
-    biu_err_o     : out std_logic       --transfer error
+    biu_ack_o     : out std_logic;      -- transfer acknowledge
+    biu_err_o     : out std_logic       -- transfer error
     );
 end pu_riscv_biu2ahb3;
 
@@ -111,13 +108,13 @@ architecture rtl of pu_riscv_biu2ahb3 is
       when "011" =>
         biu_size2hsize_return := HSIZE_DWORD;
       when others =>
-        --OOPSS
+        -- OOPSS
         biu_size2hsize_return := "XXX";
     end case;
     return biu_size2hsize_return;
   end biu_size2hsize;
 
-  --convert burst type to counter length (actually length -1)
+  -- convert burst type to counter length (actually length -1)
   function biu_type2cnt (
     biu_type : std_logic_vector(2 downto 0)
     ) return std_logic_vector is
@@ -141,13 +138,13 @@ architecture rtl of pu_riscv_biu2ahb3 is
       when INCR16 =>
         biu_type2cnt_return := "1111";
       when others =>
-        --OOPS
+        -- OOPS
         biu_type2cnt_return := "XXXX";
     end case;
     return biu_type2cnt_return;
   end biu_type2cnt;
 
-  --convert burst type to counter length (actually length -1)
+  -- convert burst type to counter length (actually length -1)
   function biu_type2hburst (
     biu_type : std_logic_vector(2 downto 0)
     ) return std_logic_vector is
@@ -171,13 +168,13 @@ architecture rtl of pu_riscv_biu2ahb3 is
       when INCR16 =>
         biu_type2hburst_return := HBURST_INCR16;
       when others =>
-        --OOPS
+        -- OOPS
         biu_type2hburst_return := "XXX";
     end case;
     return biu_type2hburst_return;
   end biu_type2hburst;
 
-  --convert burst type to counter length (actually length -1)
+  -- convert burst type to counter length (actually length -1)
   function biu_prot2hprot (
     biu_prot : std_logic_vector(2 downto 0)
     ) return std_logic_vector is
@@ -210,20 +207,20 @@ architecture rtl of pu_riscv_biu2ahb3 is
     return biu_prot2hprot_return;
   end biu_prot2hprot;
 
-  --convert burst type to counter length (actually length -1)
+  -- convert burst type to counter length (actually length -1)
   function nxt_addr (
-    addr   : std_logic_vector(PLEN-1 downto 0);  --current address
-    hburst : std_logic_vector(2 downto 0)        --AHB HBURST
+    addr   : std_logic_vector(PLEN-1 downto 0);  -- current address
+    hburst : std_logic_vector(2 downto 0)        -- AHB HBURST
     ) return std_logic_vector is
     variable nxt_addr_return : std_logic_vector (PLEN-1 downto 0);
   begin
-    --next linear address
+    -- next linear address
     if (XLEN = 32) then
       nxt_addr_return := std_logic_vector(unsigned(addr)+to_unsigned(4, PLEN)) and not std_logic_vector(to_unsigned(3, PLEN));
     else
       nxt_addr_return := std_logic_vector(unsigned(addr)+to_unsigned(8, PLEN)) and not std_logic_vector(to_unsigned(7, PLEN));
     end if;
-    --wrap?
+    -- wrap?
     case (hburst) is
       when HBURST_WRAP4 =>
         if (XLEN = 32) then
@@ -268,7 +265,7 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --State Machine
+  -- State Machine
   processing_0 : process (HCLK, HRESETn)
   begin
     if (HRESETn = '0') then
@@ -279,23 +276,23 @@ begin
       HSEL      <= '0';
       HADDR_O   <= (others => '0');
       HWRITE    <= '0';
-      HSIZE     <= (others => '0');     --dont care
-      HBURST_O  <= (others => '0');     --dont care
+      HSIZE     <= (others => '0');     -- dont care
+      HBURST_O  <= (others => '0');     -- dont care
       HPROT     <= HPROT_DATA or HPROT_PRIVILEGED or HPROT_NON_BUFFERABLE or HPROT_NON_CACHEABLE;
       HTRANS    <= HTRANS_IDLE;
       HMASTLOCK <= '0';
     elsif (rising_edge(HCLK) or falling_edge(HRESETn)) then
-      --strobe/ack signals
+      -- strobe/ack signals
       biu_err <= '0';
 
       if (HREADY = '1') then
-        if (reduce_nor(burst_cnt) = '1') then  --burst complete
+        if (reduce_nor(burst_cnt) = '1') then  -- burst complete
           if (biu_stb_i = '1' and biu_err = '0') then
             data_ena  <= '1';
             burst_cnt <= biu_type2cnt(biu_type_i);
 
             HSEL      <= '1';
-            HTRANS    <= HTRANS_NONSEQ;  --start of burst
+            HTRANS    <= HTRANS_NONSEQ;  -- start of burst
             HADDR_O   <= biu_adri_i;
             HWRITE    <= biu_we_i;
             HSIZE     <= biu_size2hsize(biu_size_i);
@@ -305,19 +302,19 @@ begin
           else
             data_ena  <= '0';
             HSEL      <= '0';
-            HTRANS    <= HTRANS_IDLE;    --no new transfer
+            HTRANS    <= HTRANS_IDLE;    -- no new transfer
             HMASTLOCK <= biu_lock_i;
           end if;
-        else                             --continue burst
+        else                             -- continue burst
           data_ena  <= '1';
           burst_cnt <= std_logic_vector(unsigned(burst_cnt)-to_unsigned(1, 4));
 
-          HTRANS  <= HTRANS_SEQ;                   --continue burst
-          HADDR_O <= nxt_addr(HADDR_O, HBURST_O);  --next address
+          HTRANS  <= HTRANS_SEQ;                   -- continue burst
+          HADDR_O <= nxt_addr(HADDR_O, HBURST_O);  -- next address
         end if;
-      --error response
+      -- error response
       elsif (HRESP = HRESP_ERROR) then
-        burst_cnt <= (others => '0');              --burst done (interrupted)
+        burst_cnt <= (others => '0');              -- burst done (interrupted)
 
         HSEL   <= '0';
         HTRANS <= HTRANS_IDLE;
@@ -333,7 +330,7 @@ begin
 
   biu_err_o <= biu_err;
 
-  --Data section
+  -- Data section
   processing_1 : process (HCLK)
   begin
     if (rising_edge(HCLK)) then

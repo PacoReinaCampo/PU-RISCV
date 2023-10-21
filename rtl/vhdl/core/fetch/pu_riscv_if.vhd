@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/core/pu_riscv_if.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -60,8 +57,8 @@ entity pu_riscv_if is
     PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
     );
   port (
-    rstn     : in std_logic;            --Reset
-    clk      : in std_logic;            --Clock
+    rstn     : in std_logic;            -- Reset
+    clk      : in std_logic;            -- Clock
     id_stall : in std_logic;
 
     if_stall_nxt_pc      : in std_logic;
@@ -71,25 +68,25 @@ entity pu_riscv_if is
     if_parcel_misaligned : in std_logic;
     if_parcel_page_fault : in std_logic;
 
-    if_instr     : out std_logic_vector(ILEN-1 downto 0);  --Instruction out
-    if_bubble    : out std_logic;  --Insert bubble in the pipe (NOP instruction)
-    if_exception : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);  --Exceptions
+    if_instr     : out std_logic_vector(ILEN-1 downto 0);  -- Instruction out
+    if_bubble    : out std_logic;  -- Insert bubble in the pipe (NOP instruction)
+    if_exception : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);  -- Exceptions
 
 
-    bp_bp_predict : in  std_logic_vector(1 downto 0);  --Branch Prediction bits
-    if_bp_predict : out std_logic_vector(1 downto 0);  --push down the pipe
+    bp_bp_predict : in  std_logic_vector(1 downto 0);  -- Branch Prediction bits
+    if_bp_predict : out std_logic_vector(1 downto 0);  -- push down the pipe
 
-    bu_flush : in std_logic;            --flush pipe & load new program counter
+    bu_flush : in std_logic;            -- flush pipe & load new program counter
     st_flush : in std_logic;
-    du_flush : in std_logic;            --flush pipe after debug exit
+    du_flush : in std_logic;            -- flush pipe after debug exit
 
-    bu_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  --Branch Unit Next Program Counter
-    st_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  --State Next Program Counter
+    bu_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  -- Branch Unit Next Program Counter
+    st_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  -- State Next Program Counter
 
-    if_nxt_pc : out std_logic_vector(XLEN-1 downto 0);  --next Program Counter
-    if_stall  : out std_logic;  --stall instruction fetch BIU (cache/bus-interface)
-    if_flush  : out std_logic;  --flush instruction fetch BIU (cache/bus-interface)
-    if_pc     : out std_logic_vector(XLEN-1 downto 0)   --Program Counter
+    if_nxt_pc : out std_logic_vector(XLEN-1 downto 0);  -- next Program Counter
+    if_stall  : out std_logic;  -- stall instruction fetch BIU (cache/bus-interface)
+    if_flush  : out std_logic;  -- flush instruction fetch BIU (cache/bus-interface)
+    if_pc     : out std_logic_vector(XLEN-1 downto 0)   -- Program Counter
     );
 end pu_riscv_if;
 
@@ -99,13 +96,13 @@ architecture rtl of pu_riscv_if is
   -- Variables
   ------------------------------------------------------------------------------
 
-  --Instruction size
+  -- Instruction size
   signal is_16bit_instruction : std_logic;
   signal is_32bit_instruction : std_logic;
-  --logic is_48bit_instruction;
-  --logic is_64bit_instruction;
+  -- logic is_48bit_instruction;
+  -- logic is_64bit_instruction;
 
-  signal flushes : std_logic;           --OR all flush signals
+  signal flushes : std_logic;           -- OR all flush signals
 
   signal parcel_shift_register : std_logic_vector(2*ILEN-1 downto 0);
   signal new_parcel            : std_logic_vector(ILEN-1 downto 0);
@@ -137,16 +134,16 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --All flush signals
+  -- All flush signals
   flushes <= bu_flush or st_flush or du_flush;
 
-  --Flush upper layer (memory BIU) 
+  -- Flush upper layer (memory BIU) 
   if_flush <= bu_flush or st_flush or du_flush or branch_taken;
 
-  --stall program counter on ID-stall and when instruction-hold register is full
+  -- stall program counter on ID-stall and when instruction-hold register is full
   if_stall <= id_stall or (reduce_and(parcel_sr_valid) and not flushes);
 
-  --parcel is valid when bus-interface says so AND when received PC is requested PC
+  -- parcel is valid when bus-interface says so AND when received PC is requested PC
   processing_0 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -156,7 +153,7 @@ begin
     end if;
   end process;
 
-  --Next Program Counter
+  -- Next Program Counter
   processing_1 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -164,12 +161,12 @@ begin
     elsif (rising_edge(clk)) then
       if (st_flush = '1') then
         if_nxt_pc_o <= st_nxt_pc;
-      elsif (bu_flush = '1' or du_flush = '1') then  --flush takes priority
+      elsif (bu_flush = '1' or du_flush = '1') then  -- flush takes priority
         if_nxt_pc_o <= bu_nxt_pc;
-      --else if (!id_stall)
+      -- else if (!id_stall)
       elsif (branch_taken = '1') then
         if_nxt_pc_o <= branch_pc;
-      elsif (if_stall_nxt_pc = '0') then             --if_stall_nxt_pc
+      elsif (if_stall_nxt_pc = '0') then             -- if_stall_nxt_pc
         if_nxt_pc_o <= std_logic_vector(unsigned(if_nxt_pc_o)+X"0000000000000004");
       end if;
     end if;
@@ -178,7 +175,7 @@ begin
   if_nxt_pc <= if_nxt_pc_o;
 
   --      else if (!if_stall_nxt_pc && !id_stall) if_nxt_pc_o <= if_nxt_pc_o + 'h4;
-  --TODO: handle if_stall and 16bit instructions
+  -- TO-DO: handle if_stall and 16bit instructions
 
   processing_2 : process (clk, rstn)
   begin
@@ -212,9 +209,9 @@ begin
     end if;
   end process;
 
-  --Instruction
+  -- Instruction
 
-  --instruction shift register, for 16bit instruction support
+  -- instruction shift register, for 16bit instruction support
   new_parcel <= if_parcel(ILEN-1 downto 0);
 
   processing_4 : process (clk, rstn)
@@ -269,29 +266,29 @@ begin
           parcel_sr_valid <= (others => '0');
         else
           case (parcel_sr_valid) is
-            --branch to 16bit address would yield 3'b010
+            -- branch to 16bit address would yield 3'b010
             when "000" =>
-              --3'b011;
+              -- 3'b011;
               parcel_sr_valid <= if_parcel_valid(2 downto 0);
             when "001" =>
-              --3'b011;
+              -- 3'b011;
               if (is_16bit_instruction = '1') then
                 parcel_sr_valid <= if_parcel_valid(2 downto 0);
-              else                      --3'b111;
+              else                      -- 3'b111;
                 parcel_sr_valid <= if_parcel_valid(2 downto 0);
               end if;
             when "011" =>
-              --3'b111;
+              -- 3'b111;
               if (is_16bit_instruction = '1') then
                 parcel_sr_valid <= if_parcel_valid(2 downto 0);
-              else                      --3'b011;
+              else                      -- 3'b011;
                 parcel_sr_valid <= if_parcel_valid(2 downto 0);
               end if;
             when "111" =>
-              --3'b011;
+              -- 3'b011;
               if (is_16bit_instruction = '1') then
                 parcel_sr_valid <= ('0' & '1' & '1');
-              else                      --3'b111;
+              else                      -- 3'b111;
                 parcel_sr_valid <= if_parcel_valid(2 downto 0);
               end if;
             when others =>
@@ -308,20 +305,20 @@ begin
 
   is_16bit_instruction <= reduce_nand(active_parcel(1 downto 0));
   is_32bit_instruction <= reduce_and(active_parcel(1 downto 0));
-  --assign is_48bit_instruction = active_parcel[5:0] == 6'b011111;
-  --assign is_64bit_instruction = active_parcel[6:0] == 7'b0111111;
+  -- assign is_48bit_instruction = active_parcel[5:0] == 6'b011111;
+  -- assign is_64bit_instruction = active_parcel[6:0] == 7'b0111111;
 
-  --Convert 16bit instructions to 32bit instructions here.
+  -- Convert 16bit instructions to 32bit instructions here.
   processing_6 : process (active_parcel, is_32bit_instruction)
   begin
     case (active_parcel) is
       when WFI =>
-        --Implement WFI as a nop 
+        -- Implement WFI as a nop 
         pd_instr <= INSTR_NOP;
       when others =>
         if (is_32bit_instruction = '1') then
           pd_instr <= active_parcel;
-        else                            --Illegal
+        else                            -- Illegal
           pd_instr <= std_logic_vector(to_signed(-1, ILEN));
         end if;
     end case;
@@ -353,7 +350,7 @@ begin
     end if;
   end process;
 
-  --Branches & Jump
+  -- Branches & Jump
   immB <= ((XLEN-1 downto 12 => pd_instr(31)) & pd_instr(7) & pd_instr(30 downto 25) & pd_instr(11 downto 8) & '0');
   immJ <= ((XLEN-1 downto 20 => pd_instr(31)) & pd_instr(19 downto 12) & pd_instr(20) & pd_instr(30 downto 25) & pd_instr(24 downto 21) & '0');
 
@@ -369,8 +366,8 @@ begin
         branch_taken <= '1';
         branch_pc    <= std_logic_vector(unsigned(pd_pc)+unsigned(immJ));
       when (OPC0_BRANCH) =>
-        --if this CPU has a Branch Predict Unit, then use it's prediction
-        --otherwise assume backwards jumps taken, forward jumps not taken
+        -- if this CPU has a Branch Predict Unit, then use it's prediction
+        -- otherwise assume backwards jumps taken, forward jumps not taken
         if (HAS_BPU = '1') then
           branch_taken <= bp_bp_predict(1);
         else
@@ -398,9 +395,9 @@ begin
     end if;
   end process;
 
-  --Exceptions
+  -- Exceptions
 
-  --parcel-fetch
+  -- parcel-fetch
   processing_11 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -416,7 +413,7 @@ begin
     end if;
   end process;
 
-  --pre-decode
+  -- pre-decode
   processing_12 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -430,7 +427,7 @@ begin
     end if;
   end process;
 
-  --instruction-fetch
+  -- instruction-fetch
   processing_13 : process (clk, rstn)
   begin
     if (rstn = '0') then

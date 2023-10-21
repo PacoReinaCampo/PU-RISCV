@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/core/pu_riscv_memory.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -64,11 +61,11 @@ entity pu_riscv_memory is
 
     wb_stall : in std_logic;
 
-    --Program counter
+    -- Program counter
     ex_pc  : in  std_logic_vector(XLEN-1 downto 0);
     mem_pc : out std_logic_vector(XLEN-1 downto 0);
 
-    --Instruction
+    -- Instruction
     ex_bubble  : in  std_logic;
     ex_instr   : in  std_logic_vector(ILEN-1 downto 0);
     mem_bubble : out std_logic;
@@ -78,11 +75,11 @@ entity pu_riscv_memory is
     wb_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
     mem_exception : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
-    --From EX
+    -- From EX
     ex_r     : in std_logic_vector(XLEN-1 downto 0);
     dmem_adr : in std_logic_vector(XLEN-1 downto 0);
 
-    --To WB
+    -- To WB
     mem_r      : out std_logic_vector(XLEN-1 downto 0);
     mem_memadr : out std_logic_vector(XLEN-1 downto 0)
     );
@@ -100,7 +97,7 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Program Counter
+  -- Program Counter
   processing_0 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -112,7 +109,7 @@ begin
     end if;
   end process;
 
-  --Instruction
+  -- Instruction
   processing_1 : process (clk)
   begin
     if (rising_edge(clk) or falling_edge(rstn)) then
@@ -133,7 +130,7 @@ begin
     end if;
   end process;
 
-  --Data
+  -- Data
   processing_3 : process (clk)
   begin
     if (rising_edge(clk)) then
@@ -152,7 +149,7 @@ begin
     end if;
   end process;
 
-  --Exception
+  -- Exception
   processing_5 : process (clk, rstn)
   begin
     if (rstn = '0') then

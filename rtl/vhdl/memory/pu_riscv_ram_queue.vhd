@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/memory/pu_riscv_ram_queue.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -58,25 +55,25 @@ entity pu_riscv_ram_queue is
     ALMOST_EMPTY_THRESHOLD : integer := 0
     );
   port (
-    rst_ni : in std_logic;              --asynchronous, active low reset
-    clk_i  : in std_logic;              --rising edge triggered clock
+    rst_ni : in std_logic;              -- asynchronous, active low reset
+    clk_i  : in std_logic;              -- rising edge triggered clock
 
-    clr_i : in std_logic;  --clear all queue entries (synchronous reset)
-    ena_i : in std_logic;               --clock enable
+    clr_i : in std_logic;  -- clear all queue entries (synchronous reset)
+    ena_i : in std_logic;               -- clock enable
 
-    --Queue Write
-    we_i : in std_logic;                           --Queue write enable
-    d_i  : in std_logic_vector(DBITS-1 downto 0);  --Queue write data
+    -- Queue Write
+    we_i : in std_logic;                           -- Queue write enable
+    d_i  : in std_logic_vector(DBITS-1 downto 0);  -- Queue write data
 
-    --Queue Read
-    re_i : in  std_logic;                           --Queue read enable
-    q_o  : out std_logic_vector(DBITS-1 downto 0);  --Queue read data
+    -- Queue Read
+    re_i : in  std_logic;                           -- Queue read enable
+    q_o  : out std_logic_vector(DBITS-1 downto 0);  -- Queue read data
 
-    --Status signals
-    empty_o        : out std_logic;     --Queue is empty
-    full_o         : out std_logic;     --Queue is full
-    almost_empty_o : out std_logic;     --Programmable almost empty
-    almost_full_o  : out std_logic      --Programmable almost full
+    -- Status signals
+    empty_o        : out std_logic;     -- Queue is empty
+    full_o         : out std_logic;     -- Queue is full
+    almost_empty_o : out std_logic;     -- Programmable almost empty
+    almost_full_o  : out std_logic      -- Programmable almost full
     );
 end pu_riscv_ram_queue;
 
@@ -101,7 +98,7 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Write Address
+  -- Write Address
   processing_0 : process (clk_i, rst_ni)
     variable were : std_logic_vector(1 downto 0);
   begin
@@ -127,7 +124,7 @@ begin
   queue_xadr <= std_logic_vector(to_unsigned(DEPTH-1, integer(log2(real(DEPTH)))))
                 when (queue_wadr = (queue_wadr'range => '0')) else std_logic_vector(unsigned(queue_wadr)-(queue_wadr'range => '1'));
 
-  --Queue Data
+  -- Queue Data
   processing_1 : process (clk_i, rst_ni)
     variable were : std_logic_vector(1 downto 0);
   begin
@@ -158,7 +155,7 @@ begin
     end if;
   end process;
 
-  --Queue Almost Empty
+  -- Queue Almost Empty
   processing_2 : process (clk_i, rst_ni)
     variable were : std_logic_vector(1 downto 0);
   begin
@@ -181,7 +178,7 @@ begin
     end if;
   end process;
 
-  --Queue Empty
+  -- Queue Empty
   processing_3 : process (clk_i, rst_ni)
     variable were : std_logic_vector(1 downto 0);
   begin
@@ -204,7 +201,7 @@ begin
     end if;
   end process;
 
-  --Queue Almost Full
+  -- Queue Almost Full
   processing_4 : process (clk_i, rst_ni)
     variable were : std_logic_vector(1 downto 0);
   begin
@@ -227,7 +224,7 @@ begin
     end if;
   end process;
 
-  --Queue Full
+  -- Queue Full
   processing_5 : process (clk_i, rst_ni)
     variable were : std_logic_vector(1 downto 0);
   begin
@@ -250,6 +247,6 @@ begin
     end if;
   end process;
 
-  --Queue output data
+  -- Queue output data
   q_o <= queue_data(0);
 end rtl;

@@ -1,6 +1,3 @@
--- Converted from pu_riscv_memory_model_wb.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -114,7 +111,7 @@ begin
   ------------------------------------------------------------------------------
   generating_0 : for u in 0 to 1 generate
 
-    --Generate ACK
+    -- Generate ACK
 
     generating_1 : if (MEM_LATENCY > 0) generate
       processing_0 : process (HCLK, HRESETn)
@@ -140,9 +137,9 @@ begin
 
     HRESP(u) <= HRESP_OKAY;
 
-    --Write Section
+    -- Write Section
 
-    --delay control signals
+    -- delay control signals
     processing_1 : process (HCLK)
     begin
       if (rising_edge(HCLK)) then
@@ -198,7 +195,7 @@ begin
       end if;
     end process;
 
-    --Read Section
+    -- Read Section
     iaddr(u) <= HADDR(u) and ((XLEN-1 downto 0 => '1') sll integer(log2(real(XLEN/8))));
 
     processing_5 : process (HCLK)

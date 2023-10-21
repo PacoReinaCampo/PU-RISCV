@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/core/execution/pu_riscv_bu.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -68,7 +65,7 @@ entity pu_riscv_bu is
     ex_stall : in std_logic;
     st_flush : in std_logic;
 
-    --Program counter
+    -- Program counter
     id_pc         : in  std_logic_vector(XLEN-1 downto 0);
     bu_nxt_pc     : out std_logic_vector(XLEN-1 downto 0);
     bu_flush      : out std_logic;
@@ -79,7 +76,7 @@ entity pu_riscv_bu is
     bu_bp_btaken  : out std_logic;
     bu_bp_update  : out std_logic;
 
-    --Instruction
+    -- Instruction
     id_bubble : in std_logic;
     id_instr  : in std_logic_vector(63 downto 0);
 
@@ -89,11 +86,11 @@ entity pu_riscv_bu is
     wb_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
     bu_exception  : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
-    --from ID
+    -- from ID
     opA : in std_logic_vector(XLEN-1 downto 0);
     opB : in std_logic_vector(XLEN-1 downto 0);
 
-    --Debug Unit
+    -- Debug Unit
     du_stall : in std_logic;
     du_flush : in std_logic;
     du_we_pc : in std_logic;
@@ -117,11 +114,11 @@ architecture rtl of pu_riscv_bu is
   signal func7     : std_logic_vector(6 downto 0);
   signal has_rvc_s : std_logic;
 
-  --Operand generation
+  -- Operand generation
   signal immJ : std_logic_vector(XLEN-1 downto 0);
   signal immB : std_logic_vector(XLEN-1 downto 0);
 
-  --Branch controls
+  -- Branch controls
   signal pipeflush    : std_logic;
   signal cacheflush   : std_logic;
   signal btaken       : std_logic;
@@ -139,14 +136,14 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Instruction
+  -- Instruction
   func7  <= id_instr(31 downto 25);
   func3  <= id_instr(14 downto 12);
   opcode <= id_instr(6 downto 2);
 
   has_rvc_s <= to_stdlogic(HAS_RVC /= '0');
 
-  --Exceptions
+  -- Exceptions
   processing_0 : process (clk, rstn)
     variable exceptions : std_logic_vector(5 downto 0);
   begin
@@ -184,7 +181,7 @@ begin
     end if;
   end process;
 
-  --Decode Immediates
+  -- Decode Immediates
   immJ <= ((XLEN-1 downto 20 => id_instr(31)) & id_instr(19 downto 12) & id_instr(20) & id_instr(30 downto 25) & id_instr(24 downto 21) & '0');
   immB <= ((XLEN-1 downto 12 => id_instr(31)) & id_instr(7) & id_instr(30 downto 25) & id_instr(11 downto 8) & '0');
 
@@ -224,10 +221,10 @@ begin
     debug := id_bubble & func7 & func3 & opcode;
     case (debug) is
       when (JAL) =>
-        --This is really only for the debug unit, such that NPC points to the correct address
+        -- This is really only for the debug unit, such that NPC points to the correct address
         btaken     <= '1';
         bp_update  <= '0';
-        pipeflush  <= '0';              --Handled in IF, do NOT flush here!!
+        pipeflush  <= '0';              -- Handled in IF, do NOT flush here!!
         cacheflush <= '0';
         nxt_pc     <= std_logic_vector(unsigned(id_pc)+unsigned(immJ));
       when (JALR) =>
@@ -316,11 +313,11 @@ begin
         bp_update  <= '0';
         pipeflush  <= '0';
         cacheflush <= '0';
-        nxt_pc     <= std_logic_vector(unsigned(id_pc)+X"0000000000000004");  --TODO: handle 16bit instructions
+        nxt_pc     <= std_logic_vector(unsigned(id_pc)+X"0000000000000004");  -- TO-DO: handle 16bit instructions
     end case;
   end process;
 
-  --Program Counter modifications (Branches/JALR)
+  -- Program Counter modifications (Branches/JALR)
   processing_5 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -356,6 +353,6 @@ begin
 
   bu_flush <= bu_flush_o;
 
-  --don't take myself (current branch) into account when updating branch history
+  -- don't take myself (current branch) into account when updating branch history
   bu_bp_history <= bp_history(BP_GLOBAL_BITS downto 1);
 end rtl;

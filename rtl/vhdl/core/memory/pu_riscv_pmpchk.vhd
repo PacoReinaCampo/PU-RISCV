@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/core/memory/pu_riscv_pmpchk.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -58,19 +55,19 @@ entity pu_riscv_pmpchk is
     PMP_CNT : integer := 16
     );
   port (
-    --From State
+    -- From State
     st_pmpcfg_i  : in std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
     st_pmpaddr_i : in std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
     st_prv_i     : in std_logic_vector(1 downto 0);
 
-    --Memory Access
-    instruction_i : in std_logic;       --This is an instruction access
-    req_i         : in std_logic;       --Memory access requested
-    adr_i         : in std_logic_vector(PLEN-1 downto 0);  --Physical Memory address (i.e. after translation)
-    size_i        : in std_logic_vector(2 downto 0);       --Transfer size
-    we_i          : in std_logic;       --Read/Write enable
+    -- Memory Access
+    instruction_i : in std_logic;       -- This is an instruction access
+    req_i         : in std_logic;       -- Memory access requested
+    adr_i         : in std_logic_vector(PLEN-1 downto 0);  -- Physical Memory address (i.e. after translation)
+    size_i        : in std_logic_vector(2 downto 0);       -- Transfer size
+    we_i          : in std_logic;       -- Read/Write enable
 
-    --Output
+    -- Output
     exception_o : out std_logic
     );
 end pu_riscv_pmpchk;
@@ -80,7 +77,7 @@ architecture rtl of pu_riscv_pmpchk is
   -- Functions
   ------------------------------------------------------------------------------
 
-  --convert transfer size in number of bytes in transfer
+  -- convert transfer size in number of bytes in transfer
   function size2bytes (
     size : std_logic_vector(2 downto 0)
     ) return integer is
@@ -103,9 +100,9 @@ architecture rtl of pu_riscv_pmpchk is
     return size2bytes_return;
   end size2bytes;
 
-  --Lower and Upper bounds for NA4/NAPOT
+  -- Lower and Upper bounds for NA4/NAPOT
   function napot_lb (
-    na4    : std_logic;                 --special case na4
+    na4    : std_logic;                 -- special case na4
     pmpddr : std_logic_vector(PLEN-1 downto 2)
     ) return std_logic_vector is
     variable n               : integer;
@@ -113,7 +110,7 @@ architecture rtl of pu_riscv_pmpchk is
     variable mask            : std_logic_vector(PLEN-1 downto 2);
     variable napot_lb_return : std_logic_vector (PLEN-1 downto 2);
   begin
-    --find 'n' boundary = 2^(n+2) bytes
+    -- find 'n' boundary = 2^(n+2) bytes
     n := 0;
     if (na4 = '0') then
       truth := '1';
@@ -129,16 +126,16 @@ architecture rtl of pu_riscv_pmpchk is
       n := n+1;
     end if;
 
-    --create mask
+    -- create mask
     mask := std_logic_vector(to_unsigned(1, PLEN-2) sll n);
 
-    --lower bound address
+    -- lower bound address
     napot_lb_return := pmpddr and mask;
     return napot_lb_return;
   end napot_lb;
 
   function napot_ub (
-    na4    : std_logic;                 --special case na4
+    na4    : std_logic;                 -- special case na4
     pmpddr : std_logic_vector(PLEN-1 downto 2)
     ) return std_logic_vector is
     variable n               : integer;
@@ -147,7 +144,7 @@ architecture rtl of pu_riscv_pmpchk is
     variable incr            : std_logic_vector(PLEN-1 downto 2);
     variable napot_ub_return : std_logic_vector (PLEN-1 downto 2);
   begin
-    --find 'n' boundary = 2^(n+2) bytes
+    -- find 'n' boundary = 2^(n+2) bytes
     n := 0;
     if (na4 = '0') then
       truth := '1';
@@ -163,16 +160,16 @@ architecture rtl of pu_riscv_pmpchk is
       n := n+1;
     end if;
 
-    --create mask and increment
+    -- create mask and increment
     mask := std_logic_vector(to_unsigned(1, PLEN-2) sll n);
     incr := std_logic_vector(to_unsigned(1, PLEN-2) sll n);
 
-    --upper bound address
+    -- upper bound address
     napot_ub_return := std_logic_vector(unsigned(pmpddr)+unsigned(incr)) and mask;
     return napot_ub_return;
   end napot_ub;
 
-  --Is ANY byte of 'access' in pmp range?
+  -- Is ANY byte of 'access' in pmp range?
   function match_any (
     access_lb : std_logic_vector(PLEN-1 downto 2);
     access_ub : std_logic_vector(PLEN-1 downto 2);
@@ -197,7 +194,7 @@ architecture rtl of pu_riscv_pmpchk is
     return match_any_return;
   end match_any;
 
-  --Are ALL bytes of 'access' in PMP range?
+  -- Are ALL bytes of 'access' in PMP range?
   function match_all (
     access_lb : std_logic_vector(PLEN-1 downto 2);
     access_ub : std_logic_vector(PLEN-1 downto 2);
@@ -216,14 +213,14 @@ architecture rtl of pu_riscv_pmpchk is
     return match_all_return;
   end match_all;
 
-  --get highest priority (==lowest number) PMP that matches
+  -- get highest priority (==lowest number) PMP that matches
   function highest_priority_match (
     m : std_logic_vector(PMP_CNT-1 downto 0)
     ) return integer is
     variable n                             : integer;
     variable highest_priority_match_return : integer;
   begin
-    highest_priority_match_return := 0;  --default value
+    highest_priority_match_return := 0;  -- default value
 
     for n in PMP_CNT-1 downto 0 loop
       if (m(n) = '1') then
@@ -260,7 +257,7 @@ begin
   access_ub <= std_logic_vector(unsigned(adr_i)+("0000000000000" & unsigned(size_i))-"0000000000000001");
 
   generating_0 : for i in 0 to PMP_CNT - 1 generate
-    --lower bounds
+    -- lower bounds
     processing_0 : process (pmp_ub, st_pmpaddr_i, st_pmpcfg_i)
     begin
       case ((st_pmpcfg_i(i)(4 downto 3))) is
@@ -284,7 +281,7 @@ begin
       end case;
     end process;
 
-    --upper bounds
+    -- upper bounds
     processing_1 : process (st_pmpaddr_i, st_pmpcfg_i)
     begin
       case ((st_pmpcfg_i(i)(4 downto 3))) is
@@ -299,7 +296,7 @@ begin
       end case;
     end process;
 
-    --match-any
+    -- match-any
     pmp_match(i) <= match_any(access_lb(PLEN-1 downto 2),
                               access_ub(PLEN-1 downto 2),
                               pmp_lb(i),
@@ -327,7 +324,7 @@ begin
                         (not matched_pmpcfg(1) and we_i) or  -- write-access while not allowed         -> FAIL 
                         (not matched_pmpcfg(2) and instruction_i)));  -- instruction read, but not instruction  -> FAIL
 
-  --Prv.Lvl != M-Mode, no PMP matched, but PMPs implemented -> FAIL
+  -- Prv.Lvl != M-Mode, no PMP matched, but PMPs implemented -> FAIL
   exception_matched <= to_stdlogic(st_prv_i /= PRV_M) and to_stdlogic(PMP_CNT > 0)
                        when reduce_nor(pmp_match) = '1' else not pmp_match_all(to_integer(unsigned(matched_pmp)));
 end rtl;

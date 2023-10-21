@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/core/execution/pu_riscv_lsu.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -64,7 +61,7 @@ entity pu_riscv_lsu is
     ex_stall  : in  std_logic;
     lsu_stall : out std_logic;
 
-    --Instruction
+    -- Instruction
     id_bubble : in std_logic;
     id_instr  : in std_logic_vector(ILEN-1 downto 0);
 
@@ -77,21 +74,21 @@ entity pu_riscv_lsu is
     wb_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
     lsu_exception : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
-    --Operands
+    -- Operands
     opA : in std_logic_vector(XLEN-1 downto 0);
     opB : in std_logic_vector(XLEN-1 downto 0);
 
-    --From State
+    -- From State
     st_xlen : in std_logic_vector(1 downto 0);
 
-    --To Memory
+    -- To Memory
     dmem_adr  : out std_logic_vector(XLEN-1 downto 0);
     dmem_d    : out std_logic_vector(XLEN-1 downto 0);
     dmem_req  : out std_logic;
     dmem_we   : out std_logic;
     dmem_size : out std_logic_vector(2 downto 0);
 
-    --From Memory (for AMO)
+    -- From Memory (for AMO)
     dmem_ack        : in std_logic;
     dmem_q          : in std_logic_vector(XLEN-1 downto 0);
     dmem_misaligned : in std_logic;
@@ -113,10 +110,10 @@ architecture rtl of pu_riscv_lsu is
   signal func7  : std_logic_vector(6 downto 0);
   signal xlen32 : std_logic;
 
-  --Operand generation
+  -- Operand generation
   signal immS : std_logic_vector(XLEN-1 downto 0);
 
-  --FSM
+  -- FSM
   signal state : std_logic_vector(1 downto 0);
 
   signal adr  : std_logic_vector(XLEN-1 downto 0);
@@ -130,19 +127,19 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Instruction
+  -- Instruction
   func7  <= id_instr(31 downto 25);
   func3  <= id_instr(14 downto 12);
   opcode <= id_instr(6 downto 2);
 
   xlen32 <= to_stdlogic(st_xlen = RV32I);
 
-  lsu_r <= (others => '0');             --for AMO
+  lsu_r <= (others => '0');             -- for AMO
 
-  --Decode Immediates
+  -- Decode Immediates
   immS <= ((XLEN-1 downto 11 => id_instr(31)) & id_instr(30 downto 25) & id_instr(11 downto 8) & id_instr(7));
 
-  --Access Statemachine
+  -- Access Statemachine
   processing_0 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -191,7 +188,7 @@ begin
 
   lsu_stall <= lsu_stall_o;
 
-  --Memory Control Signals
+  -- Memory Control Signals
   processing_1 : process (clk)
   begin
     if (rising_edge(clk)) then
@@ -210,7 +207,7 @@ begin
                 dmem_adr  <= adr;
                 dmem_d    <= d;
               when others =>
-                --do nothing
+                -- do nothing
                 null;
             end case;
           end if;
@@ -223,7 +220,7 @@ begin
     end if;
   end process;
 
-  --memory address
+  -- memory address
   processing_2 : process (func3, func7, immS, opA, opB, opcode, xlen32)
     variable memory_address : std_logic_vector(15 downto 0);
   begin
@@ -236,14 +233,14 @@ begin
       when (LW) =>
         adr <= std_logic_vector(unsigned(opA)+unsigned(opB));
       when (LD) =>
-        --RV64
+        -- RV64
         adr <= std_logic_vector(unsigned(opA)+unsigned(opB));
       when (LBU) =>
         adr <= std_logic_vector(unsigned(opA)+unsigned(opB));
       when (LHU) =>
         adr <= std_logic_vector(unsigned(opA)+unsigned(opB));
       when (LWU) =>
-        --RV64
+        -- RV64
         adr <= std_logic_vector(unsigned(opA)+unsigned(opB));
       when (SB) =>
         adr <= std_logic_vector(unsigned(opA)+unsigned(immS));
@@ -252,21 +249,21 @@ begin
       when (SW) =>
         adr <= std_logic_vector(unsigned(opA)+unsigned(immS));
       when (SD) =>
-        --RV64
+        -- RV64
         adr <= std_logic_vector(unsigned(opA)+unsigned(immS));
       when others =>
-        --'hx;
+        -- 'hx;
         adr <= std_logic_vector(unsigned(opA)+unsigned(opB));
     end case;
   end process;
 
-  --memory byte enable
-  generating_0 : if (XLEN = 64) generate  --RV64
+  -- memory byte enable
+  generating_0 : if (XLEN = 64) generate  -- RV64
     processing_3 : process (func3, func7, opcode)
       variable memory_byte_enable : std_logic_vector(15 downto 0);
     begin
       memory_byte_enable := 'X' & func7 & func3 & opcode;
-      case (memory_byte_enable) is        --func7 is don't care
+      case (memory_byte_enable) is        -- func7 is don't care
         when LB =>
           size <= BYTE;
         when LH =>
@@ -294,12 +291,12 @@ begin
       end case;
     end process;
 
-    --memory write data
+    -- memory write data
     processing_4 : process (adr, func3, func7, opB, opcode)
       variable memory_write_data : std_logic_vector(15 downto 0);
     begin
       memory_write_data := 'X' & func7 & func3 & opcode;
-      case (memory_write_data) is       --func7 is don't care
+      case (memory_write_data) is       -- func7 is don't care
         when SB =>
           d <= std_logic_vector(((XLEN-1 downto 8 => '0') & unsigned(opB(7 downto 0))) sll (8*to_integer(unsigned(adr(2 downto 0)))));
         when SH =>
@@ -312,12 +309,12 @@ begin
           d <= (others => 'X');
       end case;
     end process;
-  elsif (XLEN = 32) generate            --RV32
+  elsif (XLEN = 32) generate            -- RV32
     processing_5 : process (func3, func7, opcode)
       variable memory_write_data : std_logic_vector(15 downto 0);
     begin
       memory_write_data := 'X' & func7 & func3 & opcode;
-      case (memory_write_data) is       --func7 is don't care
+      case (memory_write_data) is       -- func7 is don't care
         when LB =>
           size <= BYTE;
         when LH =>
@@ -339,12 +336,12 @@ begin
       end case;
     end process;
 
-    --memory write data
+    -- memory write data
     processing_6 : process (adr, func3, func7, opB, opcode)
       variable memory_write_data : std_logic_vector(15 downto 0);
     begin
       memory_write_data := 'X' & func7 & func3 & opcode;
-      case (memory_write_data) is       --func7 is don't care
+      case (memory_write_data) is       -- func7 is don't care
         when SB =>
           d <= std_logic_vector(unsigned(opB(7 downto 0)) sll (8*to_integer(unsigned(adr(1 downto 0)))));
         when SH =>

@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/core/cache/pu_riscv_dext.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -53,15 +50,15 @@ use work.vhdl_pkg.all;
 entity pu_riscv_dext is
   generic (
     XLEN  : integer := 64;
-    PLEN  : integer := 64;              --Physical address bus size
-    DEPTH : integer := 2                --number of instructions in flight
+    PLEN  : integer := 64;              -- Physical address bus size
+    DEPTH : integer := 2                -- number of instructions in flight
     );
   port (
     rst_ni : in std_logic;
     clk_i  : in std_logic;
     clr_i  : in std_logic;
 
-    --CPU side
+    -- CPU side
     mem_req_i     : in  std_logic;
     mem_adr_i     : in  std_logic_vector(XLEN-1 downto 0);
     mem_size_i    : in  std_logic_vector(2 downto 0);
@@ -70,26 +67,26 @@ entity pu_riscv_dext is
     mem_prot_i    : in  std_logic_vector(2 downto 0);
     mem_we_i      : in  std_logic;
     mem_d_i       : in  std_logic_vector(XLEN-1 downto 0);
-    mem_adr_ack_o : out std_logic;      --acknowledge address phase
+    mem_adr_ack_o : out std_logic;      -- acknowledge address phase
     mem_adr_o     : out std_logic_vector(PLEN-1 downto 0);
     mem_q_o       : out std_logic_vector(XLEN-1 downto 0);
-    mem_ack_o     : out std_logic;      --acknowledge data transfer
-    mem_err_o     : out std_logic;      --data transfer error
+    mem_ack_o     : out std_logic;      -- acknowledge data transfer
+    mem_err_o     : out std_logic;      -- data transfer error
 
-    --To BIU
+    -- To BIU
     biu_stb_o     : out std_logic;
     biu_stb_ack_i : in  std_logic;
     biu_adri_o    : out std_logic_vector(PLEN-1 downto 0);
     biu_adro_i    : in  std_logic_vector(PLEN-1 downto 0);
-    biu_size_o    : out std_logic_vector(2 downto 0);  --transfer size
-    biu_type_o    : out std_logic_vector(2 downto 0);  --burst type
+    biu_size_o    : out std_logic_vector(2 downto 0);  -- transfer size
+    biu_type_o    : out std_logic_vector(2 downto 0);  -- burst type
     biu_lock_o    : out std_logic;
     biu_prot_o    : out std_logic_vector(2 downto 0);
     biu_we_o      : out std_logic;
     biu_d_o       : out std_logic_vector(XLEN-1 downto 0);
     biu_q_i       : in  std_logic_vector(XLEN-1 downto 0);
-    biu_ack_i     : in  std_logic;      --data acknowledge, 1 per data
-    biu_err_i     : in  std_logic       --data error
+    biu_ack_i     : in  std_logic;      -- data acknowledge, 1 per data
+    biu_err_i     : in  std_logic       -- data error
     );
 end pu_riscv_dext;
 
@@ -117,7 +114,7 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --State Machine
+  -- State Machine
   processing_0 : process (clk_i)
   begin
     if (rising_edge(clk_i)) then
@@ -158,7 +155,7 @@ begin
         when "10" =>
           inflight <= std_logic_vector(unsigned(inflight)+(inflight'range => '1'));
         when others =>
-          --do nothing
+          -- do nothing
           null;
       end case;
     end if;
@@ -181,7 +178,7 @@ begin
     end if;
   end process;
 
-  --External Interface
+  -- External Interface
   biu_stb    <= (mem_req_i or hold_mem_req) and not clr_i;
   biu_adri_o <= hold_mem_adr
                 when (hold_mem_req = '1') else mem_adr_i;

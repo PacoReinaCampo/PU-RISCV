@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/core/pu_riscv_wb.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -61,10 +58,10 @@ entity pu_riscv_wb is
     PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
     );
   port (
-    rst_ni : in std_logic;              --Reset
-    clk_i  : in std_logic;              --Clock
+    rst_ni : in std_logic;              -- Reset
+    clk_i  : in std_logic;              -- Clock
 
-    wb_stall_o : out std_logic;         --Stall on memory-wait
+    wb_stall_o : out std_logic;         -- Stall on memory-wait
 
     mem_pc_i : in  std_logic_vector(XLEN-1 downto 0);
     wb_pc_o  : out std_logic_vector(XLEN-1 downto 0);
@@ -81,14 +78,14 @@ entity pu_riscv_wb is
     mem_r_i      : in std_logic_vector(XLEN-1 downto 0);
     mem_memadr_i : in std_logic_vector(XLEN-1 downto 0);
 
-    --From Memory System
+    -- From Memory System
     dmem_ack_i        : in std_logic;
     dmem_err_i        : in std_logic;
     dmem_q_i          : in std_logic_vector(XLEN-1 downto 0);
     dmem_misaligned_i : in std_logic;
     dmem_page_fault_i : in std_logic;
 
-    --To Register File
+    -- To Register File
     wb_dst_o : out std_logic_vector(4 downto 0);
     wb_r_o   : out std_logic_vector(XLEN-1 downto 0);
     wb_we_o  : out std_logic
@@ -120,7 +117,7 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Program Counter
+  -- Program Counter
   processing_0 : process (clk_i, rst_ni, mem_pc_i, wb_stall)
   begin
     if (rst_ni = '0') then
@@ -132,7 +129,7 @@ begin
     end if;
   end process;
 
-  --Instruction
+  -- Instruction
   processing_1 : process (clk_i, rst_ni, mem_instr_i, wb_stall)
   begin
     if (rst_ni = '0') then
@@ -149,7 +146,7 @@ begin
   opcode <= mem_instr_i(6 downto 2);
   dst    <= mem_instr_i(11 downto 7);
 
-  --Exception
+  -- Exception
   processing_2 : process (dmem_err_i, dmem_misaligned_i, dmem_page_fault_i, mem_bubble_i, mem_exception_i, opcode)
   begin
     exception <= mem_exception_i;
@@ -208,7 +205,7 @@ begin
     end if;
   end process;
 
-  --From Memory
+  -- From Memory
   processing_5 : process (dmem_ack_i, dmem_err_i, dmem_misaligned_i, dmem_page_fault_i, mem_bubble_i, mem_exception_i, opcode)
     variable from_memory : std_logic_vector(6 downto 0);
   begin
@@ -281,7 +278,7 @@ begin
     end process;
   end generate;
 
-  --Register File Write Back
+  -- Register File Write Back
 
   -- Destination register
   processing_8 : process (clk_i)
@@ -328,7 +325,7 @@ begin
             wb_we_o <= '0';
           when OPC_BRANCH =>
             wb_we_o <= '0';
-          --OPC_SYSTEM : wb_we_o <= 'b0;
+          -- OPC_SYSTEM : wb_we_o <= 'b0;
           when others =>
             wb_we_o <= not mem_bubble_i and reduce_or(dst);
         end case;

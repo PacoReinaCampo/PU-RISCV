@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/core/pu_riscv_id.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -71,13 +68,13 @@ entity pu_riscv_id is
     bu_nxt_pc : in std_logic_vector(XLEN-1 downto 0);
     st_nxt_pc : in std_logic_vector(XLEN-1 downto 0);
 
-    --Program counter
+    -- Program counter
     if_pc         : in  std_logic_vector(XLEN-1 downto 0);
     id_pc         : out std_logic_vector(XLEN-1 downto 0);
     if_bp_predict : in  std_logic_vector(1 downto 0);
     id_bp_predict : out std_logic_vector(1 downto 0);
 
-    --Instruction
+    -- Instruction
     if_instr   : in  std_logic_vector(63 downto 0);
     if_bubble  : in  std_logic;
     id_instr   : out std_logic_vector(ILEN-1 downto 0);
@@ -89,14 +86,14 @@ entity pu_riscv_id is
     wb_instr   : in  std_logic_vector(ILEN-1 downto 0);
     wb_bubble  : in  std_logic;
 
-    --Exceptions
+    -- Exceptions
     if_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
     ex_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
     mem_exception : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
     wb_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
     id_exception  : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
-    --From State
+    -- From State
     st_prv        : in std_logic_vector(1 downto 0);
     st_xlen       : in std_logic_vector(1 downto 0);
     st_tvm        : in std_logic;
@@ -105,11 +102,11 @@ entity pu_riscv_id is
     st_mcounteren : in std_logic_vector(XLEN-1 downto 0);
     st_scounteren : in std_logic_vector(XLEN-1 downto 0);
 
-    --To RF
+    -- To RF
     id_src1 : out std_logic_vector(4 downto 0);
     id_src2 : out std_logic_vector(4 downto 0);
 
-    --To execution units
+    -- To execution units
     id_opA : out std_logic_vector(XLEN-1 downto 0);
     id_opB : out std_logic_vector(XLEN-1 downto 0);
 
@@ -122,7 +119,7 @@ entity pu_riscv_id is
     id_bypwb_opA  : out std_logic;
     id_bypwb_opB  : out std_logic;
 
-    --from MEM/WB
+    -- from MEM/WB
     mem_r : in std_logic_vector(XLEN-1 downto 0);
     wb_r  : in std_logic_vector(XLEN-1 downto 0)
     );
@@ -136,11 +133,11 @@ architecture rtl of pu_riscv_id is
   signal multi_cycle_instruction : std_logic;
   signal stall                   : std_logic;
 
-  --Immediates
+  -- Immediates
   signal immI : std_logic_vector(XLEN-1 downto 0);
   signal immU : std_logic_vector(XLEN-1 downto 0);
 
-  --Opcodes
+  -- Opcodes
   signal if_opcode  : std_logic_vector(6 downto 2);
   signal id_opcode  : std_logic_vector(6 downto 2);
   signal ex_opcode  : std_logic_vector(6 downto 2);
@@ -150,9 +147,9 @@ architecture rtl of pu_riscv_id is
   signal if_func3 : std_logic_vector(2 downto 0);
   signal if_func7 : std_logic_vector(6 downto 0);
 
-  signal xlen_s     : std_logic;        --Current CPU state XLEN
-  signal xlen64     : std_logic;        --Is the CPU state set to RV64?
-  signal xlen32     : std_logic;        --Is the CPU state set to RV32?
+  signal xlen_s     : std_logic;        -- Current CPU state XLEN
+  signal xlen64     : std_logic;        -- Is the CPU state set to RV64?
+  signal xlen32     : std_logic;        -- Is the CPU state set to RV32?
   signal has_fpu_s  : std_logic;
   signal has_muldiv : std_logic;
   signal has_amo    : std_logic;
@@ -189,7 +186,7 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Program Counter
+  -- Program Counter
   processing_0 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -197,7 +194,7 @@ begin
     elsif (rising_edge(clk)) then
       if (st_flush = '1') then
         id_pc <= st_nxt_pc;
-      elsif (bu_flush = '1' or du_flush = '1') then  --Is this required?! 
+      elsif (bu_flush = '1' or du_flush = '1') then  -- Is this required?! 
         id_pc <= bu_nxt_pc;
       elsif (stall = '0' and id_stall_sgn = '0') then
         id_pc <= if_pc;
@@ -207,7 +204,7 @@ begin
 
   -- Instruction
   ------------------------------------------------------------------------------
-  -- TODO: push if-instr upon illegal-instruction
+  -- TO-DO: push if-instr upon illegal-instruction
 
   processing_1 : process (clk)
   begin
@@ -237,7 +234,7 @@ begin
     end if;
   end process;
 
-  --local stall
+  -- local stall
   stall         <= ex_stall or (du_stall and reduce_nor(wb_exception));
   id_bubble_sgn <= stall or bu_flush or st_flush or reduce_or(ex_exception) or reduce_or(mem_exception) or reduce_or(wb_exception) or id_bubble_r;
   id_bubble     <= id_bubble_sgn;
@@ -274,7 +271,7 @@ begin
     end if;
   end process;
 
-  --Exceptions
+  -- Exceptions
   processing_4 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -299,10 +296,10 @@ begin
   end process;
 
 
-  --To Register File
+  -- To Register File
 
-  --address into register file. Gets registered in memory
-  --Should the hold be handled by the memory?!
+  -- address into register file. Gets registered in memory
+  -- Should the hold be handled by the memory?!
   id_src1 <= if_instr(19 downto 15)
              when (du_stall or ex_stall) = '0' else id_instr_sgn(19 downto 15);
   id_src2 <= if_instr(24 downto 20)
@@ -311,7 +308,7 @@ begin
   if_src1 <= if_instr(19 downto 15);
   if_src2 <= if_instr(24 downto 20);
 
-  --Decode Immediates
+  -- Decode Immediates
 
   immI <= (if_instr(31) & if_instr(31) & if_instr(31) & if_instr(31) & if_instr(31)) &
           (if_instr(31) & if_instr(31) & if_instr(31) & if_instr(31) & if_instr(31)) &
@@ -333,10 +330,10 @@ begin
           (if_instr(31) & if_instr(31) & if_instr(31) & if_instr(31) & if_instr(31)) &
           (if_instr(31) & if_instr(31) & if_instr(31)) & if_instr(30 downto 12) & "000000000000";
 
-  --Create ALU operands
+  -- Create ALU operands
 
-  --generate Load-WB-result
-  --result might fall inbetween wb_r and data available in Register File
+  -- generate Load-WB-result
+  -- result might fall inbetween wb_r and data available in Register File
   processing_5 : process (wb_bubble, wb_opcode)
   begin
     case ((wb_opcode)) is
@@ -361,7 +358,7 @@ begin
       when OPC_JAL =>
         can_ldwb <= not wb_bubble;
       when OPC_SYSTEM =>
-        --TODO not ALL SYSTEM
+        -- TO-DO: not ALL SYSTEM
         can_ldwb <= not wb_bubble;
       when others =>
         can_ldwb <= '0';
@@ -468,9 +465,9 @@ begin
             id_opA <= wb_r;
             id_opB <= immI;
           when OPC_SYSTEM =>
-            --for CSRxx
+            -- for CSRxx
             id_opA <= wb_r;
-            id_opB <= ((XLEN-1 downto 5 => '0') & if_src1);  --for CSRxxI
+            id_opB <= ((XLEN-1 downto 5 => '0') & if_src1);  -- for CSRxxI
           when others =>
             id_opA <= (others => 'X');
             id_opB <= (others => 'X');
@@ -479,7 +476,7 @@ begin
     end if;
   end process;
 
-  --Bypasses
+  -- Bypasses
   processing_8 : process (clk, rstn, if_func3, if_func7, if_opcode, xlen32)
     variable state : std_logic_vector(15 downto 0);
   begin
@@ -542,7 +539,7 @@ begin
     state := xlen32 & if_func7 & if_func3 & if_opcode;
   end process;
 
-  --Check for each stage if the result should be used
+  -- Check for each stage if the result should be used
   processing_9 : process (id_bubble_sgn, id_opcode)
   begin
     case ((id_opcode)) is
@@ -567,7 +564,7 @@ begin
       when OPC_JAL =>
         can_bypex <= not id_bubble_sgn;
       when OPC_SYSTEM =>
-        --TODO not ALL SYSTEM
+        -- TO-DO: not ALL SYSTEM
         can_bypex <= not id_bubble_sgn;
       when others =>
         can_bypex <= '0';
@@ -598,7 +595,7 @@ begin
       when OPC_JAL =>
         can_bypmem <= not ex_bubble and not multi_cycle_instruction;
       when OPC_SYSTEM =>
-        --TODO not ALL SYSTEM
+        -- TO-DO: not ALL SYSTEM
         can_bypmem <= not ex_bubble and not multi_cycle_instruction;
       when others =>
         can_bypmem <= '0';
@@ -629,7 +626,7 @@ begin
       when OPC_JAL =>
         can_bypwb <= not mem_bubble and not multi_cycle_instruction;
       when OPC_SYSTEM =>
-        --TODO not ALL SYSTEM
+        -- TO-DO: not ALL SYSTEM
         can_bypwb <= not mem_bubble and not multi_cycle_instruction;
       when others =>
         can_bypwb <= '0';
@@ -722,14 +719,14 @@ begin
     end if;
   end process;
 
-  --Generate STALL
+  -- Generate STALL
 
-  --rih: todo
+  -- rih: todo
   processing_13 : process (bu_flush, du_flush, ex_bubble, ex_dst, ex_opcode, id_bubble_sgn, id_dst, id_opcode, if_bubble, if_opcode, if_src1, if_src2, st_flush, stall)
   begin
-    if (bu_flush = '1' or st_flush = '1' or du_flush = '1') then  --flush overrules stall
+    if (bu_flush = '1' or st_flush = '1' or du_flush = '1') then  -- flush overrules stall
       id_stall_sgn <= '0';
-    elsif (stall = '1') then  --ignore NOPs e.g. after flush or IF-stall
+    elsif (stall = '1') then  -- ignore NOPs e.g. after flush or IF-stall
       id_stall_sgn <= not if_bubble;
     elsif (id_opcode = OPC_LOAD and id_bubble_sgn = '0') then
       case ((if_opcode)) is
@@ -799,7 +796,7 @@ begin
 
   id_stall <= id_stall_sgn;
 
-  --Generate Illegal Instruction
+  -- Generate Illegal Instruction
   processing_14 : process (if_opcode, has_muldiv, illegal_alu_cond, illegal_alu_instr, illegal_lsu_instr, illegal_muldiv_instr)
   begin
     case (if_opcode) is
@@ -817,7 +814,7 @@ begin
     end case;
   end process;
 
-  --ALU
+  -- ALU
   processing_15 : process (if_instr, has_s, has_u, if_func3, if_func7, if_opcode, if_src1, illegal_csr_rd, illegal_csr_wr, st_prv, st_tsr, xlen32)
     variable state : std_logic_vector(15 downto 0);
   begin
@@ -863,15 +860,15 @@ begin
           when (ADDX) =>
             illegal_alu_instr <= '0';
           when (ADDIW) =>
-            --RV64
+            -- RV64
             illegal_alu_instr <= '0';
           when (ADDW) =>
-            --RV64
+            -- RV64
             illegal_alu_instr <= '0';
           when (SUBX) =>
             illegal_alu_instr <= '0';
           when (SUBW) =>
-            --RV64
+            -- RV64
             illegal_alu_instr <= '0';
           when (XORI) =>
             illegal_alu_instr <= '0';
@@ -886,15 +883,15 @@ begin
           when (ANDX) =>
             illegal_alu_instr <= '0';
           when (SLLI) =>
-            --shamt[5] illegal for RV32
+            -- shamt[5] illegal for RV32
             illegal_alu_instr <= xlen32 and if_func7(0);
           when (SLLX) =>
             illegal_alu_instr <= '0';
           when (SLLIW) =>
-            --RV64
+            -- RV64
             illegal_alu_instr <= '0';
           when (SLLW) =>
-            --RV64
+            -- RV64
             illegal_alu_instr <= '0';
           when (SLTI) =>
             illegal_alu_instr <= '0';
@@ -905,18 +902,18 @@ begin
           when (SLTU) =>
             illegal_alu_instr <= '0';
           when (SRLI) =>
-            --shamt[5] illegal for RV32
+            -- shamt[5] illegal for RV32
             illegal_alu_instr <= xlen32 and if_func7(0);
           when (SRLX) =>
             illegal_alu_instr <= '0';
           when (SRLIW) =>
-            --RV64
+            -- RV64
             illegal_alu_instr <= '0';
           when (SRLW) =>
-            --RV64
+            -- RV64
             illegal_alu_instr <= '0';
           when (SRAI) =>
-            --shamt[5] illegal for RV32
+            -- shamt[5] illegal for RV32
             illegal_alu_instr <= xlen32 and if_func7(0);
           when (SRAX) =>
             illegal_alu_instr <= '0';
@@ -924,7 +921,7 @@ begin
             illegal_alu_instr <= '0';
           when (SRAW) =>
             illegal_alu_instr <= '0';
-          --system
+          -- system
           when (CSRRW) =>
             illegal_alu_instr <= illegal_csr_rd or illegal_csr_wr;
           when (CSRRS) =>
@@ -944,7 +941,7 @@ begin
     state := xlen32 & if_func7 & if_func3 & if_opcode;
   end process;
 
-  --LSU
+  -- LSU
   processing_16 : process (has_amo, if_func3, if_func7, if_opcode, xlen32)
     variable state : std_logic_vector(15 downto 0);
   begin
@@ -956,14 +953,14 @@ begin
       when (LW) =>
         illegal_lsu_instr <= '0';
       when (LD) =>
-        --RV64
+        -- RV64
         illegal_lsu_instr <= '0';
       when (LBU) =>
         illegal_lsu_instr <= '0';
       when (LHU) =>
         illegal_lsu_instr <= '0';
       when (LWU) =>
-        --RV64
+        -- RV64
         illegal_lsu_instr <= '0';
       when (SB) =>
         illegal_lsu_instr <= '0';
@@ -972,16 +969,16 @@ begin
       when (SW) =>
         illegal_lsu_instr <= '0';
       when (SD) =>
-        --RV64
+        -- RV64
         illegal_lsu_instr <= '0';
-      --AMO
+      -- AMO
       when others =>
         illegal_lsu_instr <= '1';
     end case;
     state := has_amo & if_func7 & if_func3 & if_opcode;
   end process;
 
-  --MULDIV
+  -- MULDIV
   processing_17 : process (if_func3, if_func7, if_opcode, xlen32)
     variable state : std_logic_vector(15 downto 0);
   begin
@@ -991,7 +988,7 @@ begin
       when (MULH) =>
         illegal_muldiv_instr <= '0';
       when (MULW) =>
-        --RV64
+        -- RV64
         illegal_muldiv_instr <= '0';
       when (MULHSU) =>
         illegal_muldiv_instr <= '0';
@@ -1000,17 +997,17 @@ begin
       when (DIV) =>
         illegal_muldiv_instr <= '0';
       when (DIVW) =>
-        --RV64
+        -- RV64
         illegal_muldiv_instr <= '0';
       when (DIVU) =>
         illegal_muldiv_instr <= '0';
       when (DIVUW) =>
-        --RV64
+        -- RV64
         illegal_muldiv_instr <= '0';
       when (REMX) =>
         illegal_muldiv_instr <= '0';
       when (REMW) =>
-        --RV64
+        -- RV64
         illegal_muldiv_instr <= '0';
       when (REMU) =>
         illegal_muldiv_instr <= '0';
@@ -1022,11 +1019,11 @@ begin
     state := xlen32 & if_func7 & if_func3 & if_opcode;
   end process;
 
-  --Check CSR accesses
+  -- Check CSR accesses
   processing_18 : process (has_fpu_s, has_s, has_u, if_instr, st_mcounteren, st_prv, st_scounteren, st_tvm, xlen32)
   begin
     case ((if_instr(31 downto 20))) is
-      --User
+      -- User
       when USTATUS =>
         illegal_csr_rd <= not has_u;
       when UIE =>
@@ -1052,19 +1049,19 @@ begin
       when CYCLE =>
         illegal_csr_rd <= not has_u or (not has_s and to_stdlogic(st_prv = PRV_U) and not st_mcounteren(CY)) or (has_s and to_stdlogic(st_prv = PRV_S) and not st_mcounteren(CY)) or (has_s and to_stdlogic(st_prv = PRV_U) and st_mcounteren(CY) and st_scounteren(CY));
       when TIMEX =>
-        --trap on reading TIME. Machine mode must access external timer
+        -- trap on reading TIME. Machine mode must access external timer
         illegal_csr_rd <= '1';
       when INSTRET =>
         illegal_csr_rd <= not has_u or (not has_s and to_stdlogic(st_prv = PRV_U) and not st_mcounteren(IR)) or (has_s and to_stdlogic(st_prv = PRV_S) and not st_mcounteren(IR)) or (has_s and to_stdlogic(st_prv = PRV_U) and st_mcounteren(IR) and st_scounteren(IR));
       when CYCLEH =>
         illegal_csr_rd <= not has_u or not xlen32 or (not has_s and to_stdlogic(st_prv = PRV_U) and not st_mcounteren(CY)) or (has_s and to_stdlogic(st_prv = PRV_S) and not st_mcounteren(CY)) or (has_s and to_stdlogic(st_prv = PRV_U) and st_mcounteren(CY) and st_scounteren(CY));
       when TIMEH =>
-        --trap on reading TIMEH. Machine mode must access external timer
+        -- trap on reading TIMEH. Machine mode must access external timer
         illegal_csr_rd <= '1';
       when INSTRETH =>
         illegal_csr_rd <= not has_u or not xlen32 or (not has_s and to_stdlogic(st_prv = PRV_U) and not st_mcounteren(IR)) or (has_s and to_stdlogic(st_prv = PRV_S) and not st_mcounteren(IR)) or (has_s and to_stdlogic(st_prv = PRV_U) and st_mcounteren(IR) and st_scounteren(IR));
-      --TODO: hpmcounters
-      --Supervisor
+      -- TO-DO: hpmcounters
+      -- Supervisor
       when SSTATUS =>
         illegal_csr_rd <= not has_s or to_stdlogic(st_prv < PRV_S);
       when SEDELEG =>
@@ -1087,7 +1084,7 @@ begin
         illegal_csr_rd <= not has_s or to_stdlogic(st_prv < PRV_S);
       when SATP =>
         illegal_csr_rd <= not has_s or to_stdlogic(st_prv < PRV_S) or (to_stdlogic(st_prv = PRV_S) and st_tvm);
-        --Hypervisor
+        -- Hypervisor
         --
         --  HSTATUS   : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
         --  HEDELEG   : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
@@ -1100,7 +1097,7 @@ begin
         --  HTVAL     : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
         --  HIP       : illegal_csr_rd = (HAS_HYPER == 0) | (st_prv < PRV_H);
 
-      --Machine
+      -- Machine
       when MVENDORID =>
         illegal_csr_rd <= to_stdlogic(st_prv < PRV_M);
       when MARCHID =>
@@ -1177,7 +1174,7 @@ begin
         illegal_csr_rd <= to_stdlogic(st_prv < PRV_M);
       when MINSTRET =>
         illegal_csr_rd <= to_stdlogic(st_prv < PRV_M);
-      --TODO: performance counters
+      -- TO-DO: performance counters
       when MCYCLEH =>
         illegal_csr_rd <= to_stdlogic(XLEN > 32) or to_stdlogic(st_prv < PRV_M);
       when MINSTRETH =>
@@ -1218,14 +1215,14 @@ begin
         illegal_csr_wr <= '1';
       when INSTRET =>
         illegal_csr_wr <= '1';
-      --TODO:hpmcounters
+      -- TO-DO:hpmcounters
       when CYCLEH =>
         illegal_csr_wr <= '1';
       when TIMEH =>
         illegal_csr_wr <= '1';
       when INSTRETH =>
         illegal_csr_wr <= '1';
-      --Supervisor
+      -- Supervisor
       when SSTATUS =>
         illegal_csr_wr <= not has_s or to_stdlogic(st_prv < PRV_S);
       when SEDELEG =>
@@ -1250,7 +1247,7 @@ begin
         illegal_csr_wr <= not has_s or to_stdlogic(st_prv < PRV_S);
       when SATP =>
         illegal_csr_wr <= not has_s or to_stdlogic(st_prv < PRV_S) or (to_stdlogic(st_prv = PRV_S) and st_tvm);
-        --Hypervisor
+        -- Hypervisor
         --
         --  HSTATUS   : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
         --  HEDELEG   : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
@@ -1263,7 +1260,7 @@ begin
         --  HBADADDR  : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
         --  HIP       : illegal_csr_wr = (HAS_HYPER == 0) | (st_prv < PRV_H);
 
-      --Machine
+      -- Machine
       when MVENDORID =>
         illegal_csr_wr <= '1';
       when MARCHID =>
@@ -1342,7 +1339,7 @@ begin
         illegal_csr_wr <= to_stdlogic(st_prv < PRV_M);
       when MINSTRET =>
         illegal_csr_wr <= to_stdlogic(st_prv < PRV_M);
-      --TODO: performance counters
+      -- TO-DO: performance counters
       when MCYCLEH =>
         illegal_csr_wr <= to_stdlogic(XLEN > 32) or to_stdlogic(st_prv < PRV_M);
       when MINSTRETH =>

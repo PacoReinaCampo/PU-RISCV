@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/core/execution/pu_riscv_mul.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -62,18 +59,18 @@ entity pu_riscv_mul is
     ex_stall  : in  std_logic;
     mul_stall : out std_logic;
 
-    --Instruction
+    -- Instruction
     id_bubble : in std_logic;
     id_instr  : in std_logic_vector(ILEN-1 downto 0);
 
-    --Operands
+    -- Operands
     opA : in std_logic_vector(XLEN-1 downto 0);
     opB : in std_logic_vector(XLEN-1 downto 0);
 
-    --from State
+    -- from State
     st_xlen : in std_logic_vector(1 downto 0);
 
-    --to WB
+    -- to WB
     mul_bubble : out std_logic;
     mul_r      : out std_logic_vector(XLEN-1 downto 0)
     );
@@ -154,7 +151,7 @@ architecture rtl of pu_riscv_mul is
   signal func7      : std_logic_vector(6 downto 0);
   signal mul_func7  : std_logic_vector(6 downto 0);
 
-  --Operand generation
+  -- Operand generation
   signal opA32 : std_logic_vector(31 downto 0);
   signal opB32 : std_logic_vector(31 downto 0);
 
@@ -169,7 +166,7 @@ architecture rtl of pu_riscv_mul is
   signal mult_r_signed     : std_logic_vector(DXLEN-1 downto 0);
   signal mult_r_signed_reg : std_logic_vector(DXLEN-1 downto 0);
 
-  --FSM (bubble, stall generation)
+  -- FSM (bubble, stall generation)
   signal is_mul : std_logic;
   signal cnt    : std_logic_vector(1 downto 0);
   signal state  : std_logic;
@@ -179,7 +176,7 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Instruction
+  -- Instruction
   func7  <= id_instr(31 downto 25);
   func3  <= id_instr(14 downto 12);
   opcode <= id_instr(6 downto 2);
@@ -190,7 +187,7 @@ begin
 
   xlen32 <= to_stdlogic(st_xlen = RV32I);
 
-  --32bit operands
+  -- 32bit operands
   opA32 <= opA(31 downto 0);
   opB32 <= opB(31 downto 0);
 
@@ -199,14 +196,14 @@ begin
   --   * Transform all multiplications into 1 unsigned multiplication
   --   * This avoids building multiple multipliers (signed x signed, signed x unsigned, unsigned x unsigned)
   --   *   at the expense of potentially making the path slower
-  --multiplier operand-A
+  -- multiplier operand-A
   processing_0 : process (func3, func7, opA, opA32, opcode)
     variable multiplier_a : std_logic_vector(15 downto 0);
   begin
     multiplier_a := 'X' & func7 & func3 & opcode;
     case (multiplier_a) is
       when MULW =>
-        --RV64
+        -- RV64
         mult_opA <= absolute(sext32(opA32));
       when MULHU =>
         mult_opA <= opA;
@@ -215,14 +212,14 @@ begin
     end case;
   end process;
 
-  --multiplier operand-B
+  -- multiplier operand-B
   processing_1 : process (func3, func7, opB, opB32, opcode)
     variable multiplier_b : std_logic_vector(15 downto 0);
   begin
     multiplier_b := 'X' & func7 & func3 & opcode;
     case (multiplier_b) is
       when MULW =>
-        --RV64
+        -- RV64
         mult_opB <= absolute(sext32(opB32));
       when MULHSU =>
         mult_opB <= opB;
@@ -233,7 +230,7 @@ begin
     end case;
   end process;
 
-  --negate multiplier output?
+  -- negate multiplier output?
   processing_2 : process (func3, func7, opA, opA32, opB, opB32, opcode)
     variable multiplier_negate : std_logic_vector(15 downto 0);
   begin
@@ -248,17 +245,17 @@ begin
       when MULHU =>
         mult_neg <= '0';
       when MULW =>
-        --RV64
+        -- RV64
         mult_neg <= opA32(31) xor opB32(31);
       when others =>
         mult_neg <= 'X';
     end case;
   end process;
 
-  --Actual multiplier
+  -- Actual multiplier
   mult_r <= std_logic_vector(unsigned(mult_opA_reg)*unsigned(mult_opB_reg));
 
-  --Correct sign
+  -- Correct sign
   mult_r_signed <= twos_dxlen(mult_r_reg)
                    when (mult_neg_reg = '0') else mult_r_reg;
 
@@ -267,18 +264,18 @@ begin
     --  *
     --  * Registers at: - output
 
-    --Register holding instruction for multiplier-output-selector
+    -- Register holding instruction for multiplier-output-selector
     mul_instr <= id_instr;
 
-    --Registers holding multiplier operands
+    -- Registers holding multiplier operands
     mult_opA_reg <= mult_opA;
     mult_opB_reg <= mult_opB;
     mult_neg_reg <= mult_neg;
 
-    --Register holding multiplier output
+    -- Register holding multiplier output
     mult_r_reg <= mult_r;
 
-    --Register holding sign correction
+    -- Register holding sign correction
     mult_r_signed_reg <= mult_r_signed;
   end generate;
   generating_1 : if (LATENCY /= 0) generate
@@ -288,7 +285,7 @@ begin
     --  * Registers at: - input
     --  *               - output
 
-    --Register holding instruction for multiplier-output-selector
+    -- Register holding instruction for multiplier-output-selector
     processing_3 : process (clk)
     begin
       if (rising_edge(clk)) then
@@ -298,7 +295,7 @@ begin
       end if;
     end process;
 
-    --Registers holding multiplier operands
+    -- Registers holding multiplier operands
     processing_4 : process (clk)
     begin
       if (rising_edge(clk)) then
@@ -311,14 +308,14 @@ begin
     end process;
 
     generating_2 : if (LATENCY = 1) generate
-      --Register holding multiplier output
+      -- Register holding multiplier output
       mult_r_reg <= mult_r;
 
-      --Register holding sign correction
+      -- Register holding sign correction
       mult_r_signed_reg <= mult_r_signed;
     end generate;
     generating_3 : if (LATENCY = 2) generate
-      --Register holding multiplier output
+      -- Register holding multiplier output
       processing_5 : process (clk)
       begin
         if (rising_edge(clk)) then
@@ -326,10 +323,10 @@ begin
         end if;
       end process;
 
-      --Register holding sign correction
+      -- Register holding sign correction
       mult_r_signed_reg <= mult_r_signed;
     end generate;
-    generating_4 : if (LATENCY /= 1 and LATENCY /= 2) generate  --Register holding multiplier output
+    generating_4 : if (LATENCY /= 1 and LATENCY /= 2) generate  -- Register holding multiplier output
       processing_6 : process (clk)
       begin
         if (rising_edge(clk)) then
@@ -337,7 +334,7 @@ begin
         end if;
       end process;
 
-      --Register holding sign correction
+      -- Register holding sign correction
       processing_7 : process (clk)
       begin
         if (rising_edge(clk)) then
@@ -347,7 +344,7 @@ begin
     end generate;
   end generate;
 
-  --Final output register
+  -- Final output register
   processing_8 : process (clk)
     variable output_register : std_logic_vector(15 downto 0);
   begin
@@ -357,7 +354,7 @@ begin
         when MUL =>
           mul_r <= mult_r_signed_reg(XLEN-1 downto 0);
         when MULW =>
-          --RV64
+          -- RV64
           mul_r <= sext32(mult_r_signed_reg(31 downto 0));
         when others =>
           mul_r <= mult_r_signed_reg(DXLEN-1 downto XLEN);
@@ -365,7 +362,7 @@ begin
     end if;
   end process;
 
-  --Stall / Bubble generation
+  -- Stall / Bubble generation
   processing_9 : process (mul_func3, mul_func7, mul_opcode, xlen32)
     variable generation : std_logic_vector(15 downto 0);
   begin
@@ -390,7 +387,7 @@ begin
   begin
     if (rstn = '0') then
       state      <= ST_IDLE;
-      cnt        <= "11";               --LATENCY
+      cnt        <= "11";               -- LATENCY
       mul_bubble <= '1';
       mul_stall  <= '0';
     elsif (rising_edge(clk)) then
@@ -415,7 +412,7 @@ begin
             cnt <= std_logic_vector(unsigned(cnt)-"01");
           else
             state      <= ST_IDLE;
-            cnt        <= "11";         --LATENCY
+            cnt        <= "11";         -- LATENCY
             mul_bubble <= '0';
             mul_stall  <= '0';
           end if;

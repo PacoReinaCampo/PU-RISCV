@@ -1,6 +1,3 @@
--- Converted from riscv_ahb2axi.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -56,7 +53,7 @@ entity riscv_ahb2axi is
     scan_mode  : in std_logic;
     bus_clk_en : in std_logic;
 
-    --AXI4 instruction
+    -- AXI4 instruction
     axi4_aw_id     : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
     axi4_aw_addr   : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
     axi4_aw_len    : out std_logic_vector(7 downto 0);
@@ -156,7 +153,7 @@ architecture rtl of riscv_ahb2axi is
 
   signal master_wstrb : std_logic_vector(7 downto 0);
 
-  --state_t      buf_state, buf_nxtstate;
+  -- state_t      buf_state, buf_nxtstate;
   signal buf_state_en : std_logic;
 
   -- Buffer signals (one entry buffer)
@@ -174,7 +171,7 @@ architecture rtl of riscv_ahb2axi is
   signal ahb3_hwdata_q  : std_logic_vector(AHB_DATA_WIDTH-1 downto 0);
   signal ahb3_hresp_q   : std_logic;
 
-  --Miscellaneous signals
+  -- Miscellaneous signals
   signal ahb3_addr_in_dccm, ahb3_addr_in_iccm, ahb3_addr_in_pic                               : std_logic;
   signal ahb3_addr_in_dccm_region_nc, ahb3_addr_in_iccm_region_nc, ahb3_addr_in_pic_region_nc : std_logic;
 

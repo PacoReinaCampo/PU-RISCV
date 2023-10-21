@@ -1,6 +1,3 @@
--- Converted from pu_riscv_axi4.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -77,24 +74,24 @@ entity pu_riscv_axi4 is
 
     MULT_LATENCY : std_logic := '1';
 
-    BREAKPOINTS : integer := 8;         --Number of hardware breakpoints
+    BREAKPOINTS : integer := 8;         -- Number of hardware breakpoints
 
     PMA_CNT : integer := 4;
-    PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
+    PMP_CNT : integer := 16;  -- Number of Physical Memory Protection entries
 
     BP_GLOBAL_BITS    : integer := 2;
     BP_LOCAL_BITS     : integer := 10;
     BP_LOCAL_BITS_LSB : integer := 2;
 
-    ICACHE_SIZE        : integer := 64;  --in KBytes
-    ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
-    ICACHE_WAYS        : integer := 2;   --'n'-way set associative
+    ICACHE_SIZE        : integer := 64;  -- in KBytes
+    ICACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
+    ICACHE_WAYS        : integer := 2;   -- 'n'-way set associative
     ICACHE_REPLACE_ALG : integer := 0;
     ITCM_SIZE          : integer := 0;
 
-    DCACHE_SIZE        : integer := 64;  --in KBytes
-    DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
-    DCACHE_WAYS        : integer := 2;   --'n'-way set associative
+    DCACHE_SIZE        : integer := 64;  -- in KBytes
+    DCACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
+    DCACHE_WAYS        : integer := 2;   -- 'n'-way set associative
     DCACHE_REPLACE_ALG : integer := 0;
     DTCM_SIZE          : integer := 0;
     WRITEBUFFER_SIZE   : integer := 8;
@@ -123,7 +120,7 @@ entity pu_riscv_axi4 is
     pma_cfg_i : in std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
     pma_adr_i : in std_logic_matrix(PMA_CNT-1 downto 0)(XLEN-1 downto 0);
 
-    --AXI4 instruction
+    -- AXI4 instruction
     axi4_ins_aw_id     : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
     axi4_ins_aw_addr   : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
     axi4_ins_aw_len    : out std_logic_vector(7 downto 0);
@@ -173,7 +170,7 @@ entity pu_riscv_axi4 is
     axi4_ins_b_valid : in  std_logic;
     axi4_ins_b_ready : out std_logic;
 
-    --AXI4 data
+    -- AXI4 data
     axi4_dat_aw_id     : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
     axi4_dat_aw_addr   : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
     axi4_dat_aw_len    : out std_logic_vector(7 downto 0);
@@ -223,11 +220,11 @@ entity pu_riscv_axi4 is
     axi4_dat_b_valid : in  std_logic;
     axi4_dat_b_ready : out std_logic;
 
-    --Interrupts
+    -- Interrupts
     ext_nmi, ext_tint, ext_sint : in std_logic;
     ext_int                     : in std_logic_vector(3 downto 0);
 
-    --Debug Interface
+    -- Debug Interface
     dbg_stall : in  std_logic;
     dbg_strb  : in  std_logic;
     dbg_we    : in  std_logic;
@@ -289,10 +286,10 @@ architecture rtl of pu_riscv_axi4 is
       PARCEL_SIZE : integer := 64
       );
     port (
-      rstn : in std_logic;              --Reset
-      clk  : in std_logic;              --Clock
+      rstn : in std_logic;              -- Reset
+      clk  : in std_logic;              -- Clock
 
-      --Instruction Memory Access bus
+      -- Instruction Memory Access bus
       if_stall_nxt_pc      : in  std_logic;
       if_nxt_pc            : out std_logic_vector(XLEN-1 downto 0);
       if_stall             : out std_logic;
@@ -303,7 +300,7 @@ architecture rtl of pu_riscv_axi4 is
       if_parcel_misaligned : in  std_logic;
       if_parcel_page_fault : in  std_logic;
 
-      --Data Memory Access bus
+      -- Data Memory Access bus
       dmem_adr        : out std_logic_vector(XLEN-1 downto 0);
       dmem_d          : out std_logic_vector(XLEN-1 downto 0);
       dmem_q          : in  std_logic_vector(XLEN-1 downto 0);
@@ -315,20 +312,20 @@ architecture rtl of pu_riscv_axi4 is
       dmem_misaligned : in  std_logic;
       dmem_page_fault : in  std_logic;
 
-      --cpu state
+      -- cpu state
       st_prv     : out std_logic_vector(1 downto 0);
       st_pmpcfg  : out std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
       st_pmpaddr : out std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
 
       bu_cacheflush : out std_logic;
 
-      --Interrupts
+      -- Interrupts
       ext_nmi  : in std_logic;
       ext_tint : in std_logic;
       ext_sint : in std_logic;
       ext_int  : in std_logic_vector(3 downto 0);
 
-      --Debug Interface
+      -- Debug Interface
       dbg_stall : in  std_logic;
       dbg_strb  : in  std_logic;
       dbg_we    : in  std_logic;
@@ -364,11 +361,11 @@ architecture rtl of pu_riscv_axi4 is
       rst_ni : in std_logic;
       clk_i  : in std_logic;
 
-      --Configuration
+      -- Configuration
       pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
       pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
-      --CPU side
+      -- CPU side
       nxt_pc_i       : in  std_logic_vector(XLEN-1 downto 0);
       stall_nxt_pc_o : out std_logic;
       stall_i        : in  std_logic;
@@ -386,7 +383,7 @@ architecture rtl of pu_riscv_axi4 is
       st_pmpaddr_i : in std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
       st_prv_i     : in std_logic_vector(1 downto 0);
 
-      --BIU ports
+      -- BIU ports
       biu_stb_o     : out std_logic;
       biu_stb_ack_i : in  std_logic;
       biu_d_ack_i   : in  std_logic;
@@ -426,11 +423,11 @@ architecture rtl of pu_riscv_axi4 is
       rst_ni : in std_logic;
       clk_i  : in std_logic;
 
-      --Configuration
+      -- Configuration
       pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
       pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(XLEN-1 downto 0);
 
-      --CPU side
+      -- CPU side
       mem_req_i        : in  std_logic;
       mem_adr_i        : in  std_logic_vector(XLEN-1 downto 0);
       mem_size_i       : in  std_logic_vector(2 downto 0);
@@ -449,7 +446,7 @@ architecture rtl of pu_riscv_axi4 is
       st_pmpaddr_i : in std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
       st_prv_i     : in std_logic_vector(1 downto 0);
 
-      --BIU ports
+      -- BIU ports
       biu_stb_o     : out std_logic;
       biu_stb_ack_i : in  std_logic;
       biu_d_ack_i   : in  std_logic;
@@ -483,7 +480,7 @@ architecture rtl of pu_riscv_axi4 is
       HRESETn : in std_logic;
       HCLK    : in std_logic;
 
-      --AXI4 instruction
+      -- AXI4 instruction
       axi4_aw_id     : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
       axi4_aw_addr   : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
       axi4_aw_len    : out std_logic_vector(7 downto 0);
@@ -533,21 +530,21 @@ architecture rtl of pu_riscv_axi4 is
       axi4_b_valid : in  std_logic;
       axi4_b_ready : out std_logic;
 
-      --BIU Bus (Core ports)
-      biu_stb_i     : in  std_logic;    --strobe
-      biu_stb_ack_o : out std_logic;  --strobe acknowledge; can send new strobe
-      biu_d_ack_o   : out std_logic;  --data acknowledge (send new biu_d_i); for pipelined buses
+      -- BIU Bus (Core ports)
+      biu_stb_i     : in  std_logic;    -- strobe
+      biu_stb_ack_o : out std_logic;  -- strobe acknowledge; can send new strobe
+      biu_d_ack_o   : out std_logic;  -- data acknowledge (send new biu_d_i); for pipelined buses
       biu_adri_i    : in  std_logic_vector(PLEN-1 downto 0);
       biu_adro_o    : out std_logic_vector(PLEN-1 downto 0);
-      biu_size_i    : in  std_logic_vector(2 downto 0);  --transfer size
-      biu_type_i    : in  std_logic_vector(2 downto 0);  --burst type
-      biu_prot_i    : in  std_logic_vector(2 downto 0);  --protection
+      biu_size_i    : in  std_logic_vector(2 downto 0);  -- transfer size
+      biu_type_i    : in  std_logic_vector(2 downto 0);  -- burst type
+      biu_prot_i    : in  std_logic_vector(2 downto 0);  -- protection
       biu_lock_i    : in  std_logic;
       biu_we_i      : in  std_logic;
       biu_d_i       : in  std_logic_vector(XLEN-1 downto 0);
       biu_q_o       : out std_logic_vector(XLEN-1 downto 0);
-      biu_ack_o     : out std_logic;    --transfer acknowledge
-      biu_err_o     : out std_logic     --transfer error
+      biu_ack_o     : out std_logic;    -- transfer acknowledge
+      biu_err_o     : out std_logic     -- transfer error
       );
   end component;
 
@@ -578,7 +575,7 @@ architecture rtl of pu_riscv_axi4 is
 
   signal cacheflush, dcflush_rdy : std_logic;
 
-  --Instruction Memory BIU connections
+  -- Instruction Memory BIU connections
   signal ibiu_stb             : std_logic;
   signal ibiu_stb_ack         : std_logic;
   signal ibiu_d_ack           : std_logic;
@@ -592,7 +589,7 @@ architecture rtl of pu_riscv_axi4 is
   signal ibiu_q               : std_logic_vector(XLEN-1 downto 0);
   signal ibiu_ack, ibiu_err   : std_logic;
 
-  --Data Memory BIU connections
+  -- Data Memory BIU connections
   signal dbiu_stb             : std_logic;
   signal dbiu_stb_ack         : std_logic;
   signal dbiu_d_ack           : std_logic;
@@ -611,7 +608,7 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Instantiate RISC-V core
+  -- Instantiate RISC-V core
   core : pu_riscv_core
     generic map (
       XLEN           => XLEN,
@@ -703,9 +700,9 @@ begin
       dbg_bp    => dbg_bp
       );
 
-  --Instantiate bus interfaces and optional caches
+  -- Instantiate bus interfaces and optional caches
 
-  --Instruction Memory Access Block
+  -- Instruction Memory Access Block
   imem_ctrl : pu_riscv_imem_ctrl
     generic map (
       XLEN => XLEN,
@@ -767,7 +764,7 @@ begin
       biu_err_i     => ibiu_err
       );
 
-  --Data Memory Access Block
+  -- Data Memory Access Block
   dmem_ctrl : pu_riscv_dmem_ctrl
     generic map (
       XLEN => XLEN,
@@ -828,7 +825,7 @@ begin
       biu_err_i     => dbiu_err
       );
 
-  --Instantiate BIU
+  -- Instantiate BIU
   ibiu : pu_riscv_biu2axi4
     generic map (
       XLEN => XLEN,
@@ -847,7 +844,7 @@ begin
       HRESETn => HRESETn,
       HCLK    => HCLK,
 
-      --AXI4 instruction
+      -- AXI4 instruction
       axi4_aw_id     => axi4_ins_aw_id,
       axi4_aw_addr   => axi4_ins_aw_addr,
       axi4_aw_len    => axi4_ins_aw_len,
@@ -927,7 +924,7 @@ begin
       HRESETn => HRESETn,
       HCLK    => HCLK,
 
-      --AXI4 data
+      -- AXI4 data
       axi4_aw_id     => axi4_dat_aw_id,
       axi4_aw_addr   => axi4_dat_aw_addr,
       axi4_aw_len    => axi4_dat_aw_len,

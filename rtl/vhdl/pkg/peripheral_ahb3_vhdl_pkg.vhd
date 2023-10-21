@@ -1,6 +1,3 @@
--- Converted from pkg/peripheral_ahb3_vhdl_pkg.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -53,19 +50,19 @@ package peripheral_ahb3_vhdl_pkg is
   constant HADDR_SIZE : integer := 64;
   constant HDATA_SIZE : integer := 64;
 
-  --HTRANS
+  -- HTRANS
   constant HTRANS_IDLE   : std_logic_vector(1 downto 0) := "00";
   constant HTRANS_BUSY   : std_logic_vector(1 downto 0) := "01";
   constant HTRANS_NONSEQ : std_logic_vector(1 downto 0) := "10";
   constant HTRANS_SEQ    : std_logic_vector(1 downto 0) := "11";
 
-  --HSIZE
+  -- HSIZE
   constant HSIZE_B8    : std_logic_vector(2 downto 0) := "000";
   constant HSIZE_B16   : std_logic_vector(2 downto 0) := "001";
   constant HSIZE_B32   : std_logic_vector(2 downto 0) := "010";
   constant HSIZE_B64   : std_logic_vector(2 downto 0) := "011";
-  constant HSIZE_B128  : std_logic_vector(2 downto 0) := "100";  --4-word line
-  constant HSIZE_B256  : std_logic_vector(2 downto 0) := "101";  --8-word line
+  constant HSIZE_B128  : std_logic_vector(2 downto 0) := "100";  -- 4-word line
+  constant HSIZE_B256  : std_logic_vector(2 downto 0) := "101";  -- 8-word line
   constant HSIZE_B512  : std_logic_vector(2 downto 0) := "110";
   constant HSIZE_B1024 : std_logic_vector(2 downto 0) := "111";
   constant HSIZE_BYTE  : std_logic_vector(2 downto 0) := HSIZE_B8;
@@ -73,7 +70,7 @@ package peripheral_ahb3_vhdl_pkg is
   constant HSIZE_WORD  : std_logic_vector(2 downto 0) := HSIZE_B32;
   constant HSIZE_DWORD : std_logic_vector(2 downto 0) := HSIZE_B64;
 
-  --HBURST
+  -- HBURST
   constant HBURST_SINGLE : std_logic_vector(2 downto 0) := "000";
   constant HBURST_INCR   : std_logic_vector(2 downto 0) := "001";
   constant HBURST_WRAP4  : std_logic_vector(2 downto 0) := "010";
@@ -83,7 +80,7 @@ package peripheral_ahb3_vhdl_pkg is
   constant HBURST_WRAP16 : std_logic_vector(2 downto 0) := "110";
   constant HBURST_INCR16 : std_logic_vector(2 downto 0) := "111";
 
-  --HPROT
+  -- HPROT
   constant HPROT_OPCODE         : std_logic_vector(3 downto 0) := "0000";
   constant HPROT_DATA           : std_logic_vector(3 downto 0) := "0001";
   constant HPROT_USER           : std_logic_vector(3 downto 0) := "0000";
@@ -93,7 +90,7 @@ package peripheral_ahb3_vhdl_pkg is
   constant HPROT_NON_CACHEABLE  : std_logic_vector(3 downto 0) := "0000";
   constant HPROT_CACHEABLE      : std_logic_vector(3 downto 0) := "1000";
 
-  --HRESP
+  -- HRESP
   constant HRESP_OKAY  : std_logic := '0';
   constant HRESP_ERROR : std_logic := '1';
 

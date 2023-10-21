@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/core/pu_riscv_state.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -108,33 +105,33 @@ entity pu_riscv_state is
     wb_badaddr   : in std_logic_vector(XLEN-1 downto 0);
 
     st_interrupt  : out std_logic;
-    st_prv        : out std_logic_vector(1 downto 0);  --Privilege level
-    st_xlen       : out std_logic_vector(1 downto 0);  --Active Architecture
-    st_tvm        : out std_logic;      --trap on satp access or SFENCE.VMA
-    st_tw         : out std_logic;      --trap on WFI (after time >=0)
-    st_tsr        : out std_logic;      --trap SRET
+    st_prv        : out std_logic_vector(1 downto 0);  -- Privilege level
+    st_xlen       : out std_logic_vector(1 downto 0);  -- Active Architecture
+    st_tvm        : out std_logic;      -- trap on satp access or SFENCE.VMA
+    st_tw         : out std_logic;      -- trap on WFI (after time >=0)
+    st_tsr        : out std_logic;      -- trap SRET
     st_mcounteren : out std_logic_vector(XLEN-1 downto 0);
     st_scounteren : out std_logic_vector(XLEN-1 downto 0);
     st_pmpcfg     : out std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
     st_pmpaddr    : out std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
 
-    --interrupts (3=M-mode, 0=U-mode)
-    ext_int  : in std_logic_vector(3 downto 0);  --external interrupt (per privilege mode; determined by PIC)
-    ext_tint : in std_logic;            --machine timer interrupt
-    ext_sint : in std_logic;            --machine software interrupt (for ipi)
-    ext_nmi  : in std_logic;            --non-maskable interrupt
+    -- interrupts (3=M-mode, 0=U-mode)
+    ext_int  : in std_logic_vector(3 downto 0);  -- external interrupt (per privilege mode; determined by PIC)
+    ext_tint : in std_logic;            -- machine timer interrupt
+    ext_sint : in std_logic;            -- machine software interrupt (for ipi)
+    ext_nmi  : in std_logic;            -- non-maskable interrupt
 
-    --CSR interface
+    -- CSR interface
     ex_csr_reg  : in  std_logic_vector(11 downto 0);
     ex_csr_we   : in  std_logic;
     ex_csr_wval : in  std_logic_vector(XLEN-1 downto 0);
     st_csr_rval : out std_logic_vector(XLEN-1 downto 0);
 
-    --Debug interface
+    -- Debug interface
     du_stall      : in  std_logic;
     du_flush      : in  std_logic;
     du_we_csr     : in  std_logic;
-    du_dato       : in  std_logic_vector(XLEN-1 downto 0);  --output from debug unit
+    du_dato       : in  std_logic_vector(XLEN-1 downto 0);  -- output from debug unit
     du_addr       : in  std_logic_vector(11 downto 0);
     du_ie         : in  std_logic_vector(31 downto 0);
     du_exceptions : out std_logic_vector(31 downto 0)
@@ -168,40 +165,40 @@ architecture rtl of pu_riscv_state is
   ------------------------------------------------------------------------------
   -- Variables
   ------------------------------------------------------------------------------
-  --Floating point registers
+  -- Floating point registers
   signal csr_fcsr_rm    : std_logic_vector(2 downto 0);
   signal csr_fcsr_flags : std_logic_vector(4 downto 0);
 
   signal csr_fcsr : std_logic_vector(7 downto 0);
 
-  --User trap setup
+  -- User trap setup
   signal csr_utvec : std_logic_vector(XLEN-1 downto 0);
 
   signal csr_utvec_we : std_logic_vector(XLEN-1 downto 0);
 
-  --User trap handler
-  signal csr_uscratch : std_logic_vector(XLEN-1 downto 0);  --scratch register
-  signal csr_uepc     : std_logic_vector(XLEN-1 downto 0);  --exception program counter
-  signal csr_ucause   : std_logic_vector(XLEN-1 downto 0);  --trap cause
-  signal csr_utval    : std_logic_vector(XLEN-1 downto 0);  --bad address
+  -- User trap handler
+  signal csr_uscratch : std_logic_vector(XLEN-1 downto 0);  -- scratch register
+  signal csr_uepc     : std_logic_vector(XLEN-1 downto 0);  -- exception program counter
+  signal csr_ucause   : std_logic_vector(XLEN-1 downto 0);  -- trap cause
+  signal csr_utval    : std_logic_vector(XLEN-1 downto 0);  -- bad address
 
-  --Supervisor
+  -- Supervisor
 
-  --Supervisor trap setup
-  signal csr_stvec      : std_logic_vector(XLEN-1 downto 0);  --trap handler base address
-  signal csr_scounteren : std_logic_vector(XLEN-1 downto 0);  --Enable performance counters for lower privilege level
-  signal csr_sedeleg    : std_logic_vector(XLEN-1 downto 0);  --trap delegation register
+  -- Supervisor trap setup
+  signal csr_stvec      : std_logic_vector(XLEN-1 downto 0);  -- trap handler base address
+  signal csr_scounteren : std_logic_vector(XLEN-1 downto 0);  -- Enable performance counters for lower privilege level
+  signal csr_sedeleg    : std_logic_vector(XLEN-1 downto 0);  -- trap delegation register
 
   signal csr_stvec_we : std_logic_vector(XLEN-1 downto 0);
 
-  --Supervisor trap handler
-  signal csr_sscratch : std_logic_vector(XLEN-1 downto 0);  --scratch register
-  signal csr_sepc     : std_logic_vector(XLEN-1 downto 0);  --exception program counter
-  signal csr_scause   : std_logic_vector(XLEN-1 downto 0);  --trap cause
-  signal csr_stval    : std_logic_vector(XLEN-1 downto 0);  --bad address
+  -- Supervisor trap handler
+  signal csr_sscratch : std_logic_vector(XLEN-1 downto 0);  -- scratch register
+  signal csr_sepc     : std_logic_vector(XLEN-1 downto 0);  -- exception program counter
+  signal csr_scause   : std_logic_vector(XLEN-1 downto 0);  -- trap cause
+  signal csr_stval    : std_logic_vector(XLEN-1 downto 0);  -- bad address
 
-  --Supervisor protection and Translation
-  signal csr_satp : std_logic_vector(XLEN-1 downto 0);  --Address translation & protection
+  -- Supervisor protection and Translation
+  signal csr_satp : std_logic_vector(XLEN-1 downto 0);  -- Address translation & protection
 
 --  //Hypervisor
 --  //Hypervisor Trap Setup
@@ -218,50 +215,50 @@ architecture rtl of pu_riscv_state is
 --  //TBD per spec v1.7, somewhat defined in 1.9, removed in 1.10
 
   -- Machine
-  signal csr_mvendorid_bank   : std_logic_vector(7 downto 0);  --Vendor-ID
-  signal csr_mvendorid_offset : std_logic_vector(6 downto 0);  --Vendor-ID
+  signal csr_mvendorid_bank   : std_logic_vector(7 downto 0);  -- Vendor-ID
+  signal csr_mvendorid_offset : std_logic_vector(6 downto 0);  -- Vendor-ID
 
   signal csr_mvendorid : std_logic_vector(14 downto 0);
 
-  signal csr_marchid : std_logic_vector(XLEN-1 downto 0);  --Architecture ID
-  signal csr_mimpid  : std_logic_vector(XLEN-1 downto 0);  --Revision number
-  signal csr_mhartid : std_logic_vector(XLEN-1 downto 0);  --Hardware Thread ID
+  signal csr_marchid : std_logic_vector(XLEN-1 downto 0);  -- Architecture ID
+  signal csr_mimpid  : std_logic_vector(XLEN-1 downto 0);  -- Revision number
+  signal csr_mhartid : std_logic_vector(XLEN-1 downto 0);  -- Hardware Thread ID
 
-  --Machine Trap Setup
+  -- Machine Trap Setup
   signal csr_mstatus_sd   : std_logic;
-  signal csr_mstatus_sxl  : std_logic_vector(1 downto 0);  --S-Mode XLEN
-  signal csr_mstatus_uxl  : std_logic_vector(1 downto 0);  --U-Mode XLEN
-  --logic  [4      :0] csr_mstatus_vm;   //virtualisation management
+  signal csr_mstatus_sxl  : std_logic_vector(1 downto 0);  -- S-Mode XLEN
+  signal csr_mstatus_uxl  : std_logic_vector(1 downto 0);  -- U-Mode XLEN
+  -- logic  [4      :0] csr_mstatus_vm;   //virtualisation management
   signal csr_mstatus_tsr  : std_logic;
   signal csr_mstatus_tw   : std_logic;
   signal csr_mstatus_tvm  : std_logic;
   signal csr_mstatus_mxr  : std_logic;
   signal csr_mstatus_sum  : std_logic;
-  signal csr_mstatus_mprv : std_logic;                     --memory privilege
+  signal csr_mstatus_mprv : std_logic;                     -- memory privilege
 
-  signal csr_mstatus_xs : std_logic_vector(1 downto 0);  --user extension status
-  signal csr_mstatus_fs : std_logic_vector(1 downto 0);  --floating point status
+  signal csr_mstatus_xs : std_logic_vector(1 downto 0);  -- user extension status
+  signal csr_mstatus_fs : std_logic_vector(1 downto 0);  -- floating point status
 
   signal csr_mstatus_mpp  : std_logic_vector(1 downto 0);
-  signal csr_mstatus_hpp  : std_logic_vector(1 downto 0);  --previous privilege levels
-  signal csr_mstatus_spp  : std_logic;  --supervisor previous privilege level
+  signal csr_mstatus_hpp  : std_logic_vector(1 downto 0);  -- previous privilege levels
+  signal csr_mstatus_spp  : std_logic;  -- supervisor previous privilege level
   signal csr_mstatus_mpie : std_logic;
   signal csr_mstatus_hpie : std_logic;
   signal csr_mstatus_spie : std_logic;
-  signal csr_mstatus_upie : std_logic;  --previous interrupt enable bits
+  signal csr_mstatus_upie : std_logic;  -- previous interrupt enable bits
   signal csr_mstatus_mie  : std_logic;
   signal csr_mstatus_hie  : std_logic;
   signal csr_mstatus_sie  : std_logic;
-  signal csr_mstatus_uie  : std_logic;  --interrupt enable bits (per privilege level) 
+  signal csr_mstatus_uie  : std_logic;  -- interrupt enable bits (per privilege level) 
 
-  signal csr_misa_base       : std_logic_vector(1 downto 0);  --Machine ISA
+  signal csr_misa_base       : std_logic_vector(1 downto 0);  -- Machine ISA
   signal csr_misa_extensions : std_logic_vector(25 downto 0);
 
-  signal csr_mnmivec    : std_logic_vector(XLEN-1 downto 0);  --ROALOGIC NMI handler base address
-  signal csr_mtvec      : std_logic_vector(XLEN-1 downto 0);  --trap handler base address
-  signal csr_mcounteren : std_logic_vector(XLEN-1 downto 0);  --Enable performance counters for lower level
-  signal csr_medeleg    : std_logic_vector(XLEN-1 downto 0);  --Exception delegation
-  signal csr_mideleg    : std_logic_vector(XLEN-1 downto 0);  --Interrupt delegation
+  signal csr_mnmivec    : std_logic_vector(XLEN-1 downto 0);  -- ROALOGIC NMI handler base address
+  signal csr_mtvec      : std_logic_vector(XLEN-1 downto 0);  -- trap handler base address
+  signal csr_mcounteren : std_logic_vector(XLEN-1 downto 0);  -- Enable performance counters for lower level
+  signal csr_medeleg    : std_logic_vector(XLEN-1 downto 0);  -- Exception delegation
+  signal csr_mideleg    : std_logic_vector(XLEN-1 downto 0);  -- Interrupt delegation
 
   signal csr_mtvec_we : std_logic_vector(XLEN-1 downto 0);
 
@@ -278,13 +275,13 @@ architecture rtl of pu_riscv_state is
   signal csr_mie_ssie : std_logic;
   signal csr_mie_usie : std_logic;
 
-  --interrupt enable
+  -- interrupt enable
   signal csr_mie      : std_logic_vector(11 downto 0);
-  --Machine trap handler
-  signal csr_mscratch : std_logic_vector(XLEN-1 downto 0);  --scratch register
-  signal csr_mepc     : std_logic_vector(XLEN-1 downto 0);  --exception program counter
-  signal csr_mcause   : std_logic_vector(XLEN-1 downto 0);  --trap cause
-  signal csr_mtval    : std_logic_vector(XLEN-1 downto 0);  --bad address
+  -- Machine trap handler
+  signal csr_mscratch : std_logic_vector(XLEN-1 downto 0);  -- scratch register
+  signal csr_mepc     : std_logic_vector(XLEN-1 downto 0);  -- exception program counter
+  signal csr_mcause   : std_logic_vector(XLEN-1 downto 0);  -- trap cause
+  signal csr_mtval    : std_logic_vector(XLEN-1 downto 0);  -- bad address
 
   signal csr_mip_meip : std_logic;
   signal csr_mip_heip : std_logic;
@@ -299,20 +296,20 @@ architecture rtl of pu_riscv_state is
   signal csr_mip_ssip : std_logic;
   signal csr_mip_usip : std_logic;
 
-  --interrupt pending
+  -- interrupt pending
   signal csr_mip     : std_logic_vector(11 downto 0);
-  --Machine protection and Translation
+  -- Machine protection and Translation
   signal csr_pmpcfg  : std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
   signal csr_pmpaddr : std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
 
-  --Machine counters/Timers
-  signal csr_mcycle_h : std_logic_vector(31 downto 0);  --timer for MCYCLE
-  signal csr_mcycle_l : std_logic_vector(31 downto 0);  --timer for MCYCLE
+  -- Machine counters/Timers
+  signal csr_mcycle_h : std_logic_vector(31 downto 0);  -- timer for MCYCLE
+  signal csr_mcycle_l : std_logic_vector(31 downto 0);  -- timer for MCYCLE
 
   signal csr_mcycle : std_logic_vector(63 downto 0);
 
-  signal csr_minstret_h : std_logic_vector(31 downto 0);  --instruction retire count for MINSTRET
-  signal csr_minstret_l : std_logic_vector(31 downto 0);  --instruction retire count for MINSTRET
+  signal csr_minstret_h : std_logic_vector(31 downto 0);  -- instruction retire count for MINSTRET
+  signal csr_minstret_l : std_logic_vector(31 downto 0);  -- instruction retire count for MINSTRET
 
   signal csr_minstret : std_logic_vector(63 downto 0);
 
@@ -337,12 +334,12 @@ architecture rtl of pu_riscv_state is
   signal has_h      : std_logic;
   signal has_ext_s  : std_logic;
 
-  signal mstatus_s : std_logic_vector(127 downto 0);  --mstatus_s is special (can be larger than 32bits)
-  signal uxl_wval  : std_logic_vector(1 downto 0);  --u/sxl are taken from bits 35:32
-  signal sxl_wval  : std_logic_vector(1 downto 0);  --and can only have limited values
+  signal mstatus_s : std_logic_vector(127 downto 0);  -- mstatus_s is special (can be larger than 32bits)
+  signal uxl_wval  : std_logic_vector(1 downto 0);  -- u/sxl are taken from bits 35:32
+  signal sxl_wval  : std_logic_vector(1 downto 0);  -- and can only have limited values
 
-  signal soft_seip : std_logic;  --software supervisor-external-interrupt
-  signal soft_ueip : std_logic;         --software user-external-interrupt
+  signal soft_seip : std_logic;  -- software supervisor-external-interrupt
+  signal soft_ueip : std_logic;         -- software user-external-interrupt
 
   signal take_interrupt : std_logic;
 
@@ -350,11 +347,11 @@ architecture rtl of pu_riscv_state is
   signal interrupt_cause : std_logic_vector(3 downto 0);
   signal trap_cause      : std_logic_vector(3 downto 0);
 
-  --Mux for debug-unit
-  signal csr_raddr : std_logic_vector(11 downto 0);      --CSR read address
-  signal csr_wval  : std_logic_vector(XLEN-1 downto 0);  --CSR write value
+  -- Mux for debug-unit
+  signal csr_raddr : std_logic_vector(11 downto 0);      -- CSR read address
+  signal csr_wval  : std_logic_vector(XLEN-1 downto 0);  -- CSR write value
 
-  signal st_prv_sgn : std_logic_vector(1 downto 0);  --Privilege level
+  signal st_prv_sgn : std_logic_vector(1 downto 0);  -- Privilege level
 
 begin
   ------------------------------------------------------------------------------
@@ -370,7 +367,7 @@ begin
   has_n      <= to_stdlogic(HAS_RVN /= '0') and has_u;
   has_u      <= to_stdlogic(HAS_USER /= '0');
   has_s      <= to_stdlogic(HAS_SUPER /= '0') and has_u;
-  has_h      <= '0';  --(HAS_HYPER  !=   0) & has_s;   //No Hypervisor
+  has_h      <= '0';  -- (HAS_HYPER  !=   0) & has_s;   //No Hypervisor
 
   has_rvc_s  <= to_stdlogic(HAS_RVC /= '0');
   has_fpu_s  <= to_stdlogic(HAS_FPU /= '0');
@@ -385,23 +382,23 @@ begin
   has_simd   <= to_stdlogic(HAS_RVP /= '0');
   has_ext_s  <= to_stdlogic(HAS_EXT /= '0');
 
-  --Mux address/data for Debug-Unit access
+  -- Mux address/data for Debug-Unit access
   csr_raddr <= du_addr
                when du_stall = '1' else ex_csr_reg;
   csr_wval <= du_dato
               when du_stall = '1' else ex_csr_wval;
 
-  --Priviliged Control Registers
+  -- Priviliged Control Registers
 
-  --mstatus_s has different values for RV32 and RV64/RV128
-  --treat it here as though it is a 128bit register
+  -- mstatus_s has different values for RV32 and RV64/RV128
+  -- treat it here as though it is a 128bit register
   mstatus_s <= (csr_mstatus_sd & "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" & csr_mstatus_sxl & csr_mstatus_uxl & "000000000" & csr_mstatus_tsr & csr_mstatus_tw & csr_mstatus_tvm & csr_mstatus_mxr & csr_mstatus_sum & csr_mstatus_mprv & csr_mstatus_xs & csr_mstatus_fs & csr_mstatus_mpp & "00" & csr_mstatus_spp & csr_mstatus_mpie & '0' & csr_mstatus_spie & csr_mstatus_upie & csr_mstatus_mie & '0' & csr_mstatus_sie & csr_mstatus_uie);
 
-  --Read
+  -- Read
   processing_0 : process (csr_raddr, csr_fcsr_flags, csr_fcsr_rm, csr_marchid, csr_mcause, csr_mcounteren, csr_mcycle, csr_mcycle_h, csr_medeleg, csr_mepc, csr_mhartid, csr_mideleg, csr_mie, csr_mimpid, csr_minstret, csr_minstret_h, csr_mip, csr_misa_base, csr_misa_extensions, csr_mnmivec, csr_mscratch, csr_mtval, csr_mtvec, csr_mvendorid, csr_pmpaddr, csr_pmpcfg, csr_satp, csr_scause, csr_scounteren, csr_sedeleg, csr_sepc, csr_sscratch, csr_stval, csr_stvec, csr_ucause, csr_uepc, csr_uscratch, csr_utval, csr_utvec, has_fpu_s, has_mmu_s, has_n, has_s, is_rv128, is_rv32, mstatus_s)
   begin
     case (csr_raddr) is
-      --User
+      -- User
       when USTATUS =>
         st_csr_rval <= (mstatus_s(127) & mstatus_s(XLEN-2 downto 0)) and (XLEN-1 downto 0 => '1');
       when UIE =>
@@ -466,7 +463,7 @@ begin
         end if;
       when CYCLE =>
         st_csr_rval <= csr_mcycle(XLEN-1 downto 0);
-      --TIME      : st_csr_rval = csr_timer[XLEN-1:0];
+      -- TIME      : st_csr_rval = csr_timer[XLEN-1:0];
       when INSTRET =>
         st_csr_rval <= csr_minstret(XLEN-1 downto 0);
       when CYCLEH =>
@@ -475,14 +472,14 @@ begin
         else
           st_csr_rval <= (others => '0');
         end if;
-      --TIMEH     : st_csr_rval = is_rv32 ? csr_timer_h    : 'h0;
+      -- TIMEH     : st_csr_rval = is_rv32 ? csr_timer_h    : 'h0;
       when INSTRETH =>
         if (is_rv32 = '1') then
           st_csr_rval <= (XLEN-1 downto 32 => '0') & csr_minstret_h;
         else
           st_csr_rval <= (others => '0');
         end if;
-      --Supervisor
+      -- Supervisor
       when SSTATUS =>
         st_csr_rval <= (mstatus_s(127) & mstatus_s(XLEN-2 downto 0)) and (std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or std_logic_vector(to_unsigned(1, XLEN) sll 32) or X"00000000000DE133");
       when STVEC =>
@@ -564,7 +561,7 @@ begin
 --      HTVAL     : st_csr_rval = has_h ? csr_htval                       : 'h0;
 --      HIP       : st_csr_rval = has_h ? csr_mip & csr_mideleg & 12'h777 : 'h0;
 
-      --Machine
+      -- Machine
       when MISA =>
         st_csr_rval <= (csr_misa_base & (XLEN-3 downto 26 => '0') & csr_misa_extensions);
       when MVENDORID =>
@@ -681,18 +678,18 @@ begin
   csr_misa_base <= RV128I
                    when is_rv128 = '1' else RV64I
                    when is_rv64 = '1'  else RV32I;
-  --reserved
-  --reserved
-  --reserved
-  --reserved for vector extensions
-  --user mode supported
-  --supervisor mode supported
-  --reserved
-  --reserved
-  --reserved
-  --reserved for JIT
-  --reserved
-  --additional extensions
+  -- reserved
+  -- reserved
+  -- reserved
+  -- reserved for vector extensions
+  -- user mode supported
+  -- supervisor mode supported
+  -- reserved
+  -- reserved
+  -- reserved
+  -- reserved for JIT
+  -- reserved
+  -- additional extensions
   csr_misa_extensions <= ('0' & '0' & has_ext_s & '0' & '0' & has_u & has_tmem & has_s & '0' & has_fpuq & has_simd & '0' & has_n & has_muldiv & has_decfpu & '0' & '0' & not is_rv32e_s & '0' & '0' & has_fpu_s & is_rv32e_s & has_fpud & has_rvc_s & has_bm & has_amo);
 
   csr_mvendorid_bank       <= std_logic_vector(to_unsigned(JEDEC_BANK-1, 8));
@@ -704,7 +701,7 @@ begin
   csr_mimpid(7 downto 0)   <= std_logic_vector(to_unsigned(REVUSR_MINOR, 8));
   csr_mhartid              <= std_logic_vector(to_unsigned(HARTID, XLEN));
 
-  --mstatus_s
+  -- mstatus_s
   csr_mstatus_sd <= reduce_and(csr_mstatus_fs) or reduce_and(csr_mstatus_xs);
 
   st_tvm <= csr_mstatus_tvm;
@@ -749,10 +746,10 @@ begin
   processing_2 : process (clk, rstn, csr_misa_base, has_ext_s, has_s, has_u)
   begin
     if (rstn = '0') then
-      st_prv_sgn <= PRV_M;              --start in machine mode
+      st_prv_sgn <= PRV_M;              -- start in machine mode
       st_nxt_pc  <= PC_INIT;
       st_flush   <= '1';
-      --csr_mstatus_vm   <= VM_MBARE;
+      -- csr_mstatus_vm   <= VM_MBARE;
       if (has_s = '1') then
         csr_mstatus_sxl <= csr_misa_base;
       else
@@ -775,19 +772,19 @@ begin
       csr_mstatus_fs   <= "00";
 
       csr_mstatus_mpp  <= "11";
-      csr_mstatus_hpp  <= (others => '0');  --reserved
+      csr_mstatus_hpp  <= (others => '0');  -- reserved
       csr_mstatus_spp  <= has_s;
       csr_mstatus_mpie <= '0';
-      csr_mstatus_hpie <= '0';              --reserved
+      csr_mstatus_hpie <= '0';              -- reserved
       csr_mstatus_spie <= '0';
       csr_mstatus_upie <= '0';
       csr_mstatus_mie  <= '0';
-      csr_mstatus_hie  <= '0';              --reserved
+      csr_mstatus_hie  <= '0';              -- reserved
       csr_mstatus_sie  <= '0';
       csr_mstatus_uie  <= '0';
     elsif (rising_edge(clk)) then
       st_flush <= '0';
-      --write from EX, Machine Mode
+      -- write from EX, Machine Mode
       if ((ex_csr_we = '1' and ex_csr_reg = MSTATUS and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MSTATUS)) then
         --            csr_mstatus_vm    <= csr_wval[28:24];
 
@@ -852,7 +849,7 @@ begin
         end if;
 
         csr_mstatus_mpp <= csr_wval(12 downto 11);
-        csr_mstatus_hpp <= (others => '0');  --reserved
+        csr_mstatus_hpp <= (others => '0');  -- reserved
 
         if (has_s = '1') then
           csr_mstatus_spp <= csr_wval(8);
@@ -861,7 +858,7 @@ begin
         end if;
 
         csr_mstatus_mpie <= csr_wval(7);
-        csr_mstatus_hpie <= '0';        --reserved
+        csr_mstatus_hpie <= '0';        -- reserved
 
         if (has_s = '1') then
           csr_mstatus_spie <= csr_wval(5);
@@ -876,7 +873,7 @@ begin
         end if;
 
         csr_mstatus_mie <= csr_wval(3);
-        csr_mstatus_hie <= '0';         --reserved
+        csr_mstatus_hie <= '0';         -- reserved
 
         if (has_s = '1') then
           csr_mstatus_sie <= csr_wval(1);
@@ -890,7 +887,7 @@ begin
           csr_mstatus_uie <= '0';
         end if;
       end if;
-      --Supervisor Mode access
+      -- Supervisor Mode access
       if (has_s = '1') then
         if ((ex_csr_we = '1' and ex_csr_reg = SSTATUS and st_prv_sgn >= PRV_S) or (du_we_csr = '1' and du_addr = SSTATUS)) then
           csr_mstatus_uxl <= uxl_wval;
@@ -922,16 +919,16 @@ begin
           csr_mstatus_uie <= csr_wval(0);
         end if;
       end if;
-      --MRET,HRET,SRET,URET
+      -- MRET,HRET,SRET,URET
       if (id_bubble = '0' and bu_flush = '0' and du_stall = '0') then
         case (id_instr) is
-          --pop privilege stack
+          -- pop privilege stack
           when MRET =>
-            --set privilege level
+            -- set privilege level
             st_prv_sgn       <= csr_mstatus_mpp;
             st_nxt_pc        <= csr_mepc;
             st_flush         <= '1';
-            --set MIE
+            -- set MIE
             csr_mstatus_mie  <= csr_mstatus_mpie;
             csr_mstatus_mpie <= '1';
 
@@ -953,40 +950,40 @@ begin
 --            csr_mstatus_hpp  <= has_u ? PRV_U : PRV_M;
 --          end
           when SRET =>
-            --set privilege level
+            -- set privilege level
             st_prv_sgn       <= ('0' & csr_mstatus_spp);
             st_nxt_pc        <= csr_sepc;
             st_flush         <= '1';
-            --set SIE
+            -- set SIE
             csr_mstatus_sie  <= csr_mstatus_spie;
             csr_mstatus_spie <= '1';
-            csr_mstatus_spp  <= '0';  --Must have User-mode. SPP is only 1 bit
+            csr_mstatus_spp  <= '0';  -- Must have User-mode. SPP is only 1 bit
           when URET =>
-            --set privilege level
+            -- set privilege level
             st_prv_sgn       <= PRV_U;
             st_nxt_pc        <= csr_uepc;
             st_flush         <= '1';
-            --set UIE
+            -- set UIE
             csr_mstatus_uie  <= csr_mstatus_upie;
             csr_mstatus_upie <= '1';
           when others =>
             null;
         end case;
       end if;
-      --push privilege stack
+      -- push privilege stack
       if (ext_nmi = '1') then
-        --NMI always at Machine-mode
+        -- NMI always at Machine-mode
         st_prv_sgn       <= PRV_M;
         st_nxt_pc        <= csr_mnmivec;
         st_flush         <= '1';
-        --store current state
+        -- store current state
         csr_mstatus_mpie <= csr_mstatus_mie;
         csr_mstatus_mie  <= '0';
         csr_mstatus_mpp  <= st_prv_sgn;
       elsif (take_interrupt = '1') then
         st_flush <= not du_stall and not du_flush;
 
-        --Check if interrupts are delegated
+        -- Check if interrupts are delegated
         if (has_n = '1' and st_prv_sgn = PRV_U and (st_int and csr_mideleg(11 downto 0) and X"111") = X"111") then
           st_prv_sgn <= PRV_U;
           st_nxt_pc  <= std_logic_vector(unsigned(csr_utvec and not std_logic_vector(to_unsigned(3, XLEN))) + unsigned(csr_utvec_we));
@@ -1070,7 +1067,7 @@ begin
 
   st_prv <= st_prv_sgn;
 
-  --mcycle, minstret
+  -- mcycle, minstret
   generating_3 : if (XLEN = 32) generate
     processing_3 : process (clk, rstn)
     begin
@@ -1078,7 +1075,7 @@ begin
         csr_mcycle   <= (others => '0');
         csr_minstret <= (others => '0');
       elsif (rising_edge(clk)) then
-        --cycle always counts (thread active time)
+        -- cycle always counts (thread active time)
         if ((ex_csr_we = '1' and ex_csr_reg = MCYCLE and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MCYCLE)) then
           csr_mcycle_l <= csr_wval(31 downto 0);
         elsif ((ex_csr_we = '1' and ex_csr_reg = MCYCLEH and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MCYCLEH)) then
@@ -1086,7 +1083,7 @@ begin
         else
           csr_mcycle <= std_logic_vector(unsigned(csr_mcycle)+X"0000000000000001");
         end if;
-        --instruction retire counter
+        -- instruction retire counter
         if ((ex_csr_we = '1' and ex_csr_reg = MINSTRET and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MINSTRET)) then
           csr_minstret_l <= csr_wval(31 downto 0);
         elsif ((ex_csr_we = '1' and ex_csr_reg = MINSTRETH and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MINSTRETH)) then
@@ -1096,20 +1093,20 @@ begin
         end if;
       end if;
     end process;
-  elsif (XLEN > 32) generate            --(XLEN > 32) begin
+  elsif (XLEN > 32) generate            -- (XLEN > 32) begin
     processing_4 : process (clk, rstn)
     begin
       if (rstn = '0') then
         csr_mcycle   <= (others => '0');
         csr_minstret <= (others => '0');
       elsif (rising_edge(clk)) then
-        --cycle always counts (thread active time)
+        -- cycle always counts (thread active time)
         if ((ex_csr_we = '1' and ex_csr_reg = MCYCLE and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MCYCLE)) then
           csr_mcycle <= csr_wval(63 downto 0);
         else
           csr_mcycle <= std_logic_vector(unsigned(csr_mcycle)+X"0000000000000001");
         end if;
-        --instruction retire counter
+        -- instruction retire counter
         if ((ex_csr_we = '1' and ex_csr_reg = MINSTRET and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MINSTRET)) then
           csr_minstret <= csr_wval(63 downto 0);
         elsif (wb_bubble = '0') then
@@ -1119,7 +1116,7 @@ begin
     end process;
   end generate;
 
-  --mnmivec - RoaLogic Extension
+  -- mnmivec - RoaLogic Extension
   processing_5 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -1131,7 +1128,7 @@ begin
     end if;
   end process;
 
-  --mtvec
+  -- mtvec
   processing_6 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -1143,7 +1140,7 @@ begin
     end if;
   end process;
 
-  --mcounteren
+  -- mcounteren
   processing_7 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -1157,11 +1154,11 @@ begin
 
   st_mcounteren <= csr_mcounteren;
 
-  --medeleg, mideleg
+  -- medeleg, mideleg
   generating_5 : if ((HAS_HYPER and HAS_SUPER and HAS_USER) = '0') generate
-  --csr_medeleg <= (others => '0');
-  --csr_mideleg <= (others => '0');
-  elsif ((HAS_HYPER or HAS_SUPER or HAS_USER) = '1') generate  --medeleg
+  -- csr_medeleg <= (others => '0');
+  -- csr_mideleg <= (others => '0');
+  elsif ((HAS_HYPER or HAS_SUPER or HAS_USER) = '1') generate  -- medeleg
     processing_8 : process (clk, rstn)
     begin
       if (rstn = '0') then
@@ -1173,7 +1170,7 @@ begin
       end if;
     end process;
 
-    --mideleg
+    -- mideleg
     processing_9 : process (clk, rstn)
     begin
       if (rstn = '0') then
@@ -1199,7 +1196,7 @@ begin
     end process;
   end generate;
 
-  --mip
+  -- mip
   processing_10 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -1207,27 +1204,27 @@ begin
       soft_seip <= '0';
       soft_ueip <= '0';
     elsif (rising_edge(clk)) then
-      --external interrupts
+      -- external interrupts
       csr_mip_meip <= ext_int(to_integer(unsigned(PRV_M)));
       csr_mip_heip <= has_h and ext_int(to_integer(unsigned(PRV_H)));
       csr_mip_seip <= has_s and (ext_int(to_integer(unsigned(PRV_S))) or soft_seip);
       csr_mip_ueip <= has_n and (ext_int(to_integer(unsigned(PRV_U))) or soft_ueip);
-      --may only be written by M-mode
+      -- may only be written by M-mode
       if ((ex_csr_we = '1' and ex_csr_reg = MIP and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MIP)) then
         soft_seip <= csr_wval(SEI) and has_s;
         soft_ueip <= csr_wval(UEI) and has_n;
       end if;
-      --timer interrupts
+      -- timer interrupts
       csr_mip_mtip <= ext_tint;
-      --may only be written by M-mode
+      -- may only be written by M-mode
       if ((ex_csr_we = '1' and ex_csr_reg = MIP and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MIP)) then
         csr_mip_htip <= csr_wval(HTI) and has_h;
         csr_mip_stip <= csr_wval(STI) and has_s;
         csr_mip_utip <= csr_wval(UTI) and has_n;
       end if;
-      --software interrupts
+      -- software interrupts
       csr_mip_msip <= ext_sint;
-      --Machine Mode write
+      -- Machine Mode write
       if ((ex_csr_we = '1' and ex_csr_reg = MIP and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MIP)) then
         csr_mip_hsip <= csr_wval(HSI) and has_h;
         csr_mip_ssip <= csr_wval(SSI) and has_s;
@@ -1242,13 +1239,13 @@ begin
 --            end
 --        end
       elsif (has_s = '1') then
-        --Supervisor Mode write
+        -- Supervisor Mode write
         if ((ex_csr_we = '1' and ex_csr_reg = SIP and st_prv_sgn >= PRV_S) or (du_we_csr = '1' and du_addr = SIP)) then
           csr_mip_ssip <= csr_wval(SSI) and csr_mideleg(SSI);
           csr_mip_usip <= csr_wval(USI) and csr_mideleg(USI) and has_n;
         end if;
       elsif (has_n = '1') then
-        --User Mode write
+        -- User Mode write
         if ((ex_csr_we = '1' and ex_csr_reg = UIP) or (du_we_csr = '1' and du_addr = UIP)) then
           csr_mip_usip <= csr_wval(USI) and csr_mideleg(USI);
         end if;
@@ -1256,7 +1253,7 @@ begin
     end if;
   end process;
 
-  --mie
+  -- mie
   processing_11 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -1310,7 +1307,7 @@ begin
     end if;
   end process;
 
-  --mscratch
+  -- mscratch
   processing_12 : process (clk, rstn)
   begin
     if (rstn = '0') then
@@ -1324,8 +1321,8 @@ begin
 
   trap_cause <= get_trap_cause(wb_exception and not du_ie(15 downto 0));
 
-  --decode interrupts
-  --priority external, software, timer
+  -- decode interrupts
+  -- priority external, software, timer
   st_int(CAUSE_MEINT) <= ((to_stdlogic(st_prv_sgn < PRV_M) or (to_stdlogic(st_prv_sgn = PRV_M) and csr_mstatus_mie)) and (csr_mip_meip and csr_mie_meie));
   st_int(CAUSE_HEINT) <= ((to_stdlogic(st_prv_sgn < PRV_H) or (to_stdlogic(st_prv_sgn = PRV_H) and csr_mstatus_hie)) and (csr_mip_heip and csr_mie_heie));
   st_int(CAUSE_SEINT) <= ((to_stdlogic(st_prv_sgn < PRV_S) or (to_stdlogic(st_prv_sgn = PRV_S) and csr_mstatus_sie)) and (csr_mip_seip and csr_mie_seie));
@@ -1341,7 +1338,7 @@ begin
   st_int(CAUSE_STINT) <= ((to_stdlogic(st_prv_sgn < PRV_S) or (to_stdlogic(st_prv_sgn = PRV_S) and csr_mstatus_sie)) and (csr_mip_stip and csr_mie_stie)) and not (st_int(CAUSE_SEINT) or st_int(CAUSE_SSINT));
   st_int(CAUSE_UTINT) <= ((to_stdlogic(st_prv_sgn = PRV_U) and csr_mstatus_uie) and (csr_mip_utip and csr_mie_utie)) and not (st_int(CAUSE_UEINT) or st_int(CAUSE_USINT));
 
-  --interrupt cause priority
+  -- interrupt cause priority
   processing_13 : process (du_ie, st_int)
     variable state : std_logic_vector(11 downto 0);
   begin
@@ -1378,31 +1375,31 @@ begin
 
   take_interrupt <= reduce_or(st_int and not du_ie(31 downto 20));
 
-  --for Debug Unit
+  -- for Debug Unit
   du_exceptions <= (st_int & (4+EXCEPTION_SIZE-1 downto EXCEPTION_SIZE => '0') & wb_exception) and du_ie;
 
-  --Update mepc and mcause
+  -- Update mepc and mcause
   processing_14 : process (clk, rstn)
   begin
     if (rstn = '0') then
       st_interrupt <= '0';
 
       csr_mepc <= (others => '0');
-      --csr_hepc     <= 'h0;
+      -- csr_hepc     <= 'h0;
       csr_sepc <= (others => '0');
       csr_uepc <= (others => '0');
 
       csr_mcause <= (others => '0');
-      --csr_hcause   <= 'h0;
+      -- csr_hcause   <= 'h0;
       csr_scause <= (others => '0');
       csr_ucause <= (others => '0');
 
       csr_mtval <= (others => '0');
-      --csr_htval    <= 'h0;
+      -- csr_htval    <= 'h0;
       csr_stval <= (others => '0');
       csr_utval <= (others => '0');
     elsif (rising_edge(clk)) then
-      --Write access to regs (lowest priority)
+      -- Write access to regs (lowest priority)
       if ((ex_csr_we = '1' and ex_csr_reg = MEPC and st_prv_sgn = PRV_M) or (du_we_csr = '1' and du_addr = MEPC)) then
         csr_mepc <= (csr_wval(XLEN-1 downto 2) & (csr_wval(1) and has_rvc_s) & '0');
       end if;
@@ -1445,12 +1442,12 @@ begin
       if ((ex_csr_we = '1' and ex_csr_reg = UTVAL and st_prv_sgn >= PRV_U) or (du_we_csr = '1' and du_addr = UTVAL)) then
         csr_utval <= csr_wval;
       end if;
-      --Handle exceptions
+      -- Handle exceptions
       st_interrupt <= '0';
 
-      --priority external interrupts, software interrupts, timer interrupts, traps
-      if (ext_nmi = '1') then  --TODO: doesn't this cause a deadlock? Need to hold of NMI once handled
-        --NMI always at Machine Level
+      -- priority external interrupts, software interrupts, timer interrupts, traps
+      if (ext_nmi = '1') then  -- TO-DO: doesn't this cause a deadlock? Need to hold of NMI once handled
+        -- NMI always at Machine Level
         st_interrupt <= '1';
 
         if (bu_flush = '1') then
@@ -1459,10 +1456,10 @@ begin
           csr_mepc <= id_pc;
         end if;
 
-        csr_mcause <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or (csr_mcause'range => '0');  --Implementation dependent. '0' indicates 'unknown cause'
+        csr_mcause <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or (csr_mcause'range => '0');  -- Implementation dependent. '0' indicates 'unknown cause'
       elsif (take_interrupt = '1') then
         st_interrupt <= '1';
-        --Check if interrupts are delegated
+        -- Check if interrupts are delegated
         if (has_n = '1' and st_prv_sgn = PRV_U and (st_int and csr_mideleg(11 downto 0) and X"111") = X"111") then
           csr_ucause <= std_logic_vector(to_unsigned(1, XLEN) sll (XLEN-1)) or ((XLEN-1 downto 4 => '0') & interrupt_cause);
           csr_uepc   <= id_pc;
@@ -1478,7 +1475,7 @@ begin
           csr_mepc   <= id_pc;
         end if;
       elsif (reduce_or(wb_exception and not du_ie(15 downto 0)) = '1') then
-        --Trap
+        -- Trap
         if (has_n = '1' and st_prv_sgn = PRV_U and reduce_or(wb_exception and csr_medeleg(EXCEPTION_SIZE-1 downto 0)) = '1') then
           csr_uepc   <= wb_pc;
           csr_ucause <= (XLEN-1 downto 4 => '0') & trap_cause;
@@ -1533,8 +1530,8 @@ begin
     end if;
   end process;
 
-  --Physical Memory Protection & Translation registers
-  generating_7 : if (XLEN > 64) generate  --RV128
+  -- Physical Memory Protection & Translation registers
+  generating_7 : if (XLEN > 64) generate  -- RV128
     generating_8 : for idx in 0 to 15 generate
       generating_9 : if (idx < PMP_CNT) generate
         processing_15 : process (clk, rstn)
@@ -1554,10 +1551,10 @@ begin
       end generate;
     end generate;
   end generate;
-  --next idx
+  -- next idx
 
-  --pmpaddr not defined for RV128 yet
-  generating_11 : if (XLEN > 32) generate  --RV64 
+  -- pmpaddr not defined for RV128 yet
+  generating_11 : if (XLEN > 32) generate  -- RV64 
     generating_12 : for idx in 0 to 7 generate
       processing_16 : process (clk, rstn)
       begin
@@ -1572,7 +1569,7 @@ begin
         end if;
       end process;
     end generate;
-    --next idx
+    -- next idx
 
     generating_13 : for idx in 8 to 15 generate
       processing_17 : process (clk, rstn)
@@ -1588,7 +1585,7 @@ begin
         end if;
       end process;
     end generate;
-    --next idx
+    -- next idx
 
     generating_14 : for idx in 0 to 15 generate
       generating_15 : if (idx < PMP_CNT) generate
@@ -1619,9 +1616,9 @@ begin
         csr_pmpaddr(idx) <= (others => '0');
       end generate;
     end generate;
-  end generate;  --next idx
+  end generate;  -- next idx
   generating_19 : if (XLEN <= 32) generate
-    --RV32
+    -- RV32
     generating_20 : for idx in 0 to 3 generate
       processing_20 : process (clk, rstn)
       begin
@@ -1636,7 +1633,7 @@ begin
         end if;
       end process;
     end generate;
-    --next idx
+    -- next idx
 
     generating_21 : for idx in 4 to 8 - 1 generate
       processing_21 : process (clk, rstn)
@@ -1652,7 +1649,7 @@ begin
         end if;
       end process;
     end generate;
-    --next idx
+    -- next idx
 
     generating_22 : for idx in 8 to 12 - 1 generate
       processing_22 : process (clk, rstn)
@@ -1668,7 +1665,7 @@ begin
         end if;
       end process;
     end generate;
-    --next idx
+    -- next idx
 
     generating_23 : for idx in 12 to 15 generate
       processing_23 : process (clk, rstn)
@@ -1684,7 +1681,7 @@ begin
         end if;
       end process;
     end generate;
-    --next idx
+    -- next idx
 
     generating_24 : for idx in 0 to 15 generate
       generating_25 : if (idx < PMP_CNT) generate
@@ -1716,7 +1713,7 @@ begin
       end generate;
     end generate;
   end generate;
-  --next idx
+  -- next idx
 
   st_pmpcfg  <= csr_pmpcfg;
   st_pmpaddr <= csr_pmpaddr;
@@ -1725,7 +1722,7 @@ begin
   -- Supervisor Registers
   ------------------------------------------------------------------------------
   generating_29 : if (HAS_SUPER = '1') generate
-    --stvec
+    -- stvec
     processing_26 : process (clk, rstn)
     begin
       if (rstn = '0') then
@@ -1737,7 +1734,7 @@ begin
       end if;
     end process;
 
-    --scounteren
+    -- scounteren
     processing_27 : process (clk, rstn)
     begin
       if (rstn = '0') then
@@ -1749,7 +1746,7 @@ begin
       end if;
     end process;
 
-    --sedeleg
+    -- sedeleg
     processing_28 : process (clk, rstn)
     begin
       if (rstn = '0') then
@@ -1761,7 +1758,7 @@ begin
       end if;
     end process;
 
-    --sscratch
+    -- sscratch
     processing_29 : process (clk, rstn)
     begin
       if (rstn = '0') then
@@ -1773,7 +1770,7 @@ begin
       end if;
     end process;
 
-    --satp
+    -- satp
     processing_30 : process (clk, rstn)
     begin
       if (rstn = '0') then
@@ -1794,10 +1791,10 @@ begin
 
   st_scounteren <= csr_scounteren;
 
-  --User Registers
+  -- User Registers
   ------------------------------------------------------------------------------
   generating_31 : if (HAS_USER = '1') generate
-    --utvec
+    -- utvec
     processing_31 : process (clk, rstn)
     begin
       if (rstn = '0') then
@@ -1809,7 +1806,7 @@ begin
       end if;
     end process;
 
-    --uscratch
+    -- uscratch
     processing_32 : process (clk, rstn)
     begin
       if (rstn = '0') then
@@ -1821,7 +1818,7 @@ begin
       end if;
     end process;
 
-    --Floating point registers
+    -- Floating point registers
     generating_32 : if (HAS_FPU = '1') generate
     end generate;
   elsif (HAS_USER = '0') generate

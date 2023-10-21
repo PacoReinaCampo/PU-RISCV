@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/memory/pu_riscv_ram_1rw_generic.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -70,15 +67,15 @@ architecture rtl of pu_riscv_ram_1rw_generic is
   ------------------------------------------------------------------------------
   -- Variables
   ------------------------------------------------------------------------------
-  signal mem_array : std_logic_matrix(2**ABITS-1 downto 0)(DBITS-1 downto 0);  --memory array
-  signal addr_reg  : std_logic_vector(ABITS-1 downto 0);  --latched read address
+  signal mem_array : std_logic_matrix(2**ABITS-1 downto 0)(DBITS-1 downto 0);  -- memory array
+  signal addr_reg  : std_logic_vector(ABITS-1 downto 0);  -- latched read address
 
 begin
   ------------------------------------------------------------------------------
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --write side
+  -- write side
   generating_0 : for i in 0 to (DBITS+7)/8 - 1 generate
     generating_1 : if (i*8+8 > DBITS) generate
       processing_0 : process (clk_i)
@@ -103,8 +100,8 @@ begin
     end generate;
   end generate;
 
-  --read side
-  --per Altera's recommendations; avoids bypass logic
+  -- read side
+  -- per Altera's recommendations; avoids bypass logic
   processing_2 : process (clk_i)
   begin
     if (rising_edge(clk_i)) then

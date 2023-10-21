@@ -1,6 +1,3 @@
--- Converted from rtl/verilog/core/pu_riscv_core.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -99,10 +96,10 @@ entity pu_riscv_core is
     PARCEL_SIZE : integer := 64
     );
   port (
-    rstn : in std_logic;                --Reset
-    clk  : in std_logic;                --Clock
+    rstn : in std_logic;                -- Reset
+    clk  : in std_logic;                -- Clock
 
-    --Instruction Memory Access bus
+    -- Instruction Memory Access bus
     if_stall_nxt_pc      : in  std_logic;
     if_nxt_pc            : out std_logic_vector(XLEN-1 downto 0);
     if_stall             : out std_logic;
@@ -113,7 +110,7 @@ entity pu_riscv_core is
     if_parcel_misaligned : in  std_logic;
     if_parcel_page_fault : in  std_logic;
 
-    --Data Memory Access bus
+    -- Data Memory Access bus
     dmem_adr        : out std_logic_vector(XLEN-1 downto 0);
     dmem_d          : out std_logic_vector(XLEN-1 downto 0);
     dmem_q          : in  std_logic_vector(XLEN-1 downto 0);
@@ -125,20 +122,20 @@ entity pu_riscv_core is
     dmem_misaligned : in  std_logic;
     dmem_page_fault : in  std_logic;
 
-    --cpu state
+    -- cpu state
     st_prv     : out std_logic_vector(1 downto 0);
     st_pmpcfg  : out std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
     st_pmpaddr : out std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
 
     bu_cacheflush : out std_logic;
 
-    --Interrupts
+    -- Interrupts
     ext_nmi  : in std_logic;
     ext_tint : in std_logic;
     ext_sint : in std_logic;
     ext_int  : in std_logic_vector(3 downto 0);
 
-    --Debug Interface
+    -- Debug Interface
     dbg_stall : in  std_logic;
     dbg_strb  : in  std_logic;
     dbg_we    : in  std_logic;
@@ -161,8 +158,8 @@ architecture rtl of pu_riscv_core is
       PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
       );
     port (
-      rstn     : in std_logic;          --Reset
-      clk      : in std_logic;          --Clock
+      rstn     : in std_logic;          -- Reset
+      clk      : in std_logic;          -- Clock
       id_stall : in std_logic;
 
       if_stall_nxt_pc      : in std_logic;
@@ -172,25 +169,25 @@ architecture rtl of pu_riscv_core is
       if_parcel_misaligned : in std_logic;
       if_parcel_page_fault : in std_logic;
 
-      if_instr     : out std_logic_vector(ILEN-1 downto 0);  --Instruction out
-      if_bubble    : out std_logic;  --Insert bubble in the pipe (NOP instruction)
-      if_exception : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);  --Exceptions
+      if_instr     : out std_logic_vector(ILEN-1 downto 0);  -- Instruction out
+      if_bubble    : out std_logic;  -- Insert bubble in the pipe (NOP instruction)
+      if_exception : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);  -- Exceptions
 
 
-      bp_bp_predict : in  std_logic_vector(1 downto 0);  --Branch Prediction bits
-      if_bp_predict : out std_logic_vector(1 downto 0);  --push down the pipe
+      bp_bp_predict : in  std_logic_vector(1 downto 0);  -- Branch Prediction bits
+      if_bp_predict : out std_logic_vector(1 downto 0);  -- push down the pipe
 
-      bu_flush : in std_logic;          --flush pipe & load new program counter
+      bu_flush : in std_logic;          -- flush pipe & load new program counter
       st_flush : in std_logic;
-      du_flush : in std_logic;          --flush pipe after debug exit
+      du_flush : in std_logic;          -- flush pipe after debug exit
 
-      bu_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  --Branch Unit Next Program Counter
-      st_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  --State Next Program Counter
+      bu_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  -- Branch Unit Next Program Counter
+      st_nxt_pc : in std_logic_vector(XLEN-1 downto 0);  -- State Next Program Counter
 
-      if_nxt_pc : out std_logic_vector(XLEN-1 downto 0);  --next Program Counter
-      if_stall  : out std_logic;  --stall instruction fetch BIU (cache/bus-interface)
-      if_flush  : out std_logic;  --flush instruction fetch BIU (cache/bus-interface)
-      if_pc     : out std_logic_vector(XLEN-1 downto 0)   --Program Counter
+      if_nxt_pc : out std_logic_vector(XLEN-1 downto 0);  -- next Program Counter
+      if_stall  : out std_logic;  -- stall instruction fetch BIU (cache/bus-interface)
+      if_flush  : out std_logic;  -- flush instruction fetch BIU (cache/bus-interface)
+      if_pc     : out std_logic_vector(XLEN-1 downto 0)   -- Program Counter
       );
   end component;
 
@@ -215,13 +212,13 @@ architecture rtl of pu_riscv_core is
       bu_nxt_pc : in std_logic_vector(XLEN-1 downto 0);
       st_nxt_pc : in std_logic_vector(XLEN-1 downto 0);
 
-      --Program counter
+      -- Program counter
       if_pc         : in  std_logic_vector(XLEN-1 downto 0);
       id_pc         : out std_logic_vector(XLEN-1 downto 0);
       if_bp_predict : in  std_logic_vector(1 downto 0);
       id_bp_predict : out std_logic_vector(1 downto 0);
 
-      --Instruction
+      -- Instruction
       if_instr   : in  std_logic_vector(ILEN-1 downto 0);
       if_bubble  : in  std_logic;
       id_instr   : out std_logic_vector(ILEN-1 downto 0);
@@ -233,14 +230,14 @@ architecture rtl of pu_riscv_core is
       wb_instr   : in  std_logic_vector(ILEN-1 downto 0);
       wb_bubble  : in  std_logic;
 
-      --Exceptions
+      -- Exceptions
       if_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
       ex_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
       mem_exception : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
       wb_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
       id_exception  : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
-      --From State
+      -- From State
       st_prv        : in std_logic_vector(1 downto 0);
       st_xlen       : in std_logic_vector(1 downto 0);
       st_tvm        : in std_logic;
@@ -249,11 +246,11 @@ architecture rtl of pu_riscv_core is
       st_mcounteren : in std_logic_vector(XLEN-1 downto 0);
       st_scounteren : in std_logic_vector(XLEN-1 downto 0);
 
-      --To RF
+      -- To RF
       id_src1 : out std_logic_vector(4 downto 0);
       id_src2 : out std_logic_vector(4 downto 0);
 
-      --To execution units
+      -- To execution units
       id_opA : out std_logic_vector(XLEN-1 downto 0);
       id_opB : out std_logic_vector(XLEN-1 downto 0);
 
@@ -266,7 +263,7 @@ architecture rtl of pu_riscv_core is
       id_bypwb_opA  : out std_logic;
       id_bypwb_opB  : out std_logic;
 
-      --from MEM/WB
+      -- from MEM/WB
       mem_r : in std_logic_vector(XLEN-1 downto 0);
       wb_r  : in std_logic_vector(XLEN-1 downto 0)
       );
@@ -292,7 +289,7 @@ architecture rtl of pu_riscv_core is
       wb_stall : in  std_logic;
       ex_stall : out std_logic;
 
-      --Program counter
+      -- Program counter
       id_pc         : in  std_logic_vector(XLEN-1 downto 0);
       ex_pc         : out std_logic_vector(XLEN-1 downto 0);
       bu_nxt_pc     : out std_logic_vector(XLEN-1 downto 0);
@@ -304,7 +301,7 @@ architecture rtl of pu_riscv_core is
       bu_bp_btaken  : out std_logic;
       bu_bp_update  : out std_logic;
 
-      --Instruction
+      -- Instruction
       id_bubble : in  std_logic;
       id_instr  : in  std_logic_vector(ILEN-1 downto 0);
       ex_bubble : out std_logic;
@@ -315,7 +312,7 @@ architecture rtl of pu_riscv_core is
       wb_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
       ex_exception  : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
-      --from ID
+      -- from ID
       id_userf_opA  : in std_logic;
       id_userf_opB  : in std_logic;
       id_bypex_opA  : in std_logic;
@@ -327,29 +324,29 @@ architecture rtl of pu_riscv_core is
       id_opA        : in std_logic_vector(XLEN-1 downto 0);
       id_opB        : in std_logic_vector(XLEN-1 downto 0);
 
-      --from RF
+      -- from RF
       rf_srcv1 : in std_logic_vector(XLEN-1 downto 0);
       rf_srcv2 : in std_logic_vector(XLEN-1 downto 0);
 
-      --to MEM
+      -- to MEM
       ex_r : out std_logic_vector(XLEN-1 downto 0);
 
-      --Bypasses
+      -- Bypasses
       mem_r : in std_logic_vector(XLEN-1 downto 0);
       wb_r  : in std_logic_vector(XLEN-1 downto 0);
 
-      --To State
+      -- To State
       ex_csr_reg  : out std_logic_vector(11 downto 0);
       ex_csr_wval : out std_logic_vector(XLEN-1 downto 0);
       ex_csr_we   : out std_logic;
 
-      --From State
+      -- From State
       st_prv      : in std_logic_vector(1 downto 0);
       st_xlen     : in std_logic_vector(1 downto 0);
       st_flush    : in std_logic;
       st_csr_rval : in std_logic_vector(XLEN-1 downto 0);
 
-      --To DCACHE/Memory
+      -- To DCACHE/Memory
       dmem_adr        : out std_logic_vector(XLEN-1 downto 0);
       dmem_d          : out std_logic_vector(XLEN-1 downto 0);
       dmem_req        : out std_logic;
@@ -360,7 +357,7 @@ architecture rtl of pu_riscv_core is
       dmem_misaligned : in  std_logic;
       dmem_page_fault : in  std_logic;
 
-      --Debug Unit
+      -- Debug Unit
       du_stall     : in std_logic;
       du_stall_dly : in std_logic;
       du_flush     : in std_logic;
@@ -385,11 +382,11 @@ architecture rtl of pu_riscv_core is
 
       wb_stall : in std_logic;
 
-      --Program counter
+      -- Program counter
       ex_pc  : in  std_logic_vector(XLEN-1 downto 0);
       mem_pc : out std_logic_vector(XLEN-1 downto 0);
 
-      --Instruction
+      -- Instruction
       ex_bubble  : in  std_logic;
       ex_instr   : in  std_logic_vector(ILEN-1 downto 0);
       mem_bubble : out std_logic;
@@ -399,11 +396,11 @@ architecture rtl of pu_riscv_core is
       wb_exception  : in  std_logic_vector(EXCEPTION_SIZE-1 downto 0);
       mem_exception : out std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
-      --From EX
+      -- From EX
       ex_r     : in std_logic_vector(XLEN-1 downto 0);
       dmem_adr : in std_logic_vector(XLEN-1 downto 0);
 
-      --To WB
+      -- To WB
       mem_r      : out std_logic_vector(XLEN-1 downto 0);
       mem_memadr : out std_logic_vector(XLEN-1 downto 0)
       );
@@ -419,10 +416,10 @@ architecture rtl of pu_riscv_core is
       PC_INIT : std_logic_vector(63 downto 0) := X"0000000080000000"
       );
     port (
-      rst_ni : in std_logic;            --Reset
-      clk_i  : in std_logic;            --Clock
+      rst_ni : in std_logic;            -- Reset
+      clk_i  : in std_logic;            -- Clock
 
-      wb_stall_o : out std_logic;       --Stall on memory-wait
+      wb_stall_o : out std_logic;       -- Stall on memory-wait
 
       mem_pc_i : in  std_logic_vector(XLEN-1 downto 0);
       wb_pc_o  : out std_logic_vector(XLEN-1 downto 0);
@@ -439,14 +436,14 @@ architecture rtl of pu_riscv_core is
       mem_r_i      : in std_logic_vector(XLEN-1 downto 0);
       mem_memadr_i : in std_logic_vector(XLEN-1 downto 0);
 
-      --From Memory System
+      -- From Memory System
       dmem_ack_i        : in std_logic;
       dmem_err_i        : in std_logic;
       dmem_q_i          : in std_logic_vector(XLEN-1 downto 0);
       dmem_misaligned_i : in std_logic;
       dmem_page_fault_i : in std_logic;
 
-      --To Register File
+      -- To Register File
       wb_dst_o : out std_logic_vector(4 downto 0);
       wb_r_o   : out std_logic_vector(XLEN-1 downto 0);
       wb_we_o  : out std_logic
@@ -511,34 +508,34 @@ architecture rtl of pu_riscv_core is
       wb_badaddr   : in std_logic_vector(XLEN-1 downto 0);
 
       st_interrupt  : out std_logic;
-      st_prv        : out std_logic_vector(1 downto 0);  --Privilege level
-      st_xlen       : out std_logic_vector(1 downto 0);  --Active Architecture
-      st_tvm        : out std_logic;    --trap on satp access or SFENCE.VMA
-      st_tw         : out std_logic;    --trap on WFI (after time >=0)
-      st_tsr        : out std_logic;    --trap SRET
+      st_prv        : out std_logic_vector(1 downto 0);  -- Privilege level
+      st_xlen       : out std_logic_vector(1 downto 0);  -- Active Architecture
+      st_tvm        : out std_logic;    -- trap on satp access or SFENCE.VMA
+      st_tw         : out std_logic;    -- trap on WFI (after time >=0)
+      st_tsr        : out std_logic;    -- trap SRET
       st_mcounteren : out std_logic_vector(XLEN-1 downto 0);
       st_scounteren : out std_logic_vector(XLEN-1 downto 0);
       st_pmpcfg     : out std_logic_matrix(PMP_CNT-1 downto 0)(7 downto 0);
       st_pmpaddr    : out std_logic_matrix(PMP_CNT-1 downto 0)(PLEN-1 downto 0);
 
 
-      --interrupts (3=M-mode, 0=U-mode)
-      ext_int  : in std_logic_vector(3 downto 0);  --external interrupt (per privilege mode; determined by PIC)
-      ext_tint : in std_logic;          --machine timer interrupt
-      ext_sint : in std_logic;          --machine software interrupt (for ipi)
-      ext_nmi  : in std_logic;          --non-maskable interrupt
+      -- interrupts (3=M-mode, 0=U-mode)
+      ext_int  : in std_logic_vector(3 downto 0);  -- external interrupt (per privilege mode; determined by PIC)
+      ext_tint : in std_logic;          -- machine timer interrupt
+      ext_sint : in std_logic;          -- machine software interrupt (for ipi)
+      ext_nmi  : in std_logic;          -- non-maskable interrupt
 
-      --CSR interface
+      -- CSR interface
       ex_csr_reg  : in  std_logic_vector(11 downto 0);
       ex_csr_we   : in  std_logic;
       ex_csr_wval : in  std_logic_vector(XLEN-1 downto 0);
       st_csr_rval : out std_logic_vector(XLEN-1 downto 0);
 
-      --Debug interface
+      -- Debug interface
       du_stall      : in  std_logic;
       du_flush      : in  std_logic;
       du_we_csr     : in  std_logic;
-      du_dato       : in  std_logic_vector(XLEN-1 downto 0);  --output from debug unit
+      du_dato       : in  std_logic_vector(XLEN-1 downto 0);  -- output from debug unit
       du_addr       : in  std_logic_vector(11 downto 0);
       du_ie         : in  std_logic_vector(31 downto 0);
       du_exceptions : out std_logic_vector(31 downto 0)
@@ -556,21 +553,21 @@ architecture rtl of pu_riscv_core is
       rstn : in std_logic;
       clk  : in std_logic;
 
-      --Register File read
+      -- Register File read
       rf_src1  : in  std_logic_matrix(RDPORTS-1 downto 0)(AR_BITS-1 downto 0);
       rf_src2  : in  std_logic_matrix(RDPORTS-1 downto 0)(AR_BITS-1 downto 0);
       rf_srcv1 : out std_logic_matrix(RDPORTS-1 downto 0)(XLEN-1 downto 0);
       rf_srcv2 : out std_logic_matrix(RDPORTS-1 downto 0)(XLEN-1 downto 0);
 
-      --Register File write
+      -- Register File write
       rf_dst  : in std_logic_matrix(WRPORTS-1 downto 0)(AR_BITS-1 downto 0);
       rf_dstv : in std_logic_matrix(WRPORTS-1 downto 0)(XLEN-1 downto 0);
       rf_we   : in std_logic_vector(WRPORTS-1 downto 0);
 
-      --Debug Interface
+      -- Debug Interface
       du_stall   : in  std_logic;
       du_we_rf   : in  std_logic;
-      du_dato    : in  std_logic_vector(XLEN-1 downto 0);  --output from debug unit
+      du_dato    : in  std_logic_vector(XLEN-1 downto 0);  -- output from debug unit
       du_dati_rf : out std_logic_vector(XLEN-1 downto 0);
       du_addr    : in  std_logic_vector(11 downto 0)
       );
@@ -596,15 +593,15 @@ architecture rtl of pu_riscv_core is
       rst_ni : in std_logic;
       clk_i  : in std_logic;
 
-      --Read side
+      -- Read side
       id_stall_i      : in  std_logic;
       if_parcel_pc_i  : in  std_logic_vector(XLEN-1 downto 0);
       bp_bp_predict_o : out std_logic_vector(1 downto 0);
 
-      --Write side
+      -- Write side
       ex_pc_i         : in std_logic_vector(XLEN-1 downto 0);
-      bu_bp_history_i : in std_logic_vector(BP_GLOBAL_BITS-1 downto 0);  --branch history
-      bu_bp_predict_i : in std_logic_vector(1 downto 0);  --prediction bits for branch
+      bu_bp_history_i : in std_logic_vector(BP_GLOBAL_BITS-1 downto 0);  -- branch history
+      bu_bp_predict_i : in std_logic_vector(1 downto 0);  -- prediction bits for branch
       bu_bp_btaken_i  : in std_logic;
       bu_bp_update_i  : in std_logic
       );
@@ -627,7 +624,7 @@ architecture rtl of pu_riscv_core is
       rstn : in std_logic;
       clk  : in std_logic;
 
-      --Debug Port interface
+      -- Debug Port interface
       dbg_stall : in  std_logic;
       dbg_strb  : in  std_logic;
       dbg_we    : in  std_logic;
@@ -637,7 +634,7 @@ architecture rtl of pu_riscv_core is
       dbg_ack   : out std_logic;
       dbg_bp    : out std_logic;
 
-      --CPU signals
+      -- CPU signals
       du_stall     : out std_logic;
       du_stall_dly : out std_logic;
       du_flush     : out std_logic;
@@ -667,7 +664,7 @@ architecture rtl of pu_riscv_core is
       dmem_ack      : in std_logic;
       ex_stall      : in std_logic;
 
-      --From state
+      -- From state
       du_exceptions : in std_logic_vector(31 downto 0)
       );
   end component;
@@ -705,7 +702,7 @@ architecture rtl of pu_riscv_core is
   signal du_stall     : std_logic;
   signal du_stall_dly : std_logic;
 
-  --Branch Prediction
+  -- Branch Prediction
   signal bp_bp_predict : std_logic_vector(1 downto 0);
   signal if_bp_predict : std_logic_vector(1 downto 0);
   signal id_bp_predict : std_logic_vector(1 downto 0);
@@ -715,14 +712,14 @@ architecture rtl of pu_riscv_core is
   signal bu_bp_btaken  : std_logic;
   signal bu_bp_update  : std_logic;
 
-  --Exceptions
+  -- Exceptions
   signal if_exception  : std_logic_vector(EXCEPTION_SIZE-1 downto 0);
   signal id_exception  : std_logic_vector(EXCEPTION_SIZE-1 downto 0);
   signal ex_exception  : std_logic_vector(EXCEPTION_SIZE-1 downto 0);
   signal mem_exception : std_logic_vector(EXCEPTION_SIZE-1 downto 0);
   signal wb_exception  : std_logic_vector(EXCEPTION_SIZE-1 downto 0);
 
-  --RF access
+  -- RF access
   constant RDPORTS : integer := 1;
   constant WRPORTS : integer := 1;
   constant AR_BITS : integer := 5;
@@ -736,7 +733,7 @@ architecture rtl of pu_riscv_core is
   signal rf_dstv  : std_logic_matrix(WRPORTS-1 downto 0)(XLEN-1 downto 0);
   signal rf_we    : std_logic_vector(WRPORTS-1 downto 0);
 
-  --ALU signals
+  -- ALU signals
   signal id_opA     : std_logic_vector(XLEN-1 downto 0);
   signal id_opB     : std_logic_vector(XLEN-1 downto 0);
   signal ex_r       : std_logic_vector(XLEN-1 downto 0);
@@ -753,7 +750,7 @@ architecture rtl of pu_riscv_core is
   signal id_bypwb_opA  : std_logic;
   signal id_bypwb_opB  : std_logic;
 
-  --CPU state
+  -- CPU state
   signal st_xlen       : std_logic_vector(1 downto 0);
   signal st_tvm        : std_logic;
   signal st_tw         : std_logic;
@@ -766,13 +763,13 @@ architecture rtl of pu_riscv_core is
   signal st_csr_rval   : std_logic_vector(XLEN-1 downto 0);
   signal ex_csr_we     : std_logic;
 
-  --Write back
+  -- Write back
   signal wb_dst     : std_logic_vector(4 downto 0);
   signal wb_r       : std_logic_vector(XLEN-1 downto 0);
   signal wb_we      : std_logic;
   signal wb_badaddr : std_logic_vector(XLEN-1 downto 0);
 
-  --Debug
+  -- Debug
   signal du_we_rf      : std_logic;
   signal du_we_frf     : std_logic;
   signal du_we_csr     : std_logic;
@@ -898,7 +895,7 @@ begin
       wb_r          => wb_r
       );
 
-  --Execution units
+  -- Execution units
   execution_unit : pu_riscv_execution
     generic map (
       XLEN           => XLEN,
@@ -976,7 +973,7 @@ begin
       du_ie           => du_ie
       );
 
-  --Memory access
+  -- Memory access
   memory_unit : pu_riscv_memory
     generic map (
       XLEN => XLEN,
@@ -1007,7 +1004,7 @@ begin
 
   dmem_adr <= dmem_adr_sgn;
 
-  --Memory acknowledge + Write Back unit
+  -- Memory acknowledge + Write Back unit
   wb_unit : pu_riscv_wb
     generic map (
       XLEN => XLEN,
@@ -1046,7 +1043,7 @@ begin
   rf_dstv (0) <= wb_r;
   rf_we (0)   <= wb_we;
 
-  --Thread state
+  -- Thread state
   cpu_state : pu_riscv_state
     generic map (
       XLEN           => XLEN,
@@ -1135,7 +1132,7 @@ begin
       du_exceptions => du_exceptions
       );
 
-  --Integer Register File
+  -- Integer Register File
   rf_unit : pu_riscv_rf
     generic map (
       XLEN    => XLEN,
@@ -1160,9 +1157,9 @@ begin
       du_addr    => du_addr
       );
 
-  --Branch Prediction Unit
+  -- Branch Prediction Unit
 
-  --Get Branch Prediction for Next Program Counter
+  -- Get Branch Prediction for Next Program Counter
   generating_0 : if (HAS_BPU = '0') generate
     bp_bp_predict <= "00";
   elsif (HAS_BPU /= '0') generate
@@ -1192,13 +1189,13 @@ begin
 
         ex_pc_i         => ex_pc,
         bu_bp_history_i => bu_bp_history,
-        bu_bp_predict_i => bu_bp_predict,  --prediction bits for branch
+        bu_bp_predict_i => bu_bp_predict,  -- prediction bits for branch
         bu_bp_btaken_i  => bu_bp_btaken,
         bu_bp_update_i  => bu_bp_update
         );
   end generate;
 
-  --Debug Unit
+  -- Debug Unit
   du_unit : pu_riscv_du
     generic map (
       XLEN => XLEN,

@@ -1,6 +1,3 @@
--- Converted from riscv_testbench.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -76,7 +73,7 @@ begin
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Generate watchdog counter
+  -- Generate watchdog counter
   processing_0 : process (clk, rstn)
   begin
     if (rstn = '0') then

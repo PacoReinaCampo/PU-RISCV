@@ -1,6 +1,3 @@
--- Converted from riscv_axi2ahb.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -57,7 +54,7 @@ entity riscv_axi2ahb is
     bus_clk_en   : in std_logic;
     clk_override : in std_logic;
 
-    --AXI4 instruction
+    -- AXI4 instruction
     axi4_aw_id     : in  std_logic_vector(AXI_ID_WIDTH-1 downto 0);
     axi4_aw_addr   : in  std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
     axi4_aw_len    : in  std_logic_vector(7 downto 0);
@@ -182,7 +179,7 @@ architecture rtl of riscv_axi2ahb is
   signal buf_data    : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
   signal buf_tag     : std_logic_vector(AXI_ID_WIDTH-1 downto 0);
 
-  --Miscellaneous signals
+  -- Miscellaneous signals
   signal buf_rst        : std_logic;
   signal buf_tag_in     : std_logic_vector(AXI_ID_WIDTH-1 downto 0);
   signal buf_addr_in    : std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
