@@ -233,9 +233,9 @@ package pu_riscv_verilog_pkg;
   localparam HRET = 32'b001000000010_00000_000_00000_1110011;
   localparam SRET = 32'b000100000010_00000_000_00000_1110011;
   localparam URET = 32'b000000000010_00000_000_00000_1110011;
-  // localparam MRTS       = 32'b001100000101_00000_000_00000_1110011;
-  // localparam MRTH       = 32'b001100000110_00000_000_00000_1110011;
-  // localparam HRTS       = 32'b001000000101_00000_000_00000_1110011;
+  localparam MRTS = 32'b001100000101_00000_000_00000_1110011;
+  localparam MRTH = 32'b001100000110_00000_000_00000_1110011;
+  localparam HRTS = 32'b001000000101_00000_000_00000_1110011;
   localparam WFI = 32'b000100000101_00000_000_00000_1110011;
 
   // f7 f3 opcode
@@ -324,6 +324,7 @@ package pu_riscv_verilog_pkg;
   localparam USTATUS = 'h000;
   localparam UIE = 'h004;
   localparam UTVEC = 'h005;
+
   // User Trap Handling
   localparam USCRATCH = 'h040;
   localparam UEPC = 'h041;
@@ -331,10 +332,12 @@ package pu_riscv_verilog_pkg;
   localparam UBADADDR = 'h043;
   localparam UTVAL = 'h043;
   localparam UIP = 'h044;
+
   // User Floating-Point CSRs
   localparam FFLAGS = 'h001;
   localparam FRM = 'h002;
   localparam FCSR = 'h003;
+
   // User Counters/Timers
   localparam CYCLE = 'hC00;
   localparam TIMEX = 'hC01;
@@ -353,12 +356,14 @@ package pu_riscv_verilog_pkg;
   localparam SIE = 'h104;
   localparam STVEC = 'h105;
   localparam SCOUNTEREN = 'h106;
+
   // Supervisor Trap Handling
   localparam SSCRATCH = 'h140;
   localparam SEPC = 'h141;
   localparam SCAUSE = 'h142;
   localparam STVAL = 'h143;
   localparam SIP = 'h144;
+
   // Supervisor Protection and Translation
   localparam SATP = 'h180;
 
@@ -369,6 +374,7 @@ package pu_riscv_verilog_pkg;
   localparam HIDELEG = 'h203;
   localparam HIE = 'h204;
   localparam HTVEC = 'h205;
+
   // Hypervisor Trap Handling
   localparam HSCRATCH = 'h240;
   localparam HEPC = 'h241;
@@ -382,6 +388,7 @@ package pu_riscv_verilog_pkg;
   localparam MARCHID = 'hF12;
   localparam MIMPID = 'hF13;
   localparam MHARTID = 'hF14;
+
   // Machine Trap Setup
   localparam MSTATUS = 'h300;
   localparam MISA = 'h301;
@@ -391,12 +398,14 @@ package pu_riscv_verilog_pkg;
   localparam MNMIVEC = 'h7C0;  // NMI Vector
   localparam MTVEC = 'h305;
   localparam MCOUNTEREN = 'h306;
+
   // Machine Trap Handling
   localparam MSCRATCH = 'h340;
   localparam MEPC = 'h341;
   localparam MCAUSE = 'h342;
   localparam MTVAL = 'h343;
   localparam MIP = 'h344;
+
   // Machine Protection and Translation
   localparam PMPCFG0 = 'h3A0;
   localparam PMPCFG1 = 'h3A1;  // RV32 only

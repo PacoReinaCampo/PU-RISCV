@@ -1,0 +1,6 @@
+sv work ../../../../../../../rtl/verilog/pkg/peripheral_axi4_verilog_pkg.sv
+
+sv work ../../../../../../../bench/verilog/tests/bfm/axi4/peripheral_bfm_basic.sv
+sv work ../../../../../../../bench/verilog/tests/bfm/axi4/peripheral_bfm_master_generic_axi4.sv
+sv work ../../../../../../../bench/verilog/tests/bfm/axi4/peripheral_bfm_slave_generic_axi4.sv
+sv work ../../../../../../../bench/verilog/tests/bfm/axi4/peripheral_bfm_testbench.sv

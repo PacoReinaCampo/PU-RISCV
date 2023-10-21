@@ -1,5 +1,11 @@
 verilog
 └── tests
+    ├── bfm
+    │   └── axi4
+    │       ├── peripheral_bfm_basic.sv
+    │       ├── peripheral_bfm_master_generic_axi4.sv
+    │       ├── peripheral_bfm_slave_generic_axi4.sv
+    │       └── peripheral_bfm_testbench.sv
     ├── core
     │   ├── cache
     │   │   ├── pu_riscv_dcache_core_testbench.sv
@@ -58,4 +64,4 @@ verilog
             ├── pu_riscv_dbg_bfm.sv
             └── pu_riscv_htif.sv
 
-15 directories, 43 files
+17 directories, 47 files
