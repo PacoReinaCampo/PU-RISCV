@@ -83,8 +83,8 @@
 ../../../../../../../rtl/verilog/pu/wb/pu_riscv_biu2wb.sv
 ../../../../../../../rtl/verilog/pu/wb/pu_riscv_wb.sv
 
-../../../../../../../bench/verilog/tests/pu/wb/pu_riscv_memory_model_wb.sv
-../../../../../../../bench/verilog/tests/pu/wb/pu_riscv_mmio_if_wb.sv
-../../../../../../../bench/verilog/tests/pu/wb/pu_riscv_testbench_wb.sv
-../../../../../../../bench/verilog/tests/bfm/pu_riscv_dbg_bfm.sv
-../../../../../../../bench/verilog/tests/bfm/pu_riscv_htif.sv
+../../../../../../../bench/verilog/tests/pu/interface/wb/pu_riscv_memory_model_wb.sv
+../../../../../../../bench/verilog/tests/pu/interface/wb/pu_riscv_mmio_if_wb.sv
+../../../../../../../bench/verilog/tests/pu/interface/wb/pu_riscv_testbench_wb.sv
+../../../../../../../bench/verilog/tests/pu/main/pu_riscv_dbg_bfm.sv
+../../../../../../../bench/verilog/tests/pu/main/pu_riscv_htif.sv

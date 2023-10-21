@@ -83,8 +83,8 @@ sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
 sv work ../../../../../../../rtl/verilog/pu/axi4/pu_riscv_biu2axi4.sv
 sv work ../../../../../../../rtl/verilog/pu/axi4/pu_riscv_axi4.sv
 
-sv work ../../../../../../../bench/verilog/tests/axi4/pu_riscv_memory_model_axi4.sv
-sv work ../../../../../../../bench/verilog/tests/axi4/pu_riscv_mmio_if_axi4.sv
-sv work ../../../../../../../bench/verilog/tests/axi4/pu_riscv_testbench_axi4.sv
-sv work ../../../../../../../bench/verilog/tests/pu_riscv_dbg_bfm.sv
-sv work ../../../../../../../bench/verilog/tests/pu_riscv_htif.sv
+sv work ../../../../../../../bench/verilog/tests/pu/interface/axi4/pu_riscv_memory_model_axi4.sv
+sv work ../../../../../../../bench/verilog/tests/pu/interface/axi4/pu_riscv_mmio_if_axi4.sv
+sv work ../../../../../../../bench/verilog/tests/pu/interface/axi4/pu_riscv_testbench_axi4.sv
+sv work ../../../../../../../bench/verilog/tests/pu/main/pu_riscv_dbg_bfm.sv
+sv work ../../../../../../../bench/verilog/tests/pu/main/pu_riscv_htif.sv

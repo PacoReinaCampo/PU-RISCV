@@ -86,8 +86,8 @@ vhdl work ../../../../../../../rtl/vhdl/pu/axi4/pu_riscv_axi4.vhd
 vhdl work ../../../../../../../rtl/vhdl/pu/riscv_ahb2axi.vhd
 vhdl work ../../../../../../../rtl/vhdl/pu/riscv_axi2ahb.vhd
 
-vhdl work ../../../../../../../bench/vhdl/tests/axi4/pu_riscv_memory_model_axi4.vhd
-vhdl work ../../../../../../../bench/vhdl/tests/axi4/pu_riscv_mmio_if_axi4.vhd
-vhdl work ../../../../../../../bench/vhdl/tests/axi4/pu_riscv_testbench_axi4.vhd
+vhdl work ../../../../../../../bench/vhdl/tests/pu/interface/axi4/pu_riscv_memory_model_axi4.vhd
+vhdl work ../../../../../../../bench/vhdl/tests/pu/interface/axi4/pu_riscv_mmio_if_axi4.vhd
+vhdl work ../../../../../../../bench/vhdl/tests/pu/interface/axi4/pu_riscv_testbench_axi4.vhd
 vhdl work ../../../../../../../bench/vhdl/tests/pu_riscv_dbg_bfm.vhd
 vhdl work ../../../../../../../bench/vhdl/tests/pu_riscv_htif.vhd

@@ -72,8 +72,8 @@
 
 ../../../../../../../rtl/vhdl/pu/axi4/pu_riscv_biu2axi4.vhd
 
-../../../../../../../bench/vhdl/tests/pu/axi4/pu_riscv_memory_model_axi4.vhd
-../../../../../../../bench/vhdl/tests/pu/axi4/pu_riscv_mmio_if_axi4.vhd
-../../../../../../../bench/vhdl/tests/pu/axi4/pu_riscv_testbench_axi4.vhd
-../../../../../../../bench/vhdl/tests/bfm/pu_riscv_dbg_bfm.vhd
-../../../../../../../bench/vhdl/tests/bfm/pu_riscv_htif.vhd
+../../../../../../../bench/vhdl/tests/pu/interface/axi4/pu_riscv_memory_model_axi4.vhd
+../../../../../../../bench/vhdl/tests/pu/interface/axi4/pu_riscv_mmio_if_axi4.vhd
+../../../../../../../bench/vhdl/tests/pu/interface/axi4/pu_riscv_testbench_axi4.vhd
+../../../../../../../bench/vhdl/tests/pu/main/pu_riscv_dbg_bfm.vhd
+../../../../../../../bench/vhdl/tests/pu/main/pu_riscv_htif.vhd

@@ -75,8 +75,8 @@ vhdl work ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
 vhdl work ../../../../../../../rtl/vhdl/pu/wb/pu_riscv_biu2wb.vhd
 
-vhdl work ../../../../../../../bench/vhdl/tests/wb/pu_riscv_memory_model_wb.vhd
-vhdl work ../../../../../../../bench/vhdl/tests/wb/pu_riscv_mmio_if_wb.vhd
-vhdl work ../../../../../../../bench/vhdl/tests/wb/pu_riscv_testbench_wb.vhd
-vhdl work ../../../../../../../bench/vhdl/tests/pu_riscv_dbg_bfm.vhd
-vhdl work ../../../../../../../bench/vhdl/tests/pu_riscv_htif.vhd
+vhdl work ../../../../../../../bench/vhdl/tests/pu/interface/wb/pu_riscv_memory_model_wb.vhd
+vhdl work ../../../../../../../bench/vhdl/tests/pu/interface/wb/pu_riscv_mmio_if_wb.vhd
+vhdl work ../../../../../../../bench/vhdl/tests/pu/interface/wb/pu_riscv_testbench_wb.vhd
+vhdl work ../../../../../../../bench/vhdl/tests/pu/main/pu_riscv_dbg_bfm.vhd
+vhdl work ../../../../../../../bench/vhdl/tests/pu/main/pu_riscv_htif.vhd
