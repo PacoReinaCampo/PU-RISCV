@@ -86,9 +86,6 @@ begin
   ------------------------------------------------------------------------------
   generating_0 : if (TECHNOLOGY = "GENERIC") generate
     -- GENERIC -- inferrable memory
-
-    -- initial $display ("INFO   : No memory technology specified. Using generic inferred memory (%m)");
-
     ram_inst : pu_riscv_ram_1rw_generic
       generic map (
         ABITS => ABITS,

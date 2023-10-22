@@ -110,11 +110,15 @@ module pu_riscv_ram_1r1w #(
         .re_i   (~contention),
         .dout_o (mem_dout)
       );
-    end else begin  // (TECHNOLOGY == "GENERIC")
+    end else begin
+      // (TECHNOLOGY == "GENERIC")
 
       // GENERIC  -- inferrable memory
 
-      // initial $display ("INFO   : No memory technology specified. Using generic inferred memory (%m)");
+      // initial begin
+      //   $display ("INFO : No memory technology specified. Using generic inferred memory (%m)");
+      // end
+
       pu_riscv_ram_1r1w_generic #(
         .ABITS(ABITS),
         .DBITS(DBITS)
