@@ -51,31 +51,31 @@ module pu_riscv_noicache_core #(
   input clk,
 
   // CPU side
-  output                    if_stall_nxt_pc,
-  input                     if_stall,
-  input                     if_flush,
-  input  [XLEN        -1:0] if_nxt_pc,
-  output [XLEN        -1:0] if_parcel_pc,
-  output [PARCEL_SIZE -1:0] if_parcel,
-  output                    if_parcel_valid,
-  output                    if_parcel_misaligned,
-  input                     bu_cacheflush,
-  input                     dcflush_rdy,
-  input  [             1:0] st_prv,
+  output                   if_stall_nxt_pc,
+  input                    if_stall,
+  input                    if_flush,
+  input  [XLEN       -1:0] if_nxt_pc,
+  output [XLEN       -1:0] if_parcel_pc,
+  output [PARCEL_SIZE-1:0] if_parcel,
+  output                   if_parcel_valid,
+  output                   if_parcel_misaligned,
+  input                    bu_cacheflush,
+  input                    dcflush_rdy,
+  input  [            1:0] st_prv,
 
   // To BIU
-  output                        biu_stb,
-  input                         biu_stb_ack,
-  output     [PLEN        -1:0] biu_adri,
-  input      [PLEN        -1:0] biu_adro,
-  output reg [             2:0] biu_size,     // transfer size
-  output reg [             2:0] biu_type,     // burst type -AHB style
-  output                        biu_lock,
-  output                        biu_we,
-  output     [XLEN        -1:0] biu_di,
-  input      [XLEN        -1:0] biu_do,
-  input                         biu_ack,      // data acknowledge, 1 per data
-  input                         biu_err,      // data error
+  output                biu_stb,
+  input                 biu_stb_ack,
+  output     [PLEN-1:0] biu_adri,
+  input      [PLEN-1:0] biu_adro,
+  output reg [     2:0] biu_size,  // transfer size
+  output reg [     2:0] biu_type,  // burst type -AHB style
+  output                biu_lock,
+  output                biu_we,
+  output     [XLEN-1:0] biu_di,
+  input      [XLEN-1:0] biu_do,
+  input                 biu_ack,  // data acknowledge, 1 per data
+  input                 biu_err,  // data error
 
   output       biu_is_cacheable,
   output       biu_is_instruction,
@@ -86,15 +86,15 @@ module pu_riscv_noicache_core #(
   //
   // Variables
   //
-  logic                        is_cacheable;
+  logic            is_cacheable;
 
-  logic [                 1:0] biu_stb_cnt;
+  logic [     1:0] biu_stb_cnt;
 
-  logic [                 2:0] biu_fifo_valid;
-  logic [XLEN            -1:0] biu_fifo_dat   [3];
-  logic [PLEN            -1:0] biu_fifo_adr   [3];
+  logic [     2:0] biu_fifo_valid;
+  logic [XLEN-1:0] biu_fifo_dat   [3];
+  logic [PLEN-1:0] biu_fifo_adr   [3];
 
-  logic                        if_flush_dly;
+  logic            if_flush_dly;
 
   //////////////////////////////////////////////////////////////////////////////
   //

@@ -816,7 +816,9 @@ module pu_riscv_dcache_core #(
         dat_in                                                            = biu_buffer;  // dat_in = biu_buffer
         dat_in[biu_adro_i[BLK_OFF_BITS-1 -: DAT_OFF_BITS] * XLEN +: XLEN] = biu_q;  // except for last transaction
       end
-      0: dat_in = {BURST_SIZE{write_buffer_data}};  // dat_in = write-data over all words
+      0: begin
+        dat_in = {BURST_SIZE{write_buffer_data}};  // dat_in = write-data over all words
+      end
       // dat_be gates writing
     endcase
   end
@@ -886,7 +888,6 @@ module pu_riscv_dcache_core #(
         biu_buffer_valid <= 'h0;
         biu_buffer_dirty <= 1'b0;
       end
-
       BURST: begin
         if (!biu_we_hold) begin
           if (biu_ack_i) begin  // latch incoming data when transfer-acknowledged

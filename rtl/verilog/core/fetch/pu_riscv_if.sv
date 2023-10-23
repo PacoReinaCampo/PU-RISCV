@@ -159,7 +159,7 @@ module pu_riscv_if #(
     end
   end
 
-  // else if (!if_stall_nxt_pc && !id_stall) begin
+  // end else if (!if_stall_nxt_pc && !id_stall) begin
   //   if_nxt_pc <= if_nxt_pc + 'h4;
 
   // TO-DO: handle if_stall and 16bit instructions
@@ -204,10 +204,13 @@ module pu_riscv_if #(
         parcel_shift_register <= {INSTR_NOP, INSTR_NOP};
       end else begin
         case (parcel_sr_valid)
-          3'b000: parcel_shift_register <= {INSTR_NOP, new_parcel};
+          3'b000: begin
+            parcel_shift_register <= {INSTR_NOP, new_parcel};
+          end
           3'b001: begin
-            if (is_16bit_instruction) parcel_shift_register <= {INSTR_NOP, new_parcel};
-            else begin
+            if (is_16bit_instruction) begin
+              parcel_shift_register <= {INSTR_NOP, new_parcel};
+            end else begin
               parcel_shift_register <= {new_parcel, parcel_shift_register[15:0]};
             end
           end

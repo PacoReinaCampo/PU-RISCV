@@ -97,9 +97,6 @@ module pu_riscv_du #(
   input [XLEN          -1:0] mem_memadr,
   input                      dmem_ack,
   input                      ex_stall,
-  // input                      mem_req,
-  // input                      mem_we,
-  // input [XLEN          -1:0] mem_adr,
 
   // From state
   input [31:0] du_exceptions
@@ -302,9 +299,10 @@ module pu_riscv_du #(
             dbg_bp_hit[n] <= 1'b1;
           end
         end
+      end else begin
+        // n >= BREAKPOINTS
+        assign dbg_bp_hit[n] = 1'b0;
       end
-      // else // n >= BREAKPOINTS
-      // assign dbg_bp_hit[n] = 1'b0;
     end
   endgenerate
 
@@ -392,10 +390,10 @@ module pu_riscv_du #(
           end
         end
       end else begin
-        // assign dbg_cc          [n] = 'h0;
-        // assign dbg_enabled     [n] = 'h0;
-        // assign dbg_implemented [n] = 'h0;
-        // assign dbg_data        [n] = 'h0;
+        assign dbg_cc          [n] = 'h0;
+        assign dbg_enabled     [n] = 'h0;
+        assign dbg_implemented [n] = 'h0;
+        assign dbg_data        [n] = 'h0;
       end
     end
   endgenerate
@@ -426,16 +424,13 @@ module pu_riscv_du #(
               BP_CTRL_CC_LD_ADR:   bp_hit[n] = (mem_memadr == dbg_data[n]) & dmem_ack & mem_read;
               BP_CTRL_CC_ST_ADR:   bp_hit[n] = (mem_memadr == dbg_data[n]) & dmem_ack & mem_write;
               BP_CTRL_CC_LDST_ADR: bp_hit[n] = (mem_memadr == dbg_data[n]) & dmem_ack & (mem_read | mem_write);
-              // BP_CTRL_CC_LD_ADR:   bp_hit[n] = (mem_adr == dbg_data[n]) & mem_req & ~mem_we;
-              // BP_CTRL_CC_ST_ADR:   bp_hit[n] = (mem_adr == dbg_data[n]) & mem_req &  mem_we;
-              // BP_CTRL_CC_LDST_ADR: bp_hit[n] = (mem_adr == dbg_data[n]) & mem_req;
               default:             bp_hit[n] = 1'b0;
             endcase
           end
         end
       end else begin
         // n >= BREAKPOINTS
-        // assign bp_hit[n] = 1'b0;
+        assign bp_hit[n] = 1'b0;
       end
     end
   endgenerate

@@ -657,7 +657,6 @@ module pu_riscv_icache_core #(
         biu_buffer       <= 'h0;
         biu_buffer_valid <= 'h0;
       end
-
       BURST: begin
         if (biu_ack_i) begin  // latch incoming data when transfer-acknowledged
           biu_buffer[biu_adro_i[BLK_OFF_BITS-1 -: DAT_OFF_BITS] * XLEN +: XLEN] <= biu_q_i;
@@ -706,7 +705,6 @@ module pu_riscv_icache_core #(
             biu_stb_o  = 1'b0;
             biu_adri_o = 'hx;
           end
-
           READ_WAY: begin
             biu_stb_o  = 1'b1;
             biu_adri_o = {mem_padr_dly[PLEN-1 : BURST_LSB], {BURST_LSB{1'b0}}};

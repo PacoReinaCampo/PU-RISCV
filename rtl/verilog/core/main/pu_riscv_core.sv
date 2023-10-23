@@ -608,7 +608,7 @@ module pu_riscv_core #(
   generate
     if (HAS_BPU == 0) begin
       assign bp_bp_predict = 2'b00;
-    end else
+    end else begin
       pu_riscv_bp #(
         .XLEN(XLEN),
 
@@ -633,6 +633,7 @@ module pu_riscv_core #(
         .bu_bp_btaken_i (bu_bp_btaken),
         .bu_bp_update_i (bu_bp_update)
       );
+    end
   endgenerate
 
   // Debug Unit
