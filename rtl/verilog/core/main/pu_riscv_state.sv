@@ -807,7 +807,7 @@ module pu_riscv_state #(
           end
         end
       end
-    end else  // (XLEN > 32) begin
+    end else begin  // (XLEN > 32) begin
       always @(posedge clk, negedge rstn) begin
         if (!rstn) begin
           csr_mcycle   <= 'h0;
@@ -828,6 +828,7 @@ module pu_riscv_state #(
           end
         end
       end
+    end
   endgenerate
 
   // mnmivec - RoaLogic Extension

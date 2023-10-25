@@ -283,7 +283,8 @@ module riscv_axi2ahb #(
   function automatic logic [2:0] get_nxtbyte_ptr(logic [2:0] current_byte_ptr, logic [7:0] byteen, logic get_next);
     logic [2:0] start_ptr;
     logic       found;
-    found          = '0;
+
+    found = '0;
 
     start_ptr[2:0] = get_next ? (current_byte_ptr[2:0] + 3'b1) : current_byte_ptr[2:0];
     for (int j = 0; j < 8; j++) begin
