@@ -1,3 +1,45 @@
+////////////////////////////////////////////////////////////////////////////////
+//                                            __ _      _     _               //
+//                                           / _(_)    | |   | |              //
+//                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |              //
+//               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |              //
+//              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |              //
+//               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|              //
+//                  | |                                                       //
+//                  |_|                                                       //
+//                                                                            //
+//                                                                            //
+//              Peripheral-BFM for MPSoC                                      //
+//              Bus Functional Model for MPSoC                                //
+//              AMBA4 AXI-Lite Bus Interface                                  //
+//                                                                            //
+////////////////////////////////////////////////////////////////////////////////
+
+/* Copyright (c) 2018-2019 by the author(s)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * =============================================================================
+ * Author(s):
+ *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
+ */
+
 import peripheral_axi4_verilog_pkg::*;
 
 module peripheral_bfm_slave_generic_axi4 (
@@ -154,13 +196,27 @@ module peripheral_bfm_slave_generic_axi4 (
   always @(posedge aclk) begin
     if (wready) begin
       case (write_strobe)
-        4'b0001: memory[write_address] <= {memory[write_address][31:8], write_data[7:0]};
-        4'b0010: memory[write_address] <= {memory[write_address][31:16], write_data[15:8], memory[write_address][7:0]};
-        4'b0100: memory[write_address] <= {memory[write_address][31:24], write_data[23:16], memory[write_address][15:0]};
-        4'b1000: memory[write_address] <= {write_data[31:24], memory[write_address][23:0]};
-        4'b0011: memory[write_address] <= {write_data[31:16], memory[write_address][15:0]};
-        4'b1100: memory[write_address] <= {memory[write_address][31:16], write_data[15:0]};
-        4'b1111: memory[write_address] <= write_data[31:0];
+        4'b0001: begin
+          memory[write_address] <= {memory[write_address][31:8], write_data[7:0]};
+        end
+        4'b0010: begin
+          memory[write_address] <= {memory[write_address][31:16], write_data[15:8], memory[write_address][7:0]};
+        end
+        4'b0100: begin
+          memory[write_address] <= {memory[write_address][31:24], write_data[23:16], memory[write_address][15:0]};
+        end
+        4'b1000: begin
+          memory[write_address] <= {write_data[31:24], memory[write_address][23:0]};
+        end
+        4'b0011: begin
+          memory[write_address] <= {write_data[31:16], memory[write_address][15:0]};
+        end
+        4'b1100: begin
+          memory[write_address] <= {memory[write_address][31:16], write_data[15:0]};
+        end
+        4'b1111: begin
+          memory[write_address] <= write_data[31:0];
+        end
       endcase
     end
   end
