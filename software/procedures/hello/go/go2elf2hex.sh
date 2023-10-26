@@ -55,3 +55,6 @@ go build -o hello_go.run hello_go.go
 # RISCV-64 ISA
 GOOS=linux GOARCH=riscv64 go build -o hello_go.elf hello_go.go
 riscv64-unknown-elf-objcopy -O ihex hello_go.elf hello_go.hex
+
+# Baremetal simulation
+spike pk hello_go.elf

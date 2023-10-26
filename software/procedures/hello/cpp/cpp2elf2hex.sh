@@ -54,3 +54,6 @@ g++ hello_cpp.cpp -o hello_cpp.run
 # RISCV-64 ISA
 riscv64-unknown-elf-g++ -o hello_cpp.elf hello_cpp.cpp
 riscv64-unknown-elf-objcopy -O ihex hello_cpp.elf hello_cpp.hex
+
+# Baremetal simulation
+spike pk hello_cpp.elf

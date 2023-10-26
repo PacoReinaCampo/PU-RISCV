@@ -46,14 +46,15 @@ git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
 
 cd riscv-gnu-toolchain
 
+sudo rm -rf opt/riscv-elf-gcc
+sudo rm -rf opt/riscv-app-gcc
+
+# Baremetal
 ./configure --prefix=/opt/riscv-elf-gcc
 sudo make clean
 sudo make
 
-./configure --prefix=/opt/riscv-elf-gcc
-sudo make clean
-sudo make linux
-
-./configure --prefix=/opt/riscv-elf-gcc --enable-multilib
+# Application
+./configure --prefix=/opt/riscv-app-gcc --enable-multilib
 sudo make clean
 sudo make linux

@@ -42,7 +42,7 @@
 ##                                                                               ##
 ###################################################################################
 
-export PATH=/opt/riscv-elf-gcc/bin:${PATH}
+export PATH=/opt/riscv-app-gcc/bin:${PATH}
 
 git clone --recursive https://github.com/buildroot/buildroot
 
