@@ -46,7 +46,7 @@ module peripheral_bfm_slave_generic_axi4 (
 
   // Global Signals
   input wire aclk,
-  input wire aresetn, //Active LOW
+  input wire aresetn, // Active LOW
 
   // Write Address Channel
   input  wire [ 3:0] awid,     // Address Write ID

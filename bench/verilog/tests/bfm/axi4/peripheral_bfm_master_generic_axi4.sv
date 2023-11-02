@@ -46,7 +46,7 @@ module peripheral_bfm_master_generic_axi4 (
 
   // Global Signals
   input wire aclk,
-  input wire aresetn, //Active LOW
+  input wire aresetn, // Active LOW
 
   // Write Address Channel
   output reg  [ 3:0] awid,     // Address Write ID
@@ -156,7 +156,7 @@ module peripheral_bfm_master_generic_axi4 (
       awlock  <= AXI_LOCK_NORMAL;
       awcache <= 0;
       awprot  <= AXI_PROTECTION_NORMAL;
-      @(posedge awready);  //This should arrive on a clock edge!
+      @(posedge awready);  // This should arrive on a clock edge!
 
       // Data Phase
       awvalid <= 0;
@@ -196,7 +196,7 @@ module peripheral_bfm_master_generic_axi4 (
       arcache   <= 0;
       arprot    <= AXI_PROTECTION_NORMAL;
       rready    <= 0;
-      @(posedge arready);  //This should arrive on a clock edge!
+      @(posedge arready);  // This should arrive on a clock edge!
 
       // Data Phase
       arvalid <= 0;

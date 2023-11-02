@@ -44,7 +44,7 @@ module peripheral_bfm_master_axi4 (
 
   // Global Signals
   input wire aclk,
-  input wire aresetn, //Active LOW
+  input wire aresetn, // Active LOW
 
   // Write Address Channel
   output reg  [ 3:0] awid,     // Address Write ID

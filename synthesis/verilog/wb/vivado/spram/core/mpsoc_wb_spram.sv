@@ -42,11 +42,11 @@
  */
 
 module mpsoc_wb_spram #(
-  //Memory parameters
+  // Memory parameters
   parameter DEPTH   = 256,
   parameter MEMFILE = "",
 
-  //Wishbone parameters
+  // Wishbone parameters
   parameter DW = 32,
   parameter AW = $clog2(DEPTH)
 )
@@ -170,7 +170,7 @@ module mpsoc_wb_spram #(
   always@(posedge wb_clk_i) begin
     adr_r   <= adr;
     valid_r <= valid;
-    //Ack generation
+    // Ack generation
     wb_ack_o <= valid & (!((wb_cti_i == 3'b000) | (wb_cti_i == 3'b111)) | !wb_ack_o);
     if(wb_rst_i) begin
       adr_r    <= {AW{1'b0}};
@@ -181,7 +181,7 @@ module mpsoc_wb_spram #(
 
   assign ram_we = wb_we_i & valid & wb_ack_o;
 
-  //TODO:ck for burst address errors
+  // TODO:ck for burst address errors
   assign wb_err_o =  1'b0;
 
   mpsoc_wb_ram_generic #(

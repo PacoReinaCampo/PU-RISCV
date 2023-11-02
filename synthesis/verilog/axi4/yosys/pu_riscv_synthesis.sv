@@ -59,23 +59,23 @@ module pu_riscv_synthesis #(
 
   parameter            MULT_LATENCY       = 1,
 
-  parameter            BREAKPOINTS        = 8,  //Number of hardware breakpoints
+  parameter            BREAKPOINTS        = 8,  // Number of hardware breakpoints
 
   parameter            PMA_CNT            = 4,
-  parameter            PMP_CNT            = 16, //Number of Physical Memory Protection entries
+  parameter            PMP_CNT            = 16, // Number of Physical Memory Protection entries
 
   parameter            BP_GLOBAL_BITS     = 2,
   parameter            BP_LOCAL_BITS      = 10,
   parameter            BP_LOCAL_BITS_LSB  = 2,
 
-  parameter            ICACHE_SIZE        = 64,  //in KBytes
-  parameter            ICACHE_BLOCK_SIZE  = 64,  //in Bytes
+  parameter            ICACHE_SIZE        = 64,  // in KBytes
+  parameter            ICACHE_BLOCK_SIZE  = 64,  // in Bytes
   parameter            ICACHE_WAYS        = 2,   //'n'-way set associative
   parameter            ICACHE_REPLACE_ALG = 0,
   parameter            ITCM_SIZE          = 0,
 
-  parameter            DCACHE_SIZE        = 64,  //in KBytes
-  parameter            DCACHE_BLOCK_SIZE  = 64,  //in Bytes
+  parameter            DCACHE_SIZE        = 64,  // in KBytes
+  parameter            DCACHE_BLOCK_SIZE  = 64,  // in Bytes
   parameter            DCACHE_WAYS        = 2,   //'n'-way set associative
   parameter            DCACHE_REPLACE_ALG = 0,
   parameter            DTCM_SIZE          = 0,
@@ -100,13 +100,13 @@ module pu_riscv_synthesis #(
     input                               HRESETn,
     input                               HCLK,
 
-    //Interrupts
+    // Interrupts
     input                               ext_nmi,
     input                               ext_tint,
     input                               ext_sint,
     input                    [     3:0] ext_int,
 
-    //Debug Interface
+    // Debug Interface
     input                               dbg_stall,
     input                               dbg_strb,
     input                               dbg_we,
@@ -137,7 +137,7 @@ module pu_riscv_synthesis #(
   // Variables
   //
 
-  //PMA configuration
+  // PMA configuration
   logic [PMA_CNT-1:0][    13:0] pma_cfg;
   logic [PMA_CNT-1:0][PLEN-1:0] pma_adr;
 
@@ -191,7 +191,7 @@ module pu_riscv_synthesis #(
   logic                        axi4_ins_b_valid;
   logic                        axi4_ins_b_ready;
 
-  //AXI4 Data
+  // AXI4 Data
   logic [AXI_ID_WIDTH    -1:0] axi4_dat_aw_id;
   logic [AXI_ADDR_WIDTH  -1:0] axi4_dat_aw_addr;
   logic [                 7:0] axi4_dat_aw_len;
@@ -246,21 +246,21 @@ module pu_riscv_synthesis #(
   // Module Body
   //
 
-  //Define PMA regions
+  // Define PMA regions
 
-  //crt.0 (ROM) region
+  // crt.0 (ROM) region
   assign pma_adr[0] = TOHOST >> 2;
   assign pma_cfg[0] = {`MEM_TYPE_MAIN, 8'b1111_1000, `AMO_TYPE_NONE, `TOR};
 
-  //TOHOST region
+  // TOHOST region
   assign pma_adr[1] = ((TOHOST >> 2) & ~'hf) | 'h7;
   assign pma_cfg[1] = {`MEM_TYPE_IO, 8'b0100_0000, `AMO_TYPE_NONE, `NAPOT};
 
-  //UART-Tx region
+  // UART-Tx region
   assign pma_adr[2] = UART_TX >> 2;
   assign pma_cfg[2] = {`MEM_TYPE_IO, 8'b0100_0000, `AMO_TYPE_NONE, `NA4};
 
-  //RAM region
+  // RAM region
   assign pma_adr[3] = 1 << 31;
   assign pma_cfg[3] = {`MEM_TYPE_MAIN, 8'b1111_0000, `AMO_TYPE_NONE, `TOR};
 
@@ -296,7 +296,7 @@ module pu_riscv_synthesis #(
     .pma_cfg_i ( pma_cfg ),
     .pma_adr_i ( pma_adr ),
 
-    //AXI4 instruction
+    // AXI4 instruction
     .axi4_ins_aw_id     ( axi4_ins_aw_id ),
     .axi4_ins_aw_addr   ( axi4_ins_aw_addr ),
     .axi4_ins_aw_len    ( axi4_ins_aw_len ),
@@ -346,7 +346,7 @@ module pu_riscv_synthesis #(
     .axi4_ins_b_valid   ( axi4_ins_b_valid ),
     .axi4_ins_b_ready   ( axi4_ins_b_ready),
 
-    //AXI4 data
+    // AXI4 data
     .axi4_dat_aw_id     ( axi4_dat_aw_id ),
     .axi4_dat_aw_addr   ( axi4_dat_aw_addr ),
     .axi4_dat_aw_len    ( axi4_dat_aw_len ),
@@ -396,13 +396,13 @@ module pu_riscv_synthesis #(
     .axi4_dat_b_valid   ( axi4_dat_b_valid ),
     .axi4_dat_b_ready   ( axi4_dat_b_ready),
     
-    //Interrupts
+    // Interrupts
     .ext_nmi   ( ext_nmi  ),
     .ext_tint  ( ext_tint ),
     .ext_sint  ( ext_sint ),
     .ext_int   ( ext_int  ),
 
-    //Debug Interface
+    // Debug Interface
     .dbg_stall ( dbg_stall ),
     .dbg_strb  ( dbg_strb  ),
     .dbg_we    ( dbg_we    ),
@@ -413,7 +413,7 @@ module pu_riscv_synthesis #(
     .dbg_bp    ( dbg_bp    )
   );
 
-  //Instruction AXI4
+  // Instruction AXI4
   mpsoc_axi4_spram #(
     .AXI_ID_WIDTH   ( AXI_ID_WIDTH   ),
     .AXI_ADDR_WIDTH ( AXI_ADDR_WIDTH ),
@@ -482,7 +482,7 @@ module pu_riscv_synthesis #(
     .data_i ( 0 )
   );
 
-  //Data AXI4
+  // Data AXI4
   mpsoc_axi4_spram #(
     .AXI_ID_WIDTH   ( AXI_ID_WIDTH   ),
     .AXI_ADDR_WIDTH ( AXI_ADDR_WIDTH ),

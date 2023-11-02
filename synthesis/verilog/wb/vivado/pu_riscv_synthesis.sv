@@ -59,23 +59,23 @@ module pu_riscv_synthesis #(
 
   parameter            MULT_LATENCY       = 1,
 
-  parameter            BREAKPOINTS        = 8,  //Number of hardware breakpoints
+  parameter            BREAKPOINTS        = 8,  // Number of hardware breakpoints
 
   parameter            PMA_CNT            = 4,
-  parameter            PMP_CNT            = 16, //Number of Physical Memory Protection entries
+  parameter            PMP_CNT            = 16, // Number of Physical Memory Protection entries
 
   parameter            BP_GLOBAL_BITS     = 2,
   parameter            BP_LOCAL_BITS      = 10,
   parameter            BP_LOCAL_BITS_LSB  = 2,
 
-  parameter            ICACHE_SIZE        = 64,  //in KBytes
-  parameter            ICACHE_BLOCK_SIZE  = 64,  //in Bytes
+  parameter            ICACHE_SIZE        = 64,  // in KBytes
+  parameter            ICACHE_BLOCK_SIZE  = 64,  // in Bytes
   parameter            ICACHE_WAYS        = 2,   //'n'-way set associative
   parameter            ICACHE_REPLACE_ALG = 0,
   parameter            ITCM_SIZE          = 0,
 
-  parameter            DCACHE_SIZE        = 64,  //in KBytes
-  parameter            DCACHE_BLOCK_SIZE  = 64,  //in Bytes
+  parameter            DCACHE_SIZE        = 64,  // in KBytes
+  parameter            DCACHE_BLOCK_SIZE  = 64,  // in Bytes
   parameter            DCACHE_WAYS        = 2,   //'n'-way set associative
   parameter            DCACHE_REPLACE_ALG = 0,
   parameter            DTCM_SIZE          = 0,
@@ -100,13 +100,13 @@ module pu_riscv_synthesis #(
     input                               HRESETn,
     input                               HCLK,
 
-    //Interrupts
+    // Interrupts
     input                               ext_nmi,
     input                               ext_tint,
     input                               ext_sint,
     input                    [     3:0] ext_int,
 
-    //Debug Interface
+    // Debug Interface
     input                               dbg_stall,
     input                               dbg_strb,
     input                               dbg_we,
@@ -131,11 +131,11 @@ module pu_riscv_synthesis #(
   // Variables
   //
 
-  //PMA configuration
+  // PMA configuration
   logic [PMA_CNT-1:0][    13:0] pma_cfg;
   logic [PMA_CNT-1:0][PLEN-1:0] pma_adr;
 
-  //WB instruction
+  // WB instruction
   logic              [PLEN-1:0] wb_ins_adr_o;
   logic              [XLEN-1:0] wb_ins_dat_o;
   logic              [     3:0] wb_ins_sel_o;
@@ -149,7 +149,7 @@ module pu_riscv_synthesis #(
   logic                         wb_ins_err_i;
   logic              [     2:0] wb_ins_rty_i;
 
-  //WB data
+  // WB data
   logic              [PLEN-1:0] wb_dat_adr_o;
   logic              [XLEN-1:0] wb_dat_dat_o;
   logic              [     3:0] wb_dat_sel_o;
@@ -168,21 +168,21 @@ module pu_riscv_synthesis #(
   // Module Body
   //
 
-  //Define PMA regions
+  // Define PMA regions
 
-  //crt.0 (ROM) region
+  // crt.0 (ROM) region
   assign pma_adr[0] = TOHOST >> 2;
   assign pma_cfg[0] = {`MEM_TYPE_MAIN, 8'b1111_1000, `AMO_TYPE_NONE, `TOR};
 
-  //TOHOST region
+  // TOHOST region
   assign pma_adr[1] = ((TOHOST >> 2) & ~'hf) | 'h7;
   assign pma_cfg[1] = {`MEM_TYPE_IO, 8'b0100_0000, `AMO_TYPE_NONE, `NAPOT};
 
-  //UART-Tx region
+  // UART-Tx region
   assign pma_adr[2] = UART_TX >> 2;
   assign pma_cfg[2] = {`MEM_TYPE_IO, 8'b0100_0000, `AMO_TYPE_NONE, `NA4};
 
-  //RAM region
+  // RAM region
   assign pma_adr[3] = 1 << 31;
   assign pma_cfg[3] = {`MEM_TYPE_MAIN, 8'b1111_0000, `AMO_TYPE_NONE, `TOR};
 
@@ -218,7 +218,7 @@ module pu_riscv_synthesis #(
     .pma_cfg_i ( pma_cfg ),
     .pma_adr_i ( pma_adr ),
 
-    //WB instruction
+    // WB instruction
     .wb_ins_adr_o ( wb_ins_adr_o ),
     .wb_ins_dat_o ( wb_ins_dat_o ),
     .wb_ins_sel_o ( wb_ins_sel_o ),
@@ -232,7 +232,7 @@ module pu_riscv_synthesis #(
     .wb_ins_err_i ( wb_ins_err_i ),
     .wb_ins_rty_i ( wb_ins_rty_i ),
 
-    //WB data
+    // WB data
     .wb_dat_adr_o ( wb_dat_adr_o ),
     .wb_dat_dat_o ( wb_dat_dat_o ),
     .wb_dat_sel_o ( wb_dat_sel_o ),
@@ -246,13 +246,13 @@ module pu_riscv_synthesis #(
     .wb_dat_err_i ( wb_dat_err_i ),
     .wb_dat_rty_i ( wb_dat_rty_i ),
     
-    //Interrupts
+    // Interrupts
     .ext_nmi   ( ext_nmi  ),
     .ext_tint  ( ext_tint ),
     .ext_sint  ( ext_sint ),
     .ext_int   ( ext_int  ),
 
-    //Debug Interface
+    // Debug Interface
     .dbg_stall ( dbg_stall ),
     .dbg_strb  ( dbg_strb  ),
     .dbg_we    ( dbg_we    ),
@@ -263,7 +263,7 @@ module pu_riscv_synthesis #(
     .dbg_bp    ( dbg_bp    )
   );
 
-  //Instruction WB
+  // Instruction WB
   mpsoc_wb_spram #(
     .DEPTH   ( 256  ),
     .MEMFILE ( ""   ),
@@ -287,7 +287,7 @@ module pu_riscv_synthesis #(
     .wb_dat_o ( wb_ins_dat_i )
   );
 
-  //Data WB
+  // Data WB
   mpsoc_wb_spram #(
     .DEPTH   ( 256  ),
     .MEMFILE ( ""   ),

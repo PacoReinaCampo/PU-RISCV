@@ -43,8 +43,8 @@
 import peripheral_ahb3_verilog_pkg::*;
 
 module mpsoc_ahb3_spram #(
-  parameter MEM_SIZE          = 0,   //Memory in Bytes
-  parameter MEM_DEPTH         = 256, //Memory depth
+  parameter MEM_SIZE          = 0,   // Memory in Bytes
+  parameter MEM_DEPTH         = 256, // Memory depth
   parameter PLEN              = 8,
   parameter XLEN              = 32,
   parameter TECHNOLOGY        = "GENERIC",
@@ -54,8 +54,8 @@ module mpsoc_ahb3_spram #(
     input                 HRESETn,
     input                 HCLK,
 
-    //AHB Slave Interfaces (receive data from AHB Masters)
-    //AHB Masters connect to these ports
+    // AHB Slave Interfaces (receive data from AHB Masters)
+    // AHB Masters connect to these ports
     input                 HSEL,
     input      [PLEN-1:0] HADDR,
     input      [XLEN-1:0] HWDATA,
@@ -108,7 +108,7 @@ module mpsoc_ahb3_spram #(
     logic [  6:0] haddr_masked;
     logic [  6:0] address_offset;
 
-    //get number of active lanes for a 1024bit databus (max width) for this HSIZE
+    // get number of active lanes for a 1024bit databus (max width) for this HSIZE
     case (hsize)
       HSIZE_B1024 : full_be = 128'hffff_ffff_ffff_ffff_ffff_ffff_ffff_ffff; 
       HSIZE_B512  : full_be = 128'h0000_0000_0000_0000_ffff_ffff_ffff_ffff;
@@ -120,7 +120,7 @@ module mpsoc_ahb3_spram #(
       default     : full_be = 128'h0000_0000_0000_0000_0000_0000_0000_0001;
     endcase
 
-    //What are the lesser bits in HADDR?
+    // What are the lesser bits in HADDR?
     case (XLEN)
       1024    : address_offset = 7'b111_1111; 
       0512    : address_offset = 7'b011_1111;
@@ -132,42 +132,42 @@ module mpsoc_ahb3_spram #(
       default : address_offset = 7'b000_0000;
     endcase
 
-    //generate masked address
+    // generate masked address
     haddr_masked = haddr & address_offset;
 
-    //create byte-enable
+    // create byte-enable
     gen_be = full_be[BE_SIZE-1:0] << haddr_masked;
-  endfunction //gen_be
+  endfunction // gen_be
 
   //////////////////////////////////////////////////////////////////
   //
   // Module Body
   //
 
-  //generate internal write signal
-  //This causes read/write contention, which is handled by memory
+  // generate internal write signal
+  // This causes read/write contention, which is handled by memory
   always @(posedge HCLK) begin
     if (HREADY) we <= HSEL & HWRITE & (HTRANS != HTRANS_BUSY) & (HTRANS != HTRANS_IDLE);
     else        we <= 1'b0;
   end
 
-  //decode Byte-Enables
+  // decode Byte-Enables
   always @(posedge HCLK) begin
     if (HREADY) be <= gen_be(HSIZE,HADDR);
   end
 
-  //store write address
+  // store write address
   always @(posedge HCLK) begin
     if (HREADY) waddr <= HADDR;
   end
 
-  //Is there read/write contention on the memory?
+  // Is there read/write contention on the memory?
   assign contention = (waddr[MEM_ABITS_LSB +: MEM_ABITS] == HADDR[MEM_ABITS_LSB +: MEM_ABITS]) & we &
     HSEL & HREADY & ~HWRITE & (HTRANS != HTRANS_BUSY) & (HTRANS != HTRANS_IDLE);
 
-  //if all bytes were written contention is/can be handled by memory
-  //otherwise stall a cycle (forced by N3S)
-  //We could do an exception for N3S here, but this file should be technology agnostic
+  // if all bytes were written contention is/can be handled by memory
+  // otherwise stall a cycle (forced by N3S)
+  // We could do an exception for N3S here, but this file should be technology agnostic
   assign ready = ~(contention & ~&be);
 
   /*
@@ -196,8 +196,8 @@ module mpsoc_ahb3_spram #(
     .dout_o  ( dout                 )
   );
 
-  //AHB bus response
-  assign HRESP = HRESP_OKAY; //always OK
+  // AHB bus response
+  assign HRESP = HRESP_OKAY; // always OK
 
   generate
     if (REGISTERED_OUTPUT == "NO") begin
