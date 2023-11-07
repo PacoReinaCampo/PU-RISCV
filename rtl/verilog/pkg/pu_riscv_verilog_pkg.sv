@@ -43,9 +43,8 @@
 package pu_riscv_verilog_pkg;
 
   //////////////////////////////////////////////////////////////////////////////
-  //
   // Processing Unit
-  //
+  //////////////////////////////////////////////////////////////////////////////
 
   // Core Parameters
   localparam XLEN = 64;
@@ -135,9 +134,8 @@ package pu_riscv_verilog_pkg;
   localparam REVUSR_MINOR = 2;
 
   //////////////////////////////////////////////////////////////////////////////
-  //
   // Execution Unit
-  //
+  //////////////////////////////////////////////////////////////////////////////
 
   // RISCV Opcodes Package
   localparam ILEN = 64;
@@ -291,9 +289,8 @@ package pu_riscv_verilog_pkg;
   localparam REMUW = 15'b0000001_111_01110;
 
   //////////////////////////////////////////////////////////////////////////////
-  //
   // Memory Unit
-  //
+  //////////////////////////////////////////////////////////////////////////////
 
   localparam MEM_TYPE_EMPTY = 2'h0;
   localparam MEM_TYPE_MAIN = 2'h1;
@@ -306,9 +303,8 @@ package pu_riscv_verilog_pkg;
   localparam AMO_TYPE_ARITHMETIC = 2'h3;
 
   //////////////////////////////////////////////////////////////////////////////
-  //
   // State Unit
-  //
+  //////////////////////////////////////////////////////////////////////////////
 
   // Per Supervisor Spec draft 1.10
 
@@ -519,16 +515,15 @@ package pu_riscv_verilog_pkg;
   localparam CAUSE_MEINT = 11;
 
   //////////////////////////////////////////////////////////////////////////////
-  //
   // Debug Unit
-  //
+  //////////////////////////////////////////////////////////////////////////////
 
   // One Debug Unit per Hardware Thread (hart)
   localparam DU_ADDR_SIZE = 12;  // 12bit internal address bus
 
   localparam MAX_BREAKPOINTS = 8;
 
-  /*
+ /*
   * Debug Unit Memory Map
   *
   * addr_bits  Description
@@ -546,7 +541,7 @@ package pu_riscv_verilog_pkg;
   localparam DBG_GPRS = 4'h1;
   localparam DBG_CSRS = 4'h2;
 
-  /*
+ /*
   * Control registers
   * 0 00 00 ctrl
   * 0 00 01
@@ -595,7 +590,7 @@ package pu_riscv_verilog_pkg;
   localparam BP_CTRL_CC_ST_ADR = 3'h2;
   localparam BP_CTRL_CC_LDST_ADR = 3'h3;
 
-  /*
+ /*
   * addr         Key  Description
   * --------------------------------------------
   * 0x000-0x01f  GPR  General Purpose Registers
@@ -609,7 +604,7 @@ package pu_riscv_verilog_pkg;
   localparam DBG_NPC = 12'h200;
   localparam DBG_PPC = 12'h201;
 
-  /*
+ /*
   * Bank2 - CSRs
   *
   * Direct mapping to the 12bit CSR address space
