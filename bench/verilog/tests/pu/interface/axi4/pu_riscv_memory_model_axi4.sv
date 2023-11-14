@@ -14,31 +14,29 @@
 //             AMBA3 AHB-Lite Bus Interface                                   //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
-
-/* Copyright (c) 2017-2018 by the author(s)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * =============================================================================
- * Author(s):
- *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
- */
+// Copyright (c) 2017-2018 by the author(s)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+////////////////////////////////////////////////////////////////////////////////
+// Author(s):
+//   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
 `include "riscv_defines.sv"
 
@@ -188,21 +186,19 @@ module pu_riscv_memory_model_axi4 #(
 
     logic   [PLEN-1:0]      base_addr = BASE;
 
-    /*
-     * 1: start code
-     * 2: byte count  (2 hex digits)
-     * 3: address     (4 hex digits)
-     * 4: record type (2 hex digits)
-     *    00: data
-     *    01: end of file
-     *    02: extended segment address
-     *    03: start segment address
-     *    04: extended linear address (16lsbs of 32bit address)
-     *    05: start linear address
-     * 5: data
-     * 6: checksum    (2 hex digits)
-     */
-
+    // 1: start code
+    // 2: byte count  (2 hex digits)
+    // 3: address     (4 hex digits)
+    // 4: record type (2 hex digits)
+    //    00: data
+    //    01: end of file
+    //    02: extended segment address
+    //    03: start segment address
+    //    04: extended linear address (16lsbs of 32bit address)
+    //    05: start linear address
+    // 5: data
+    // 6: checksum    (2 hex digits)
+   
     fd = $fopen(INIT_FILE, "r");  // open file
     if (fd < 32'h8000_0000) begin
       $display("ERROR  : Skip reading file %s. Reason file not found", INIT_FILE);

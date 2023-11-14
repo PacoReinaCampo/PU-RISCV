@@ -14,31 +14,29 @@
 //              AMBA3 AHB-Lite Bus Interface                                  //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
-
-/* Copyright (c) 2017-2018 by the author(s)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * =============================================================================
- * Author(s):
- *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
- */
+// Copyright (c) 2017-2018 by the author(s)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+////////////////////////////////////////////////////////////////////////////////
+// Author(s):
+//   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
 import pu_riscv_verilog_pkg::*;
 import peripheral_biu_verilog_pkg::*;
@@ -158,13 +156,12 @@ module pu_riscv_pmpchk #(
     input [PLEN-1:2] pma_lb;
     input [PLEN-1:2] pma_ub;
 
-    /* Check if ANY byte of the access lies within the PMA range
-     *   pma_lb <= range < pma_ub
-     * 
-     *   match_none = (access_lb >= pma_ub) OR (access_ub < pma_lb)  (1)
-     *   match_any  = !match_none                                    (2)
-     */
-
+    // Check if ANY byte of the access lies within the PMA range
+    //   pma_lb <= range < pma_ub
+    // 
+    //   match_none = (access_lb >= pma_ub) OR (access_ub < pma_lb)  (1)
+    //   match_any  = !match_none                                    (2)
+   
     match_any = (access_lb >= pma_ub) || (access_ub < pma_lb) ? 1'b0 : 1'b1;
   endfunction
 
@@ -211,12 +208,10 @@ module pu_riscv_pmpchk #(
   // Module Body
   //////////////////////////////////////////////////////////////////////////////
 
-  /*
-   * Address Range Matching
-   * Access Exception
-   * Cacheable
-   */
-
+  // Address Range Matching
+  // Access Exception
+  // Cacheable
+ 
   assign access_lb = adr_i;
   assign access_ub = adr_i + size2bytes(size_i) - 1;
 
@@ -252,12 +247,11 @@ module pu_riscv_pmpchk #(
   assign matched_pmp = highest_priority_match(pmp_match);
   assign matched_pmpcfg = st_pmpcfg_i[matched_pmp];
 
-  /* Access FAIL when:
-   * 1. some bytes matched highest priority PMP, but not the entire transfer range OR
-   * 2. pmpcfg.l is set AND privilegel level is S or U AND pmpcfg.rwx tests fail OR
-   * 3. privilegel level is S or U AND no PMPs matched AND PMPs are implemented
-   */
-
+  // Access FAIL when:
+  // 1. some bytes matched highest priority PMP, but not the entire transfer range OR
+  // 2. pmpcfg.l is set AND privilegel level is S or U AND pmpcfg.rwx tests fail OR
+  // 3. privilegel level is S or U AND no PMPs matched AND PMPs are implemented
+ 
   assign exception_o = req_i & (~|pmp_match ? (st_prv_i != PRV_M) & (PMP_CNT > 0)  // Prv.Lvl != M-Mode, no PMP matched, but PMPs implemented -> FAIL
     : ~pmp_match_all[matched_pmp] | (((st_prv_i != PRV_M) | matched_pmpcfg[7]) &  // pmpcfg.l set or privilege level != M-mode
     ((~matched_pmpcfg[0] & ~we_i) |  // read-access while not allowed          -> FAIL

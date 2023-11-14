@@ -1,0 +1,111 @@
+# vsim -c "+notimingchecks" -l ./log/DCACHE_SIZE0@ICACHE_SIZE0@MEM_LATENCY0@WRITEBUFFER_SIZE0@XLEN32@rv32ui-p-simple.log pu_riscv_testbench_ahb3 -do "run -all; quit" -gINIT_FILE="../../../../../../../../../software/tests/hex/rv32ui-p-simple.hex" 
+# Start time: 15:48:16 on Nov 14,2023
+# Loading sv_std.std
+# Loading work.pu_riscv_verilog_pkg
+# Loading work.pu_riscv_testbench_ahb3_sv_unit
+# Loading work.pu_riscv_testbench_ahb3
+# Loading work.pu_riscv_ahb3
+# Loading work.pu_riscv_core
+# Loading work.pu_riscv_if_sv_unit
+# Loading work.pu_riscv_if
+# Loading work.pu_riscv_id_sv_unit
+# Loading work.pu_riscv_id
+# Loading work.pu_riscv_execution
+# Loading work.pu_riscv_alu_sv_unit
+# Loading work.pu_riscv_alu
+# Loading work.peripheral_biu_verilog_pkg
+# Loading work.pu_riscv_lsu_sv_unit
+# Loading work.pu_riscv_lsu
+# Loading work.pu_riscv_bu_sv_unit
+# Loading work.pu_riscv_bu
+# Loading work.pu_riscv_memory
+# Loading work.pu_riscv_wb_sv_unit
+# Loading work.pu_riscv_wb
+# Loading work.pu_riscv_state_sv_unit
+# Loading work.pu_riscv_state
+# Loading work.pu_riscv_rf
+# Loading work.pu_riscv_du_sv_unit
+# Loading work.pu_riscv_du
+# Loading work.pu_riscv_imem_ctrl_sv_unit
+# Loading work.pu_riscv_imem_ctrl
+# Loading work.pu_riscv_membuf
+# Loading work.pu_riscv_ram_queue
+# Loading work.pu_riscv_memmisaligned_sv_unit
+# Loading work.pu_riscv_memmisaligned
+# Loading work.pu_riscv_mmu
+# Loading work.pu_riscv_pmachk_sv_unit
+# Loading work.pu_riscv_pmachk
+# Loading work.pu_riscv_pmpchk_sv_unit
+# Loading work.pu_riscv_pmpchk
+# Loading work.pu_riscv_dext
+# Loading work.pu_riscv_mux_sv_unit
+# Loading work.pu_riscv_mux
+# Loading work.pu_riscv_dmem_ctrl_sv_unit
+# Loading work.pu_riscv_dmem_ctrl
+# Loading work.peripheral_ahb3_verilog_pkg
+# Loading work.pu_riscv_biu2ahb3_sv_unit
+# Loading work.pu_riscv_biu2ahb3
+# Loading work.pu_riscv_dbg_bfm
+# Loading work.pu_riscv_memory_model_ahb3_sv_unit
+# Loading work.pu_riscv_memory_model_ahb3
+# Loading work.pu_riscv_mmio_if_ahb3_sv_unit
+# Loading work.pu_riscv_mmio_if_ahb3
+# Loading work.pu_riscv_mul_sv_unit
+# Loading work.pu_riscv_mul
+# Loading work.pu_riscv_div_sv_unit
+# Loading work.pu_riscv_div
+# Loading work.pu_riscv_bp
+# Loading work.pu_riscv_ram_1r1w
+# Loading work.pu_riscv_icache_core_sv_unit
+# Loading work.pu_riscv_icache_core
+# Loading work.pu_riscv_dcache_core_sv_unit
+# Loading work.pu_riscv_dcache_core
+# Loading work.pu_riscv_ram_1r1w_generic
+# Loading work.pu_riscv_ram_1rw
+# Loading work.pu_riscv_ram_1rw_generic
+# run -all
+# 
+# 
+#                                                                                                          
+#                                                                                                          
+#                                                               ***                     ***          **    
+#                                                             ** ***    *                ***          **   
+#                                                            **   ***  ***                **          **   
+#                                                            **         *                 **          **   
+#     ****    **   ****                                      **                           **          **   
+#    * ***  *  **    ***  *    ***       ***    ***  ****    ******   ***        ***      **      *** **   
+#   *   ****   **     ****    * ***     * ***    **** **** * *****     ***      * ***     **     ********* 
+#  **    **    **      **    *   ***   *   ***    **   ****  **         **     *   ***    **    **   ****  
+#  **    **    **      **   **    *** **    ***   **    **   **         **    **    ***   **    **    **   
+#  **    **    **      **   ********  ********    **    **   **         **    ********    **    **    **   
+#  **    **    **      **   *******   *******     **    **   **         **    *******     **    **    **   
+#  **    **    **      **   **        **          **    **   **         **    **          **    **    **   
+#   *******     ******* **  ****    * ****    *   **    **   **         **    ****    *   **    **    **   
+#    ******      *****   **  *******   *******    ***   ***  **         *** *  *******    *** *  *****     
+#        **                   *****     *****      ***   ***  **         ***    *****      ***    ***      
+#        **                                                                                                
+#        **                                                                                                
+#         **                                                                                               
+# - RISC-V Regression TestBench ---------------------------------------------------------------------------
+#   XLEN | PRIV | MMU | FPU | RVA | RVM | MULLAT
+#     64 | MHSU |   1 |   1 |   1 |   1 |      1
+# ------------------------------------------------------------------------------
+#   CORES | NODES | X | Y | Z | CORES_PER_TILE | CORES_PER_MISD | CORES_PER_SIMD
+#     1   |     1 | 1 | 1 | 1 |       --       |       --       |       --       
+# ------------------------------------------------------------------------------
+#   Test   = ../../../../../../../../../software/tests/hex/rv32ui-p-simple.hex
+#   ICache = 64kB
+#   DCache = 64kB
+# ------------------------------------------------------------------------------
+# 
+# 
+# -------------------------------------------------------------
+# * RISC-V test bench finished
+# * PASSED 1
+# -------------------------------------------------------------
+# 
+# 
+# ** Note: $finish    : /home/user/GitHub/code/Architecture-Test/PU-RISCV/bench/verilog/tests/pu/interface/ahb3/pu_riscv_mmio_if_ahb3.sv(155)
+#    Time: 3305 ps  Iteration: 1  Instance: /pu_riscv_testbench_ahb3/genblk1/mmio_if
+# End time: 15:48:17 on Nov 14,2023, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0

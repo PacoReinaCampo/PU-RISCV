@@ -14,31 +14,29 @@
 //              AMBA3 AHB-Lite Bus Interface                                  //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
-
-/* Copyright (c) 2017-2018 by the author(s)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * =============================================================================
- * Author(s):
- *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
- */
+// Copyright (c) 2017-2018 by the author(s)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+////////////////////////////////////////////////////////////////////////////////
+// Author(s):
+//   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
 import pu_riscv_verilog_pkg::*;
 
@@ -167,14 +165,12 @@ module pu_riscv_mul #(
   assign opA32      = opA[31:0];
   assign opB32      = opB[31:0];
 
-  /*
-   *  Multiply operations
-   *
-   * Transform all multiplications into 1 unsigned multiplication
-   * This avoids building multiple multipliers (signed x signed, signed x unsigned, unsigned x unsigned)
-   *   at the expense of potentially making the path slower
-   */
-
+  //  Multiply operations
+  //
+  // Transform all multiplications into 1 unsigned multiplication
+  // This avoids building multiple multipliers (signed x signed, signed x unsigned, unsigned x unsigned)
+  //   at the expense of potentially making the path slower
+ 
   // multiplier operand-A
   always @(*) begin
     casex ({
@@ -221,12 +217,10 @@ module pu_riscv_mul #(
   generate
     if (LATENCY == 0) begin
 
-      /*
-       * Single cycle multiplier
-       *
-       * Registers at: - output
-       */
-
+      // Single cycle multiplier
+      //
+      // Registers at: - output
+     
       // Register holding instruction for multiplier-output-selector
       assign mul_instr         = id_instr;
 
@@ -242,13 +236,11 @@ module pu_riscv_mul #(
       assign mult_r_signed_reg = mult_r_signed;
     end else begin
 
-      /*
-       * Multi cycle multiplier
-       *
-       * Registers at: - input
-       *               - output
-       */
-
+      // Multi cycle multiplier
+      //
+      // Registers at: - input
+      //               - output
+     
       // Register holding instruction for multiplier-output-selector
       always @(posedge clk) begin
         if (!ex_stall) begin
