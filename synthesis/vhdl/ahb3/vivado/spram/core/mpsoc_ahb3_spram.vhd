@@ -1,6 +1,3 @@
--- Converted from verilog/mpsoc_ram/mpsoc_ahb3_spram.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -41,7 +38,6 @@
 --------------------------------------------------------------------------------
 -- Author(s):
 --   Paco Reina Campo <pacoreinacampo@queenfield.tech>
---
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -53,8 +49,8 @@ use work.vhdl_pkg.all;
 
 entity mpsoc_ahb3_spram is
   generic (
-    MEM_SIZE          : integer := 256;  --Memory in Bytes
-    MEM_DEPTH         : integer := 256;  --Memory depth
+    MEM_SIZE          : integer := 256;  -- Memory in Bytes
+    MEM_DEPTH         : integer := 256;  -- Memory depth
     PLEN              : integer := 64;
     XLEN              : integer := 64;
     TECHNOLOGY        : string  := "GENERIC";
@@ -64,8 +60,8 @@ entity mpsoc_ahb3_spram is
     HRESETn : in std_logic;
     HCLK    : in std_logic;
 
-    --AHB Slave Interfaces (receive data from AHB Masters)
-    --AHB Masters connect to these ports
+    -- AHB Slave Interfaces (receive data from AHB Masters)
+    -- AHB Masters connect to these ports
     HSEL      : in  std_logic;
     HADDR     : in  std_logic_vector(PLEN-1 downto 0);
     HWDATA    : in  std_logic_vector(XLEN-1 downto 0);
@@ -93,13 +89,13 @@ architecture rtl of mpsoc_ahb3_spram is
       rst_ni : in std_logic;
       clk_i  : in std_logic;
 
-      --Write side
+      -- Write side
       waddr_i : in std_logic_vector(ABITS-1 downto 0);
       din_i   : in std_logic_vector(DBITS-1 downto 0);
       we_i    : in std_logic;
       be_i    : in std_logic_vector((DBITS+7)/8-1 downto 0);
 
-      --Read side
+      -- Read side
       raddr_i : in  std_logic_vector(ABITS-1 downto 0);
       re_i    : in  std_logic;
       dout_o  : out std_logic_vector(DBITS-1 downto 0)
@@ -108,7 +104,7 @@ architecture rtl of mpsoc_ahb3_spram is
 
   ------------------------------------------------------------------------------
   -- Constants
-  --
+  ------------------------------------------------------------------------------
   constant BE_SIZE : integer := (PLEN+7)/8;
 
   constant MEM_SIZE_DEPTH : integer := 8*MEM_SIZE/XLEN;
@@ -141,7 +137,7 @@ architecture rtl of mpsoc_ahb3_spram is
 
     variable gen_be_return : std_logic_vector (BE_SIZE-1 downto 0);
   begin
-    --get number of active lanes for a 1024bit databus (max width) for this HSIZE
+    -- get number of active lanes for a 1024bit databus (max width) for this HSIZE
     case (hsize_s) is
       when HSIZE_B1024 =>
         full_be := X"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
@@ -161,7 +157,7 @@ architecture rtl of mpsoc_ahb3_spram is
         full_be := X"00000000000000000000000000000001";
     end case;
 
-    --What are the lesser bits in HADDR?
+    -- What are the lesser bits in HADDR?
     case (XLEN) is
       when 1024 =>
         address_offset := "1111111";
@@ -181,21 +177,21 @@ architecture rtl of mpsoc_ahb3_spram is
         address_offset := "0000000";
     end case;
 
-    --generate masked address
+    -- generate masked address
     haddr_masked := haddr_s(6 downto 0) and address_offset;
 
-    --create byte-enable
+    -- create byte-enable
     gen_be_return := std_logic_vector(unsigned(full_be(BE_SIZE-1 downto 0)) sll to_integer(unsigned(haddr_masked)));
     return gen_be_return;
-  end gen_be;  --gen_be
+  end gen_be;  -- gen_be
 
 begin
   ------------------------------------------------------------------------------
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --generate internal write signal
-  --This causes read/write contention, which is handled by memory
+  -- generate internal write signal
+  -- This causes read/write contention, which is handled by memory
   processing_0 : process (HCLK)
   begin
     if (rising_edge(HCLK)) then
@@ -207,7 +203,7 @@ begin
     end if;
   end process;
 
-  --decode Byte-Enables
+  -- decode Byte-Enables
   processing_1 : process (HCLK)
   begin
     if (rising_edge(HCLK)) then
@@ -217,7 +213,7 @@ begin
     end if;
   end process;
 
-  --store write address
+  -- store write address
   processing_2 : process (HCLK)
   begin
     if (rising_edge(HCLK)) then
@@ -227,12 +223,12 @@ begin
     end if;
   end process;
 
-  --Is there read/write contention on the memory?
+  -- Is there read/write contention on the memory?
   contention <= to_stdlogic(waddr(MEM_ABITS+MEM_ABITS_LSB-1 downto MEM_ABITS_LSB) = HADDR(MEM_ABITS+MEM_ABITS_LSB-1 downto MEM_ABITS_LSB)) and we and HSEL and HREADY and not HWRITE and to_stdlogic(HTRANS /= HTRANS_BUSY) and to_stdlogic(HTRANS /= HTRANS_IDLE);
 
-  --if all bytes were written contention is/can be handled by memory
-  --otherwise stall a cycle (forced by N3S)
-  --We could do an exception for N3S here, but this file should be technology agnostic
+  -- if all bytes were written contention is/can be handled by memory
+  -- otherwise stall a cycle (forced by N3S)
+  -- We could do an exception for N3S here, but this file should be technology agnostic
   ready <= not (contention and reduce_nand(be));
 
   --  * Hookup Memory Wrapper
@@ -260,8 +256,8 @@ begin
       dout_o  => dout
       );
 
-  --AHB bus response
-  HRESP <= HRESP_OKAY;                  --always OK
+  -- AHB bus response
+  HRESP <= HRESP_OKAY;                  -- always OK
 
   processing_3 : process (HCLK, HRESETn)
   begin

@@ -1,6 +1,3 @@
--- Converted from pu_riscv_synthesis.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -41,7 +38,6 @@
 --------------------------------------------------------------------------------
 -- Author(s):
 --   Paco Reina Campo <pacoreinacampo@queenfield.tech>
---
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -69,23 +65,23 @@ entity pu_riscv_synthesis is
 
       MULT_LATENCY : std_logic := '1';
 
-      BREAKPOINTS : integer := 8;       --Number of hardware breakpoints
+      BREAKPOINTS : integer := 8;       -- Number of hardware breakpoints
 
       PMA_CNT : integer := 4;
-      PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
+      PMP_CNT : integer := 16;  -- Number of Physical Memory Protection entries
 
       BP_GLOBAL_BITS    : integer := 2;
       BP_LOCAL_BITS     : integer := 10;
       BP_LOCAL_BITS_LSB : integer := 2;
 
-      ICACHE_SIZE        : integer := 64;  --in KBytes
-      ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+      ICACHE_SIZE        : integer := 64;  -- in KBytes
+      ICACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
       ICACHE_WAYS        : integer := 2;   --'n'-way set associative
       ICACHE_REPLACE_ALG : integer := 0;
       ITCM_SIZE          : integer := 0;
 
-      DCACHE_SIZE        : integer := 64;  --in KBytes
-      DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+      DCACHE_SIZE        : integer := 64;  -- in KBytes
+      DCACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
       DCACHE_WAYS        : integer := 2;   --'n'-way set associative
       DCACHE_REPLACE_ALG : integer := 0;
       DTCM_SIZE          : integer := 0;
@@ -113,13 +109,13 @@ entity pu_riscv_synthesis is
     HRESETn : in std_logic;
     HCLK    : in std_logic;
 
-    --Interrupts
+    -- Interrupts
     ext_nmi  : in std_logic;
     ext_tint : in std_logic;
     ext_sint : in std_logic;
     ext_int  : in std_logic_vector(3 downto 0);
 
-    --Debug Interface
+    -- Debug Interface
     dbg_stall : in  std_logic;
     dbg_strb  : in  std_logic;
     dbg_we    : in  std_logic;
@@ -155,23 +151,23 @@ architecture rtl of pu_riscv_synthesis is
 
       MULT_LATENCY : std_logic := '1';
 
-      BREAKPOINTS : integer := 8;       --Number of hardware breakpoints
+      BREAKPOINTS : integer := 8;       -- Number of hardware breakpoints
 
       PMA_CNT : integer := 4;
-      PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
+      PMP_CNT : integer := 16;  -- Number of Physical Memory Protection entries
 
       BP_GLOBAL_BITS    : integer := 2;
       BP_LOCAL_BITS     : integer := 10;
       BP_LOCAL_BITS_LSB : integer := 2;
 
-      ICACHE_SIZE        : integer := 64;  --in KBytes
-      ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+      ICACHE_SIZE        : integer := 64;  -- in KBytes
+      ICACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
       ICACHE_WAYS        : integer := 2;   --'n'-way set associative
       ICACHE_REPLACE_ALG : integer := 0;
       ITCM_SIZE          : integer := 0;
 
-      DCACHE_SIZE        : integer := 64;  --in KBytes
-      DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+      DCACHE_SIZE        : integer := 64;  -- in KBytes
+      DCACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
       DCACHE_WAYS        : integer := 2;   --'n'-way set associative
       DCACHE_REPLACE_ALG : integer := 0;
       DTCM_SIZE          : integer := 0;
@@ -196,7 +192,7 @@ architecture rtl of pu_riscv_synthesis is
       PARCEL_SIZE : integer := 64
     );
     port (
-      --AHB interfaces
+      -- AHB interfaces
       HRESETn : in std_logic;
       HCLK    : in std_logic;
 
@@ -229,13 +225,13 @@ architecture rtl of pu_riscv_synthesis is
       dat_HREADY    : in  std_logic;
       dat_HRESP     : in  std_logic;
 
-      --Interrupts
+      -- Interrupts
       ext_nmi  : in std_logic;
       ext_tint : in std_logic;
       ext_sint : in std_logic;
       ext_int  : in std_logic_vector(3 downto 0);
 
-      --Debug Interface
+      -- Debug Interface
       dbg_stall : in  std_logic;
       dbg_strb  : in  std_logic;
       dbg_we    : in  std_logic;
@@ -249,8 +245,8 @@ architecture rtl of pu_riscv_synthesis is
 
   component mpsoc_ahb3_spram
     generic (
-      MEM_SIZE          : integer := 256;  --Memory in Bytes
-      MEM_DEPTH         : integer := 256;  --Memory depth
+      MEM_SIZE          : integer := 256;  -- Memory in Bytes
+      MEM_DEPTH         : integer := 256;  -- Memory depth
       PLEN              : integer := 64;
       XLEN              : integer := 64;
       TECHNOLOGY        : string  := "GENERIC";
@@ -260,8 +256,8 @@ architecture rtl of pu_riscv_synthesis is
       HRESETn : in std_logic;
       HCLK    : in std_logic;
 
-      --AHB Slave Interfaces (receive data from AHB Masters)
-      --AHB Masters connect to these ports
+      -- AHB Slave Interfaces (receive data from AHB Masters)
+      -- AHB Masters connect to these ports
       HSEL      : in  std_logic;
       HADDR     : in  std_logic_vector(PLEN-1 downto 0);
       HWDATA    : in  std_logic_vector(XLEN-1 downto 0);
@@ -280,7 +276,7 @@ architecture rtl of pu_riscv_synthesis is
 
   ------------------------------------------------------------------------------
   -- Constants
-  --
+  ------------------------------------------------------------------------------
 
   constant HTIF    : integer                       := 0;  -- Host-Interface
   constant TOHOST  : std_logic_vector(31 downto 0) := X"80001000";
@@ -290,11 +286,11 @@ architecture rtl of pu_riscv_synthesis is
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --PMA configuration
+  -- PMA configuration
   signal pma_cfg : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
   signal pma_adr : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
-  --AHB3 instruction
+  -- AHB3 instruction
   signal ins_HSEL      : std_logic;
   signal ins_HADDR     : std_logic_vector(PLEN-1 downto 0);
   signal ins_HWDATA    : std_logic_vector(XLEN-1 downto 0);
@@ -308,7 +304,7 @@ architecture rtl of pu_riscv_synthesis is
   signal ins_HREADY    : std_logic;
   signal ins_HRESP     : std_logic;
 
-  --AHB3 data
+  -- AHB3 data
   signal dat_HSEL      : std_logic;
   signal dat_HADDR     : std_logic_vector(PLEN-1 downto 0);
   signal dat_HWDATA    : std_logic_vector(XLEN-1 downto 0);
@@ -322,20 +318,19 @@ architecture rtl of pu_riscv_synthesis is
   signal dat_HREADY    : std_logic;
   signal dat_HRESP     : std_logic;
 
-  --Debug Interface
+  -- Debug Interface
   signal dbg_dato_s : std_logic_vector(XLEN-1 downto 0);
 
 begin
-  --/////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Define PMA regions
+  -- Define PMA regions
   pma_adr <= (others => (others => '0'));
   pma_cfg <= (others => (others => '0'));
 
-  --Debug Interface
+  -- Debug Interface
   dbg_dato_s <= X"00000000" & dbg_dato;
 
   -- Processing Unit
@@ -403,7 +398,7 @@ begin
       pma_cfg_i => pma_cfg,
       pma_adr_i => pma_adr,
 
-      --AHB3 instruction
+      -- AHB3 instruction
       ins_HSEL      => ins_HSEL,
       ins_HADDR     => ins_HADDR,
       ins_HWDATA    => ins_HWDATA,
@@ -417,7 +412,7 @@ begin
       ins_HREADY    => ins_HREADY,
       ins_HRESP     => ins_HRESP,
 
-      --AHB3 data
+      -- AHB3 data
       dat_HSEL      => dat_HSEL,
       dat_HADDR     => dat_HADDR,
       dat_HWDATA    => dat_HWDATA,
@@ -431,13 +426,13 @@ begin
       dat_HREADY    => dat_HREADY,
       dat_HRESP     => dat_HRESP,
 
-      --Interrupts
+      -- Interrupts
       ext_nmi       => ext_nmi,
       ext_tint      => ext_tint,
       ext_sint      => ext_sint,
       ext_int       => ext_int,
 
-      --Debug Interface
+      -- Debug Interface
       dbg_stall => dbg_stall,
       dbg_strb  => dbg_strb,
       dbg_we    => dbg_we,
@@ -448,7 +443,7 @@ begin
       dbg_bp    => dbg_bp
     );
 
-  --Instruction AHB3
+  -- Instruction AHB3
   instruction_ahb3 : mpsoc_ahb3_spram
     generic map (
       MEM_SIZE          => 256,
@@ -477,7 +472,7 @@ begin
       HRESP     => ins_HRESP
     );
 
-  --Data AHB3
+  -- Data AHB3
   data_ahb3 : mpsoc_ahb3_spram
     generic map (
       MEM_SIZE          => 256,

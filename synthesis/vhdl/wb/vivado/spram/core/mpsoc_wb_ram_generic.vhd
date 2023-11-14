@@ -1,6 +1,3 @@
--- Converted from mpsoc_wb_ram_generic.v
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -42,7 +39,6 @@
 -- Author(s):
 --   Olof Kindgren <olof.kindgren@gmail.com>
 --   Paco Reina Campo <pacoreinacampo@queenfield.tech>
---
 
 library ieee;
 use ieee.std_logic_1164.all;

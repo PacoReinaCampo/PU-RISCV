@@ -1,6 +1,3 @@
--- Converted from pu_riscv_synthesis.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -41,7 +38,6 @@
 --------------------------------------------------------------------------------
 -- Author(s):
 --   Paco Reina Campo <pacoreinacampo@queenfield.tech>
---
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -69,23 +65,23 @@ entity pu_riscv_synthesis is
 
     MULT_LATENCY : std_logic := '1';
 
-    BREAKPOINTS : integer := 8;       --Number of hardware breakpoints
+    BREAKPOINTS : integer := 8;       -- Number of hardware breakpoints
 
     PMA_CNT : integer := 4;
-    PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
+    PMP_CNT : integer := 16;  -- Number of Physical Memory Protection entries
 
     BP_GLOBAL_BITS    : integer := 2;
     BP_LOCAL_BITS     : integer := 10;
     BP_LOCAL_BITS_LSB : integer := 2;
 
-    ICACHE_SIZE        : integer := 64;  --in KBytes
-    ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+    ICACHE_SIZE        : integer := 64;  -- in KBytes
+    ICACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
     ICACHE_WAYS        : integer := 2;   --'n'-way set associative
     ICACHE_REPLACE_ALG : integer := 0;
     ITCM_SIZE          : integer := 0;
 
-    DCACHE_SIZE        : integer := 64;  --in KBytes
-    DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+    DCACHE_SIZE        : integer := 64;  -- in KBytes
+    DCACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
     DCACHE_WAYS        : integer := 2;   --'n'-way set associative
     DCACHE_REPLACE_ALG : integer := 0;
     DTCM_SIZE          : integer := 0;
@@ -113,13 +109,13 @@ entity pu_riscv_synthesis is
     HRESETn : in std_logic;
     HCLK    : in std_logic;
 
-    --Interrupts
+    -- Interrupts
     ext_nmi  : in std_logic;
     ext_tint : in std_logic;
     ext_sint : in std_logic;
     ext_int  : in std_logic_vector(3 downto 0);
 
-    --Debug Interface
+    -- Debug Interface
     dbg_stall : in  std_logic;
     dbg_strb  : in  std_logic;
     dbg_we    : in  std_logic;
@@ -155,23 +151,23 @@ architecture rtl of pu_riscv_synthesis is
 
       MULT_LATENCY : std_logic := '1';
 
-      BREAKPOINTS : integer := 8;       --Number of hardware breakpoints
+      BREAKPOINTS : integer := 8;       -- Number of hardware breakpoints
 
       PMA_CNT : integer := 4;
-      PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
+      PMP_CNT : integer := 16;  -- Number of Physical Memory Protection entries
 
       BP_GLOBAL_BITS    : integer := 2;
       BP_LOCAL_BITS     : integer := 10;
       BP_LOCAL_BITS_LSB : integer := 2;
 
-      ICACHE_SIZE        : integer := 64;  --in KBytes
-      ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+      ICACHE_SIZE        : integer := 64;  -- in KBytes
+      ICACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
       ICACHE_WAYS        : integer := 2;   --'n'-way set associative
       ICACHE_REPLACE_ALG : integer := 0;
       ITCM_SIZE          : integer := 0;
 
-      DCACHE_SIZE        : integer := 64;  --in KBytes
-      DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+      DCACHE_SIZE        : integer := 64;  -- in KBytes
+      DCACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
       DCACHE_WAYS        : integer := 2;   --'n'-way set associative
       DCACHE_REPLACE_ALG : integer := 0;
       DTCM_SIZE          : integer := 0;
@@ -202,7 +198,7 @@ architecture rtl of pu_riscv_synthesis is
       pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
       pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
-      --WB interfaces
+      -- WB interfaces
       wb_ins_adr_o : out std_logic_vector(PLEN-1 downto 0);
       wb_ins_dat_o : out std_logic_vector(XLEN-1 downto 0);
       wb_ins_sel_o : out std_logic_vector(3 downto 0);
@@ -229,13 +225,13 @@ architecture rtl of pu_riscv_synthesis is
       wb_dat_err_i : in  std_logic;
       wb_dat_rty_i : in  std_logic_vector(2 downto 0);
 
-      --Interrupts
+      -- Interrupts
       ext_nmi  : in std_logic;
       ext_tint : in std_logic;
       ext_sint : in std_logic;
       ext_int  : in std_logic_vector(3 downto 0);
 
-      --Debug Interface
+      -- Debug Interface
       dbg_stall : in  std_logic;
       dbg_strb  : in  std_logic;
       dbg_we    : in  std_logic;
@@ -249,11 +245,11 @@ architecture rtl of pu_riscv_synthesis is
 
   component mpsoc_wb_spram
     generic (
-      --Memory parameters
+      -- Memory parameters
       DEPTH   : integer := 256;
       MEMFILE : string  := "";
 
-      --Wishbone parameters
+      -- Wishbone parameters
       DW : integer := 32;
       AW : integer := integer(log2(real(256)))
       );
@@ -278,7 +274,7 @@ architecture rtl of pu_riscv_synthesis is
 
   ------------------------------------------------------------------------------
   -- Constants
-  --
+  ------------------------------------------------------------------------------
 
   constant HTIF    : integer                       := 0;  -- Host-Interface
   constant TOHOST  : std_logic_vector(31 downto 0) := X"80001000";
@@ -288,11 +284,11 @@ architecture rtl of pu_riscv_synthesis is
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --PMA configuration
+  -- PMA configuration
   signal pma_cfg : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
   signal pma_adr : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
-  --WB Instruction
+  -- WB Instruction
   signal wb_ins_adr_o : std_logic_vector(PLEN-1 downto 0);
   signal wb_ins_dat_o : std_logic_vector(XLEN-1 downto 0);
   signal wb_ins_sel_o : std_logic_vector(3 downto 0);
@@ -306,7 +302,7 @@ architecture rtl of pu_riscv_synthesis is
   signal wb_ins_err_i : std_logic;
   signal wb_ins_rty_i : std_logic_vector(2 downto 0);
 
-  --WB Data
+  -- WB Data
   signal wb_dat_adr_o : std_logic_vector(PLEN-1 downto 0);
   signal wb_dat_dat_o : std_logic_vector(XLEN-1 downto 0);
   signal wb_dat_sel_o : std_logic_vector(3 downto 0);
@@ -320,20 +316,19 @@ architecture rtl of pu_riscv_synthesis is
   signal wb_dat_err_i : std_logic;
   signal wb_dat_rty_i : std_logic_vector(2 downto 0);
 
-  --Debug Interface
+  -- Debug Interface
   signal dbg_dato_s : std_logic_vector(XLEN-1 downto 0);
 
 begin
-  --/////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Define PMA regions
+  -- Define PMA regions
   pma_adr <= (others => (others => '0'));
   pma_cfg <= (others => (others => '0'));
 
-  --Debug Interface
+  -- Debug Interface
   dbg_dato_s <= X"00000000" & dbg_dato;
 
   -- Processing Unit
@@ -401,7 +396,7 @@ begin
       pma_cfg_i => pma_cfg,
       pma_adr_i => pma_adr,
 
-      --WB instruction
+      -- WB instruction
       wb_ins_adr_o => wb_ins_adr_o,
       wb_ins_dat_o => wb_ins_dat_o,
       wb_ins_sel_o => wb_ins_sel_o,
@@ -415,7 +410,7 @@ begin
       wb_ins_err_i => wb_ins_err_i,
       wb_ins_rty_i => wb_ins_rty_i,
 
-      --WB data
+      -- WB data
       wb_dat_adr_o => wb_dat_adr_o,
       wb_dat_dat_o => wb_dat_dat_o,
       wb_dat_sel_o => wb_dat_sel_o,
@@ -429,13 +424,13 @@ begin
       wb_dat_err_i => wb_dat_err_i,
       wb_dat_rty_i => wb_dat_rty_i,
  
-      --Interrupts
+      -- Interrupts
       ext_nmi       => ext_nmi,
       ext_tint      => ext_tint,
       ext_sint      => ext_sint,
       ext_int       => ext_int,
 
-      --Debug Interface
+      -- Debug Interface
       dbg_stall => dbg_stall,
       dbg_strb  => dbg_strb,
       dbg_we    => dbg_we,
@@ -446,7 +441,7 @@ begin
       dbg_bp    => dbg_bp
     );
 
-  --Instruction wb
+  -- Instruction wb
   instruction_wb : mpsoc_wb_spram
     generic map (
       DEPTH   => 256,
@@ -471,7 +466,7 @@ begin
       wb_dat_o => wb_ins_dat_i
     );
 
-  --Data wb
+  -- Data wb
   data_wb : mpsoc_wb_spram
     generic map (
       DEPTH   => 256,

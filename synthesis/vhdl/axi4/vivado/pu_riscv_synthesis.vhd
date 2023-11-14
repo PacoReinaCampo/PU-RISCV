@@ -1,6 +1,3 @@
--- Converted from pu_riscv_synthesis.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -41,7 +38,6 @@
 --------------------------------------------------------------------------------
 -- Author(s):
 --   Paco Reina Campo <pacoreinacampo@queenfield.tech>
---
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -76,23 +72,23 @@ entity pu_riscv_synthesis is
 
     MULT_LATENCY : std_logic := '1';
 
-    BREAKPOINTS : integer := 8;  --Number of hardware breakpoints
+    BREAKPOINTS : integer := 8;  -- Number of hardware breakpoints
 
     PMA_CNT : integer := 4;
-    PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
+    PMP_CNT : integer := 16;  -- Number of Physical Memory Protection entries
 
     BP_GLOBAL_BITS    : integer := 2;
     BP_LOCAL_BITS     : integer := 10;
     BP_LOCAL_BITS_LSB : integer := 2;
 
-    ICACHE_SIZE        : integer := 64;  --in KBytes
-    ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+    ICACHE_SIZE        : integer := 64;  -- in KBytes
+    ICACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
     ICACHE_WAYS        : integer := 2;   --'n'-way set associative
     ICACHE_REPLACE_ALG : integer := 0;
     ITCM_SIZE          : integer := 0;
 
-    DCACHE_SIZE        : integer := 64;  --in KBytes
-    DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+    DCACHE_SIZE        : integer := 64;  -- in KBytes
+    DCACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
     DCACHE_WAYS        : integer := 2;   --'n'-way set associative
     DCACHE_REPLACE_ALG : integer := 0;
     DTCM_SIZE          : integer := 0;
@@ -120,13 +116,13 @@ entity pu_riscv_synthesis is
     HRESETn : in std_logic;
     HCLK    : in std_logic;
 
-    --Interrupts
+    -- Interrupts
     ext_nmi  : in std_logic;
     ext_tint : in std_logic;
     ext_sint : in std_logic;
     ext_int  : in std_logic_vector(3 downto 0);
 
-    --Debug Interface
+    -- Debug Interface
     dbg_stall : in  std_logic;
     dbg_strb  : in  std_logic;
     dbg_we    : in  std_logic;
@@ -171,23 +167,23 @@ architecture rtl of pu_riscv_synthesis is
 
       MULT_LATENCY : std_logic := '1';
 
-      BREAKPOINTS : integer := 8;       --Number of hardware breakpoints
+      BREAKPOINTS : integer := 8;       -- Number of hardware breakpoints
 
       PMA_CNT : integer := 4;
-      PMP_CNT : integer := 16;  --Number of Physical Memory Protection entries
+      PMP_CNT : integer := 16;  -- Number of Physical Memory Protection entries
 
       BP_GLOBAL_BITS    : integer := 2;
       BP_LOCAL_BITS     : integer := 10;
       BP_LOCAL_BITS_LSB : integer := 2;
 
-      ICACHE_SIZE        : integer := 64;  --in KBytes
-      ICACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+      ICACHE_SIZE        : integer := 64;  -- in KBytes
+      ICACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
       ICACHE_WAYS        : integer := 2;   --'n'-way set associative
       ICACHE_REPLACE_ALG : integer := 0;
       ITCM_SIZE          : integer := 0;
 
-      DCACHE_SIZE        : integer := 64;  --in KBytes
-      DCACHE_BLOCK_SIZE  : integer := 64;  --in Bytes
+      DCACHE_SIZE        : integer := 64;  -- in KBytes
+      DCACHE_BLOCK_SIZE  : integer := 64;  -- in Bytes
       DCACHE_WAYS        : integer := 2;   --'n'-way set associative
       DCACHE_REPLACE_ALG : integer := 0;
       DTCM_SIZE          : integer := 0;
@@ -217,7 +213,7 @@ architecture rtl of pu_riscv_synthesis is
       pma_cfg_i : in std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
       pma_adr_i : in std_logic_matrix(PMA_CNT-1 downto 0)(XLEN-1 downto 0);
 
-      --AXI4 instruction
+      -- AXI4 instruction
       axi4_ins_aw_id     : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
       axi4_ins_aw_addr   : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
       axi4_ins_aw_len    : out std_logic_vector(7 downto 0);
@@ -267,7 +263,7 @@ architecture rtl of pu_riscv_synthesis is
       axi4_ins_b_valid : in  std_logic;
       axi4_ins_b_ready : out std_logic;
 
-      --AXI4 data
+      -- AXI4 data
       axi4_dat_aw_id     : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
       axi4_dat_aw_addr   : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
       axi4_dat_aw_len    : out std_logic_vector(7 downto 0);
@@ -317,11 +313,11 @@ architecture rtl of pu_riscv_synthesis is
       axi4_dat_b_valid : in  std_logic;
       axi4_dat_b_ready : out std_logic;
 
-      --Interrupts
+      -- Interrupts
       ext_nmi, ext_tint, ext_sint : in std_logic;
       ext_int                     : in std_logic_vector(3 downto 0);
 
-      --Debug Interface
+      -- Debug Interface
       dbg_stall : in  std_logic;
       dbg_strb  : in  std_logic;
       dbg_we    : in  std_logic;
@@ -407,7 +403,7 @@ architecture rtl of pu_riscv_synthesis is
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --PMA configuration
+  -- PMA configuration
   signal pma_cfg : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
   signal pma_adr : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
@@ -461,7 +457,7 @@ architecture rtl of pu_riscv_synthesis is
   signal axi4_ins_b_valid : std_logic;
   signal axi4_ins_b_ready : std_logic;
 
-  --AXI4 Data
+  -- AXI4 Data
   signal axi4_dat_aw_id     : std_logic_vector(AXI_ID_WIDTH-1 downto 0);
   signal axi4_dat_aw_addr   : std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
   signal axi4_dat_aw_len    : std_logic_vector(7 downto 0);
@@ -511,21 +507,20 @@ architecture rtl of pu_riscv_synthesis is
   signal axi4_dat_b_valid : std_logic;
   signal axi4_dat_b_ready : std_logic;
 
-  --Debug Interface
+  -- Debug Interface
   signal dbg_dato_s : std_logic_vector(XLEN-1 downto 0);
 
 begin
 
-  --/////////////////////////////////////////////////////////////
-  --
+  ------------------------------------------------------------------------------
   -- Module Body
   ------------------------------------------------------------------------------
 
-  --Define PMA regions
+  -- Define PMA regions
   pma_adr <= (others => (others => '0'));
   pma_cfg <= (others => (others => '0'));
 
-  --Debug Interface
+  -- Debug Interface
   dbg_dato_s <= X"00000000" & dbg_dato;
 
   -- Processing Unit
@@ -593,7 +588,7 @@ begin
       pma_cfg_i => pma_cfg,
       pma_adr_i => pma_adr,
 
-      --AXI4 instruction
+      -- AXI4 instruction
       axi4_ins_aw_id     => axi4_ins_aw_id,
       axi4_ins_aw_addr   => axi4_ins_aw_addr,
       axi4_ins_aw_len    => axi4_ins_aw_len,
@@ -639,7 +634,7 @@ begin
       axi4_ins_b_valid   => axi4_ins_b_valid,
       axi4_ins_b_ready   => axi4_ins_b_ready,
 
-      --AXI4 data
+      -- AXI4 data
       axi4_dat_aw_id     => axi4_dat_aw_id,
       axi4_dat_aw_addr   => axi4_dat_aw_addr,
       axi4_dat_aw_len    => axi4_dat_aw_len,
@@ -685,13 +680,13 @@ begin
       axi4_dat_b_valid   => axi4_dat_b_valid,
       axi4_dat_b_ready   => axi4_dat_b_ready,
 
-      --Interrupts
+      -- Interrupts
       ext_nmi  => ext_nmi,
       ext_tint => ext_tint,
       ext_sint => ext_sint,
       ext_int  => ext_int,
 
-      --Debug Interface
+      -- Debug Interface
       dbg_stall => dbg_stall,
       dbg_strb  => dbg_strb,
       dbg_we    => dbg_we,
@@ -702,7 +697,7 @@ begin
       dbg_bp    => dbg_bp
       );
 
-  --Instruction AXI4
+  -- Instruction AXI4
   instruction_axi4 : mpsoc_axi4_spram
     generic map (
       AXI_ID_WIDTH   => AXI_ID_WIDTH,
@@ -772,7 +767,7 @@ begin
       data_i => (others => '0')
       );
 
-  --Data AXI4
+  -- Data AXI4
   data_axi4 : mpsoc_axi4_spram
     generic map (
       AXI_ID_WIDTH   => AXI_ID_WIDTH,

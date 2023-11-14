@@ -1,6 +1,3 @@
--- Converted from mpsoc_axi4_spram.sv
--- by verilog2vhdl - QueenField
-
 --------------------------------------------------------------------------------
 --                                            __ _      _     _               --
 --                                           / _(_)    | |   | |              --
@@ -41,7 +38,6 @@
 --------------------------------------------------------------------------------
 -- Author(s):
 --   Paco Reina Campo <pacoreinacampo@queenfield.tech>
---
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -124,7 +120,7 @@ architecture rtl of mpsoc_axi4_spram is
   -- - for wrapping bursts, the burst length must be 2, 4, 8, or 16
   -- - a burst must not cross a 4KB address boundary
   -- - early termination of bursts is not supported.
-  --typedef enum logic [1:0] { FIXED = 2'b00, INCR = 2'b01, WRAP = 2'b10} axi_burst_t;
+  -- typedef enum logic [1:0] { FIXED = 2'b00, INCR = 2'b01, WRAP = 2'b10} axi_burst_t;
 
   constant LOG_NR_BYTES : integer := (null)(AXI_DATA_WIDTH/8);
 
