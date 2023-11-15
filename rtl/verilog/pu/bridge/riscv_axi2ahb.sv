@@ -222,7 +222,6 @@ module riscv_axi2ahb #(
   logic                      ahb3_hwrite_q;
   logic [AXI_DATA_WIDTH-1:0] ahb3_hrdata_q;
 
-
   logic                      slvbuf_write;
   logic                      slvbuf_error;
   logic [AXI_ID_WIDTH  -1:0] slvbuf_tag;

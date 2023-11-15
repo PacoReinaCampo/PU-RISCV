@@ -157,7 +157,6 @@ module pu_riscv_dmem_ctrl #(
   // all exceptions
   logic                           exception;
 
-
   // From Cache Controller Core
   logic [     XLEN-1:0]           cache_q;
   logic                           cache_ack;

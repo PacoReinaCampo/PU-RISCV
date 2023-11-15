@@ -105,7 +105,6 @@ module pu_riscv_state #(
   output     [PMP_CNT-1:0][     7:0] st_pmpcfg,
   output     [PMP_CNT-1:0][XLEN-1:0] st_pmpaddr,
 
-
   // interrupts (3=M-mode, 0=U-mode)
   input [3:0] ext_int,   // external interrupt (per privilege mode; determined by PIC)
   input       ext_tint,  // machine timer interrupt
@@ -295,7 +294,6 @@ module pu_riscv_state #(
   logic [     31 : 0]           csr_minstret_l;  // instruction retire count for MINSTRET
 
   logic [     63 : 0]           csr_minstret;
-
 
   logic                         is_rv32;
   logic                         is_rv32e;
@@ -499,9 +497,8 @@ module pu_riscv_state #(
   end
 
   //////////////////////////////////////////////////////////////////////////////
-  //
   // Machine registers
-  //
+  //////////////////////////////////////////////////////////////////////////////
   assign csr_misa_base = is_rv128 ? RV128I : is_rv64 ? RV64I : RV32I;
   assign csr_misa_extensions = {
     1'b0,  // reserved
@@ -1333,7 +1330,6 @@ module pu_riscv_state #(
   assign st_pmpaddr = csr_pmpaddr;
 
   //////////////////////////////////////////////////////////////////////////////
-  //
   // Supervisor Registers
   //
   generate
@@ -1394,9 +1390,8 @@ module pu_riscv_state #(
   assign st_scounteren = csr_scounteren;
 
   //////////////////////////////////////////////////////////////////////////////
-  //
   // User Registers
-  //
+  //////////////////////////////////////////////////////////////////////////////
   generate
     if (HAS_USER) begin
       // utvec

@@ -45,7 +45,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-entity mpsoc_wb_ram_generic is
+entity peripheral_ram_generic_wb is
   generic (
     DEPTH   : integer := 256;
     MEMFILE : string  := "";
@@ -61,9 +61,9 @@ entity mpsoc_wb_ram_generic is
     raddr : in  std_logic_vector(AW-1 downto 0);
     dout  : out std_logic_vector(DW-1 downto 0)
     );
-end mpsoc_wb_ram_generic;
+end peripheral_ram_generic_wb;
 
-architecture rtl of mpsoc_wb_ram_generic is
+architecture rtl of peripheral_ram_generic_wb is
   ------------------------------------------------------------------------------
   -- Module Body
   ------------------------------------------------------------------------------

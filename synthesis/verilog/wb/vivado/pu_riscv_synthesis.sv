@@ -259,7 +259,7 @@ module pu_riscv_synthesis #(
   );
 
   // Instruction WB
-  mpsoc_wb_spram #(
+  peripheral_spram_wb #(
     .DEPTH   ( 256  ),
     .MEMFILE ( ""   ),
     .AW      ( PLEN ),
@@ -283,7 +283,7 @@ module pu_riscv_synthesis #(
   );
 
   // Data WB
-  mpsoc_wb_spram #(
+  peripheral_spram_wb #(
     .DEPTH   ( 256  ),
     .MEMFILE ( ""   ),
     .AW      ( PLEN ),

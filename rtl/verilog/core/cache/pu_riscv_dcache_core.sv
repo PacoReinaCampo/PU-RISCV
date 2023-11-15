@@ -636,7 +636,6 @@ module pu_riscv_dcache_core #(
   // get requested data (XLEN-size) from way_q_mux(BLK_BITS-size)
   assign way_q = way_q_mux[DCACHE_WAYS-1] >> (dat_offset * XLEN);
 
-
   assign in_biubuffer = mem_preq_dly ? (biu_adri_hold[PLEN-1:BLK_OFF_BITS] == mem_padr_dly[PLEN-1:BLK_OFF_BITS]) & (biu_buffer_valid >> dat_offset)
                                      : (biu_adri_hold[PLEN-1:BLK_OFF_BITS] == mem_padr_i  [PLEN-1:BLK_OFF_BITS]) & (biu_buffer_valid >> dat_offset);
 

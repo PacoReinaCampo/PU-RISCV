@@ -65,7 +65,6 @@ module pu_riscv_du #(
   output                          dbg_ack,
   output reg                      dbg_bp,
 
-
   // CPU signals
   output                          du_stall,
   output reg                      du_stall_dly,

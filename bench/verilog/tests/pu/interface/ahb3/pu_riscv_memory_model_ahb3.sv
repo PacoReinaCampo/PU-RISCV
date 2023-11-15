@@ -96,7 +96,6 @@ module pu_riscv_memory_model_ahb3 #(
 
   logic [  MEM_LATENCY : 1] ack_latency[        2];
 
-
   logic [              1:0] dHTRANS    [        2];
   logic                     dHWRITE    [        2];
   logic [              2:0] dHSIZE     [        2];

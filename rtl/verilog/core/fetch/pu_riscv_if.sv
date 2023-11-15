@@ -63,7 +63,6 @@ module pu_riscv_if #(
   output reg                      if_bubble,    // Insert bubble in the pipe (NOP instruction)
   output reg [EXCEPTION_SIZE-1:0] if_exception, // Exceptions
 
-
   input      [1:0] bp_bp_predict,  // Branch Prediction bits
   output reg [1:0] if_bp_predict,  // push down the pipe
 

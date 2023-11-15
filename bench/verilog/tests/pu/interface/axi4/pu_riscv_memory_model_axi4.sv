@@ -122,9 +122,8 @@ module pu_riscv_memory_model_axi4 #(
   localparam RADRCNT_MSB = $clog2(BURST) + $clog2(XLEN / 8) - 1;
 
   //////////////////////////////////////////////////////////////////////////////
-  //
-  // Typedefs
-  //
+  // Types
+  //////////////////////////////////////////////////////////////////////////////
   typedef logic [PLEN-1:0] addr_type;
 
   //////////////////////////////////////////////////////////////////////////////
@@ -144,7 +143,6 @@ module pu_riscv_memory_model_axi4 #(
   logic [XLEN/8       -1:0]                     dbe        [        2];
 
   logic [  MEM_LATENCY : 1]                     ack_latency[        2];
-
 
   logic [              1:0]                     dHTRANS    [        2];
   logic                                         dHWRITE    [        2];

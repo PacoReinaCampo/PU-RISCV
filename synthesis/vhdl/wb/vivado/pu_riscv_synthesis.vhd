@@ -243,7 +243,7 @@ architecture rtl of pu_riscv_synthesis is
     );
   end component;
 
-  component mpsoc_wb_spram
+  component peripheral_spram_wb
     generic (
       -- Memory parameters
       DEPTH   : integer := 256;
@@ -442,7 +442,7 @@ begin
     );
 
   -- Instruction wb
-  instruction_wb : mpsoc_wb_spram
+  instruction_wb : peripheral_spram_wb
     generic map (
       DEPTH   => 256,
       MEMFILE => "",
@@ -467,7 +467,7 @@ begin
     );
 
   -- Data wb
-  data_wb : mpsoc_wb_spram
+  data_wb : peripheral_spram_wb
     generic map (
       DEPTH   => 256,
       MEMFILE => "",

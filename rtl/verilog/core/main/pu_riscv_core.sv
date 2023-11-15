@@ -187,7 +187,6 @@ module pu_riscv_core #(
   logic                                    bu_bp_btaken;
   logic                                    bu_bp_update;
 
-
   // Exceptions
   logic [EXCEPTION_SIZE -1:0]              if_exception;
   logic [EXCEPTION_SIZE -1:0]              id_exception;
