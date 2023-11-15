@@ -489,8 +489,11 @@ module pu_riscv_icache_core #(
   // FILL / WRITE_WAYS use fill_way_select 1 cycle later
   always @(posedge clk_i) begin
     case (memfsm_state)
-      ARMED:   fill_way_select_hold <= fill_way_select;
-      default: ;
+      ARMED: begin
+        fill_way_select_hold <= fill_way_select;
+      end
+      default: begin
+      end
     endcase
   end
 
@@ -522,7 +525,8 @@ module pu_riscv_icache_core #(
       end
       // pending access or current access
       RECOVER: tag_idx_hold <= mem_vreq_dly ? vadr_dly_idx : vadr_idx;
-      default: ;
+      default: begin
+      end
     endcase
   end
 
@@ -532,7 +536,9 @@ module pu_riscv_icache_core #(
     for (way = 0; way < ICACHE_WAYS; way = way + 1) begin : gen_way_we
       always @(*) begin
         case (memfsm_state)
-          default: tag_we[way] = filling & fill_way_select_hold[way] & biufsm_ack;
+          default: begin
+            tag_we[way] = filling & fill_way_select_hold[way] & biufsm_ack;
+          end
         endcase
       end
     end
@@ -572,8 +578,12 @@ module pu_riscv_icache_core #(
     for (way = 0; way < ICACHE_WAYS; way = way + 1) begin : gen_dat_we
       always @(*) begin
         case (memfsm_state)
-          WAIT4BIUCMD0: dat_we[way] = fill_way_select_hold[way] & biufsm_ack;  // write BIU data
-          default:      dat_we[way] = 1'b0;
+          WAIT4BIUCMD0: begin
+            dat_we[way] = fill_way_select_hold[way] & biufsm_ack;  // write BIU data
+          end
+          default: begin
+            dat_we[way] = 1'b0;
+          end
         endcase
       end
     end
@@ -602,7 +612,9 @@ module pu_riscv_icache_core #(
       case (biufsm_state)
         IDLE: begin
           case (biucmd)
-            NOP: ;  // do nothing
+            NOP: begin
+              // do nothing
+            end
 
             READ_WAY: begin
               // read a way from main memory
@@ -656,7 +668,8 @@ module pu_riscv_icache_core #(
           biu_buffer_valid[biu_adro_i[BLK_OFF_BITS-1 -: DAT_OFF_BITS]]          <= 1'b1;
         end
       end
-      default: ;
+      default: begin
+      end
     endcase
   end
 

@@ -710,8 +710,11 @@ module pu_riscv_dcache_core #(
         end
       end
       // pending access or current access
-      RECOVER: tag_idx_hold <= mem_vreq_dly ? vadr_dly_idx : vadr_idx;
-      default: ;
+      RECOVER: begin
+        tag_idx_hold <= mem_vreq_dly ? vadr_dly_idx : vadr_idx;
+      end
+      default: begin
+      end
     endcase
   end
 
@@ -895,7 +898,8 @@ module pu_riscv_dcache_core #(
           end
         end
       end
-      default: ;
+      default: begin
+      end
     endcase
   end
 

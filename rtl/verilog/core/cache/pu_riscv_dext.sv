@@ -126,9 +126,15 @@ module pu_riscv_dext #(
       case ({
         biu_stb_ack_i, biu_ack_i | biu_err_i
       })
-        2'b01:   inflight <= inflight - 1;
-        2'b10:   inflight <= inflight + 1;
-        default: ;  // do nothing
+        2'b01: begin
+          inflight <= inflight - 1;
+        end
+        2'b10: begin
+          inflight <= inflight + 1;
+        end
+        default: begin
+          // do nothing
+        end
       endcase
     end
   end

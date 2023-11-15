@@ -185,7 +185,7 @@ module pu_riscv_id #(
   // Instruction
   //
   // TO-DO: push if-instr upon illegal-instruction
- 
+
   always @(posedge clk) begin
     if (!stall) begin
       id_instr <= if_instr;
@@ -273,7 +273,7 @@ module pu_riscv_id #(
   // Decode Immediates
   //
   //                                 31    30          12           11  10           5  4            1            0
- 
+
   assign immI    = {{XLEN - 11{if_instr[31]}}, if_instr[30:25], if_instr[24:21], if_instr[20]};
   assign immU    = {{XLEN - 31{if_instr[31]}}, if_instr[30:12], 12'b0};
 
@@ -419,8 +419,9 @@ module pu_riscv_id #(
 
   // Bypasses
   always @(posedge clk, negedge rstn) begin
-    if (!rstn) multi_cycle_instruction <= 1'b0;
-    else if (!stall) begin
+    if (!rstn) begin
+      multi_cycle_instruction <= 1'b0;
+    end else if (!stall) begin
       casex ({
         xlen32, if_func7, if_func3, if_opcode
       })
@@ -497,7 +498,7 @@ module pu_riscv_id #(
   // set bypass switches.
   // 'x0' is used as a black hole. It should always be zero, but may contain other values in the pipeline
   // therefore we check if dst is non-zero
- 
+
   always @(posedge clk) begin
     if (!stall) begin
       casex (if_opcode)
@@ -672,66 +673,67 @@ module pu_riscv_id #(
   // ALU
   always @(*) begin
     casex (if_instr)
-      FENCE: illegal_alu_instr = 1'b0;
+      FENCE:   illegal_alu_instr = 1'b0;
       FENCE_I: illegal_alu_instr = 1'b0;
-      ECALL: illegal_alu_instr = 1'b0;
-      EBREAK: illegal_alu_instr = 1'b0;
-      URET: illegal_alu_instr = ~has_u;
-      SRET: illegal_alu_instr = ~has_s || st_prv < PRV_S || (st_prv == PRV_S && st_tsr);
-      MRET: illegal_alu_instr = st_prv != PRV_M;
-      default:
-      casex ({
-        xlen32, if_func7, if_func3, if_opcode
-      })
-        {1'b?, LUI} :   illegal_alu_instr = 1'b0;
-        {1'b?, AUIPC} : illegal_alu_instr = 1'b0;
-        {1'b?, JAL} :   illegal_alu_instr = 1'b0;
-        {1'b?, JALR} :  illegal_alu_instr = 1'b0;
-        {1'b?, BEQ} :   illegal_alu_instr = 1'b0;
-        {1'b?, BNE} :   illegal_alu_instr = 1'b0;
-        {1'b?, BLT} :   illegal_alu_instr = 1'b0;
-        {1'b?, BGE} :   illegal_alu_instr = 1'b0;
-        {1'b?, BLTU} :  illegal_alu_instr = 1'b0;
-        {1'b?, BGEU} :  illegal_alu_instr = 1'b0;
-        {1'b?, ADDI} :  illegal_alu_instr = 1'b0;
-        {1'b?, ADD} :   illegal_alu_instr = 1'b0;
-        {1'b0, ADDIW} : illegal_alu_instr = 1'b0;  // RV64
-        {1'b0, ADDW} :  illegal_alu_instr = 1'b0;  // RV64
-        {1'b?, SUB} :   illegal_alu_instr = 1'b0;
-        {1'b0, SUBW} :  illegal_alu_instr = 1'b0;  // RV64
-        {1'b?, XORI} :  illegal_alu_instr = 1'b0;
-        {1'b?, XORX} :  illegal_alu_instr = 1'b0;
-        {1'b?, ORI} :   illegal_alu_instr = 1'b0;
-        {1'b?, ORX} :   illegal_alu_instr = 1'b0;
-        {1'b?, ANDI} :  illegal_alu_instr = 1'b0;
-        {1'b?, ANDX} :  illegal_alu_instr = 1'b0;
-        {1'b?, SLLI} :  illegal_alu_instr = xlen32 & if_func7[0];  // shamt[5] illegal for RV32
-        {1'b?, SLLX} :  illegal_alu_instr = 1'b0;
-        {1'b0, SLLIW} : illegal_alu_instr = 1'b0;  // RV64
-        {1'b0, SLLW} :  illegal_alu_instr = 1'b0;  // RV64
-        {1'b?, SLTI} :  illegal_alu_instr = 1'b0;
-        {1'b?, SLT} :   illegal_alu_instr = 1'b0;
-        {1'b?, SLTIU} : illegal_alu_instr = 1'b0;
-        {1'b?, SLTU} :  illegal_alu_instr = 1'b0;
-        {1'b?, SRLI} :  illegal_alu_instr = xlen32 & if_func7[0];  // shamt[5] illegal for RV32
-        {1'b?, SRLX} :  illegal_alu_instr = 1'b0;
-        {1'b0, SRLIW} : illegal_alu_instr = 1'b0;  // RV64
-        {1'b0, SRLW} :  illegal_alu_instr = 1'b0;  // RV64
-        {1'b?, SRAI} :  illegal_alu_instr = xlen32 & if_func7[0];  // shamt[5] illegal for RV32
-        {1'b?, SRAX} :  illegal_alu_instr = 1'b0;
-        {1'b0, SRAIW} : illegal_alu_instr = 1'b0;
-        {1'b?, SRAW} :  illegal_alu_instr = 1'b0;
+      ECALL:   illegal_alu_instr = 1'b0;
+      EBREAK:  illegal_alu_instr = 1'b0;
+      URET:    illegal_alu_instr = ~has_u;
+      SRET:    illegal_alu_instr = ~has_s || st_prv < PRV_S || (st_prv == PRV_S && st_tsr);
+      MRET:    illegal_alu_instr = st_prv != PRV_M;
+      default: begin
+        casex ({
+          xlen32, if_func7, if_func3, if_opcode
+        })
+          {1'b?, LUI} :   illegal_alu_instr = 1'b0;
+          {1'b?, AUIPC} : illegal_alu_instr = 1'b0;
+          {1'b?, JAL} :   illegal_alu_instr = 1'b0;
+          {1'b?, JALR} :  illegal_alu_instr = 1'b0;
+          {1'b?, BEQ} :   illegal_alu_instr = 1'b0;
+          {1'b?, BNE} :   illegal_alu_instr = 1'b0;
+          {1'b?, BLT} :   illegal_alu_instr = 1'b0;
+          {1'b?, BGE} :   illegal_alu_instr = 1'b0;
+          {1'b?, BLTU} :  illegal_alu_instr = 1'b0;
+          {1'b?, BGEU} :  illegal_alu_instr = 1'b0;
+          {1'b?, ADDI} :  illegal_alu_instr = 1'b0;
+          {1'b?, ADD} :   illegal_alu_instr = 1'b0;
+          {1'b0, ADDIW} : illegal_alu_instr = 1'b0;  // RV64
+          {1'b0, ADDW} :  illegal_alu_instr = 1'b0;  // RV64
+          {1'b?, SUB} :   illegal_alu_instr = 1'b0;
+          {1'b0, SUBW} :  illegal_alu_instr = 1'b0;  // RV64
+          {1'b?, XORI} :  illegal_alu_instr = 1'b0;
+          {1'b?, XORX} :  illegal_alu_instr = 1'b0;
+          {1'b?, ORI} :   illegal_alu_instr = 1'b0;
+          {1'b?, ORX} :   illegal_alu_instr = 1'b0;
+          {1'b?, ANDI} :  illegal_alu_instr = 1'b0;
+          {1'b?, ANDX} :  illegal_alu_instr = 1'b0;
+          {1'b?, SLLI} :  illegal_alu_instr = xlen32 & if_func7[0];  // shamt[5] illegal for RV32
+          {1'b?, SLLX} :  illegal_alu_instr = 1'b0;
+          {1'b0, SLLIW} : illegal_alu_instr = 1'b0;  // RV64
+          {1'b0, SLLW} :  illegal_alu_instr = 1'b0;  // RV64
+          {1'b?, SLTI} :  illegal_alu_instr = 1'b0;
+          {1'b?, SLT} :   illegal_alu_instr = 1'b0;
+          {1'b?, SLTIU} : illegal_alu_instr = 1'b0;
+          {1'b?, SLTU} :  illegal_alu_instr = 1'b0;
+          {1'b?, SRLI} :  illegal_alu_instr = xlen32 & if_func7[0];  // shamt[5] illegal for RV32
+          {1'b?, SRLX} :  illegal_alu_instr = 1'b0;
+          {1'b0, SRLIW} : illegal_alu_instr = 1'b0;  // RV64
+          {1'b0, SRLW} :  illegal_alu_instr = 1'b0;  // RV64
+          {1'b?, SRAI} :  illegal_alu_instr = xlen32 & if_func7[0];  // shamt[5] illegal for RV32
+          {1'b?, SRAX} :  illegal_alu_instr = 1'b0;
+          {1'b0, SRAIW} : illegal_alu_instr = 1'b0;
+          {1'b?, SRAW} :  illegal_alu_instr = 1'b0;
 
-        // system
-        {1'b?, CSRRW} :  illegal_alu_instr = illegal_csr_rd | illegal_csr_wr;
-        {1'b?, CSRRS} :  illegal_alu_instr = illegal_csr_rd | (|if_src1 & illegal_csr_wr);
-        {1'b?, CSRRC} :  illegal_alu_instr = illegal_csr_rd | (|if_src1 & illegal_csr_wr);
-        {1'b?, CSRRWI} : illegal_alu_instr = illegal_csr_rd | (|if_src1 & illegal_csr_wr);
-        {1'b?, CSRRSI} : illegal_alu_instr = illegal_csr_rd | (|if_src1 & illegal_csr_wr);
-        {1'b?, CSRRCI} : illegal_alu_instr = illegal_csr_rd | (|if_src1 & illegal_csr_wr);
+          // system
+          {1'b?, CSRRW} :  illegal_alu_instr = illegal_csr_rd | illegal_csr_wr;
+          {1'b?, CSRRS} :  illegal_alu_instr = illegal_csr_rd | (|if_src1 & illegal_csr_wr);
+          {1'b?, CSRRC} :  illegal_alu_instr = illegal_csr_rd | (|if_src1 & illegal_csr_wr);
+          {1'b?, CSRRWI} : illegal_alu_instr = illegal_csr_rd | (|if_src1 & illegal_csr_wr);
+          {1'b?, CSRRSI} : illegal_alu_instr = illegal_csr_rd | (|if_src1 & illegal_csr_wr);
+          {1'b?, CSRRCI} : illegal_alu_instr = illegal_csr_rd | (|if_src1 & illegal_csr_wr);
 
-        default: illegal_alu_instr = 1'b1;
-      endcase
+          default: illegal_alu_instr = 1'b1;
+        endcase
+      end
     endcase
   end
 

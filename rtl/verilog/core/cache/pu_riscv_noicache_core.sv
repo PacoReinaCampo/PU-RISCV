@@ -185,7 +185,9 @@ module pu_riscv_noicache_core #(
           biu_fifo_valid[1] <= biu_fifo_valid[2];
           biu_fifo_valid[2] <= 1'b0;
         end
-        2'b11: ;  // FIFO read/write, no change
+        2'b11: begin
+          // FIFO read/write, no change
+        end
       endcase
     end
   end
@@ -224,46 +226,47 @@ module pu_riscv_noicache_core #(
         biu_fifo_dat[2] <= 'hx;
         biu_fifo_adr[2] <= 'hx;
       end
-      2'b11:
-      casex ({
-        biu_fifo_valid[2], biu_fifo_valid[1], biu_fifo_valid[0]
-      })
-        3'b1??: begin
-          // fill entry2
-          biu_fifo_dat[2] <= biu_do;
-          biu_fifo_adr[2] <= biu_adro;
+      2'b11: begin
+        casex ({
+          biu_fifo_valid[2], biu_fifo_valid[1], biu_fifo_valid[0]
+        })
+          3'b1??: begin
+            // fill entry2
+            biu_fifo_dat[2] <= biu_do;
+            biu_fifo_adr[2] <= biu_adro;
 
-          // push other entries
-          biu_fifo_dat[0] <= biu_fifo_dat[1];
-          biu_fifo_adr[0] <= biu_fifo_adr[1];
-          biu_fifo_dat[1] <= biu_fifo_dat[2];
-          biu_fifo_adr[1] <= biu_fifo_adr[2];
-        end
-        3'b01?: begin
-          // fill entry1
-          biu_fifo_dat[1] <= biu_do;
-          biu_fifo_adr[1] <= biu_adro;
+            // push other entries
+            biu_fifo_dat[0] <= biu_fifo_dat[1];
+            biu_fifo_adr[0] <= biu_fifo_adr[1];
+            biu_fifo_dat[1] <= biu_fifo_dat[2];
+            biu_fifo_adr[1] <= biu_fifo_adr[2];
+          end
+          3'b01?: begin
+            // fill entry1
+            biu_fifo_dat[1] <= biu_do;
+            biu_fifo_adr[1] <= biu_adro;
 
-          // push entry0
-          biu_fifo_dat[0] <= biu_fifo_dat[1];
-          biu_fifo_adr[0] <= biu_fifo_adr[1];
+            // push entry0
+            biu_fifo_dat[0] <= biu_fifo_dat[1];
+            biu_fifo_adr[0] <= biu_fifo_adr[1];
 
-          // don't care
-          biu_fifo_dat[2] <= 'hx;
-          biu_fifo_adr[2] <= 'hx;
-        end
-        default: begin
-          // fill entry0
-          biu_fifo_dat[0] <= biu_do;
-          biu_fifo_adr[0] <= biu_adro;
+            // don't care
+            biu_fifo_dat[2] <= 'hx;
+            biu_fifo_adr[2] <= 'hx;
+          end
+          default: begin
+            // fill entry0
+            biu_fifo_dat[0] <= biu_do;
+            biu_fifo_adr[0] <= biu_adro;
 
-          // don't care
-          biu_fifo_dat[1] <= 'hx;
-          biu_fifo_adr[1] <= 'hx;
-          biu_fifo_dat[2] <= 'hx;
-          biu_fifo_adr[2] <= 'hx;
-        end
-      endcase
+            // don't care
+            biu_fifo_dat[1] <= 'hx;
+            biu_fifo_adr[1] <= 'hx;
+            biu_fifo_dat[2] <= 'hx;
+            biu_fifo_adr[2] <= 'hx;
+          end
+        endcase
+      end
     endcase
   end
 endmodule
