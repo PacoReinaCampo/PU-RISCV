@@ -103,9 +103,15 @@ module pu_riscv_membuf #(
       case ({
         req_i, ack_i
       })
-        2'b01:   access_pending <= access_pending - 1;
-        2'b10:   access_pending <= access_pending + 1;
-        default: ;  // do nothing
+        2'b01: begin
+          access_pending <= access_pending - 1;
+        end
+        2'b10: begin
+          access_pending <= access_pending + 1;
+        end
+        default: begin
+          // do nothing
+        end
       endcase
     end
   end

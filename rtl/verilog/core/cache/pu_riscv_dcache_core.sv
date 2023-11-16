@@ -666,8 +666,11 @@ module pu_riscv_dcache_core #(
   // FILL / WRITE_WAYS use fill_way_select 1 cycle later
   always @(posedge clk_i) begin
     case (memfsm_state)
-      ARMED:   fill_way_select_hold <= fill_way_select;
-      default: ;
+      ARMED: begin
+        fill_way_select_hold <= fill_way_select;
+      end
+      default: begin
+      end
     endcase
   end
 

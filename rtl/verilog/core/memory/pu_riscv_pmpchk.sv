@@ -72,11 +72,21 @@ module pu_riscv_pmpchk #(
     input [2:0] size;
 
     case (size)
-      BYTE:  size2bytes = 1;
-      HWORD: size2bytes = 2;
-      WORD:  size2bytes = 4;
-      DWORD: size2bytes = 8;
-      QWORD: size2bytes = 16;
+      BYTE: begin
+        size2bytes = 1;
+      end
+      HWORD: begin
+        size2bytes = 2;
+      end
+      WORD: begin
+        size2bytes = 4;
+      end
+      DWORD: begin
+        size2bytes = 8;
+      end
+      QWORD: begin
+        size2bytes = 16;
+      end
       default: begin
         size2bytes = 0 - 1;
         // $error ("Illegal biu_size_t");
