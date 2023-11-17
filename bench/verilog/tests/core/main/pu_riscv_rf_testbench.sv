@@ -38,6 +38,10 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
+import pu_riscv_verilog_pkg::*;
+
+module pu_riscv_div_testbench;
+
   // Integer Register File
   pu_riscv_rf #(
     .XLEN(XLEN),
@@ -62,3 +66,4 @@
     .du_dati_rf(du_dati_rf),
     .du_addr   (du_addr)
   );
+endmodule

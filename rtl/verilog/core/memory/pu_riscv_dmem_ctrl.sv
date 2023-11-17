@@ -404,7 +404,7 @@ module pu_riscv_dmem_ctrl #(
 
     // Instantiate TCM block
     // TO-DO: speculative read (vmadr)
-    //       needs write buffer (clear write when not qualified)
+    //        needs write buffer (clear write when not qualified)
    
     if (DTCM_SIZE > 0) begin
     end else begin  // No TCM

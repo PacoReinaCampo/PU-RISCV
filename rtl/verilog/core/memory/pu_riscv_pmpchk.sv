@@ -263,9 +263,8 @@ module pu_riscv_pmpchk #(
   // 3. privilegel level is S or U AND no PMPs matched AND PMPs are implemented
  
   assign exception_o = req_i & (~|pmp_match ? (st_prv_i != PRV_M) & (PMP_CNT > 0)  // Prv.Lvl != M-Mode, no PMP matched, but PMPs implemented -> FAIL
-    : ~pmp_match_all[matched_pmp] | (((st_prv_i != PRV_M) | matched_pmpcfg[7]) &  // pmpcfg.l set or privilege level != M-mode
-    ((~matched_pmpcfg[0] & ~we_i) |  // read-access while not allowed          -> FAIL
-    (~matched_pmpcfg[1] & we_i) |  // write-access while not allowed         -> FAIL
-    (~matched_pmpcfg[2] & instruction_i))  // instruction read, but not instruction  -> FAIL
-    ));
+     : ~pmp_match_all[matched_pmp] | (((st_prv_i != PRV_M) | matched_pmpcfg[7]) &  // pmpcfg.l set or privilege level != M-mode
+                                                  ((~matched_pmpcfg[0] & ~we_i) |  // read-access while not allowed          -> FAIL
+                                                    (~matched_pmpcfg[1] & we_i) |  // write-access while not allowed         -> FAIL
+                                         (~matched_pmpcfg[2] & instruction_i))));  // instruction read, but not instruction  -> FAIL                                                                              
 endmodule

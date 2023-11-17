@@ -38,6 +38,10 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
+import pu_riscv_verilog_pkg::*;
+
+module pu_riscv_div_testbench;
+
   // Instantiate Queue 
   pu_riscv_ram_queue #(
     .DEPTH(DEPTH),
@@ -56,3 +60,4 @@
     .almost_empty_o(),
     .almost_full_o ()
   );
+endmodule

@@ -159,27 +159,31 @@ module pu_riscv_noicache_core #(
       case ({
         biu_ack, if_parcel_valid
       })
-        2'b00: ;  // no action
-        2'b10:  // FIFO write
-        case ({
-          biu_fifo_valid[1], biu_fifo_valid[0]
-        })
-          2'b11: begin
-            // entry 0,1 full. Fill entry2
-            biu_fifo_valid[2] <= 1'b1;
-          end
-          2'b01: begin
-            // entry 0 full. Fill entry1, clear entry2
-            biu_fifo_valid[1] <= 1'b1;
-            biu_fifo_valid[2] <= 1'b0;
-          end
-          default: begin
-            // Fill entry0, clear entry1,2
-            biu_fifo_valid[0] <= 1'b1;
-            biu_fifo_valid[1] <= 1'b0;
-            biu_fifo_valid[2] <= 1'b0;
-          end
-        endcase
+        2'b00: begin
+          // no action
+        end
+        2'b10: begin
+          // FIFO write
+          case ({
+            biu_fifo_valid[1], biu_fifo_valid[0]
+          })
+            2'b11: begin
+              // entry 0,1 full. Fill entry2
+              biu_fifo_valid[2] <= 1'b1;
+            end
+            2'b01: begin
+              // entry 0 full. Fill entry1, clear entry2
+              biu_fifo_valid[1] <= 1'b1;
+              biu_fifo_valid[2] <= 1'b0;
+            end
+            default: begin
+              // Fill entry0, clear entry1,2
+              biu_fifo_valid[0] <= 1'b1;
+              biu_fifo_valid[1] <= 1'b0;
+              biu_fifo_valid[2] <= 1'b0;
+            end
+          endcase
+        end
         2'b01: begin  // FIFO read
           biu_fifo_valid[0] <= biu_fifo_valid[1];
           biu_fifo_valid[1] <= biu_fifo_valid[2];
@@ -197,27 +201,29 @@ module pu_riscv_noicache_core #(
     case ({
       biu_ack, if_parcel_valid
     })
-      2'b00: ;
-      2'b10:
-      case ({
-        biu_fifo_valid[1], biu_fifo_valid[0]
-      })
-        2'b11: begin
-          // fill entry2
-          biu_fifo_dat[2] <= biu_do;
-          biu_fifo_adr[2] <= biu_adro;
-        end
-        2'b01: begin
-          // fill entry1
-          biu_fifo_dat[1] <= biu_do;
-          biu_fifo_adr[1] <= biu_adro;
-        end
-        default: begin
-          // fill entry0
-          biu_fifo_dat[0] <= biu_do;
-          biu_fifo_adr[0] <= biu_adro;
-        end
-      endcase
+      2'b00: begin
+      end
+      2'b10: begin
+        case ({
+          biu_fifo_valid[1], biu_fifo_valid[0]
+        })
+          2'b11: begin
+            // fill entry2
+            biu_fifo_dat[2] <= biu_do;
+            biu_fifo_adr[2] <= biu_adro;
+          end
+          2'b01: begin
+            // fill entry1
+            biu_fifo_dat[1] <= biu_do;
+            biu_fifo_adr[1] <= biu_adro;
+          end
+          default: begin
+            // fill entry0
+            biu_fifo_dat[0] <= biu_do;
+            biu_fifo_adr[0] <= biu_adro;
+          end
+        endcase
+      end
       2'b01: begin
         biu_fifo_dat[0] <= biu_fifo_dat[1];
         biu_fifo_adr[0] <= biu_fifo_adr[1];

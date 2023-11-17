@@ -38,6 +38,10 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
+import pu_riscv_verilog_pkg::*;
+
+module pu_riscv_div_testbench;
+
   // Memory acknowledge + Write Back unit
   pu_riscv_wb #(
     .XLEN(XLEN),
@@ -71,3 +75,4 @@
     .wb_r_o           (wb_r),
     .wb_we_o          (wb_we)
   );
+endmodule

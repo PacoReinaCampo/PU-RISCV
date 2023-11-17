@@ -139,11 +139,20 @@ module pu_riscv_dcache_core #(
     adr_lsbs = adr[$clog2(XLEN/8)-1:0];
 
     case (size)
-      BYTE:    size2be = 'h1 << adr_lsbs;
-      HWORD:   size2be = 'h3 << adr_lsbs;
-      WORD:    size2be = 'hf << adr_lsbs;
-      DWORD:   size2be = 'hff << adr_lsbs;
-      default: ;
+      BYTE: begin
+        size2be = 'h1 << adr_lsbs;
+      end
+      HWORD: begin
+        size2be = 'h3 << adr_lsbs;
+      end
+      WORD: begin
+        size2be = 'hf << adr_lsbs;
+      end
+      DWORD: begin
+        size2be = 'hff << adr_lsbs;
+      end
+      default: begin
+      end
     endcase
   endfunction
 
@@ -838,7 +847,9 @@ module pu_riscv_dcache_core #(
       case (biufsm_state)
         IDLE: begin
           case (biucmd)
-            NOP: ;  // do nothing
+            NOP: begin
+              // do nothing
+            end
             READ_WAY: begin
               // read a way from main memory
               if (biu_stb_ack_i) begin

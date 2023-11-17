@@ -124,11 +124,20 @@ module pu_riscv_icache_core #(
     adr_lsbs = adr[$clog2(XLEN/8)-1:0];
 
     case (size)
-      BYTE:    size2be = 'h1 << adr_lsbs;
-      HWORD:   size2be = 'h3 << adr_lsbs;
-      WORD:    size2be = 'hf << adr_lsbs;
-      DWORD:   size2be = 'hff << adr_lsbs;
-      default: ;
+      BYTE: begin
+        size2be = 'h1 << adr_lsbs;
+      end
+      HWORD: begin
+        size2be = 'h3 << adr_lsbs;
+      end
+      WORD: begin
+        size2be = 'hf << adr_lsbs;
+      end
+      DWORD: begin
+        size2be = 'hff << adr_lsbs;
+      end
+      default: begin
+      end
     endcase
   endfunction
 

@@ -38,6 +38,10 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
+import pu_riscv_verilog_pkg::*;
+
+module pu_riscv_div_testbench;
+
   // Arithmetic Logic Unit
   pu_riscv_alu #(
     .XLEN   (XLEN),
@@ -60,3 +64,4 @@
     .st_csr_rval(st_csr_rval),
     .st_xlen    (st_xlen)
   );
+endmodule

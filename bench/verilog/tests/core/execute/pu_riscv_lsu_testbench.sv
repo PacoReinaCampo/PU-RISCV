@@ -38,6 +38,10 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
+import pu_riscv_verilog_pkg::*;
+
+module pu_riscv_div_testbench;
+
   // Load-Store Unit
   pu_riscv_lsu #(
     .XLEN          (XLEN),
@@ -70,3 +74,4 @@
     .dmem_misaligned(dmem_misaligned),
     .dmem_page_fault(dmem_page_fault)
   );
+endmodule

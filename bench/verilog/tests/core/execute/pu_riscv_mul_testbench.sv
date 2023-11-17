@@ -37,20 +37,25 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
- 
-      pu_riscv_mul #(
-        .XLEN(XLEN),
-        .ILEN(ILEN)
-      ) mul (
-        .rstn      (rstn),
-        .clk       (clk),
-        .ex_stall  (ex_stall),
-        .mul_stall (mul_stall),
-        .id_bubble (id_bubble),
-        .id_instr  (id_instr),
-        .opA       (opA),
-        .opB       (opB),
-        .st_xlen   (st_xlen),
-        .mul_bubble(mul_bubble),
-        .mul_r     (mul_r)
-      );
+
+import pu_riscv_verilog_pkg::*;
+
+module pu_riscv_div_testbench;
+
+  pu_riscv_mul #(
+    .XLEN(XLEN),
+    .ILEN(ILEN)
+  ) mul (
+    .rstn      (rstn),
+    .clk       (clk),
+    .ex_stall  (ex_stall),
+    .mul_stall (mul_stall),
+    .id_bubble (id_bubble),
+    .id_instr  (id_instr),
+    .opA       (opA),
+    .opB       (opB),
+    .st_xlen   (st_xlen),
+    .mul_bubble(mul_bubble),
+    .mul_r     (mul_r)
+  );
+endmodule

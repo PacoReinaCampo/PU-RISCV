@@ -38,19 +38,24 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
-      pu_riscv_div #(
-        .XLEN(XLEN),
-        .ILEN(ILEN)
-      ) div (
-        .rstn      (rstn),
-        .clk       (clk),
-        .ex_stall  (ex_stall),
-        .div_stall (div_stall),
-        .id_bubble (id_bubble),
-        .id_instr  (id_instr),
-        .opA       (opA),
-        .opB       (opB),
-        .st_xlen   (st_xlen),
-        .div_bubble(div_bubble),
-        .div_r     (div_r)
-      );
+import pu_riscv_verilog_pkg::*;
+
+module pu_riscv_div_testbench;
+
+  pu_riscv_div #(
+    .XLEN(XLEN),
+    .ILEN(ILEN)
+  ) div (
+    .rstn      (rstn),
+    .clk       (clk),
+    .ex_stall  (ex_stall),
+    .div_stall (div_stall),
+    .id_bubble (id_bubble),
+    .id_instr  (id_instr),
+    .opA       (opA),
+    .opB       (opB),
+    .st_xlen   (st_xlen),
+    .div_bubble(div_bubble),
+    .div_r     (div_r)
+  );
+endmodule

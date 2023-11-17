@@ -134,7 +134,7 @@ module pu_riscv_memory_model_ahb3 #(
     //    05: start linear address
     // 5: data
     // 6: checksum    (2 hex digits)
-   
+
     fd = $fopen(INIT_FILE, "r");  // open file
     if (fd < 32'h8000_0000) begin
       $display("ERROR  : Skip reading file %s. Reason file not found", INIT_FILE);

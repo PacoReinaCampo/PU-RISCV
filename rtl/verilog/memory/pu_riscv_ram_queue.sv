@@ -96,9 +96,14 @@ module pu_riscv_ram_queue #(
       case ({
         we_i, re_i
       })
-        2'b01:   queue_wadr <= queue_wadr - 1;
-        2'b10:   queue_wadr <= queue_wadr + 1;
-        default: ;
+        2'b01: begin
+          queue_wadr <= queue_wadr - 1;
+        end
+        2'b10: begin
+          queue_wadr <= queue_wadr + 1;
+        end
+        default: begin
+        end
       endcase
     end
   end
@@ -131,7 +136,8 @@ module pu_riscv_ram_queue #(
               queue_data[DEPTH-1]    <= 'h0;
               queue_data[queue_xadr] <= d_i;
             end
-            default: ;
+            default: begin
+            end
           endcase
         end
       end
@@ -148,9 +154,14 @@ module pu_riscv_ram_queue #(
       case ({
         we_i, re_i
       })
-        2'b01:   almost_empty_o <= (queue_wadr <= ALMOST_EMPTY_THRESHOLD_CHECK);
-        2'b10:   almost_empty_o <= ~(queue_wadr > ALMOST_EMPTY_THRESHOLD_CHECK);
-        default: ;
+        2'b01: begin
+          almost_empty_o <= (queue_wadr <= ALMOST_EMPTY_THRESHOLD_CHECK);
+        end
+        2'b10: begin
+          almost_empty_o <= ~(queue_wadr > ALMOST_EMPTY_THRESHOLD_CHECK);
+        end
+        default: begin
+        end
       endcase
     end
   end
@@ -165,9 +176,14 @@ module pu_riscv_ram_queue #(
       case ({
         we_i, re_i
       })
-        2'b01:   empty_o <= (queue_wadr == EMPTY_THRESHOLD);
-        2'b10:   empty_o <= 1'b0;
-        default: ;
+        2'b01: begin
+          empty_o <= (queue_wadr == EMPTY_THRESHOLD);
+        end
+        2'b10: begin
+          empty_o <= 1'b0;
+        end
+        default: begin
+        end
       endcase
     end
   end
@@ -182,9 +198,14 @@ module pu_riscv_ram_queue #(
       case ({
         we_i, re_i
       })
-        2'b01:   almost_full_o <= ~(queue_wadr < ALMOST_FULL_THRESHOLD_CHECK);
-        2'b10:   almost_full_o <= (queue_wadr >= ALMOST_FULL_THRESHOLD_CHECK);
-        default: ;
+        2'b01: begin
+          almost_full_o <= ~(queue_wadr < ALMOST_FULL_THRESHOLD_CHECK);
+        end
+        2'b10: begin
+          almost_full_o <= (queue_wadr >= ALMOST_FULL_THRESHOLD_CHECK);
+        end
+        default: begin
+        end
       endcase
     end
   end
@@ -199,9 +220,14 @@ module pu_riscv_ram_queue #(
       case ({
         we_i, re_i
       })
-        2'b01:   full_o <= 1'b0;
-        2'b10:   full_o <= (queue_wadr == FULL_THRESHOLD);
-        default: ;
+        2'b01: begin
+          full_o <= 1'b0;
+        end
+        2'b10: begin
+          full_o <= (queue_wadr == FULL_THRESHOLD);
+        end
+        default: begin
+        end
       endcase
     end
   end

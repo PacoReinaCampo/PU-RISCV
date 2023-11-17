@@ -36,28 +36,33 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
- 
-      pu_riscv_bp #(
-        .XLEN(XLEN),
 
-        .BP_GLOBAL_BITS   (BP_GLOBAL_BITS),
-        .BP_LOCAL_BITS    (BP_LOCAL_BITS),
-        .BP_LOCAL_BITS_LSB(BP_LOCAL_BITS_LSB),
+import pu_riscv_verilog_pkg::*;
 
-        .TECHNOLOGY(TECHNOLOGY),
+module pu_riscv_div_testbench;
 
-        .PC_INIT(PC_INIT)
-      ) bp_unit (
-        .rst_ni(rstn),
-        .clk_i (clk),
+  pu_riscv_bp #(
+    .XLEN(XLEN),
 
-        .id_stall_i     (id_stall),
-        .if_parcel_pc_i (if_parcel_pc),
-        .bp_bp_predict_o(bp_bp_predict),
+    .BP_GLOBAL_BITS   (BP_GLOBAL_BITS),
+    .BP_LOCAL_BITS    (BP_LOCAL_BITS),
+    .BP_LOCAL_BITS_LSB(BP_LOCAL_BITS_LSB),
 
-        .ex_pc_i        (ex_pc),
-        .bu_bp_history_i(bu_bp_history),
-        .bu_bp_predict_i(bu_bp_predict),  // prediction bits for branch
-        .bu_bp_btaken_i (bu_bp_btaken),
-        .bu_bp_update_i (bu_bp_update)
-      );
+    .TECHNOLOGY(TECHNOLOGY),
+
+    .PC_INIT(PC_INIT)
+  ) bp_unit (
+    .rst_ni(rstn),
+    .clk_i (clk),
+
+    .id_stall_i     (id_stall),
+    .if_parcel_pc_i (if_parcel_pc),
+    .bp_bp_predict_o(bp_bp_predict),
+
+    .ex_pc_i        (ex_pc),
+    .bu_bp_history_i(bu_bp_history),
+    .bu_bp_predict_i(bu_bp_predict),  // prediction bits for branch
+    .bu_bp_btaken_i (bu_bp_btaken),
+    .bu_bp_update_i (bu_bp_update)
+  );
+endmodule

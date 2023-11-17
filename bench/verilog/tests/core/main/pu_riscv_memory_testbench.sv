@@ -38,6 +38,10 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
+import pu_riscv_verilog_pkg::*;
+
+module pu_riscv_div_testbench;
+
   // Memory access
   pu_riscv_memory #(
     .XLEN(XLEN),
@@ -65,3 +69,4 @@
     .mem_r        (mem_r),
     .mem_memadr   (mem_memadr)
   );
+endmodule

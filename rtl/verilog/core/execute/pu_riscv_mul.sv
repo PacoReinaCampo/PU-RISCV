@@ -319,7 +319,7 @@ module pu_riscv_mul #(
       mul_bubble <= 1'b1;
       case (state)
         ST_IDLE: begin
-          if (!ex_stall)
+          if (!ex_stall) begin
             if (!id_bubble && is_mul) begin
               if (LATENCY == 0) begin
                 mul_bubble <= 1'b0;
@@ -332,6 +332,7 @@ module pu_riscv_mul #(
                 mul_stall  <= 1'b1;
               end
             end
+          end
         end
         ST_WAIT: begin
           if (|cnt) begin

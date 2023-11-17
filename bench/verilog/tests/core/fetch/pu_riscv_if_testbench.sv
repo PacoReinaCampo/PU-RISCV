@@ -38,6 +38,10 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
+import pu_riscv_verilog_pkg::*;
+
+module pu_riscv_div_testbench;
+
   pu_riscv_if #(
     .XLEN(XLEN),
     .ILEN(ILEN),
@@ -69,3 +73,4 @@
     .if_flush            (if_flush),
     .if_pc               (if_pc)
   );
+endmodule

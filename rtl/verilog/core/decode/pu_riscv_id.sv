@@ -272,7 +272,7 @@ module pu_riscv_id #(
 
   // Decode Immediates
   //
-  //                                 31    30          12           11  10           5  4            1            0
+  // 31    30          12           11  10           5  4            1            0
 
   assign immI    = {{XLEN - 11{if_instr[31]}}, if_instr[30:25], if_instr[24:21], if_instr[20]};
   assign immU    = {{XLEN - 31{if_instr[31]}}, if_instr[30:12], 12'b0};
@@ -356,8 +356,10 @@ module pu_riscv_id #(
   always @(posedge clk) begin
     if (!stall) begin
       casex (if_opcode)
-        OPC_LOAD_FP:  ;
-        OPC_MISC_MEM: ;
+        OPC_LOAD_FP: begin
+        end
+        OPC_MISC_MEM: begin
+        end
         OPC_OP_IMM: begin
           id_opA <= wb_r;
           id_opB <= immI;
@@ -378,8 +380,10 @@ module pu_riscv_id #(
           id_opA <= wb_r;
           id_opB <= wb_r;
         end
-        OPC_STORE_FP: ;
-        OPC_AMO:      ;
+        OPC_STORE_FP: begin
+        end
+        OPC_AMO: begin
+        end
         OPC_OP: begin
           id_opA <= wb_r;
           id_opB <= wb_r;
@@ -392,11 +396,16 @@ module pu_riscv_id #(
           id_opA <= wb_r;
           id_opB <= wb_r;
         end
-        OPC_MADD:     ;
-        OPC_MSUB:     ;
-        OPC_NMSUB:    ;
-        OPC_NMADD:    ;
-        OPC_OP_FP:    ;
+        OPC_MADD: begin
+        end
+        OPC_MSUB: begin
+        end
+        OPC_NMSUB: begin
+        end
+        OPC_NMADD: begin
+        end
+        OPC_OP_FP: begin
+        end
         OPC_BRANCH: begin
           id_opA <= wb_r;
           id_opB <= wb_r;

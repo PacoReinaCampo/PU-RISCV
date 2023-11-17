@@ -195,7 +195,9 @@ module pu_riscv_lsu #(
               dmem_adr  <= adr;
               dmem_d    <= d;
             end
-            default: ;  // do nothing
+            default: begin
+              // do nothing
+            end
           endcase
         end
       end

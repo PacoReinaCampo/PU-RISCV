@@ -38,6 +38,10 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
+import pu_riscv_verilog_pkg::*;
+
+module pu_riscv_div_testbench;
+
   // Debug Unit
   pu_riscv_du #(
     .XLEN(XLEN),
@@ -90,3 +94,4 @@
     .ex_stall     (ex_stall),
     .du_exceptions(du_exceptions)
   );
+endmodule
