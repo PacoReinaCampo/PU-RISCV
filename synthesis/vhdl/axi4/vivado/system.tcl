@@ -86,7 +86,7 @@ read_vhdl -vhdl2008 ../../../../rtl/vhdl/pu/axi4/pu_riscv_axi4.vhd
 read_verilog -sv ../../../../rtl/verilog/pu/pu_riscv_ahb2axi.sv
 read_verilog -sv ../../../../rtl/verilog/pu/pu_riscv_axi2ahb.sv
 
-read_verilog -sv ../../../verilog/axi4/vivado/spram/core/mpsoc_axi4_spram.sv
+read_verilog -sv ../../../verilog/axi4/vivado/spram/core/peripheral_spram_axi4.sv
 
 read_vhdl -vhdl2008 pu_riscv_synthesis.vhd
 

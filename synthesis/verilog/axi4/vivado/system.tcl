@@ -85,7 +85,7 @@ read_verilog -sv ../../../../rtl/verilog/pu/axi4/pu_riscv_axi4.sv
 read_verilog -sv ../../../../rtl/verilog/pu/pu_riscv_ahb2axi.sv
 read_verilog -sv ../../../../rtl/verilog/pu/pu_riscv_axi2ahb.sv
 
-read_verilog -sv spram/core/mpsoc_axi4_spram.sv
+read_verilog -sv spram/core/peripheral_spram_axi4.sv
 read_verilog -sv pu_riscv_synthesis.sv
 
 read_xdc system.xdc

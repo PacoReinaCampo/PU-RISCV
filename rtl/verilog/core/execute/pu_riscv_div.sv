@@ -354,7 +354,8 @@ module pu_riscv_div #(
                   b         <= {{XLEN - 32{1'b0}}, opB32};
                 end
               end
-              default: ;
+              default: begin
+              end
             endcase
           end
         end

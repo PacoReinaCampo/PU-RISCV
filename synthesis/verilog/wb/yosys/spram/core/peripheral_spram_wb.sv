@@ -47,42 +47,41 @@ module peripheral_spram_wb #(
   // Wishbone parameters
   parameter DW = 32,
   parameter AW = $clog2(DEPTH)
-)
-  (
-    input           wb_clk_i,
-    input           wb_rst_i,
+) (
+  input wb_clk_i,
+  input wb_rst_i,
 
-    input  [AW-1:0] wb_adr_i,
-    input  [DW-1:0] wb_dat_i,
-    input  [   3:0] wb_sel_i,
-    input           wb_we_i,
-    input  [   1:0] wb_bte_i,
-    input  [   2:0] wb_cti_i,
-    input           wb_cyc_i,
-    input           wb_stb_i,
+  input [AW-1:0] wb_adr_i,
+  input [DW-1:0] wb_dat_i,
+  input [   3:0] wb_sel_i,
+  input          wb_we_i,
+  input [   1:0] wb_bte_i,
+  input [   2:0] wb_cti_i,
+  input          wb_cyc_i,
+  input          wb_stb_i,
 
-    output reg      wb_ack_o,
-    output          wb_err_o,
-    output [DW-1:0] wb_dat_o
-  );
+  output reg          wb_ack_o,
+  output              wb_err_o,
+  output     [DW-1:0] wb_dat_o
+);
 
   //////////////////////////////////////////////////////////////////////////////
   // Constants
   //////////////////////////////////////////////////////////////////////////////
   localparam CLASSIC_CYCLE = 1'b0;
-  localparam BURST_CYCLE   = 1'b1;
+  localparam BURST_CYCLE = 1'b1;
 
-  localparam READ  = 1'b0;
+  localparam READ = 1'b0;
   localparam WRITE = 1'b1;
 
-  localparam [2:0] CTI_CLASSIC      = 3'b000;
-  localparam [2:0] CTI_CONST_BURST  = 3'b001;
-  localparam [2:0] CTI_INC_BURST    = 3'b010;
+  localparam [2:0] CTI_CLASSIC = 3'b000;
+  localparam [2:0] CTI_CONST_BURST = 3'b001;
+  localparam [2:0] CTI_INC_BURST = 3'b010;
   localparam [2:0] CTI_END_OF_BURST = 3'b111;
 
-  localparam [1:0] BTE_LINEAR  = 2'd0;
-  localparam [1:0] BTE_WRAP_4  = 2'd1;
-  localparam [1:0] BTE_WRAP_8  = 2'd2;
+  localparam [1:0] BTE_LINEAR = 2'd0;
+  localparam [1:0] BTE_WRAP_4 = 2'd1;
+  localparam [1:0] BTE_WRAP_8 = 2'd2;
   localparam [1:0] BTE_WRAP_16 = 2'd3;
 
   //////////////////////////////////////////////////////////////////////////////
@@ -99,37 +98,42 @@ module peripheral_spram_wb #(
     input [2:0] cti;
     begin
       case (cti)
-        CTI_CLASSIC      : wb_is_last = 1'b1;
-        CTI_CONST_BURST  : wb_is_last = 1'b0;
-        CTI_INC_BURST    : wb_is_last = 1'b0;
-        CTI_END_OF_BURST : wb_is_last = 1'b1;
+        CTI_CLASSIC:      wb_is_last = 1'b1;
+        CTI_CONST_BURST:  wb_is_last = 1'b0;
+        CTI_INC_BURST:    wb_is_last = 1'b0;
+        CTI_END_OF_BURST: wb_is_last = 1'b1;
       endcase
     end
   endfunction
 
   function [31:0] wb_next_adr;
     input [31:0] adr_i;
-    input [2:0]  cti_i;
-    input [1:0]  bte_i;
+    input [2:0] cti_i;
+    input [1:0] bte_i;
 
     input integer dw;
 
-    reg [31:0] adr;
+    reg     [31:0] adr;
 
-    integer shift;
+    integer        shift;
     begin
-      if (dw == 64) shift = 3;
-      else if (dw == 32) shift = 2;
-      else if (dw == 16) shift = 1;
-      else shift = 0;
+      if (dw == 64) begin
+        shift = 3;
+      end else if (dw == 32) begin
+        shift = 2;
+      end else if (dw == 16) begin
+        shift = 1;
+      end else begin
+        shift = 0;
+      end
       adr = adr_i >> shift;
       if (cti_i == CTI_INC_BURST)
         case (bte_i)
-          BTE_LINEAR   : adr = adr + 1;
-          BTE_WRAP_4   : adr = {adr[31:2], adr[1:0]+2'd1};
-          BTE_WRAP_8   : adr = {adr[31:3], adr[2:0]+3'd1};
-          BTE_WRAP_16  : adr = {adr[31:4], adr[3:0]+4'd1};
-        endcase // case (burst_type_i)
+          BTE_LINEAR:  adr = adr + 1;
+          BTE_WRAP_4:  adr = {adr[31:2], adr[1:0] + 2'd1};
+          BTE_WRAP_8:  adr = {adr[31:3], adr[2:0] + 3'd1};
+          BTE_WRAP_16: adr = {adr[31:4], adr[3:0] + 4'd1};
+        endcase  // case (burst_type_i)
       wb_next_adr = adr << shift;
     end
   endfunction
@@ -157,40 +161,39 @@ module peripheral_spram_wb #(
 
   assign new_cycle = (valid & !valid_r) | is_last_r;
 
-  assign next_adr = wb_next_adr(adr_r, wb_cti_i, wb_bte_i, DW);
+  assign next_adr  = wb_next_adr(adr_r, wb_cti_i, wb_bte_i, DW);
 
-  assign adr = new_cycle ? wb_adr_i : next_adr;
+  assign adr       = new_cycle ? wb_adr_i : next_adr;
 
-  always@(posedge wb_clk_i) begin
-    adr_r   <= adr;
-    valid_r <= valid;
+  always @(posedge wb_clk_i) begin
+    adr_r    <= adr;
+    valid_r  <= valid;
     // Ack generation
     wb_ack_o <= valid & (!((wb_cti_i == 3'b000) | (wb_cti_i == 3'b111)) | !wb_ack_o);
-    if(wb_rst_i) begin
+    if (wb_rst_i) begin
       adr_r    <= {AW{1'b0}};
       valid_r  <= 1'b0;
       wb_ack_o <= 1'b0;
     end
   end
 
-  assign ram_we = wb_we_i & valid & wb_ack_o;
+  assign ram_we   = wb_we_i & valid & wb_ack_o;
 
-  // TODO:ck for burst address errors
-  assign wb_err_o =  1'b0;
+  // TO-DO:ck for burst address errors
+  assign wb_err_o = 1'b0;
 
   peripheral_ram_generic_wb #(
-    .DEPTH   (DEPTH/4),
-    .MEMFILE (MEMFILE),
+    .DEPTH  (DEPTH / 4),
+    .MEMFILE(MEMFILE),
 
-    .AW ($clog2(DEPTH/4)),
-    .DW (DW)
-  )
-  ram0 (
-    .clk   (wb_clk_i),
-    .we    ({4{ram_we}} & wb_sel_i),
-    .din   (wb_dat_i),
-    .waddr (adr_r[AW-1:2]),
-    .raddr (adr[AW-1:2]),
-    .dout  (wb_dat_o)
+    .AW($clog2(DEPTH / 4)),
+    .DW(DW)
+  ) ram0 (
+    .clk  (wb_clk_i),
+    .we   ({4{ram_we}} & wb_sel_i),
+    .din  (wb_dat_i),
+    .waddr(adr_r[AW-1:2]),
+    .raddr(adr[AW-1:2]),
+    .dout (wb_dat_o)
   );
 endmodule

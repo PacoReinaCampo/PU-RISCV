@@ -409,7 +409,7 @@ module pu_riscv_synthesis #(
   );
 
   // Instruction AXI4
-  mpsoc_axi4_spram #(
+  peripheral_spram_axi4 #(
     .AXI_ID_WIDTH   ( AXI_ID_WIDTH   ),
     .AXI_ADDR_WIDTH ( AXI_ADDR_WIDTH ),
     .AXI_DATA_WIDTH ( AXI_DATA_WIDTH ),
@@ -478,7 +478,7 @@ module pu_riscv_synthesis #(
   );
 
   // Data AXI4
-  mpsoc_axi4_spram #(
+  peripheral_spram_axi4 #(
     .AXI_ID_WIDTH   ( AXI_ID_WIDTH   ),
     .AXI_ADDR_WIDTH ( AXI_ADDR_WIDTH ),
     .AXI_DATA_WIDTH ( AXI_DATA_WIDTH ),

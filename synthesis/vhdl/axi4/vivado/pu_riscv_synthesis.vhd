@@ -329,7 +329,7 @@ architecture rtl of pu_riscv_synthesis is
       );
   end component;
 
-  component mpsoc_axi4_spram
+  component peripheral_spram_axi4
     generic (
       AXI_ID_WIDTH   : integer := 10;
       AXI_ADDR_WIDTH : integer := 64;
@@ -698,7 +698,7 @@ begin
       );
 
   -- Instruction AXI4
-  instruction_axi4 : mpsoc_axi4_spram
+  instruction_axi4 : peripheral_spram_axi4
     generic map (
       AXI_ID_WIDTH   => AXI_ID_WIDTH,
       AXI_ADDR_WIDTH => AXI_ADDR_WIDTH,
@@ -768,7 +768,7 @@ begin
       );
 
   -- Data AXI4
-  data_axi4 : mpsoc_axi4_spram
+  data_axi4 : peripheral_spram_axi4
     generic map (
       AXI_ID_WIDTH   => AXI_ID_WIDTH,
       AXI_ADDR_WIDTH => AXI_ADDR_WIDTH,

@@ -259,7 +259,7 @@ module pu_riscv_wb #(
         OPC_STORE:    wb_we_o <= 'b0;
         OPC_STORE_FP: wb_we_o <= 'b0;
         OPC_BRANCH:   wb_we_o <= 'b0;
-        // OPC_SYSTEM:   wb_we_o <= 'b0;
+        // OPC_SYSTEM: wb_we_o <= 'b0;
         default:      wb_we_o <= ~mem_bubble_i & |dst;
       endcase
     end

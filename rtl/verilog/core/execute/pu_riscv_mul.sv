@@ -216,7 +216,6 @@ module pu_riscv_mul #(
 
   generate
     if (LATENCY == 0) begin
-
       // Single cycle multiplier
       //
       // Registers at: - output
@@ -235,7 +234,6 @@ module pu_riscv_mul #(
       // Register holding sign correction
       assign mult_r_signed_reg = mult_r_signed;
     end else begin
-
       // Multi cycle multiplier
       //
       // Registers at: - input

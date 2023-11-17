@@ -521,7 +521,6 @@ package pu_riscv_verilog_pkg;
 
   localparam MAX_BREAKPOINTS = 8;
 
- //
  // Debug Unit Memory Map
  //
  // addr_bits  Description
@@ -538,7 +537,6 @@ package pu_riscv_verilog_pkg;
   localparam DBG_GPRS = 4'h1;
   localparam DBG_CSRS = 4'h2;
 
- //
  // Control registers
  // 0 00 00 ctrl
  // 0 00 01
@@ -586,7 +584,6 @@ package pu_riscv_verilog_pkg;
   localparam BP_CTRL_CC_ST_ADR = 3'h2;
   localparam BP_CTRL_CC_LDST_ADR = 3'h3;
 
- //
  // addr         Key  Description
  // --------------------------------------------
  // 0x000-0x01f  GPR  General Purpose Registers
@@ -599,7 +596,6 @@ package pu_riscv_verilog_pkg;
   localparam DBG_NPC = 12'h200;
   localparam DBG_PPC = 12'h201;
 
- //
  // Bank2 - CSRs
  //
  // Direct mapping to the 12bit CSR address space
