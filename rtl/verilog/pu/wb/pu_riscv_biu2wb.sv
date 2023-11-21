@@ -182,7 +182,7 @@ module pu_riscv_biu2wb #(
       wb_stb_o  <= 1'b0;
       wb_adr_o  <= 'h0;
       wb_we_o   <= 1'b0;
-      wb_cti_o  <= 'h0;  // dont care
+      wb_cti_o  <= 'h0;  // don't care
       wb_sel_o  <= `HPROT_DATA | `HPROT_PRIVILEGED | `HPROT_NON_BUFFERABLE | `HPROT_NON_CACHEABLE;
       wb_bte_o  <= `HTRANS_IDLE;
       wb_cyc_o  <= 1'b0;

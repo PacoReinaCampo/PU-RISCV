@@ -188,8 +188,8 @@ module pu_riscv_biu2ahb3 #(
       HSEL      <= 1'b0;
       HADDR     <= 'h0;
       HWRITE    <= 1'b0;
-      HSIZE     <= 'h0;  // dont care
-      HBURST    <= 'h0;  // dont care
+      HSIZE     <= 'h0;  // don't care
+      HBURST    <= 'h0;  // don't care
       HPROT     <= HPROT_DATA | HPROT_PRIVILEGED | HPROT_NON_BUFFERABLE | HPROT_NON_CACHEABLE;
       HTRANS    <= HTRANS_IDLE;
       HMASTLOCK <= 1'b0;

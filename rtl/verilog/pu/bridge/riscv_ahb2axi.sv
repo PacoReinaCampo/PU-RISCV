@@ -224,7 +224,7 @@ module riscv_ahb2axi #(
         buf_nxtstate = (ahb3_hresp | (ahb3_htrans[1:0] == 2'b0) | ~ahb3_hsel) ? IDLE : (ahb3_hwrite ? WR : RD);
         buf_state_en = (~cmdbuf_full | ahb3_hresp);
         cmdbuf_wr_en = ~cmdbuf_full & ~(ahb3_hresp | ((ahb3_htrans[1:0] == 2'b01) & ahb3_hsel));
-        // Dont send command to the buffer in case of an error or when the master is not ready with the data now.
+        // Don't send command to the buffer in case of an error or when the master is not ready with the data now.
       end
       RD: begin  // Read command recieved last cycle.
         buf_nxtstate = ahb3_hresp ? IDLE : PEND;  // If error go to idle, else wait for read data

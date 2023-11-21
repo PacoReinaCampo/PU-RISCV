@@ -61,7 +61,7 @@ module pu_riscv_alu #(
   input [XLEN-1:0] opA,
   input [XLEN-1:0] opB,
 
-  // to WB
+  // To WB
   output reg            alu_bubble,
   output reg [XLEN-1:0] alu_r,
 

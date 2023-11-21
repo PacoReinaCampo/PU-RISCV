@@ -391,8 +391,8 @@ begin
       hsel      <= '0';
       haddr     <= X"0";
       hwrite    <= '0';
-      hsize     <= X"0";                -- dont care
-      hburst    <= X"0";                -- dont care
+      hsize     <= X"0";                -- don't care
+      hburst    <= X"0";                -- don't care
       hprot     <= HPROT_DATA or HPROT_PRIVILEGED or HPROT_NON_BUFFERABLE or HPROT_NON_CACHEABLE;
       htrans    <= HTRANS_IDLE;
       hmastlock <= '0';

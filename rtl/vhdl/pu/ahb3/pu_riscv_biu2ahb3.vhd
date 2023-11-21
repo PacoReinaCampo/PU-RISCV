@@ -275,8 +275,8 @@ begin
       HSEL      <= '0';
       HADDR_O   <= (others => '0');
       HWRITE    <= '0';
-      HSIZE     <= (others => '0');     -- dont care
-      HBURST_O  <= (others => '0');     -- dont care
+      HSIZE     <= (others => '0');     -- don't care
+      HBURST_O  <= (others => '0');     -- don't care
       HPROT     <= HPROT_DATA or HPROT_PRIVILEGED or HPROT_NON_BUFFERABLE or HPROT_NON_CACHEABLE;
       HTRANS    <= HTRANS_IDLE;
       HMASTLOCK <= '0';

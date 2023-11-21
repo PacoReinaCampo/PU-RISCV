@@ -239,8 +239,8 @@ module pu_riscv_biu2axi4 #(
       hsel      <= 1'b0;
       haddr     <= 'h0;
       hwrite    <= 1'b0;
-      hsize     <= 'h0;  // dont care
-      hburst    <= 'h0;  // dont care
+      hsize     <= 'h0;  // don't care
+      hburst    <= 'h0;  // don't care
       hprot     <= `HPROT_DATA | `HPROT_PRIVILEGED | `HPROT_NON_BUFFERABLE | `HPROT_NON_CACHEABLE;
       htrans    <= `HTRANS_IDLE;
       hmastlock <= 1'b0;

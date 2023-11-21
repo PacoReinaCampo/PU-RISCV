@@ -219,7 +219,7 @@ begin
                         when ahb3_hwrite                                                      else RD;
         buf_state_en <= (not cmdbuf_full or ahb3_hresp);
         cmdbuf_wr_en <= not cmdbuf_full and not (ahb3_hresp or ((ahb3_htrans(1 downto 0) = "01") and ahb3_hsel));
-      -- Dont send command to the buffer in case of an error or when the master is not ready with the data now.
+      -- Don't send command to the buffer in case of an error or when the master is not ready with the data now.
       when RD =>
         -- Read command recieved last cycle.
         -- If error go to idle, else wait for read data

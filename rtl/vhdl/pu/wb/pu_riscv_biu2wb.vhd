@@ -271,7 +271,7 @@ begin
       wb_stb_o <= '0';
       wb_adr_o <= (others => '0');
       wb_we_o  <= '0';
-      wb_cti_o <= (others => '0');      -- dont care
+      wb_cti_o <= (others => '0');      -- don't care
       wb_sel_o <= HPROT_DATA or HPROT_PRIVILEGED or HPROT_NON_BUFFERABLE or HPROT_NON_CACHEABLE;
       wb_bte_o <= HTRANS_IDLE;
       wb_cyc_o <= '0';

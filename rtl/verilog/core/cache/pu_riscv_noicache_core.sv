@@ -105,7 +105,7 @@ module pu_riscv_noicache_core #(
   // For now don't support 16bit accesses
   assign if_parcel_misaligned = |if_nxt_pc[1:0];  // send out together with instruction
 
-  // delay IF-flush
+  // Delay IF-flush
   always @(posedge clk, negedge rstn) begin
     if (!rstn) begin
       if_flush_dly <= 1'b0;
@@ -145,7 +145,7 @@ module pu_riscv_noicache_core #(
     end
   end
 
-  // valid bits
+  // Valid bits
   always @(posedge clk, negedge rstn) begin
     if (!rstn) begin
       biu_fifo_valid[0] <= 1'b0;
@@ -160,7 +160,7 @@ module pu_riscv_noicache_core #(
         biu_ack, if_parcel_valid
       })
         2'b00: begin
-          // no action
+          // No action
         end
         2'b10: begin
           // FIFO write
@@ -168,11 +168,11 @@ module pu_riscv_noicache_core #(
             biu_fifo_valid[1], biu_fifo_valid[0]
           })
             2'b11: begin
-              // entry 0,1 full. Fill entry2
+              // Entry 0,1 full. Fill entry2
               biu_fifo_valid[2] <= 1'b1;
             end
             2'b01: begin
-              // entry 0 full. Fill entry1, clear entry2
+              // Entry 0 full. Fill entry1, clear entry2
               biu_fifo_valid[1] <= 1'b1;
               biu_fifo_valid[2] <= 1'b0;
             end
