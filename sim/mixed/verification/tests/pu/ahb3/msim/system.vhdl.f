@@ -48,8 +48,8 @@
 ../../../../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
 
 ../../../../../../../rtl/vhdl/core/cache/pu_riscv_dext.vhd
-../../../../../../../rtl/vhdl/core/execute/pu_riscv_div.vhd
-../../../../../../../rtl/vhdl/core/execute/pu_riscv_mul.vhd
+../../../../../../../rtl/vhdl/core/execute/pu_riscv_divider.vhd
+../../../../../../../rtl/vhdl/core/execute/pu_riscv_multiplier.vhd
 ../../../../../../../rtl/vhdl/core/memory/pu_riscv_memmisaligned.vhd
 ../../../../../../../rtl/vhdl/core/memory/pu_riscv_mmu.vhd
 ../../../../../../../rtl/vhdl/core/main/pu_riscv_memory.vhd

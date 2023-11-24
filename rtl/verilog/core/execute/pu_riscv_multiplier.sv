@@ -40,7 +40,7 @@
 
 import pu_riscv_verilog_pkg::*;
 
-module pu_riscv_mul #(
+module pu_riscv_multiplier #(
   parameter XLEN = 64,
   parameter ILEN = 64
 ) (
@@ -169,7 +169,7 @@ module pu_riscv_mul #(
   //
   // Transform all multiplications into 1 unsigned multiplication
   // This avoids building multiple multipliers (signed x signed, signed x unsigned, unsigned x unsigned)
-  //   at the expense of potentially making the path slower
+  // at the expense of potentially making the path slower
  
   // multiplier operand-A
   always @(*) begin

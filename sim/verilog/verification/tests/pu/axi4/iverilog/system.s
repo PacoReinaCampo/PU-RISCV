@@ -53,10 +53,10 @@
 ../../../../../../../rtl/verilog/core/decode/pu_riscv_id.sv
 ../../../../../../../rtl/verilog/core/execute/pu_riscv_alu.sv
 ../../../../../../../rtl/verilog/core/execute/pu_riscv_bu.sv
-../../../../../../../rtl/verilog/core/execute/pu_riscv_div.sv
+../../../../../../../rtl/verilog/core/execute/pu_riscv_divider.sv
 ../../../../../../../rtl/verilog/core/execute/pu_riscv_execution.sv
 ../../../../../../../rtl/verilog/core/execute/pu_riscv_lsu.sv
-../../../../../../../rtl/verilog/core/execute/pu_riscv_mul.sv
+../../../../../../../rtl/verilog/core/execute/pu_riscv_multiplier.sv
 ../../../../../../../rtl/verilog/core/fetch/pu_riscv_if.sv
 ../../../../../../../rtl/verilog/core/memory/pu_riscv_dmem_ctrl.sv
 ../../../../../../../rtl/verilog/core/memory/pu_riscv_imem_ctrl.sv

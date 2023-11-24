@@ -40,7 +40,7 @@
 
 import pu_riscv_verilog_pkg::*;
 
-module pu_riscv_div #(
+module pu_riscv_divider #(
   parameter XLEN = 64,
   parameter ILEN = 64
 ) (
@@ -193,10 +193,12 @@ module pu_riscv_div #(
               {
                 1'b?, DIV
               } : begin
-                if (~|opB) begin  // signed divide by zero
+                if (~|opB) begin
+                  // signed divide by zero
                   div_r      <= {XLEN{1'b1}};  // =-1
                   div_bubble <= 1'b0;
-                end else if (opA == {1'b1, {XLEN - 1{1'b0}}} && &opB) begin  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
+                end else if (opA == {1'b1, {XLEN - 1{1'b0}}} && &opB) begin
+                  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
                   div_r      <= {1'b1, {XLEN - 1{1'b0}}};
                   div_bubble <= 1'b0;
                 end else begin
@@ -215,10 +217,12 @@ module pu_riscv_div #(
               {
                 1'b0, DIVW
               } : begin
-                if (~|opB32) begin  // signed divide by zero
+                if (~|opB32) begin
+                  // signed divide by zero
                   div_r      <= {XLEN{1'b1}};  // =-1
                   div_bubble <= 1'b0;
-                end else if (opA32 == {1'b1, {31{1'b0}}} && &opB32) begin  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
+                end else if (opA32 == {1'b1, {31{1'b0}}} && &opB32) begin
+                  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
                   div_r      <= sext32({1'b1, {31{1'b0}}});
                   div_bubble <= 1'b0;
                 end else begin
@@ -237,7 +241,8 @@ module pu_riscv_div #(
               {
                 1'b?, DIVU
               } : begin
-                if (~|opB) begin  // unsigned divide by zero
+                if (~|opB) begin
+                  // unsigned divide by zero
                   div_r      <= {XLEN{1'b1}};  // = 2^XLEN -1
                   div_bubble <= 1'b0;
                 end else begin
@@ -256,7 +261,8 @@ module pu_riscv_div #(
               {
                 1'b0, DIVUW
               } : begin
-                if (~|opB32) begin  // unsigned divide by zero
+                if (~|opB32) begin
+                  // unsigned divide by zero
                   div_r      <= {XLEN{1'b1}};  // = 2^XLEN -1
                   div_bubble <= 1'b0;
                 end else begin
@@ -275,10 +281,12 @@ module pu_riscv_div #(
               {
                 1'b?, REM
               } : begin
-                if (~|opB) begin  // signed divide by zero
+                if (~|opB) begin
+                  // signed divide by zero
                   div_r      <= opA;
                   div_bubble <= 1'b0;
-                end else if (opA == {1'b1, {XLEN - 1{1'b0}}} && &opB) begin  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
+                end else if (opA == {1'b1, {XLEN - 1{1'b0}}} && &opB) begin
+                  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
                   div_r      <= 'h0;
                   div_bubble <= 1'b0;
                 end else begin
@@ -297,10 +305,12 @@ module pu_riscv_div #(
               {
                 1'b0, REMW
               } : begin
-                if (~|opB32) begin  // signed divide by zero
+                if (~|opB32) begin
+                  // signed divide by zero
                   div_r      <= sext32(opA32);
                   div_bubble <= 1'b0;
-                end else if (opA32 == {1'b1, {31{1'b0}}} && &opB32) begin  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
+                end else if (opA32 == {1'b1, {31{1'b0}}} && &opB32) begin
+                  // signed overflow (Dividend=-2^(XLEN-1), Divisor=-1)
                   div_r      <= 'h0;
                   div_bubble <= 1'b0;
                 end else begin
@@ -319,7 +329,8 @@ module pu_riscv_div #(
               {
                 1'b?, REMU
               } : begin
-                if (~|opB) begin  // unsigned divide by zero
+                if (~|opB) begin
+                  // unsigned divide by zero
                   div_r      <= opA;
                   div_bubble <= 1'b0;
                 end else begin
@@ -366,10 +377,12 @@ module pu_riscv_div #(
             state <= ST_RES;
           end
           // restoring divider section
-          if (p_minus_b[XLEN]) begin  // sub gave negative result
+          if (p_minus_b[XLEN]) begin
+            // sub gave negative result
             pa_p <= pa_shifted_p;  // restore
             pa_a <= {pa_shifted_a[XLEN-1:1], 1'b0};  // shift in '0' for Q
-          end else begin  // sub gave positive result
+          end else begin
+            // sub gave positive result
             pa_p <= p_minus_b[XLEN-1:0];  // store sub result
             pa_a <= {pa_shifted_a[XLEN-1:1], 1'b1};  // shift in '1' for Q
           end

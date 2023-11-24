@@ -46,7 +46,7 @@ use ieee.numeric_std.all;
 use work.pu_riscv_vhdl_pkg.all;
 use work.vhdl_pkg.all;
 
-entity pu_riscv_mul is
+entity pu_riscv_multiplier is
   generic (
     XLEN : integer := 64;
     ILEN : integer := 64
@@ -73,9 +73,9 @@ entity pu_riscv_mul is
     mul_bubble : out std_logic;
     mul_r      : out std_logic_vector(XLEN-1 downto 0)
     );
-end pu_riscv_mul;
+end pu_riscv_multiplier;
 
-architecture rtl of pu_riscv_mul is
+architecture rtl of pu_riscv_multiplier is
   ------------------------------------------------------------------------------
   -- Constants
   ------------------------------------------------------------------------------

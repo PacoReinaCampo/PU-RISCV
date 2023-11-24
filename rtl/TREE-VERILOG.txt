@@ -10,10 +10,10 @@ verilog
 │   ├── execute
 │   │   ├── pu_riscv_alu.sv
 │   │   ├── pu_riscv_bu.sv
-│   │   ├── pu_riscv_div.sv
+│   │   ├── pu_riscv_divider.sv
 │   │   ├── pu_riscv_execution.sv
 │   │   ├── pu_riscv_lsu.sv
-│   │   └── pu_riscv_mul.sv
+│   │   └── pu_riscv_multiplier.sv
 │   ├── fetch
 │   │   └── pu_riscv_if.sv
 │   ├── main

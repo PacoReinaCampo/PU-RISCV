@@ -232,7 +232,8 @@ module pu_riscv_lsu #(
 
   generate
     // memory byte enable
-    if (XLEN == 64) begin  // RV64
+    if (XLEN == 64) begin
+      // RV64
       always @(*) begin
         casex ({
           func7, func3, opcode
@@ -264,7 +265,8 @@ module pu_riscv_lsu #(
           default: d = 'hx;
         endcase
       end
-    end else begin  // RV32
+    end else begin
+      // RV32
       always @(*) begin
         casex ({
           func7, func3, opcode

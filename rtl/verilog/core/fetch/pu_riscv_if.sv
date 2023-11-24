@@ -273,8 +273,8 @@ module pu_riscv_if #(
 
   assign is_16bit_instruction = ~&active_parcel[1:0];
   assign is_32bit_instruction = &active_parcel[1:0];
-  // assign is_48bit_instruction =   active_parcel[5:0] == 6'b011111;
-  // assign is_64bit_instruction =   active_parcel[6:0] == 7'b0111111;
+  // assign is_48bit_instruction = active_parcel[5:0] == 6'b011111;
+  // assign is_64bit_instruction = active_parcel[6:0] == 7'b0111111;
 
   // Convert 16bit instructions to 32bit instructions here.
   always @(*) begin

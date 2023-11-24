@@ -50,7 +50,7 @@ module pu_riscv_alu #(
 
   input ex_stall,
 
-  // Program counter
+  // Program Counter
   input [XLEN-1:0] id_pc,
 
   // Instruction

@@ -47,7 +47,7 @@ use ieee.math_real.all;
 use work.pu_riscv_vhdl_pkg.all;
 use work.vhdl_pkg.all;
 
-entity pu_riscv_div is
+entity pu_riscv_divider is
   generic (
     XLEN : integer := 64;
     ILEN : integer := 64
@@ -74,9 +74,9 @@ entity pu_riscv_div is
     div_bubble : out std_logic;
     div_r      : out std_logic_vector(XLEN-1 downto 0)
     );
-end pu_riscv_div;
+end pu_riscv_divider;
 
-architecture rtl of pu_riscv_div is
+architecture rtl of pu_riscv_divider is
   ------------------------------------------------------------------------------
   -- functions
   ------------------------------------------------------------------------------

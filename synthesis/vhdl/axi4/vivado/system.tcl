@@ -54,10 +54,10 @@ read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/cache/pu_riscv_noicache_core.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/decode/pu_riscv_id.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/pu_riscv_alu.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/pu_riscv_bu.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/pu_riscv_div.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/pu_riscv_divider.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/pu_riscv_execution.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/pu_riscv_lsu.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/pu_riscv_mul.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/execute/pu_riscv_multiplier.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/fetch/pu_riscv_if.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/pu_riscv_dmem_ctrl.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/memory/pu_riscv_imem_ctrl.vhd

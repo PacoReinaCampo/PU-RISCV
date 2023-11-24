@@ -139,9 +139,23 @@ module pu_riscv_bu #(
         casex ({
           id_bubble, opcode
         })
-          {1'b0, OPC_JALR} :   bu_exception[CAUSE_MISALIGNED_INSTRUCTION] <= id_exception[CAUSE_MISALIGNED_INSTRUCTION] | has_rvc ? nxt_pc[0] : |nxt_pc[1:0];
-          {1'b0, OPC_BRANCH} : bu_exception[CAUSE_MISALIGNED_INSTRUCTION] <= id_exception[CAUSE_MISALIGNED_INSTRUCTION] | has_rvc ? nxt_pc[0] : |nxt_pc[1:0];
-          default:             bu_exception[CAUSE_MISALIGNED_INSTRUCTION] <= id_exception[CAUSE_MISALIGNED_INSTRUCTION];
+          {1'b0, OPC_JALR} : begin
+            if (id_exception[CAUSE_MISALIGNED_INSTRUCTION] | has_rvc) begin
+              bu_exception[CAUSE_MISALIGNED_INSTRUCTION] <= nxt_pc[0];
+            end else begin
+              bu_exception[CAUSE_MISALIGNED_INSTRUCTION] <= |nxt_pc[1:0];
+            end
+          end
+          {1'b0, OPC_BRANCH} : begin
+            if (id_exception[CAUSE_MISALIGNED_INSTRUCTION] | has_rvc) begin
+              bu_exception[CAUSE_MISALIGNED_INSTRUCTION] <= nxt_pc[0];
+            end else begin
+              bu_exception[CAUSE_MISALIGNED_INSTRUCTION] <= |nxt_pc[1:0];
+            end
+          end
+          default: begin
+            bu_exception[CAUSE_MISALIGNED_INSTRUCTION] <= id_exception[CAUSE_MISALIGNED_INSTRUCTION];
+          end
         endcase
       end
     end
@@ -180,7 +194,8 @@ module pu_riscv_bu #(
     })
       {
         1'b0, JAL
-      } : begin  // This is really only for the debug unit, such that NPC points to the correct address
+      } : begin
+        // This is really only for the debug unit, such that NPC points to the correct address
         btaken     = 'b1;
         bp_update  = 'b0;
         pipeflush  = 'b0;  // Handled in IF, do NOT flush here!!

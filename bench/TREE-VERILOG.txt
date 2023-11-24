@@ -17,10 +17,10 @@ verilog
     │   ├── execute
     │   │   ├── pu_riscv_alu_testbench.sv
     │   │   ├── pu_riscv_bu_testbench.sv
-    │   │   ├── pu_riscv_div_testbench.sv
+    │   │   ├── pu_riscv_divider_testbench.sv
     │   │   ├── pu_riscv_execution_testbench.sv
     │   │   ├── pu_riscv_lsu_testbench.sv
-    │   │   └── pu_riscv_mul_testbench.sv
+    │   │   └── pu_riscv_multiplier_testbench.sv
     │   ├── fetch
     │   │   └── pu_riscv_if_testbench.sv
     │   ├── main

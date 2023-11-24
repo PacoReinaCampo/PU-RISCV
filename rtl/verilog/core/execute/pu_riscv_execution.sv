@@ -308,10 +308,10 @@ module pu_riscv_execution #(
 
   generate
     if (HAS_RVM) begin
-      pu_riscv_mul #(
+      pu_riscv_multiplier #(
         .XLEN(XLEN),
         .ILEN(ILEN)
-      ) mul (
+      ) multiplier (
         .rstn      (rstn),
         .clk       (clk),
         .ex_stall  (ex_stall),
@@ -325,10 +325,10 @@ module pu_riscv_execution #(
         .mul_r     (mul_r)
       );
 
-      pu_riscv_div #(
+      pu_riscv_divider #(
         .XLEN(XLEN),
         .ILEN(ILEN)
-      ) div (
+      ) divider (
         .rstn      (rstn),
         .clk       (clk),
         .ex_stall  (ex_stall),

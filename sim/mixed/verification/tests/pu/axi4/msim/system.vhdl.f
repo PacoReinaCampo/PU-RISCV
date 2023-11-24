@@ -49,10 +49,10 @@
 ../../../../../../../rtl/vhdl/core/decode/pu_riscv_id.vhd
 ../../../../../../../rtl/vhdl/core/execute/pu_riscv_alu.vhd
 ../../../../../../../rtl/vhdl/core/execute/pu_riscv_bu.vhd
-../../../../../../../rtl/vhdl/core/execute/pu_riscv_div.vhd
+../../../../../../../rtl/vhdl/core/execute/pu_riscv_divider.vhd
 ../../../../../../../rtl/vhdl/core/execute/pu_riscv_execution.vhd
 ../../../../../../../rtl/vhdl/core/execute/pu_riscv_lsu.vhd
-../../../../../../../rtl/vhdl/core/execute/pu_riscv_mul.vhd
+../../../../../../../rtl/vhdl/core/execute/pu_riscv_multiplier.vhd
 ../../../../../../../rtl/vhdl/core/memory/pu_riscv_membuf.vhd
 ../../../../../../../rtl/vhdl/core/memory/pu_riscv_memmisaligned.vhd
 ../../../../../../../rtl/vhdl/core/memory/pu_riscv_mmu.vhd

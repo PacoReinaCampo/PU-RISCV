@@ -59,7 +59,7 @@ module pu_riscv_id #(
   input [XLEN-1:0] bu_nxt_pc,
   input [XLEN-1:0] st_nxt_pc,
 
-  // Program counter
+  // Program Counter
   input      [XLEN-1:0] if_pc,
   output reg [XLEN-1:0] id_pc,
   input      [     1:0] if_bp_predict,

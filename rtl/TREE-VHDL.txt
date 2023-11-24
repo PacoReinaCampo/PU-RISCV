@@ -10,10 +10,10 @@ vhdl
 │   ├── execute
 │   │   ├── pu_riscv_alu.vhd
 │   │   ├── pu_riscv_bu.vhd
-│   │   ├── pu_riscv_div.vhd
+│   │   ├── pu_riscv_divider.vhd
 │   │   ├── pu_riscv_execution.vhd
 │   │   ├── pu_riscv_lsu.vhd
-│   │   └── pu_riscv_mul.vhd
+│   │   └── pu_riscv_multiplier.vhd
 │   ├── fetch
 │   │   └── pu_riscv_if.vhd
 │   ├── main

@@ -53,10 +53,10 @@ sv work ../../../../../../../rtl/verilog/core/cache/pu_riscv_noicache_core.sv
 sv work ../../../../../../../rtl/verilog/core/decode/pu_riscv_id.sv
 sv work ../../../../../../../rtl/verilog/core/execute/pu_riscv_alu.sv
 sv work ../../../../../../../rtl/verilog/core/execute/pu_riscv_bu.sv
-sv work ../../../../../../../rtl/verilog/core/execute/pu_riscv_div.sv
+sv work ../../../../../../../rtl/verilog/core/execute/pu_riscv_divider.sv
 sv work ../../../../../../../rtl/verilog/core/execute/pu_riscv_execution.sv
 sv work ../../../../../../../rtl/verilog/core/execute/pu_riscv_lsu.sv
-sv work ../../../../../../../rtl/verilog/core/execute/pu_riscv_mul.sv
+sv work ../../../../../../../rtl/verilog/core/execute/pu_riscv_multiplier.sv
 sv work ../../../../../../../rtl/verilog/core/fetch/pu_riscv_if.sv
 sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_dmem_ctrl.sv
 sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_imem_ctrl.sv

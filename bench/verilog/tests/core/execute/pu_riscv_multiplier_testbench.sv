@@ -10,7 +10,7 @@
 //                                                                            //
 //                                                                            //
 //              MPSoC-RISCV CPU                                               //
-//              Core - Division Unit                                          //
+//              Core - Multiplier Unit                                        //
 //              AMBA3 AHB-Lite Bus Interface                                  //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,27 +40,27 @@
 
 import pu_riscv_verilog_pkg::*;
 
-module pu_riscv_div_testbench;
+module pu_riscv_divider_testbench;
 
   //////////////////////////////////////////////////////////////////////////////
   // Module Body
   //////////////////////////////////////////////////////////////////////////////
 
   // DUT
-  pu_riscv_div #(
+  pu_riscv_multiplier #(
     .XLEN(XLEN),
     .ILEN(ILEN)
-  ) div (
+  ) mul (
     .rstn      (rstn),
     .clk       (clk),
     .ex_stall  (ex_stall),
-    .div_stall (div_stall),
+    .mul_stall (mul_stall),
     .id_bubble (id_bubble),
     .id_instr  (id_instr),
     .opA       (opA),
     .opB       (opB),
     .st_xlen   (st_xlen),
-    .div_bubble(div_bubble),
-    .div_r     (div_r)
+    .mul_bubble(mul_bubble),
+    .mul_r     (mul_r)
   );
 endmodule

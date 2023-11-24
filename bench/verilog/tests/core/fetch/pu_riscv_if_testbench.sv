@@ -40,7 +40,7 @@
 
 import pu_riscv_verilog_pkg::*;
 
-module pu_riscv_div_testbench;
+module pu_riscv_divider_testbench;
 
   //////////////////////////////////////////////////////////////////////////////
   // Module Body

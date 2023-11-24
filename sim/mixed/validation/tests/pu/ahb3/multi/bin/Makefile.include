@@ -88,8 +88,8 @@ RTL_VLOG = $(DUT_SRC_VLOG)/core/cache/pu_riscv_dcache_core.sv \
 
 DUT_SRC_VHDL=$(ROOT_DIR)/rtl/vhdl
 RTL_VHDL = $(DUT_SRC_VHDL)/core/cache/pu_riscv_dext.vhd \
-           $(DUT_SRC_VHDL)/core/execute/pu_riscv_div.vhd \
-           $(DUT_SRC_VHDL)/core/execute/pu_riscv_mul.vhd \
+           $(DUT_SRC_VHDL)/core/execute/pu_riscv_divider.vhd \
+           $(DUT_SRC_VHDL)/core/execute/pu_riscv_multiplier.vhd \
            $(DUT_SRC_VHDL)/core/memory/pu_riscv_memmisaligned.vhd \
            $(DUT_SRC_VHDL)/core/memory/pu_riscv_mmu.vhd \
            $(DUT_SRC_VHDL)/core/main/pu_riscv_memory.vhd \

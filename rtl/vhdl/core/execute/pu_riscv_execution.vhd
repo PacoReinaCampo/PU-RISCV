@@ -277,7 +277,7 @@ architecture rtl of pu_riscv_execution is
       );
   end component;
 
-  component pu_riscv_mul
+  component pu_riscv_multiplier
     generic (
       XLEN : integer := 64;
       ILEN : integer := 64
@@ -306,7 +306,7 @@ architecture rtl of pu_riscv_execution is
       );
   end component;
 
-  component pu_riscv_div
+  component pu_riscv_divider
     generic (
       XLEN : integer := 64;
       ILEN : integer := 64
@@ -563,7 +563,7 @@ begin
   ex_exception <= ex_exception_sgn;
 
   generating_0 : if (HAS_RVM = '1') generate
-    mul : pu_riscv_mul
+    multiplier : pu_riscv_multiplier
       generic map (
         XLEN => XLEN,
         ILEN => ILEN
@@ -582,7 +582,7 @@ begin
         mul_r      => mul_r
         );
 
-    div : pu_riscv_div
+    divider : pu_riscv_divider
       generic map (
         XLEN => XLEN,
         ILEN => ILEN
