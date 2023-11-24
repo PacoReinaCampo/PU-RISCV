@@ -395,7 +395,8 @@ module pu_riscv_dmem_ctrl #(
         .biu_ack_i    (biu_ack[CACHE]),
         .biu_err_i    (biu_err[CACHE])
       );
-    end else begin  // No cache
+    end else begin
+      // No cache
       assign cache_q       = 'h0;
       assign cache_ack     = 1'b0;
       assign cache_err     = 1'b0;
@@ -407,7 +408,8 @@ module pu_riscv_dmem_ctrl #(
     //        needs write buffer (clear write when not qualified)
    
     if (DTCM_SIZE > 0) begin
-    end else begin  // No TCM
+    end else begin
+      // No TCM
       assign tcm_q   = 'h0;
       assign tcm_ack = 1'b0;
     end
