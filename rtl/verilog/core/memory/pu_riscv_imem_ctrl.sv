@@ -218,7 +218,7 @@ module pu_riscv_imem_ctrl #(
   assign {parcel_queue_q_pc, parcel_queue_q_parcel, parcel_queue_q_valid, parcel_queue_q_misaligned, parcel_queue_q_page_fault, parcel_queue_q_error} = parcel_queue_q;
 
   //////////////////////////////////////////////////////////////////////////////
-  // Module Body
+  // Body
   //////////////////////////////////////////////////////////////////////////////
 
   //  // For debugging
