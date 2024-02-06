@@ -46,10 +46,6 @@ sv work ../../../../../../../rtl/verilog/pkg/peripheral_ahb3_verilog_pkg.sv
 sv work ../../../../../../../rtl/verilog/pkg/peripheral_biu_verilog_pkg.sv
 sv work ../../../../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
 
-sv work ../../../../../../../rtl/verilog/pkg/peripheral_ahb3_verilog_pkg.sv
-sv work ../../../../../../../rtl/verilog/pkg/peripheral_biu_verilog_pkg.sv
-sv work ../../../../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
-
 sv work ../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
 sv work ../../../../../../../rtl/verilog/core/cache/pu_riscv_dext.sv
 sv work ../../../../../../../rtl/verilog/core/cache/pu_riscv_icache_core.sv
@@ -70,13 +66,13 @@ sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_mmu.sv
 sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_mux.sv
 sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_pmachk.sv
 sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_pmpchk.sv
-sv work ../../../../../../../rtl/verilog/core/pu_riscv_bp.sv
-sv work ../../../../../../../rtl/verilog/core/pu_riscv_core.sv
-sv work ../../../../../../../rtl/verilog/core/pu_riscv_du.sv
-sv work ../../../../../../../rtl/verilog/core/pu_riscv_memory.sv
-sv work ../../../../../../../rtl/verilog/core/pu_riscv_rf.sv
-sv work ../../../../../../../rtl/verilog/core/pu_riscv_state.sv
-sv work ../../../../../../../rtl/verilog/core/pu_riscv_wb.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_bp.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_core.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_du.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_memory.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_rf.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_state.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_wb.sv
 
 sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1r1w_generic.sv
 sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1r1w.sv
@@ -86,8 +82,6 @@ sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
 
 sv work ../../../../../../../rtl/verilog/pu/ahb3/pu_riscv_biu2ahb3.sv
 sv work ../../../../../../../rtl/verilog/pu/ahb3/pu_riscv_ahb3.sv
-sv work ../../../../../../../rtl/verilog/pu/riscv_ahb2axi.sv
-sv work ../../../../../../../rtl/verilog/pu/riscv_axi2ahb.sv
 
 sv work ../../../../../../../bench/verilog/tests/pu/interface/ahb3/pu_riscv_memory_model_ahb3.sv
 sv work ../../../../../../../bench/verilog/tests/pu/interface/ahb3/pu_riscv_mmio_if_ahb3.sv
