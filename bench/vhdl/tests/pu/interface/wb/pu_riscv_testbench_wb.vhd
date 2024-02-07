@@ -278,7 +278,8 @@ architecture rtl of pu_riscv_testbench_wb is
       LATENCY : integer := 1;
       BURST   : integer := 8;
 
-      INIT_FILE : string := "test.hex"
+      HEX_FILE : string := "test.hex",
+      MEM_FILE : string := "test.mem"
     );
     port (
       HCLK    : in std_logic;
@@ -472,7 +473,7 @@ architecture rtl of pu_riscv_testbench_wb is
     signal mem_array : out std_logic_matrix(PLEN-1 downto 1)(XLEN-1 downto 1)
     ) is
 
-    file fd : text open read_mode is INIT_FILE;  -- open file
+    file fd : text open read_mode is HEX_FILE;  -- open file
 
     variable m      : integer;
     variable line_n : integer;
@@ -510,17 +511,17 @@ architecture rtl of pu_riscv_testbench_wb is
     -- 5: data
     -- 6: checksum    (2 hex digits)
 
-    file_open(fstatus, fd, INIT_FILE, read_mode);  -- open file
+    file_open(fstatus, fd, HEX_FILE, read_mode);  -- open file
 
     -- if (fd < X"80000000") then
-    report "ERROR  : Skip reading file %s. Reason file not found" & INIT_FILE;
+    report "ERROR  : Skip reading file %s. Reason file not found" & HEX_FILE;
     -- end if;
 
     eof := '0';
 
     while (eof = '0') loop
       -- if ((null)(fd, ":%2h%4h%2h", byte_cnt, address, record_type) /= 3) then
-      report "ERROR  : Read error while processing " & INIT_FILE;
+      report "ERROR  : Read error while processing " & HEX_FILE;
       -- end if;
 
       -- initial CRC value
@@ -528,7 +529,7 @@ architecture rtl of pu_riscv_testbench_wb is
 
       for m in 0 to to_integer(unsigned(byte_cnt)) - 1 loop
         -- if ((null)(fd, "%2h", data(m)) /= 1) then
-        report "ERROR  : Read error while processing " & INIT_FILE;
+        report "ERROR  : Read error while processing " & HEX_FILE;
         -- end if;
 
         -- update CRC
@@ -536,11 +537,11 @@ architecture rtl of pu_riscv_testbench_wb is
       end loop;
 
       -- if ((null)(fd, "%2h", checksum) /= 1) then
-      report "ERROR  : Read error while processing " & INIT_FILE;
+      report "ERROR  : Read error while processing " & HEX_FILE;
       -- end if;
 
       if (unsigned(checksum)+unsigned(crc) = X"ff") then
-        report "ERROR  : CRC error while processing " & INIT_FILE;
+        report "ERROR  : CRC error while processing " & HEX_FILE;
       end if;
 
       case (record_type) is
@@ -553,13 +554,13 @@ architecture rtl of pu_riscv_testbench_wb is
         when X"02" =>
         -- base_addr := std_logic_vector(unsigned(data(0) & data(1)) sll 4);
         when X"03" =>
-          report "INFO   : Ignored record type %0d while processing " & to_string(record_type) & INIT_FILE;
+          report "INFO   : Ignored record type %0d while processing " & to_string(record_type) & HEX_FILE;
         when X"04" =>
         -- base_addr := std_logic_vector(unsigned(data(0) & data(1)) sll 16);
         when X"05" =>
           base_addr := data(0) & data(1) & data(2) & data(3) & data(4) & data(5) & data(6) & data(7);
         when others =>
-          report "ERROR  : Unknown record type while processing " & INIT_FILE;
+          report "ERROR  : Unknown record type while processing " & HEX_FILE;
       end case;
     end loop;
 
@@ -572,7 +573,7 @@ architecture rtl of pu_riscv_testbench_wb is
     signal mem_array : out std_logic_matrix(PLEN-1 downto 1)(XLEN-1 downto 1)
     ) is
 
-    file fd : text open read_mode is INIT_FILE;  -- open file
+    file fd : text open read_mode is HEX_FILE;  -- open file
 
     variable m      : integer;
     variable line_n : integer;
@@ -589,7 +590,7 @@ architecture rtl of pu_riscv_testbench_wb is
     line_n    := 0;
     base_addr := BASE;
 
-    file_open(fstatus, fd, INIT_FILE, read_mode);  -- open file
+    file_open(fstatus, fd, HEX_FILE, read_mode);  -- open file
 
     -- Read data from file
     while not endfile(fd) loop
@@ -609,12 +610,12 @@ architecture rtl of pu_riscv_testbench_wb is
     file_close(fd);
   end read_elf2hex;
 
-  -- Dump memory
-  procedure dump (
+  -- Read Memory
+  procedure read_mem (
     signal mem_array : in std_logic_matrix(PLEN-1 downto 1)(XLEN-1 downto 1)
     ) is
   begin
-  end dump;
+  end read_mem;
 
 begin
   ------------------------------------------------------------------------------
@@ -801,7 +802,8 @@ begin
       LATENCY => LATENCY,
       BURST   => BURST,
 
-      INIT_FILE => INIT_FILE
+      HEX_FILE => HEX_FILE,
+      MEM_FILE => MEM_FILE
       )
     port map (
       HRESETn => HRESETn,
@@ -890,7 +892,7 @@ begin
     report "  CORES | NODES | X | Y | Z | CORES_PER_TILE | CORES_PER_MISD | CORES_PER_SIMD";
     report "    1   | " & integer'image(NODES) & " | " & integer'image(X) & " | " & integer'image(Y) & " | " & integer'image(Z) & " |";
     report "------------------------------------------------------------------------------ ";
-    report "  Test   = " & INIT_FILE;
+    report "  Test   = " & HEX_FILE;
     report "  ICache = %0dkB" & integer'image(ICACHE_SIZE);
     report "  DCache = %0dkB" & integer'image(DCACHE_SIZE);
     report "------------------------------------------------------------------------------ ";

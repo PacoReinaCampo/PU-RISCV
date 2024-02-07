@@ -47,7 +47,8 @@ module pu_riscv_testbench_wb;
   parameter PLEN = 64;  // 64bit address bus
   parameter PC_INIT = 'h8000_0000;  // Start here after reset
   parameter BASE = PC_INIT;  // offset where to load program in memory
-  parameter INIT_FILE = "test.hex";
+  parameter HEX_FILE = "test.hex";
+  parameter MEM_FILE = "test.mem";
   parameter MEM_LATENCY = 1;
   parameter WRITEBUFFER_SIZE = 4;
   parameter HAS_U = 1;
@@ -261,7 +262,8 @@ module pu_riscv_testbench_wb;
 
   // hookup memory model
   pu_riscv_memory_model_wb #(
-    .INIT_FILE(INIT_FILE)
+    .HEX_FILE(HEX_FILE),
+    .MEM_FILE(MEM_FILE)
   ) memory_model (
     .HRESETn(HRESETn),
     .HCLK   (HCLK),
@@ -352,7 +354,7 @@ module pu_riscv_testbench_wb;
     $display("  CORES | NODES | X | Y | Z | CORES_PER_TILE | CORES_PER_MISD | CORES_PER_SIMD");
     $display("    1   | %5d | %1d | %1d | %1d |       --       |       --       |       --       ", NODES, X, Y, Z);
     $display("------------------------------------------------------------------------------");
-    $display("  Test   = %s", INIT_FILE);
+    $display("  Test   = %s", HEX_FILE);
     $display("  ICache = %0dkB", ICACHE_SIZE);
     $display("  DCache = %0dkB", DCACHE_SIZE);
     $display("------------------------------------------------------------------------------");
@@ -368,7 +370,7 @@ module pu_riscv_testbench_wb;
 
     // memory_model.read_elf2hex;
     memory_model.read_ihex;
-    // memory_model.dump;
+    // memory_model.read_model;
 
     HCLK    = 'b0;
 

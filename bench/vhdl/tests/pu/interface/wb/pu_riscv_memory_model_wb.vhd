@@ -58,7 +58,8 @@ entity pu_riscv_memory_model_wb is
     LATENCY : integer := 1;
     BURST   : integer := 8;
 
-    INIT_FILE : string := "test.hex"
+    HEX_FILE : string := "test.hex",
+    MEM_FILE : string := "test.mem"
   );
   port (
     HCLK    : in std_logic;

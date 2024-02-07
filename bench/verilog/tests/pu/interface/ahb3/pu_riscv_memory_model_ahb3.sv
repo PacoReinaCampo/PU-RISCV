@@ -51,7 +51,8 @@ module pu_riscv_memory_model_ahb3 #(
   parameter LATENCY = 1,
   parameter BURST   = 8,
 
-  parameter INIT_FILE = "test.hex"
+  parameter HEX_FILE = "test.hex",
+  parameter MEM_FILE = "test.mem"
 ) (
   input HCLK,
   input HRESETn,
@@ -137,16 +138,16 @@ module pu_riscv_memory_model_ahb3 #(
     // 5: data
     // 6: checksum    (2 hex digits)
 
-    fd = $fopen(INIT_FILE, "r");  // open file
+    fd = $fopen(HEX_FILE, "r");  // open file
     if (fd < 32'h8000_0000) begin
-      $display("ERROR  : Skip reading file %s. Reason file not found", INIT_FILE);
+      $display("ERROR  : Skip reading file %s. Reason file not found", HEX_FILE);
       $finish();
     end
 
     eof = 0;
     while (eof == 0) begin
       if ($fscanf(fd, ":%2h%4h%2h", byte_cnt, address, record_type) != 3) begin
-        $display("ERROR  : Read error while processing %s", INIT_FILE);
+        $display("ERROR  : Read error while processing %s", HEX_FILE);
       end
 
       // initial CRC value
@@ -154,7 +155,7 @@ module pu_riscv_memory_model_ahb3 #(
 
       for (m = 0; m < byte_cnt; m = m + 1) begin
         if ($fscanf(fd, "%2h", data[m]) != 1) begin
-          $display("ERROR  : Read error while processing %s", INIT_FILE);
+          $display("ERROR  : Read error while processing %s", HEX_FILE);
         end
 
         // update CRC
@@ -162,11 +163,11 @@ module pu_riscv_memory_model_ahb3 #(
       end
 
       if ($fscanf(fd, "%2h", checksum) != 1) begin
-        $display("ERROR  : Read error while processing %s", INIT_FILE);
+        $display("ERROR  : Read error while processing %s", HEX_FILE);
       end
 
       if (checksum + crc) begin
-        $display("ERROR  : CRC error while processing %s", INIT_FILE);
+        $display("ERROR  : CRC error while processing %s", HEX_FILE);
       end
 
       case (record_type)
@@ -177,10 +178,10 @@ module pu_riscv_memory_model_ahb3 #(
         end
         8'h01:   eof = 1;
         8'h02:   base_addr = {data[0], data[1]} << 4;
-        8'h03:   $display("INFO   : Ignored record type %0d while processing %s", record_type, INIT_FILE);
+        8'h03:   $display("INFO   : Ignored record type %0d while processing %s", record_type, HEX_FILE);
         8'h04:   base_addr = {data[0], data[1]} << 16;
         8'h05:   base_addr = {data[0], data[1], data[2], data[3]};
-        default: $display("ERROR  : Unknown record type while processing %s", INIT_FILE);
+        default: $display("ERROR  : Unknown record type while processing %s", HEX_FILE);
       endcase
     end
 
@@ -197,12 +198,12 @@ module pu_riscv_memory_model_ahb3 #(
 
     logic   [PLEN-1:0] base_addr = BASE;
 
-    fd = $fopen(INIT_FILE, "r");  // open file
+    fd = $fopen(HEX_FILE, "r");  // open file
     if (fd < 32'h8000_0000) begin
-      $display("ERROR  : Skip reading file %s. File not found", INIT_FILE);
+      $display("ERROR  : Skip reading file %s. File not found", HEX_FILE);
       $finish();
     end else begin
-      $display("INFO   : Reading %s", INIT_FILE);
+      $display("INFO   : Reading %s", HEX_FILE);
     end
 
     // Read data from file
@@ -211,7 +212,7 @@ module pu_riscv_memory_model_ahb3 #(
     )) begin
       line = line + 1;
       if ($fscanf(fd, "%32h", data) != 1) begin
-        $display("ERROR  : Read error while processing %s (line %0d)", INIT_FILE, line);
+        $display("ERROR  : Read error while processing %s (line %0d)", HEX_FILE, line);
       end
 
       for (m = 0; m < 128 / XLEN; m = m + 1) begin
@@ -224,9 +225,9 @@ module pu_riscv_memory_model_ahb3 #(
     $fclose(fd);
   endtask
 
-  // Dump memory
-  task dump;
-    foreach (mem_array[m]) $display("[%8h]:%8h", m, mem_array[m]);
+  // Read Memory
+  task read_mem;
+    $readmemh(MEM_FILE, mem_array);
   endtask
 
   //////////////////////////////////////////////////////////////////////////////
