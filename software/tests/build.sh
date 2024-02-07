@@ -46,10 +46,12 @@ export PATH=/opt/riscv-elf-gcc/bin:${PATH}
 
 rm -rf dump
 rm -rf hex
+rm -rf mem
 rm -rf riscv-tests
 
 mkdir dump
 mkdir hex
+mkdir mem
 
 git clone --recursive https://github.com/riscv/riscv-tests
 
@@ -58,12 +60,16 @@ autoconf
 ./configure --prefix=/opt/riscv-elf-gcc/bin
 make
 
+cp ../ihex2mem.tcl isa
+
 cd isa
 
 source ../../elf2hex.sh
+source ../../hex2mem.sh
 
 mv *.dump ../../dump
 mv *.hex ../../hex
+mv *.mem ../../mem
 
 cd ..
 
