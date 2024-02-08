@@ -370,7 +370,7 @@ module pu_riscv_testbench_wb;
 
     // memory_model.read_elf2hex;
     memory_model.read_ihex;
-    // memory_model.read_model;
+    // memory_model.read_mem;
 
     HCLK    = 'b0;
 

@@ -9,4 +9,7 @@ simulate:
 	vsim -c -do run.do work.generator_mem
 
 clean:
-	rm -rf work ../../../../mem transcript *.txt *.vstf
+	rm -rf work transcript *.txt *.vstf
+
+wash:
+	rm -rf ../../../../mem
