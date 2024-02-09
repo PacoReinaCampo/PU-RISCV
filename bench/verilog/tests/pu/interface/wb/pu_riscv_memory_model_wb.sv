@@ -38,7 +38,7 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
-`include "riscv_defines.sv"
+import peripheral_wb_verilog_pkg::*;
 
 module pu_riscv_memory_model_wb #(
   parameter XLEN = 64,
@@ -179,12 +179,24 @@ module pu_riscv_memory_model_wb #(
             mem_array[(base_addr + address + m) & ~(XLEN/8 - 1)][((base_addr + address + m) % (XLEN/8))*8+:8] = data[m];
           end
         end
-        8'h01:   eof = 1;
-        8'h02:   base_addr = {data[0], data[1]} << 4;
-        8'h03:   $display("INFO   : Ignored record type %0d while processing %s", record_type, HEX_FILE);
-        8'h04:   base_addr = {data[0], data[1]} << 16;
-        8'h05:   base_addr = {data[0], data[1], data[2], data[3]};
-        default: $display("ERROR  : Unknown record type while processing %s", HEX_FILE);
+        8'h01: begin
+          eof = 1;
+        end
+        8'h02: begin
+          base_addr = {data[0], data[1]} << 4;
+        end
+        8'h03: begin
+          $display("INFO   : Ignored record type %0d while processing %s", record_type, INIT_FILE);
+        end
+        8'h04: begin
+          base_addr = {data[0], data[1]} << 16;
+        end
+        8'h05: begin
+          base_addr = {data[0], data[1], data[2], data[3]};
+        end
+        default: begin
+          $display("ERROR  : Unknown record type while processing %s", INIT_FILE);
+        end
       endcase
     end
 
@@ -208,11 +220,11 @@ module pu_riscv_memory_model_wb #(
     end else $display("INFO   : Reading %s", HEX_FILE);
 
     // Read data from file
-    while (!$feof(
-      fd
-    )) begin
+    while (!$feof(fd)) begin
       line = line + 1;
-      if ($fscanf(fd, "%32h", data) != 1) $display("ERROR  : Read error while processing %s (line %0d)", HEX_FILE, line);
+      if ($fscanf(fd, "%32h", data) != 1) begin
+        $display("ERROR  : Read error while processing %s (line %0d)", HEX_FILE, line);
+      end
 
       for (m = 0; m < 128 / XLEN; m = m + 1) begin
         mem_array[base_addr] = data[m*XLEN +: XLEN];
@@ -243,9 +255,9 @@ module pu_riscv_memory_model_wb #(
           if (!HRESETn) begin
             ack_latency[u] <= {MEM_LATENCY{1'b1}};
           end else if (wb_ack_o[u]) begin
-            if (wb_bte_i[u] == `HTRANS_IDLE) begin
+            if (wb_bte_i[u] == HTRANS_IDLE) begin
               ack_latency[u] <= {MEM_LATENCY{1'b1}};
-            end else if (wb_bte_i[u] == `HTRANS_NONSEQ) begin
+            end else if (wb_bte_i[u] == HTRANS_NONSEQ) begin
               ack_latency[u] <= 'h0;
             end
           end else begin
@@ -257,7 +269,7 @@ module pu_riscv_memory_model_wb #(
         assign wb_ack_o[u] = 1'b1;
       end
 
-      assign wb_err_o[u] = `HRESP_OKAY;
+      assign wb_err_o[u] = HRESP_OKAY;
 
       // Write Section
 
@@ -272,21 +284,21 @@ module pu_riscv_memory_model_wb #(
       end
 
       always @(posedge HCLK) begin
-        if (wb_ack_o[u] && wb_bte_i[u] != `HTRANS_BUSY) begin
+        if (wb_ack_o[u] && wb_bte_i[u] != HTRANS_BUSY) begin
           waddr[u] <= wb_adr_i[u] & ({XLEN{1'b1}} << $clog2(XLEN / 8));
 
           case (wb_rty_i[u])
-            `HSIZE_BYTE:  dbe[u] <= 1'h1 << wb_adr_i[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_HWORD: dbe[u] <= 2'h3 << wb_adr_i[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_WORD:  dbe[u] <= 4'hf << wb_adr_i[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_DWORD: dbe[u] <= 8'hff << wb_adr_i[u][$clog2(XLEN/8)-1:0];
+            HSIZE_BYTE:  dbe[u] <= 1'h1 << wb_adr_i[u][$clog2(XLEN/8)-1:0];
+            HSIZE_HWORD: dbe[u] <= 2'h3 << wb_adr_i[u][$clog2(XLEN/8)-1:0];
+            HSIZE_WORD:  dbe[u] <= 4'hf << wb_adr_i[u][$clog2(XLEN/8)-1:0];
+            HSIZE_DWORD: dbe[u] <= 8'hff << wb_adr_i[u][$clog2(XLEN/8)-1:0];
           endcase
         end
       end
 
       always @(posedge HCLK) begin
         if (wb_ack_o[u]) begin
-          wreq[u] <= (wb_bte_i[u] != `HTRANS_IDLE & wb_bte_i[u] != `HTRANS_BUSY) & wb_we_i[u];
+          wreq[u] <= (wb_bte_i[u] != HTRANS_IDLE & wb_bte_i[u] != HTRANS_BUSY) & wb_we_i[u];
         end
       end
 
@@ -304,7 +316,7 @@ module pu_riscv_memory_model_wb #(
       assign iaddr[u] = wb_adr_i[u] & ({XLEN{1'b1}} << $clog2(XLEN / 8));
 
       always @(posedge HCLK) begin
-        if (wb_ack_o[u] && (wb_bte_i[u] != `HTRANS_IDLE) && (wb_bte_i[u] != `HTRANS_BUSY) && !wb_we_i[u]) begin
+        if (wb_ack_o[u] && (wb_bte_i[u] != HTRANS_IDLE) && (wb_bte_i[u] != HTRANS_BUSY) && !wb_we_i[u]) begin
           if (iaddr[u] == waddr[u] && wreq[u]) begin
             for (n = 0; n < XLEN / 8; n++) begin
               if (dbe[u]) begin

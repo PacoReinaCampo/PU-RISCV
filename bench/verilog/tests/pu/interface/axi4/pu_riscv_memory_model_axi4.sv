@@ -38,7 +38,7 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
-`include "riscv_defines.sv"
+import peripheral_axi4_verilog_pkg::*;
 
 module pu_riscv_memory_model_axi4 #(
   parameter AXI_ID_WIDTH   = 10,
@@ -238,12 +238,24 @@ module pu_riscv_memory_model_axi4 #(
             mem_array[(base_addr + address + m) & ~(XLEN/8 - 1)][((base_addr + address + m) % (XLEN/8))*8+:8] = data[m];
           end
         end
-        8'h01:   eof = 1;
-        8'h02:   base_addr = {data[0], data[1]} << 4;
-        8'h03:   $display("INFO   : Ignored record type %0d while processing %s", record_type, HEX_FILE);
-        8'h04:   base_addr = {data[0], data[1]} << 16;
-        8'h05:   base_addr = {data[0], data[1], data[2], data[3]};
-        default: $display("ERROR  : Unknown record type while processing %s", HEX_FILE);
+        8'h01: begin
+          eof = 1;
+        end
+        8'h02: begin
+          base_addr = {data[0], data[1]} << 4;
+        end
+        8'h03: begin
+          $display("INFO   : Ignored record type %0d while processing %s", record_type, INIT_FILE);
+        end
+        8'h04: begin
+          base_addr = {data[0], data[1]} << 16;
+        end
+        8'h05: begin
+          base_addr = {data[0], data[1], data[2], data[3]};
+        end
+        default: begin
+          $display("ERROR  : Unknown record type while processing %s", INIT_FILE);
+        end
       endcase
     end
 
@@ -269,9 +281,7 @@ module pu_riscv_memory_model_axi4 #(
     end
 
     // Read data from file
-    while (!$feof(
-      fd
-    )) begin
+    while (!$feof(fd)) begin
       line = line + 1;
       if ($fscanf(fd, "%32h", data) != 1) begin
         $display("ERROR  : Read error while processing %s (line %0d)", HEX_FILE, line);
@@ -307,9 +317,9 @@ module pu_riscv_memory_model_axi4 #(
           if (!HRESETn) begin
             ack_latency[u] <= {MEM_LATENCY{1'b1}};
           end else if (hreadyout[u]) begin
-            if (htrans[u] == `HTRANS_IDLE) begin
+            if (htrans[u] == HTRANS_IDLE) begin
               ack_latency[u] <= {MEM_LATENCY{1'b1}};
-            end else if (htrans[u] == `HTRANS_NONSEQ) begin
+            end else if (htrans[u] == HTRANS_NONSEQ) begin
               ack_latency[u] <= 'h0;
             end
           end else begin
@@ -321,7 +331,7 @@ module pu_riscv_memory_model_axi4 #(
         assign hreadyout[u] = 1'b1;
       end
 
-      assign hresp[u] = `HRESP_OKAY;
+      assign hresp[u] = HRESP_OKAY;
 
       // Write Section
 
@@ -336,21 +346,21 @@ module pu_riscv_memory_model_axi4 #(
       end
 
       always @(posedge HCLK) begin
-        if (hreadyout[u] && htrans[u] != `HTRANS_BUSY) begin
+        if (hreadyout[u] && htrans[u] != HTRANS_BUSY) begin
           waddr[u] <= haddr[u] & ({XLEN{1'b1}} << $clog2(XLEN / 8));
 
           case (hsize[u])
-            `HSIZE_BYTE:  dbe[u] <= 1'h1 << haddr[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_HWORD: dbe[u] <= 2'h3 << haddr[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_WORD:  dbe[u] <= 4'hf << haddr[u][$clog2(XLEN/8)-1:0];
-            `HSIZE_DWORD: dbe[u] <= 8'hff << haddr[u][$clog2(XLEN/8)-1:0];
+            HSIZE_BYTE:  dbe[u] <= 1'h1 << haddr[u][$clog2(XLEN/8)-1:0];
+            HSIZE_HWORD: dbe[u] <= 2'h3 << haddr[u][$clog2(XLEN/8)-1:0];
+            HSIZE_WORD:  dbe[u] <= 4'hf << haddr[u][$clog2(XLEN/8)-1:0];
+            HSIZE_DWORD: dbe[u] <= 8'hff << haddr[u][$clog2(XLEN/8)-1:0];
           endcase
         end
       end
 
       always @(posedge HCLK) begin
         if (hreadyout[u]) begin
-          wreq[u] <= (htrans[u] != `HTRANS_IDLE & htrans[u] != `HTRANS_BUSY) & hwrite[u];
+          wreq[u] <= (htrans[u] != HTRANS_IDLE & htrans[u] != HTRANS_BUSY) & hwrite[u];
         end
       end
 
@@ -368,7 +378,7 @@ module pu_riscv_memory_model_axi4 #(
       assign iaddr[u] = haddr[u] & ({XLEN{1'b1}} << $clog2(XLEN / 8));
 
       always @(posedge HCLK) begin
-        if (hreadyout[u] && (htrans[u] != `HTRANS_IDLE) && (htrans[u] != `HTRANS_BUSY) && !hwrite[u]) begin
+        if (hreadyout[u] && (htrans[u] != HTRANS_IDLE) && (htrans[u] != HTRANS_BUSY) && !hwrite[u]) begin
           if (iaddr[u] == waddr[u] && wreq[u]) begin
             for (n = 0; n < XLEN / 8; n++) begin
               if (dbe[u]) begin

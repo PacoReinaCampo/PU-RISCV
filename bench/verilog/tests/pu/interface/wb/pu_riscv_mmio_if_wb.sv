@@ -38,7 +38,7 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
-`include "riscv_defines.sv"
+import peripheral_wb_verilog_pkg::*;
 
 module pu_riscv_mmio_if_wb #(
   parameter HDATA_SIZE    = 32,

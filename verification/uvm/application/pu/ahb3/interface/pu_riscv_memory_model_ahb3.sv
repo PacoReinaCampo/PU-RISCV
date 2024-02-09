@@ -175,12 +175,24 @@ module pu_riscv_memory_model_ahb3 #(
             mem_array[(base_addr + address + m) & ~(XLEN/8 - 1)][((base_addr + address + m) % (XLEN/8))*8+:8] = data[m];
           end
         end
-        8'h01:   eof = 1;
-        8'h02:   base_addr = {data[0], data[1]} << 4;
-        8'h03:   $display("INFO   : Ignored record type %0d while processing %s", record_type, INIT_FILE);
-        8'h04:   base_addr = {data[0], data[1]} << 16;
-        8'h05:   base_addr = {data[0], data[1], data[2], data[3]};
-        default: $display("ERROR  : Unknown record type while processing %s", INIT_FILE);
+        8'h01: begin
+          eof = 1;
+        end
+        8'h02: begin
+          base_addr = {data[0], data[1]} << 4;
+        end
+        8'h03: begin
+          $display("INFO   : Ignored record type %0d while processing %s", record_type, INIT_FILE);
+        end
+        8'h04: begin
+          base_addr = {data[0], data[1]} << 16;
+        end
+        8'h05: begin
+          base_addr = {data[0], data[1], data[2], data[3]};
+        end
+        default: begin
+          $display("ERROR  : Unknown record type while processing %s", INIT_FILE);
+        end
       endcase
     end
 
@@ -206,9 +218,7 @@ module pu_riscv_memory_model_ahb3 #(
     end
 
     // Read data from file
-    while (!$feof(
-      fd
-    )) begin
+    while (!$feof(fd)) begin
       line = line + 1;
       if ($fscanf(fd, "%32h", data) != 1) begin
         $display("ERROR  : Read error while processing %s (line %0d)", INIT_FILE, line);

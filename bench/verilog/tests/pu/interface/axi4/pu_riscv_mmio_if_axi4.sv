@@ -38,7 +38,7 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
-`include "riscv_defines.sv"
+import peripheral_axi4_verilog_pkg::*;
 
 module pu_riscv_mmio_if_axi4 #(
   parameter AXI_ID_WIDTH   = 10,
@@ -160,7 +160,7 @@ module pu_riscv_mmio_if_axi4 #(
   end
 
   // Catch write to host address
-  assign HRESP = `HRESP_OKAY;
+  assign HRESP = HRESP_OKAY;
 
   always @(posedge HCLK) begin
     dHTRANS <= htrans;
@@ -171,7 +171,7 @@ module pu_riscv_mmio_if_axi4 #(
   always @(posedge HCLK, negedge HRESETn) begin
     if (!HRESETn) begin
       hreadyout <= 1'b1;
-    end else if (htrans == `HTRANS_IDLE) begin
+    end else if (htrans == HTRANS_IDLE) begin
     end
   end
 
@@ -180,8 +180,8 @@ module pu_riscv_mmio_if_axi4 #(
       catch_test    <= 1'b0;
       catch_uart_tx <= 1'b0;
     end else begin
-      catch_test    <= dHTRANS == `HTRANS_NONSEQ && dHWRITE && dHADDR == CATCH_TEST;
-      catch_uart_tx <= dHTRANS == `HTRANS_NONSEQ && dHWRITE && dHADDR == CATCH_UART_TX;
+      catch_test    <= dHTRANS == HTRANS_NONSEQ && dHWRITE && dHADDR == CATCH_TEST;
+      catch_uart_tx <= dHTRANS == HTRANS_NONSEQ && dHWRITE && dHADDR == CATCH_UART_TX;
       data_reg      <= hwdata;
     end
   end
