@@ -273,7 +273,9 @@ module peripheral_uvm_testbench;
   generate
     if (HTIF) begin
       // Old HTIF interface
-      pu_riscv_htif #(XLEN) htif_frontend (
+      pu_riscv_htif #(
+        .XLEN(XLEN)
+      ) htif_frontend (
         .rstn             (HRESETn),
         .clk              (HCLK),
         .host_csr_req     (host_csr_req),
