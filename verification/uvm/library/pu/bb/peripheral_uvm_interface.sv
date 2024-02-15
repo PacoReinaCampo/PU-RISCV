@@ -37,52 +37,13 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
-import pu_riscv_verilog_pkg::*;
-
-interface peripheral_design_if (
-  input logic HCLK,
-  input logic HRESETn
+interface peripheral_adder_if (
+  input logic clk,
+  input logic rst
 );
 
-  // PMA configuration
-  logic [PMA_CNT-1:0][    13:0] pma_cfg;
-  logic [PMA_CNT-1:0][PLEN-1:0] pma_adr;
+  logic [7:0] ip1;
+  logic [7:0] ip2;
 
-  // Instruction interface
-  logic                         ins_HSEL;
-  logic [   PLEN-1:0]           ins_HADDR;
-  logic [   XLEN-1:0]           ins_HRDATA;
-  logic [   XLEN-1:0]           ins_HWDATA;
-  logic                         ins_HWRITE;
-  logic [        2:0]           ins_HSIZE;
-  logic [        2:0]           ins_HBURST;
-  logic [        3:0]           ins_HPROT;
-  logic [        1:0]           ins_HTRANS;
-  logic                         ins_HMASTLOCK;
-  logic                         ins_HREADY;
-  logic                         ins_HRESP;
-
-  // Data interface
-  logic                         dat_HSEL;
-  logic [   PLEN-1:0]           dat_HADDR;
-  logic [   XLEN-1:0]           dat_HWDATA;
-  logic [   XLEN-1:0]           dat_HRDATA;
-  logic                         dat_HWRITE;
-  logic [        2:0]           dat_HSIZE;
-  logic [        2:0]           dat_HBURST;
-  logic [        3:0]           dat_HPROT;
-  logic [        1:0]           dat_HTRANS;
-  logic                         dat_HMASTLOCK;
-  logic                         dat_HREADY;
-  logic                         dat_HRESP;
-
-  // Debug Interface
-  logic                         dbg_stall;
-  logic                         dbg_strb;
-  logic                         dbg_we;
-  logic [   PLEN-1:0]           dbg_addr;
-  logic [   XLEN-1:0]           dbg_dati;
-  logic [   XLEN-1:0]           dbg_dato;
-  logic                         dbg_ack;
-  logic                         dbg_bp;
+  logic [8:0] out;
 endinterface
