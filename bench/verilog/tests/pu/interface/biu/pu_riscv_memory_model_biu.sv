@@ -187,7 +187,7 @@ module pu_riscv_memory_model_biu #(
           base_addr = {data[0], data[1]} << 4;
         end
         8'h03: begin
-          $display("INFO   : Ignored record type %0d while processing %s", record_type, INIT_FILE);
+          $display("INFO   : Ignored record type %0d while processing %s", record_type, HEX_FILE);
         end
         8'h04: begin
           base_addr = {data[0], data[1]} << 16;
@@ -196,7 +196,7 @@ module pu_riscv_memory_model_biu #(
           base_addr = {data[0], data[1], data[2], data[3]};
         end
         default: begin
-          $display("ERROR  : Unknown record type while processing %s", INIT_FILE);
+          $display("ERROR  : Unknown record type while processing %s", HEX_FILE);
         end
       endcase
     end
