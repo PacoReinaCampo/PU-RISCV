@@ -1601,7 +1601,8 @@
         "instruction_control":["RD_R3", "R1_R1"]
     },
     {
-        "name":"c.addi16sp cr[4:2], u[12:5]",
+        "name":"c.addi16sp",
+        "parts":"cr[4:2], u[12:5]",
         "parts":"",
         "length":"16",
         "dlength":"32",
