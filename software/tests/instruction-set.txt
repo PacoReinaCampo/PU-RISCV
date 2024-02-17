@@ -32,22 +32,22 @@
 - rv32ud/fadd.s              F[rd] = F[rs1] + F[rs2]
 - rv32ud/fclass.s            R[rd] = class(F[rs1])
 - rv32ud/fcmp.s
-- rv32ud/fcvt.s
-- rv32ud/fcvt_w.s
+- rv32ud/fcvt.s              R[rd] = float(F[rs1](31:0))
+- rv32ud/fcvt_w.s            R[rd](31:0) = integer(F[rs1])
 - rv32ud/fdiv.s              F[rd] = F[rs1] / F[rs2]
 - rv32ud/fmadd.s             F[rd] = F[rs1] * F[rs2] + F[rs3]
-- rv32ud/fmin.s
+- rv32ud/fmin.s              F[rd] = (F[rs1] < F[rs2])? F[rs1] : F[rs2]
 - rv32ud/ldst.s
 - rv32ud/move.s
 - rv32ud/recoding.s
 - rv32uf/fadd.s              F[rd] = F[rs1] + F[rs2]
 - rv32uf/fclass.s            R[rd] = class(F[rs1])
 - rv32uf/fcmp.s
-- rv32uf/fcvt.s
-- rv32uf/fcvt_w.s
+- rv32uf/fcvt.s              R[rd] = float(F[rs1](31:0))
+- rv32uf/fcvt_w.s            R[rd](31:0) = integer(F[rs1])
 - rv32uf/fdiv.s              F[rd] = F[rs1] / F[rs2]
 - rv32uf/fmadd.s             F[rd] = F[rs1] * F[rs2] + F[rs3]
-- rv32uf/fmin.s
+- rv32uf/fmin.s              F[rd] = (F[rs1] < F[rs2])? F[rs1] : F[rs2]
 - rv32uf/ldst.s
 - rv32uf/move.s
 - rv32uf/recoding.s
@@ -65,9 +65,9 @@
 - rv32ui/fence_i.s
 - rv32ui/jalr.s              R[rd] = PC + 4; PC = R[rs1] + imm
 - rv32ui/jal.s               R[rd] = PC + 4; PC = PC + {imm, 1'b0}
-- rv32ui/lb.s
+- rv32ui/lb.s                R[rd] = {56'bM[](7), M[R[rs1]] + imm](7:0)}
 - rv32ui/lbu.s
-- rv32ui/lh.s
+- rv32ui/lh.s                R[rd] = {48'bM[](15), M[R[rs1]] + imm](15:0)}
 - rv32ui/lhu.s
 - rv32ui/lui.s               R[rd] = {32b'imm<31>, imm, 12'b0}
 - rv32ui/lw.s                R[rd] = {32'bM[](31), M[R[rs1]] + imm](31:0)}
@@ -102,11 +102,11 @@
 - rv32uzfh/fadd.s            F[rd] = F[rs1] + F[rs2]
 - rv32uzfh/fclass.s          R[rd] = class(F[rs1])
 - rv32uzfh/fcmp.s
-- rv32uzfh/fcvt.s
-- rv32uzfh/fcvt_w.s
+- rv32uzfh/fcvt.s            R[rd] = float(F[rs1](31:0))
+- rv32uzfh/fcvt_w.s          R[rd](31:0) = integer(F[rs1])
 - rv32uzfh/fdiv.s            F[rd] = F[rs1] / F[rs2]
 - rv32uzfh/fmadd.s           F[rd] = F[rs1] * F[rs2] + F[rs3]
-- rv32uzfh/fmin.s
+- rv32uzfh/fmin.s            F[rd] = (F[rs1] < F[rs2])? F[rs1] : F[rs2]
 - rv32uzfh/ldst.s
 - rv32uzfh/move.s
 - rv32uzfh/recoding.s
@@ -158,11 +158,11 @@
 - rv64ud/fadd.s              F[rd] = F[rs1] + F[rs2]
 - rv64ud/fclass.s            R[rd] = class(F[rs1])
 - rv64ud/fcmp.s
-- rv64ud/fcvt.s
-- rv64ud/fcvt_w.s
+- rv64ud/fcvt.s              R[rd] = float(F[rs1](63:0))
+- rv64ud/fcvt_w.s            R[rd](63:0) = integer(F[rs1])
 - rv64ud/fdiv.s              F[rd] = F[rs1] / F[rs2]
 - rv64ud/fmadd.s             F[rd] = F[rs1] * F[rs2] + F[rs3]
-- rv64ud/fmin.s
+- rv64ud/fmin.s              F[rd] = (F[rs1] < F[rs2])? F[rs1] : F[rs2]
 - rv64ud/ldst.s
 - rv64ud/move.s
 - rv64ud/recoding.s
@@ -170,11 +170,11 @@
 - rv64uf/fadd.s              F[rd] = F[rs1] + F[rs2]
 - rv64uf/fclass.s            R[rd] = class(F[rs1])
 - rv64uf/fcmp.s
-- rv64uf/fcvt.s
-- rv64uf/fcvt_w.s
+- rv64uf/fcvt.s              R[rd] = float(F[rs1](63:0))
+- rv64uf/fcvt_w.s            R[rd](63:0) = integer(F[rs1])
 - rv64uf/fdiv.s              F[rd] = F[rs1] / F[rs2]
 - rv64uf/fmadd.s             F[rd] = F[rs1] * F[rs2] + F[rs3]
-- rv64uf/fmin.s
+- rv64uf/fmin.s              F[rd] = (F[rs1] < F[rs2])? F[rs1] : F[rs2]
 - rv64uf/ldst.s
 - rv64uf/move.s
 - rv64uf/recoding.s
@@ -194,10 +194,10 @@
 - rv64ui/fence_i.s
 - rv64ui/jalr.s              R[rd] = PC + 4; PC = R[rs1] + imm
 - rv64ui/jal.s               R[rd] = PC + 4; PC = PC + {imm, 1'b0}
-- rv64ui/lb.s
+- rv64ui/lb.s                R[rd] = {56'bM[](7), M[R[rs1]] + imm](7:0)}
 - rv64ui/lbu.s
-- rv64ui/ld.s
-- rv64ui/lh.s
+- rv64ui/ld.s                R[rd] = M[R[rs1] + imm](63:0)
+- rv64ui/lh.s                R[rd] = {48'bM[](15), M[R[rs1]] + imm](15:0)}
 - rv64ui/lhu.s
 - rv64ui/lui.s               R[rd] = {32b'imm<31>, imm, 12'b0}
 - rv64ui/lw.s                R[rd] = {32'bM[](31), M[R[rs1]] + imm](31:0)}
@@ -246,11 +246,11 @@
 - rv64uzfh/fadd.s            F[rd] = F[rs1] + F[rs2]
 - rv64uzfh/fclass.s          R[rd] = class(F[rs1])
 - rv64uzfh/fcmp.s
-- rv64uzfh/fcvt.s
-- rv64uzfh/fcvt_w.s
+- rv64uzfh/fcvt.s            R[rd] = float(F[rs1](63:0))
+- rv64uzfh/fcvt_w.s          R[rd](63:0) = integer(F[rs1])
 - rv64uzfh/fdiv.s            F[rd] = F[rs1] / F[rs2]
 - rv64uzfh/fmadd.s           F[rd] = F[rs1] * F[rs2] + F[rs3]
-- rv64uzfh/fmin.s
+- rv64uzfh/fmin.s            F[rd] = (F[rs1] < F[rs2])? F[rs1] : F[rs2]
 - rv64uzfh/ldst.s
 - rv64uzfh/move.s
 - rv64uzfh/recoding.s
