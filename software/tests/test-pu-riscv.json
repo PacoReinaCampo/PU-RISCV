@@ -225,7 +225,7 @@
         "dlength":"32",
         "field": ["XXXXX", "XX", "XXXXX", "XXXXX", "110", "XXXXX", "00100", "11"],
         "category":"ALU",
-        "implementation":["XS", "XS", "IS", "return m_pe_thread->SExtXlen(op1 |  op2)"],
+        "implementation":["XS", "XS", "IS", "return m_pe_thread->SExtXlen(op1 | op2)"],
         "instruction_control":["RD_R3", "R1_R1", "OP_LOGIC_OR", "IMM_I"]
     },
     {
@@ -235,7 +235,7 @@
         "dlength":"32",
         "field": ["XXXXX", "XX", "XXXXX", "XXXXX", "111", "XXXXX", "00100", "11"],
         "category":"ALU",
-        "implementation":["XS", "XS", "IS", "return m_pe_thread->SExtXlen(op1 &  op2)"],
+        "implementation":["XS", "XS", "IS", "return m_pe_thread->SExtXlen(op1 & op2)"],
         "instruction_control":["RD_R3", "R1_R1", "OP_LOGIC_AND", "IMM_I"]
     },
     {
@@ -355,7 +355,7 @@
         "dlength":"32",
         "field": ["00000", "00", "XXXXX", "XXXXX", "110", "XXXXX", "01100", "11"],
         "category":"ALU",
-        "implementation":["XU", "XU", "XU", "return          op1 |  op2 "],
+        "implementation":["XU", "XU", "XU", "return op1 | op2 "],
         "instruction_control":["RD_R3", "R1_R1", "R2_R2", "OP_LOGIC_OR"]
     },
     {
@@ -365,7 +365,7 @@
         "dlength":"32",
         "field": ["00000", "00", "XXXXX", "XXXXX", "111", "XXXXX", "01100", "11"],
         "category":"ALU",
-        "implementation":["XU", "XU", "XU", "return          op1 &  op2 "],
+        "implementation":["XU", "XU", "XU", "return op1 & op2 "],
         "instruction_control":["RD_R3", "R1_R1", "R2_R2", "OP_LOGIC_AND"]
     },
     {
