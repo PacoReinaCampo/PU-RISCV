@@ -8,6 +8,8 @@ application
 │   │   └── peripheral_test.java
 │   ├── bb
 │   │   └── peripheral_test.java
+│   ├── biu
+│   │   └── peripheral_test.java
 │   └── wb
 │       └── peripheral_test.java
 ├── core
@@ -18,6 +20,8 @@ application
 │   ├── axi4
 │   │   └── peripheral_test.java
 │   ├── bb
+│   │   └── peripheral_test.java
+│   ├── biu
 │   │   └── peripheral_test.java
 │   └── wb
 │       └── peripheral_test.java
@@ -30,7 +34,9 @@ application
     │   └── peripheral_test.java
     ├── bb
     │   └── peripheral_test.java
+    ├── biu
+    │   └── peripheral_test.java
     └── wb
         └── peripheral_test.java
 
-18 directories, 15 files
+21 directories, 18 files

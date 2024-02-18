@@ -1,256 +1,1245 @@
-- rv32mi/breakpoint.s
-- rv32mi/csr.s
-- rv32mi/illegal.s
-- rv32mi/lh-misaligned.s
-- rv32mi/lw-misaligned.s
-- rv32mi/ma_addr.s
-- rv32mi/ma_fetch.s
-- rv32mi/mcsr.s
-- rv32mi/sbreak.s
-- rv32mi/scall.s
-- rv32mi/shamt.s
-- rv32mi/sh-misaligned.s
-- rv32mi/sw-misaligned.s
-- rv32mi/zicntr.s
-- rv32si/csr.s
-- rv32si/dirty.s
-- rv32si/ma_fetch.s
-- rv32si/sbreak.s
-- rv32si/scall.s
-- rv32si/wfi.s
-- rv32ua/amoadd_w.s          R[rd] = M[R[rs1]]; M[R[rS1]] = M[R[rs1]] + R[rS2]
-- rv32ua/amoand_w.s          R[rd] = M[R[rs1]]; M[R[rS1]] = M[R[rs1]] & R[rS2]
-- rv32ua/amomaxu_w.s
-- rv32ua/amomax_w.s
-- rv32ua/amominu_w.s
-- rv32ua/amomin_w.s
-- rv32ua/amoor_w.s           R[rd] = M[R[rs1]]; M[R[rS1]] = M[R[rs1]] | R[rS2]
-- rv32ua/amoswap_w.s         R[rd] = M[R[rs1]]; M[R[rS1]] = R[rS2]
-- rv32ua/amoxor_w.s          R[rd] = M[R[rs1]]; M[R[rS1]] = M[R[rs1]] ^ R[rS2]
-- rv32ua/lrsc.s
-- rv32uc/rvc.s
-- rv32ud/fadd.s              F[rd] = F[rs1] + F[rs2]
-- rv32ud/fclass.s            R[rd] = class(F[rs1])
-- rv32ud/fcmp.s
-- rv32ud/fcvt.s              R[rd] = float(F[rs1](31:0))
-- rv32ud/fcvt_w.s            R[rd](31:0) = integer(F[rs1])
-- rv32ud/fdiv.s              F[rd] = F[rs1] / F[rs2]
-- rv32ud/fmadd.s             F[rd] = F[rs1] * F[rs2] + F[rs3]
-- rv32ud/fmin.s              F[rd] = (F[rs1] < F[rs2])? F[rs1] : F[rs2]
-- rv32ud/ldst.s
-- rv32ud/move.s
-- rv32ud/recoding.s
-- rv32uf/fadd.s              F[rd] = F[rs1] + F[rs2]
-- rv32uf/fclass.s            R[rd] = class(F[rs1])
-- rv32uf/fcmp.s
-- rv32uf/fcvt.s              R[rd] = float(F[rs1](31:0))
-- rv32uf/fcvt_w.s            R[rd](31:0) = integer(F[rs1])
-- rv32uf/fdiv.s              F[rd] = F[rs1] / F[rs2]
-- rv32uf/fmadd.s             F[rd] = F[rs1] * F[rs2] + F[rs3]
-- rv32uf/fmin.s              F[rd] = (F[rs1] < F[rs2])? F[rs1] : F[rs2]
-- rv32uf/ldst.s
-- rv32uf/move.s
-- rv32uf/recoding.s
-- rv32ui/addi.s              R[rd] = R[rs1] + imm
-- rv32ui/add.s               R[rd] = R[rs1] + R[rs2]
-- rv32ui/andi.s              R[rd] = R[rs1] & imm
-- rv32ui/and.s               R[rd] = R[rs1] & R[rs2]
-- rv32ui/auipc.s             R[rd] = PC + {imm, 12'b0}
-- rv32ui/beq.s               if(R[rs1] == R[rs2]) PC = PC + {imm, 1'b0}
-- rv32ui/bge.s               if(R[rs1] >= R[rs2]) PC = PC + {imm, 1'b0}
-- rv32ui/bgeu.s              if(R[rs1] >= R[rs2]) PC = PC + {imm, 1'b0}
-- rv32ui/blt.s               if(R[rs1] < R[rs2]) PC = PC + {imm, 1'b0}
-- rv32ui/bltu.s              if(R[rs1] < R[rs2]) PC = PC + {imm, 1'b0}
-- rv32ui/bne.s               if(R[rs1] != R[rs2]) PC = PC + {imm, 1'b0}
-- rv32ui/fence_i.s
-- rv32ui/jalr.s              R[rd] = PC + 4; PC = R[rs1] + imm
-- rv32ui/jal.s               R[rd] = PC + 4; PC = PC + {imm, 1'b0}
-- rv32ui/lb.s                R[rd] = {56'bM[](7), M[R[rs1]] + imm](7:0)}
-- rv32ui/lbu.s
-- rv32ui/lh.s                R[rd] = {48'bM[](15), M[R[rs1]] + imm](15:0)}
-- rv32ui/lhu.s
-- rv32ui/lui.s               R[rd] = {32b'imm<31>, imm, 12'b0}
-- rv32ui/lw.s                R[rd] = {32'bM[](31), M[R[rs1]] + imm](31:0)}
-- rv32ui/ma_data.s
-- rv32ui/ori.s               R[rd] = R[rs1] | imm
-- rv32ui/or.s                R[rd] = R[rs1] | R[rs2]
-- rv32ui/sb.s                M[R[rs1] + imm](7:0) = R[rs2](7:0)
-- rv32ui/sh.s                M[R[rs1] + imm](15:0) = R[rs2](15:0)
-- rv32ui/simple.s
-- rv32ui/slli.s              R[rd] = R[rs1] << imm
-- rv32ui/sll.s               R[rd] = R[rs1] << R[rs2]
-- rv32ui/slti.s              R[rd] = (R[rs1] < imm)? 1 : 0
-- rv32ui/sltiu.s             R[rd] = (R[rs1] < imm)? 1 : 0
-- rv32ui/slt.s               R[rd] = (R[rs1] < R[rs2])? 1 : 0
-- rv32ui/sltu.s              R[rd] = (R[rs1] < R[rs2])? 1 : 0
-- rv32ui/srai.s              R[rd] = R[rs1] >> imm
-- rv32ui/sra.s               R[rd] = R[rs1] >> R[rs2]
-- rv32ui/srli.s              R[rd] = R[rs1] >> imm
-- rv32ui/srl.s               R[rd] = R[rs1] >> R[rs2]
-- rv32ui/sub.s               R[rd] = R[rs1] - R[rs2]
-- rv32ui/sw.s                M[R[rs1] + imm](31:0) = R[rs2](31:0)
-- rv32ui/xori.s              R[rd] = R[rs1] ^ imm
-- rv32ui/xor.s               R[rd] = R[rs1] ^ R[rs2]
-- rv32um/div.s               R[rd] = (R[rs1] / R[rs2])
-- rv32um/divu.s              R[rd] = (R[rs1] / R[rs2])
-- rv32um/mulh.s              R[rd] = (R[rs1] * R[rs2])(127:64)
-- rv32um/mulhsu.s            R[rd] = (R[rs1] * R[rs2])(127:64)
-- rv32um/mulhu.s             R[rd] = (R[rs1] * R[rs2])(127:64)
-- rv32um/mul.s               R[rd] = (R[rs1] * R[rs2])(63:0)
-- rv32um/rem.s               R[rd] = (R[rs1] % R[rs2])
-- rv32um/remu.s              R[rd] = (R[rs1] % R[rs2])
-- rv32uzfh/fadd.s            F[rd] = F[rs1] + F[rs2]
-- rv32uzfh/fclass.s          R[rd] = class(F[rs1])
-- rv32uzfh/fcmp.s
-- rv32uzfh/fcvt.s            R[rd] = float(F[rs1](31:0))
-- rv32uzfh/fcvt_w.s          R[rd](31:0) = integer(F[rs1])
-- rv32uzfh/fdiv.s            F[rd] = F[rs1] / F[rs2]
-- rv32uzfh/fmadd.s           F[rd] = F[rs1] * F[rs2] + F[rs3]
-- rv32uzfh/fmin.s            F[rd] = (F[rs1] < F[rs2])? F[rs1] : F[rs2]
-- rv32uzfh/ldst.s
-- rv32uzfh/move.s
-- rv32uzfh/recoding.s
-- rv64mi/access.s
-- rv64mi/breakpoint.s
-- rv64mi/csr.s
-- rv64mi/illegal.s
-- rv64mi/ld-misaligned.s
-- rv64mi/lh-misaligned.s
-- rv64mi/lw-misaligned.s
-- rv64mi/ma_addr.s
-- rv64mi/ma_fetch.s
-- rv64mi/mcsr.s
-- rv64mi/sbreak.s
-- rv64mi/scall.s
-- rv64mi/sd-misaligned.s
-- rv64mi/sh-misaligned.s
-- rv64mi/sw-misaligned.s
-- rv64mi/zicntr.s
-- rv64mzicbo/zero.s
-- rv64si/csr.s
-- rv64si/dirty.s
-- rv64si/icache-alias.s
-- rv64si/ma_fetch.s
-- rv64si/sbreak.s
-- rv64si/scall.s
-- rv64si/wfi.s
-- rv64ssvnapot/napot.s
-- rv64ua/amoadd_d.s          R[rd] = M[R[rs1]]; M[R[rS1]] = M[R[rs1]] + R[rS2]
-- rv64ua/amoadd_w.s          R[rd] = M[R[rs1]]; M[R[rS1]] = M[R[rs1]] + R[rS2]
-- rv64ua/amoand_d.s          R[rd] = M[R[rs1]]; M[R[rS1]] = M[R[rs1]] & R[rS2]
-- rv64ua/amoand_w.s          R[rd] = M[R[rs1]]; M[R[rS1]] = M[R[rs1]] & R[rS2]
-- rv64ua/amomax_d.s
-- rv64ua/amomaxu_d.s
-- rv64ua/amomaxu_w.s
-- rv64ua/amomax_w.s
-- rv64ua/amomin_d.s
-- rv64ua/amominu_d.s
-- rv64ua/amominu_w.s
-- rv64ua/amomin_w.s
-- rv64ua/amoor_d.s           R[rd] = M[R[rs1]]; M[R[rS1]] = M[R[rs1]] | R[rS2]
-- rv64ua/amoor_w.s           R[rd] = M[R[rs1]]; M[R[rS1]] = M[R[rs1]] | R[rS2]
-- rv64ua/amoswap_d.s         R[rd] = M[R[rs1]]; M[R[rS1]] = R[rS2]
-- rv64ua/amoswap_w.s         R[rd] = M[R[rs1]]; M[R[rS1]] = R[rS2]
-- rv64ua/amoxor_d.s          R[rd] = M[R[rs1]]; M[R[rS1]] = M[R[rs1]] ^ R[rS2]
-- rv64ua/amoxor_w.s          R[rd] = M[R[rs1]]; M[R[rS1]] = M[R[rs1]] ^ R[rS2]
-- rv64ua/lrsc.s
-- rv64uc/rvc.s
-- rv64ud/fadd.s              F[rd] = F[rs1] + F[rs2]
-- rv64ud/fclass.s            R[rd] = class(F[rs1])
-- rv64ud/fcmp.s
-- rv64ud/fcvt.s              R[rd] = float(F[rs1](63:0))
-- rv64ud/fcvt_w.s            R[rd](63:0) = integer(F[rs1])
-- rv64ud/fdiv.s              F[rd] = F[rs1] / F[rs2]
-- rv64ud/fmadd.s             F[rd] = F[rs1] * F[rs2] + F[rs3]
-- rv64ud/fmin.s              F[rd] = (F[rs1] < F[rs2])? F[rs1] : F[rs2]
-- rv64ud/ldst.s
-- rv64ud/move.s
-- rv64ud/recoding.s
-- rv64ud/structural.s
-- rv64uf/fadd.s              F[rd] = F[rs1] + F[rs2]
-- rv64uf/fclass.s            R[rd] = class(F[rs1])
-- rv64uf/fcmp.s
-- rv64uf/fcvt.s              R[rd] = float(F[rs1](63:0))
-- rv64uf/fcvt_w.s            R[rd](63:0) = integer(F[rs1])
-- rv64uf/fdiv.s              F[rd] = F[rs1] / F[rs2]
-- rv64uf/fmadd.s             F[rd] = F[rs1] * F[rs2] + F[rs3]
-- rv64uf/fmin.s              F[rd] = (F[rs1] < F[rs2])? F[rs1] : F[rs2]
-- rv64uf/ldst.s
-- rv64uf/move.s
-- rv64uf/recoding.s
-- rv64ui/addi.s              R[rd] = R[rs1] + imm
-- rv64ui/addiw.s             R[rd] = R[rs1] + imm
-- rv64ui/add.s               R[rd] = R[rs1] + R[rs2]
-- rv64ui/addw.s              R[rd] = R[rs1] + R[rs2]
-- rv64ui/andi.s              R[rd] = R[rs1] & imm
-- rv64ui/and.s               R[rd] = R[rs1] & R[rs2]
-- rv64ui/auipc.s             R[rd] = PC + {imm, 12'b0}
-- rv64ui/beq.s               if(R[rs1] == R[rs2]) PC = PC + {imm, 1'b0}
-- rv64ui/bge.s               if(R[rs1] >= R[rs2]) PC = PC + {imm, 1'b0}
-- rv64ui/bgeu.s              if(R[rs1] >= R[rs2]) PC = PC + {imm, 1'b0}
-- rv64ui/blt.s               if(R[rs1] < R[rs2]) PC = PC + {imm, 1'b0}
-- rv64ui/bltu.s              if(R[rs1] < R[rs2]) PC = PC + {imm, 1'b0}
-- rv64ui/bne.s               if(R[rs1] != R[rs2]) PC = PC + {imm, 1'b0}
-- rv64ui/fence_i.s
-- rv64ui/jalr.s              R[rd] = PC + 4; PC = R[rs1] + imm
-- rv64ui/jal.s               R[rd] = PC + 4; PC = PC + {imm, 1'b0}
-- rv64ui/lb.s                R[rd] = {56'bM[](7), M[R[rs1]] + imm](7:0)}
-- rv64ui/lbu.s
-- rv64ui/ld.s                R[rd] = M[R[rs1] + imm](63:0)
-- rv64ui/lh.s                R[rd] = {48'bM[](15), M[R[rs1]] + imm](15:0)}
-- rv64ui/lhu.s
-- rv64ui/lui.s               R[rd] = {32b'imm<31>, imm, 12'b0}
-- rv64ui/lw.s                R[rd] = {32'bM[](31), M[R[rs1]] + imm](31:0)}
-- rv64ui/lwu.s
-- rv64ui/ma_data.s
-- rv64ui/ori.s               R[rd] = R[rs1] | imm
-- rv64ui/or.s                R[rd] = R[rs1] | R[rs2]
-- rv64ui/sb.s                M[R[rs1] + imm](7:0) = R[rs2](7:0)
-- rv64ui/sd.s                M[R[rs1] + imm](63:0) = R[rs2](63:0)
-- rv64ui/sh.s                M[R[rs1] + imm](15:0) = R[rs2](15:0)
-- rv64ui/simple.s
-- rv64ui/slli.s              R[rd] = R[rs1] << imm
-- rv64ui/slliw.s             R[rd] = R[rs1] << imm
-- rv64ui/sll.s               R[rd] = R[rs1] << R[rs2]
-- rv64ui/sllw.s              R[rd] = R[rs1] << R[rs2]              
-- rv64ui/slti.s              R[rd] = (R[rs1] < imm)? 1 : 0
-- rv64ui/sltiu.s             R[rd] = (R[rs1] < imm)? 1 : 0
-- rv64ui/slt.s               R[rd] = (R[rs1] < R[rs2])? 1 : 0
-- rv64ui/sltu.s              R[rd] = (R[rs1] < R[rs2])? 1 : 0
-- rv64ui/srai.s              R[rd] = R[rs1] >> imm
-- rv64ui/sraiw.s             R[rd] = R[rs1] >> imm
-- rv64ui/sra.s               R[rd] = R[rs1] >> R[rs2]
-- rv64ui/sraw.s              R[rd] = R[rs1] >> R[rs2]
-- rv64ui/srli.s              R[rd] = R[rs1] >> imm
-- rv64ui/srliw.s             R[rd] = R[rs1] >> imm
-- rv64ui/srl.s               R[rd] = R[rs1] >> R[rs2]
-- rv64ui/srlw.s              R[rd] = R[rs1] >> R[rs2]
-- rv64ui/sub.s               R[rd] = R[rs1] - R[rs2]
-- rv64ui/subw.s              R[rd] = R[rs1] - R[rs2]
-- rv64ui/sw.s                M[R[rs1] + imm](31:0) = R[rs2](31:0)
-- rv64ui/xori.s              R[rd] = R[rs1] ^ imm
-- rv64ui/xor.s               R[rd] = R[rs1] ^ R[rs2]
-- rv64um/div.s               R[rd] = (R[rs1] / R[rs2])
-- rv64um/divu.s              R[rd] = (R[rs1] / R[rs2])
-- rv64um/divuw.s             R[rd] = (R[rs1] / R[rs2])
-- rv64um/divw.s              R[rd] = (R[rs1] / R[rs2])
-- rv64um/mulh.s              R[rd] = (R[rs1] * R[rs2])(127:64)
-- rv64um/mulhsu.s            R[rd] = (R[rs1] * R[rs2])(127:64)
-- rv64um/mulhu.s             R[rd] = (R[rs1] * R[rs2])(127:64)
-- rv64um/mul.s               R[rd] = (R[rs1] * R[rs2])(63:0)
-- rv64um/mulw.s              R[rd] = (R[rs1] * R[rs2])(63:0)
-- rv64um/rem.s               R[rd] = (R[rs1] % R[rs2])
-- rv64um/remu.s              R[rd] = (R[rs1] % R[rs2])
-- rv64um/remuw.s             R[rd] = (R[rs1] % R[rs2])
-- rv64um/remw.s              R[rd] = (R[rs1] % R[rs2])
-- rv64uzfh/fadd.s            F[rd] = F[rs1] + F[rs2]
-- rv64uzfh/fclass.s          R[rd] = class(F[rs1])
-- rv64uzfh/fcmp.s
-- rv64uzfh/fcvt.s            R[rd] = float(F[rs1](63:0))
-- rv64uzfh/fcvt_w.s          R[rd](63:0) = integer(F[rs1])
-- rv64uzfh/fdiv.s            F[rd] = F[rs1] / F[rs2]
-- rv64uzfh/fmadd.s           F[rd] = F[rs1] * F[rs2] + F[rs3]
-- rv64uzfh/fmin.s            F[rd] = (F[rs1] < F[rs2])? F[rs1] : F[rs2]
-- rv64uzfh/ldst.s
-- rv64uzfh/move.s
-- rv64uzfh/recoding.s
+add rd, rs1, rs2
+x[rd] = x[rs1] + x[rs2]
+Add. R-type, RV32I and RV64I.
+Adds register x[rs2] to register x[rs1] and writes the result to x[rd]. Arithmetic overflow is ignored.
+Compressed forms: c.add rd, rs2; c.mv rd, rs2
+
+addi rd, rs1, immediate
+x[rd] = x[rs1] + sext(immediate)
+Add Immediate. I-type, RV32I and RV64I.
+Adds the sign-extended immediate to register x[rs1] and writes the result to x[rd]. Arithmetic overflow is ignored.
+Compressed forms: c.li rd, imm; c.addi rd, imm; c.addi16sp imm; c.addi4spn rd, imm
+
+addiw rd, rs1, immediate
+x[rd] = sext((x[rs1] + sext(immediate))[31:0])
+Add Word Immediate. I-type, RV64I only.
+Adds the sign-extended immediate to x[rs1], truncates the result to 32 bits, and writes the sign-extended result to x[rd]. Arithmetic overflow is ignored.
+Compressed form: c.addiw rd, imm
+
+addw rd, rs1, rs2
+x[rd] = sext((x[rs1] + x[rs2])[31:0])
+Add Word. R-type, RV64I only.
+Adds register x[rs2] to register x[rs1], truncates the result to 32 bits, and writes the sign-extended result to x[rd]. Arithmetic overflow is ignored.
+Compressed form: c.addw rd, rs2
+
+amoadd.d rd, rs2, (rs1)
+x[rd] = AMO64(M[x[rs1]] + x[rs2])
+Atomic Memory Operation: Add Doubleword. R-type, RV64A only.
+Atomically, let t be the value of the memory doubleword at address x[rs1], then set that memory doubleword to t + x[rs2]. Set x[rd] to t.
+
+amoadd.w rd, rs2, (rs1)
+x[rd] = AMO32(M[x[rs1]] + x[rs2])
+Atomic Memory Operation: Add Word. R-type, RV32A and RV64A.
+Atomically, let t be the value of the memory word at address x[rs1], then set that memory word to t + x[rs2]. Set x[rd] to the sign extension of t.
+
+amoand.d rd, rs2, (rs1)
+x[rd] = AMO64(M[x[rs1]] & x[rs2])
+Atomic Memory Operation: AND Doubleword. R-type, RV64A only.
+Atomically, let t be the value of the memory doubleword at address x[rs1], then set that memory doubleword to the bitwise AND of t and x[rs2]. Set x[rd] to t.
+
+amoand.w rd, rs2, (rs1)
+x[rd] = AMO32(M[x[rs1]] & x[rs2])
+Atomic Memory Operation: AND Word. R-type, RV32A and RV64A.
+Atomically, let t be the value of the memory word at address x[rs1], then set that memory word to the bitwise AND of t and x[rs2]. Set x[rd] to the sign extension of t.
+
+amomax.d rd, rs2, (rs1)
+x[rd] = AMO64(M[x[rs1]] MAX x[rs2])
+Atomic Memory Operation: Maximum Doubleword. R-type, RV64A only.
+Atomically, let t be the value of the memory doubleword at address x[rs1], then set that memory doubleword to the larger of t and x[rs2], using a two’s complement comparison. Set x[rd] to t.
+
+amomax.w rd, rs2, (rs1)
+x[rd] = AMO32(M[x[rs1]] MAX x[rs2])
+Atomic Memory Operation: Maximum Word. R-type, RV32A and RV64A.
+Atomically, let t be the value of the memory word at address x[rs1], then set that memory word to the larger of t and x[rs2], using a two’s complement comparison. Set x[rd] to the sign extension of t.
+
+amomaxu.d rd, rs2, (rs1)
+x[rd] = AMO64(M[x[rs1]] MAXU x[rs2])
+Atomic Memory Operation: Maximum Doubleword, Unsigned. R-type, RV64A only.
+Atomically, let t be the value of the memory doubleword at address x[rs1], then set that memory doubleword to the larger of t and x[rs2], using an unsigned comparison. Set x[rd] to t.
+
+amomaxu.w rd, rs2, (rs1)
+x[rd] = AMO32(M[x[rs1]] MAXU x[rs2])
+Atomic Memory Operation: Maximum Word, Unsigned. R-type, RV32A and RV64A.
+Atomically, let t be the value of the memory word at address x[rs1], then set that memory word to the larger of t and x[rs2], using an unsigned comparison. Set x[rd] to the sign extension of t.
+
+amomin.d rd, rs2, (rs1)
+x[rd] = AMO64(M[x[rs1]] MIN x[rs2])
+Atomic Memory Operation: Minimum Doubleword. R-type, RV64A only.
+Atomically, let t be the value of the memory doubleword at address x[rs1], then set that memory doubleword to the smaller of t and x[rs2], using a two’s complement comparison. Set x[rd] to t.
+
+amomin.w rd, rs2, (rs1)
+x[rd] = AMO32(M[x[rs1]] MIN x[rs2])
+Atomic Memory Operation: Minimum Word. R-type, RV32A and RV64A.
+Atomically, let t be the value of the memory word at address x[rs1], then set that memory word to the smaller of t and x[rs2], using a two’s complement comparison. Set x[rd] to the sign extension of t.
+
+amominu.d rd, rs2, (rs1)
+x[rd] = AMO64(M[x[rs1]] MINU x[rs2])
+Atomic Memory Operation: Minimum Doubleword, Unsigned. R-type, RV64A only.
+Atomically, let t be the value of the memory doubleword at address x[rs1], then set that memory doubleword to the smaller of t and x[rs2], using an unsigned comparison. Set x[rd] to t.
+
+amominu.w rd, rs2, (rs1)
+x[rd] = AMO32(M[x[rs1]] MINU x[rs2]) Atomic Memory Operation: Minimum Word, Unsigned. R-type, RV32A and RV64A.
+Atomically, let t be the value of the memory word at address x[rs1], then set that memory word to the smaller of t and x[rs2], using an unsigned comparison. Set x[rd] to the sign extension of t.
+
+amoor.d rd, rs2, (rs1)
+x[rd] = AMO64(M[x[rs1]] | x[rs2])
+Atomic Memory Operation: OR Doubleword. R-type, RV64A only.
+Atomically, let t be the value of the memory doubleword at address x[rs1], then set that memory doubleword to the bitwise OR of t and x[rs2]. Set x[rd] to t.
+
+amoor.w rd, rs2, (rs1)
+x[rd] = AMO32(M[x[rs1]] | x[rs2])
+Atomic Memory Operation: OR Word. R-type, RV32A and RV64A.
+Atomically, let t be the value of the memory word at address x[rs1], then set that memory word to the bitwise OR of t and x[rs2]. Set x[rd] to the sign extension of t.
+
+amoswap.d rd, rs2, (rs1)
+x[rd] = AMO64(M[x[rs1]] SWAP x[rs2])
+Atomic Memory Operation: Swap Doubleword. R-type, RV64A only.
+Atomically, let t be the value of the memory doubleword at address x[rs1], then set that memory doubleword to x[rs2]. Set x[rd] to t.
+
+amoswap.w rd, rs2, (rs1)
+x[rd] = AMO32(M[x[rs1]] SWAP x[rs2])
+Atomic Memory Operation: Swap Word. R-type, RV32A and RV64A.
+Atomically, let t be the value of the memory word at address x[rs1], then set that memory word to x[rs2]. Set x[rd] to the sign extension of t.
+
+amoxor.d rd, rs2, (rs1)
+x[rd] = AMO64(M[x[rs1]] ^ x[rs2])
+Atomic Memory Operation: XOR Doubleword. R-type, RV64A only.
+Atomically, let t be the value of the memory doubleword at address x[rs1], then set that memory doubleword to the bitwise XOR of t and x[rs2]. Set x[rd] to t.
+
+amoxor.w rd, rs2, (rs1)
+x[rd] = AMO32(M[x[rs1]] ^ x[rs2])
+Atomic Memory Operation: XOR Word. R-type, RV32A and RV64A.
+Atomically, let t be the value of the memory word at address x[rs1], then set that memory word to the bitwise XOR of t and x[rs2]. Set x[rd] to the sign extension of t.
+
+and rd, rs1, rs2
+x[rd] = x[rs1] & x[rs2]
+AND. R-type, RV32I and RV64I.
+Computes the bitwise AND of registers x[rs1] and x[rs2] and writes the result to x[rd].
+Compressed form: c.and rd, rs2
+
+andi rd, rs1, immediate
+x[rd] = x[rs1] & sext(immediate)
+AND Immediate. I-type, RV32I and RV64I.
+Computes the bitwise AND of the sign-extended immediate and register x[rs1] and writes the result to x[rd].
+Compressed form: c.andi rd, imm
+
+auipc rd, immediate
+x[rd] = pc + sext(immediate[31:12] << 12)
+Add Upper Immediate to PC. U-type, RV32I and RV64I.
+Adds the sign-extended 20-bit immediate, left-shifted by 12 bits, to the pc, and writes the result to x[rd].
+
+beq rs1, rs2, offset
+if (rs1 == rs2) pc += sext(offset)
+Branch if Equal. B-type, RV32I and RV64I.
+If register x[rs1] equals register x[rs2], set the pc to the current pc plus the sign-extended offset.
+Compressed form: c.beqz rs1, offset
+
+beqz rs1, offset
+if (rs1 == 0) pc += sext(offset)
+Branch if Equal to Zero. Pseudoinstruction, RV32I and RV64I. Expands to beq rs1, x0, offset.
+
+bge rs1, rs2, offset
+if (rs1 >=s rs2) pc += sext(offset)
+Branch if Greater Than or Equal. B-type, RV32I and RV64I.
+If register x[rs1] is at least x[rs2], treating the values as two’s complement numbers, set the pc to the current pc plus the sign-extended offset.
+
+bgeu rs1, rs2, offset
+if (rs1 >=u rs2) pc += sext(offset)
+Branch if Greater Than or Equal, Unsigned. B-type, RV32I and RV64I.
+If register x[rs1] is at least x[rs2], treating the values as unsigned numbers, set the pc to the current pc plus the sign-extended offset.
+
+bgez rs1, offset
+if (rs1 >=s 0) pc += sext(offset)
+Branch if Greater Than or Equal to Zero. Pseudoinstruction, RV32I and RV64I. Expands to bge rs1, x0, offset.
+
+bgt rs1, rs2, offset
+if (rs1 >s rs2) pc += sext(offset)
+Branch if Greater Than. Pseudoinstruction, RV32I and RV64I. Expands to blt rs2, rs1, offset.
+
+bgtu rs1, rs2, offset
+if (rs1 >u rs2) pc += sext(offset)
+Branch if Greater Than, Unsigned. Pseudoinstruction, RV32I and RV64I. Expands to bltu rs2, rs1, offset.
+
+bgtz rs2, offset
+if (rs2 >s 0) pc += sext(offset)
+Branch if Greater Than Zero. Pseudoinstruction, RV32I and RV64I. Expands to blt x0, rs2, offset.
+
+ble rs1, rs2, offset
+if (rs1 <=s rs2) pc += sext(offset)
+Branch if Less Than or Equal. Pseudoinstruction, RV32I and RV64I. Expands to bge rs2, rs1, offset.
+
+bleu rs1, rs2, offset
+if (rs1 <=u rs2) pc += sext(offset)
+Branch if Less Than or Equal, Unsigned. Pseudoinstruction, RV32I and RV64I. Expands to bgeu rs2, rs1, offset.
+
+blez rs2, offset
+if (rs2 <=s 0) pc += sext(offset)
+Branch if Less Than or Equal to Zero. Pseudoinstruction, RV32I and RV64I. Expands to bge x0, rs2, offset.
+
+blt rs1, rs2, offset
+if (rs1 <s rs2) pc += sext(offset)
+Branch if Less Than. B-type, RV32I and RV64I.
+If register x[rs1] is less than x[rs2], treating the values as two’s complement numbers, set the
+pc to the current pc plus the sign-extended offset.
+
+bltz rs1, offset
+if (rs1 <s 0) pc += sext(offset)
+Branch if Less Than Zero. Pseudoinstruction, RV32I and RV64I. Expands to blt rs1, x0, offset.
+
+bltu rs1, rs2, offset
+if (rs1 <u rs2) pc += sext(offset)
+Branch if Less Than, Unsigned. B-type, RV32I and RV64I.
+If register x[rs1] is less than x[rs2], treating the values as unsigned numbers, set the pc to the current pc plus the sign-extended offset.
+
+bne rs1, rs2, offset
+if (rs1 = rs2) pc += sext(offset)
+Branch if Not Equal. B-type, RV32I and RV64I.
+If register x[rs1] does not equal register x[rs2], set the pc to the current pc plus the sign-extended offset.
+Compressed form: c.bnez rs1, offset
+
+bnez rs1, offset
+if (rs1 != 0) pc += sext(offset)
+Branch if Not Equal to Zero. Pseudoinstruction, RV32I and RV64I. Expands to bne rs1, x0, offset.
+
+c.add rd, rs2
+x[rd] = x[rd] + x[rs2]
+Add. RV32IC and RV64IC.
+Expands to add rd, rd, rs2. Invalid when rd=x0 or rs2=x0.
+
+c.addi rd, imm
+x[rd] = x[rd] + sext(imm)
+Add Immediate. RV32IC and RV64IC. Expands to addi rd, rd, imm.
+
+c.addi16sp imm
+x[2] = x[2] + sext(imm)
+Add Immediate, Scaled by 16, to Stack Pointer. RV32IC and RV64IC. Expands to addi x2, x2, imm. Invalid when imm=0.
+
+c.addi4spn rdj, uimm
+x[8+rd'] = x[2] + uimm
+Add Immediate, Scaled by 4, to Stack Pointer, Nondestructive. RV32IC and RV64IC. Expands to addi rd, x2, uimm, where rd=8+rd'. Invalid when uimm=0.
+
+c.addiw rd, imm
+x[rd] = sext((x[rd] + sext(imm))[31:0])
+Add Word Immediate. RV64IC only.
+Expands to addiw rd, rd, imm. Invalid when rd=x0.
+
+c.and rdj, rs2'
+x[8+rd'] = x[8+rd'] & x[8+rs2']
+AND. RV32IC and RV64IC.
+Expands to and rd, rd, rs2, where rd=8+rd' and rs2=8+rs2'.
+
+c.addw rdj, rs2'
+x[8+rd'] = sext((x[8+rd'] + x[8+rs2'])[31:0])
+Add Word. RV64IC only.
+Expands to addw rd, rd, rs2, where rd=8+rd' and rs2=8+rs2'.
+
+c.a ndi rdj, imm
+x[8+rd'] = x[8+rd'] & sext(imm)
+AND Immediate. RV32IC and RV64IC. Expands to andi rd, rd, imm, where rd=8+rd'.
+
+c.b eqz rs1j, offset
+if (x[8+rs1'] == 0) pc += sext(offset)
+Branch if Equal to Zero. RV32IC and RV64IC. Expands to beq rs1, x0, offset, where rs1=8+rs1'.
+
+c.bnez rs1j, offset
+if (x[8+rs1'] != 0) pc += sext(offset)
+Branch if Not Equal to Zero. RV32IC and RV64IC. Expands to bne rs1, x0, offset, where rs1=8+rs1'.
+
+c.ebreak
+RaiseException(Breakpoint)
+Environment Breakpoint. RV31IC and RV64IC. Expands to ebreak.
+
+c.fld rdj, uimm(rs1j)
+f[8+rd'] = M[x[8+rs1'] + uimm][63:0]
+Floating-point Load Doubleword. RV32DC and RV64DC. Expands to fld rd, uimm(rs1), where rd=8+rd' and rs1=8+rs1'.
+
+c.fldsp rd, uimm(x2)
+f[rd] = M[x[2] + uimm][63:0]
+Floating-point Load Doubleword, Stack-Pointer Relative. RV32DC and RV64DC. Expands to fld rd, uimm(x2).
+
+c.flw rdj, uimm(rs1j)
+f[8+rd'] = M[x[8+rs1'] + uimm][31:0]
+Floating-point Load Word. RV32FC only.
+Expands to flw rd, uimm(rs1), where rd=8+rd' and rs1=8+rs1'.
+
+c.flwsp rd, uimm(x2)
+f[rd] = M[x[2] + uimm][31:0]
+Floating-point Load Word, Stack-Pointer Relative. RV32FC only. Expands to flw rd, uimm(x2).
+
+c.fsd rs2', uimm(rs1j)
+M[x[8+rs1'] + uimm][63:0] = f[8+rs2']
+Floating-point Store Doubleword. RV32DC and RV64DC. Expands to fsd rs2, uimm(rs1), where rs2=8+rs2' and rs1=8+rs1'.
+
+c.fsdsp rs2, uimm(x2)
+M[x[2] + uimm][63:0] = f[rs2]
+Floating-point Store Doubleword, Stack-Pointer Relative. RV32DC and RV64DC. Expands to fsd rs2, uimm(x2).
+
+c.fsw rs2', uimm(rs1j)
+M[x[8+rs1'] + uimm][31:0] = f[8+rs2']
+Floating-point Store Word. RV32FC only.
+Expands to fsw rs2, uimm(rs1), where rs2=8+rs2' and rs1=8+rs1'.
+
+c.fswsp rs2, uimm(x2)
+M[x[2] + uimm][31:0] = f[rs2]
+Floating-point Store Word, Stack-Pointer Relative. RV32FC only. Expands to fsw rs2, uimm(x2).
+
+c.j offset
+pc += sext(offset)
+Jump. RV32IC and RV64IC.
+Expands to jal x0, offset.
+
+c.jal offset
+x[1] = pc+2; pc += sext(offset)
+Jump and Link. RV32IC only. Expands to jal x1, offset.
+
+c.jalr rs1
+t = pc+2; pc = x[rs1]; x[1] = t
+Jump and Link Register. RV32IC and RV64IC. Expands to jalr x1, 0(rs1). Invalid when rs1=x0.
+
+c.jr rs1
+pc = x[rs1]
+Jump Register. RV32IC and RV64IC.
+Expands to jalr x0, 0(rs1). Invalid when rs1=x0.
+
+c.ld rdj, uimm(rs1j)
+x[8+rd'] = M[x[8+rs1'] + uimm][63:0]
+Load Doubleword. RV64IC only.
+Expands to ld rd, uimm(rs1), where rd=8+rd' and rs1=8+rs1'.
+
+c.ldsp rd, uimm(x2)
+x[rd] = M[x[2] + uimm][63:0]
+Load Doubleword, Stack-Pointer Relative. RV64IC only. Expands to ld rd, uimm(x2). Invalid when rd=x0.
+
+c.li rd, imm
+x[rd] = sext(imm)
+Load Immediate. RV32IC and RV64IC. Expands to addi rd, x0, imm.
+
+c.lui rd, imm
+x[rd] = sext(imm[17:12] << 12)
+Load Upper Immediate. RV32IC and RV64IC. Expands to lui rd, imm. Invalid when rd=x2 or imm=0.
+imm[17]
+imm[16:12]
+
+c.lw rdj, uimm(rs1j)
+x[8+rd'] = sext(M[x[8+rs1'] + uimm][31:0])
+Load Word. RV32IC and RV64IC.
+Expands to lw rd, uimm(rs1), where rd=8+rd' and rs1=8+rs1'.
+
+c.lwsp rd, uimm(x2)
+x[rd] = sext(M[x[2] + uimm][31:0])
+Load Word, Stack-Pointer Relative. RV32IC and RV64IC. Expands to lw rd, uimm(x2). Invalid when rd=x0.
+
+c.mv rd, rs2
+x[rd] = x[rs2]
+Move. RV32IC and RV64IC.
+Expands to add rd, x0, rs2. Invalid when rs2=x0.
+
+c.or rdj, rs2'
+x[8+rd'] = x[8+rd'] | x[8+rs2']
+OR. RV32IC and RV64IC.
+Expands to or rd, rd, rs2, where rd=8+rd' and rs2=8+rs2'.
+
+c.sd rs2', uimm(rs1j)
+M[x[8+rs1'] + uimm][63:0] = x[8+rs2']
+Store Doubleword. RV64IC only.
+Expands to sd rs2, uimm(rs1), where rs2=8+rs2' and rs1=8+rs1'.
+
+c.sdsp rs2, uimm(x2)
+M[x[2] + uimm][63:0] = x[rs2]
+Store Doubleword, Stack-Pointer Relative. RV64IC only. Expands to sd rs2, uimm(x2).
+
+c.slli rd, uimm
+x[rd] = x[rd] << uimm
+Shift Left Logical Immediate. RV32IC and RV64IC. Expands to slli rd, rd, uimm.
+ 
+c.srai rdj, uimm
+x[8+rd'] = x[8+rd'] >>s uimm
+Shift Right Arithmetic Immediate. RV32IC and RV64IC. Expands to srai rd, rd, uimm, where rd=8+rd'.
+ 
+c.srli rdj, uimm
+x[8+rd'] = x[8+rd'] >>u uimm
+Shift Right Logical Immediate. RV32IC and RV64IC. Expands to srli rd, rd, uimm, where rd=8+rd'.
+ 
+c.sub rdj, rs2'
+x[8+rd'] = x[8+rd'] - x[8+rs2']
+Subtract. RV32IC and RV64IC.
+Expands to sub rd, rd, rs2, where rd=8+rd' and rs2=8+rs2'.
+
+c.subw rdj, rs2'
+x[8+rd'] = sext((x[8+rd'] - x[8+rs2'])[31:0])
+Subtract Word. RV64IC only.
+Expands to subw rd, rd, rs2, where rd=8+rd' and rs2=8+rs2'.
+ 
+c.sw rs2', uimm(rs1j)
+M[x[8+rs1'] + uimm][31:0] = x[8+rs2']
+Store Word. RV32IC and RV64IC.
+Expands to sw rs2, uimm(rs1), where rs2=8+rs2' and rs1=8+rs1'.
+
+c.swsp rs2, uimm(x2)
+M[x[2] + uimm][31:0] = x[rs2]
+Store Word, Stack-Pointer Relative. RV32IC and RV64IC. Expands to sw rs2, uimm(x2).
+
+c.xor rdj, rs2'
+x[8+rd'] = x[8+rd'] ^ x[8+rs2']
+Exclusive-OR. RV32IC and RV64IC.
+Expands to xor rd, rd, rs2, where rd=8+rd' and rs2=8+rs2'.
+
+call rd, symbol
+x[rd] = pc+8; pc = &symbol
+Call. Pseudoinstruction, RV32I and RV64I.
+Writes the address of the next instruction (pc+8) to x[rd], then sets the pc to symbol. Expands to auipc rd, offsetHi then jalr rd, offsetLo(rd). If rd is omitted, x1 is implied.
+
+csrr rd, csr
+x[rd] = CSRs[csr]
+Control and Status Register Read. Pseudoinstruction, RV32I and RV64I. Copies control and status register csr to x[rd]. Expands to csrrs rd, csr, x0.
+
+csrc csr, rs1
+CSRs[csr] &= ~x[rs1]
+Control and Status Register Clear. Pseudoinstruction, RV32I and RV64I.
+For each bit set in x[rs1], clear the corresponding bit in control and status register csr. Expands to csrrc x0, csr, rs1.
+
+csrci csr, zimm[4:0]
+CSRs[csr] &= ~zimm
+Control and Status Register Clear Immediate. Pseudoinstruction, RV32I and RV64I.
+For each bit set in the five-bit zero-extended immediate, clear the corresponding bit in control and status register csr. Expands to csrrci x0, csr, zimm.
+
+csrrc rd, csr, rs1
+t = CSRs[csr]; CSRs[csr] = t & x[rs1]; x[rd] = t
+Control and Status Register Read and Clear. I-type, RV32I and RV64I.
+Let t be the value of control and status register csr. Write the bitwise AND of t and the ones’ complement of x[rs1] to the csr, then write t to x[rd].
+
+csrrci rd, csr, zimm[4:0]
+t = CSRs[csr]; CSRs[csr] = t &∼zimm; x[rd] = t
+Control and Status Register Read and Clear Immediate. I-type, RV32I and RV64I.
+Let t be the value of control and status register csr. Write the bitwise AND of t and the ones’ complement of the five-bit zero-extended immediate zimm to the csr, then write t to x[rd]. (Bits 5 and above in the csr are not modified.)
+zimm[4:0]
+
+csrrs rd, csr, rs1
+t = CSRs[csr]; CSRs[csr] = t | x[rs1]; x[rd] = t
+Control and Status Register Read and Set. I-type, RV32I and RV64I.
+Let t be the value of control and status register csr. Write the bitwise OR of t and x[rs1] to the csr, then write t to x[rd].
+
+csrrsi rd, csr, zimm[4:0]
+t = CSRs[csr]; CSRs[csr] = t | zimm; x[rd] = t
+Control and Status Register Read and Set Immediate. I-type, RV32I and RV64I.
+Let t be the value of control and status register csr. Write the bitwise OR of t and the five-bit zero-extended immediate zimm to the csr, then write t to x[rd]. (Bits 5 and above in the csr are not modified.)
+zimm[4:0]
+
+csrrw rd, csr, rs1
+t = CSRs[csr]; CSRs[csr] = x[rs1]; x[rd] = t
+Control and Status Register Read and Write. I-type, RV32I and RV64I.
+Let t be the value of control and status register csr. Copy x[rs1] to the csr, then write t to x[rd].
+
+csrrwi rd, csr, zimm[4:0]
+x[rd] = CSRs[csr]; CSRs[csr] = zimm
+Control and Status Register Read and Write Immediate. I-type, RV32I and RV64I.
+Copies the control and status register csr to x[rd], then writes the five-bit zero-extended immediate zimm to the csr.
+zimm[4:0]
+
+csrs csr, rs1
+CSRs[csr] |= x[rs1]
+Control and Status Register Set. Pseudoinstruction, RV32I and RV64I.
+For each bit set in x[rs1], set the corresponding bit in control and status register csr. Expands to csrrs x0, csr, rs1.
+
+csrsi csr, zimm[4:0]
+CSRs[csr] |= zimm
+Control and Status Register Set Immediate. Pseudoinstruction, RV32I and RV64I.
+For each bit set in the five-bit zero-extended immediate, set the corresponding bit in control and status register csr. Expands to csrrsi x0, csr, zimm.
+
+csrw csr, rs1
+CSRs[csr] = x[rs1]
+Control and Status Register Write. Pseudoinstruction, RV32I and RV64I. Copies x[rs1] to control and status register csr. Expands to csrrw x0, csr, rs1.
+
+csrwi csr, zimm[4:0]
+CSRs[csr] = zimm
+Control and Status Register Write Immediate. Pseudoinstruction, RV32I and RV64I. Copies the five-bit zero-extended immediate to control and status register csr. Expands to csrrwi x0, csr, zimm.
+
+div rd, rs1, rs2
+x[rd] = x[rs1] /s x[rs2]
+Divide. R-type, RV32M and RV64M.
+Divides x[rs1] by x[rs2], rounding towards zero, treating the values as two’s complement numbers, and writes the quotient to x[rd].
+
+divu rd, rs1, rs2
+x[rd] = x[rs1]
+u x[rs2]
+Divide, Unsigned. R-type, RV32M and RV64M.
+Divides x[rs1] by x[rs2], rounding towards zero, treating the values as unsigned numbers, and writes the quotient to x[rd].
+
+divuw rd, rs1, rs2
+x[rd] = sext(x[rs1][31:0] /u x[rs2][31:0])
+Divide Word, Unsigned. R-type, RV64M only.
+Divides the lower 32 bits of x[rs1] by the lower 32 bits of x[rs2], rounding towards zero, treating the values as unsigned numbers, and writes the sign-extended 32-bit quotient to x[rd].
+
+divw rd, rs1, rs2
+x[rd] = sext(x[rs1][31:0] /s x[rs2][31:0])
+Divide Word. R-type, RV64M only.
+Divides the lower 32 bits of x[rs1] by the lower 32 bits of x[rs2], rounding towards zero, treating the values as two’s complement numbers, and writes the sign-extended 32-bit quo- tient to x[rd].
+
+ebreak
+RaiseException(Breakpoint)
+Environment Breakpoint. I-type, RV32I and RV64I.
+Makes a request of the debugger by raising a Breakpoint exception.
+
+ecall
+RaiseException(EnvironmentCall)
+Environment Call. I-type, RV32I and RV64I.
+Makes a request of the execution environment by raising an Environment Call exception.
+
+fabs.d rd, rs1
+f[rd] = f[rs1]
+Floating-point Absolute Value. Pseudoinstruction, RV32D and RV64D.
+Writes the absolute value of the double-precision floating-point number in f[rs1] to f[rd]. Expands to fsgnjx.d rd, rs1, rs1.
+
+fabs.s rd, rs1
+f[rd] = f[rs1]
+Floating-point Absolute Value. Pseudoinstruction, RV32F and RV64F.
+Writes the absolute value of the single-precision floating-point number in f[rs1] to f[rd]. Expands to fsgnjx.s rd, rs1, rs1.
+
+fadd.d rd, rs1, rs2
+f[rd] = f[rs1] + f[rs2]
+Floating-point Add, Double-Precision. R-type, RV32D and RV64D.
+Adds the double-precision floating-point numbers in registers f[rs1] and f[rs2] and writes the rounded double-precision sum to f[rd].
+
+fadd.s rd, rs1, rs2
+f[rd] = f[rs1] + f[rs2]
+Floating-point Add, Single-Precision. R-type, RV32F and RV64F.
+Adds the single-precision floating-point numbers in registers f[rs1] and f[rs2] and writes the rounded single-precision sum to f[rd].
+
+fclass.d rd, rs1, rs2
+x[rd] = classifyd(f[rs1])
+Floating-point Classify, Double-Precision. R-type, RV32D and RV64D.
+Writes to x[rd] a mask indicating the class of the double-precision floating-point number in f[rs1]. See the description of fclass.s for the interpretation of the value written to x[rd].
+
+fclass.s rd, rs1, rs2
+x[rd] = classifys(f[rs1])
+Floating-point Classify, Single-Precision. R-type, RV32F and RV64F.
+Writes to x[rd] a mask indicating the class of the single-precision floating-point number in f[rs1].
+
+fcvt.d.l rd, rs1, rs2
+f[rd] = f64s64(x[rs1])
+Floating-point Convert to Double from Long. R-type, RV64D only.
+Converts the 64-bit two’s complement integer in x[rs1] to a double-precision floating-point number and writes it to f[rd].
+
+fcvt.d.lu rd, rs1, rs2
+f[rd] = f64u64(x[rs1])
+Floating-point Convert to Double from Unsigned Long. R-type, RV64D only.
+Converts the 64-bit unsigned integer in x[rs1] to a double-precision floating-point number and writes it to f[rd].
+
+fcvt.d.s rd, rs1, rs2
+f[rd] = f64f32(f[rs1])
+Floating-point Convert to Double from Single. R-type, RV32D and RV64D.
+Converts the single-precision floating-point number in f[rs1] to a double-precision floating- point number and writes it to f[rd].
+
+fcvt.d.w rd, rs1, rs2
+f[rd] = f64s32(x[rs1])
+Floating-point Convert to Double from Word. R-type, RV32D and RV64D.
+Converts the 32-bit two’s complement integer in x[rs1] to a double-precision floating-point number and writes it to f[rd].
+
+fcvt.d.wu rd, rs1, rs2
+f[rd] = f64u32(x[rs1])
+Floating-point Convert to Double from Unsigned Word. R-type, RV32D and RV64D. Converts the 32-bit unsigned integer in x[rs1] to a double-precision floating-point number and writes it to f[rd].
+
+fcvt.l.d rd, rs1, rs2
+x[rd] = s64f64(f[rs1])
+Floating-point Convert to Long from Double. R-type, RV64D only.
+Converts the double-precision floating-point number in register f[rs1] to a 64-bit two’s com- plement integer and writes it to x[rd].
+
+fcvt.l.s rd, rs1, rs2
+x[rd] = s64f32(f[rs1])
+Floating-point Convert to Long from Single. R-type, RV64F only.
+Converts the single-precision floating-point number in register f[rs1] to a 64-bit two’s com- plement integer and writes it to x[rd].
+
+fcvt.lu.d rd, rs1, rs2
+x[rd] = u64f64(f[rs1])
+Floating-point Convert to Unsigned Long from Double. R-type, RV64D only.
+Converts the double-precision floating-point number in register f[rs1] to a 64-bit unsigned integer and writes it to x[rd].
+
+fcvt.lu.s rd, rs1, rs2
+x[rd] = u64f32(f[rs1])
+Floating-point Convert to Unsigned Long from Single. R-type, RV64F only.
+Converts the single-precision floating-point number in register f[rs1] to a 64-bit unsigned integer and writes it to x[rd].
+
+fcvt.s.d rd, rs1, rs2
+f[rd] = f32f64(f[rs1])
+Floating-point Convert to Single from Double. R-type, RV32D and RV64D.
+Converts the double-precision floating-point number in f[rs1] to a single-precision floating- point number and writes it to f[rd].01
+
+fcvt.s.l rd, rs1, rs2
+f[rd] = f32s64(x[rs1])
+Floating-point Convert to Single from Long. R-type, RV64F only.
+Converts the 64-bit two’s complement integer in x[rs1] to a single-precision floating-point number and writes it to f[rd].
+
+fcvt.s.lu rd, rs1, rs2
+f[rd] = f32u64(x[rs1])
+Floating-point Convert to Single from Unsigned Long. R-type, RV64F only.
+Converts the 64-bit unsigned integer in x[rs1] to a single-precision floating-point number and writes it to f[rd].
+
+fcvt.s.w rd, rs1, rs2
+f[rd] = f32s32(x[rs1])
+Floating-point Convert to Single from Word. R-type, RV32F and RV64F.
+Converts the 32-bit two’s complement integer in x[rs1] to a single-precision floating-point number and writes it to f[rd].
+
+fcvt.s.wu rd, rs1, rs2
+f[rd] = f32u32(x[rs1])
+Floating-point Convert to Single from Unsigned Word. R-type, RV32F and RV64F. Converts the 32-bit unsigned integer in x[rs1] to a single-precision floating-point number and writes it to f[rd].
+
+fcvt.w.d rd, rs1, rs2
+x[rd] = sext(s32f64(f[rs1]))
+Floating-point Convert to Word from Double. R-type, RV32D and RV64D.
+Converts the double-precision floating-point number in register f[rs1] to a 32-bit two’s com- plement integer and writes the sign-extended result to x[rd].
+
+fcvt.wu.d rd, rs1, rs2
+x[rd] = sext(u32f64(f[rs1]))
+Floating-point Convert to Unsigned Word from Double. R-type, RV32D and RV64D. Converts the double-precision floating-point number in register f[rs1] to a 32-bit unsigned integer and writes the sign-extended result to x[rd].
+
+fcvt.w.s rd, rs1, rs2
+x[rd] = sext(s32f32(f[rs1]))
+Floating-point Convert to Word from Single. R-type, RV32F and RV64F.
+Converts the single-precision floating-point number in register f[rs1] to a 32-bit two’s com- plement integer and writes the sign-extended result to x[rd].
+
+fcvt.wu.s rd, rs1, rs2
+x[rd] = sext(u32f32(f[rs1]))
+Floating-point Convert to Unsigned Word from Single. R-type, RV32F and RV64F. Converts the single-precision floating-point number in register f[rs1] to a 32-bit unsigned integer and writes the sign-extended result to x[rd].
+
+fdiv.d rd, rs1, rs2
+f[rd] = f[rs1] / f[rs2]
+Floating-point Divide, Double-Precision. R-type, RV32D and RV64D.
+Divides the double-precision floating-point number in register f[rs1] by f[rs2] and writes the rounded double-precision quotient to f[rd].
+
+fdiv.s rd, rs1, rs2
+f[rd] = f[rs1] / f[rs2]
+Floating-point Divide, Single-Precision. R-type, RV32F and RV64F.
+Divides the single-precision floating-point number in register f[rs1] by f[rs2] and writes the rounded single-precision quotient to f[rd].
+
+fence pred, succ
+Fence(pred, succ)
+Fence Memory and I/O. I-type, RV32I and RV64I.
+Renders preceding memory and I/O accesses in the predecessor set observable to other threads and devices before subsequent memory and I/O accesses in the successor set become observable. Bits 3, 2, 1, and 0 in these sets correspond to device input, device output, mem- ory reads, and memory writes, respectively. The instruction fence r,rw, for example, orders older reads with younger reads and writes, and is encoded with pred=0010 and succ=0011. If the arguments are omitted, a full fence iorw, iorw is implied.
+
+fence.i
+Fence(Store, Fetch)
+Fence Instruction Stream. I-type, RV32I and RV64I.
+Renders stores to instruction memory observable to subsequent instruction fetches.
+
+feq.d rd, rs1, rs2
+x[rd] = f[rs1] == f[rs2]
+Floating-point Equals, Double-Precision. R-type, RV32D and RV64D.
+Writes 1 to x[rd] if the double-precision floating-point number in f[rs1] equals the number in f[rs2], and 0 if not.
+
+feq.s rd, rs1, rs2
+x[rd] = f[rs1] == f[rs2]
+Floating-point Equals, Single-Precision. R-type, RV32F and RV64F.
+Writes 1 to x[rd] if the single-precision floating-point number in f[rs1] equals the number in f[rs2], and 0 if not.
+
+fld rd, offset(rs1)
+f[rd] = M[x[rs1] + sext(offset)][63:0]
+Floating-point Load Doubleword. I-type, RV32D and RV64D.
+Loads a double-precision floating-point number from memory address x[rs1] + sign-extend(offset) and writes it to f[rd].
+Compressed forms: c.fldsp rd, offset; c.fld rd, offset(rs1)
+
+fle.d rd, rs1, rs2
+x[rd] = f[rs1]
+f[rs2]
+Floating-point Less Than or Equal, Double-Precision. R-type, RV32D and RV64D.
+Writes 1 to x[rd] if the double-precision floating-point number in f[rs1] is less than or equal to the number in f[rs2], and 0 if not.
+
+fle.s rd, rs1, rs2
+x[rd] = f[rs1]
+f[rs2]
+Floating-point Less Than or Equal, Single-Precision. R-type, RV32F and RV64F.
+Writes 1 to x[rd] if the single-precision floating-point number in f[rs1] is less than or equal to the number in f[rs2], and 0 if not.
+
+flt.d rd, rs1, rs2
+x[rd] = f[rs1] < f[rs2]
+Floating-point Less Than, Double-Precision. R-type, RV32D and RV64D.
+Writes 1 to x[rd] if the double-precision floating-point number in f[rs1] is less than the num- ber in f[rs2], and 0 if not.
+
+flt.s rd, rs1, rs2
+x[rd] = f[rs1] < f[rs2]
+Floating-point Less Than, Single-Precision. R-type, RV32F and RV64F.
+Writes 1 to x[rd] if the single-precision floating-point number in f[rs1] is less than the number in f[rs2], and 0 if not.
+
+flw rd, offset(rs1)
+f[rd] = M[x[rs1] + sext(offset)][31:0]
+Floating-point Load Word. I-type, RV32F and RV64F.
+Loads a single-precision floating-point number from memory address x[rs1] + sign-extend(offset) and writes it to f[rd].
+Compressed forms: c.flwsp rd, offset; c.flw rd, offset(rs1)
+
+fmadd.d rd, rs1, rs2, rs3
+f[rd] = f[rs1] f[rs2]+f[rs3]
+Floating-point Fused Multiply-Add, Double-Precision. R4-type, RV32D and RV64D. Multiplies the double-precision floating-point numbers in f[rs1] and f[rs2], adds the un- rounded product to the double-precision floating-point number in f[rs3], and writes the rounded double-precision result to f[rd].
+
+fmadd.s rd, rs1, rs2, rs3
+f[rd] = f[rs1] f[rs2]+f[rs3]
+Floating-point Fused Multiply-Add, Single-Precision. R4-type, RV32F and RV64F. Multiplies the single-precision floating-point numbers in f[rs1] and f[rs2], adds the un- rounded product to the single-precision floating-point number in f[rs3], and writes the rounded single-precision result to f[rd].
+
+fmax.d rd, rs1, rs2
+f[rd] = max(f[rs1], f[rs2])
+Floating-point Maximum, Double-Precision. R-type, RV32D and RV64D.
+Copies the larger of the double-precision floating-point numbers in registers f[rs1] and f[rs2] to f[rd].
+
+fmax.s rd, rs1, rs2
+f[rd] = max(f[rs1], f[rs2])
+Floating-point Maximum, Single-Precision. R-type, RV32F and RV64F.
+Copies the larger of the single-precision floating-point numbers in registers f[rs1] and f[rs2] to f[rd].
+
+fmin.d rd, rs1, rs2
+f[rd] = min(f[rs1], f[rs2])
+Floating-point Minimum, Double-Precision. R-type, RV32D and RV64D.
+Copies the smaller of the double-precision floating-point numbers in registers f[rs1] and f[rs2] to f[rd].
+
+fmin.s rd, rs1, rs2
+f[rd] = min(f[rs1], f[rs2])
+Floating-point Minimum, Single-Precision. R-type, RV32F and RV64F.
+Copies the smaller of the single-precision floating-point numbers in registers f[rs1] and f[rs2] to f[rd].
+
+fmsub.d rd, rs1, rs2, rs3
+f[rd] = f[rs1] * f[rs2] - f[rs3]
+Floating-point Fused Multiply-Subtract, Double-Precision. R4-type, RV32D and RV64D. Multiplies the double-precision floating-point numbers in f[rs1] and f[rs2], subtracts the double-precision floating-point number in f[rs3] from the unrounded product, and writes the rounded double-precision result to f[rd].
+
+fmsub.s rd, rs1, rs2, rs3
+f[rd] = f[rs1] * f[rs2] - f[rs3]
+Floating-point Fused Multiply-Subtract, Single-Precision. R4-type, RV32F and RV64F. Multiplies the single-precision floating-point numbers in f[rs1] and f[rs2], subtracts the single-precision floating-point number in f[rs3] from the unrounded product, and writes the rounded single-precision result to f[rd].
+
+fmul.d rd, rs1, rs2
+f[rd] = f[rs1] * f[rs2]
+Floating-point Multiply, Double-Precision. R-type, RV32D and RV64D.
+Multiplies the double-precision floating-point numbers in registers f[rs1] and f[rs2] and writes the rounded double-precision product to f[rd].
+
+fmul.s rd, rs1, rs2
+f[rd] = f[rs1] * f[rs2]
+Floating-point Multiply, Single-Precision. R-type, RV32F and RV64F.
+Multiplies the single-precision floating-point numbers in registers f[rs1] and f[rs2] and writes the rounded single-precision product to f[rd].
+
+fmv.d rd, rs1
+f[rd] = f[rs1]
+Floating-point Move. Pseudoinstruction, RV32D and RV64D.
+Copies the double-precision floating-point number in f[rs1] to f[rd]. Expands to fsgnj.d rd, rs1, rs1.
+
+fmv.d.x rd, rs1, rs2
+f[rd] = x[rs1][63:0]
+Floating-point Move Doubleword from Integer. R-type, RV64D only. Copies the double-precision floating-point number in register x[rs1] to f[rd].
+
+fmv.s rd, rs1
+f[rd] = f[rs1]
+Floating-point Move. Pseudoinstruction, RV32F and RV64F.
+Copies the single-precision floating-point number in f[rs1] to f[rd]. Expands to fsgnj.s rd, rs1, rs1.
+
+fmv.w.x rd, rs1, rs2
+f[rd] = x[rs1][31:0]
+Floating-point Move Word from Integer. R-type, RV32F and RV64F. Copies the single-precision floating-point number in register x[rs1] to f[rd].
+
+fmv.x.d rd, rs1, rs2
+x[rd] = f[rs1][63:0]
+Floating-point Move Doubleword to Integer. R-type, RV64D only.
+Copies the double-precision floating-point number in register f[rs1] to x[rd].
+
+fmv.x.w rd, rs1, rs2
+x[rd] = sext(f[rs1][31:0])
+Floating-point Move Word to Integer. R-type, RV32F and RV64F.
+Copies the single-precision floating-point number in register f[rs1] to x[rd], sign-extending the result for RV64F.
+
+fneg.d rd, rs1
+f[rd] = -f[rs1]
+Floating-point Negate. Pseudoinstruction, RV32D and RV64D.
+Writes the opposite of the double-precision floating-point number in f[rs1] to f[rd]. Expands to fsgnjn.d rd, rs1, rs1.
+
+fneg.s rd, rs1
+f[rd] = -f[rs1]
+Floating-point Negate. Pseudoinstruction, RV32F and RV64F.
+Writes the opposite of the single-precision floating-point number in f[rs1] to f[rd]. Expands to fsgnjn.s rd, rs1, rs1.
+
+fnmadd.d rd, rs1, rs2, rs3
+f[rd] = -f[rs1] * f[rs2] - f[rs3]
+Floating-point Fused Negative Multiply-Add, Double-Precision. R4-type, RV32D and RV64D.
+Multiplies the double-precision floating-point numbers in f[rs1] and f[rs2], negates the result, subtracts the double-precision floating-point number in f[rs3] from the unrounded product, and writes the rounded double-precision result to f[rd].
+
+fnmadd.s rd, rs1, rs2, rs3
+f[rd] = -f[rs1] * f[rs2] - f[rs3]
+Floating-point Fused Negative Multiply-Add, Single-Precision. R4-type, RV32F and RV64F. Multiplies the single-precision floating-point numbers in f[rs1] and f[rs2], negates the result, subtracts the single-precision floating-point number in f[rs3] from the unrounded product, and writes the rounded single-precision result to f[rd].
+
+fnmsub.d rd, rs1, rs2, rs3
+f[rd] = -f[rs1] * f[rs2] + f[rs3]
+Floating-point Fused Negative Multiply-Subtract, Double-Precision. R4-type, RV32D and RV64D.
+Multiplies the double-precision floating-point numbers in f[rs1] and f[rs2], negates the re- sult, adds the unrounded product to the double-precision floating-point number in f[rs3], and writes the rounded double-precision result to f[rd].
+
+fnmsub.s rd, rs1, rs2, rs3
+f[rd] = -f[rs1] * f[rs2]+f[rs3]
+Floating-point Fused Negative Multiply-Subtract, Single-Precision. R4-type, RV32F and RV64F.
+Multiplies the single-precision floating-point numbers in f[rs1] and f[rs2], negates the result, adds the unrounded product to the single-precision floating-point number in f[rs3], and writes the rounded single-precision result to f[rd].
+
+frcsr rd
+x[rd] = CSRs[fcsr]
+Floating-point Read Control and Status Register. Pseudoinstruction, RV32F and RV64F. Copies the floating-point control and status register to x[rd]. Expands to csrrs rd, fcsr, x0.
+
+frflags rd
+x[rd] = CSRs[fflags]
+Floating-point Read Exception Flags. Pseudoinstruction, RV32F and RV64F. Copies the floating-point exception flags to x[rd]. Expands to csrrs rd, fflags, x0.
+
+frrm rd
+x[rd] = CSRs[frm]
+Floating-point Read Rounding Mode. Pseudoinstruction, RV32F and RV64F. Copies the floating-point rounding mode to x[rd]. Expands to csrrs rd, frm, x0.
+
+fscsr rd, rs1
+t = CSRs[fcsr]; CSRs[fcsr] = x[rs1]; x[rd] = t
+Floating-point Swap Control and Status Register. Pseudoinstruction, RV32F and RV64F. Copies x[rs1] to the floating-point control and status register, then copies the previous value of the floating-point control and status register to x[rd]. Expands to csrrw rd, fcsr, rs1. If rd is omitted, x0 is assumed.
+
+fsd rs2, offset(rs1)
+M[x[rs1] + sext(offset)] = f[rs2][63:0]
+Floating-point Store Doubleword. S-type, RV32D and RV64D.
+Stores the double-precision floating-point number in register f[rs2] to memory at address x[rs1] + sign-extend(offset).
+Compressed forms: c.fsdsp rs2, offset; c.fsd rs2, offset(rs1)
+
+fsflags rd, rs1
+t = CSRs[fflags]; CSRs[fflags] = x[rs1]; x[rd] = t
+Floating-point Swap Exception Flags. Pseudoinstruction, RV32F and RV64F.
+Copies x[rs1] to the floating-point exception flags register, then copies the previous floating- point exception flags to x[rd]. Expands to csrrw rd, fflags, rs1. If rd is omitted, x0 is assumed.
+
+fsgnj.d rd, rs1, rs2
+f[rd] = {f[rs2][63], f[rs1][62:0]}
+Floating-point Sign Inject, Double-Precision. R-type, RV32D and RV64D.
+Constructs a new double-precision floating-point number from the exponent and significand of f[rs1], taking the sign from f[rs2], and writes it to f[rd].
+
+fsgnj.s rd, rs1, rs2
+f[rd] = {f[rs2][31], f[rs1][30:0]}
+Floating-point Sign Inject, Single-Precision. R-type, RV32F and RV64F.
+Constructs a new single-precision floating-point number from the exponent and significand of f[rs1], taking the sign from f[rs2], and writes it to f[rd].
+
+fsgnjn.d rd, rs1, rs2
+f[rd] = { f[rs2][63], f[rs1][62:0]} Floating-point Sign Inject-Negate, Double-Precision. R-type, RV32D and RV64D. Constructs a new double-precision floating-point number from the exponent and significand of f[rs1], taking the opposite sign of f[rs2], and writes it to f[rd].
+
+fsgnjn.s rd, rs1, rs2
+f[rd] = { f[rs2][31], f[rs1][30:0]}
+Floating-point Sign Inject-Negate, Single-Precision. R-type, RV32F and RV64F.
+Constructs a new single-precision floating-point number from the exponent and significand of f[rs1], taking the opposite sign of f[rs2], and writes it to f[rd].
+
+fsgnjx.d rd, rs1, rs2
+f[rd] = {f[rs1][63] ^ f[rs2][63], f[rs1][62:0]}
+Floating-point Sign Inject-XOR, Double-Precision. R-type, RV32D and RV64D.
+Constructs a new double-precision floating-point number from the exponent and significand of f[rs1], taking the sign from the XOR of the signs of f[rs1] and f[rs2], and writes it to f[rd].
+
+fsgnjx.s rd, rs1, rs2
+f[rd] = {f[rs1][31] ^ f[rs2][31], f[rs1][30:0]}
+Floating-point Sign Inject-XOR, Single-Precision. R-type, RV32F and RV64F.
+Constructs a new single-precision floating-point number from the exponent and significand of f[rs1], taking the sign from the XOR of the signs of f[rs1] and f[rs2], and writes it to f[rd].
+
+fsqrt.d rd, rs1, rs2
+f[rd] = √f[rs1]
+Floating-point Square Root, Double-Precision. R-type, RV32D and RV64D.
+Computes the square root of the double-precision floating-point number in register f[rs1] and writes the rounded double-precision result to f[rd].
+
+fsqrt.s rd, rs1, rs2
+f[rd] = √f[rs1]
+Floating-point Square Root, Single-Precision. R-type, RV32F and RV64F.
+Computes the square root of the single-precision floating-point number in register f[rs1] and writes the rounded single-precision result to f[rd].
+
+fsrm rd, rs1
+t = CSRs[frm]; CSRs[frm] = x[rs1]; x[rd] = t
+Floating-point Swap Rounding Mode. Pseudoinstruction, RV32F and RV64F.
+Copies x[rs1] to the floating-point rounding mode register, then copies the previous floating- point rounding mode to x[rd]. Expands to csrrw rd, frm, rs1. If rd is omitted, x0 is assumed.
+
+fsub.d rd, rs1, rs2
+f[rd] = f[rs1] - f[rs2]
+Floating-point Subtract, Double-Precision. R-type, RV32D and RV64D.
+Subtracts the double-precision floating-point number in register f[rs2] from f[rs1] and writes the rounded double-precision difference to f[rd].
+
+fsub.s rd, rs1, rs2
+f[rd] = f[rs1] - f[rs2]
+Floating-point Subtract, Single-Precision. R-type, RV32F and RV64F.
+Subtracts the single-precision floating-point number in register f[rs2] from f[rs1] and writes the rounded single-precision difference to f[rd].
+
+fsw rs2, offset(rs1)
+M[x[rs1] + sext(offset)] = f[rs2][31:0]
+Floating-point Store Word. S-type, RV32F and RV64F.
+Stores the single-precision floating-point number in register f[rs2] to memory at address x[rs1] + sign-extend(offset).
+Compressed forms: c.fswsp rs2, offset; c.fsw rs2, offset(rs1)
+
+j offset
+pc += sext(offset)
+Jump. Pseudoinstruction, RV32I and RV64I.
+Sets the pc to the current pc plus the sign-extended offset. Expands to jal x0, offset.
+
+jal rd, offset
+x[rd] = pc+4; pc += sext(offset)
+Jump and Link. J-type, RV32I and RV64I.
+Writes the address of the next instruction (pc+4) to x[rd], then set the pc to the current pc
+plus the sign-extended offset. If rd is omitted, x1 is assumed.
+Compressed forms: c.j offset; c.jal offset
+
+jalr rd, offset(rs1)
+t = pc+4; pc = (x[rs1]+sext(offset))& 1; x[rd]=t
+Jump and Link Register. I-type, RV32I and RV64I.
+Sets the pc to x[rs1] + sign-extend(offset), masking off the least-significant bit of the com- puted address, then writes the previous pc+4 to x[rd]. If rd is omitted, x1 is assumed.
+Compressed forms: c.jr rs1; c.jalr rs1
+
+jr rs1
+pc = x[rs1]
+Jump Register. Pseudoinstruction, RV32I and RV64I. Sets the pc to x[rs1]. Expands to jalr x0, 0(rs1).
+
+la rd, symbol
+x[rd] = &symbol
+Load Address. Pseudoinstruction, RV32I and RV64I.
+Loads the address of symbol into x[rd]. When assembling position-independent code, it expands into a load from the Global Offset Table: for RV32I, auipc rd, offsetHi then lw rd, offsetLo(rd); for RV64I, auipc rd, offsetHi then ld rd, offsetLo(rd). Otherwise, it expands into auipc rd, offsetHi then addi rd, rd, offsetLo.
+
+lb rd, offset(rs1)
+x[rd] = sext(M[x[rs1] + sext(offset)][7:0])
+Load Byte. I-type, RV32I and RV64I.
+Loads a byte from memory at address x[rs1] + sign-extend(offset) and writes it to x[rd], sign-extending the result.
+
+lbu rd, offset(rs1)
+x[rd] = M[x[rs1] + sext(offset)][7:0]
+Load Byte, Unsigned. I-type, RV32I and RV64I.
+Loads a byte from memory at address x[rs1] + sign-extend(offset) and writes it to x[rd], zero- extending the result.
+
+ld rd, offset(rs1)
+x[rd] = M[x[rs1] + sext(offset)][63:0]
+Load Doubleword. I-type, RV64I only.
+Loads eight bytes from memory at address x[rs1] + sign-extend(offset) and writes them to x[rd].
+Compressed forms: c.ldsp rd, offset; c.ld rd, offset(rs1)
+
+lh rd, offset(rs1)
+x[rd] = sext(M[x[rs1] + sext(offset)][15:0])
+Load Halfword. I-type, RV32I and RV64I.
+Loads two bytes from memory at address x[rs1] + sign-extend(offset) and writes them to x[rd], sign-extending the result.
+
+lhu rd, offset(rs1)
+x[rd] = M[x[rs1] + sext(offset)][15:0]
+Load Halfword, Unsigned. I-type, RV32I and RV64I.
+Loads two bytes from memory at address x[rs1] + sign-extend(offset) and writes them to x[rd], zero-extending the result.
+
+li rd, immediate
+x[rd] = immediate
+Load Immediate. Pseudoinstruction, RV32I and RV64I.
+Loads a constant into x[rd], using as few instructions as possible. For RV32I, it expands to lui and/or addi; for RV64I, it’s as long as lui, addi, slli, addi, slli, addi, slli, addi.
+
+lla rd, symbol
+x[rd] = &symbol
+Load Local Address. Pseudoinstruction, RV32I and RV64I.
+Loads the address of symbol into x[rd]. Expands into auipc rd, offsetHi then addi rd, rd, offsetLo.
+
+lr.d rd, (rs1)
+x[rd] = LoadReserved64(M[x[rs1]])
+Load-Reserved Doubleword. R-type, RV64A only.
+Loads the eight bytes from memory at address x[rs1], writes them to x[rd], and registers a reservation on that memory doubleword.
+
+lr.w rd, (rs1)
+x[rd] = LoadReserved32(M[x[rs1]])
+Load-Reserved Word. R-type, RV32A and RV64A.
+Loads the four bytes from memory at address x[rs1], writes them to x[rd], sign-extending the result, and registers a reservation on that memory word.
+
+lw rd, offset(rs1)
+x[rd] = sext(M[x[rs1] + sext(offset)][31:0])
+Load Word. I-type, RV32I and RV64I.
+Loads four bytes from memory at address x[rs1] + sign-extend(offset) and writes them to x[rd]. For RV64I, the result is sign-extended.
+Compressed forms: c.lwsp rd, offset; c.lw rd, offset(rs1)
+
+lwu rd, offset(rs1)
+x[rd] = M[x[rs1] + sext(offset)][31:0]
+Load Word, Unsigned. I-type, RV64I only.
+Loads four bytes from memory at address x[rs1] + sign-extend(offset) and writes them to x[rd], zero-extending the result.
+
+lui rd, immediate
+x[rd] = sext(immediate[31:12] << 12)
+Load Upper Immediate. U-type, RV32I and RV64I.
+Writes the sign-extended 20-bit immediate, left-shifted by 12 bits, to x[rd], zeroing the lower 12 bits.
+Compressed form: c.lui rd, imm
+
+mret
+ExceptionReturn(Machine)
+Machine-mode Exception Return. R-type, RV32I and RV64I privileged architectures. Returns from a machine-mode exception handler. Sets the pc to CSRs[mepc], the privilege mode to CSRs[mstatus].MPP, CSRs[mstatus].MIE to CSRs[mstatus].MPIE, and CSRs[mstatus].MPIE to 1; and, if user mode is supported, sets CSRs[mstatus].MPP to 0.
+
+mul rd, rs1, rs2
+x[rd] = x[rs1] * x[rs2]
+Multiply. R-type, RV32M and RV64M.
+Multiplies x[rs1] by x[rs2] and writes the product to x[rd]. Arithmetic overflow is ignored.
+
+mulh rd, rs1, rs2
+x[rd] = (x[rs1] s*s x[rs2]) >>s XLEN
+Multiply High. R-type, RV32M and RV64M.
+Multiplies x[rs1] by x[rs2], treating the values as two’s complement numbers, and writes the upper half of the product to x[rd].
+
+mulhsu rd, rs1, rs2
+x[rd] = (x[rs1] s u x[rs2]) >>s XLEN
+Multiply High Signed-Unsigned. R-type, RV32M and RV64M.
+Multiplies x[rs1] by x[rs2], treating x[rs1] as a two’s complement number and x[rs2] as an unsigned number, and writes the upper half of the product to x[rd].
+
+mulhu rd, rs1, rs2
+x[rd] = (x[rs1] u u x[rs2]) >>u XLEN
+Multiply High Unsigned. R-type, RV32M and RV64M.
+Multiplies x[rs1] by x[rs2], treating the values as unsigned numbers, and writes the upper half of the product to x[rd].
+
+mulw rd, rs1, rs2
+x[rd] = sext((x[rs1] * x[rs2])[31:0])
+Multiply Word. R-type, RV64M only.
+Multiplies x[rs1] by x[rs2], truncates the product to 32 bits, and writes the sign-extended result to x[rd]. Arithmetic overflow is ignored.
+
+mv rd, rs1
+x[rd] = x[rs1]
+Move. Pseudoinstruction, RV32I and RV64I.
+Copies register x[rs1] to x[rd]. Expands to addi rd, rs1, 0.
+
+neg rd, rs2
+x[rd] = -x[rs2]
+Negate. Pseudoinstruction, RV32I and RV64I.
+Writes the two’s complement of x[rs2] to x[rd]. Expands to sub rd, x0, rs2.
+
+negw rd, rs2
+x[rd] = sext((-x[rs2])[31:0])
+Negate Word. Pseudoinstruction, RV64I only.
+Computes the two’s complement of x[rs2], truncates the result to 32 bits, and writes the sign-extended result to x[rd]. Expands to subw rd, x0, rs2.
+
+nop
+Nothing
+No operation. Pseudoinstruction, RV32I and RV64I.
+Merely advances the pc to the next instruction. Expands to addi x0, x0, 0.
+
+not rd, rs1
+x[rd] = ~x[rs1]
+NOT. Pseudoinstruction, RV32I and RV64I.
+Writes the ones’ complement of x[rs1] to x[rd]. Expands to xori rd, rs1, -1.
+
+or rd, rs1, rs2
+x[rd] = x[rs1] | x[rs2]
+OR. R-type, RV32I and RV64I.
+Computes the bitwise inclusive-OR of registers x[rs1] and x[rs2] and writes the result to x[rd].
+Compressed form: c.or rd, rs2
+
+ori rd, rs1, immediate
+x[rd] = x[rs1] | sext(immediate)
+OR Immediate. I-type, RV32I and RV64I.
+Computes the bitwise inclusive-OR of the sign-extended immediate and register x[rs1] and writes the result to x[rd].
+
+rdcycle rd
+x[rd] = CSRs[cycle]
+Read Cycle Counter. Pseudoinstruction, RV32I and RV64I.
+Writes the number of cycles that have elapsed to x[rd]. Expands to csrrs rd, cycle, x0.
+
+rdcycleh rd
+x[rd] = CSRs[cycleh]
+Read Cycle Counter High. Pseudoinstruction, RV32I only.
+Writes the number of cycles that have elapsed, shifted right by 32 bits, to x[rd]. Expands to csrrs rd, cycleh, x0.
+
+rdinstret rd
+x[rd] = CSRs[instret]
+Read Instructions-Retired Counter. Pseudoinstruction, RV32I and RV64I.
+Writes the number of instructions that have retired to x[rd]. Expands to csrrs rd, instret, x0.
+
+rdinstreth rd
+x[rd] = CSRs[instreth]
+Read Instructions-Retired Counter High. Pseudoinstruction, RV32I only.
+Writes the number of instructions that have retired, shifted right by 32 bits, to x[rd]. Expands to csrrs rd, instreth, x0.
+
+rdtime rd
+x[rd] = CSRs[time]
+Read Time. Pseudoinstruction, RV32I and RV64I.
+Writes the current time to x[rd]. The timer frequency is platform-dependent. Expands to csrrs rd, time, x0.
+
+rdtimeh rd
+x[rd] = CSRs[timeh]
+Read Time High. Pseudoinstruction, RV32I only.
+Writes the current time, shifted right by 32 bits, to x[rd]. The timer frequency is platform- dependent. Expands to csrrs rd, timeh, x0.
+
+rem rd, rs1, rs2
+x[rd] = x[rs1] %s x[rs2]
+Remainder. R-type, RV32M and RV64M.
+Divides x[rs1] by x[rs2], rounding towards zero, treating the values as two’s complement numbers, and writes the remainder to x[rd].
+
+remu rd, rs1, rs2
+x[rd] = x[rs1] %u x[rs2]
+Remainder, Unsigned. R-type, RV32M and RV64M.
+Divides x[rs1] by x[rs2], rounding towards zero, treating the values as unsigned numbers, and writes the remainder to x[rd].
+
+remuw rd, rs1, rs2
+x[rd] = sext(x[rs1][31:0] %u x[rs2][31:0])
+Remainder Word, Unsigned. R-type, RV64M only.
+Divides the lower 32 bits of x[rs1] by the lower 32 bits of x[rs2], rounding towards zero, treating the values as unsigned numbers, and writes the sign-extended 32-bit remainder to x[rd].
+
+remw rd, rs1, rs2
+x[rd] = sext(x[rs1][31:0] %s x[rs2][31:0])
+Remainder Word. R-type, RV64M only.
+Divides the lower 32 bits of x[rs1] by the lower 32 bits of x[rs2], rounding towards zero, treating the values as two’s complement numbers, and writes the sign-extended 32-bit re- mainder to x[rd].
+
+ret
+pc = x[1]
+Return. Pseudoinstruction, RV32I and RV64I. Returns from a subroutine. Expands to jalr x0, 0(x1).
+
+sb rs2, offset(rs1)
+M[x[rs1] + sext(offset)] = x[rs2][7:0]
+Store Byte. S-type, RV32I and RV64I.
+Stores the least-significant byte in register x[rs2] to memory at address x[rs1] + sign-extend(offset).
+
+sc.d rd, rs2, (rs1)
+x[rd] = StoreConditional64(M[x[rs1]], x[rs2])
+Store-Conditional Doubleword. R-type, RV64A only.
+Stores the eight bytes in register x[rs2] to memory at address x[rs1], provided there exists a load reservation on that memory address. Writes 0 to x[rd] if the store succeeded, or a nonzero error code otherwise.
+
+sc.w rd, rs2, (rs1)
+x[rd] = StoreConditional32(M[x[rs1]], x[rs2])
+Store-Conditional Word. R-type, RV32A and RV64A.
+Stores the four bytes in register x[rs2] to memory at address x[rs1], provided there exists a load reservation on that memory address. Writes 0 to x[rd] if the store succeeded, or a nonzero error code otherwise.
+
+sd rs2, offset(rs1)
+M[x[rs1] + sext(offset)] = x[rs2][63:0]
+Store Doubleword. S-type, RV64I only.
+Stores the eight bytes in register x[rs2] to memory at address x[rs1] + sign-extend(offset). Compressed forms: c.sdsp rs2, offset; c.sd rs2, offset(rs1)
+
+seqz rd, rs1
+x[rd] = (x[rs1] == 0)
+Set if Equal to Zero. Pseudoinstruction, RV32I and RV64I.
+Writes 1 to x[rd] if x[rs1] equals 0, or 0 if not. Expands to sltiu rd, rs1, 1.
+
+sext.w rd, rs1
+x[rd] = sext(x[rs1][31:0])
+Sign-extend Word. Pseudoinstruction, RV64I only.
+Reads the lower 32 bits of x[rs1], sign-extends them, and writes the result to x[rd]. Expands to addiw rd, rs1, 0.
+
+sfence.vma rs1, rs2
+Fence(Store, AddressTranslation)
+Fence Virtual Memory. R-type, RV32I and RV64I privileged architectures.
+Orders preceding stores to the page tables with subsequent virtual-address translations. When rs2=0, translations for all address spaces are affected; otherwise, only translations for address space identified by x[rs2] are ordered. When rs1=0, translations for all virtual addresses in the selected address spaces are ordered; otherwise, only translations for the page containing virtual address x[rs1] in the selected address spaces are ordered.
+
+sgtz rd, rs2
+x[rd] = (x[rs2] >s 0)
+Set if Greater Than to Zero. Pseudoinstruction, RV32I and RV64I.
+Writes 1 to x[rd] if x[rs2] is greater than 0, or 0 if not. Expands to slt rd, x0, rs2.
+
+sh rs2, offset(rs1)
+M[x[rs1] + sext(offset)] = x[rs2][15:0]
+Store Halfword. S-type, RV32I and RV64I.
+Stores the two least-significant bytes in register x[rs2] to memory at address x[rs1] + sign-extend(offset).
+
+sw rs2, offset(rs1)
+M[x[rs1] + sext(offset)] = x[rs2][31:0]
+Store Word. S-type, RV32I and RV64I.
+Stores the four least-significant bytes in register x[rs2] to memory at address x[rs1] + sign-extend(offset).
+Compressed forms: c.swsp rs2, offset; c.sw rs2, offset(rs1)
+
+sll rd, rs1, rs2
+x[rd] = x[rs1] << x[rs2]
+Shift Left Logical. R-type, RV32I and RV64I.
+Shifts register x[rs1] left by x[rs2] bit positions. The vacated bits are filled with zeros, and the result is written to x[rd]. The least-significant five bits of x[rs2] (or six bits for RV64I) form the shift amount; the upper bits are ignored.
+
+slli rd, rs1, shamt
+x[rd] = x[rs1] << shamt
+Shift Left Logical Immediate. I-type, RV32I and RV64I.
+Shifts register x[rs1] left by shamt bit positions. The vacated bits are filled with zeros, and the result is written to x[rd]. For RV32I, the instruction is only legal when shamt[5]=0.
+Compressed form: c.slli rd, shamt
+
+slliw rd, rs1, shamt
+x[rd] = sext((x[rs1] << shamt)[31:0])
+Shift Left Logical Word Immediate. I-type, RV64I only.
+Shifts x[rs1] left by shamt bit positions. The vacated bits are filled with zeros, the result is truncated to 32 bits, and the sign-extended 32-bit result is written to x[rd]. The instruction is only legal when shamt[5]=0.
+
+sllw rd, rs1, rs2
+x[rd] = sext((x[rs1] << x[rs2][4:0])[31:0])
+Shift Left Logical Word. R-type, RV64I only.
+Shifts the lower 32 bits of x[rs1] left by x[rs2] bit positions. The vacated bits are filled with zeros, and the sign-extended 32-bit result is written to x[rd]. The least-significant five bits of x[rs2] form the shift amount; the upper bits are ignored.
+
+slt rd, rs1, rs2
+x[rd] = x[rs1] <s x[rs2]
+Set if Less Than. R-type, RV32I and RV64I.
+Compares x[rs1] and x[rs2] as two’s complement numbers, and writes 1 to x[rd] if x[rs1] is smaller, or 0 if not.
+
+slti rd, rs1, immediate
+x[rd] = x[rs1] <s sext(immediate)
+Set if Less Than Immediate. I-type, RV32I and RV64I.
+Compares x[rs1] and the sign-extended immediate as two’s complement numbers, and writes 1 to x[rd] if x[rs1] is smaller, or 0 if not.
+
+sltiu rd, rs1, immediate
+x[rd] = x[rs1] <u sext(immediate)
+Set if Less Than Immediate, Unsigned. I-type, RV32I and RV64I.
+Compares x[rs1] and the sign-extended immediate as unsigned numbers, and writes 1 to x[rd] if x[rs1] is smaller, or 0 if not.
+
+sltu rd, rs1, rs2
+x[rd] = x[rs1] <u x[rs2]
+Set if Less Than, Unsigned. R-type, RV32I and RV64I.
+Compares x[rs1] and x[rs2] as unsigned numbers, and writes 1 to x[rd] if x[rs1] is smaller, or 0 if not.
+
+sltz rd, rs1
+x[rd] = (x[rs1] <s 0)
+Set if Less Than to Zero. Pseudoinstruction, RV32I and RV64I.
+Writes 1 to x[rd] if x[rs1] is less than zero, or 0 if not. Expands to slt rd, rs1, x0.
+
+snez rd, rs2
+x[rd] = (x[rs2] = 0)
+Set if Not Equal to Zero. Pseudoinstruction, RV32I and RV64I.
+Writes 0 to x[rd] if x[rs2] equals 0, or 1 if not. Expands to sltu rd, x0, rs2.
+
+sra rd, rs1, rs2
+x[rd] = x[rs1] >>s x[rs2]
+Shift Right Arithmetic. R-type, RV32I and RV64I.
+Shifts register x[rs1] right by x[rs2] bit positions. The vacated bits are filled with copies of x[rs1]’s most-significant bit, and the result is written to x[rd]. The least-significant five bits of x[rs2] (or six bits for RV64I) form the shift amount; the upper bits are ignored.
+
+srai rd, rs1, shamt
+x[rd] = x[rs1] >>s shamt
+Shift Right Arithmetic Immediate. I-type, RV32I and RV64I.
+Shifts register x[rs1] right by shamt bit positions. The vacated bits are filled with copies of x[rs1]’s most-significant bit, and the result is written to x[rd]. For RV32I, the instruction is only legal when shamt[5]=0.
+Compressed form: c.srai rd, shamt
+
+sraiw rd, rs1, shamt
+x[rd] = sext(x[rs1][31:0] >>s shamt)
+Shift Right Arithmetic Word Immediate. I-type, RV64I only.
+Shifts the lower 32 bits of x[rs1] right by shamt bit positions. The vacated bits are filled with copies of x[rs1][31], and the sign-extended 32-bit result is written to x[rd]. The instruction is only legal when shamt[5]=0.
+
+sraw rd, rs1, rs2
+x[rd] = sext(x[rs1][31:0] >>s x[rs2][4:0])
+Shift Right Arithmetic Word. R-type, RV64I only.
+Shifts the lower 32 bits of x[rs1] right by x[rs2] bit positions. The vacated bits are filled with x[rs1][31], and the sign-extended 32-bit result is written to x[rd]. The least-significant five bits of x[rs2] form the shift amount; the upper bits are ignored.
+
+sret
+ExceptionReturn(Supervisor)
+Supervisor-mode Exception Return. R-type, RV32I and RV64I privileged architectures. Returns from a supervisor-mode exception handler. Sets the pc to CSRs[sepc], the privilege mode to CSRs[sstatus].SPP, CSRs[sstatus].SIE to CSRs[sstatus].SPIE, CSRs[sstatus].SPIE to 1, and CSRs[sstatus].SPP to 0.
+
+srl rd, rs1, rs2
+x[rd] = x[rs1] >>u x[rs2]
+Shift Right Logical. R-type, RV32I and RV64I.
+Shifts register x[rs1] right by x[rs2] bit positions. The vacated bits are filled with zeros, and the result is written to x[rd]. The least-significant five bits of x[rs2] (or six bits for RV64I) form the shift amount; the upper bits are ignored.
+
+srli rd, rs1, shamt
+x[rd] = x[rs1] >>u shamt
+Shift Right Logical Immediate. I-type, RV32I and RV64I.
+Shifts register x[rs1] right by shamt bit positions. The vacated bits are filled with zeros, and the result is written to x[rd]. For RV32I, the instruction is only legal when shamt[5]=0.
+Compressed form: c.srli rd, shamt
+
+srliw rd, rs1, shamt
+x[rd] = sext(x[rs1][31:0] >>u shamt)
+Shift Right Logical Word Immediate. I-type, RV64I only.
+Shifts the lower 32 bits of x[rs1] right by shamt bit positions. The vacated bits are filled with zeros, and the sign-extended 32-bit result is written to x[rd]. The instruction is only legal when shamt[5]=0.
+
+srlw rd, rs1, rs2
+x[rd] = sext(x[rs1][31:0] >>u x[rs2][4:0])
+Shift Right Logical Word. R-type, RV64I only.
+Shifts the lower 32 bits of x[rs1] right by x[rs2] bit positions. The vacated bits are filled with zeros, and the sign-extended 32-bit result is written to x[rd]. The least-significant five bits of x[rs2] form the shift amount; the upper bits are ignored.
+
+sub rd, rs1, rs2
+x[rd] = x[rs1] - x[rs2]
+Subtract. R-type, RV32I and RV64I.
+Subtracts register x[rs2] from register x[rs1] and writes the result to x[rd]. Arithmetic over- flow is ignored.
+Compressed form: c.sub rd, rs2
+
+subw rd, rs1, rs2
+x[rd] = sext((x[rs1] - x[rs2])[31:0])
+Subtract Word. R-type, RV64I only.
+Subtracts register x[rs2] from register x[rs1], truncates the result to 32 bits, and writes the sign-extended result to x[rd]. Arithmetic overflow is ignored.
+Compressed form: c.subw rd, rs2
+
+tail symbol
+pc = &symbol; clobber x[6]
+Tail call. Pseudoinstruction, RV32I and RV64I.
+Sets the pc to symbol, overwriting x[6] in the process. Expands to auipc x6, offsetHi then jalr x0, offsetLo(x6).
+
+wfi
+while (noInterruptsPending) idle
+Wait for Interrupt. R-type, RV32I and RV64I privileged architectures.
+Idles the processor to save energy if no enabled interrupts are currently pending.
+
+xor rd, rs1, rs2
+x[rd] = x[rs1] ^ x[rs2]
+Exclusive-OR. R-type, RV32I and RV64I.
+Computes the bitwise exclusive-OR of registers x[rs1] and x[rs2] and writes the result to x[rd].
+Compressed form: c.xor rd, rs2
+
+xori rd, rs1, immediate
+x[rd] = x[rs1] ^ sext(immediate)
+Exclusive-OR Immediate. I-type, RV32I and RV64I.
+Computes the bitwise exclusive-OR of the sign-extended immediate and register x[rs1] and writes the result to x[rd].
