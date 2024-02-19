@@ -1,1018 +1,1018 @@
 [
     {
-        "name": "add rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] + x[rs2]"
+        "format": "add rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] + x[rs2]"
     },
     {
-        "name": "addi rd, rs1, immediate",
-        "instruction": "x[rd] = x[rs1] + sext(immediate)"
+        "format": "addi rd, rs1, immediate",
+        "implementation": "x[rd] ← x[rs1] + sext(immediate)"
     },
     {
-        "name": "addiw rd, rs1, immediate",
-        "instruction": "x[rd] = sext((x[rs1] + sext(immediate))[31:0])"
+        "format": "addiw rd, rs1, immediate",
+        "implementation": "x[rd] ← sext((x[rs1] + sext(immediate))[31:0])"
     },
     {
-        "name": "addw rd, rs1, rs2",
-        "instruction": "x[rd] = sext((x[rs1] + x[rs2])[31:0])"
+        "format": "addw rd, rs1, rs2",
+        "implementation": "x[rd] ← sext((x[rs1] + x[rs2])[31:0])"
     },
     {
-        "name": "amoadd.d rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO64(M[x[rs1]] + x[rs2])"
+        "format": "amoadd.d rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO64(M[x[rs1]] + x[rs2])"
     },
     {
-        "name": "amoadd.w rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO32(M[x[rs1]] + x[rs2])"
+        "format": "amoadd.w rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO32(M[x[rs1]] + x[rs2])"
     },
     {
-        "name": "amoand.d rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO64(M[x[rs1]] and x[rs2])"
+        "format": "amoand.d rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO64(M[x[rs1]] and x[rs2])"
     },
     {
-        "name": "amoand.w rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO32(M[x[rs1]] and x[rs2])"
+        "format": "amoand.w rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO32(M[x[rs1]] and x[rs2])"
     },
     {
-        "name": "amomax.d rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO64(M[x[rs1]] MAX x[rs2])"
+        "format": "amomax.d rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO64(M[x[rs1]] MAX x[rs2])"
     },
     {
-        "name": "amomax.w rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO32(M[x[rs1]] MAX x[rs2])"
+        "format": "amomax.w rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO32(M[x[rs1]] MAX x[rs2])"
     },
     {
-        "name": "amomaxu.d rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO64(M[x[rs1]] MAXU x[rs2])"
+        "format": "amomaxu.d rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO64(M[x[rs1]] MAXU x[rs2])"
     },
     {
-        "name": "amomaxu.w rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO32(M[x[rs1]] MAXU x[rs2])"
+        "format": "amomaxu.w rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO32(M[x[rs1]] MAXU x[rs2])"
     },
     {
-        "name": "amomin.d rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO64(M[x[rs1]] MIN x[rs2])"
+        "format": "amomin.d rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO64(M[x[rs1]] MIN x[rs2])"
     },
     {
-        "name": "amomin.w rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO32(M[x[rs1]] MIN x[rs2])"
+        "format": "amomin.w rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO32(M[x[rs1]] MIN x[rs2])"
     },
     {
-        "name": "amominu.d rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO64(M[x[rs1]] MINU x[rs2])"
+        "format": "amominu.d rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO64(M[x[rs1]] MINU x[rs2])"
     },
     {
-        "name": "amominu.w rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO32(M[x[rs1]] MINU x[rs2])"
+        "format": "amominu.w rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO32(M[x[rs1]] MINU x[rs2])"
     },
     {
-        "name": "amoor.d rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO64(M[x[rs1]] or x[rs2])"
+        "format": "amoor.d rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO64(M[x[rs1]] or x[rs2])"
     },
     {
-        "name": "amoor.w rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO32(M[x[rs1]] or x[rs2])"
+        "format": "amoor.w rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO32(M[x[rs1]] or x[rs2])"
     },
     {
-        "name": "amoswap.d rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO64(M[x[rs1]] SWAP x[rs2])"
+        "format": "amoswap.d rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO64(M[x[rs1]] SWAP x[rs2])"
     },
     {
-        "name": "amoswap.w rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO32(M[x[rs1]] SWAP x[rs2])"
+        "format": "amoswap.w rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO32(M[x[rs1]] SWAP x[rs2])"
     },
     {
-        "name": "amoxor.d rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO64(M[x[rs1]] ^ x[rs2])"
+        "format": "amoxor.d rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO64(M[x[rs1]] ^ x[rs2])"
     },
     {
-        "name": "amoxor.w rd, rs2, (rs1)",
-        "instruction": "x[rd] = AMO32(M[x[rs1]] ^ x[rs2])"
+        "format": "amoxor.w rd, rs2, (rs1)",
+        "implementation": "x[rd] ← AMO32(M[x[rs1]] ^ x[rs2])"
     },
     {
-        "name": "and rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] and x[rs2]"
+        "format": "and rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] and x[rs2]"
     },
     {
-        "name": "andi rd, rs1, immediate",
-        "instruction": "x[rd] = x[rs1] and sext(immediate)"
+        "format": "andi rd, rs1, immediate",
+        "implementation": "x[rd] ← x[rs1] and sext(immediate)"
     },
     {
-        "name": "auipc rd, immediate",
-        "instruction": "x[rd] = pc + sext(immediate[31:12] << 12)"
+        "format": "auipc rd, immediate",
+        "implementation": "x[rd] ← pc + sext(immediate[31:12] << 12)"
     },
     {
-        "name": "beq rs1, rs2, offset",
-        "instruction": "if (rs1 == rs2) pc += sext(offset)"
+        "format": "beq rs1, rs2, offset",
+        "implementation": "if (rs1 == rs2) pc += sext(offset)"
     },
     {
-        "name": "beqz rs1, offset",
-        "instruction": "if (rs1 == 0) pc += sext(offset)"
+        "format": "beqz rs1, offset",
+        "implementation": "if (rs1 == 0) pc += sext(offset)"
     },
     {
-        "name": "bge rs1, rs2, offset",
-        "instruction": "if (rs1 >=s rs2) pc += sext(offset)"
+        "format": "bge rs1, rs2, offset",
+        "implementation": "if (rs1 >=s rs2) pc += sext(offset)"
     },
     {
-        "name": "bgeu rs1, rs2, offset",
-        "instruction": "if (rs1 >=u rs2) pc += sext(offset)"
+        "format": "bgeu rs1, rs2, offset",
+        "implementation": "if (rs1 >=u rs2) pc += sext(offset)"
     },
     {
-        "name": "bgez rs1, offset",
-        "instruction": "if (rs1 >=s 0) pc += sext(offset)"
+        "format": "bgez rs1, offset",
+        "implementation": "if (rs1 >=s 0) pc += sext(offset)"
     },
     {
-        "name": "bgt rs1, rs2, offset",
-        "instruction": "if (rs1 >s rs2) pc += sext(offset)"
+        "format": "bgt rs1, rs2, offset",
+        "implementation": "if (rs1 >s rs2) pc += sext(offset)"
     },
     {
-        "name": "bgtu rs1, rs2, offset",
-        "instruction": "if (rs1 >u rs2) pc += sext(offset)"
+        "format": "bgtu rs1, rs2, offset",
+        "implementation": "if (rs1 >u rs2) pc += sext(offset)"
     },
     {
-        "name": "bgtz rs2, offset",
-        "instruction": "if (rs2 >s 0) pc += sext(offset)"
+        "format": "bgtz rs2, offset",
+        "implementation": "if (rs2 >s 0) pc += sext(offset)"
     },
     {
-        "name": "ble rs1, rs2, offset",
-        "instruction": "if (rs1 <=s rs2) pc += sext(offset)"
+        "format": "ble rs1, rs2, offset",
+        "implementation": "if (rs1 <=s rs2) pc += sext(offset)"
     },
     {
-        "name": "bleu rs1, rs2, offset",
-        "instruction": "if (rs1 <=u rs2) pc += sext(offset)"
+        "format": "bleu rs1, rs2, offset",
+        "implementation": "if (rs1 <=u rs2) pc += sext(offset)"
     },
     {
-        "name": "blez rs2, offset",
-        "instruction": "if (rs2 <=s 0) pc += sext(offset)"
+        "format": "blez rs2, offset",
+        "implementation": "if (rs2 <=s 0) pc += sext(offset)"
     },
     {
-        "name": "blt rs1, rs2, offset",
-        "instruction": "if (rs1 <s rs2) pc += sext(offset)"
+        "format": "blt rs1, rs2, offset",
+        "implementation": "if (rs1 <s rs2) pc += sext(offset)"
     },
     {
-        "name": "bltz rs1, offset",
-        "instruction": "if (rs1 <s 0) pc += sext(offset)"
+        "format": "bltz rs1, offset",
+        "implementation": "if (rs1 <s 0) pc += sext(offset)"
     },
     {
-        "name": "bltu rs1, rs2, offset",
-        "instruction": "if (rs1 <u rs2) pc += sext(offset)"
+        "format": "bltu rs1, rs2, offset",
+        "implementation": "if (rs1 <u rs2) pc += sext(offset)"
     },
     {
-        "name": "bne rs1, rs2, offset",
-        "instruction": "if (rs1 == rs2) pc += sext(offset)"
+        "format": "bne rs1, rs2, offset",
+        "implementation": "if (rs1 == rs2) pc += sext(offset)"
     },
     {
-        "name": "bnez rs1, offset",
-        "instruction": "if (rs1 != 0) pc += sext(offset)"
+        "format": "bnez rs1, offset",
+        "implementation": "if (rs1 != 0) pc += sext(offset)"
     },
     {
-        "name": "c.add rd, rs2",
-        "instruction": "x[rd] = x[rd] + x[rs2]"
+        "format": "c.add rd, rs2",
+        "implementation": "x[rd] ← x[rd] + x[rs2]"
     },
     {
-        "name": "c.addi rd, imm",
-        "instruction": "x[rd] = x[rd] + sext(imm)"
+        "format": "c.addi rd, imm",
+        "implementation": "x[rd] ← x[rd] + sext(imm)"
     },
     {
-        "name": "c.addi16sp imm",
-        "instruction": "x[2] = x[2] + sext(imm)"
+        "format": "c.addi16sp imm",
+        "implementation": "x[2] ← x[2] + sext(imm)"
     },
     {
-        "name": "c.addi4spn rd', uimm",
-        "instruction": "x[8+rd'] = x[2] + uimm"
+        "format": "c.addi4spn rd', uimm",
+        "implementation": "x[8+rd'] ← x[2] + uimm"
     },
     {
-        "name": "c.addiw rd, imm",
-        "instruction": "x[rd] = sext((x[rd] + sext(imm))[31:0])"
+        "format": "c.addiw rd, imm",
+        "implementation": "x[rd] ← sext((x[rd] + sext(imm))[31:0])"
     },
     {
-        "name": "c.and rd', rs2'",
-        "instruction": "x[8+rd'] = x[8+rd'] and x[8+rs2']"
+        "format": "c.and rd', rs2'",
+        "implementation": "x[8+rd'] ← x[8+rd'] and x[8+rs2']"
     },
     {
-        "name": "c.addw rd', rs2'",
-        "instruction": "x[8+rd'] = sext((x[8+rd'] + x[8+rs2'])[31:0])"
+        "format": "c.addw rd', rs2'",
+        "implementation": "x[8+rd'] ← sext((x[8+rd'] + x[8+rs2'])[31:0])"
     },
     {
-        "name": "c.a ndi rd', imm",
-        "instruction": "x[8+rd'] = x[8+rd'] and sext(imm)"
+        "format": "c.a ndi rd', imm",
+        "implementation": "x[8+rd'] ← x[8+rd'] and sext(imm)"
     },
     {
-        "name": "c.b eqz rs1', offset",
-        "instruction": "if (x[8+rs1'] == 0) pc += sext(offset)"
+        "format": "c.b eqz rs1', offset",
+        "implementation": "if (x[8+rs1'] == 0) pc += sext(offset)"
     },
     {
-        "name": "c.bnez rs1', offset",
-        "instruction": "if (x[8+rs1'] != 0) pc += sext(offset)"
+        "format": "c.bnez rs1', offset",
+        "implementation": "if (x[8+rs1'] != 0) pc += sext(offset)"
     },
     {
-        "name": "c.ebreak",
-        "instruction": "RaiseException(Breakpoint)"
+        "format": "c.ebreak",
+        "implementation": "RaiseException(Breakpoint)"
     },
     {
-        "name": "c.fld rd', uimm(rs1')",
-        "instruction": "f[8+rd'] = M[x[8+rs1'] + uimm][63:0]"
+        "format": "c.fld rd', uimm(rs1')",
+        "implementation": "f[8+rd'] ← M[x[8+rs1'] + uimm][63:0]"
     },
     {
-        "name": "c.fldsp rd, uimm(x2)",
-        "instruction": "f[rd] = M[x[2] + uimm][63:0]"
+        "format": "c.fldsp rd, uimm(x2)",
+        "implementation": "f[rd] ← M[x[2] + uimm][63:0]"
     },
     {
-        "name": "c.flw rd', uimm(rs1')",
-        "instruction": "f[8+rd'] = M[x[8+rs1'] + uimm][31:0]"
+        "format": "c.flw rd', uimm(rs1')",
+        "implementation": "f[8+rd'] ← M[x[8+rs1'] + uimm][31:0]"
     },
     {
-        "name": "c.flwsp rd, uimm(x2)",
-        "instruction": "f[rd] = M[x[2] + uimm][31:0]"
+        "format": "c.flwsp rd, uimm(x2)",
+        "implementation": "f[rd] ← M[x[2] + uimm][31:0]"
     },
     {
-        "name": "c.fsd rs2', uimm(rs1')",
-        "instruction": "M[x[8+rs1'] + uimm][63:0] = f[8+rs2']"
+        "format": "c.fsd rs2', uimm(rs1')",
+        "implementation": "M[x[8+rs1'] + uimm][63:0] ← f[8+rs2']"
     },
     {
-        "name": "c.fsdsp rs2, uimm(x2)",
-        "instruction": "M[x[2] + uimm][63:0] = f[rs2]"
+        "format": "c.fsdsp rs2, uimm(x2)",
+        "implementation": "M[x[2] + uimm][63:0] ← f[rs2]"
     },
     {
-        "name": "c.fsw rs2', uimm(rs1')",
-        "instruction": "M[x[8+rs1'] + uimm][31:0] = f[8+rs2']"
+        "format": "c.fsw rs2', uimm(rs1')",
+        "implementation": "M[x[8+rs1'] + uimm][31:0] ← f[8+rs2']"
     },
     {
-        "name": "c.fswsp rs2, uimm(x2)",
-        "instruction": "M[x[2] + uimm][31:0] = f[rs2]"
+        "format": "c.fswsp rs2, uimm(x2)",
+        "implementation": "M[x[2] + uimm][31:0] ← f[rs2]"
     },
     {
-        "name": "c.j offset",
-        "instruction": "pc += sext(offset)"
+        "format": "c.j offset",
+        "implementation": "pc += sext(offset)"
     },
     {
-        "name": "c.jal offset",
-        "instruction": "x[1] = pc+2; pc += sext(offset)"
+        "format": "c.jal offset",
+        "implementation": "x[1] ← pc+2; pc += sext(offset)"
     },
     {
-        "name": "c.jalr rs1",
-        "instruction": "t = pc+2; pc = x[rs1]; x[1] = t"
+        "format": "c.jalr rs1",
+        "implementation": "t ← pc+2; pc ← x[rs1]; x[1] ← t"
     },
     {
-        "name": "c.jr rs1",
-        "instruction": "pc = x[rs1]"
+        "format": "c.jr rs1",
+        "implementation": "pc ← x[rs1]"
     },
     {
-        "name": "c.ld rd', uimm(rs1')",
-        "instruction": "x[8+rd'] = M[x[8+rs1'] + uimm][63:0]"
+        "format": "c.ld rd', uimm(rs1')",
+        "implementation": "x[8+rd'] ← M[x[8+rs1'] + uimm][63:0]"
     },
     {
-        "name": "c.ldsp rd, uimm(x2)",
-        "instruction": "x[rd] = M[x[2] + uimm][63:0]"
+        "format": "c.ldsp rd, uimm(x2)",
+        "implementation": "x[rd] ← M[x[2] + uimm][63:0]"
     },
     {
-        "name": "c.li rd, imm",
-        "instruction": "x[rd] = sext(imm)"
+        "format": "c.li rd, imm",
+        "implementation": "x[rd] ← sext(imm)"
     },
     {
-        "name": "c.lui rd, imm",
-        "instruction": "x[rd] = sext(imm[17:12] << 12)"
+        "format": "c.lui rd, imm",
+        "implementation": "x[rd] ← sext(imm[17:12] << 12)"
     },
     {
-        "name": "c.lw rd', uimm(rs1')",
-        "instruction": "x[8+rd'] = sext(M[x[8+rs1'] + uimm][31:0])"
+        "format": "c.lw rd', uimm(rs1')",
+        "implementation": "x[8+rd'] ← sext(M[x[8+rs1'] + uimm][31:0])"
     },
     {
-        "name": "c.lwsp rd, uimm(x2)",
-        "instruction": "x[rd] = sext(M[x[2] + uimm][31:0])"
+        "format": "c.lwsp rd, uimm(x2)",
+        "implementation": "x[rd] ← sext(M[x[2] + uimm][31:0])"
     },
     {
-        "name": "c.mv rd, rs2",
-        "instruction": "x[rd] = x[rs2]"
+        "format": "c.mv rd, rs2",
+        "implementation": "x[rd] ← x[rs2]"
     },
     {
-        "name": "c.or rd', rs2'",
-        "instruction": "x[8+rd'] = x[8+rd'] or x[8+rs2']"
+        "format": "c.or rd', rs2'",
+        "implementation": "x[8+rd'] ← x[8+rd'] or x[8+rs2']"
     },
     {
-        "name": "c.sd rs2', uimm(rs1')",
-        "instruction": "M[x[8+rs1'] + uimm][63:0] = x[8+rs2']"
+        "format": "c.sd rs2', uimm(rs1')",
+        "implementation": "M[x[8+rs1'] + uimm][63:0] ← x[8+rs2']"
     },
     {
-        "name": "c.sdsp rs2, uimm(x2)",
-        "instruction": "M[x[2] + uimm][63:0] = x[rs2]"
+        "format": "c.sdsp rs2, uimm(x2)",
+        "implementation": "M[x[2] + uimm][63:0] ← x[rs2]"
     },
     {
-        "name": "c.slli rd, uimm",
-        "instruction": "x[rd] = x[rd] << uimm"
+        "format": "c.slli rd, uimm",
+        "implementation": "x[rd] ← x[rd] << uimm"
     },
     {
-        "name": "c.srai rd', uimm",
-        "instruction": "x[8+rd'] = x[8+rd'] >>s uimm"
+        "format": "c.srai rd', uimm",
+        "implementation": "x[8+rd'] ← x[8+rd'] >>s uimm"
     },
     {
-        "name": "c.srli rd', uimm",
-        "instruction": "x[8+rd'] = x[8+rd'] >>u uimm"
+        "format": "c.srli rd', uimm",
+        "implementation": "x[8+rd'] ← x[8+rd'] >>u uimm"
     },
     {
-        "name": "c.sub rd', rs2'",
-        "instruction": "x[8+rd'] = x[8+rd'] - x[8+rs2']"
+        "format": "c.sub rd', rs2'",
+        "implementation": "x[8+rd'] ← x[8+rd'] - x[8+rs2']"
     },
     {
-        "name": "c.subw rd', rs2'",
-        "instruction": "x[8+rd'] = sext((x[8+rd'] - x[8+rs2'])[31:0])"
+        "format": "c.subw rd', rs2'",
+        "implementation": "x[8+rd'] ← sext((x[8+rd'] - x[8+rs2'])[31:0])"
     },
     {
-        "name": "c.sw rs2', uimm(rs1')",
-        "instruction": "M[x[8+rs1'] + uimm][31:0] = x[8+rs2']"
+        "format": "c.sw rs2', uimm(rs1')",
+        "implementation": "M[x[8+rs1'] + uimm][31:0] ← x[8+rs2']"
     },
     {
-        "name": "c.swsp rs2, uimm(x2)",
-        "instruction": "M[x[2] + uimm][31:0] = x[rs2]"
+        "format": "c.swsp rs2, uimm(x2)",
+        "implementation": "M[x[2] + uimm][31:0] ← x[rs2]"
     },
     {
-        "name": "c.xor rd', rs2'",
-        "instruction": "x[8+rd'] = x[8+rd'] ^ x[8+rs2']"
+        "format": "c.xor rd', rs2'",
+        "implementation": "x[8+rd'] ← x[8+rd'] ^ x[8+rs2']"
     },
     {
-        "name": "call rd, symbol",
-        "instruction": "x[rd] = pc+8; pc = &symbol"
+        "format": "call rd, symbol",
+        "implementation": "x[rd] ← pc+8; pc ← &symbol"
     },
     {
-        "name": "csrr rd, csr",
-        "instruction": "x[rd] = CSRs[csr]"
+        "format": "csrr rd, csr",
+        "implementation": "x[rd] ← CSRs[csr]"
     },
     {
-        "name": "csrc csr, rs1",
-        "instruction": "CSRs[csr] and= ~x[rs1]"
+        "format": "csrc csr, rs1",
+        "implementation": "CSRs[csr] and= ~x[rs1]"
     },
     {
-        "name": "csrci csr, zimm[4:0]",
-        "instruction": "CSRs[csr] and= ~zimm"
+        "format": "csrci csr, zimm[4:0]",
+        "implementation": "CSRs[csr] and= ~zimm"
     },
     {
-        "name": "csrrc rd, csr, rs1",
-        "instruction": "t = CSRs[csr]; CSRs[csr] = t and x[rs1]; x[rd] = t"
+        "format": "csrrc rd, csr, rs1",
+        "implementation": "t ← CSRs[csr]; CSRs[csr] ← t and x[rs1]; x[rd] ← t"
     },
     {
-        "name": "csrrci rd, csr, zimm[4:0]",
-        "instruction": "t = CSRs[csr]; CSRs[csr] = t and ~zimm; x[rd] = t"
+        "format": "csrrci rd, csr, zimm[4:0]",
+        "implementation": "t ← CSRs[csr]; CSRs[csr] ← t and ~zimm; x[rd] ← t"
     },
     {
-        "name": "csrrs rd, csr, rs1",
-        "instruction": "t = CSRs[csr]; CSRs[csr] = t or x[rs1]; x[rd] = t"
+        "format": "csrrs rd, csr, rs1",
+        "implementation": "t ← CSRs[csr]; CSRs[csr] ← t or x[rs1]; x[rd] ← t"
     },
     {
-        "name": "csrrsi rd, csr, zimm[4:0]",
-        "instruction": "t = CSRs[csr]; CSRs[csr] = t or zimm; x[rd] = t"
+        "format": "csrrsi rd, csr, zimm[4:0]",
+        "implementation": "t ← CSRs[csr]; CSRs[csr] ← t or zimm; x[rd] ← t"
     },
     {
-        "name": "csrrw rd, csr, rs1",
-        "instruction": "t = CSRs[csr]; CSRs[csr] = x[rs1]; x[rd] = t"
+        "format": "csrrw rd, csr, rs1",
+        "implementation": "t ← CSRs[csr]; CSRs[csr] ← x[rs1]; x[rd] ← t"
     },
     {
-        "name": "csrrwi rd, csr, zimm[4:0]",
-        "instruction": "x[rd] = CSRs[csr]; CSRs[csr] = zimm"
+        "format": "csrrwi rd, csr, zimm[4:0]",
+        "implementation": "x[rd] ← CSRs[csr]; CSRs[csr] ← zimm"
     },
     {
-        "name": "csrs csr, rs1",
-        "instruction": "CSRs[csr] or= x[rs1]"
+        "format": "csrs csr, rs1",
+        "implementation": "CSRs[csr] or= x[rs1]"
     },
     {
-        "name": "csrsi csr, zimm[4:0]",
-        "instruction": "CSRs[csr] or= zimm"
+        "format": "csrsi csr, zimm[4:0]",
+        "implementation": "CSRs[csr] or= zimm"
     },
     {
-        "name": "csrw csr, rs1",
-        "instruction": "CSRs[csr] = x[rs1]"
+        "format": "csrw csr, rs1",
+        "implementation": "CSRs[csr] ← x[rs1]"
     },
     {
-        "name": "csrwi csr, zimm[4:0]",
-        "instruction": "CSRs[csr] = zimm"
+        "format": "csrwi csr, zimm[4:0]",
+        "implementation": "CSRs[csr] ← zimm"
     },
     {
-        "name": "div rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] /s x[rs2]"
+        "format": "div rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] /s x[rs2]"
     },
     {
-        "name": "divu rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] /u x[rs2]"
+        "format": "divu rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] /u x[rs2]"
     },
     {
-        "name": "divuw rd, rs1, rs2",
-        "instruction": "x[rd] = sext(x[rs1][31:0] /u x[rs2][31:0])"
+        "format": "divuw rd, rs1, rs2",
+        "implementation": "x[rd] ← sext(x[rs1][31:0] /u x[rs2][31:0])"
     },
     {
-        "name": "divw rd, rs1, rs2",
-        "instruction": "x[rd] = sext(x[rs1][31:0] /s x[rs2][31:0])"
+        "format": "divw rd, rs1, rs2",
+        "implementation": "x[rd] ← sext(x[rs1][31:0] /s x[rs2][31:0])"
     },
     {
-        "name": "ebreak",
-        "instruction": "RaiseException(Breakpoint)"
+        "format": "ebreak",
+        "implementation": "RaiseException(Breakpoint)"
     },
     {
-        "name": "ecall",
-        "instruction": "RaiseException(EnvironmentCall)"
+        "format": "ecall",
+        "implementation": "RaiseException(EnvironmentCall)"
     },
     {
-        "name": "fabs.d rd, rs1",
-        "instruction": "f[rd] = f[rs1]"
+        "format": "fabs.d rd, rs1",
+        "implementation": "f[rd] ← f[rs1]"
     },
     {
-        "name": "fabs.s rd, rs1",
-        "instruction": "f[rd] = f[rs1]"
+        "format": "fabs.s rd, rs1",
+        "implementation": "f[rd] ← f[rs1]"
     },
     {
-        "name": "fadd.d rd, rs1, rs2",
-        "instruction": "f[rd] = f[rs1] + f[rs2]"
+        "format": "fadd.d rd, rs1, rs2",
+        "implementation": "f[rd] ← f[rs1] + f[rs2]"
     },
     {
-        "name": "fadd.s rd, rs1, rs2",
-        "instruction": "f[rd] = f[rs1] + f[rs2]"
+        "format": "fadd.s rd, rs1, rs2",
+        "implementation": "f[rd] ← f[rs1] + f[rs2]"
     },
     {
-        "name": "fclass.d rd, rs1, rs2",
-        "instruction": "x[rd] = classifyd(f[rs1])"
+        "format": "fclass.d rd, rs1, rs2",
+        "implementation": "x[rd] ← classifyd(f[rs1])"
     },
     {
-        "name": "fclass.s rd, rs1, rs2",
-        "instruction": "x[rd] = classifys(f[rs1])"
+        "format": "fclass.s rd, rs1, rs2",
+        "implementation": "x[rd] ← classifys(f[rs1])"
     },
     {
-        "name": "fcvt.d.l rd, rs1, rs2",
-        "instruction": "f[rd] = f64s64(x[rs1])"
+        "format": "fcvt.d.l rd, rs1, rs2",
+        "implementation": "f[rd] ← f64s64(x[rs1])"
     },
     {
-        "name": "fcvt.d.lu rd, rs1, rs2",
-        "instruction": "f[rd] = f64u64(x[rs1])"
+        "format": "fcvt.d.lu rd, rs1, rs2",
+        "implementation": "f[rd] ← f64u64(x[rs1])"
     },
     {
-        "name": "fcvt.d.s rd, rs1, rs2",
-        "instruction": "f[rd] = f64f32(f[rs1])"
+        "format": "fcvt.d.s rd, rs1, rs2",
+        "implementation": "f[rd] ← f64f32(f[rs1])"
     },
     {
-        "name": "fcvt.d.w rd, rs1, rs2",
-        "instruction": "f[rd] = f64s32(x[rs1])"
+        "format": "fcvt.d.w rd, rs1, rs2",
+        "implementation": "f[rd] ← f64s32(x[rs1])"
     },
     {
-        "name": "fcvt.d.wu rd, rs1, rs2",
-        "instruction": "f[rd] = f64u32(x[rs1])"
+        "format": "fcvt.d.wu rd, rs1, rs2",
+        "implementation": "f[rd] ← f64u32(x[rs1])"
     },
     {
-        "name": "fcvt.l.d rd, rs1, rs2",
-        "instruction": "x[rd] = s64f64(f[rs1])"
+        "format": "fcvt.l.d rd, rs1, rs2",
+        "implementation": "x[rd] ← s64f64(f[rs1])"
     },
     {
-        "name": "fcvt.l.s rd, rs1, rs2",
-        "instruction": "x[rd] = s64f32(f[rs1])"
+        "format": "fcvt.l.s rd, rs1, rs2",
+        "implementation": "x[rd] ← s64f32(f[rs1])"
     },
     {
-        "name": "fcvt.lu.d rd, rs1, rs2",
-        "instruction": "x[rd] = u64f64(f[rs1])"
+        "format": "fcvt.lu.d rd, rs1, rs2",
+        "implementation": "x[rd] ← u64f64(f[rs1])"
     },
     {
-        "name": "fcvt.lu.s rd, rs1, rs2",
-        "instruction": "x[rd] = u64f32(f[rs1])"
+        "format": "fcvt.lu.s rd, rs1, rs2",
+        "implementation": "x[rd] ← u64f32(f[rs1])"
     },
     {
-        "name": "fcvt.s.d rd, rs1, rs2",
-        "instruction": "f[rd] = f32f64(f[rs1])"
+        "format": "fcvt.s.d rd, rs1, rs2",
+        "implementation": "f[rd] ← f32f64(f[rs1])"
     },
     {
-        "name": "fcvt.s.l rd, rs1, rs2",
-        "instruction": "f[rd] = f32s64(x[rs1])"
+        "format": "fcvt.s.l rd, rs1, rs2",
+        "implementation": "f[rd] ← f32s64(x[rs1])"
     },
     {
-        "name": "fcvt.s.lu rd, rs1, rs2",
-        "instruction": "f[rd] = f32u64(x[rs1])"
+        "format": "fcvt.s.lu rd, rs1, rs2",
+        "implementation": "f[rd] ← f32u64(x[rs1])"
     },
     {
-        "name": "fcvt.s.w rd, rs1, rs2",
-        "instruction": "f[rd] = f32s32(x[rs1])"
+        "format": "fcvt.s.w rd, rs1, rs2",
+        "implementation": "f[rd] ← f32s32(x[rs1])"
     },
     {
-        "name": "fcvt.s.wu rd, rs1, rs2",
-        "instruction": "f[rd] = f32u32(x[rs1])"
+        "format": "fcvt.s.wu rd, rs1, rs2",
+        "implementation": "f[rd] ← f32u32(x[rs1])"
     },
     {
-        "name": "fcvt.w.d rd, rs1, rs2",
-        "instruction": "x[rd] = sext(s32f64(f[rs1]))"
+        "format": "fcvt.w.d rd, rs1, rs2",
+        "implementation": "x[rd] ← sext(s32f64(f[rs1]))"
     },
     {
-        "name": "fcvt.wu.d rd, rs1, rs2",
-        "instruction": "x[rd] = sext(u32f64(f[rs1]))"
+        "format": "fcvt.wu.d rd, rs1, rs2",
+        "implementation": "x[rd] ← sext(u32f64(f[rs1]))"
     },
     {
-        "name": "fcvt.w.s rd, rs1, rs2",
-        "instruction": "x[rd] = sext(s32f32(f[rs1]))"
+        "format": "fcvt.w.s rd, rs1, rs2",
+        "implementation": "x[rd] ← sext(s32f32(f[rs1]))"
     },
     {
-        "name": "fcvt.wu.s rd, rs1, rs2",
-        "instruction": "x[rd] = sext(u32f32(f[rs1]))"
+        "format": "fcvt.wu.s rd, rs1, rs2",
+        "implementation": "x[rd] ← sext(u32f32(f[rs1]))"
     },
     {
-        "name": "fdiv.d rd, rs1, rs2",
-        "instruction": "f[rd] = f[rs1] / f[rs2]"
+        "format": "fdiv.d rd, rs1, rs2",
+        "implementation": "f[rd] ← f[rs1] / f[rs2]"
     },
     {
-        "name": "fdiv.s rd, rs1, rs2",
-        "instruction": "f[rd] = f[rs1] / f[rs2]"
+        "format": "fdiv.s rd, rs1, rs2",
+        "implementation": "f[rd] ← f[rs1] / f[rs2]"
     },
     {
-        "name": "fence pred, succ",
-        "instruction": "fence(pred, succ)"
+        "format": "fence pred, succ",
+        "implementation": "fence(pred, succ)"
     },
     {
-        "name": "fence.i",
-        "instruction": "fence(Store, Fetch)"
+        "format": "fence.i",
+        "implementation": "fence(Store, Fetch)"
     },
     {
-        "name": "feq.d rd, rs1, rs2",
-        "instruction": "x[rd] = f[rs1] == f[rs2]"
+        "format": "feq.d rd, rs1, rs2",
+        "implementation": "x[rd] ← f[rs1] == f[rs2]"
     },
     {
-        "name": "feq.s rd, rs1, rs2",
-        "instruction": "x[rd] = f[rs1] == f[rs2]"
+        "format": "feq.s rd, rs1, rs2",
+        "implementation": "x[rd] ← f[rs1] == f[rs2]"
     },
     {
-        "name": "fld rd, offset(rs1)",
-        "instruction": "f[rd] = M[x[rs1] + sext(offset)][63:0]"
+        "format": "fld rd, offset(rs1)",
+        "implementation": "f[rd] ← M[x[rs1] + sext(offset)][63:0]"
     },
     {
-        "name": "fle.d rd, rs1, rs2",
-        "instruction": "x[rd] = f[rs1] or f[rs2]"
+        "format": "fle.d rd, rs1, rs2",
+        "implementation": "x[rd] ← f[rs1] or f[rs2]"
     },
     {
-        "name": "fle.s rd, rs1, rs2",
-        "instruction": "x[rd] = f[rs1] or f[rs2]"
+        "format": "fle.s rd, rs1, rs2",
+        "implementation": "x[rd] ← f[rs1] or f[rs2]"
     },
     {
-        "name": "flt.d rd, rs1, rs2",
-        "instruction": "x[rd] = f[rs1] < f[rs2]"
+        "format": "flt.d rd, rs1, rs2",
+        "implementation": "x[rd] ← f[rs1] < f[rs2]"
     },
     {
-        "name": "flt.s rd, rs1, rs2",
-        "instruction": "x[rd] = f[rs1] < f[rs2]"
+        "format": "flt.s rd, rs1, rs2",
+        "implementation": "x[rd] ← f[rs1] < f[rs2]"
     },
     {
-        "name": "flw rd, offset(rs1)",
-        "instruction": "f[rd] = M[x[rs1] + sext(offset)][31:0]"
+        "format": "flw rd, offset(rs1)",
+        "implementation": "f[rd] ← M[x[rs1] + sext(offset)][31:0]"
     },
     {
-        "name": "fmadd.d rd, rs1, rs2, rs3",
-        "instruction": "f[rd] = f[rs1] f[rs2]+f[rs3]"
+        "format": "fmadd.d rd, rs1, rs2, rs3",
+        "implementation": "f[rd] ← f[rs1] f[rs2]+f[rs3]"
     },
     {
-        "name": "fmadd.s rd, rs1, rs2, rs3",
-        "instruction": "f[rd] = f[rs1] f[rs2]+f[rs3]"
+        "format": "fmadd.s rd, rs1, rs2, rs3",
+        "implementation": "f[rd] ← f[rs1] f[rs2]+f[rs3]"
     },
     {
-        "name": "fmax.d rd, rs1, rs2",
-        "instruction": "f[rd] = max(f[rs1], f[rs2])"
+        "format": "fmax.d rd, rs1, rs2",
+        "implementation": "f[rd] ← max(f[rs1], f[rs2])"
     },
     {
-        "name": "fmax.s rd, rs1, rs2",
-        "instruction": "f[rd] = max(f[rs1], f[rs2])"
+        "format": "fmax.s rd, rs1, rs2",
+        "implementation": "f[rd] ← max(f[rs1], f[rs2])"
     },
     {
-        "name": "fmin.d rd, rs1, rs2",
-        "instruction": "f[rd] = min(f[rs1], f[rs2])"
+        "format": "fmin.d rd, rs1, rs2",
+        "implementation": "f[rd] ← min(f[rs1], f[rs2])"
     },
     {
-        "name": "fmin.s rd, rs1, rs2",
-        "instruction": "f[rd] = min(f[rs1], f[rs2])"
+        "format": "fmin.s rd, rs1, rs2",
+        "implementation": "f[rd] ← min(f[rs1], f[rs2])"
     },
     {
-        "name": "fmsub.d rd, rs1, rs2, rs3",
-        "instruction": "f[rd] = f[rs1] * f[rs2] - f[rs3]"
+        "format": "fmsub.d rd, rs1, rs2, rs3",
+        "implementation": "f[rd] ← f[rs1] * f[rs2] - f[rs3]"
     },
     {
-        "name": "fmsub.s rd, rs1, rs2, rs3",
-        "instruction": "f[rd] = f[rs1] * f[rs2] - f[rs3]"
+        "format": "fmsub.s rd, rs1, rs2, rs3",
+        "implementation": "f[rd] ← f[rs1] * f[rs2] - f[rs3]"
     },
     {
-        "name": "fmul.d rd, rs1, rs2",
-        "instruction": "f[rd] = f[rs1] * f[rs2]"
+        "format": "fmul.d rd, rs1, rs2",
+        "implementation": "f[rd] ← f[rs1] * f[rs2]"
     },
     {
-        "name": "fmul.s rd, rs1, rs2",
-        "instruction": "f[rd] = f[rs1] * f[rs2]"
+        "format": "fmul.s rd, rs1, rs2",
+        "implementation": "f[rd] ← f[rs1] * f[rs2]"
     },
     {
-        "name": "fmv.d rd, rs1",
-        "instruction": "f[rd] = f[rs1]"
+        "format": "fmv.d rd, rs1",
+        "implementation": "f[rd] ← f[rs1]"
     },
     {
-        "name": "fmv.d.x rd, rs1, rs2",
-        "instruction": "f[rd] = x[rs1][63:0]"
+        "format": "fmv.d.x rd, rs1, rs2",
+        "implementation": "f[rd] ← x[rs1][63:0]"
     },
     {
-        "name": "fmv.s rd, rs1",
-        "instruction": "f[rd] = f[rs1]"
+        "format": "fmv.s rd, rs1",
+        "implementation": "f[rd] ← f[rs1]"
     },
     {
-        "name": "fmv.w.x rd, rs1, rs2",
-        "instruction": "f[rd] = x[rs1][31:0]"
+        "format": "fmv.w.x rd, rs1, rs2",
+        "implementation": "f[rd] ← x[rs1][31:0]"
     },
     {
-        "name": "fmv.x.d rd, rs1, rs2",
-        "instruction": "x[rd] = f[rs1][63:0]"
+        "format": "fmv.x.d rd, rs1, rs2",
+        "implementation": "x[rd] ← f[rs1][63:0]"
     },
     {
-        "name": "fmv.x.w rd, rs1, rs2",
-        "instruction": "x[rd] = sext(f[rs1][31:0])"
+        "format": "fmv.x.w rd, rs1, rs2",
+        "implementation": "x[rd] ← sext(f[rs1][31:0])"
     },
     {
-        "name": "fneg.d rd, rs1",
-        "instruction": "f[rd] = -f[rs1]"
+        "format": "fneg.d rd, rs1",
+        "implementation": "f[rd] ← -f[rs1]"
     },
     {
-        "name": "fneg.s rd, rs1",
-        "instruction": "f[rd] = -f[rs1]"
+        "format": "fneg.s rd, rs1",
+        "implementation": "f[rd] ← -f[rs1]"
     },
     {
-        "name": "fnmadd.d rd, rs1, rs2, rs3",
-        "instruction": "f[rd] = -f[rs1] * f[rs2] - f[rs3]"
+        "format": "fnmadd.d rd, rs1, rs2, rs3",
+        "implementation": "f[rd] ← -f[rs1] * f[rs2] - f[rs3]"
     },
     {
-        "name": "fnmadd.s rd, rs1, rs2, rs3",
-        "instruction": "f[rd] = -f[rs1] * f[rs2] - f[rs3]"
+        "format": "fnmadd.s rd, rs1, rs2, rs3",
+        "implementation": "f[rd] ← -f[rs1] * f[rs2] - f[rs3]"
     },
     {
-        "name": "fnmsub.d rd, rs1, rs2, rs3",
-        "instruction": "f[rd] = -f[rs1] * f[rs2] + f[rs3]"
+        "format": "fnmsub.d rd, rs1, rs2, rs3",
+        "implementation": "f[rd] ← -f[rs1] * f[rs2] + f[rs3]"
     },
     {
-        "name": "fnmsub.s rd, rs1, rs2, rs3",
-        "instruction": "f[rd] = -f[rs1] * f[rs2] + f[rs3]"
+        "format": "fnmsub.s rd, rs1, rs2, rs3",
+        "implementation": "f[rd] ← -f[rs1] * f[rs2] + f[rs3]"
     },
     {
-        "name": "frcsr rd",
-        "instruction": "x[rd] = CSRs[fcsr]"
+        "format": "frcsr rd",
+        "implementation": "x[rd] ← CSRs[fcsr]"
     },
     {
-        "name": "frflags rd",
-        "instruction": "x[rd] = CSRs[fflags]"
+        "format": "frflags rd",
+        "implementation": "x[rd] ← CSRs[fflags]"
     },
     {
-        "name": "frrm rd",
-        "instruction": "x[rd] = CSRs[frm]"
+        "format": "frrm rd",
+        "implementation": "x[rd] ← CSRs[frm]"
     },
     {
-        "name": "fscsr rd, rs1",
-        "instruction": "t = CSRs[fcsr]; CSRs[fcsr] = x[rs1]; x[rd] = t"
+        "format": "fscsr rd, rs1",
+        "implementation": "t ← CSRs[fcsr]; CSRs[fcsr] ← x[rs1]; x[rd] ← t"
     },
     {
-        "name": "fsd rs2, offset(rs1)",
-        "instruction": "M[x[rs1] + sext(offset)] = f[rs2][63:0]"
+        "format": "fsd rs2, offset(rs1)",
+        "implementation": "M[x[rs1] + sext(offset)] ← f[rs2][63:0]"
     },
     {
-        "name": "fsflags rd, rs1",
-        "instruction": "t = CSRs[fflags]; CSRs[fflags] = x[rs1]; x[rd] = t"
+        "format": "fsflags rd, rs1",
+        "implementation": "t ← CSRs[fflags]; CSRs[fflags] ← x[rs1]; x[rd] ← t"
     },
     {
-        "name": "fsgnj.d rd, rs1, rs2",
-        "instruction": "f[rd] = {f[rs2][63], f[rs1][62:0]}"
+        "format": "fsgnj.d rd, rs1, rs2",
+        "implementation": "f[rd] ← {f[rs2][63], f[rs1][62:0]}"
     },
     {
-        "name": "fsgnj.s rd, rs1, rs2",
-        "instruction": "f[rd] = {f[rs2][31], f[rs1][30:0]}"
+        "format": "fsgnj.s rd, rs1, rs2",
+        "implementation": "f[rd] ← {f[rs2][31], f[rs1][30:0]}"
     },
     {
-        "name": "fsgnjn.d rd, rs1, rs2",
-        "instruction": "f[rd] = {f[rs2][63], f[rs1][62:0]}"
+        "format": "fsgnjn.d rd, rs1, rs2",
+        "implementation": "f[rd] ← {f[rs2][63], f[rs1][62:0]}"
     },
     {
-        "name": "fsgnjn.s rd, rs1, rs2",
-        "instruction": "f[rd] = { f[rs2][31], f[rs1][30:0]}"
+        "format": "fsgnjn.s rd, rs1, rs2",
+        "implementation": "f[rd] ← { f[rs2][31], f[rs1][30:0]}"
     },
     {
-        "name": "fsgnjx.d rd, rs1, rs2",
-        "instruction": "f[rd] = {f[rs1][63] ^ f[rs2][63], f[rs1][62:0]}"
+        "format": "fsgnjx.d rd, rs1, rs2",
+        "implementation": "f[rd] ← {f[rs1][63] ^ f[rs2][63], f[rs1][62:0]}"
     },
     {
-        "name": "fsgnjx.s rd, rs1, rs2",
-        "instruction": "f[rd] = {f[rs1][31] ^ f[rs2][31], f[rs1][30:0]}"
+        "format": "fsgnjx.s rd, rs1, rs2",
+        "implementation": "f[rd] ← {f[rs1][31] ^ f[rs2][31], f[rs1][30:0]}"
     },
     {
-        "name": "fsqrt.d rd, rs1, rs2",
-        "instruction": "f[rd] = √f[rs1]"
+        "format": "fsqrt.d rd, rs1, rs2",
+        "implementation": "f[rd] ← √f[rs1]"
     },
     {
-        "name": "fsqrt.s rd, rs1, rs2",
-        "instruction": "f[rd] = √f[rs1]"
+        "format": "fsqrt.s rd, rs1, rs2",
+        "implementation": "f[rd] ← √f[rs1]"
     },
     {
-        "name": "fsrm rd, rs1",
-        "instruction": "t = CSRs[frm]; CSRs[frm] = x[rs1]; x[rd] = t"
+        "format": "fsrm rd, rs1",
+        "implementation": "t ← CSRs[frm]; CSRs[frm] ← x[rs1]; x[rd] ← t"
     },
     {
-        "name": "fsub.d rd, rs1, rs2",
-        "instruction": "f[rd] = f[rs1] - f[rs2]"
+        "format": "fsub.d rd, rs1, rs2",
+        "implementation": "f[rd] ← f[rs1] - f[rs2]"
     },
     {
-        "name": "fsub.s rd, rs1, rs2",
-        "instruction": "f[rd] = f[rs1] - f[rs2]"
+        "format": "fsub.s rd, rs1, rs2",
+        "implementation": "f[rd] ← f[rs1] - f[rs2]"
     },
     {
-        "name": "fsw rs2, offset(rs1)",
-        "instruction": "M[x[rs1] + sext(offset)] = f[rs2][31:0]"
+        "format": "fsw rs2, offset(rs1)",
+        "implementation": "M[x[rs1] + sext(offset)] ← f[rs2][31:0]"
     },
     {
-        "name": "j offset",
-        "instruction": "pc += sext(offset)"
+        "format": "j offset",
+        "implementation": "pc += sext(offset)"
     },
     {
-        "name": "jal rd, offset",
-        "instruction": "x[rd] = pc+4; pc += sext(offset)"
+        "format": "jal rd, offset",
+        "implementation": "x[rd] ← pc+4; pc += sext(offset)"
     },
     {
-        "name": "jalr rd, offset(rs1)",
-        "instruction": "t = pc+4; pc = (x[rs1]+sext(offset))& 1; x[rd]=t"
+        "format": "jalr rd, offset(rs1)",
+        "implementation": "t ← pc+4; pc ← (x[rs1]+sext(offset))& 1; x[rd]=t"
     },
     {
-        "name": "jr rs1",
-        "instruction": "pc = x[rs1]"
+        "format": "jr rs1",
+        "implementation": "pc ← x[rs1]"
     },
     {
-        "name": "la rd, symbol",
-        "instruction": "x[rd] = &symbol"
+        "format": "la rd, symbol",
+        "implementation": "x[rd] ← &symbol"
     },
     {
-        "name": "lb rd, offset(rs1)",
-        "instruction": "x[rd] = sext(M[x[rs1] + sext(offset)][7:0])"
+        "format": "lb rd, offset(rs1)",
+        "implementation": "x[rd] ← sext(M[x[rs1] + sext(offset)][7:0])"
     },
     {
-        "name": "lbu rd, offset(rs1)",
-        "instruction": "x[rd] = M[x[rs1] + sext(offset)][7:0]"
+        "format": "lbu rd, offset(rs1)",
+        "implementation": "x[rd] ← M[x[rs1] + sext(offset)][7:0]"
     },
     {
-        "name": "ld rd, offset(rs1)",
-        "instruction": "x[rd] = M[x[rs1] + sext(offset)][63:0]"
+        "format": "ld rd, offset(rs1)",
+        "implementation": "x[rd] ← M[x[rs1] + sext(offset)][63:0]"
     },
     {
-        "name": "lh rd, offset(rs1)",
-        "instruction": "x[rd] = sext(M[x[rs1] + sext(offset)][15:0])"
+        "format": "lh rd, offset(rs1)",
+        "implementation": "x[rd] ← sext(M[x[rs1] + sext(offset)][15:0])"
     },
     {
-        "name": "lhu rd, offset(rs1)",
-        "instruction": "x[rd] = M[x[rs1] + sext(offset)][15:0]"
+        "format": "lhu rd, offset(rs1)",
+        "implementation": "x[rd] ← M[x[rs1] + sext(offset)][15:0]"
     },
     {
-        "name": "li rd, immediate",
-        "instruction": "x[rd] = immediate"
+        "format": "li rd, immediate",
+        "implementation": "x[rd] ← immediate"
     },
     {
-        "name": "lla rd, symbol",
-        "instruction": "x[rd] = &symbol"
+        "format": "lla rd, symbol",
+        "implementation": "x[rd] ← &symbol"
     },
     {
-        "name": "lr.d rd, (rs1)",
-        "instruction": "x[rd] = LoadReserved64(M[x[rs1]])"
+        "format": "lr.d rd, (rs1)",
+        "implementation": "x[rd] ← LoadReserved64(M[x[rs1]])"
     },
     {
-        "name": "lr.w rd, (rs1)",
-        "instruction": "x[rd] = LoadReserved32(M[x[rs1]])"
+        "format": "lr.w rd, (rs1)",
+        "implementation": "x[rd] ← LoadReserved32(M[x[rs1]])"
     },
     {
-        "name": "lw rd, offset(rs1)",
-        "instruction": "x[rd] = sext(M[x[rs1] + sext(offset)][31:0])"
+        "format": "lw rd, offset(rs1)",
+        "implementation": "x[rd] ← sext(M[x[rs1] + sext(offset)][31:0])"
     },
     {
-        "name": "lwu rd, offset(rs1)",
-        "instruction": "x[rd] = M[x[rs1] + sext(offset)][31:0]"
+        "format": "lwu rd, offset(rs1)",
+        "implementation": "x[rd] ← M[x[rs1] + sext(offset)][31:0]"
     },
     {
-        "name": "lui rd, immediate",
-        "instruction": "x[rd] = sext(immediate[31:12] << 12)"
+        "format": "lui rd, immediate",
+        "implementation": "x[rd] ← sext(immediate[31:12] << 12)"
     },
     {
-        "name": "mret",
-        "instruction": "ExceptionReturn(Machine)"
+        "format": "mret",
+        "implementation": "ExceptionReturn(Machine)"
     },
     {
-        "name": "mul rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] * x[rs2]"
+        "format": "mul rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] * x[rs2]"
     },
     {
-        "name": "mulh rd, rs1, rs2",
-        "instruction": "x[rd] = (x[rs1] s*s x[rs2]) >>s XLEN"
+        "format": "mulh rd, rs1, rs2",
+        "implementation": "x[rd] ← (x[rs1] s*s x[rs2]) >>s XLEN"
     },
     {
-        "name": "mulhsu rd, rs1, rs2",
-        "instruction": "x[rd] = (x[rs1] s u x[rs2]) >>s XLEN"
+        "format": "mulhsu rd, rs1, rs2",
+        "implementation": "x[rd] ← (x[rs1] s u x[rs2]) >>s XLEN"
     },
     {
-        "name": "mulhu rd, rs1, rs2",
-        "instruction": "x[rd] = (x[rs1] u u x[rs2]) >>u XLEN"
+        "format": "mulhu rd, rs1, rs2",
+        "implementation": "x[rd] ← (x[rs1] u u x[rs2]) >>u XLEN"
     },
     {
-        "name": "mulw rd, rs1, rs2",
-        "instruction": "x[rd] = sext((x[rs1] * x[rs2])[31:0])"
+        "format": "mulw rd, rs1, rs2",
+        "implementation": "x[rd] ← sext((x[rs1] * x[rs2])[31:0])"
     },
     {
-        "name": "mv rd, rs1",
-        "instruction": "x[rd] = x[rs1]"
+        "format": "mv rd, rs1",
+        "implementation": "x[rd] ← x[rs1]"
     },
     {
-        "name": "neg rd, rs2",
-        "instruction": "x[rd] = -x[rs2]"
+        "format": "neg rd, rs2",
+        "implementation": "x[rd] ← -x[rs2]"
     },
     {
-        "name": "negw rd, rs2",
-        "instruction": "x[rd] = sext((-x[rs2])[31:0])"
+        "format": "negw rd, rs2",
+        "implementation": "x[rd] ← sext((-x[rs2])[31:0])"
     },
     {
-        "name": "nop",
-        "instruction": "Nothing"
+        "format": "nop",
+        "implementation": "Nothing"
     },
     {
-        "name": "not rd, rs1",
-        "instruction": "x[rd] = ~x[rs1]"
+        "format": "not rd, rs1",
+        "implementation": "x[rd] ← ~x[rs1]"
     },
     {
-        "name": "or rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] or x[rs2]"
+        "format": "or rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] or x[rs2]"
     },
     {
-        "name": "ori rd, rs1, immediate",
-        "instruction": "x[rd] = x[rs1] or sext(immediate)"
+        "format": "ori rd, rs1, immediate",
+        "implementation": "x[rd] ← x[rs1] or sext(immediate)"
     },
     {
-        "name": "rdcycle rd",
-        "instruction": "x[rd] = CSRs[cycle]"
+        "format": "rdcycle rd",
+        "implementation": "x[rd] ← CSRs[cycle]"
     },
     {
-        "name": "rdcycleh rd",
-        "instruction": "x[rd] = CSRs[cycleh]"
+        "format": "rdcycleh rd",
+        "implementation": "x[rd] ← CSRs[cycleh]"
     },
     {
-        "name": "rdinstret rd",
-        "instruction": "x[rd] = CSRs[instret]"
+        "format": "rdinstret rd",
+        "implementation": "x[rd] ← CSRs[instret]"
     },
     {
-        "name": "rdinstreth rd",
-        "instruction": "x[rd] = CSRs[instreth]"
+        "format": "rdinstreth rd",
+        "implementation": "x[rd] ← CSRs[instreth]"
     },
     {
-        "name": "rdtime rd",
-        "instruction": "x[rd] = CSRs[time]"
+        "format": "rdtime rd",
+        "implementation": "x[rd] ← CSRs[time]"
     },
     {
-        "name": "rdtimeh rd",
-        "instruction": "x[rd] = CSRs[timeh]"
+        "format": "rdtimeh rd",
+        "implementation": "x[rd] ← CSRs[timeh]"
     },
     {
-        "name": "rem rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] %s x[rs2]"
+        "format": "rem rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] %s x[rs2]"
     },
     {
-        "name": "remu rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] %u x[rs2]"
+        "format": "remu rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] %u x[rs2]"
     },
     {
-        "name": "remuw rd, rs1, rs2",
-        "instruction": "x[rd] = sext(x[rs1][31:0] %u x[rs2][31:0])"
+        "format": "remuw rd, rs1, rs2",
+        "implementation": "x[rd] ← sext(x[rs1][31:0] %u x[rs2][31:0])"
     },
     {
-        "name": "remw rd, rs1, rs2",
-        "instruction": "x[rd] = sext(x[rs1][31:0] %s x[rs2][31:0])"
+        "format": "remw rd, rs1, rs2",
+        "implementation": "x[rd] ← sext(x[rs1][31:0] %s x[rs2][31:0])"
     },
     {
-        "name": "ret",
-        "instruction": "pc = x[1]"
+        "format": "ret",
+        "implementation": "pc ← x[1]"
     },
     {
-        "name": "sb rs2, offset(rs1)",
-        "instruction": "M[x[rs1] + sext(offset)] = x[rs2][7:0]"
+        "format": "sb rs2, offset(rs1)",
+        "implementation": "M[x[rs1] + sext(offset)] ← x[rs2][7:0]"
     },
     {
-        "name": "sc.d rd, rs2, (rs1)",
-        "instruction": "x[rd] = StoreConditional64(M[x[rs1]], x[rs2])"
+        "format": "sc.d rd, rs2, (rs1)",
+        "implementation": "x[rd] ← StoreConditional64(M[x[rs1]], x[rs2])"
     },
     {
-        "name": "sc.w rd, rs2, (rs1)",
-        "instruction": "x[rd] = StoreConditional32(M[x[rs1]], x[rs2])"
+        "format": "sc.w rd, rs2, (rs1)",
+        "implementation": "x[rd] ← StoreConditional32(M[x[rs1]], x[rs2])"
     },
     {
-        "name": "sd rs2, offset(rs1)",
-        "instruction": "M[x[rs1] + sext(offset)] = x[rs2][63:0]"
+        "format": "sd rs2, offset(rs1)",
+        "implementation": "M[x[rs1] + sext(offset)] ← x[rs2][63:0]"
     },
     {
-        "name": "seqz rd, rs1",
-        "instruction": "x[rd] = (x[rs1] == 0)"
+        "format": "seqz rd, rs1",
+        "implementation": "x[rd] ← (x[rs1] == 0)"
     },
     {
-        "name": "sext.w rd, rs1",
-        "instruction": "x[rd] = sext(x[rs1][31:0])"
+        "format": "sext.w rd, rs1",
+        "implementation": "x[rd] ← sext(x[rs1][31:0])"
     },
     {
-        "name": "sfence.vma rs1, rs2",
-        "instruction": "fence(Store, AddressTranslation)"
+        "format": "sfence.vma rs1, rs2",
+        "implementation": "fence(Store, AddressTranslation)"
     },
     {
-        "name": "sgtz rd, rs2",
-        "instruction": "x[rd] = (x[rs2] >s 0)"
+        "format": "sgtz rd, rs2",
+        "implementation": "x[rd] ← (x[rs2] >s 0)"
     },
     {
-        "name": "sh rs2, offset(rs1)",
-        "instruction": "M[x[rs1] + sext(offset)] = x[rs2][15:0]"
+        "format": "sh rs2, offset(rs1)",
+        "implementation": "M[x[rs1] + sext(offset)] ← x[rs2][15:0]"
     },
     {
-        "name": "sw rs2, offset(rs1)",
-        "instruction": "M[x[rs1] + sext(offset)] = x[rs2][31:0]"
+        "format": "sw rs2, offset(rs1)",
+        "implementation": "M[x[rs1] + sext(offset)] ← x[rs2][31:0]"
     },
     {
-        "name": "sll rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] << x[rs2]"
+        "format": "sll rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] << x[rs2]"
     },
     {
-        "name": "slli rd, rs1, shamt",
-        "instruction": "x[rd] = x[rs1] << shamt"
+        "format": "slli rd, rs1, shamt",
+        "implementation": "x[rd] ← x[rs1] << shamt"
     },
     {
-        "name": "slliw rd, rs1, shamt",
-        "instruction": "x[rd] = sext((x[rs1] << shamt)[31:0])"
+        "format": "slliw rd, rs1, shamt",
+        "implementation": "x[rd] ← sext((x[rs1] << shamt)[31:0])"
     },
     {
-        "name": "sllw rd, rs1, rs2",
-        "instruction": "x[rd] = sext((x[rs1] << x[rs2][4:0])[31:0])"
+        "format": "sllw rd, rs1, rs2",
+        "implementation": "x[rd] ← sext((x[rs1] << x[rs2][4:0])[31:0])"
     },
     {
-        "name": "slt rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] <s x[rs2]"
+        "format": "slt rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] <s x[rs2]"
     },
     {
-        "name": "slti rd, rs1, immediate",
-        "instruction": "x[rd] = x[rs1] <s sext(immediate)"
+        "format": "slti rd, rs1, immediate",
+        "implementation": "x[rd] ← x[rs1] <s sext(immediate)"
     },
     {
-        "name": "sltiu rd, rs1, immediate",
-        "instruction": "x[rd] = x[rs1] <u sext(immediate)"
+        "format": "sltiu rd, rs1, immediate",
+        "implementation": "x[rd] ← x[rs1] <u sext(immediate)"
     },
     {
-        "name": "sltu rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] <u x[rs2]"
+        "format": "sltu rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] <u x[rs2]"
     },
     {
-        "name": "sltz rd, rs1",
-        "instruction": "x[rd] = (x[rs1] <s 0)"
+        "format": "sltz rd, rs1",
+        "implementation": "x[rd] ← (x[rs1] <s 0)"
     },
     {
-        "name": "snez rd, rs2",
-        "instruction": "x[rd] = (x[rs2] = 0)"
+        "format": "snez rd, rs2",
+        "implementation": "x[rd] ← (x[rs2] ← 0)"
     },
     {
-        "name": "sra rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] >>s x[rs2]"
+        "format": "sra rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] >>s x[rs2]"
     },
     {
-        "name": "srai rd, rs1, shamt",
-        "instruction": "x[rd] = x[rs1] >>s shamt"
+        "format": "srai rd, rs1, shamt",
+        "implementation": "x[rd] ← x[rs1] >>s shamt"
     },
     {
-        "name": "sraiw rd, rs1, shamt",
-        "instruction": "x[rd] = sext(x[rs1][31:0] >>s shamt)"
+        "format": "sraiw rd, rs1, shamt",
+        "implementation": "x[rd] ← sext(x[rs1][31:0] >>s shamt)"
     },
     {
-        "name": "sraw rd, rs1, rs2",
-        "instruction": "x[rd] = sext(x[rs1][31:0] >>s x[rs2][4:0])"
+        "format": "sraw rd, rs1, rs2",
+        "implementation": "x[rd] ← sext(x[rs1][31:0] >>s x[rs2][4:0])"
     },
     {
-        "name": "sret",
-        "instruction": "ExceptionReturn(Supervisor)"
+        "format": "sret",
+        "implementation": "ExceptionReturn(Supervisor)"
     },
     {
-        "name": "srl rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] >>u x[rs2]"
+        "format": "srl rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] >>u x[rs2]"
     },
     {
-        "name": "srli rd, rs1, shamt",
-        "instruction": "x[rd] = x[rs1] >>u shamt"
+        "format": "srli rd, rs1, shamt",
+        "implementation": "x[rd] ← x[rs1] >>u shamt"
     },
     {
-        "name": "srliw rd, rs1, shamt",
-        "instruction": "x[rd] = sext(x[rs1][31:0] >>u shamt)"
+        "format": "srliw rd, rs1, shamt",
+        "implementation": "x[rd] ← sext(x[rs1][31:0] >>u shamt)"
     },
     {
-        "name": "srlw rd, rs1, rs2",
-        "instruction": "x[rd] = sext(x[rs1][31:0] >>u x[rs2][4:0])"
+        "format": "srlw rd, rs1, rs2",
+        "implementation": "x[rd] ← sext(x[rs1][31:0] >>u x[rs2][4:0])"
     },
     {
-        "name": "sub rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] - x[rs2]"
+        "format": "sub rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] - x[rs2]"
     },
     {
-        "name": "subw rd, rs1, rs2",
-        "instruction": "x[rd] = sext((x[rs1] - x[rs2])[31:0])"
+        "format": "subw rd, rs1, rs2",
+        "implementation": "x[rd] ← sext((x[rs1] - x[rs2])[31:0])"
     },
     {
-        "name": "tail symbol",
-        "instruction": "pc = &symbol; clobber x[6]"
+        "format": "tail symbol",
+        "implementation": "pc ← &symbol; clobber x[6]"
     },
     {
-        "name": "wfi",
-        "instruction": "while (noInterruptsPending) idle"
+        "format": "wfi",
+        "implementation": "while (noInterruptsPending) idle"
     },
     {
-        "name": "xor rd, rs1, rs2",
-        "instruction": "x[rd] = x[rs1] ^ x[rs2]"
+        "format": "xor rd, rs1, rs2",
+        "implementation": "x[rd] ← x[rs1] ^ x[rs2]"
     },
     {
-        "name": "xori rd, rs1, immediate",
-        "instruction": "x[rd] = x[rs1] ^ sext(immediate)"
+        "format": "xori rd, rs1, immediate",
+        "implementation": "x[rd] ← x[rs1] ^ sext(immediate)"
     }
 ]

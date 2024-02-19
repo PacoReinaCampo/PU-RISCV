@@ -1,4 +1,4 @@
-| name                       | instruction                                        |
+| format                     | implementation                                     |
 |----------------------------|----------------------------------------------------|
 | add rd, rs1, rs2           | x[rd] = x[rs1] + x[rs2]                            |
 | addi rd, rs1, immediate    | x[rd] = x[rs1] + sext(immediate)                   |
