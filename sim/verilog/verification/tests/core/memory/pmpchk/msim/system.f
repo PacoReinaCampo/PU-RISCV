@@ -83,8 +83,8 @@
 ../../../../../../../rtl/verilog/pu/ahb3/pu_riscv_biu2ahb3.sv
 ../../../../../../../rtl/verilog/pu/ahb3/pu_riscv_ahb3.sv
 
-../../../../../../../bench/verilog/tests/pu/ahb3/pu_riscv_memory_model_ahb3.sv
-../../../../../../../bench/verilog/tests/pu/ahb3/pu_riscv_mmio_if_ahb3.sv
-../../../../../../../bench/verilog/tests/pu/ahb3/pu_riscv_testbench_ahb3.sv
-../../../../../../../bench/verilog/tests/bfm/pu_riscv_dbg_bfm.sv
-../../../../../../../bench/verilog/tests/bfm/pu_riscv_htif.sv
+../../../../../../../validation/tasks/verilog/library/pu/ahb3/pu_riscv_memory_model_ahb3.sv
+../../../../../../../validation/tasks/verilog/library/pu/ahb3/pu_riscv_mmio_if_ahb3.sv
+../../../../../../../validation/tasks/verilog/library/pu/ahb3/pu_riscv_testbench_ahb3.sv
+../../../../../../../validation/tasks/verilog/library/bfm/pu_riscv_dbg_bfm.sv
+../../../../../../../validation/tasks/verilog/library/bfm/pu_riscv_htif.sv
