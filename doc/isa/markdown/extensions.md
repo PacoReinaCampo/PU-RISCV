@@ -2,7 +2,7 @@
 
 Format of a line in the table:
 
-`<prefix> <isa width> <alpha code> <inst width> "<extension description>"`
+`<prefix> <isa width> <alpha code> <instruction width> "<extension description>"`
 
 | prefix | isa width | alpha code | instruction width | extension description                                                        |
 |--------|:----------|:-----------|:------------------|:-----------------------------------------------------------------------------|

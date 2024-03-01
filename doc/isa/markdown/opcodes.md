@@ -6,9 +6,7 @@ Format of a line in the table:
 
 `<arguments> is one of rd, rs1, rs2, frd, frs1, frs2, frs3, imm20, imm12, sbimm12, simm12, shamt5, shamt6, rm, aq, rl, pred, succ`
 
-`<opcode> is given by specifying one or more range/value pairs:`
-
-`hi..lo=value or bit=value or argument=value (e.g. 6..2=0x45 10=1)`
+`<opcode> is given by specifying one or more range/value pairs: hi..lo=value or bit=value or argument=value (e.g. 6..2=0x45 10=1)`
 
 `<codec> is one of r, i, s, sb, u, uj, ...`
 

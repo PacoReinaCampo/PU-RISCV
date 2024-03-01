@@ -1,6 +1,7 @@
 ## Descriptions
 
 Format of a line in the table:
+
 `<symbol[,alias]> description>`
 
 | symbol        | description                                             |
@@ -17,32 +18,32 @@ Format of a line in the table:
 | `u128,cu`     | `Unsigned 128-bit Word`                                 |
 | `sx`          | `Signed Full Width Word (32, 64 or 128-bit)`            |
 | `ux`          | `Unsigned Full width Word (32, 64 or 128-bit)`          |
-: Glossary A
+: Word Type
 
 | symbol        | description                                             |
 |---------------|:--------------------------------------------------------|
 | `f32,s`       | `Single Precision Floating-point`                       |
 | `f64,d`       | `Double Precision Floating-point`                       |
 | `f128,q`      | `Quadruple Precision Floating-point`                    |
-: Glossary B
+: Precision Floating-point
 
 | symbol        | description                                             |
 |---------------|:--------------------------------------------------------|
 | `XLEN`        | `Integer Register Width in Bits (32, 64 or 128)`        |
 | `FLEN`        | `Floating-point Register Width in Bits (32, 64 or 128)` |
-: Glossary C
+: Register Width in Bits
 
 | symbol        | description                                             |
 |---------------|:--------------------------------------------------------|
 | `rd`          | `Integer Register Destination`                          |
 | `rs[n]`       | `Integer Register Source [n]`                           |
-: Glossary D
+: Integer Register
 
 | symbol        | description                                             |
 |---------------|:--------------------------------------------------------|
-| `frd`         | `Floating-point Register Destination`                   |
-| `frs[n]`      | `Floating-point Register Source [n]`                    |
-: Glossary E
+| `frd`         | `Floating-Point Register Destination`                   |
+| `frs[n]`      | `Floating-Point Register Source [n]`                    |
+: Floating-Point Register
 
 | symbol        | description                                             |
 |---------------|:--------------------------------------------------------|
@@ -51,14 +52,14 @@ Format of a line in the table:
 | `imm`         | `Immediate Value encoded in an instruction`             |
 | `offset`      | `Immediate Value decoded as a relative offset`          |
 | `shamt`       | `Immediate Value decoded as a shift amount`             |
-: Glossary F
+: Values
 
 | symbol        | description                                             |
 |---------------|:--------------------------------------------------------|
 | `SP`          | `Single Precision`                                      |
 | `DP`          | `Double Precision`                                      |
 | `QP`          | `Quadruple Precision`                                   |
-: Glossary G
+: Precision
 
 | symbol        | description                                             |
 |---------------|:--------------------------------------------------------|
@@ -66,7 +67,7 @@ Format of a line in the table:
 | `U`           | `User`                                                  |
 | `S`           | `Supervisor`                                            |
 | `H`           | `Hypervisor`                                            |
-: Glossary H
+: Privilege Modes I
 
 | symbol        | description                                             |
 |---------------|:--------------------------------------------------------|
@@ -76,19 +77,19 @@ Format of a line in the table:
 | `SEE`         | `Supervisor Execution Environment`                      |
 | `HBI`         | `Hypervisor Binary Interface`                           |
 | `HEE`         | `Hypervisor Execution Environment`                      |
-: Glossary I
+: Privilege Modes II
 
 | symbol        | description                                             |
 |---------------|:--------------------------------------------------------|
 | `CSR`         | `Control and Status Register`                           |
-: Glossary J
+: Control and Status Register
 
 | symbol        | description                                             |
 |---------------|:--------------------------------------------------------|
 | `PA`          | `Physical Address`                                      |
 | `VA`          | `Virtual Address`                                       |
 | `PPN`         | `Physical Page Number`                                  |
-: Glossary K
+: Address & Page Number
 
 | symbol        | description                                             |
 |---------------|:--------------------------------------------------------|
@@ -99,4 +100,4 @@ Format of a line in the table:
 | `PPN`         | `Physical Page Number`                                  |
 | `VPN`         | `Virtual Page Number`                                   |
 | `VCLN`        | `Virtual Cache Line Number`                             |
-: Glossary L
+: Physical & Virtual

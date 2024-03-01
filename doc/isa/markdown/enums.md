@@ -2,7 +2,7 @@
 
 Format of a line in the table:
 
-`<enum group> <enum name> <enum value> "<enum description>" <version>`
+`<group> <name> <value> "<description>" <version>`
 
 | group     | name                   | value     | description                                          | version       |
 |-----------|:-----------------------|:----------|:-----------------------------------------------------|:--------------|

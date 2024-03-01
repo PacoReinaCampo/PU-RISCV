@@ -1,5 +1,9 @@
 ## Instruction Classes
 
+Format of a line in the table:
+
+`<ins name> <class>`
+
 | ins name     | class           |
 |--------------|:----------------|
 | `lui`        | `alu`           |
