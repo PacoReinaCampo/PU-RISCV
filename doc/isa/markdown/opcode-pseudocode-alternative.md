@@ -1,4 +1,9 @@
 ## Instruction Pseudo Code (Alternative)
+
+Format of a line in the table:
+
+`<instruction name> "<instruction pseudo code>"`
+
 | ins name     | instruction pseudo code                                             |
 |--------------|:--------------------------------------------------------------------|
 | `lui`        | `rd = imm`                                                          |
@@ -56,7 +61,7 @@
 | `sllw`       | `rd = s32(u32(rs1) << rs2)`                                         |
 | `srlw`       | `rd = s32(u32(rs1) >> rs2)`                                         |
 | `sraw`       | `rd = s32(rs1) >> rs2`                                              |
-: RV64I - "RV64I Base Integer Instruction Set (in addition to RV32I)"
+: RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
 
 | ins name     | instruction pseudo code                                             |
 |--------------|:--------------------------------------------------------------------|
@@ -77,7 +82,7 @@
 | `divuw`      | `rd = u32(rs1) / u32(rs2)`                                          |
 | `remw`       | `rd = s32(rs1) mod s32(rs2)`                                        |
 | `remuw`      | `rd = u32(rs1) mod u32(rs2)`                                        |
-: RV64M - "RV64M Standard Extension for Integer Multiply and Divide (in addition to RV32M)"
+: RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
 
 | ins name     | instruction pseudo code                                             |
 |--------------|:--------------------------------------------------------------------|
@@ -107,7 +112,7 @@
 | `amomax.d`   | `rd = s64[rs1] , u64[rs1] = s64_max(s64(rs2), s64[rs1])`            |
 | `amominu.d`  | `rd = s64[rs1] , u64[rs1] = u64_min(u64(rs2), u64[rs1])`            |
 | `amomaxu.d`  | `rd = s64[rs1] , u64[rs1] = u64_max(u64(rs2), u64[rs1])`            |
-: RV64A - "RV64A Standard Extension for Atomic Instructions (in addition to RV32A)"
+: RV64A - "RV64A Standard Extension for Atomic Instructions (+ RV32A)"
 
 | ins name     | instruction pseudo code                                             |
 |--------------|:--------------------------------------------------------------------|
@@ -170,7 +175,7 @@
 | `fcvt.lu.s`  | `frm = rm ; rd = u64(f32(frs1))`                                    |
 | `fcvt.s.l`   | `frm = rm ; frd = f32(s64(rs1))`                                    |
 | `fcvt.s.lu`  | `frm = rm ; frd = f32(u64(rs1))`                                    |
-: RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (in addition to RV32F)"
+: RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
 
 | ins name     | instruction pseudo code                                             |
 |--------------|:--------------------------------------------------------------------|
@@ -210,7 +215,7 @@
 | `fcvt.d.l`   | `frm = rm ; frd = f64(u64(rs1))`                                    |
 | `fcvt.d.lu`  | `frm = rm ; frd = f64(s64(rs1))`                                    |
 | `fmv.d.x`    | `frd = u64(rs1)`                                                    |
-: RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (in addition to RV32D)"
+: RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32D)"
 
 | ins name     | instruction pseudo code                                             |
 |--------------|:--------------------------------------------------------------------|
@@ -250,13 +255,13 @@
 | `fcvt.lu.q`  | `frm = rm ; if f128(frs1) > 0 then rd = u64(f128(frs1) else rd = 0` |
 | `fcvt.q.l`   | `frm = rm ; frd = f128(u64(rs1))`                                   |
 | `fcvt.q.lu`  | `frm = rm ; frd = f128(s64(rs1))`                                   |
-: RV64Q - "RV64Q Standard Extension for Quadruple-Precision Floating-Point (in addition to RV32Q)"
+: RV64Q - "RV64Q Standard Extension for Quadruple-Precision Floating-Point (+ RV32Q)"
 
 | ins name     | instruction pseudo code                                             |
 |--------------|:--------------------------------------------------------------------|
 | `fmv.x.q`    | `rd = s64(frs1)`                                                    |
 | `fmv.q.x`    | `frd = u64(rs1)`                                                    |
-: RV128Q - "RV128Q Standard Extension for Quadruple-Precision Floating-Point (in addition to RV64Q)"
+: RV128Q - "RV128Q Standard Extension for Quadruple-Precision Floating-Point (+ RV64Q)"
 
 | ins name     | instruction pseudo code                                             |
 |--------------|:--------------------------------------------------------------------|

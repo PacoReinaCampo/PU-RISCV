@@ -1,5 +1,9 @@
 ## Test
 
+Format of a line in the table:
+
+`<test>`
+
 | test rv32                |
 |--------------------------|
 | `rv32mi-p-breakpoint`    |

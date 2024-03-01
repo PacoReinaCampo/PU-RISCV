@@ -1,5 +1,9 @@
 ## Disassembly Formats
 
+Format of a line in the table:
+
+`<format> <format description>`
+
 | format                  |
 |:------------------------|
 | `none`                  |

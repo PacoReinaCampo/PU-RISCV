@@ -1,5 +1,23 @@
 ## Operand Bit Encodings
 
+Format of a line in the table:
+
+`<argument> <bit encoding> <type> <description>`
+
+`<bit encoding> contains a comma list of gather[scatter] bits. e.g.`
+
+`    12:10[8|4:3],6:2[7:6|2:1|5]`
+
+`is equivalent to the RISC-V Compressed Instruction Set notation:`
+
+`    12         10  6               2`
+
+`    offset[8|4:3]  offset[7:6|2:1|5]`
+
+`when [scatter] is ommitted, bits are right justified from bit 0`
+
+`type is one of arg, creg, ireg, freg, offset, simm, uimm`
+
 | argument     | bit encoding                   | type      | description                        |
 |--------------|:-------------------------------|:----------|:-----------------------------------|
 | `rd`         | `11:7`                         | `ireg`    | `rd`                               |

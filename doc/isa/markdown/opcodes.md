@@ -1,5 +1,19 @@
 ## Opcode Encoding Information
 
+Format of a line in the table:
+
+`<instruction name> [<arguments> ...] <opcode> <codec> <extension>`
+
+`<arguments> is one of rd, rs1, rs2, frd, frs1, frs2, frs3, imm20, imm12, sbimm12, simm12, shamt5, shamt6, rm, aq, rl, pred, succ`
+
+`<opcode> is given by specifying one or more range/value pairs:`
+
+`hi..lo=value or bit=value or argument=value (e.g. 6..2=0x45 10=1)`
+
+`<codec> is one of r, i, s, sb, u, uj, ...`
+
+`<extension> is one of { rv32, rv64, rv128 } · { i, m, a, f, d, s, c }`
+
 | ins name     | argument              | opcode                                                                             | codec        | extension            |
 |--------------|:----------------------|:-----------------------------------------------------------------------------------|:-------------|:---------------------|
 | `lui`        | `rd imm20`            |                    `6..2=0x0D 1..0=3`                                              | `u`          | `rv32i rv64i rv128i` |
@@ -60,7 +74,7 @@
 | `sllw`       | `rd rs1 rs2`          | `31..25=0  14..12=1 6..2=0x0E 1..0=3`                                              | `r`          |       `rv64i rv128i` |
 | `srlw`       | `rd rs1 rs2`          | `31..25=0  14..12=5 6..2=0x0E 1..0=3`                                              | `r`          |       `rv64i rv128i` |
 | `sraw`       | `rd rs1 rs2`          | `31..25=32 14..12=5 6..2=0x0E 1..0=3`                                              | `r`          |       `rv64i rv128i` |
-: RV64I - "RV64I Base Integer Instruction Set (in addition to RV32I)"
+: RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
 
 | ins name     | argument              | opcode                                                                             | codec        | extension            |
 |--------------|:----------------------|:-----------------------------------------------------------------------------------|:-------------|:---------------------|
@@ -79,7 +93,7 @@
 | `slld`       | `rd rs1 rs2`          | `31..25=0  14..12=1 6..2=0x1E 1..0=3`                                              | `r`          |             `rv128i` |
 | `srld`       | `rd rs1 rs2`          | `31..25=0  14..12=5 6..2=0x1E 1..0=3`                                              | `r`          |             `rv128i` |
 | `srad`       | `rd rs1 rs2`          | `31..25=32 14..12=5 6..2=0x1E 1..0=3`                                              | `r`          |             `rv128i` |
-: RV128I - "RV128I Base Integer Instruction Set (in addition to RV64I)"
+: RV128I - "RV128I Base Integer Instruction Set (+ RV64I)"
 
 | ins name     | argument              | opcode                                                                             | codec        | extension            |
 |--------------|:----------------------|:-----------------------------------------------------------------------------------|:-------------|:---------------------|
@@ -100,7 +114,7 @@
 | `divuw`      | `rd rs1 rs2`          | `31..25=1 14..12=5 6..2=0x0E 1..0=3`                                               | `r`          |       `rv64m rv128m` |
 | `remw`       | `rd rs1 rs2`          | `31..25=1 14..12=6 6..2=0x0E 1..0=3`                                               | `r`          |       `rv64m rv128m` |
 | `remuw`      | `rd rs1 rs2`          | `31..25=1 14..12=7 6..2=0x0E 1..0=3`                                               | `r`          |       `rv64m rv128m` |
-: RV64M - "RV64M Standard Extension for Integer Multiply and Divide (in addition to RV32M)"
+: RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
 
 | ins name     | argument              | opcode                                                                             | codec        | extension            |
 |--------------|:----------------------|:-----------------------------------------------------------------------------------|:-------------|:---------------------|
@@ -109,7 +123,7 @@
 | `divud`      | `rd rs1 rs2`          | `31..25=1 14..12=5 6..2=0x1E 1..0=3`                                               | `r`          |             `rv128m` |
 | `remd`       | `rd rs1 rs2`          | `31..25=1 14..12=6 6..2=0x1E 1..0=3`                                               | `r`          |             `rv128m` |
 | `remud`      | `rd rs1 rs2`          | `31..25=1 14..12=7 6..2=0x1E 1..0=3`                                               | `r`          |             `rv128m` |
-: RV128M - "RV128M Standard Extension for Integer Multiply and Divide (in addition to RV64M)"
+: RV128M - "RV128M Standard Extension for Integer Multiply and Divide (+ RV64M)"
 
 | ins name     | argument              | opcode                                                                             | codec        | extension            |
 |--------------|:----------------------|:-----------------------------------------------------------------------------------|:-------------|:---------------------|
@@ -139,7 +153,7 @@
 | `amomax.d`   | `rd rs1 rs2`          | `aq rl 31..29=5 28..27=0 14..12=3 6..2=0x0B 1..0=3`                                | `r·a`        |       `rv64a rv128a` |
 | `amominu.d`  | `rd rs1 rs2`          | `aq rl 31..29=6 28..27=0 14..12=3 6..2=0x0B 1..0=3`                                | `r·a`        |       `rv64a rv128a` |
 | `amomaxu.d`  | `rd rs1 rs2`          | `aq rl 31..29=7 28..27=0 14..12=3 6..2=0x0B 1..0=3`                                | `r·a`        |       `rv64a rv128a` |
-: RV64A - "RV64A Standard Extension for Atomic Instructions (in addition to RV32A)"
+: RV64A - "RV64A Standard Extension for Atomic Instructions (+ RV32A)"
 
 | ins name     | argument              | opcode                                                                             | codec        | extension            |
 |--------------|:----------------------|:-----------------------------------------------------------------------------------|:-------------|:---------------------|
@@ -154,7 +168,7 @@
 | `amomax.q`   | `rd rs1 rs2`          | `aq rl 31..29=5 28..27=0 14..12=4 6..2=0x0B 1..0=3`                                | `r·a`        |             `rv128a` |
 | `amominu.q`  | `rd rs1 rs2`          | `aq rl 31..29=6 28..27=0 14..12=4 6..2=0x0B 1..0=3`                                | `r·a`        |             `rv128a` |
 | `amomaxu.q`  | `rd rs1 rs2`          | `aq rl 31..29=7 28..27=0 14..12=4 6..2=0x0B 1..0=3`                                | `r·a`        |             `rv128a` |
-: RV128A - "RV128A Standard Extension for Atomic Instructions (in addition to RV64A)"
+: RV128A - "RV128A Standard Extension for Atomic Instructions (+ RV64A)"
 
 | ins name     | argument              | opcode                                                                             | codec        | extension            |
 |--------------|:----------------------|:-----------------------------------------------------------------------------------|:-------------|:---------------------|
@@ -218,7 +232,7 @@
 | `fcvt.lu.s`  | `rd frs1  24..20=3`   | `31..27=0x18 rm       26..25=0 6..2=0x14 1..0=3`                                   | `r·m+rf`     |       `rv64f rv128f` |
 | `fcvt.s.l`   | `frd rs1  24..20=2`   | `31..27=0x1A rm       26..25=0 6..2=0x14 1..0=3`                                   | `r·m+fr`     |       `rv64f rv128f` |
 | `fcvt.s.lu`  | `frd rs1  24..20=3`   | `31..27=0x1A rm       26..25=0 6..2=0x14 1..0=3`                                   | `r·m+fr`     |       `rv64f rv128f` |
-: RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (in addition to RV32F)"
+: RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
 
 | ins name     | argument              | opcode                                                                             | codec        | extension            |
 |--------------|:----------------------|:-----------------------------------------------------------------------------------|:-------------|:---------------------|
@@ -258,7 +272,7 @@
 | `fcvt.d.l`   | `frd rs1  24..20=2`   | `31..27=0x1A rm       26..25=1 6..2=0x14 1..0=3`                                   | `r·m+fr`     |       `rv64d rv128d` |
 | `fcvt.d.lu`  | `frd rs1  24..20=3`   | `31..27=0x1A rm       26..25=1 6..2=0x14 1..0=3`                                   | `r·m+fr`     |       `rv64d rv128d` |
 | `fmv.d.x`    | `frd rs1  24..20=0`   | `31..27=0x1E 14..12=0 26..25=1 6..2=0x14 1..0=3`                                   | `r+fr`       |       `rv64d rv128d` |
-: RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (in addition to RV32D)"
+: RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32D)"
 
 | ins name     | argument              | opcode                                                                             | codec        | extension            |
 |--------------|:----------------------|:-----------------------------------------------------------------------------------|:-------------|:---------------------|
@@ -298,13 +312,13 @@
 | `fcvt.lu.q`  | `rd frs124..20=3`     | `31..27=0x18 rm       26..25=3 6..2=0x14 1..0=3`                                   | `r·m+rf`     |       `rv64q rv128q` |
 | `fcvt.q.l`   | `frd rs124..20=2`     | `31..27=0x1A rm       26..25=3 6..2=0x14 1..0=3`                                   | `r·m+fr`     |       `rv64q rv128q` |
 | `fcvt.q.lu`  | `frd rs124..20=3`     | `31..27=0x1A rm       26..25=3 6..2=0x14 1..0=3`                                   | `r·m+fr`     |       `rv64q rv128q` |
-: RV64Q - "RV64Q Standard Extension for Quad-Precision Floating-Point (in addition to RV32Q)"
+: RV64Q - "RV64Q Standard Extension for Quad-Precision Floating-Point (+ RV32Q)"
 
 | ins name     | argument              | opcode                                                                             | codec        | extension            |
 |--------------|:----------------------|:-----------------------------------------------------------------------------------|:-------------|:---------------------|
 | `fmv.x.q`    | `rd frs124..20=0`     | `31..27=0x1C 14..12=0 26..25=3 6..2=0x14 1..0=3`                                   | `r+rf`       |       `rv64q rv128q` |
 | `fmv.q.x`    | `frd rs124..20=0`     | `31..27=0x1E 14..12=0 26..25=3 6..2=0x14 1..0=3`                                   | `r+fr`       |       `rv64q rv128q` |
-: RV128Q - "RV128Q Standard Extension for Quadruple-Precision Floating-Point (in addition to RV64Q)"
+: RV128Q - "RV128Q Standard Extension for Quadruple-Precision Floating-Point (+ RV64Q)"
 
 | ins name     | argument              | opcode                                                                             | codec        | extension            |
 |--------------|:----------------------|:-----------------------------------------------------------------------------------|:-------------|:---------------------|
@@ -369,7 +383,7 @@
 | `c.slli`     | `crs1rd      cimmsh6` | `1..0=2 15..13=0`                                                                  | `ci·sh6`     |       `rv64c`        |
 | `c.ldsp`     | `crd        cimmldsp` | `1..0=2 15..13=3`                                                                  | `ci·ldsp`    |       `rv64c`        |
 | `c.sdsp`     | `crs2       cimmsdsp` | `1..0=2 15..13=7`                                                                  | `css·sdsp`   |       `rv64c`        |
-: RV64C - "RV64C Standard Extension for Compressed Instructions (in addition to RV32C)"
+: RV64C - "RV64C Standard Extension for Compressed Instructions (+ RV32C)"
                                            
 | ins name     | argument              | opcode                                                                             | codec        | extension            |
 |--------------|:----------------------|:-----------------------------------------------------------------------------------|:-------------|:---------------------|
@@ -377,4 +391,4 @@
 | `c.sq`       | `crs1q crs2q   cimmq` | `1..0=0 15..13=5`                                                                  | `cs·sq`      |             `rv128c` |
 | `c.lqsp`     | `crd        cimmlqsp` | `1..0=2 15..13=1`                                                                  | `ci·lqsp`    |             `rv128c` |
 | `c.sqsp`     | `crs2       cimmsqsp` | `1..0=2 15..13=5`                                                                  | `css·sqsp`   |             `rv128c` |
-: RV128C - "RV128C Standard Extension for Compressed Instructions (in addition to RV64C)"
+: RV128C - "RV128C Standard Extension for Compressed Instructions (+ RV64C)"

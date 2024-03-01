@@ -1,5 +1,9 @@
 ## Pseudo Instructions
 
+Format of a line in the table:
+
+`<pseudo opcode> <opcode> <format> <constraint...`
+
 | pseudo        | opcode                   | format           | constraint                       |
 |---------------|:-------------------------|:-----------------|:---------------------------------|
 | `nop`         | `addi`                   | `none`           | `rd_eq_x0 rs1_eq_x0 imm_eq_zero` |

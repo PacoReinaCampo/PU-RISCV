@@ -1,5 +1,11 @@
 ## Compressed Instruction
 
+Format of a line in the table:
+
+`<compressed opcode> <decompressed opcode> [<constraint name> ...]`
+
+`<constraint> is one of imm_6, imm_7, imm_8, imm_9, imm_10, imm_12, imm_18, imm_nz, imm_x2, imm_x4, imm_x8, rd_b3, rs1_b3, rs2_b3, rs1_eq_sp, rd_eq_x0, rs1_eq_x0, rs2_eq_x0, rd_ne_x0, rs1_ne_x0, rs2_ne_x0, rd_eq_rs1, rd_eq_ra, rd_ne_x0_x2, rd_eq_sp`
+
 | c-opcode     | d-opcode                       | constraint name                 |
 |--------------|:-------------------------------|:--------------------------------|
 | `c.addi4spn` | `addi   imm_10 imm_x4 imm_nz`  | `rd_b3 rs1_eq_sp`               |

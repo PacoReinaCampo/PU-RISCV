@@ -1,5 +1,9 @@
 ## Instruction Types
 
+Format of a line in the table:
+
+`<type> <type name> <bit encoding>[=<name>] ...`
+
 | type   | type name              | bit encoding                                                                              |
 |--------|:-----------------------|:------------------------------------------------------------------------------------------|
 | `32`   | `Base`                 | `31:25                     24:20     19:15     14:12        11:7              6:0`        |
@@ -10,7 +14,7 @@
 | `sb`   | `Branch`               | `31:25[12|10:5]=imm        24:20=rs2 19:15=rs1 14:12=funct3 11:7[4:1|11]=imm  6:0=opcode` |
 | `u`    | `Upper`                | `31:12[31:12]=imm                                           11:7=rd           6:0=opcode` |
 | `uj`   | `Jump`                 | `31:12[20|10:1|11|19:12]=imm                                11:7=rd           6:0=opcode` |
-: Normal Instruction Type
+: Base Instruction Type
 
 | type   | type name              | bit encoding                                                                              |
 |--------|:-----------------------|:------------------------------------------------------------------------------------------|

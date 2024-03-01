@@ -1,5 +1,9 @@
 ## Notation
 
+Format of a line in the table:
+
+`<symbol> <alias> <arity> <description> <LaTeX code>`
+
 | symbol        | alias         | arity   | description             | LaTeX code   |
 |---------------|:--------------|:--------|:------------------------|:-------------|
 | `=`           | `==`          | `2`     | `Equal To`              | `=`          |

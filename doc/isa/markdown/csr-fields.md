@@ -1,5 +1,9 @@
 ## Control and Status Register Fields
 
+Format of a line in the table:
+
+`<csr> <field> <bitspec> <modes> "<field description>" <version>`
+
 | csr         | field     | bitspec   | modes     | field description                         | version          |
 |-------------|:----------|:----------|:----------|:------------------------------------------|:-----------------|
 | `status`    | `ie`      | `0`       | `m`       | `Interrupt Enable Stack 0`                | `1.7`            |

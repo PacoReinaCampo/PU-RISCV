@@ -1,5 +1,4 @@
 markdown/definition.md
-markdown/glossary.md
 markdown/notation.md
 markdown/enums.md
 markdown/constraints.md
@@ -25,3 +24,5 @@ markdown/formats.md
 markdown/opcode-majors.md
 markdown/verification.md
 markdown/test.md
+markdown/glossary.md
+markdown/descriptions.md

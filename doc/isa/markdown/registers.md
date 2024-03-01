@@ -1,5 +1,13 @@
 ## Registers ABI Definitions
 
+Format of a line in the table:
+
+`<name> <alias> <type> <save> <description>`
+
+`<type> is one of ireg, freg`
+
+`<save> is one of caller, callee, global, zero`
+
 | name   | alias   | type    | save      |  description                          |
 |--------|:--------|:--------|:----------|:--------------------------------------|
 | `x0`   | `zero`  | `ireg`  | `zero`    | `Hard-wired zero`                     |

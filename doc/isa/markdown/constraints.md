@@ -1,5 +1,9 @@
 ## Constraint Definitions
 
+Format of a line in the table:
+
+`<constraint name> <constraint expression> <hint>`
+
 | constraint name | constraint expression                     | hint        |
 |-----------------|:------------------------------------------|:------------|
 | `simm_6`        | `imm >= -32 && imm < 32`                  |             |

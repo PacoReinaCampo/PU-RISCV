@@ -1,5 +1,12 @@
 ## Control and Status Registers
 
+Format of a line in the table:
+`<csr number> <csr access> <csr name> "<csr description>" <version>`
+
+`<access> is one of urw, uro, srw, sro, hrw, hro, mrw, mro`
+
+`<version> is [introduced]-[deprecated]`
+
 | csr      | num    | access            | description                                       | version          |
 |----------|:-------|:------------------|:--------------------------------------------------|:-----------------|
 | `0x000`  | `urw`  | `ustatus`         | `User status register`                            | `1.9-`           |

@@ -1,5 +1,19 @@
 ## Instruction Encodings
 
+Format of a line in the table:
+
+`<codec> <format> [<argument> ... ]`
+
+`<codec> denotes a distinct instruction type, subtype and format`
+
+`[<argument> ... ] lists operands declared in opcodes as a cross-check`
+
+`Codecs with a · sign denote a subtype of the higher level type`
+
+`Codecs with a + sign denote a format variant for the same type`
+
+`i.e. <type(·subtype+format)?> where codec is the distinct codec`
+
 | codec        | format                   | argument                |
 |--------------|:-------------------------|:------------------------|
 | `u`          | `rd,imm`                 | `rd imm20`              |

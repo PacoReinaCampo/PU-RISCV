@@ -57,7 +57,7 @@
 | `sllw`       | `alu`           |
 | `srlw`       | `alu`           |
 | `sraw`       | `alu`           |
-: RV64I - "RV64I Base Integer Instruction Set (in addition to RV32I)"
+: RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
 
 | ins name     | class           |
 |--------------|:----------------|
@@ -78,7 +78,7 @@
 | `divuw`      | `alu,multiply`  |
 | `remw`       | `alu,divide`    |
 | `remuw`      | `alu,divide`    |
-: RV64M - "RV64M Standard Extension for Integer Multiply and Divide (in addition to RV32M)"
+: RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
 
 | ins name     | class           |
 |--------------|:----------------|
@@ -108,7 +108,7 @@
 | `amomax.d`   | `atomic`        |
 | `amominu.d`  | `atomic`        |
 | `amomaxu.d`  | `atomic`        |
-: RV64A - "RV64A Standard Extension for Atomic Instructions (in addition to RV32A)"
+: RV64A - "RV64A Standard Extension for Atomic Instructions (+ RV32A)"
 
 | ins name     | class           |
 |--------------|:----------------|
@@ -171,7 +171,7 @@
 | `fcvt.lu.s`  | `fpu,fcvt`      |
 | `fcvt.s.l`   | `fpu,fcvt`      |
 | `fcvt.s.lu`  | `fpu,fcvt`      |
-: RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (in addition to RV32F)"
+: RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
 
 | ins name     | class           |
 |--------------|:----------------|
@@ -211,7 +211,7 @@
 | `fcvt.d.l`   | `fpu,fcvt`      |
 | `fcvt.d.lu`  | `fpu,fcvt`      |
 | `fmv.d.x`    | `fpu,fmove`     |
-: RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (in addition to RV32D)"
+: RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32D)"
 
 | ins name     | class           |
 |--------------|:----------------|

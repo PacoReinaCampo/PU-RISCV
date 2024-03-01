@@ -1,5 +1,9 @@
 ## Instruction Full Names
 
+Format of a line in the table:
+
+`<instruction name> "<instruction full name>"`
+
 | ins name     | instruction full name                                               |
 |--------------|:--------------------------------------------------------------------|
 | `lui`        | `Load Upper Immediate`                                              |
@@ -57,7 +61,7 @@
 | `sllw`       | `Shift Left Logical Word`                                           |
 | `srlw`       | `Shift Right Logical Word`                                          |
 | `sraw`       | `Shift Right Arithmetic Word`                                       |
-: RV64I - "RV64I Base Integer Instruction Set (in addition to RV32I)"
+: RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
 
 | ins name     | instruction full name                                               |
 |--------------|:--------------------------------------------------------------------|
@@ -78,7 +82,7 @@
 | `divuw`      | `Divide Unsigned Word`                                              |
 | `remw`       | `Remainder Signed Word`                                             |
 | `remuw`      | `Remainder Unsigned Word`                                           |
-: RV64M - "RV64M Standard Extension for Integer Multiply and Divide (in addition to RV32M)"
+: RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
 
 | ins name     | instruction full name                                               |
 |--------------|:--------------------------------------------------------------------|
@@ -108,7 +112,7 @@
 | `amomax.d`   | `Atomic Maximum Double Word`                                        |
 | `amominu.d`  | `Atomic Minimum Unsigned Double Word`                               |
 | `amomaxu.d`  | `Atomic Maximum Unsigned Double Word`                               |
-: RV64A - "RV64A Standard Extension for Atomic Instructions (in addition to RV32A)"
+: RV64A - "RV64A Standard Extension for Atomic Instructions (+ RV32A)"
 
 | ins name     | instruction full name                                               |
 |--------------|:--------------------------------------------------------------------|
@@ -171,7 +175,7 @@
 | `fcvt.lu.s`  | `FP Convert Float to Double Word Unsigned (SP)`                     |
 | `fcvt.s.l`   | `FP Convert Double Word to Float (SP)`                              |
 | `fcvt.s.lu`  | `FP Convert Double Word Unsigned to Float (SP)`                     |
-: RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (in addition to RV32F)"
+: RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
 
 | ins name     | instruction full name                                               |
 |--------------|:--------------------------------------------------------------------|
@@ -211,7 +215,7 @@
 | `fcvt.d.l`   | `FP Convert Double Word to Float (DP)`                              |
 | `fcvt.d.lu`  | `FP Convert Double Word Unsigned Float (DP)`                        |
 | `fmv.d.x`    | `FP Move from Integer Register (DP)`                                |
-: RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (in addition to RV32F)"
+: RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32F)"
 
 | ins name     | instruction full name                                               |
 |--------------|:--------------------------------------------------------------------|
@@ -251,13 +255,13 @@
 | `fcvt.lu.q`  | `FP Convert Float to Double Word Unsigned (QP)`                     |
 | `fcvt.q.l`   | `FP Convert Double Word to Float (QP)`                              |
 | `fcvt.q.lu`  | `FP Convert Double Word Unsigned Float (QP)`                        |
-: RV64Q - "RV64Q Standard Extension for Quadruple-Precision Floating-Point (in addition to RV32Q)"
+: RV64Q - "RV64Q Standard Extension for Quadruple-Precision Floating-Point (+ RV32Q)"
 
 | ins name     | instruction full name                                               |
 |--------------|:--------------------------------------------------------------------|
 | `fmv.x.q`    | `FP Move to Integer Register (QP)`                                  |
 | `fmv.q.x`    | `FP Move from Integer Register (QP)`                                |
-: RV128Q - "RV128Q Standard Extension for Quadruple-Precision Floating-Point (in addition to RV64Q)"
+: RV128Q - "RV128Q Standard Extension for Quadruple-Precision Floating-Point (+ RV64Q)"
 
 | ins name     | instruction full name                                               |
 |--------------|:--------------------------------------------------------------------|

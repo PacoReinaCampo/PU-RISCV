@@ -1,5 +1,9 @@
 ## Enumerated Types
 
+Format of a line in the table:
+
+`<enum group> <enum name> <enum value> "<enum description>" <version>`
+
 | group     | name                   | value     | description                                          | version       |
 |-----------|:-----------------------|:----------|:-----------------------------------------------------|:--------------|
 | `type`    | `none`                 | `0`       | `None`                                               | `1.7-`        |
