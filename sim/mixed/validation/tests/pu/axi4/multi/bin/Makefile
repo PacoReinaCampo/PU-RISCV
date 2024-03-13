@@ -44,7 +44,7 @@
 
 all: regression
 
-SIMULATORS = msim riviera
+SIMULATORS = iverilog msim vivado
 SIM        = msim
 
 MS     = -s
@@ -67,108 +67,219 @@ REGRESSION_MULT_LATENCY     = 3 2 1 0
 ##########################################################################
 # Tests
 ##########################################################################
-XLEN    = 32
-HAS_RVC = 1
-HAS_U   = 1
-HAS_S   = 1
-HAS_H   = 1
+XLEN = 32
+
+HAS_RVI = 1
 HAS_RVA = 1
-HAS_FPU = 1
-HAS_MMU = 1
 HAS_RVM = 1
-HAS_DIV = $(HAS_RVM)
-U_INT_TESTS =	simple							\
-		add addi						\
-		and andi						\
-		auipc							\
-		beq bge bgeu blt bltu bne				\
-		fence_i							\
-		jal jalr						\
-		lb lbu lh lhu lw					\
-		lui							\
-		or ori							\
-		sb sh sw						\
-		sll slli						\
-		slt slti sltiu sltu					\
-		sra srai						\
-		srl srli						\
-		sub							\
-		xor xori						\
-	$(if $(filter 64, $(XLEN)),					\
-		addiw addw						\
-		lwu ld							\
-		sd							\
-		sllw slliw						\
-		sllw slliw						\
-		sltu sltiu						\
-		sraw sraiw						\
-		srlw srliw						\
-		subw )
-U_RVC_TESTS  =  rvc
-U_AMO_TESTS  =	amoadd_w amoand_w amomax_w amomaxu_w			\
-		amomin_w amominu_w amoor_w amoxor_w amoswap_w lrsc	\
-	$(if $(filter 64, $(XLEN)),					\
-		amoadd_d amoand_d amomax_d amomaxu_d			\
-		amomin_d amominu_d amoor_d amoxor_d amoswap_d )
-U_MUL_TESTS  =	mul mulh mulhu mulhsu					\
-	$(if $(filter 64, $(XLEN)), mulw )
-U_DIV_TESTS  =	div divu rem remu					\
-	 $(if $(filter 64,$(XLEN)), divw divuw remw remuw )
-U_NEW_TESTS   =	fadd fclass fcmp fcvt fcvt_w fdiv fmadd fmin ldst	\
-		recoding 						\
+HAS_RVF = 1
+HAS_RVD = 1
+HAS_RVC = 1
 
-#machine mode tests
-M_TESTS      =	breakpoint csr illegal ma_addr ma_fetch mcsr sbreak	\
-		scall							\
-	$(if $(filter 32,$(XLEN)), shamt)
+HAS_U = 1
+HAS_S = 1
+HAS_H = 1
+HAS_M = 1
 
-#supervisor mode tests
-S_TESTS      =	csr dirty illegal ma_fetch sbreak scall wfi
+# user mode tests
+USER_RVI_TESTS = \
+add \
+addi \
+and \
+andi \
+auipc \
+beq \
+bge \
+bgeu \
+blt \
+bltu \
+bne \
+fence_i \
+jal \
+jalr \
+lb \
+lbu \
+lh \
+lhu \
+lui \
+lw \
+or \
+ori \
+sb \
+sh \
+simple \
+sll \
+slli \
+slt \
+slti \
+sltiu \
+sltu \
+sra \
+srai \
+srl \
+srli \
+sub \
+sw \
+xor \
+xori \
 
+$(if $(filter 64, $(XLEN)), \
+addiw \
+addw \
+ld \
+lwu \
+sd \
+slliw \
+slliw \
+sllw \
+sllw \
+sltiu \
+sltu \
+sraiw \
+sraw \
+srliw \
+srlw \
+subw \
+)
 
-#User Mode Integer Tests
-uitst_lst  =                      $(foreach t, $(U_INT_TESTS),rv$(XLEN)ui-p-$t)
-uitst_lst += $(if $(HAS_RVM) > 0, $(foreach t, $(U_MUL_TESTS),rv$(XLEN)um-p-$t))
-uitst_lst += $(if $(HAS_DIV) > 0, $(foreach t, $(U_DIV_TESTS),rv$(XLEN)um-p-$t))
-uitst_lst += $(if $(HAS_DIV) > 0, $(foreach t, $(U_NEW_TESTS),rv$(XLEN)ud-p-$t))
-uitests    = $(if $(HAS_U)   > 0, $(uitst_lst))
+USER_RVC_TESTS = \
+rvc
 
-#User Mode RVC Tests
-uctst_lst = $(if $(HAS_RVC), $(foreach t, $(U_RVC_TESTS),rv$(XLEN)uc-p-$t))
-uctests   = $(if $(HAS_U) > 0, $(uctst_lst))
+USER_RVA_TESTS = \
+amoadd_w \
+amoand_w \
+amomaxu_w \
+amomax_w \
+amominu_w \
+amomin_w \
+amoor_w \
+amoswap_w \
+amoxor_w \
+lrsc \
 
-#Supervisor Mode Tests
-sitst_lst = $(S_TESTS)
+$(if $(filter 64, $(XLEN)), \
+amoadd_d \
+amoand_d \
+amomax_d \
+amomaxu_d \
+amomin_d \
+amominu_d \
+amoor_d \
+amoswap_d \
+amoxor_d \
+)
+
+USER_RVM_TESTS = \
+div \
+divu \
+mul \
+mulh \
+mulhsu \
+mulhu \
+rem \
+remu \
+
+$(if $(filter 64, $(XLEN)), \
+divuw \
+divw \
+mulw \
+remuw \
+remw \
+)
+
+USER_RVF_TESTS = \
+fadd \
+fclass \
+fcmp \
+fcvt \
+fcvt_w \
+fdiv \
+fmadd \
+fmin \
+ldst \
+recoding \
+
+# supervisor mode tests
+SUPERVISOR_RVI_TESTS = \
+csr \
+dirty \
+illegal \
+ma_fetch \
+sbreak \
+scall \
+wfi
+
+# machine mode tests
+MACHINE_RVI_TESTS = \
+breakpoint \
+csr \
+illegal \
+ma_addr \
+ma_fetch \
+mcsr \
+sbreak \
+scall \
+
+$(if $(filter 64, $(XLEN)), \
+shamt \
+)
+
+# User Mode RVI Tests
+utst_lst += $(if $(HAS_RVI) > 0, $(foreach t, $(USER_RVI_TESTS),rv$(XLEN)ui-p-$t))
+
+# User Mode RVM Tests
+utst_lst += $(if $(HAS_RVM) > 0, $(foreach t, $(USER_RVM_TESTS),rv$(XLEN)um-p-$t))
+
+# User Mode RVA Tests
+utst_lst += $(if $(HAS_RVA) > 0, $(foreach t, $(USER_RVA_TESTS),rv$(XLEN)ua-p-$t))
+
+# User Mode RVF Tests
+utst_lst += $(if $(HAS_RVF) > 0, $(foreach t, $(USER_RVF_TESTS),rv$(XLEN)uf-p-$t))
+
+# User Mode RVF Tests
+utst_lst += $(if $(HAS_RVD) > 0, $(foreach t, $(USER_RVD_TESTS),rv$(XLEN)ud-p-$t))
+
+# User Mode RVC Tests
+#utst_lst += $(if $(HAS_RVC) > 0, $(foreach t, $(USER_RVC_TESTS),rv$(XLEN)uc-p-$t))
+
+utests    = $(if $(HAS_U)   > 0, $(utst_lst))
+
+# Supervisor Mode RVI Tests
+sitst_lst = $(SUPERVISOR_RVI_TESTS)
 sitests   = $(if $(HAS_S) > 0, $(foreach t, $(sitst_lst),rv$(XLEN)si-p-$t))
 
-#Machine Mode Tests
-mitst_lst = $(M_TESTS)
-mitests   = $(foreach t, $(mitst_lst),rv$(XLEN)mi-p-$t)
+# Hypervisor Mode RVI Tests
+hitst_lst = $(HYPERVISOR_RVI_TESTS)
+hitests   = $(if $(HAS_H) > 0, $(foreach t, $(hitst_lst),rv$(XLEN)hi-p-$t))
 
-#All tests
-tests = $(uitests) $(mitests)
+# Machine Mode RVI Tests
+mitst_lst = $(MACHINE_RVI_TESTS)
+mitests   = $(if $(HAS_M) > 0, $(foreach t, $(mitst_lst),rv$(XLEN)mi-p-$t))
+
+# All Tests
+tests = $(utests) $(mitests)
 
 
-##########################################################################
+############################################################################
 # Functions
 ############################################################################
 add_regression    = $(foreach p,$(REGRESSION_$(1)), $(addprefix $(1)$(p)@, $(2)))
 add_regression_if = $(if $(filter $(2), $(subst -, , $(1))), $(call add_regression,$(3),$(4)),$(4))
 
-logs = $(call add_regression,DCACHE_SIZE,					\
-       $(call add_regression,ICACHE_SIZE,					\
-       $(call add_regression,MEM_LATENCY,					\
-       $(call add_regression,WRITEBUFFER_SIZE,					\
-       $(call add_regression,XLEN,						\
-       $(foreach t,$(tests),							\
-         $(call add_regression_if,$t,$(U_MUL_TESTS),MULT_LATENCY,		\
-         $t.log									\
-         )									\
-       )									\
-       )									\
-       )									\
-       )									\
-       )									\
+logs = $(call add_regression,DCACHE_SIZE, \
+       $(call add_regression,ICACHE_SIZE, \
+       $(call add_regression,MEM_LATENCY, \
+       $(call add_regression,WRITEBUFFER_SIZE, \
+       $(call add_regression,XLEN, \
+       $(foreach t,$(tests), \
+         $(call add_regression_if,$t,$(U_MUL_TESTS),MULT_LATENCY, \
+         $t.log \
+         ) \
+       ) \
+       ) \
+       ) \
+       ) \
+       ) \
        )
 
 regression: $(logs)
@@ -189,10 +300,10 @@ regression: $(logs)
 ##########################################################################
 .PHONY: $(SIMULATORS)
 $(SIMULATORS): % : %/Makefile
-	@$(MAKE) $(MS) -C $@ sim				\
-	VLOG="$(abspath $(RTL_VLOG) $(TB_VLOG))"		\
-	VHDL="$(abspath $(RTL_VHDL) $(TB_VHDL))"		\
-	TOP=$(TB_TOP)						\
+	@$(MAKE) $(MS) -C $@ sim                                 \
+	VLOG="$(abspath $(PACKAGE_VLOG) $(RTL_VLOG) $(TB_VLOG))" \
+	VHDL="$(abspath $(PACKAGE_VHDL) $(RTL_VHDL) $(TB_VHDL))" \
+	TOP=$(TB_TOP)                                            \
 	LOG=$(LOG) PARAMETERS="$(PARAMETERS)"
 
 
