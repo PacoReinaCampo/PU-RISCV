@@ -1,8 +1,8 @@
 
-rv32uzfh-p-fmadd:     formato del fichero elf32-littleriscv
+rv32uzfh-p-fmadd:     file format elf32-littleriscv
 
 
-Desensamblado de la sección .text.init:
+Disassembly of section .text.init:
 
 80000000 <_start>:
 80000000:	0500006f          	j	80000050 <reset_vector>
@@ -23,7 +23,7 @@ Desensamblado de la sección .text.init:
 80000034:	0040006f          	j	80000038 <handle_exception>
 
 80000038 <handle_exception>:
-80000038:	5391e193          	or	gp,gp,1337
+80000038:	5391e193          	ori	gp,gp,1337
 
 8000003c <write_tohost>:
 8000003c:	00001f17          	auipc	t5,0x1
@@ -67,33 +67,33 @@ Desensamblado de la sección .text.init:
 800000cc:	f1402573          	csrr	a0,mhartid
 800000d0:	00051063          	bnez	a0,800000d0 <reset_vector+0x80>
 800000d4:	00000297          	auipc	t0,0x0
-800000d8:	01028293          	add	t0,t0,16 # 800000e4 <reset_vector+0x94>
+800000d8:	01028293          	addi	t0,t0,16 # 800000e4 <reset_vector+0x94>
 800000dc:	30529073          	csrw	mtvec,t0
-800000e0:	74445073          	csrw	0x744,8
+800000e0:	74445073          	csrwi	0x744,8
 800000e4:	00000297          	auipc	t0,0x0
-800000e8:	01028293          	add	t0,t0,16 # 800000f4 <reset_vector+0xa4>
+800000e8:	01028293          	addi	t0,t0,16 # 800000f4 <reset_vector+0xa4>
 800000ec:	30529073          	csrw	mtvec,t0
-800000f0:	18005073          	csrw	satp,0
+800000f0:	18005073          	csrwi	satp,0
 800000f4:	00000297          	auipc	t0,0x0
-800000f8:	02028293          	add	t0,t0,32 # 80000114 <reset_vector+0xc4>
+800000f8:	02028293          	addi	t0,t0,32 # 80000114 <reset_vector+0xc4>
 800000fc:	30529073          	csrw	mtvec,t0
 80000100:	800002b7          	lui	t0,0x80000
-80000104:	fff28293          	add	t0,t0,-1 # 7fffffff <_start-0x1>
+80000104:	fff28293          	addi	t0,t0,-1 # 7fffffff <_start-0x1>
 80000108:	3b029073          	csrw	pmpaddr0,t0
 8000010c:	01f00293          	li	t0,31
 80000110:	3a029073          	csrw	pmpcfg0,t0
-80000114:	30405073          	csrw	mie,0
+80000114:	30405073          	csrwi	mie,0
 80000118:	00000297          	auipc	t0,0x0
-8000011c:	01428293          	add	t0,t0,20 # 8000012c <reset_vector+0xdc>
+8000011c:	01428293          	addi	t0,t0,20 # 8000012c <reset_vector+0xdc>
 80000120:	30529073          	csrw	mtvec,t0
-80000124:	30205073          	csrw	medeleg,0
-80000128:	30305073          	csrw	mideleg,0
+80000124:	30205073          	csrwi	medeleg,0
+80000128:	30305073          	csrwi	mideleg,0
 8000012c:	00000193          	li	gp,0
 80000130:	00000297          	auipc	t0,0x0
-80000134:	ed428293          	add	t0,t0,-300 # 80000004 <trap_vector>
+80000134:	ed428293          	addi	t0,t0,-300 # 80000004 <trap_vector>
 80000138:	30529073          	csrw	mtvec,t0
 8000013c:	00100513          	li	a0,1
-80000140:	01f51513          	sll	a0,a0,0x1f
+80000140:	01f51513          	slli	a0,a0,0x1f
 80000144:	00054c63          	bltz	a0,8000015c <reset_vector+0x10c>
 80000148:	0ff0000f          	fence
 8000014c:	00100193          	li	gp,1
@@ -104,14 +104,14 @@ Desensamblado de la sección .text.init:
 80000160:	00028a63          	beqz	t0,80000174 <reset_vector+0x124>
 80000164:	10529073          	csrw	stvec,t0
 80000168:	0000b2b7          	lui	t0,0xb
-8000016c:	10928293          	add	t0,t0,265 # b109 <_start-0x7fff4ef7>
+8000016c:	10928293          	addi	t0,t0,265 # b109 <_start-0x7fff4ef7>
 80000170:	30229073          	csrw	medeleg,t0
-80000174:	30005073          	csrw	mstatus,0
+80000174:	30005073          	csrwi	mstatus,0
 80000178:	00002537          	lui	a0,0x2
 8000017c:	30052073          	csrs	mstatus,a0
-80000180:	00305073          	csrw	fcsr,0
+80000180:	00305073          	csrwi	fcsr,0
 80000184:	00000297          	auipc	t0,0x0
-80000188:	01428293          	add	t0,t0,20 # 80000198 <test_2>
+80000188:	01428293          	addi	t0,t0,20 # 80000198 <test_2>
 8000018c:	34129073          	csrw	mepc,t0
 80000190:	f1402573          	csrr	a0,mhartid
 80000194:	30200073          	mret
@@ -119,7 +119,7 @@ Desensamblado de la sección .text.init:
 80000198 <test_2>:
 80000198:	00200193          	li	gp,2
 8000019c:	00002517          	auipc	a0,0x2
-800001a0:	e6450513          	add	a0,a0,-412 # 80002000 <test_2_data>
+800001a0:	e6450513          	addi	a0,a0,-412 # 80002000 <test_2_data>
 800001a4:	00051007          	flh	ft0,0(a0)
 800001a8:	00251087          	flh	ft1,2(a0)
 800001ac:	00451107          	flh	ft2,4(a0)
@@ -134,7 +134,7 @@ Desensamblado de la sección .text.init:
 800001cc <test_3>:
 800001cc:	00300193          	li	gp,3
 800001d0:	00002517          	auipc	a0,0x2
-800001d4:	e3850513          	add	a0,a0,-456 # 80002008 <test_3_data>
+800001d4:	e3850513          	addi	a0,a0,-456 # 80002008 <test_3_data>
 800001d8:	00051007          	flh	ft0,0(a0)
 800001dc:	00251087          	flh	ft1,2(a0)
 800001e0:	00451107          	flh	ft2,4(a0)
@@ -149,7 +149,7 @@ Desensamblado de la sección .text.init:
 80000200 <test_4>:
 80000200:	00400193          	li	gp,4
 80000204:	00002517          	auipc	a0,0x2
-80000208:	e0c50513          	add	a0,a0,-500 # 80002010 <test_4_data>
+80000208:	e0c50513          	addi	a0,a0,-500 # 80002010 <test_4_data>
 8000020c:	00051007          	flh	ft0,0(a0)
 80000210:	00251087          	flh	ft1,2(a0)
 80000214:	00451107          	flh	ft2,4(a0)
@@ -164,7 +164,7 @@ Desensamblado de la sección .text.init:
 80000234 <test_5>:
 80000234:	00500193          	li	gp,5
 80000238:	00002517          	auipc	a0,0x2
-8000023c:	de050513          	add	a0,a0,-544 # 80002018 <test_5_data>
+8000023c:	de050513          	addi	a0,a0,-544 # 80002018 <test_5_data>
 80000240:	00051007          	flh	ft0,0(a0)
 80000244:	00251087          	flh	ft1,2(a0)
 80000248:	00451107          	flh	ft2,4(a0)
@@ -179,7 +179,7 @@ Desensamblado de la sección .text.init:
 80000268 <test_6>:
 80000268:	00600193          	li	gp,6
 8000026c:	00002517          	auipc	a0,0x2
-80000270:	db450513          	add	a0,a0,-588 # 80002020 <test_6_data>
+80000270:	db450513          	addi	a0,a0,-588 # 80002020 <test_6_data>
 80000274:	00051007          	flh	ft0,0(a0)
 80000278:	00251087          	flh	ft1,2(a0)
 8000027c:	00451107          	flh	ft2,4(a0)
@@ -194,7 +194,7 @@ Desensamblado de la sección .text.init:
 8000029c <test_7>:
 8000029c:	00700193          	li	gp,7
 800002a0:	00002517          	auipc	a0,0x2
-800002a4:	d8850513          	add	a0,a0,-632 # 80002028 <test_7_data>
+800002a4:	d8850513          	addi	a0,a0,-632 # 80002028 <test_7_data>
 800002a8:	00051007          	flh	ft0,0(a0)
 800002ac:	00251087          	flh	ft1,2(a0)
 800002b0:	00451107          	flh	ft2,4(a0)
@@ -209,7 +209,7 @@ Desensamblado de la sección .text.init:
 800002d0 <test_8>:
 800002d0:	00800193          	li	gp,8
 800002d4:	00002517          	auipc	a0,0x2
-800002d8:	d5c50513          	add	a0,a0,-676 # 80002030 <test_8_data>
+800002d8:	d5c50513          	addi	a0,a0,-676 # 80002030 <test_8_data>
 800002dc:	00051007          	flh	ft0,0(a0)
 800002e0:	00251087          	flh	ft1,2(a0)
 800002e4:	00451107          	flh	ft2,4(a0)
@@ -224,7 +224,7 @@ Desensamblado de la sección .text.init:
 80000304 <test_9>:
 80000304:	00900193          	li	gp,9
 80000308:	00002517          	auipc	a0,0x2
-8000030c:	d3050513          	add	a0,a0,-720 # 80002038 <test_9_data>
+8000030c:	d3050513          	addi	a0,a0,-720 # 80002038 <test_9_data>
 80000310:	00051007          	flh	ft0,0(a0)
 80000314:	00251087          	flh	ft1,2(a0)
 80000318:	00451107          	flh	ft2,4(a0)
@@ -239,7 +239,7 @@ Desensamblado de la sección .text.init:
 80000338 <test_10>:
 80000338:	00a00193          	li	gp,10
 8000033c:	00002517          	auipc	a0,0x2
-80000340:	d0450513          	add	a0,a0,-764 # 80002040 <test_10_data>
+80000340:	d0450513          	addi	a0,a0,-764 # 80002040 <test_10_data>
 80000344:	00051007          	flh	ft0,0(a0)
 80000348:	00251087          	flh	ft1,2(a0)
 8000034c:	00451107          	flh	ft2,4(a0)
@@ -254,7 +254,7 @@ Desensamblado de la sección .text.init:
 8000036c <test_11>:
 8000036c:	00b00193          	li	gp,11
 80000370:	00002517          	auipc	a0,0x2
-80000374:	cd850513          	add	a0,a0,-808 # 80002048 <test_11_data>
+80000374:	cd850513          	addi	a0,a0,-808 # 80002048 <test_11_data>
 80000378:	00051007          	flh	ft0,0(a0)
 8000037c:	00251087          	flh	ft1,2(a0)
 80000380:	00451107          	flh	ft2,4(a0)
@@ -269,7 +269,7 @@ Desensamblado de la sección .text.init:
 800003a0 <test_12>:
 800003a0:	00c00193          	li	gp,12
 800003a4:	00002517          	auipc	a0,0x2
-800003a8:	cac50513          	add	a0,a0,-852 # 80002050 <test_12_data>
+800003a8:	cac50513          	addi	a0,a0,-852 # 80002050 <test_12_data>
 800003ac:	00051007          	flh	ft0,0(a0)
 800003b0:	00251087          	flh	ft1,2(a0)
 800003b4:	00451107          	flh	ft2,4(a0)
@@ -284,7 +284,7 @@ Desensamblado de la sección .text.init:
 800003d4 <test_13>:
 800003d4:	00d00193          	li	gp,13
 800003d8:	00002517          	auipc	a0,0x2
-800003dc:	c8050513          	add	a0,a0,-896 # 80002058 <test_13_data>
+800003dc:	c8050513          	addi	a0,a0,-896 # 80002058 <test_13_data>
 800003e0:	00051007          	flh	ft0,0(a0)
 800003e4:	00251087          	flh	ft1,2(a0)
 800003e8:	00451107          	flh	ft2,4(a0)
@@ -300,8 +300,8 @@ Desensamblado de la sección .text.init:
 8000040c <fail>:
 8000040c:	0ff0000f          	fence
 80000410:	00018063          	beqz	gp,80000410 <fail+0x4>
-80000414:	00119193          	sll	gp,gp,0x1
-80000418:	0011e193          	or	gp,gp,1
+80000414:	00119193          	slli	gp,gp,0x1
+80000418:	0011e193          	ori	gp,gp,1
 8000041c:	05d00893          	li	a7,93
 80000420:	00018513          	mv	a0,gp
 80000424:	00000073          	ecall
@@ -313,107 +313,107 @@ Desensamblado de la sección .text.init:
 80000434:	00000513          	li	a0,0
 80000438:	00000073          	ecall
 8000043c:	c0001073          	unimp
-80000440:	0000                	.2byte	0x0
-80000442:	0000                	.2byte	0x0
-80000444:	0000                	.2byte	0x0
-80000446:	0000                	.2byte	0x0
-80000448:	0000                	.2byte	0x0
-8000044a:	0000                	.2byte	0x0
-8000044c:	0000                	.2byte	0x0
-8000044e:	0000                	.2byte	0x0
-80000450:	0000                	.2byte	0x0
-80000452:	0000                	.2byte	0x0
-80000454:	0000                	.2byte	0x0
-80000456:	0000                	.2byte	0x0
-80000458:	0000                	.2byte	0x0
-8000045a:	0000                	.2byte	0x0
-8000045c:	0000                	.2byte	0x0
-8000045e:	0000                	.2byte	0x0
-80000460:	0000                	.2byte	0x0
-80000462:	0000                	.2byte	0x0
-80000464:	0000                	.2byte	0x0
-80000466:	0000                	.2byte	0x0
-80000468:	0000                	.2byte	0x0
-8000046a:	0000                	.2byte	0x0
-8000046c:	0000                	.2byte	0x0
-8000046e:	0000                	.2byte	0x0
-80000470:	0000                	.2byte	0x0
-80000472:	0000                	.2byte	0x0
-80000474:	0000                	.2byte	0x0
-80000476:	0000                	.2byte	0x0
-80000478:	0000                	.2byte	0x0
-8000047a:	0000                	.2byte	0x0
+80000440:	0000                	.insn	2, 0x
+80000442:	0000                	.insn	2, 0x
+80000444:	0000                	.insn	2, 0x
+80000446:	0000                	.insn	2, 0x
+80000448:	0000                	.insn	2, 0x
+8000044a:	0000                	.insn	2, 0x
+8000044c:	0000                	.insn	2, 0x
+8000044e:	0000                	.insn	2, 0x
+80000450:	0000                	.insn	2, 0x
+80000452:	0000                	.insn	2, 0x
+80000454:	0000                	.insn	2, 0x
+80000456:	0000                	.insn	2, 0x
+80000458:	0000                	.insn	2, 0x
+8000045a:	0000                	.insn	2, 0x
+8000045c:	0000                	.insn	2, 0x
+8000045e:	0000                	.insn	2, 0x
+80000460:	0000                	.insn	2, 0x
+80000462:	0000                	.insn	2, 0x
+80000464:	0000                	.insn	2, 0x
+80000466:	0000                	.insn	2, 0x
+80000468:	0000                	.insn	2, 0x
+8000046a:	0000                	.insn	2, 0x
+8000046c:	0000                	.insn	2, 0x
+8000046e:	0000                	.insn	2, 0x
+80000470:	0000                	.insn	2, 0x
+80000472:	0000                	.insn	2, 0x
+80000474:	0000                	.insn	2, 0x
+80000476:	0000                	.insn	2, 0x
+80000478:	0000                	.insn	2, 0x
+8000047a:	0000                	.insn	2, 0x
 
-Desensamblado de la sección .data:
+Disassembly of section .data:
 
 80002000 <test_2_data>:
-80002000:	3c00                	.2byte	0x3c00
-80002002:	4100                	.2byte	0x4100
-80002004:	3c00                	.2byte	0x3c00
-80002006:	4300                	.2byte	0x4300
+80002000:	3c00                	.insn	2, 0x3c00
+80002002:	4100                	.insn	2, 0x4100
+80002004:	3c00                	.insn	2, 0x3c00
+80002006:	4300                	.insn	2, 0x4300
 
 80002008 <test_3_data>:
-80002008:	bc00                	.2byte	0xbc00
-8000200a:	ca0d                	.2byte	0xca0d
-8000200c:	3c66                	.2byte	0x3c66
-8000200e:	4a9a                	.2byte	0x4a9a
+80002008:	bc00                	.insn	2, 0xbc00
+8000200a:	ca0d                	.insn	2, 0xca0d
+8000200c:	3c66                	.insn	2, 0x3c66
+8000200e:	4a9a                	.insn	2, 0x4a9a
 
 80002010 <test_4_data>:
-80002010:	4000                	.2byte	0x4000
-80002012:	c500                	.2byte	0xc500
-80002014:	c000                	.2byte	0xc000
-80002016:	ca00                	.2byte	0xca00
+80002010:	4000                	.insn	2, 0x4000
+80002012:	c500                	.insn	2, 0xc500
+80002014:	c000                	.insn	2, 0xc000
+80002016:	ca00                	.insn	2, 0xca00
 
 80002018 <test_5_data>:
-80002018:	3c00                	.2byte	0x3c00
-8000201a:	4100                	.2byte	0x4100
-8000201c:	3c00                	.2byte	0x3c00
-8000201e:	c300                	.2byte	0xc300
+80002018:	3c00                	.insn	2, 0x3c00
+8000201a:	4100                	.insn	2, 0x4100
+8000201c:	3c00                	.insn	2, 0x3c00
+8000201e:	c300                	.insn	2, 0xc300
 
 80002020 <test_6_data>:
-80002020:	bc00                	.2byte	0xbc00
-80002022:	ca0d                	.2byte	0xca0d
-80002024:	3c66                	.2byte	0x3c66
-80002026:	ca9a                	.2byte	0xca9a
+80002020:	bc00                	.insn	2, 0xbc00
+80002022:	ca0d                	.insn	2, 0xca0d
+80002024:	3c66                	.insn	2, 0x3c66
+80002026:	ca9a                	.insn	2, 0xca9a
 
 80002028 <test_7_data>:
-80002028:	4000                	.2byte	0x4000
-8000202a:	c500                	.2byte	0xc500
-8000202c:	c000                	.2byte	0xc000
-8000202e:	4a00                	.2byte	0x4a00
+80002028:	4000                	.insn	2, 0x4000
+8000202a:	c500                	.insn	2, 0xc500
+8000202c:	c000                	.insn	2, 0xc000
+8000202e:	4a00                	.insn	2, 0x4a00
 
 80002030 <test_8_data>:
-80002030:	3c00                	.2byte	0x3c00
-80002032:	4100                	.2byte	0x4100
-80002034:	3c00                	.2byte	0x3c00
-80002036:	3e00                	.2byte	0x3e00
+80002030:	3c00                	.insn	2, 0x3c00
+80002032:	4100                	.insn	2, 0x4100
+80002034:	3c00                	.insn	2, 0x3c00
+80002036:	3e00                	.insn	2, 0x3e00
 
 80002038 <test_9_data>:
-80002038:	bc00                	.2byte	0xbc00
-8000203a:	ca0d                	.2byte	0xca0d
-8000203c:	3c66                	.2byte	0x3c66
-8000203e:	4980                	.2byte	0x4980
+80002038:	bc00                	.insn	2, 0xbc00
+8000203a:	ca0d                	.insn	2, 0xca0d
+8000203c:	3c66                	.insn	2, 0x3c66
+8000203e:	4980                	.insn	2, 0x4980
 
 80002040 <test_10_data>:
-80002040:	4000                	.2byte	0x4000
-80002042:	c500                	.2byte	0xc500
-80002044:	c000                	.2byte	0xc000
-80002046:	c800                	.2byte	0xc800
+80002040:	4000                	.insn	2, 0x4000
+80002042:	c500                	.insn	2, 0xc500
+80002044:	c000                	.insn	2, 0xc000
+80002046:	c800                	.insn	2, 0xc800
 
 80002048 <test_11_data>:
-80002048:	3c00                	.2byte	0x3c00
-8000204a:	4100                	.2byte	0x4100
-8000204c:	3c00                	.2byte	0x3c00
-8000204e:	be00                	.2byte	0xbe00
+80002048:	3c00                	.insn	2, 0x3c00
+8000204a:	4100                	.insn	2, 0x4100
+8000204c:	3c00                	.insn	2, 0x3c00
+8000204e:	be00                	.insn	2, 0xbe00
 
 80002050 <test_12_data>:
-80002050:	bc00                	.2byte	0xbc00
-80002052:	ca0d                	.2byte	0xca0d
-80002054:	3c66                	.2byte	0x3c66
-80002056:	c980                	.2byte	0xc980
+80002050:	bc00                	.insn	2, 0xbc00
+80002052:	ca0d                	.insn	2, 0xca0d
+80002054:	3c66                	.insn	2, 0x3c66
+80002056:	c980                	.insn	2, 0xc980
 
 80002058 <test_13_data>:
-80002058:	4000                	.2byte	0x4000
-8000205a:	c500                	.2byte	0xc500
-8000205c:	c000                	.2byte	0xc000
-8000205e:	4800                	.2byte	0x4800
+80002058:	4000                	.insn	2, 0x4000
+8000205a:	c500                	.insn	2, 0xc500
+8000205c:	c000                	.insn	2, 0xc000
+8000205e:	4800                	.insn	2, 0x4800

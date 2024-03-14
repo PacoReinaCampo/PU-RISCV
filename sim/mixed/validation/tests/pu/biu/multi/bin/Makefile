@@ -225,24 +225,24 @@ shamt \
 )
 
 # User Mode RVI Tests
-utst_lst += $(if $(HAS_RVI) > 0, $(foreach t, $(USER_RVI_TESTS),rv$(XLEN)ui-p-$t))
+uitst_lst += $(if $(HAS_RVI) > 0, $(foreach t, $(USER_RVI_TESTS),rv$(XLEN)ui-p-$t))
 
 # User Mode RVM Tests
-utst_lst += $(if $(HAS_RVM) > 0, $(foreach t, $(USER_RVM_TESTS),rv$(XLEN)um-p-$t))
+umtst_lst += $(if $(HAS_RVM) > 0, $(foreach t, $(USER_RVM_TESTS),rv$(XLEN)um-p-$t))
 
 # User Mode RVA Tests
-utst_lst += $(if $(HAS_RVA) > 0, $(foreach t, $(USER_RVA_TESTS),rv$(XLEN)ua-p-$t))
+uatst_lst += $(if $(HAS_RVA) > 0, $(foreach t, $(USER_RVA_TESTS),rv$(XLEN)ua-p-$t))
 
 # User Mode RVF Tests
-utst_lst += $(if $(HAS_RVF) > 0, $(foreach t, $(USER_RVF_TESTS),rv$(XLEN)uf-p-$t))
+uftst_lst += $(if $(HAS_RVF) > 0, $(foreach t, $(USER_RVF_TESTS),rv$(XLEN)uf-p-$t))
 
-# User Mode RVF Tests
-utst_lst += $(if $(HAS_RVD) > 0, $(foreach t, $(USER_RVD_TESTS),rv$(XLEN)ud-p-$t))
+# User Mode RVD Tests
+udtst_lst += $(if $(HAS_RVD) > 0, $(foreach t, $(USER_RVD_TESTS),rv$(XLEN)ud-p-$t))
 
 # User Mode RVC Tests
-#utst_lst += $(if $(HAS_RVC) > 0, $(foreach t, $(USER_RVC_TESTS),rv$(XLEN)uc-p-$t))
+uctst_lst += $(if $(HAS_RVC) > 0, $(foreach t, $(USER_RVC_TESTS),rv$(XLEN)uc-p-$t))
 
-utests    = $(if $(HAS_U)   > 0, $(utst_lst))
+utests = $(if $(HAS_U) > 0, $(uitst_lst) $(umtst_lst) $(uatst_lst) $(uftst_lst))
 
 # Supervisor Mode RVI Tests
 sitst_lst = $(SUPERVISOR_RVI_TESTS)
