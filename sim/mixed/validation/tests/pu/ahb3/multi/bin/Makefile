@@ -657,7 +657,7 @@ regression: $(logs)
 
 %.log:
 	$(MAKE) $(SIM) LOG=./log/$(@F) \
-	  PARAMETERS=" HEX_FILE=\"$(TST_SRC_DIR)/$(lastword $(subst @, ,$*)).hex\" "
+	PARAMETERS=" HEX_FILE=\"$(TST_SRC_DIR)/$(lastword $(subst @, ,$*)).hex\" "
 
 
 ##########################################################################
