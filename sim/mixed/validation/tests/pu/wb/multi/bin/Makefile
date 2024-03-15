@@ -106,7 +106,7 @@ HAS_H64 = 1
 HAS_M32 = 1
 HAS_M64 = 1
 
-# User Mode RV64I Tests
+# User Mode RV32I Tests
 USER_RV32I_TESTS = \
 add \
 addi \
@@ -149,7 +149,7 @@ sw \
 xor \
 xori
 
-# User Mode RV32I Tests
+# User Mode RV64I Tests
 USER_RV64I_TESTS = \
 add \
 addi \
