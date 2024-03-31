@@ -1,4 +1,17 @@
 verilog
+├── bfm
+│   ├── ahb3
+│   │   └── peripheral_design.sv
+│   ├── apb4
+│   │   └── peripheral_design.sv
+│   ├── axi4
+│   │   ├── peripheral_bfm_master_axi4.sv
+│   │   ├── peripheral_bfm_slave_axi4.sv
+│   │   └── peripheral_bfm_slave_generic_axi4.sv
+│   └── biu
+│       ├── peripheral_spram_biu.sv
+│       ├── peripheral_spram_bridge_biu.sv
+│       └── peripheral_spram_generic_biu.sv
 ├── core
 │   ├── cache
 │   │   ├── pu_riscv_dcache_core.sv
@@ -55,6 +68,9 @@ verilog
     │   ├── pu_riscv_axi4.sv
     │   ├── pu_riscv_biu2axi4.sv
     │   └── pu_riscv_module_axi4.sv
+    ├── biu
+    │   ├── pu_riscv_biu.sv
+    │   └── pu_riscv_module_biu.sv
     ├── bridge
     │   ├── riscv_ahb2axi.sv
     │   └── riscv_axi2ahb.sv
@@ -63,4 +79,4 @@ verilog
         ├── pu_riscv_module_wb.sv
         └── pu_riscv_wb.sv
 
-14 directories, 49 files
+20 directories, 59 files
