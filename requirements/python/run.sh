@@ -42,18 +42,18 @@
 ##                                                                               ##
 ###################################################################################
 
-python3 library/bfm/ahb3/peripheral_design.py
-python3 library/bfm/apb4/peripheral_design.py
-python3 library/bfm/axi4/peripheral_design.py
-python3 library/bfm/bb/peripheral_design.py
-python3 library/bfm/wb/peripheral_design.py
-python3 library/core/ahb3/peripheral_design.py
-python3 library/core/apb4/peripheral_design.py
-python3 library/core/axi4/peripheral_design.py
-python3 library/core/bb/peripheral_design.py
-python3 library/core/wb/peripheral_design.py
-python3 library/pu/ahb3/peripheral_design.py
-python3 library/pu/apb4/peripheral_design.py
-python3 library/pu/axi4/peripheral_design.py
-python3 library/pu/bb/peripheral_design.py
-python3 library/pu/wb/peripheral_design.py
+python3 -B library/bfm/ahb3/peripheral_design.py
+python3 -B library/bfm/apb4/peripheral_design.py
+python3 -B library/bfm/axi4/peripheral_design.py
+python3 -B library/bfm/bb/peripheral_design.py
+python3 -B library/bfm/wb/peripheral_design.py
+python3 -B library/core/ahb3/peripheral_design.py
+python3 -B library/core/apb4/peripheral_design.py
+python3 -B library/core/axi4/peripheral_design.py
+python3 -B library/core/bb/peripheral_design.py
+python3 -B library/core/wb/peripheral_design.py
+python3 -B library/pu/ahb3/peripheral_design.py
+python3 -B library/pu/apb4/peripheral_design.py
+python3 -B library/pu/axi4/peripheral_design.py
+python3 -B library/pu/bb/peripheral_design.py
+python3 -B library/pu/wb/peripheral_design.py
