@@ -51,9 +51,18 @@ vhdl
     ├── ahb3
     │   ├── pu_riscv_ahb3.vhd
     │   └── pu_riscv_biu2ahb3.vhd
+    ├── apb4
+    │   ├── pu_riscv_ahb3.vhd
+    │   └── pu_riscv_biu2ahb3.vhd
     ├── axi4
     │   ├── pu_riscv_axi4.vhd
     │   └── pu_riscv_biu2axi4.vhd
+    ├── bb
+    │   ├── pu_riscv_ahb3.vhd
+    │   └── pu_riscv_biu2ahb3.vhd
+    ├── biu
+    │   ├── pu_riscv_ahb3.vhd
+    │   └── pu_riscv_biu2ahb3.vhd
     ├── bridge
     │   ├── riscv_ahb2axi.vhd
     │   └── riscv_axi2ahb.vhd
@@ -61,4 +70,4 @@ vhdl
         ├── pu_riscv_biu2wb.vhd
         └── pu_riscv_wb.vhd
 
-14 directories, 47 files
+17 directories, 53 files

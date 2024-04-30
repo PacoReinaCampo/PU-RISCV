@@ -42,8 +42,8 @@
 ##                                                                               ##
 ###################################################################################
 
-../../../../../../../rtl/verilog/pkg/peripheral_ahb3_verilog_pkg.sv
-../../../../../../../rtl/verilog/pkg/peripheral_biu_verilog_pkg.sv
+../../../../../../../rtl/verilog/pkg/peripheral_wb_verilog_pkg.sv
+../../../../../../../rtl/verilog/pkg/peripheral_wb_verilog_pkg.sv
 ../../../../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
 
 ../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
@@ -80,11 +80,11 @@
 ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1rw.sv
 ../../../../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
 
-../../../../../../../rtl/verilog/pu/ahb3/pu_riscv_biu2ahb3.sv
-../../../../../../../rtl/verilog/pu/ahb3/pu_riscv_ahb3.sv
+../../../../../../../rtl/verilog/pu/wb/pu_riscv_wb2ahb3.sv
+../../../../../../../rtl/verilog/pu/wb/pu_riscv_wb.sv
 
-../../../../../../../verification/tasks/verilog/library/pu/ahb3/pu_riscv_memory_model_ahb3.sv
-../../../../../../../verification/tasks/verilog/library/pu/ahb3/pu_riscv_mmio_if_ahb3.sv
-../../../../../../../verification/tasks/verilog/library/pu/ahb3/pu_riscv_testbench_ahb3.sv
+../../../../../../../verification/tasks/verilog/library/pu/wb/pu_riscv_memory_model_wb.sv
+../../../../../../../verification/tasks/verilog/library/pu/wb/pu_riscv_mmio_if_wb.sv
+../../../../../../../verification/tasks/verilog/library/pu/wb/pu_riscv_testbench_wb.sv
 ../../../../../../../verification/tasks/verilog/library/bfm/pu_riscv_dbg_bfm.sv
 ../../../../../../../verification/tasks/verilog/library/bfm/pu_riscv_htif.sv

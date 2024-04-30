@@ -8,10 +8,14 @@ verilog
 │   │   ├── peripheral_bfm_master_axi4.sv
 │   │   ├── peripheral_bfm_slave_axi4.sv
 │   │   └── peripheral_bfm_slave_generic_axi4.sv
-│   └── biu
-│       ├── peripheral_spram_biu.sv
-│       ├── peripheral_spram_bridge_biu.sv
-│       └── peripheral_spram_generic_biu.sv
+│   ├── bb
+│   │   └── peripheral_design.sv
+│   ├── biu
+│   │   ├── peripheral_spram_biu.sv
+│   │   ├── peripheral_spram_bridge_biu.sv
+│   │   └── peripheral_spram_generic_biu.sv
+│   └── wb
+│       └── peripheral_design.sv
 ├── core
 │   ├── cache
 │   │   ├── pu_riscv_dcache_core.sv
@@ -64,10 +68,18 @@ verilog
     │   ├── pu_riscv_ahb3.sv
     │   ├── pu_riscv_biu2ahb3.sv
     │   └── pu_riscv_module_ahb3.sv
+    ├── apb4
+    │   ├── pu_riscv_ahb3.sv
+    │   ├── pu_riscv_biu2ahb3.sv
+    │   └── pu_riscv_module_ahb3.sv
     ├── axi4
     │   ├── pu_riscv_axi4.sv
     │   ├── pu_riscv_biu2axi4.sv
     │   └── pu_riscv_module_axi4.sv
+    ├── bb
+    │   ├── pu_riscv_ahb3.sv
+    │   ├── pu_riscv_biu2ahb3.sv
+    │   └── pu_riscv_module_ahb3.sv
     ├── biu
     │   ├── pu_riscv_biu.sv
     │   └── pu_riscv_module_biu.sv
@@ -79,4 +91,4 @@ verilog
         ├── pu_riscv_module_wb.sv
         └── pu_riscv_wb.sv
 
-20 directories, 59 files
+24 directories, 67 files

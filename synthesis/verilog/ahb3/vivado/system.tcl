@@ -43,7 +43,7 @@
 ###################################################################################
 
 read_verilog -sv ../../../../rtl/verilog/pkg/peripheral_ahb3_verilog_pkg.sv
-read_verilog -sv ../../../../rtl/verilog/pkg/peripheral_biu_verilog_pkg.sv
+read_verilog -sv ../../../../rtl/verilog/pkg/peripheral_ahb3_verilog_pkg.sv
 read_verilog -sv ../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
 
 read_verilog -sv ../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
@@ -72,7 +72,7 @@ read_verilog -sv ../../../../rtl/verilog/core/main/pu_riscv_du.sv
 read_verilog -sv ../../../../rtl/verilog/core/main/pu_riscv_memory.sv
 read_verilog -sv ../../../../rtl/verilog/core/main/pu_riscv_rf.sv
 read_verilog -sv ../../../../rtl/verilog/core/main/pu_riscv_state.sv
-read_verilog -sv ../../../../rtl/verilog/core/main/pu_riscv_wb.sv
+read_verilog -sv ../../../../rtl/verilog/core/main/pu_riscv_ahb3.sv
 
 read_verilog -sv ../../../../rtl/verilog/memory/pu_riscv_ram_1r1w_generic.sv
 read_verilog -sv ../../../../rtl/verilog/memory/pu_riscv_ram_1r1w.sv
@@ -80,7 +80,7 @@ read_verilog -sv ../../../../rtl/verilog/memory/pu_riscv_ram_1rw_generic.sv
 read_verilog -sv ../../../../rtl/verilog/memory/pu_riscv_ram_1rw.sv
 read_verilog -sv ../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
 
-read_verilog -sv ../../../../rtl/verilog/pu/ahb3/pu_riscv_biu2ahb3.sv
+read_verilog -sv ../../../../rtl/verilog/pu/ahb3/pu_riscv_ahb32ahb3.sv
 read_verilog -sv ../../../../rtl/verilog/pu/ahb3/pu_riscv_ahb3.sv
 
 read_verilog -sv spram/core/mpsoc_ahb3_spram.sv

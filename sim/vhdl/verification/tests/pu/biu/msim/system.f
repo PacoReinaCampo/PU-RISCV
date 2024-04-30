@@ -42,7 +42,7 @@
 ##                                                                               ##
 ###################################################################################
 
-../../../../../../../rtl/vhdl/pkg/peripheral_ahb3_vhdl_pkg.vhd
+../../../../../../../rtl/vhdl/pkg/peripheral_biu_vhdl_pkg.vhd
 ../../../../../../../rtl/vhdl/pkg/peripheral_biu_vhdl_pkg.vhd
 ../../../../../../../rtl/vhdl/pkg/pu_riscv_vhdl_pkg.vhd
 ../../../../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
@@ -73,7 +73,7 @@
 ../../../../../../../rtl/vhdl/core/main/pu_riscv_memory.vhd
 ../../../../../../../rtl/vhdl/core/main/pu_riscv_rf.vhd
 ../../../../../../../rtl/vhdl/core/main/pu_riscv_state.vhd
-../../../../../../../rtl/vhdl/core/main/pu_riscv_wb.vhd
+../../../../../../../rtl/vhdl/core/main/pu_riscv_biu.vhd
 
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1r1w.vhd
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1r1w_generic.vhd
@@ -82,10 +82,10 @@
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
 ../../../../../../../rtl/vhdl/pu/biu/pu_riscv_biu2ahb3.vhd
-../../../../../../../rtl/vhdl/pu/biu/pu_riscv_ahb3.vhd
+../../../../../../../rtl/vhdl/pu/biu/pu_riscv_biu.vhd
 
-../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_memory_model_ahb3.vhd
-../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_mmio_if_ahb3.vhd
-../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_testbench_ahb3.vhd
+../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_memory_model_biu.vhd
+../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_mmio_if_biu.vhd
+../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_testbench_biu.vhd
 ../../../../../../../verification/tasks/vhdl/library/pu/main/pu_riscv_dbg_bfm.vhd
 ../../../../../../../verification/tasks/vhdl/library/pu/main/pu_riscv_htif.vhd

@@ -43,7 +43,7 @@
 ###################################################################################
 
 ../../../../../../../rtl/verilog/pkg/peripheral_ahb3_pkg.sv
-../../../../../../../rtl/verilog/pkg/peripheral_biu_pkg.sv
+../../../../../../../rtl/verilog/pkg/peripheral_ahb3_pkg.sv
 ../../../../../../../rtl/verilog/pkg/pu_riscv_pkg.sv
 
 ../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
@@ -68,7 +68,7 @@
 ../../../../../../../rtl/verilog/core/main/pu_riscv_state.sv
 ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1rw_generic.sv
 ../../../../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
-../../../../../../../rtl/verilog/pu/ahb3/pu_riscv_biu2ahb3.sv
+../../../../../../../rtl/verilog/pu/ahb3/pu_riscv_ahb32ahb3.sv
 ../../../../../../../rtl/verilog/pu/ahb3/pu_riscv_ahb3.sv
 
 ../../../../../../../verification/tasks/verilog/library/pu/interface/ahb3/pu_riscv_memory_model_ahb3.sv

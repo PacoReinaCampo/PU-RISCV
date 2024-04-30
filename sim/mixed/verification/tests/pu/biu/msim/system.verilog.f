@@ -42,7 +42,7 @@
 ##                                                                               ##
 ###################################################################################
 
-../../../../../../../rtl/verilog/pkg/peripheral_ahb3_pkg.sv
+../../../../../../../rtl/verilog/pkg/peripheral_biu_pkg.sv
 ../../../../../../../rtl/verilog/pkg/peripheral_biu_pkg.sv
 ../../../../../../../rtl/verilog/pkg/pu_riscv_pkg.sv
 
@@ -69,10 +69,10 @@
 ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1rw_generic.sv
 ../../../../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
 ../../../../../../../rtl/verilog/pu/biu/pu_riscv_biu2ahb3.sv
-../../../../../../../rtl/verilog/pu/biu/pu_riscv_ahb3.sv
+../../../../../../../rtl/verilog/pu/biu/pu_riscv_biu.sv
 
-../../../../../../../verification/tasks/verilog/library/pu/interface/biu/pu_riscv_memory_model_ahb3.sv
-../../../../../../../verification/tasks/verilog/library/pu/interface/biu/pu_riscv_mmio_if_ahb3.sv
-../../../../../../../verification/tasks/verilog/library/pu/interface/biu/pu_riscv_testbench_ahb3.sv
+../../../../../../../verification/tasks/verilog/library/pu/interface/biu/pu_riscv_memory_model_biu.sv
+../../../../../../../verification/tasks/verilog/library/pu/interface/biu/pu_riscv_mmio_if_biu.sv
+../../../../../../../verification/tasks/verilog/library/pu/interface/biu/pu_riscv_testbench_biu.sv
 ../../../../../../../verification/tasks/verilog/library/pu/main/pu_riscv_dbg_bfm.sv
 ../../../../../../../verification/tasks/verilog/library/pu/main/pu_riscv_htif.sv
