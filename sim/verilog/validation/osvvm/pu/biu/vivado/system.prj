@@ -42,10 +42,10 @@
 //                                                                               //
 ///////////////////////////////////////////////////////////////////////////////////
 
-vhdl2008 work ../../../../../../../validation/osvvm/application/pu/ahb3/peripheral_osvvm_design.vhd
-vhdl2008 work ../../../../../../../validation/osvvm/application/pu/ahb3/peripheral_osvvm_design_pkg.vhd
+vhdl2008 work ../../../../../../../validation/osvvm/application/pu/biu/peripheral_osvvm_design.vhd
+vhdl2008 work ../../../../../../../validation/osvvm/application/pu/biu/peripheral_osvvm_design_pkg.vhd
 
-vhdl2008 work ../../../../../../../validation/osvvm/library/pu/ahb3/peripheral_osvvm_model.vhd
-vhdl2008 work ../../../../../../../validation/osvvm/library/pu/ahb3/peripheral_osvvm_model_pkg.vhd
+vhdl2008 work ../../../../../../../validation/osvvm/library/pu/biu/peripheral_osvvm_model.vhd
+vhdl2008 work ../../../../../../../validation/osvvm/library/pu/biu/peripheral_osvvm_model_pkg.vhd
 
-vhdl2008 work ../../../../../../../validation/osvvm/library/pu/ahb3/peripheral_osvvm_testbench.vhd
+vhdl2008 work ../../../../../../../validation/osvvm/library/pu/biu/peripheral_osvvm_testbench.vhd

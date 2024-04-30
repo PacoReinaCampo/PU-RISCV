@@ -81,11 +81,11 @@
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw_generic.vhd
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-../../../../../../../rtl/vhdl/pu/ahb3/pu_riscv_biu2ahb3.vhd
-../../../../../../../rtl/vhdl/pu/ahb3/pu_riscv_ahb3.vhd
+../../../../../../../rtl/vhdl/pu/biu/pu_riscv_biu2ahb3.vhd
+../../../../../../../rtl/vhdl/pu/biu/pu_riscv_ahb3.vhd
 
-../../../../../../../verification/tasks/vhdl/library/pu/interface/ahb3/pu_riscv_memory_model_ahb3.vhd
-../../../../../../../verification/tasks/vhdl/library/pu/interface/ahb3/pu_riscv_mmio_if_ahb3.vhd
-../../../../../../../verification/tasks/vhdl/library/pu/interface/ahb3/pu_riscv_testbench_ahb3.vhd
+../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_memory_model_ahb3.vhd
+../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_mmio_if_ahb3.vhd
+../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_testbench_ahb3.vhd
 ../../../../../../../verification/tasks/vhdl/library/pu/main/pu_riscv_dbg_bfm.vhd
 ../../../../../../../verification/tasks/vhdl/library/pu/main/pu_riscv_htif.vhd
