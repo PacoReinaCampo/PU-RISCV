@@ -43,7 +43,7 @@
 ###################################################################################
 
 ../../../../../../../rtl/verilog/pkg/peripheral_apb4_verilog_pkg.sv
-../../../../../../../rtl/verilog/pkg/peripheral_apb4_verilog_pkg.sv
+../../../../../../../rtl/verilog/pkg/peripheral_biu_verilog_pkg.sv
 ../../../../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
 
 ../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
@@ -72,7 +72,7 @@
 ../../../../../../../rtl/verilog/core/main/pu_riscv_memory.sv
 ../../../../../../../rtl/verilog/core/main/pu_riscv_rf.sv
 ../../../../../../../rtl/verilog/core/main/pu_riscv_state.sv
-../../../../../../../rtl/verilog/core/main/pu_riscv_apb4.sv
+../../../../../../../rtl/verilog/core/main/pu_riscv_wb.sv
 
 ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1r1w_generic.sv
 ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1r1w.sv
@@ -80,7 +80,7 @@
 ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1rw.sv
 ../../../../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
 
-../../../../../../../rtl/verilog/pu/apb4/pu_riscv_apb42ahb3.sv
+../../../../../../../rtl/verilog/pu/apb4/pu_riscv_biu2apb4.sv
 ../../../../../../../rtl/verilog/pu/apb4/pu_riscv_apb4.sv
 
 ../../../../../../../verification/tasks/verilog/library/pu/interface/apb4/pu_riscv_memory_model_apb4.sv

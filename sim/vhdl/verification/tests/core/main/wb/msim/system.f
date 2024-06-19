@@ -42,7 +42,7 @@
 ##                                                                               ##
 ###################################################################################
 
-../../../../../../../rtl/vhdl/pkg/peripheral_wb_vhdl_pkg.vhd
+../../../../../../../rtl/vhdl/pkg/peripheral_biu_vhdl_pkg.vhd
 ../../../../../../../rtl/vhdl/pkg/peripheral_wb_vhdl_pkg.vhd
 ../../../../../../../rtl/vhdl/pkg/pu_riscv_vhdl_pkg.vhd
 ../../../../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
@@ -81,7 +81,7 @@
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw_generic.vhd
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-../../../../../../../rtl/vhdl/pu/wb/pu_riscv_wb2ahb3.vhd
+../../../../../../../rtl/vhdl/pu/wb/pu_riscv_biu2wb.vhd
 ../../../../../../../rtl/vhdl/pu/wb/pu_riscv_wb.vhd
 
 ../../../../../../../verification/tasks/vhdl/library/pu/wb/pu_riscv_memory_model_wb.vhd

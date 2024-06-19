@@ -43,7 +43,7 @@
 ###################################################################################
 
 ../../../../../../../rtl/vhdl/pkg/peripheral_bb_vhdl_pkg.vhd
-../../../../../../../rtl/vhdl/pkg/peripheral_bb_vhdl_pkg.vhd
+../../../../../../../rtl/vhdl/pkg/peripheral_biu_vhdl_pkg.vhd
 ../../../../../../../rtl/vhdl/pkg/pu_riscv_vhdl_pkg.vhd
 ../../../../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
 
@@ -73,7 +73,7 @@
 ../../../../../../../rtl/vhdl/core/main/pu_riscv_memory.vhd
 ../../../../../../../rtl/vhdl/core/main/pu_riscv_rf.vhd
 ../../../../../../../rtl/vhdl/core/main/pu_riscv_state.vhd
-../../../../../../../rtl/vhdl/core/main/pu_riscv_bb.vhd
+../../../../../../../rtl/vhdl/core/main/pu_riscv_wb.vhd
 
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1r1w.vhd
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1r1w_generic.vhd
@@ -81,7 +81,7 @@
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw_generic.vhd
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-../../../../../../../rtl/vhdl/pu/bb/pu_riscv_bb2ahb3.vhd
+../../../../../../../rtl/vhdl/pu/bb/pu_riscv_biu2bb.vhd
 ../../../../../../../rtl/vhdl/pu/bb/pu_riscv_bb.vhd
 
 ../../../../../../../verification/tasks/vhdl/library/pu/bb/pu_riscv_memory_model_bb.vhd

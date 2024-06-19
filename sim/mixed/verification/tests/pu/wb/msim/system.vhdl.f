@@ -42,7 +42,10 @@
 ##                                                                               ##
 ###################################################################################
 
-../../../../../../../rtl/vhdl/pkg/riscv_defines.vhd
+../../../../../../../rtl/vhdl/pkg/peripheral_biu_vhdl_pkg.vhd
+../../../../../../../rtl/vhdl/pkg/peripheral_wb_vhdl_pkg.vhd
+../../../../../../../rtl/vhdl/pkg/pu_riscv_vhdl_pkg.vhd
+../../../../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
 
 ../../../../../../../rtl/vhdl/core/cache/pu_riscv_dext.vhd
 ../../../../../../../rtl/vhdl/core/cache/pu_riscv_noicache_core.vhd
@@ -70,7 +73,7 @@
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw.vhd
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-../../../../../../../rtl/vhdl/pu/wb/pu_riscv_wb2wb.vhd
+../../../../../../../rtl/vhdl/pu/wb/pu_riscv_biu2wb.vhd
 
 ../../../../../../../verification/tasks/vhdl/library/pu/interface/wb/pu_riscv_memory_model_wb.vhd
 ../../../../../../../verification/tasks/vhdl/library/pu/interface/wb/pu_riscv_mmio_if_wb.vhd

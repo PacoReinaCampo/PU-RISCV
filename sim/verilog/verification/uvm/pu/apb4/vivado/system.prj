@@ -43,7 +43,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 sv work ../../../../../../../rtl/verilog/pkg/peripheral_apb4_verilog_pkg.sv
-sv work ../../../../../../../rtl/verilog/pkg/peripheral_apb4_verilog_pkg.sv
+sv work ../../../../../../../rtl/verilog/pkg/peripheral_biu_verilog_pkg.sv
 sv work ../../../../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
 
 sv work ../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
@@ -72,7 +72,7 @@ sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_du.sv
 sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_memory.sv
 sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_rf.sv
 sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_state.sv
-sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_apb4.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_wb.sv
 
 sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1r1w_generic.sv
 sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1r1w.sv
@@ -80,7 +80,7 @@ sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1rw_generic.sv
 sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1rw.sv
 sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
 
-sv work ../../../../../../../rtl/verilog/pu/apb4/pu_riscv_apb42apb4.sv
+sv work ../../../../../../../rtl/verilog/pu/apb4/pu_riscv_biu2apb4.sv
 sv work ../../../../../../../rtl/verilog/pu/apb4/pu_riscv_apb4.sv
 
 sv work ../../../../../../../verification/uvm/application/pu/apb4/main/pu_riscv_htif.sv

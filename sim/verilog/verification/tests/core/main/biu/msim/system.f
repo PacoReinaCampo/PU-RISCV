@@ -43,7 +43,6 @@
 ###################################################################################
 
 ../../../../../../../rtl/verilog/pkg/peripheral_biu_verilog_pkg.sv
-../../../../../../../rtl/verilog/pkg/peripheral_biu_verilog_pkg.sv
 ../../../../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
 
 ../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
@@ -72,7 +71,7 @@
 ../../../../../../../rtl/verilog/core/main/pu_riscv_memory.sv
 ../../../../../../../rtl/verilog/core/main/pu_riscv_rf.sv
 ../../../../../../../rtl/verilog/core/main/pu_riscv_state.sv
-../../../../../../../rtl/verilog/core/main/pu_riscv_biu.sv
+../../../../../../../rtl/verilog/core/main/pu_riscv_wb.sv
 
 ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1r1w_generic.sv
 ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1r1w.sv
@@ -80,7 +79,6 @@
 ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1rw.sv
 ../../../../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
 
-../../../../../../../rtl/verilog/pu/biu/pu_riscv_biu2ahb3.sv
 ../../../../../../../rtl/verilog/pu/biu/pu_riscv_biu.sv
 
 ../../../../../../../verification/tasks/verilog/library/pu/biu/pu_riscv_memory_model_biu.sv

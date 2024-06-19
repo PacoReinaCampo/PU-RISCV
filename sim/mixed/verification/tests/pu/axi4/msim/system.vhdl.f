@@ -42,7 +42,10 @@
 ##                                                                               ##
 ###################################################################################
 
-../../../../../../../rtl/vhdl/pkg/riscv_defines.vhd
+../../../../../../../rtl/vhdl/pkg/peripheral_axi4_vhdl_pkg.vhd
+../../../../../../../rtl/vhdl/pkg/peripheral_biu_vhdl_pkg.vhd
+../../../../../../../rtl/vhdl/pkg/pu_riscv_vhdl_pkg.vhd
+../../../../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
 
 ../../../../../../../rtl/vhdl/core/cache/pu_riscv_dext.vhd
 ../../../../../../../rtl/vhdl/core/cache/pu_riscv_noicache_core.vhd
@@ -62,7 +65,7 @@
 ../../../../../../../rtl/vhdl/core/main/pu_riscv_du.vhd
 ../../../../../../../rtl/vhdl/core/main/pu_riscv_memory.vhd
 ../../../../../../../rtl/vhdl/core/main/pu_riscv_state.vhd
-../../../../../../../rtl/vhdl/core/main/pu_riscv_axi4.vhd
+../../../../../../../rtl/vhdl/core/main/pu_riscv_wb.vhd
 
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1r1w.vhd
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1r1w_generic.vhd
@@ -70,7 +73,7 @@
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw.vhd
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-../../../../../../../rtl/vhdl/pu/axi4/pu_riscv_axi42axi4.vhd
+../../../../../../../rtl/vhdl/pu/axi4/pu_riscv_biu2axi4.vhd
 
 ../../../../../../../verification/tasks/vhdl/library/pu/interface/axi4/pu_riscv_memory_model_axi4.vhd
 ../../../../../../../verification/tasks/vhdl/library/pu/interface/axi4/pu_riscv_mmio_if_axi4.vhd
