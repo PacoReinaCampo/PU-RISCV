@@ -1,5 +1,7 @@
 ## REGISTERS ABI DEFINITIONS
 
+RISC-V specifies a standard Application Binary Interface (ABI) that defines conventions for register usage across software and hardware interfaces. The ABI standardizes how registers are used for passing arguments to functions, returning values, and preserving state across function calls. It also defines callee-saved and caller-saved registers, ensuring compatibility and interoperability between different compilers and operating systems targeting RISC-V processors.
+
 Format of a line in the table:
 
 `<name> <alias> <type> <save> <description>`

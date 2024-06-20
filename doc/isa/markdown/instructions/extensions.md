@@ -1,5 +1,7 @@
 ## INSTRUCTION SET EXTENSIONS
 
+RISC-V supports a modular approach to its instruction set, allowing for standard and custom extensions. Standard extensions, denoted by a single letter (e.g., `I` for base integer instructions), provide essential functionalities such as arithmetic, load/store operations, and control flow. Custom extensions, designated by additional letters (e.g., `M` for integer multiplication and division), expand the ISA with specialized instructions tailored for specific applications like vector processing or cryptographic operations.
+
 Format of a line in the table:
 
 `<prefix> <isa width> <alpha code> <instruction width> "<extension description>"`
@@ -46,5 +48,7 @@ Format of a line in the table:
 | `rv`   | `64`      | `t`        | `32`              | `RV64T Standard Extension for Transactional Memory (+ RV32T)`                |
 | `rv`   | `128`     | `t`        | `32`              | `RV128T Standard Extension for Transactional Memory (+ RV64T)`               |
 : Instruction Set Extensions
+
+This table outlines the various instruction set extensions available in the RISC-V architecture, each introducing additional functionality beyond the base ISA to cater to specific application domains or performance optimizations.
 
 ![Extensions](assets/extensions.svg){width=10cm}

@@ -52,17 +52,17 @@ vhdl
     │   ├── pu_riscv_ahb3.vhd
     │   └── pu_riscv_biu2ahb3.vhd
     ├── apb4
-    │   ├── pu_riscv_ahb3.vhd
-    │   └── pu_riscv_biu2ahb3.vhd
+    │   ├── pu_riscv_apb4.vhd
+    │   └── pu_riscv_biu2apb4.vhd
     ├── axi4
     │   ├── pu_riscv_axi4.vhd
     │   └── pu_riscv_biu2axi4.vhd
     ├── bb
-    │   ├── pu_riscv_ahb3.vhd
-    │   └── pu_riscv_biu2ahb3.vhd
+    │   ├── pu_riscv_bb.vhd
+    │   └── pu_riscv_biu2bb.vhd
     ├── biu
-    │   ├── pu_riscv_ahb3.vhd
-    │   └── pu_riscv_biu2ahb3.vhd
+    │   ├── pu_riscv_biu.vhd
+    │   └── pu_riscv_module_biu.vhd
     ├── bridge
     │   ├── riscv_ahb2axi.vhd
     │   └── riscv_axi2ahb.vhd

@@ -1,5 +1,11 @@
 ## OPERAND BIT ENCODINGS
 
+RISC-V instructions use specific encodings for operands and fields within instructions:
+
+- **Register Encoding**: Registers are typically encoded by their numerical index within the register file.
+- **Immediate Encoding**: Immediate values are encoded directly within instruction fields, often sign-extended or zero-extended to fit the required bit length.
+- **Opcode Encoding**: The opcode field determines the general operation or category of an instruction, facilitating instruction decoding.
+
 Format of a line in the table:
 
 `<argument> <bit encoding> <type> <description>`
@@ -77,3 +83,7 @@ Format of a line in the table:
 | `cimmd`      | `12:10[5:3],6:5[7:6]`          | `uimm`    | `uimm`                             |
 | `cimmq`      | `12:10[5:4|8],6:5[7:6]`        | `uimm`    | `uimm`                             |
 : Operand Bit Encodings
+
+The operand bit encodings table provides detailed information on the bit-level representations and formats of operands used in RISC-V instructions.
+
+These encodings are designed to be efficient in terms of both instruction size and decoding complexity, aligning with RISC-V's goal of simplicity and versatility in various computing environments.

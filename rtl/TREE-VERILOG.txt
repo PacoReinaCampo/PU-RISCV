@@ -69,17 +69,17 @@ verilog
     │   ├── pu_riscv_biu2ahb3.sv
     │   └── pu_riscv_module_ahb3.sv
     ├── apb4
-    │   ├── pu_riscv_ahb3.sv
-    │   ├── pu_riscv_biu2ahb3.sv
-    │   └── pu_riscv_module_ahb3.sv
+    │   ├── pu_riscv_apb4.sv
+    │   ├── pu_riscv_biu2apb4.sv
+    │   └── pu_riscv_module_apb4.sv
     ├── axi4
     │   ├── pu_riscv_axi4.sv
     │   ├── pu_riscv_biu2axi4.sv
     │   └── pu_riscv_module_axi4.sv
     ├── bb
-    │   ├── pu_riscv_ahb3.sv
-    │   ├── pu_riscv_biu2ahb3.sv
-    │   └── pu_riscv_module_ahb3.sv
+    │   ├── pu_riscv_bb.sv
+    │   ├── pu_riscv_biu2bb.sv
+    │   └── pu_riscv_module_bb.sv
     ├── biu
     │   ├── pu_riscv_biu.sv
     │   └── pu_riscv_module_biu.sv
