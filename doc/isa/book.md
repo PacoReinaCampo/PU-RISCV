@@ -1,5 +1,4 @@
 markdown/architecture/definition.md
-markdown/architecture/notation.md
 markdown/architecture/enums.md
 markdown/architecture/constraints.md
 markdown/architecture/operands.md
@@ -28,3 +27,4 @@ markdown/verification/test-32.md
 markdown/verification/test-64.md
 markdown/data_formats/glossary.md
 markdown/data_formats/descriptions.md
+markdown/data_formats/notation.md

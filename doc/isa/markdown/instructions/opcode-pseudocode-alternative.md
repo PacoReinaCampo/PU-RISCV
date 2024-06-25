@@ -101,7 +101,7 @@ Extending RV32M to 64-bit, RV64M introduces support for integer multiplication a
 | `amoswap.w`  | `rd = s32[rs1] , u32[rs1] = s32(rs2)`                               |
 | `amoadd.w`   | `rd = s32[rs1] , u32[rs1] = s32(rs2) + s32[rs1]`                    |
 | `amoxor.w`   | `rd = s32[rs1] , u32[rs1] = s32(rs2) ^ s32[rs1]`                    |
-| `amoor.w`    | `rd = s32[rs1] , u32[rs1] = s32(rs2) | s32[rs1]`                    |
+| `amoor.w`    | `rd = s32[rs1] , u32[rs1] = s32(rs2) \| s32[rs1]`                   |
 | `amoand.w`   | `rd = s32[rs1] , u32[rs1] = s32(rs2) & s32[rs1]`                    |
 | `amomin.w`   | `rd = s32[rs1] , u32[rs1] = s32_min(s32(rs2), s32[rs1])`            |
 | `amomax.w`   | `rd = s32[rs1] , u32[rs1] = s32_max(s32(rs2), s32[rs1])`            |
@@ -118,7 +118,7 @@ Detailed here are the atomic instruction set extensions for the 32-bit RISC-V ar
 | `amoswap.d`  | `rd = s64[rs1] , u64[rs1] = s64(rs2)`                               |
 | `amoadd.d`   | `rd = s64[rs1] , u64[rs1] = s64(rs2) + s64[rs1]`                    |
 | `amoxor.d`   | `rd = s64[rs1] , u64[rs1] = s64(rs2) ^ s64[rs1]`                    |
-| `amoor.d`    | `rd = s64[rs1] , u64[rs1] = s64(rs2) | s64[rs1]`                    |
+| `amoor.d`    | `rd = s64[rs1] , u64[rs1] = s64(rs2) \| s64[rs1]`                   |
 | `amoand.d`   | `rd = s64[rs1] , u64[rs1] = s64(rs2) & s64[rs1]`                    |
 | `amomin.d`   | `rd = s64[rs1] , u64[rs1] = s64_min(s64(rs2), s64[rs1])`            |
 | `amomax.d`   | `rd = s64[rs1] , u64[rs1] = s64_max(s64(rs2), s64[rs1])`            |

@@ -167,11 +167,11 @@ This section covers supervisor-level instructions tailored for the 32-bit RISC-V
 | `fsub.s`     | `fenv_setrm(rm); f32(frd) = f32(frs1) - f32(frs2)`                                                          |                                     |
 | `fmul.s`     | `fenv_setrm(rm); f32(frd) = f32(frs1) * f32(frs2)`                                                          |                                     |
 | `fdiv.s`     | `fenv_setrm(rm); f32(frd) = f32(frs1) / f32(frs2)`                                                          |                                     |
-| `fsgnj.s`    | `u32(frd) = (u32(frs1) & u32(~(1U<<31))) | (u32(frs2) & u32(1U<<31))`                                       |                                     |
-| `fsgnjn.s`   | `u32(frd) = (u32(frs1) & u32(~(1U<<31))) | (~u32(frs2) & u32(1U<<31))`                                      |                                     |
+| `fsgnj.s`    | `u32(frd) = (u32(frs1) & u32(~(1U<<31))) \| (u32(frs2) & u32(1U<<31))`                                      |                                     |
+| `fsgnjn.s`   | `u32(frd) = (u32(frs1) & u32(~(1U<<31))) \| (~u32(frs2) & u32(1U<<31))`                                     |                                     |
 | `fsgnjx.s`   | `u32(frd) = u32(frs1) ^ (u32(frs2) & u32(1U<<31))`                                                          |                                     |
-| `fmin.s`     | `f32(frd) = (f32(frs1) < f32(frs2)) || isnan(f32(frs2)) ? f32(frs1) : f32(frs2)`                            |                                     |
-| `fmax.s`     | `f32(frd) = (f32(frs1) > f32(frs2)) || isnan(f32(frs2)) ? f32(frs1) : f32(frs2)`                            |                                     |
+| `fmin.s`     | `f32(frd) = (f32(frs1) < f32(frs2)) \|\| isnan(f32(frs2)) ? f32(frs1) : f32(frs2)`                          |                                     |
+| `fmax.s`     | `f32(frd) = (f32(frs1) > f32(frs2)) \|\| isnan(f32(frs2)) ? f32(frs1) : f32(frs2)`                          |                                     |
 | `fsqrt.s`    | `fenv_setrm(rm); f32(frd) = riscv::f32_sqrt(f32(frs1))`                                                     |                                     |
 | `fle.s`      | `rd = f32(frs1) <= f32(frs2)`                                                                               |                                     |
 | `flt.s`      | `rd = f32(frs1) < f32(frs2)`                                                                                |                                     |
@@ -209,11 +209,11 @@ The RV32F table details the single-precision floating-point extension for the 32
 | `fsub.d`     | `fenv_setrm(rm); f64(frd) = f64(frs1) - f64(frs2)`                                                          |                                     |
 | `fmul.d`     | `fenv_setrm(rm); f64(frd) = f64(frs1) * f64(frs2)`                                                          |                                     |
 | `fdiv.d`     | `fenv_setrm(rm); f64(frd) = f64(frs1) / f64(frs2)`                                                          |                                     |
-| `fsgnj.d`    | `u64(frd) = (u64(frs1) & u64(~(1ULL<<63))) | (u64(frs2) & u64(1ULL<<63))`                                   |                                     |
-| `fsgnjn.d`   | `u64(frd) = (u64(frs1) & u64(~(1ULL<<63))) | (~u64(frs2) & u64(1ULL<<63))`                                  |                                     |
+| `fsgnj.d`    | `u64(frd) = (u64(frs1) & u64(~(1ULL<<63))) \| (u64(frs2) & u64(1ULL<<63))`                                  |                                     |
+| `fsgnjn.d`   | `u64(frd) = (u64(frs1) & u64(~(1ULL<<63))) \| (~u64(frs2) & u64(1ULL<<63))`                                 |                                     |
 | `fsgnjx.d`   | `u64(frd) = u64(frs1) ^ (u64(frs2) & u64(1ULL<<63))`                                                        |                                     |
-| `fmin.d`     | `f64(frd) = (f64(frs1) < f64(frs2)) || isnan(f64(frs2)) ? f64(frs1) : f64(frs2)`                            |                                     |
-| `fmax.d`     | `f64(frd) = (f64(frs1) > f64(frs2)) || isnan(f64(frs2)) ? f64(frs1) : f64(frs2)`                            |                                     |
+| `fmin.d`     | `f64(frd) = (f64(frs1) < f64(frs2)) \|\| isnan(f64(frs2)) ? f64(frs1) : f64(frs2)`                          |                                     |
+| `fmax.d`     | `f64(frd) = (f64(frs1) > f64(frs2)) \|\| isnan(f64(frs2)) ? f64(frs1) : f64(frs2)`                          |                                     |
 | `fcvt.s.d`   | `fenv_setrm(rm); f32(frd) = f32(f64(frs1))`                                                                 |                                     |
 | `fcvt.d.s`   | `fenv_setrm(rm); f64(frd) = f64(f32(frs1))`                                                                 |                                     |
 | `fsqrt.d`    | `fenv_setrm(rm); f64(frd) = riscv::f64_sqrt(f64(frs1))`                                                     |                                     |
