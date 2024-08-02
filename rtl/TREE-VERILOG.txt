@@ -40,7 +40,7 @@ verilog
 │   │   ├── pu_riscv_memory.sv
 │   │   ├── pu_riscv_rf.sv
 │   │   ├── pu_riscv_state.sv
-│   │   └── pu_riscv_wb.sv
+│   │   └── pu_riscv_writeback.sv
 │   └── memory
 │       ├── pu_riscv_dmem_ctrl.sv
 │       ├── pu_riscv_imem_ctrl.sv

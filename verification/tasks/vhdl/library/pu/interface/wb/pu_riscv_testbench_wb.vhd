@@ -135,7 +135,7 @@ architecture rtl of pu_riscv_testbench_wb is
   ------------------------------------------------------------------------------
   -- Components
   ------------------------------------------------------------------------------
-  component pu_riscv_wb
+  component pu_riscv_writeback
     generic (
       XLEN : integer := 64;
       PLEN : integer := 64;
@@ -641,7 +641,7 @@ begin
   pma_cfg(3) <= (MEM_TYPE_MAIN & "11110000" & AMO_TYPE_NONE & TOR);
 
   -- Hookup Device Under Test
-  dut : pu_riscv_wb
+  dut : pu_riscv_writeback
     generic map (
       XLEN => XLEN,
       PLEN => PLEN,

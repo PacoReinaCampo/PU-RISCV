@@ -72,7 +72,7 @@ sv work ../../../../../../../rtl/verilog/core/pu_riscv_du.sv
 sv work ../../../../../../../rtl/verilog/core/pu_riscv_memory.sv
 sv work ../../../../../../../rtl/verilog/core/pu_riscv_rf.sv
 sv work ../../../../../../../rtl/verilog/core/pu_riscv_state.sv
-sv work ../../../../../../../rtl/verilog/core/pu_riscv_wb.sv
+sv work ../../../../../../../rtl/verilog/core/pu_riscv_writeback.sv
 
 sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1r1w_generic.sv
 sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1r1w.sv

@@ -466,7 +466,7 @@ module pu_riscv_core #(
   );
 
   // Memory acknowledge + Write Back unit
-  pu_riscv_wb #(
+  pu_riscv_writeback #(
     .XLEN(XLEN),
     .ILEN(ILEN),
 

@@ -179,7 +179,7 @@ module pu_riscv_testbench_wb;
   assign pma_cfg[3] = {MEM_TYPE_MAIN, 8'b1111_0000, AMO_TYPE_NONE, TOR};
 
   // Hookup Device Under Test
-  pu_riscv_wb #(
+  pu_riscv_writeback #(
     .XLEN        (XLEN),
     .PLEN        (PLEN),
     .PC_INIT     (PC_INIT),

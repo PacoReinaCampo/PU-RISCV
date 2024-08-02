@@ -23,7 +23,7 @@ vhdl
 │   │   ├── pu_riscv_memory.vhd
 │   │   ├── pu_riscv_rf.vhd
 │   │   ├── pu_riscv_state.vhd
-│   │   └── pu_riscv_wb.vhd
+│   │   └── pu_riscv_writeback.vhd
 │   └── memory
 │       ├── pu_riscv_dmem_ctrl.vhd
 │       ├── pu_riscv_imem_ctrl.vhd

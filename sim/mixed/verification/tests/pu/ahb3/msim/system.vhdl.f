@@ -53,7 +53,7 @@
 ../../../../../../../rtl/vhdl/core/memory/pu_riscv_memmisaligned.vhd
 ../../../../../../../rtl/vhdl/core/memory/pu_riscv_mmu.vhd
 ../../../../../../../rtl/vhdl/core/main/pu_riscv_memory.vhd
-../../../../../../../rtl/vhdl/core/main/pu_riscv_wb.vhd
+../../../../../../../rtl/vhdl/core/main/pu_riscv_writeback.vhd
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1r1w.vhd
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1r1w_generic.vhd
 ../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw.vhd

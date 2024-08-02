@@ -405,7 +405,7 @@ architecture rtl of pu_riscv_core is
       );
   end component;
 
-  component pu_riscv_wb
+  component pu_riscv_writeback
     generic (
       XLEN : integer := 64;
       ILEN : integer := 64;
@@ -1004,7 +1004,7 @@ begin
   dmem_adr <= dmem_adr_sgn;
 
   -- Memory acknowledge + Write Back unit
-  wb_unit : pu_riscv_wb
+  wb_unit : pu_riscv_writeback
     generic map (
       XLEN => XLEN,
       ILEN => ILEN,

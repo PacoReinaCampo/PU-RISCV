@@ -5,7 +5,7 @@ build:
 	vlog -sv -f system.f
 
 simulate:
-	vsim -c -do run.do work.pu_riscv_wb
+	vsim -c -do run.do work.pu_riscv_writeback
 
 clean:
 	rm -rf work transcript
