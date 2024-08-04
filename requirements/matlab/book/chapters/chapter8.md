@@ -18,11 +18,9 @@ MATLAB offers a variety of debugging tools to identify and fix issues in your co
   myFunction();  % Run the function; execution will pause at the breakpoint
   ```
 
-- **Step Through Code**:
-  Use the Step, Step In, Step Out, and Continue buttons in the MATLAB Editor toolbar.
+- **Step Through Code**: Use the Step, Step In, Step Out, and Continue buttons in the MATLAB Editor toolbar.
 
-- **Inspect Variables**:
-  Use the Workspace window or the `whos` command to inspect variable values at breakpoints.
+- **Inspect Variables**: Use the Workspace window or the `whos` command to inspect variable values at breakpoints.
 
 - **Clear Breakpoints**:
   ```matlab
@@ -31,11 +29,9 @@ MATLAB offers a variety of debugging tools to identify and fix issues in your co
 
 ### Code Analysis
 
-- **Code Analyzer**:
-  MATLAB automatically checks your code for potential errors and inefficiencies. Warnings and suggestions appear in the Editor margin.
+- **Code Analyzer**: MATLAB automatically checks your code for potential errors and inefficiencies. Warnings and suggestions appear in the Editor margin.
 
-- **Static Code Analysis**:
-  Use the `mlint` function for detailed analysis.
+- **Static Code Analysis**: Use the `mlint` function for detailed analysis.
   ```matlab
   mlint myScript.m;  % Analyze myScript.m for issues
   ```
@@ -44,8 +40,7 @@ MATLAB offers a variety of debugging tools to identify and fix issues in your co
 
 ### Performance Measurement
 
-- **Timing Code**:
-  Use the `tic` and `toc` functions to measure execution time.
+- **Timing Code**: Use the `tic` and `toc` functions to measure execution time.
   ```matlab
   tic;
   myFunction();
@@ -53,8 +48,7 @@ MATLAB offers a variety of debugging tools to identify and fix issues in your co
   disp(['Elapsed time: ', num2str(elapsedTime), ' seconds']);
   ```
 
-- **Profiling Code**:
-  The MATLAB Profiler provides detailed performance metrics.
+- **Profiling Code**: The MATLAB Profiler provides detailed performance metrics.
   ```matlab
   profile on;
   myFunction();
@@ -63,8 +57,7 @@ MATLAB offers a variety of debugging tools to identify and fix issues in your co
 
 ### Memory Management
 
-- **Monitoring Memory Usage**:
-  Use the `memory` function to check memory usage.
+- **Monitoring Memory Usage**: Use the `memory` function to check memory usage.
   ```matlab
   [user, sys] = memory;  % Get memory usage details
   ```
@@ -175,16 +168,14 @@ MATLAB allows for the automation of repetitive tasks such as building projects, 
 
 ### Using MATLAB Scripts for Automation
 
-- **Automate with Scripts**:
-  Create scripts to automate build processes.
+- **Automate with Scripts**: Create scripts to automate build processes.
   ```matlab
   % buildScript.m
   runtests('testFolder');
   % Additional build tasks
   ```
 
-- **Scheduling Tasks**:
-  Use the `schedule` function to run tasks at specific times.
+- **Scheduling Tasks**: Use the `schedule` function to run tasks at specific times.
 
 ## CONTINUOUS INTEGRATION (CI)
 

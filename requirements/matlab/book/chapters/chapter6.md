@@ -206,8 +206,7 @@ Ensuring the security of MATLAB code involves safeguarding against unauthorized 
 
 ### Security Practices
 
-- **Avoid Using `eval`**:
-  The `eval` function can execute arbitrary code and pose a security risk.
+- **Avoid Using `eval`**: The `eval` function can execute arbitrary code and pose a security risk.
   ```matlab
   % Avoid this:
   eval('disp(''Hello World'')');
@@ -216,8 +215,7 @@ Ensuring the security of MATLAB code involves safeguarding against unauthorized 
   disp('Hello World');
   ```
 
-- **Validate Inputs**:
-  Validate input arguments to functions and scripts to prevent injection attacks.
+- **Validate Inputs**: Validate input arguments to functions and scripts to prevent injection attacks.
   ```matlab
   function safeFunction(inputArg)
       validateattributes(inputArg, {'numeric'}, {'nonempty'});
@@ -225,8 +223,7 @@ Ensuring the security of MATLAB code involves safeguarding against unauthorized 
   end
   ```
 
-- **Use Access Control**:
-  Control access to sensitive data and functions using private functions and properties.
+- **Use Access Control**: Control access to sensitive data and functions using private functions and properties.
   ```matlab
   classdef SecureClass
       properties (Access = private)

@@ -18,10 +18,12 @@ To call C++ code from MATLAB, you can use MEX files or MATLAB Engine API.
          plhs[0] = mxCreateDoubleScalar(input[0] * 2);
      }
      ```
+
   2. **Compile the MEX File**:
      ```matlab
      mex mymexfunction.cpp
      ```
+
   3. **Call the MEX Function**:
      ```matlab
      result = mymexfunction(10);
@@ -49,6 +51,7 @@ MATLAB can directly call Java classes and methods.
      ```matlab
      javaaddpath('path/to/java/classes');
      ```
+
   2. **Call Java Methods**:
      ```matlab
      myObj = javaObject('MyJavaClass');
@@ -99,6 +102,7 @@ Use the MATLAB Engine API for Python.
      ```sh
      pip install matlab
      ```
+
   2. **Use MATLAB in Python**:
      ```python
      import matlab.engine
