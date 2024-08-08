@@ -24,7 +24,8 @@ MATLAB provides various tools and settings to customize your development environ
   - Arrange and resize tool windows to suit your workflow.
   - Save layouts for different tasks using the "Layouts" menu.
 
-- **Toolbars and Panes**: Customize toolbars and panes for quick access to frequently used tools.
+- **Toolbars and Panes**:
+  - Customize toolbars and panes for quick access to frequently used tools.
 
 ### Shortcuts and Quick Access
 

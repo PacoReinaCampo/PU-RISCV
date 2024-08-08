@@ -161,13 +161,11 @@ Executing MATLAB code can be done interactively or via scripts and functions.
 
 ### Interactive Execution
 
-- **Command Window**:
-  Type commands directly in the Command Window.
+- **Command Window**: Type commands directly in the Command Window.
 
 ### Batch Execution
 
-- **Scripts and Functions**:
-  Run scripts and functions from the Command Window or using the `run` command.
+- **Scripts and Functions**: Run scripts and functions from the Command Window or using the `run` command.
   ```matlab
   run('myScript.m');  % Run a script
   ```

@@ -40,8 +40,7 @@ end
 
 ### Running the App
 
-- **Run the App**:
-  - Click the "Run" button in the App Designer toolstrip to test the app.
+- **Run the App**: Click the "Run" button in the App Designer toolstrip to test the app.
 
 ## DEVELOP APPS PROGRAMMATICALLY
 
@@ -156,9 +155,9 @@ GUIDE is MATLAB's older app building tool, and it is recommended to migrate GUID
 1. **Open the GUIDE App in GUIDE**: In MATLAB, type `guide` and open your GUIDE app.
    
 2. **Export to App Designer**: Use the GUIDE to App Designer migration tool:
-     ```matlab
-     guideToAppDesigner('yourGuideApp.fig');
-     ```
+  ```matlab
+  guideToAppDesigner('yourGuideApp.fig');
+  ```
 
 3. **Adjust the Code**: Update the auto-generated code as needed to fit the App Designer structure.
 
