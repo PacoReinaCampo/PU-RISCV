@@ -42,9 +42,9 @@
 //                                                                               //
 ///////////////////////////////////////////////////////////////////////////////////
 
-vhdl work ../../../../../../../rtl/vhdl/pkg/peripheral_wb_pkg.vhd
-vhdl work ../../../../../../../rtl/vhdl/pkg/peripheral_wb_pkg.vhd
-vhdl work ../../../../../../../rtl/vhdl/pkg/pu_riscv_pkg.vhd
+vhdl work ../../../../../../../rtl/vhdl/pkg/peripheral_wb_vhdl_pkg.vhd
+vhdl work ../../../../../../../rtl/vhdl/pkg/peripheral_biu_vhdl_pkg.vhd
+vhdl work ../../../../../../../rtl/vhdl/pkg/pu_riscv_vhdl_pkg.vhd
 vhdl work ../../../../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
 
 vhdl work ../../../../../../../rtl/vhdl/core/cache/pu_riscv_dext.vhd

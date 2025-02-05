@@ -42,7 +42,9 @@
 ##                                                                               ##
 ###################################################################################
 
-+incdir+../../../../../../../rtl/verilog/pkg
+sv work ../../../../../../../rtl/verilog/pkg/peripheral_wb_verilog_pkg.sv
+sv work ../../../../../../../rtl/verilog/pkg/peripheral_biu_verilog_pkg.sv
+sv work ../../../../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
 
 ../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
 ../../../../../../../rtl/verilog/core/cache/pu_riscv_icache_core.sv
