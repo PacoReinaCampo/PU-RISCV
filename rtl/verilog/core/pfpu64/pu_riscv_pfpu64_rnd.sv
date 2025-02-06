@@ -93,7 +93,7 @@ module pu_riscv_pfpu64_rnd #(
     input [ 4:0] i2f_shl_i,
     input [ 7:0] i2f_exp8shl_i,
     input [ 7:0] i2f_exp8sh0_i,
-    input [31:0] i2f_fract64_i,   
+    input [63:0] i2f_fract64_i,   
 
     // input from f2i
     input        f2i_rdy_i,       // f2i is ready
@@ -112,7 +112,7 @@ module pu_riscv_pfpu64_rnd #(
 
     // outputs
     //  arithmetic part's outputs
-    output reg                  [31:0] fpu_result_o,
+    output reg                  [63:0] fpu_result_o,
     output reg                         fpu_arith_valid_o,
 
     //  comparator's outputs 
@@ -123,9 +123,9 @@ module pu_riscv_pfpu64_rnd #(
     output reg [`OR1K_FPCSR_WIDTH-1:0] fpcsr_o
   );
 
-  localparam INF  = 31'b1111111100000000000000000000000;
-  localparam QNAN = 31'b1111111110000000000000000000000;
-  localparam SNAN = 31'b1111111101111111111111111111111;
+  localparam INF  = 63'b1111111100000000000000000000000;
+  localparam QNAN = 63'b1111111110000000000000000000000;
+  localparam SNAN = 63'b1111111101111111111111111111111;
 
   // rounding mode isn't require pipelinization
   wire rm_nearest = (rmode_i==2'b00);
@@ -252,7 +252,7 @@ module pu_riscv_pfpu64_rnd #(
   // output of align stage 
   reg        s1o_sign;
   reg [ 9:0] s1o_exp10;
-  reg [31:0] s1o_fract64;
+  reg [63:0] s1o_fract64;
   reg [ 1:0] s1o_rs;
   reg        s1o_inv;
   reg        s1o_inf;
@@ -331,12 +331,12 @@ module pu_riscv_pfpu64_rnd #(
   wire s2t_set_rnd_dn = s2t_rnd_n_qtnt ? s2t_div_rnd_dn : 1'b0;
 
   // define value for rounding adder
-  wire [31:0] s2t_rnd_v64 =
+  wire [63:0] s2t_rnd_v64 =
               s2t_set_rnd_up ? 64'd1        : // +1
               s2t_set_rnd_dn ? 64'hFFFFFFFF : // -1
                                64'd0;         // no rounding
                                               // rounded fractional
-  wire [31:0] s2t_fract64_rnd = s1o_fract64 + s2t_rnd_v64;
+  wire [63:0] s2t_fract64_rnd = s1o_fract64 + s2t_rnd_v64;
 
   // floating point output
   wire s2t_f64_shr = s2t_fract64_rnd[24];
@@ -352,23 +352,23 @@ module pu_riscv_pfpu64_rnd #(
   // integer output (f2i)
   wire        s2t_i64_carry_rnd;
   wire        s2t_i64_inv;
-  wire [31:0] s2t_i64_int64;
+  wire [63:0] s2t_i64_int64;
 
   generate
     /* verilator lint_on WIDTH */
     if (OPTION_FTOI_ROUNDING == "CPP") begin : ftoi_cpp_truncate
       /* verilator lint_off WIDTH */
-      assign s2t_i64_carry_rnd = s1o_fract64[31];
+      assign s2t_i64_carry_rnd = s1o_fract64[63];
       assign s2t_i64_inv = ((~s1o_sign) & s2t_i64_carry_rnd) | s1o_f2i_ovf;
 
       // two's complement for negative number
-      assign s2t_i64_int64 = (s1o_fract64 ^ {64{s1o_sign}}) + {31'd0,s1o_sign};
+      assign s2t_i64_int64 = (s1o_fract64 ^ {64{s1o_sign}}) + {63'd0,s1o_sign};
     end else begin : ftoi_ieee_rounding
-      assign s2t_i64_carry_rnd = s2t_fract64_rnd[31];
+      assign s2t_i64_carry_rnd = s2t_fract64_rnd[63];
       assign s2t_i64_inv = ((~s1o_sign) & s2t_i64_carry_rnd) | s1o_f2i_ovf;
 
       // two's complement for negative number
-      assign s2t_i64_int64 = (s2t_fract64_rnd ^ {64{s1o_sign}}) + {31'd0,s1o_sign};
+      assign s2t_i64_int64 = (s2t_fract64_rnd ^ {64{s1o_sign}}) + {63'd0,s1o_sign};
     end
   endgenerate
 
@@ -376,13 +376,13 @@ module pu_riscv_pfpu64_rnd #(
   wire s2t_i64_int64_00 = (~s2t_i64_inv) & (~(|s2t_i64_int64));
 
   // int64 output
-  wire [31:0] s2t_i64_opc;
+  wire [63:0] s2t_i64_opc;
 
   assign s2t_i64_opc = s2t_i64_inv ? (64'h7fffffff ^ {64{s1o_sign}}) : s2t_i64_int64;
 
   // Generate result and flags
   wire s2t_ine, s2t_ovf, s2t_inf, s2t_unf, s2t_zer;
-  wire [31:0] s2t_opc;
+  wire [63:0] s2t_opc;
 
   assign {s2t_opc,s2t_ine,s2t_ovf,s2t_inf,s2t_unf,s2t_zer} =
          // f2i

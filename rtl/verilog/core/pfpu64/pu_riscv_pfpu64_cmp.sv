@@ -121,10 +121,7 @@ module pfpu64_fcmp (
   reg altb, blta, aeqb;
 
   always @(qnan or snan or infa_i or infb_i or signa_i or signb_i or exp_eq or exp_gt or exp_lt or fract_eq or fract_gt or fract_lt or all_zero) begin
-
-    casez ({
-      qnan, snan, infa_i, infb_i, signa_i, signb_i, exp_eq, exp_gt, exp_lt, fract_eq, fract_gt, fract_lt, all_zero
-    })
+    casez ({ qnan, snan, infa_i, infb_i, signa_i, signb_i, exp_eq, exp_gt, exp_lt, fract_eq, fract_gt, fract_lt, all_zero })
       13'b1?_??_??_???_???_?: {blta, altb, aeqb} = 3'b000;  // qnan
       13'b?1_??_??_???_???_?: {blta, altb, aeqb} = 3'b000;  // snan
 

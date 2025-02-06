@@ -341,7 +341,7 @@ module pu_riscv_pfpu64_muldiv (
          //   (!) 1x.xx case is processed in next stage
          {{9'd0,s1o_exp10c_0},(s1o_exp10c | {9'd0,s1o_exp10c_0})};
 
-  // limited by 31 and forced result to zero
+  // limited by 63 and forced result to zero
   wire [4:0] s2t_shrx = s2t_shr_t[4:0] | {5{|s2t_shr_t[9:5]}};
 
   // Support Goldshmidt iteration
@@ -516,11 +516,11 @@ module pu_riscv_pfpu64_muldiv (
        itr_state[6] | itr_rndQ;
 
   // multiplexer for multiplier's input 'A'
-  wire [31:0] itr_mul64a =
+  wire [63:0] itr_mul64a =
               s1t_is_mul   ? {s1t_fract24a,8'd0}   :
               itr_state[0] ? {itr_recip11b,21'd0}  :
               itr_rndQ     ? {itr_res_qtnt26,6'd0} : // truncate by 2^(-n-1)
-              itr_rmnd33[31:0];
+              itr_rmnd33[63:0];
 
   // register of multiplier's input 'A'
   reg [15:0] s1o_mul16_al;
@@ -530,7 +530,7 @@ module pu_riscv_pfpu64_muldiv (
   always @(posedge clk) begin
     if(adv_i & itr_uinA) begin
       s1o_mul16_al <= itr_mul64a[15: 0];
-      s1o_mul16_ah <= itr_mul64a[31:16];
+      s1o_mul16_ah <= itr_mul64a[63:16];
     end
   end
 
@@ -542,11 +542,11 @@ module pu_riscv_pfpu64_muldiv (
        itr_rndQ;
 
   // multiplexer for multiplier's input 'B'
-  wire [31:0] itr_mul64b =
+  wire [63:0] itr_mul64b =
               s1t_is_mul               ? {s1t_fract24b,8'd0} :
              (itr_state[0] | itr_rndQ) ? {s1o_fract24b,8'd0} :
               itr_state[1]             ? {s1o_fract24a,8'd0} :
-              itr_qtnt33[31:0];
+              itr_qtnt33[63:0];
 
   // register of multiplier's input 'B'
   reg [15:0] s1o_mul16_bl;
@@ -555,7 +555,7 @@ module pu_riscv_pfpu64_muldiv (
   always @(posedge clk) begin
     if(adv_i & itr_uinB) begin
       s1o_mul16_bl <= itr_mul64b[15: 0];
-      s1o_mul16_bh <= itr_mul64b[31:16];
+      s1o_mul16_bh <= itr_mul64b[63:16];
     end
   end
 
@@ -576,10 +576,10 @@ module pu_riscv_pfpu64_muldiv (
   reg  [9:0] s2o_exp10rx;
 
   //   multipliers
-  reg [31:0] s2o_fract64_albl;
-  reg [31:0] s2o_fract64_albh;
-  reg [31:0] s2o_fract64_ahbl;
-  reg [31:0] s2o_fract64_ahbh;
+  reg [63:0] s2o_fract64_albl;
+  reg [63:0] s2o_fract64_albh;
+  reg [63:0] s2o_fract64_ahbl;
+  reg [63:0] s2o_fract64_ahbh;
 
   //   registering
   always @(posedge clk) begin
@@ -636,7 +636,7 @@ module pu_riscv_pfpu64_muldiv (
   assign s3t_fract48 = {s2o_fract64_ahbh,  16'd0} +
                        {16'd0, s2o_fract64_ahbl} +
                        {16'd0, s2o_fract64_albh} +
-                       {64'd0, s2o_fract64_albl[31:16]};
+                       {64'd0, s2o_fract64_albl[63:16]};
 
   // stage #3 outputs (for division support)
 
@@ -701,10 +701,10 @@ module pu_riscv_pfpu64_muldiv (
 
   // Feedback from multiplier's output with various rounding tecqs.
   //   +2^(-n-2) in case of rounding 1.xxx qutient
-  wire itr_rndQ1xx =   s3o_mul33o[31];
+  wire itr_rndQ1xx =   s3o_mul33o[63];
 
   //   +2^(-n-2) in case of rounding 0.1xx qutient
-  wire itr_rndQ01x = (~s3o_mul33o[31]);
+  wire itr_rndQ01x = (~s3o_mul33o[63]);
 
   //   rounding mask:
   wire [64:0] itr_rndM33 = // bits [6],[5] ... [0]
@@ -742,12 +742,12 @@ module pu_riscv_pfpu64_muldiv (
   // rounded
   reg [25:0] s3o_res_qtnt26;
 
-  assign     itr_res_qtnt26 = {itr_qtnt33[31:7],itr_qtnt33[6] & itr_rndQ01x};
+  assign     itr_res_qtnt26 = {itr_qtnt33[63:7],itr_qtnt33[6] & itr_rndQ01x};
 
   // latching
   always @(posedge clk ) begin
     if(itr_rndQ) begin
-      s3o_raw_qtnt26 <= s3o_mul33o[31:6];
+      s3o_raw_qtnt26 <= s3o_mul33o[63:6];
       s3o_res_qtnt26 <= itr_res_qtnt26;
     end
   end

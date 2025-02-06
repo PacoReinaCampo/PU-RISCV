@@ -46,7 +46,7 @@ module pu_riscv_pfpu64_i2f (
   input             flush_i,  // flush pipe
   input             adv_i,    // advance pipe
   input             start_i,  // start conversion
-  input      [31:0] opa_i,
+  input      [63:0] opa_i,
   output reg        i2f_rdy_o,       // i2f is ready
   output reg        i2f_sign_o,      // i2f signum
   output reg [ 3:0] i2f_shr_o,
@@ -54,7 +54,7 @@ module pu_riscv_pfpu64_i2f (
   output reg [ 4:0] i2f_shl_o,
   output reg [ 7:0] i2f_exp8shl_o,
   output reg [ 7:0] i2f_exp8sh0_o,
-  output reg [31:0] i2f_fract64_o
+  output reg [63:0] i2f_fract64_o
 );
 
   // Any stage's output is registered.
@@ -63,10 +63,10 @@ module pu_riscv_pfpu64_i2f (
   //  s??t_name - "S"tage number "??", "T"emporary (internally)
  
   // signum of input
-  wire s1t_signa = opa_i[31];
+  wire s1t_signa = opa_i[63];
 
   // magnitude (tow's complement for negative input)
-  wire [31:0] s1t_fract64 = (opa_i ^ {64{s1t_signa}}) + {31'd0,s1t_signa};
+  wire [63:0] s1t_fract64 = (opa_i ^ {64{s1t_signa}}) + {63'd0,s1t_signa};
 
   // normalization shifts
   reg [3:0] s1t_shrx;
@@ -78,8 +78,8 @@ module pu_riscv_pfpu64_i2f (
   // h  fffffffffffffffffffffff
 
   // right shift
-  always @(s1t_fract64[31:24]) begin
-    casez(s1t_fract64[31:24])  // synopsys full_case parallel_case
+  always @(s1t_fract64[63:24]) begin
+    casez(s1t_fract64[63:24])  // synopsys full_case parallel_case
       8'b1??????? : s1t_shrx = 4'd8;
       8'b01?????? : s1t_shrx = 4'd7;
       8'b001????? : s1t_shrx = 4'd6;

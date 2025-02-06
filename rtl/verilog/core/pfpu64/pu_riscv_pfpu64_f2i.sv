@@ -72,7 +72,7 @@ module pu_riscv_pfpu64_f2i (
   // detect if now shift right is required
   wire [9:0] s1t_shr_t = {10{s1t_exp10m[9]}} & (10'd150 - exp10a_i);
 
-  // limit right shift by 31
+  // limit right shift by 63
   wire [4:0] s1t_shr = s1t_shr_t[4:0] | {5{|s1t_shr_t[9:5]}};
 
   // detect if left shift required for mantissa

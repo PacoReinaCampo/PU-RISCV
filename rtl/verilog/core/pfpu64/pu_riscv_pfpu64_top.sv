@@ -90,7 +90,7 @@ module pu_riscv_pfpu64_top #(
 
   // analysis of input values
   //   split input a
-  wire        in_signa  = rfa_i[31];
+  wire        in_signa  = rfa_i[63];
   wire [ 7:0] in_expa   = rfa_i[30:23];
   wire [22:0] in_fracta = rfa_i[22:0];
 
@@ -109,7 +109,7 @@ module pu_riscv_pfpu64_top #(
   wire in_opa_dn = (~(|in_expa)) & (|in_fracta);
 
   //   split input b
-  wire        in_signb  = rfb_i[31];
+  wire        in_signb  = rfb_i[63];
   wire [ 7:0] in_expb   = rfb_i[30:23];
   wire [22:0] in_fractb = rfb_i[22:0];
 
@@ -331,7 +331,7 @@ module pu_riscv_pfpu64_top #(
   wire [ 4:0] i2f_shl_o;
   wire [ 7:0] i2f_exp8shl_o;
   wire [ 7:0] i2f_exp8sh0_o;
-  wire [31:0] i2f_fract64_o;
+  wire [63:0] i2f_fract64_o;
 
   //   i2f module instance
   pu_riscv_pfpu64_i2f u_i2f_cnv (
