@@ -318,18 +318,12 @@ module pu_riscv_if #(
 
   // Branch and Jump prediction
   always @(*) begin
-    casex ({
-      pd_bubble, opcode
-    })
-      {
-        1'b0, OPC_JAL
-      } : begin
+    casex ({ pd_bubble, opcode })
+      { 1'b0, OPC_JAL } : begin
         branch_taken = 1'b1;
         branch_pc    = pd_pc + immJ;
       end
-      {
-        1'b0, OPC_BRANCH
-      } : begin
+      { 1'b0, OPC_BRANCH } : begin
         // if this CPU has a Branch Predict Unit, then use it's prediction
         // otherwise assume backwards jumps taken, forward jumps not taken
         branch_taken = HAS_BPU ? bp_bp_predict[1] : immB[31];

@@ -157,17 +157,13 @@ module pu_riscv_noicache_core #(
       biu_fifo_valid[1] <= 1'b0;
       biu_fifo_valid[2] <= 1'b0;
     end else begin
-      case ({
-        biu_ack, if_parcel_valid
-      })
+      case ({ biu_ack, if_parcel_valid })
         2'b00: begin
           // No action
         end
         2'b10: begin
           // FIFO write
-          case ({
-            biu_fifo_valid[1], biu_fifo_valid[0]
-          })
+          case ({ biu_fifo_valid[1], biu_fifo_valid[0] })
             2'b11: begin
               // Entry 0,1 full. Fill entry2
               biu_fifo_valid[2] <= 1'b1;
@@ -199,15 +195,11 @@ module pu_riscv_noicache_core #(
 
   // Address & Data
   always @(posedge clk) begin
-    case ({
-      biu_ack, if_parcel_valid
-    })
+    case ({ biu_ack, if_parcel_valid })
       2'b00: begin
       end
       2'b10: begin
-        case ({
-          biu_fifo_valid[1], biu_fifo_valid[0]
-        })
+        case ({ biu_fifo_valid[1], biu_fifo_valid[0] })
           2'b11: begin
             // fill entry2
             biu_fifo_dat[2] <= biu_do;
@@ -234,9 +226,7 @@ module pu_riscv_noicache_core #(
         biu_fifo_adr[2] <= 'hx;
       end
       2'b11: begin
-        casex ({
-          biu_fifo_valid[2], biu_fifo_valid[1], biu_fifo_valid[0]
-        })
+        casex ({ biu_fifo_valid[2], biu_fifo_valid[1], biu_fifo_valid[0] })
           3'b1??: begin
             // fill entry2
             biu_fifo_dat[2] <= biu_do;

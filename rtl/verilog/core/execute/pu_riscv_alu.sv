@@ -133,9 +133,7 @@ module pu_riscv_alu #(
     if (!rstn) begin
       alu_r <= 'h0;
     end else if (!ex_stall) begin
-      casex ({
-        xlen32, func7, func3, opcode
-      })
+      casex ({ xlen32, func7, func3, opcode })
         {1'b?, LUI} :   alu_r <= opA + opB;  // actually just opB, but simplify encoding
         {1'b?, AUIPC} : alu_r <= opA + opB;
         {1'b?, JAL} :   alu_r <= id_pc + 'h4;
@@ -187,9 +185,7 @@ module pu_riscv_alu #(
     if (!rstn) begin
       alu_bubble <= 1'b1;
     end else if (!ex_stall) begin
-      casex ({
-        xlen32, func7, func3, opcode
-      })
+      casex ({ xlen32, func7, func3, opcode })
         {1'b?, LUI} :   alu_bubble <= id_bubble;
         {1'b?, AUIPC} : alu_bubble <= id_bubble;
         {1'b?, JAL} :   alu_bubble <= id_bubble;
@@ -242,42 +238,28 @@ module pu_riscv_alu #(
   assign csri       = {{XLEN - 5{1'b0}}, opB[4:0]};
 
   always @(*) begin
-    casex ({
-      id_bubble, func7, func3, opcode
-    })
-      {
-        1'b0, CSRRW
-      } : begin
+    casex ({ id_bubble, func7, func3, opcode })
+      { 1'b0, CSRRW } : begin
         ex_csr_we   = 'b1;
         ex_csr_wval = opA;
       end
-      {
-        1'b0, CSRRWI
-      } : begin
+      { 1'b0, CSRRWI } : begin
         ex_csr_we   = |csri;
         ex_csr_wval = csri;
       end
-      {
-        1'b0, CSRRS
-      } : begin
+      { 1'b0, CSRRS } : begin
         ex_csr_we   = |opA;
         ex_csr_wval = st_csr_rval | opA;
       end
-      {
-        1'b0, CSRRSI
-      } : begin
+      { 1'b0, CSRRSI } : begin
         ex_csr_we   = |csri;
         ex_csr_wval = st_csr_rval | csri;
       end
-      {
-        1'b0, CSRRC
-      } : begin
+      { 1'b0, CSRRC } : begin
         ex_csr_we   = |opA;
         ex_csr_wval = st_csr_rval & ~opA;
       end
-      {
-        1'b0, CSRRCI
-      } : begin
+      { 1'b0, CSRRCI } : begin
         ex_csr_we   = |csri;
         ex_csr_wval = st_csr_rval & ~csri;
       end

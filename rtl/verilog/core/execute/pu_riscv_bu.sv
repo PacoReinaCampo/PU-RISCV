@@ -138,9 +138,7 @@ module pu_riscv_bu #(
       end else if (!du_stall) begin
         bu_exception <= id_exception;
 
-        casex ({
-          id_bubble, opcode
-        })
+        casex ({ id_bubble, opcode })
           {1'b0, OPC_JALR} : begin
             if (id_exception[CAUSE_MISALIGNED_INSTRUCTION] | has_rvc) begin
               bu_exception[CAUSE_MISALIGNED_INSTRUCTION] <= nxt_pc[0];
@@ -191,12 +189,8 @@ module pu_riscv_bu #(
   end
 
   always @(*) begin
-    casex ({
-      id_bubble, func7, func3, opcode
-    })
-      {
-        1'b0, JAL
-      } : begin
+    casex ({ id_bubble, func7, func3, opcode })
+      { 1'b0, JAL } : begin
         // This is really only for the debug unit, such that NPC points to the correct address
         btaken     = 'b1;
         bp_update  = 'b0;
@@ -204,72 +198,56 @@ module pu_riscv_bu #(
         cacheflush = 'b0;
         nxt_pc     = id_pc + immJ;
       end
-      {
-        1'b0, JALR
-      } : begin
+      { 1'b0, JALR } : begin
         btaken     = 'b1;
         bp_update  = 'b0;
         pipeflush  = 'b1;
         cacheflush = 'b0;
         nxt_pc     = (opA + opB) & {{XLEN - 1{1'b1}}, 1'b0};
       end
-      {
-        1'b0, BEQ
-      } : begin
+      { 1'b0, BEQ } : begin
         btaken     = (opA == opB);
         bp_update  = 'b1;
         pipeflush  = btaken ^ id_bp_predict[1];
         cacheflush = 'b0;
         nxt_pc     = btaken ? id_pc + immB : id_pc + 'h4;
       end
-      {
-        1'b0, BNE
-      } : begin
+      { 1'b0, BNE } : begin
         btaken     = (opA != opB);
         bp_update  = 'b1;
         pipeflush  = btaken ^ id_bp_predict[1];
         cacheflush = 'b0;
         nxt_pc     = btaken ? id_pc + immB : id_pc + 'h4;
       end
-      {
-        1'b0, BLTU
-      } : begin
+      { 1'b0, BLTU } : begin
         btaken     = (opA < opB);
         bp_update  = 'b1;
         pipeflush  = btaken ^ id_bp_predict[1];
         cacheflush = 'b0;
         nxt_pc     = btaken ? id_pc + immB : id_pc + 'h4;
       end
-      {
-        1'b0, BGEU
-      } : begin
+      { 1'b0, BGEU } : begin
         btaken     = (opA >= opB);
         bp_update  = 'b1;
         pipeflush  = btaken ^ id_bp_predict[1];
         cacheflush = 'b0;
         nxt_pc     = btaken ? id_pc + immB : id_pc + 'h4;
       end
-      {
-        1'b0, BLT
-      } : begin
+      { 1'b0, BLT } : begin
         btaken     = $signed(opA) < $signed(opB);
         bp_update  = 'b1;
         pipeflush  = btaken ^ id_bp_predict[1];
         cacheflush = 'b0;
         nxt_pc     = btaken ? id_pc + immB : id_pc + 'h4;
       end
-      {
-        1'b0, BGE
-      } : begin
+      { 1'b0, BGE } : begin
         btaken     = $signed(opA) >= $signed(opB);
         bp_update  = 'b1;
         pipeflush  = btaken ^ id_bp_predict[1];
         cacheflush = 'b0;
         nxt_pc     = btaken ? id_pc + immB : id_pc + 'h4;
       end
-      {
-        1'b0, MISCMEM
-      } : begin
+      { 1'b0, MISCMEM } : begin
         case (id_instr)
           FENCE_I: begin
             btaken     = 'b0;

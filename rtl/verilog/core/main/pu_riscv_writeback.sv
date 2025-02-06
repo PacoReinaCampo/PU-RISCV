@@ -176,9 +176,7 @@ module pu_riscv_writeback #(
 
   // From Memory
   always @(*) begin
-    casex ({
-      mem_bubble_i, |mem_exception_i, opcode
-    })
+    casex ({ mem_bubble_i, |mem_exception_i, opcode })
       {2'b00, OPC_LOAD} :  wb_stall_o = ~(dmem_ack_i | dmem_err_i | dmem_misaligned_i | dmem_page_fault_i);
       {2'b00, OPC_STORE} : wb_stall_o = ~(dmem_ack_i | dmem_err_i | dmem_misaligned_i | dmem_page_fault_i);
       default:             wb_stall_o = 1'b0;
@@ -194,9 +192,7 @@ module pu_riscv_writeback #(
       assign m_qd = dmem_q_i;
 
       always @(*) begin
-        casex ({
-          func7, func3, opcode
-        })
+        casex ({ func7, func3, opcode })
           LB:      m_data = {{XLEN - 8{m_qb[7]}}, m_qb};
           LH:      m_data = {{XLEN - 16{m_qh[15]}}, m_qh};
           LW:      m_data = {{XLEN - 32{m_qw[31]}}, m_qw};
@@ -213,9 +209,7 @@ module pu_riscv_writeback #(
       assign m_qw = dmem_q_i;
 
       always @(*) begin
-        casex ({
-          func7, func3, opcode
-        })
+        casex ({ func7, func3, opcode })
           LB:      m_data = {{XLEN - 8{m_qb[7]}}, m_qb};
           LH:      m_data = {{XLEN - 16{m_qh[15]}}, m_qh};
           LW:      m_data = {m_qw};

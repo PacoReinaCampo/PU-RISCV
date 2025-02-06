@@ -564,9 +564,7 @@ module pu_riscv_imem_ctrl #(
   assign parcel_queue_d_pc = ext_ack ? ext_vadr : buf_adr_dly;
 
   always @(*) begin
-    case ({
-      ext_ack, cache_ack, tcm_ack
-    })
+    case ({ ext_ack, cache_ack, tcm_ack })
       3'b001:  parcel_queue_d_parcel = tcm_q;
       3'b010:  parcel_queue_d_parcel = cache_q;
       default: parcel_queue_d_parcel = ext_q >> (16 * parcel_queue_d_pc[1 +: $clog2(XLEN/16)]);

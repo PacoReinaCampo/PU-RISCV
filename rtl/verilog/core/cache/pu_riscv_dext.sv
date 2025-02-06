@@ -124,9 +124,7 @@ module pu_riscv_dext #(
     if (!rst_ni) begin
       inflight <= 'h0;
     end else begin
-      case ({
-        biu_stb_ack_i, biu_ack_i | biu_err_i
-      })
+      case ({ biu_stb_ack_i, biu_ack_i | biu_err_i })
         2'b01: begin
           inflight <= inflight - 1;
         end

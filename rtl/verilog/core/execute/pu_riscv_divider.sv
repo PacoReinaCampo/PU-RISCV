@@ -189,12 +189,8 @@ module pu_riscv_divider #(
         // Setup dividor registers
         ST_CHK: begin
           if (!ex_stall && !id_bubble) begin
-            casex ({
-              xlen32, func7, func3, opcode
-            })
-              {
-                1'b?, DIV
-              } : begin
+            casex ({ xlen32, func7, func3, opcode })
+              { 1'b?, DIV } : begin
                 if (~|opB) begin
                   // signed divide by zero
                   div_r      <= {XLEN{1'b1}};  // =-1
@@ -216,9 +212,7 @@ module pu_riscv_divider #(
                   b         <= abs(opB);
                 end
               end
-              {
-                1'b0, DIVW
-              } : begin
+              { 1'b0, DIVW } : begin
                 if (~|opB32) begin
                   // signed divide by zero
                   div_r      <= {XLEN{1'b1}};  // =-1
@@ -240,9 +234,7 @@ module pu_riscv_divider #(
                   b         <= abs(sext32(opB32));
                 end
               end
-              {
-                1'b?, DIVU
-              } : begin
+              { 1'b?, DIVU } : begin
                 if (~|opB) begin
                   // unsigned divide by zero
                   div_r      <= {XLEN{1'b1}};  // = 2^XLEN -1
@@ -260,9 +252,7 @@ module pu_riscv_divider #(
                   b         <= opB;
                 end
               end
-              {
-                1'b0, DIVUW
-              } : begin
+              { 1'b0, DIVUW } : begin
                 if (~|opB32) begin
                   // unsigned divide by zero
                   div_r      <= {XLEN{1'b1}};  // = 2^XLEN -1
@@ -280,9 +270,7 @@ module pu_riscv_divider #(
                   b         <= {{XLEN - 32{1'b0}}, opB32};
                 end
               end
-              {
-                1'b?, REM
-              } : begin
+              { 1'b?, REM } : begin
                 if (~|opB) begin
                   // signed divide by zero
                   div_r      <= opA;
@@ -304,9 +292,7 @@ module pu_riscv_divider #(
                   b         <= abs(opB);
                 end
               end
-              {
-                1'b0, REMW
-              } : begin
+              { 1'b0, REMW } : begin
                 if (~|opB32) begin
                   // signed divide by zero
                   div_r      <= sext32(opA32);
@@ -328,9 +314,7 @@ module pu_riscv_divider #(
                   b         <= abs(sext32(opB32));
                 end
               end
-              {
-                1'b?, REMU
-              } : begin
+              { 1'b?, REMU } : begin
                 if (~|opB) begin
                   // unsigned divide by zero
                   div_r      <= opA;
@@ -348,9 +332,7 @@ module pu_riscv_divider #(
                   b         <= opB;
                 end
               end
-              {
-                1'b0, REMUW
-              } : begin
+              { 1'b0, REMUW } : begin
                 if (~|opB32) begin
                   div_r      <= sext32(opA32);
                   div_bubble <= 1'b0;
@@ -394,9 +376,7 @@ module pu_riscv_divider #(
           state      <= ST_CHK;
           div_bubble <= 1'b0;
           div_stall  <= 1'b0;
-          casex ({
-            div_func7, div_func3, div_opcode
-          })
+          casex ({ div_func7, div_func3, div_opcode })
             DIV:     div_r <= neg_q ? twos(pa_a) : pa_a;
             DIVW:    div_r <= sext32(neg_q ? twos(pa_a) : pa_a);
             DIVU:    div_r <= pa_a;

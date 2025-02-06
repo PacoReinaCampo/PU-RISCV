@@ -214,9 +214,7 @@ module pu_riscv_lsu #(
 
   // memory address
   always @(*) begin
-    casex ({
-      xlen32, func7, func3, opcode
-    })
+    casex ({ xlen32, func7, func3, opcode })
       {1'b?, LB} :  adr = opA + opB;
       {1'b?, LH} :  adr = opA + opB;
       {1'b?, LW} :  adr = opA + opB;
@@ -237,9 +235,7 @@ module pu_riscv_lsu #(
     if (XLEN == 64) begin
       // RV64
       always @(*) begin
-        casex ({
-          func7, func3, opcode
-        })  // func7 is don't care
+        casex ({ func7, func3, opcode })  // func7 is don't care
           LB:      size = BYTE;
           LH:      size = HWORD;
           LW:      size = WORD;
@@ -257,9 +253,7 @@ module pu_riscv_lsu #(
 
       // memory write data
       always @(*) begin
-        casex ({
-          func7, func3, opcode
-        })  // func7 is don't care
+        casex ({ func7, func3, opcode })  // func7 is don't care
           SB:      d = opB[7:0] << (8 * adr[2:0]);
           SH:      d = opB[15:0] << (8 * adr[2:0]);
           SW:      d = opB[31:0] << (8 * adr[2:0]);
@@ -270,9 +264,7 @@ module pu_riscv_lsu #(
     end else begin
       // RV32
       always @(*) begin
-        casex ({
-          func7, func3, opcode
-        })  // func7 is don't care
+        casex ({ func7, func3, opcode })  // func7 is don't care
           LB:      size = BYTE;
           LH:      size = HWORD;
           LW:      size = WORD;
@@ -287,9 +279,7 @@ module pu_riscv_lsu #(
 
       // memory write data
       always @(*) begin
-        casex ({
-          func7, func3, opcode
-        })  // func7 is don't care
+        casex ({ func7, func3, opcode })  // func7 is don't care
           SB:      d = opB[7:0] << (8 * adr[1:0]);
           SH:      d = opB[15:0] << (8 * adr[1:0]);
           SW:      d = opB;

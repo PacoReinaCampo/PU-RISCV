@@ -95,9 +95,7 @@ module pu_riscv_ram_queue #(
     end else if (clr_i) begin
       queue_wadr <= 'h0;
     end else if (ena_i) begin
-      case ({
-        we_i, re_i
-      })
+      case ({ we_i, re_i })
         2'b01: begin
           queue_wadr <= queue_wadr - 1;
         end
@@ -123,9 +121,7 @@ module pu_riscv_ram_queue #(
           queue_data[n]       <= 'h0;
           queue_data[DEPTH-1] <= 'h0;
         end else if (ena_i) begin
-          case ({
-            we_i, re_i
-          })
+          case ({ we_i, re_i })
             2'b01: begin
               queue_data[n]       <= queue_data[n+1];
               queue_data[DEPTH-1] <= 'h0;
@@ -153,9 +149,7 @@ module pu_riscv_ram_queue #(
     end else if (clr_i) begin
       almost_empty_o <= 1'b1;
     end else if (ena_i) begin
-      case ({
-        we_i, re_i
-      })
+      case ({ we_i, re_i })
         2'b01: begin
           almost_empty_o <= (queue_wadr <= ALMOST_EMPTY_THRESHOLD_CHECK);
         end
@@ -175,9 +169,7 @@ module pu_riscv_ram_queue #(
     end else if (clr_i) begin
       empty_o <= 1'b1;
     end else if (ena_i) begin
-      case ({
-        we_i, re_i
-      })
+      case ({ we_i, re_i })
         2'b01: begin
           empty_o <= (queue_wadr == EMPTY_THRESHOLD);
         end
@@ -197,9 +189,7 @@ module pu_riscv_ram_queue #(
     end else if (clr_i) begin
       almost_full_o <= 1'b0;
     end else if (ena_i) begin
-      case ({
-        we_i, re_i
-      })
+      case ({ we_i, re_i })
         2'b01: begin
           almost_full_o <= ~(queue_wadr < ALMOST_FULL_THRESHOLD_CHECK);
         end
@@ -219,9 +209,7 @@ module pu_riscv_ram_queue #(
     end else if (clr_i) begin
       full_o <= 1'b0;
     end else if (ena_i) begin
-      case ({
-        we_i, re_i
-      })
+      case ({ we_i, re_i })
         2'b01: begin
           full_o <= 1'b0;
         end

@@ -432,9 +432,7 @@ module pu_riscv_id #(
     if (!rstn) begin
       multi_cycle_instruction <= 1'b0;
     end else if (!stall) begin
-      casex ({
-        xlen32, if_func7, if_func3, if_opcode
-      })
+      casex ({ xlen32, if_func7, if_func3, if_opcode })
         {1'b?, MUL} :    multi_cycle_instruction <= MULT_LATENCY > 0 ? has_muldiv : 1'b0;
         {1'b?, MULH} :   multi_cycle_instruction <= MULT_LATENCY > 0 ? has_muldiv : 1'b0;
         {1'b0, MULW} :   multi_cycle_instruction <= MULT_LATENCY > 0 ? has_muldiv : 1'b0;
@@ -691,9 +689,7 @@ module pu_riscv_id #(
       SRET:    illegal_alu_instr = ~has_s || st_prv < PRV_S || (st_prv == PRV_S && st_tsr);
       MRET:    illegal_alu_instr = st_prv != PRV_M;
       default: begin
-        casex ({
-          xlen32, if_func7, if_func3, if_opcode
-        })
+        casex ({ xlen32, if_func7, if_func3, if_opcode })
           {1'b?, LUI} :   illegal_alu_instr = 1'b0;
           {1'b?, AUIPC} : illegal_alu_instr = 1'b0;
           {1'b?, JAL} :   illegal_alu_instr = 1'b0;
@@ -749,9 +745,7 @@ module pu_riscv_id #(
 
   // LSU
   always @(*) begin
-    casex ({
-      xlen32, has_amo, if_func7, if_func3, if_opcode
-    })
+    casex ({ xlen32, has_amo, if_func7, if_func3, if_opcode })
       {1'b?, 1'b?, LB} :  illegal_lsu_instr = 1'b0;
       {1'b?, 1'b?, LH} :  illegal_lsu_instr = 1'b0;
       {1'b?, 1'b?, LW} :  illegal_lsu_instr = 1'b0;
@@ -771,9 +765,7 @@ module pu_riscv_id #(
 
   // MULDIV
   always @(*) begin
-    casex ({
-      xlen32, if_func7, if_func3, if_opcode
-    })
+    casex ({ xlen32, if_func7, if_func3, if_opcode })
       {1'b?, MUL} :    illegal_muldiv_instr = 1'b0;
       {1'b?, MULH} :   illegal_muldiv_instr = 1'b0;
       {1'b0, MULW} :   illegal_muldiv_instr = 1'b0;  // RV64

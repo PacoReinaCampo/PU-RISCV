@@ -187,9 +187,7 @@ module pu_riscv_execution #(
   // use du_stall_dly, because this is combinatorial
   // When the pipeline is longer than the time for the debugger to access the system, this fails
   always @(*) begin
-    casex ({
-      id_userf_opA, id_bypwb_opA, id_bypmem_opA, id_bypex_opA
-    })
+    casex ({ id_userf_opA, id_bypwb_opA, id_bypmem_opA, id_bypex_opA })
       4'b???1: opA = du_stall_dly ? rf_srcv1 : ex_r;
       4'b??10: opA = du_stall_dly ? rf_srcv1 : mem_r;
       4'b?100: opA = du_stall_dly ? rf_srcv1 : wb_r;
@@ -199,9 +197,7 @@ module pu_riscv_execution #(
   end
 
   always @(*) begin
-    casex ({
-      id_userf_opB, id_bypwb_opB, id_bypmem_opB, id_bypex_opB
-    })
+    casex ({ id_userf_opB, id_bypwb_opB, id_bypmem_opB, id_bypex_opB })
       4'b???1: opB = du_stall_dly ? rf_srcv2 : ex_r;
       4'b??10: opB = du_stall_dly ? rf_srcv2 : mem_r;
       4'b?100: opB = du_stall_dly ? rf_srcv2 : wb_r;
@@ -358,9 +354,7 @@ module pu_riscv_execution #(
 
   // result
   always @(*) begin
-    casex ({
-      mul_bubble, div_bubble, lsu_bubble
-    })
+    casex ({ mul_bubble, div_bubble, lsu_bubble })
       3'b110:  ex_r = lsu_r;
       3'b101:  ex_r = div_r;
       3'b011:  ex_r = mul_r;

@@ -101,9 +101,7 @@ module pu_riscv_membuf #(
     end else if (clr_i) begin
       access_pending <= 'h0;
     end else if (ena_i) begin
-      case ({
-        req_i, ack_i
-      })
+      case ({ req_i, ack_i })
         2'b01: begin
           access_pending <= access_pending - 1;
         end
