@@ -67,7 +67,7 @@ library
 │       ├── peripheral_test.sv
 │       └── peripheral_transaction.sv
 ├── core
-│   ├── ahb3
+│   ├── cache
 │   │   ├── peripheral_agent.sv
 │   │   ├── peripheral_driver.sv
 │   │   ├── peripheral_environment.sv
@@ -78,7 +78,7 @@ library
 │   │   ├── peripheral_testbench.sv
 │   │   ├── peripheral_test.sv
 │   │   └── peripheral_transaction.sv
-│   ├── apb4
+│   ├── decode
 │   │   ├── peripheral_agent.sv
 │   │   ├── peripheral_driver.sv
 │   │   ├── peripheral_environment.sv
@@ -89,7 +89,7 @@ library
 │   │   ├── peripheral_testbench.sv
 │   │   ├── peripheral_test.sv
 │   │   └── peripheral_transaction.sv
-│   ├── axi4
+│   ├── execute
 │   │   ├── peripheral_agent.sv
 │   │   ├── peripheral_driver.sv
 │   │   ├── peripheral_environment.sv
@@ -100,7 +100,7 @@ library
 │   │   ├── peripheral_testbench.sv
 │   │   ├── peripheral_test.sv
 │   │   └── peripheral_transaction.sv
-│   ├── bb
+│   ├── fetch
 │   │   ├── peripheral_agent.sv
 │   │   ├── peripheral_driver.sv
 │   │   ├── peripheral_environment.sv
@@ -111,7 +111,7 @@ library
 │   │   ├── peripheral_testbench.sv
 │   │   ├── peripheral_test.sv
 │   │   └── peripheral_transaction.sv
-│   ├── biu
+│   ├── main
 │   │   ├── peripheral_agent.sv
 │   │   ├── peripheral_driver.sv
 │   │   ├── peripheral_environment.sv
@@ -122,7 +122,7 @@ library
 │   │   ├── peripheral_testbench.sv
 │   │   ├── peripheral_test.sv
 │   │   └── peripheral_transaction.sv
-│   └── wb
+│   └── memory
 │       ├── peripheral_agent.sv
 │       ├── peripheral_driver.sv
 │       ├── peripheral_environment.sv
@@ -207,4 +207,4 @@ library
         ├── peripheral_test.sv
         └── peripheral_transaction.sv
 
-21 directories, 186 files
+22 directories, 186 files

@@ -73,7 +73,7 @@ library
 │       ├── peripheral_uvm_testbench.sv
 │       └── peripheral_uvm_test.sv
 ├── core
-│   ├── ahb3
+│   ├── cache
 │   │   ├── peripheral_uvm_agent.sv
 │   │   ├── peripheral_uvm_driver.sv
 │   │   ├── peripheral_uvm_environment.sv
@@ -85,7 +85,7 @@ library
 │   │   ├── peripheral_uvm_sequence.sv
 │   │   ├── peripheral_uvm_testbench.sv
 │   │   └── peripheral_uvm_test.sv
-│   ├── apb4
+│   ├── decode
 │   │   ├── peripheral_uvm_agent.sv
 │   │   ├── peripheral_uvm_driver.sv
 │   │   ├── peripheral_uvm_environment.sv
@@ -97,7 +97,7 @@ library
 │   │   ├── peripheral_uvm_sequence.sv
 │   │   ├── peripheral_uvm_testbench.sv
 │   │   └── peripheral_uvm_test.sv
-│   ├── axi4
+│   ├── execute
 │   │   ├── peripheral_uvm_agent.sv
 │   │   ├── peripheral_uvm_driver.sv
 │   │   ├── peripheral_uvm_environment.sv
@@ -109,7 +109,7 @@ library
 │   │   ├── peripheral_uvm_sequence.sv
 │   │   ├── peripheral_uvm_testbench.sv
 │   │   └── peripheral_uvm_test.sv
-│   ├── bb
+│   ├── fetch
 │   │   ├── peripheral_uvm_agent.sv
 │   │   ├── peripheral_uvm_driver.sv
 │   │   ├── peripheral_uvm_environment.sv
@@ -121,7 +121,7 @@ library
 │   │   ├── peripheral_uvm_sequence.sv
 │   │   ├── peripheral_uvm_testbench.sv
 │   │   └── peripheral_uvm_test.sv
-│   ├── biu
+│   ├── main
 │   │   ├── peripheral_uvm_agent.sv
 │   │   ├── peripheral_uvm_driver.sv
 │   │   ├── peripheral_uvm_environment.sv
@@ -133,7 +133,7 @@ library
 │   │   ├── peripheral_uvm_sequence.sv
 │   │   ├── peripheral_uvm_testbench.sv
 │   │   └── peripheral_uvm_test.sv
-│   └── wb
+│   └── memory
 │       ├── peripheral_uvm_agent.sv
 │       ├── peripheral_uvm_driver.sv
 │       ├── peripheral_uvm_environment.sv
@@ -225,4 +225,4 @@ library
         ├── peripheral_uvm_testbench.sv
         └── peripheral_uvm_test.sv
 
-21 directories, 204 files
+22 directories, 204 files

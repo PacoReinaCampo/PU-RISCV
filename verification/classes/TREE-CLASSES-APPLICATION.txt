@@ -19,22 +19,22 @@ application
 │       ├── peripheral_design.sv
 │       └── peripheral_testbench.sv
 ├── core
-│   ├── ahb3
+│   ├── cache
 │   │   ├── peripheral_design.sv
 │   │   └── peripheral_testbench.sv
-│   ├── apb4
+│   ├── decode
 │   │   ├── peripheral_design.sv
 │   │   └── peripheral_testbench.sv
-│   ├── axi4
+│   ├── execute
 │   │   ├── peripheral_design.sv
 │   │   └── peripheral_testbench.sv
-│   ├── bb
+│   ├── fetch
 │   │   ├── peripheral_design.sv
 │   │   └── peripheral_testbench.sv
-│   ├── biu
+│   ├── main
 │   │   ├── peripheral_design.sv
 │   │   └── peripheral_testbench.sv
-│   └── wb
+│   └── memory
 │       ├── peripheral_design.sv
 │       └── peripheral_testbench.sv
 └── pu
@@ -57,4 +57,4 @@ application
         ├── peripheral_design.sv
         └── peripheral_testbench.sv
 
-21 directories, 36 files
+22 directories, 36 files
