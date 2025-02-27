@@ -75,4 +75,4 @@ library
         ├── peripheral_osvvm_model.vhd
         └── peripheral_osvvm_testbench.vhd
 
-22 directories, 54 files
+21 directories, 54 files

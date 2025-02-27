@@ -207,4 +207,4 @@ library
         ├── peripheral_test.sv
         └── peripheral_transaction.sv
 
-22 directories, 186 files
+21 directories, 186 files

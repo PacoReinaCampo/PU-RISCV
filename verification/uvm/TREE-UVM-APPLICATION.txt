@@ -57,4 +57,4 @@ application
         ├── peripheral_design.sv
         └── peripheral_testbench.sv
 
-22 directories, 36 files
+21 directories, 36 files
