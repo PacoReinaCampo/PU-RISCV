@@ -44,13 +44,13 @@
 
 +incdir+../../../../../../../rtl/verilog/pkg
 
-../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
-../../../../../../../rtl/verilog/core/cache/pu_riscv_icache_core.sv
-../../../../../../../rtl/verilog/core/fetch/pu_riscv_if.sv
-../../../../../../../rtl/verilog/core/memory/pu_riscv_dmem_ctrl.sv
-../../../../../../../rtl/verilog/core/memory/pu_riscv_imem_ctrl.sv
-../../../../../../../rtl/verilog/core/memory/pu_riscv_mux.sv
-../../../../../../../rtl/verilog/core/main/pu_riscv_core.sv
-../../../../../../../rtl/verilog/core/main/pu_riscv_rf.sv
+../../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
+../../../../../../../../rtl/verilog/core/cache/pu_riscv_icache_core.sv
+../../../../../../../../rtl/verilog/core/fetch/pu_riscv_if.sv
+../../../../../../../../rtl/verilog/core/memory/pu_riscv_dmem_ctrl.sv
+../../../../../../../../rtl/verilog/core/memory/pu_riscv_imem_ctrl.sv
+../../../../../../../../rtl/verilog/core/memory/pu_riscv_mux.sv
+../../../../../../../../rtl/verilog/core/main/pu_riscv_core.sv
+../../../../../../../../rtl/verilog/core/main/pu_riscv_rf.sv
 
-../../../../../../../rtl/verilog/pu/axi4/pu_riscv_axi4.sv
+../../../../../../../../rtl/verilog/pu/axi4/pu_riscv_axi4.sv

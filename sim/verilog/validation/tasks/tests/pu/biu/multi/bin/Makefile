@@ -49,7 +49,7 @@ SIM        = msim
 
 MS     = -s
 
-ROOT_DIR=../../../../../../../..
+ROOT_DIR=../../../../../../../../..
 TST_SRC_DIR=$(ROOT_DIR)/../software/tests/hex
 
 

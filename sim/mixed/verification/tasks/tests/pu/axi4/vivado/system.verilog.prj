@@ -42,17 +42,17 @@
 //                                                                               //
 ///////////////////////////////////////////////////////////////////////////////////
 
-sv work ../../../../../../../rtl/verilog/pkg/peripheral_axi4_verilog_pkg.sv
-sv work ../../../../../../../rtl/verilog/pkg/peripheral_biu_verilog_pkg.sv
-sv work ../../../../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
+sv work ../../../../../../../../rtl/verilog/pkg/peripheral_axi4_verilog_pkg.sv
+sv work ../../../../../../../../rtl/verilog/pkg/peripheral_biu_verilog_pkg.sv
+sv work ../../../../../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
 
-sv work ../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
-sv work ../../../../../../../rtl/verilog/core/cache/pu_riscv_icache_core.sv
-sv work ../../../../../../../rtl/verilog/core/fetch/pu_riscv_if.sv
-sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_dmem_ctrl.sv
-sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_imem_ctrl.sv
-sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_mux.sv
-sv work ../../../../../../../rtl/verilog/core/pu_riscv_core.sv
-sv work ../../../../../../../rtl/verilog/core/pu_riscv_rf.sv
+sv work ../../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
+sv work ../../../../../../../../rtl/verilog/core/cache/pu_riscv_icache_core.sv
+sv work ../../../../../../../../rtl/verilog/core/fetch/pu_riscv_if.sv
+sv work ../../../../../../../../rtl/verilog/core/memory/pu_riscv_dmem_ctrl.sv
+sv work ../../../../../../../../rtl/verilog/core/memory/pu_riscv_imem_ctrl.sv
+sv work ../../../../../../../../rtl/verilog/core/memory/pu_riscv_mux.sv
+sv work ../../../../../../../../rtl/verilog/core/pu_riscv_core.sv
+sv work ../../../../../../../../rtl/verilog/core/pu_riscv_rf.sv
 
-sv work ../../../../../../../rtl/verilog/pu/axi4/pu_riscv_axi4.sv
+sv work ../../../../../../../../rtl/verilog/pu/axi4/pu_riscv_axi4.sv
