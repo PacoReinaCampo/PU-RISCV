@@ -69,8 +69,8 @@
 ../../../../../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
 ../../../../../../../../rtl/verilog/pu/biu/pu_riscv_biu.sv
 
-../../../../../../../../verification/tasks/verilog/library/pu/interface/biu/pu_riscv_memory_model_biu.sv
-../../../../../../../../verification/tasks/verilog/library/pu/interface/biu/pu_riscv_mmio_if_biu.sv
-../../../../../../../../verification/tasks/verilog/library/pu/interface/biu/pu_riscv_testbench_biu.sv
-../../../../../../../../verification/tasks/verilog/library/pu/main/pu_riscv_dbg_bfm.sv
-../../../../../../../../verification/tasks/verilog/library/pu/main/pu_riscv_htif.sv
+../../../../../../../../verification/tasks/tests/verilog/library/pu/interface/biu/pu_riscv_memory_model_biu.sv
+../../../../../../../../verification/tasks/tests/verilog/library/pu/interface/biu/pu_riscv_mmio_if_biu.sv
+../../../../../../../../verification/tasks/tests/verilog/library/pu/interface/biu/pu_riscv_testbench_biu.sv
+../../../../../../../../verification/tasks/tests/verilog/library/pu/main/pu_riscv_dbg_bfm.sv
+../../../../../../../../verification/tasks/tests/verilog/library/pu/main/pu_riscv_htif.sv

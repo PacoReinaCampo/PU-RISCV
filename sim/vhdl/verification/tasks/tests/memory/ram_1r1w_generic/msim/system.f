@@ -84,8 +84,8 @@
 ../../../../../../../../rtl/vhdl/pu/ahb3/pu_riscv_biu2ahb3.vhd
 ../../../../../../../../rtl/vhdl/pu/ahb3/pu_riscv_ahb3.vhd
 
-../../../../../../../../verification/tasks/vhdl/library/pu/ahb3/pu_riscv_memory_model_ahb3.vhd
-../../../../../../../../verification/tasks/vhdl/library/pu/ahb3/pu_riscv_mmio_if_ahb3.vhd
-../../../../../../../../verification/tasks/vhdl/library/pu/ahb3/pu_riscv_testbench_ahb3.vhd
-../../../../../../../../verification/tasks/vhdl/library/bfm/pu_riscv_dbg_bfm.vhd
-../../../../../../../../verification/tasks/vhdl/library/bfm/pu_riscv_htif.vhd
+../../../../../../../../verification/tasks/tests/vhdl/library/pu/ahb3/pu_riscv_memory_model_ahb3.vhd
+../../../../../../../../verification/tasks/tests/vhdl/library/pu/ahb3/pu_riscv_mmio_if_ahb3.vhd
+../../../../../../../../verification/tasks/tests/vhdl/library/pu/ahb3/pu_riscv_testbench_ahb3.vhd
+../../../../../../../../verification/tasks/tests/vhdl/library/bfm/pu_riscv_dbg_bfm.vhd
+../../../../../../../../verification/tasks/tests/vhdl/library/bfm/pu_riscv_htif.vhd

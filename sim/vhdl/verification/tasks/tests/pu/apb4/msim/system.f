@@ -84,8 +84,8 @@
 ../../../../../../../../rtl/vhdl/pu/apb4/pu_riscv_biu2apb4.vhd
 ../../../../../../../../rtl/vhdl/pu/apb4/pu_riscv_apb4.vhd
 
-../../../../../../../../verification/tasks/vhdl/library/pu/interface/apb4/pu_riscv_memory_model_apb4.vhd
-../../../../../../../../verification/tasks/vhdl/library/pu/interface/apb4/pu_riscv_mmio_if_apb4.vhd
-../../../../../../../../verification/tasks/vhdl/library/pu/interface/apb4/pu_riscv_testbench_apb4.vhd
-../../../../../../../../verification/tasks/vhdl/library/pu/main/pu_riscv_dbg_bfm.vhd
-../../../../../../../../verification/tasks/vhdl/library/pu/main/pu_riscv_htif.vhd
+../../../../../../../../verification/tasks/tests/vhdl/library/pu/interface/apb4/pu_riscv_memory_model_apb4.vhd
+../../../../../../../../verification/tasks/tests/vhdl/library/pu/interface/apb4/pu_riscv_mmio_if_apb4.vhd
+../../../../../../../../verification/tasks/tests/vhdl/library/pu/interface/apb4/pu_riscv_testbench_apb4.vhd
+../../../../../../../../verification/tasks/tests/vhdl/library/pu/main/pu_riscv_dbg_bfm.vhd
+../../../../../../../../verification/tasks/tests/vhdl/library/pu/main/pu_riscv_htif.vhd

@@ -98,7 +98,7 @@ RTL_VHDL =
 # Testbench Sources
 #####################################################################
 TB_TOP=pu_riscv_testbench_wb
-TB_SRC_DIR=$(ROOT_DIR)/validation/tasks/verilog/library
+TB_SRC_DIR=$(ROOT_DIR)/validation/tasks/tests/verilog/library
 TB_VLOG = $(TB_SRC_DIR)/interface/wb/pu_riscv_memory_model_wb.sv \
           $(TB_SRC_DIR)/interface/wb/pu_riscv_mmio_if_wb.sv \
           $(TB_SRC_DIR)/interface/wb/pu_riscv_testbench_wb.sv \

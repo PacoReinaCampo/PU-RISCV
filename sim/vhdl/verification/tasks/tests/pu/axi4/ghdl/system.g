@@ -41,8 +41,8 @@ ghdl -a --std=08 ../../../../../../../../rtl/vhdl/pu/axi4/pu_riscv_axi4.vhd
 ghdl -a --std=08 ../../../../../../../../rtl/vhdl/pu/bridge/riscv_ahb2axi.vhd
 ghdl -a --std=08 ../../../../../../../../rtl/vhdl/pu/bridge/riscv_axi2ahb.vhd
 
-ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/axi4/pu_riscv_memory_model_axi4.vhd
-ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/axi4/pu_riscv_mmio_if_axi4.vhd
-ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/axi4/pu_riscv_testbench_axi4.vhd
-ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/main/pu_riscv_dbg_bfm.vhd
-ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/main/pu_riscv_htif.vhd
+ghdl -a --std=08 ../../../../../../../../verification/tasks/tests/vhdl/library/pu/interface/axi4/pu_riscv_memory_model_axi4.vhd
+ghdl -a --std=08 ../../../../../../../../verification/tasks/tests/vhdl/library/pu/interface/axi4/pu_riscv_mmio_if_axi4.vhd
+ghdl -a --std=08 ../../../../../../../../verification/tasks/tests/vhdl/library/pu/interface/axi4/pu_riscv_testbench_axi4.vhd
+ghdl -a --std=08 ../../../../../../../../verification/tasks/tests/vhdl/library/pu/main/pu_riscv_dbg_bfm.vhd
+ghdl -a --std=08 ../../../../../../../../verification/tasks/tests/vhdl/library/pu/main/pu_riscv_htif.vhd

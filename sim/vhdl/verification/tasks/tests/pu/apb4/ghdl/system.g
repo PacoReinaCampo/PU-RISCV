@@ -39,8 +39,8 @@ ghdl -a --std=08 ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 ghdl -a --std=08 ../../../../../../../../rtl/vhdl/pu/apb4/pu_riscv_biu2apb4.vhd
 ghdl -a --std=08 ../../../../../../../../rtl/vhdl/pu/apb4/pu_riscv_apb4.vhd
 
-ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/apb4/pu_riscv_memory_model_apb4.vhd
-ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/apb4/pu_riscv_mmio_if_apb4.vhd
-ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/apb4/pu_riscv_testbench_apb4.vhd
-ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/main/pu_riscv_dbg_bfm.vhd
-ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/main/pu_riscv_htif.vhd
+ghdl -a --std=08 ../../../../../../../../verification/tasks/tests/vhdl/library/pu/interface/apb4/pu_riscv_memory_model_apb4.vhd
+ghdl -a --std=08 ../../../../../../../../verification/tasks/tests/vhdl/library/pu/interface/apb4/pu_riscv_mmio_if_apb4.vhd
+ghdl -a --std=08 ../../../../../../../../verification/tasks/tests/vhdl/library/pu/interface/apb4/pu_riscv_testbench_apb4.vhd
+ghdl -a --std=08 ../../../../../../../../verification/tasks/tests/vhdl/library/pu/main/pu_riscv_dbg_bfm.vhd
+ghdl -a --std=08 ../../../../../../../../verification/tasks/tests/vhdl/library/pu/main/pu_riscv_htif.vhd
