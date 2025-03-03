@@ -84,8 +84,8 @@ vhdl work ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 vhdl work ../../../../../../../../rtl/vhdl/pu/wb/pu_riscv_wb2ahb3.vhd
 vhdl work ../../../../../../../../rtl/vhdl/pu/wb/pu_riscv_wb.vhd
 
-vhdl work ../../../../../../../../verification/tasks/tests/vhdl/library/wb/pu_riscv_memory_model_wb.vhd
-vhdl work ../../../../../../../../verification/tasks/tests/vhdl/library/wb/pu_riscv_mmio_if_wb.vhd
-vhdl work ../../../../../../../../verification/tasks/tests/vhdl/library/wb/pu_riscv_testbench_wb.vhd
-vhdl work ../../../../../../../../verification/tasks/tests/vhdl/library/pu_riscv_dbg_bfm.vhd
-vhdl work ../../../../../../../../verification/tasks/tests/vhdl/library/pu_riscv_htif.vhd
+vhdl work ../../../../../../../../verification/tasks/vhdl/library/wb/pu_riscv_memory_model_wb.vhd
+vhdl work ../../../../../../../../verification/tasks/vhdl/library/wb/pu_riscv_mmio_if_wb.vhd
+vhdl work ../../../../../../../../verification/tasks/vhdl/library/wb/pu_riscv_testbench_wb.vhd
+vhdl work ../../../../../../../../verification/tasks/vhdl/library/pu_riscv_dbg_bfm.vhd
+vhdl work ../../../../../../../../verification/tasks/vhdl/library/pu_riscv_htif.vhd

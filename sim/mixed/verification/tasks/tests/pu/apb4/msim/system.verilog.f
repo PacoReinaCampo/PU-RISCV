@@ -71,8 +71,8 @@
 ../../../../../../../../rtl/verilog/pu/apb4/pu_riscv_apb42biu.sv
 ../../../../../../../../rtl/verilog/pu/apb4/pu_riscv_apb4.sv
 
-../../../../../../../../verification/tasks/tests/verilog/library/pu/interface/apb4/pu_riscv_memory_model_apb4.sv
-../../../../../../../../verification/tasks/tests/verilog/library/pu/interface/apb4/pu_riscv_mmio_if_apb4.sv
-../../../../../../../../verification/tasks/tests/verilog/library/pu/interface/apb4/pu_riscv_testbench_apb4.sv
-../../../../../../../../verification/tasks/tests/verilog/library/pu/main/pu_riscv_dbg_bfm.sv
-../../../../../../../../verification/tasks/tests/verilog/library/pu/main/pu_riscv_htif.sv
+../../../../../../../../verification/tasks/verilog/library/pu/interface/apb4/pu_riscv_memory_model_apb4.sv
+../../../../../../../../verification/tasks/verilog/library/pu/interface/apb4/pu_riscv_mmio_if_apb4.sv
+../../../../../../../../verification/tasks/verilog/library/pu/interface/apb4/pu_riscv_testbench_apb4.sv
+../../../../../../../../verification/tasks/verilog/library/pu/main/pu_riscv_dbg_bfm.sv
+../../../../../../../../verification/tasks/verilog/library/pu/main/pu_riscv_htif.sv

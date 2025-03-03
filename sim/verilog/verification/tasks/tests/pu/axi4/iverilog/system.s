@@ -85,8 +85,8 @@
 ../../../../../../../../rtl/verilog/pu/bridge/riscv_ahb2axi.sv
 ../../../../../../../../rtl/verilog/pu/bridge/riscv_axi2ahb.sv
 
-../../../../../../../../verification/tasks/tests/verilog/library/pu/interface/axi4/pu_riscv_memory_model_axi4.sv
-../../../../../../../../verification/tasks/tests/verilog/library/pu/interface/axi4/pu_riscv_mmio_if_axi4.sv
-../../../../../../../../verification/tasks/tests/verilog/library/pu/interface/axi4/pu_riscv_testbench_axi4.sv
-../../../../../../../../verification/tasks/tests/verilog/library/pu/main/pu_riscv_dbg_bfm.sv
-../../../../../../../../verification/tasks/tests/verilog/library/pu/main/pu_riscv_htif.sv
+../../../../../../../../verification/tasks/verilog/library/pu/interface/axi4/pu_riscv_memory_model_axi4.sv
+../../../../../../../../verification/tasks/verilog/library/pu/interface/axi4/pu_riscv_mmio_if_axi4.sv
+../../../../../../../../verification/tasks/verilog/library/pu/interface/axi4/pu_riscv_testbench_axi4.sv
+../../../../../../../../verification/tasks/verilog/library/pu/main/pu_riscv_dbg_bfm.sv
+../../../../../../../../verification/tasks/verilog/library/pu/main/pu_riscv_htif.sv

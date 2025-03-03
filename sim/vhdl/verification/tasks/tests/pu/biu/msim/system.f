@@ -82,8 +82,8 @@
 
 ../../../../../../../../rtl/vhdl/pu/biu/pu_riscv_biu.vhd
 
-../../../../../../../../verification/tasks/tests/vhdl/library/pu/interface/biu/pu_riscv_memory_model_biu.vhd
-../../../../../../../../verification/tasks/tests/vhdl/library/pu/interface/biu/pu_riscv_mmio_if_biu.vhd
-../../../../../../../../verification/tasks/tests/vhdl/library/pu/interface/biu/pu_riscv_testbench_biu.vhd
-../../../../../../../../verification/tasks/tests/vhdl/library/pu/main/pu_riscv_dbg_bfm.vhd
-../../../../../../../../verification/tasks/tests/vhdl/library/pu/main/pu_riscv_htif.vhd
+../../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_memory_model_biu.vhd
+../../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_mmio_if_biu.vhd
+../../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_testbench_biu.vhd
+../../../../../../../../verification/tasks/vhdl/library/pu/main/pu_riscv_dbg_bfm.vhd
+../../../../../../../../verification/tasks/vhdl/library/pu/main/pu_riscv_htif.vhd
