@@ -55,4 +55,4 @@ sv work ../../../../../../../../rtl/verilog/core/memory/pu_riscv_mux.sv
 sv work ../../../../../../../../rtl/verilog/core/pu_riscv_core.sv
 sv work ../../../../../../../../rtl/verilog/core/pu_riscv_rf.sv
 
-sv work ../../../../../../../../rtl/verilog/pu/axi4/pu_riscv_axi4.sv
+sv work ../../../../../../../../rtl/verilog/module/axi4/pu_riscv_axi4.sv

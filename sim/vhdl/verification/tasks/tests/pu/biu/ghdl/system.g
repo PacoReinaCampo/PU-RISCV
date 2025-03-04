@@ -35,7 +35,7 @@ ghdl -a --std=08 ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw_generi
 ghdl -a --std=08 ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw.vhd
 ghdl -a --std=08 ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-ghdl -a --std=08 ../../../../../../../../rtl/vhdl/pu/biu/pu_riscv_biu.vhd
+ghdl -a --std=08 ../../../../../../../../rtl/vhdl/module/biu/pu_riscv_biu.vhd
 
 ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_memory_model_biu.vhd
 ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_mmio_if_biu.vhd

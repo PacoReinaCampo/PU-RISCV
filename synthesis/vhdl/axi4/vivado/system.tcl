@@ -81,10 +81,10 @@ read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/pu_riscv_ram_1rw_generic.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/pu_riscv_ram_1rw.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-read_verilog -sv ../../../../rtl/verilog/pu/axi4/pu_riscv_axi42axi4.sv
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/pu/axi4/pu_riscv_axi4.vhd
-read_verilog -sv ../../../../rtl/verilog/pu/pu_riscv_ahb2axi.sv
-read_verilog -sv ../../../../rtl/verilog/pu/pu_riscv_axi2ahb.sv
+read_verilog -sv ../../../../rtl/verilog/module/axi4/pu_riscv_axi42axi4.sv
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/module/axi4/pu_riscv_axi4.vhd
+read_verilog -sv ../../../../rtl/verilog/module/pu_riscv_ahb2axi.sv
+read_verilog -sv ../../../../rtl/verilog/module/pu_riscv_axi2ahb.sv
 
 read_verilog -sv ../../../verilog/axi4/vivado/spram/core/peripheral_spram_axi4.sv
 

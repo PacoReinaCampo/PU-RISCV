@@ -39,35 +39,35 @@ vhdl
 │   ├── pu_riscv_ram_1rw_generic.vhd
 │   ├── pu_riscv_ram_1rw.vhd
 │   └── pu_riscv_ram_queue.vhd
-├── pkg
-│   ├── peripheral_ahb3_vhdl_pkg.vhd
-│   ├── peripheral_apb4_vhdl_pkg.vhd
-│   ├── peripheral_axi4_vhdl_pkg.vhd
-│   ├── peripheral_biu_vhdl_pkg.vhd
-│   ├── peripheral_wb_vhdl_pkg.vhd
-│   ├── pu_riscv_vhdl_pkg.vhd
-│   └── vhdl_pkg.vhd
-└── pu
-    ├── ahb3
-    │   ├── pu_riscv_ahb3.vhd
-    │   └── pu_riscv_biu2ahb3.vhd
-    ├── apb4
-    │   ├── pu_riscv_apb4.vhd
-    │   └── pu_riscv_biu2apb4.vhd
-    ├── axi4
-    │   ├── pu_riscv_axi4.vhd
-    │   └── pu_riscv_biu2axi4.vhd
-    ├── bb
-    │   ├── pu_riscv_bb.vhd
-    │   └── pu_riscv_biu2bb.vhd
-    ├── biu
-    │   ├── pu_riscv_biu.vhd
-    │   └── pu_riscv_module_biu.vhd
-    ├── bridge
-    │   ├── riscv_ahb2axi.vhd
-    │   └── riscv_axi2ahb.vhd
-    └── wb
-        ├── pu_riscv_biu2wb.vhd
-        └── pu_riscv_wb.vhd
+├── module
+│   ├── ahb3
+│   │   ├── pu_riscv_ahb3.vhd
+│   │   └── pu_riscv_biu2ahb3.vhd
+│   ├── apb4
+│   │   ├── pu_riscv_apb4.vhd
+│   │   └── pu_riscv_biu2apb4.vhd
+│   ├── axi4
+│   │   ├── pu_riscv_axi4.vhd
+│   │   └── pu_riscv_biu2axi4.vhd
+│   ├── bb
+│   │   ├── pu_riscv_bb.vhd
+│   │   └── pu_riscv_biu2bb.vhd
+│   ├── biu
+│   │   ├── pu_riscv_biu.vhd
+│   │   └── pu_riscv_module_biu.vhd
+│   ├── bridge
+│   │   ├── riscv_ahb2axi.vhd
+│   │   └── riscv_axi2ahb.vhd
+│   └── wb
+│       ├── pu_riscv_biu2wb.vhd
+│       └── pu_riscv_wb.vhd
+└── pkg
+    ├── peripheral_ahb3_vhdl_pkg.vhd
+    ├── peripheral_apb4_vhdl_pkg.vhd
+    ├── peripheral_axi4_vhdl_pkg.vhd
+    ├── peripheral_biu_vhdl_pkg.vhd
+    ├── peripheral_wb_vhdl_pkg.vhd
+    ├── pu_riscv_vhdl_pkg.vhd
+    └── vhdl_pkg.vhd
 
 17 directories, 53 files

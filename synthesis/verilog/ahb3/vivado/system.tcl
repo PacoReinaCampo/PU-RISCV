@@ -80,8 +80,8 @@ read_verilog -sv ../../../../rtl/verilog/memory/pu_riscv_ram_1rw_generic.sv
 read_verilog -sv ../../../../rtl/verilog/memory/pu_riscv_ram_1rw.sv
 read_verilog -sv ../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
 
-read_verilog -sv ../../../../rtl/verilog/pu/ahb3/pu_riscv_ahb32ahb3.sv
-read_verilog -sv ../../../../rtl/verilog/pu/ahb3/pu_riscv_ahb3.sv
+read_verilog -sv ../../../../rtl/verilog/module/ahb3/pu_riscv_ahb32ahb3.sv
+read_verilog -sv ../../../../rtl/verilog/module/ahb3/pu_riscv_ahb3.sv
 
 read_verilog -sv spram/core/mpsoc_ahb3_spram.sv
 read_verilog -sv spram/core/mpsoc_ram_1r1w.sv

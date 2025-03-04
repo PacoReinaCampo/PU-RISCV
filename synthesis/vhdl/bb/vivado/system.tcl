@@ -81,8 +81,8 @@ read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/pu_riscv_ram_1rw_generic.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/pu_riscv_ram_1rw.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/pu/bb/pu_riscv_bb2ahb3.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/pu/bb/pu_riscv_bb.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/module/bb/pu_riscv_bb2ahb3.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/module/bb/pu_riscv_bb.vhd
 
 read_vhdl -vhdl2008 spram/core/mpsoc_bb_spram.vhd
 read_vhdl -vhdl2008 spram/core/mpsoc_ram_1r1w.vhd

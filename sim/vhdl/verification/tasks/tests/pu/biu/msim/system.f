@@ -80,7 +80,7 @@
 ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw_generic.vhd
 ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-../../../../../../../../rtl/vhdl/pu/biu/pu_riscv_biu.vhd
+../../../../../../../../rtl/vhdl/module/biu/pu_riscv_biu.vhd
 
 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_memory_model_biu.vhd
 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/biu/pu_riscv_mmio_if_biu.vhd

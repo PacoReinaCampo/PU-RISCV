@@ -80,10 +80,10 @@ read_verilog -sv ../../../../rtl/verilog/memory/pu_riscv_ram_1rw_generic.sv
 read_verilog -sv ../../../../rtl/verilog/memory/pu_riscv_ram_1rw.sv
 read_verilog -sv ../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
 
-read_verilog -sv ../../../../rtl/verilog/pu/axi4/pu_riscv_axi42axi4.sv
-read_verilog -sv ../../../../rtl/verilog/pu/axi4/pu_riscv_axi4.sv
-read_verilog -sv ../../../../rtl/verilog/pu/pu_riscv_ahb2axi.sv
-read_verilog -sv ../../../../rtl/verilog/pu/pu_riscv_axi2ahb.sv
+read_verilog -sv ../../../../rtl/verilog/module/axi4/pu_riscv_axi42axi4.sv
+read_verilog -sv ../../../../rtl/verilog/module/axi4/pu_riscv_axi4.sv
+read_verilog -sv ../../../../rtl/verilog/module/pu_riscv_ahb2axi.sv
+read_verilog -sv ../../../../rtl/verilog/module/pu_riscv_axi2ahb.sv
 
 read_verilog -sv spram/core/peripheral_spram_axi4.sv
 read_verilog -sv pu_riscv_synthesis.sv

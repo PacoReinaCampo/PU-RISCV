@@ -80,8 +80,8 @@ sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1rw_generic.sv
 sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1rw.sv
 sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
 
-sv work ../../../../../../../rtl/verilog/pu/ahb3/pu_riscv_biu2ahb3.sv
-sv work ../../../../../../../rtl/verilog/pu/ahb3/pu_riscv_ahb3.sv
+sv work ../../../../../../../rtl/verilog/module/ahb3/pu_riscv_biu2ahb3.sv
+sv work ../../../../../../../rtl/verilog/module/ahb3/pu_riscv_ahb3.sv
 
 sv work ../../../../../../../verification/uvm/application/pu/ahb3/main/pu_riscv_htif.sv
 sv work ../../../../../../../verification/uvm/application/pu/ahb3/main/pu_riscv_dbg_bfm.sv

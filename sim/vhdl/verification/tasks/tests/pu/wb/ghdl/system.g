@@ -36,8 +36,8 @@ ghdl -a --std=08 ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw.vhd
 ghdl -a --std=08 ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw_generic.vhd
 ghdl -a --std=08 ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-ghdl -a --std=08 ../../../../../../../../rtl/vhdl/pu/wb/pu_riscv_biu2wb.vhd
-ghdl -a --std=08 ../../../../../../../../rtl/vhdl/pu/wb/pu_riscv_wb.vhd
+ghdl -a --std=08 ../../../../../../../../rtl/vhdl/module/wb/pu_riscv_biu2wb.vhd
+ghdl -a --std=08 ../../../../../../../../rtl/vhdl/module/wb/pu_riscv_wb.vhd
 
 ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/wb/pu_riscv_memory_model_wb.vhd
 ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/wb/pu_riscv_mmio_if_wb.vhd

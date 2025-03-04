@@ -68,8 +68,8 @@
 ../../../../../../../../rtl/verilog/core/main/pu_riscv_state.sv
 ../../../../../../../../rtl/verilog/memory/pu_riscv_ram_1rw_generic.sv
 ../../../../../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
-../../../../../../../../rtl/verilog/pu/bb/pu_riscv_bb2biu.sv
-../../../../../../../../rtl/verilog/pu/bb/pu_riscv_bb.sv
+../../../../../../../../rtl/verilog/module/bb/pu_riscv_bb2biu.sv
+../../../../../../../../rtl/verilog/module/bb/pu_riscv_bb.sv
 
 ../../../../../../../../verification/tasks/verilog/library/pu/interface/bb/pu_riscv_memory_model_bb.sv
 ../../../../../../../../verification/tasks/verilog/library/pu/interface/bb/pu_riscv_mmio_if_bb.sv
