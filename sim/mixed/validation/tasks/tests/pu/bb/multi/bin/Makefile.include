@@ -83,8 +83,8 @@ RTL_VLOG = $(DUT_SRC_VLOG)/core/cache/pu_riscv_dcache_core.sv \
            $(DUT_SRC_VLOG)/core/main/pu_riscv_state.sv \
            $(DUT_SRC_VLOG)/memory/pu_riscv_ram_1rw_generic.sv \
            $(DUT_SRC_VLOG)/memory/pu_riscv_ram_queue.sv \
-           $(DUT_SRC_VLOG)/module/ahb3/pu_riscv_biu2ahb3.sv \
-           $(DUT_SRC_VLOG)/module/ahb3/pu_riscv_ahb3.sv
+           $(DUT_SRC_VLOG)/pu/ahb3/pu_riscv_biu2ahb3.sv \
+           $(DUT_SRC_VLOG)/pu/ahb3/pu_riscv_ahb3.sv
 
 DUT_SRC_VHDL=$(ROOT_DIR)/rtl/vhdl
 RTL_VHDL = $(DUT_SRC_VHDL)/core/cache/pu_riscv_dext.vhd \

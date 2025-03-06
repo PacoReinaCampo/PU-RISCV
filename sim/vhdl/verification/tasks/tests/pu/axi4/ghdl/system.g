@@ -36,10 +36,10 @@ ghdl -a --std=08 ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw.vhd
 ghdl -a --std=08 ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw_generic.vhd
 ghdl -a --std=08 ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-ghdl -a --std=08 ../../../../../../../../rtl/vhdl/module/axi4/pu_riscv_biu2axi4.vhd
-ghdl -a --std=08 ../../../../../../../../rtl/vhdl/module/axi4/pu_riscv_axi4.vhd
-ghdl -a --std=08 ../../../../../../../../rtl/vhdl/module/bridge/riscv_ahb2axi.vhd
-ghdl -a --std=08 ../../../../../../../../rtl/vhdl/module/bridge/riscv_axi2ahb.vhd
+ghdl -a --std=08 ../../../../../../../../rtl/vhdl/pu/axi4/pu_riscv_biu2axi4.vhd
+ghdl -a --std=08 ../../../../../../../../rtl/vhdl/pu/axi4/pu_riscv_axi4.vhd
+ghdl -a --std=08 ../../../../../../../../rtl/vhdl/pu/bridge/riscv_ahb2axi.vhd
+ghdl -a --std=08 ../../../../../../../../rtl/vhdl/pu/bridge/riscv_axi2ahb.vhd
 
 ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/axi4/pu_riscv_memory_model_axi4.vhd
 ghdl -a --std=08 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/axi4/pu_riscv_mmio_if_axi4.vhd

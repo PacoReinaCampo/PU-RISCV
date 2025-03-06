@@ -55,4 +55,4 @@ sv work ../../../../../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
 ../../../../../../../../rtl/verilog/core/main/pu_riscv_core.sv
 ../../../../../../../../rtl/verilog/core/main/pu_riscv_rf.sv
 
-../../../../../../../../rtl/verilog/module/wb/pu_riscv_wb.sv
+../../../../../../../../rtl/verilog/pu/wb/pu_riscv_wb.sv

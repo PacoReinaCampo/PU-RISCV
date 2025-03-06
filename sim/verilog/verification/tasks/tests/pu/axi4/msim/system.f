@@ -80,10 +80,10 @@
 ../../../../../../../../rtl/verilog/memory/pu_riscv_ram_1rw.sv
 ../../../../../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
 
-../../../../../../../../rtl/verilog/module/axi4/pu_riscv_biu2axi4.sv
-../../../../../../../../rtl/verilog/module/axi4/pu_riscv_axi4.sv
-../../../../../../../../rtl/verilog/module/bridge/riscv_ahb2axi.sv
-../../../../../../../../rtl/verilog/module/bridge/riscv_axi2ahb.sv
+../../../../../../../../rtl/verilog/pu/axi4/pu_riscv_biu2axi4.sv
+../../../../../../../../rtl/verilog/pu/axi4/pu_riscv_axi4.sv
+../../../../../../../../rtl/verilog/pu/bridge/riscv_ahb2axi.sv
+../../../../../../../../rtl/verilog/pu/bridge/riscv_axi2ahb.sv
 
 ../../../../../../../../verification/tasks/verilog/library/pu/interface/axi4/pu_riscv_memory_model_axi4.sv
 ../../../../../../../../verification/tasks/verilog/library/pu/interface/axi4/pu_riscv_mmio_if_axi4.sv

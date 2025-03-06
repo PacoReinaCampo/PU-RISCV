@@ -68,8 +68,8 @@ sv work ../../../../../../../../rtl/verilog/core/pu_riscv_rf.sv
 sv work ../../../../../../../../rtl/verilog/core/pu_riscv_state.sv
 sv work ../../../../../../../../rtl/verilog/memory/pu_riscv_ram_1rw_generic.sv
 sv work ../../../../../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
-sv work ../../../../../../../../rtl/verilog/module/apb4/pu_riscv_apb42biu.sv
-sv work ../../../../../../../../rtl/verilog/module/apb4/pu_riscv_apb4.sv
+sv work ../../../../../../../../rtl/verilog/pu/apb4/pu_riscv_apb42biu.sv
+sv work ../../../../../../../../rtl/verilog/pu/apb4/pu_riscv_apb4.sv
 
 sv work ../../../../../../../../verification/tasks/verilog/library/pu/interface/apb4/pu_riscv_memory_model_apb4.sv
 sv work ../../../../../../../../verification/tasks/verilog/library/pu/interface/apb4/pu_riscv_mmio_if_apb4.sv

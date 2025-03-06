@@ -53,4 +53,4 @@
 ../../../../../../../../rtl/verilog/core/main/pu_riscv_core.sv
 ../../../../../../../../rtl/verilog/core/main/pu_riscv_rf.sv
 
-../../../../../../../../rtl/verilog/module/axi4/pu_riscv_axi4.sv
+../../../../../../../../rtl/verilog/pu/axi4/pu_riscv_axi4.sv

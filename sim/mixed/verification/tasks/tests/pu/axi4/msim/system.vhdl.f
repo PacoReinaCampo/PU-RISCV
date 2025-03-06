@@ -73,7 +73,7 @@
 ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw.vhd
 ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-../../../../../../../../rtl/vhdl/module/axi4/pu_riscv_biu2axi4.vhd
+../../../../../../../../rtl/vhdl/pu/axi4/pu_riscv_biu2axi4.vhd
 
 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/axi4/pu_riscv_memory_model_axi4.vhd
 ../../../../../../../../verification/tasks/vhdl/library/pu/interface/axi4/pu_riscv_mmio_if_axi4.vhd
