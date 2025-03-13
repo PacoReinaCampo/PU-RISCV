@@ -517,7 +517,8 @@ package pu_riscv_verilog_pkg;
   //////////////////////////////////////////////////////////////////////////////
 
   // One Debug Unit per Hardware Thread (hart)
-  localparam DU_ADDR_SIZE = 12;  // 12bit internal address bus
+  localparam DBG_ADDR_SIZE = 16;  // 16bit Debug Addresses
+  localparam DU_ADDR_SIZE  = 12;  // 12bit internal address bus
 
   localparam MAX_BREAKPOINTS = 8;
 

@@ -44,6 +44,11 @@ package peripheral_ahb3_verilog_pkg;
   localparam HDATA_SIZE = 64;
 
   // HTRANS
+  localparam HTRANS_SIZE = 2;
+  localparam HSIZE_SIZE  = 3;
+  localparam HBURST_SIZE = 3;
+  localparam HPROT_SIZE  = 4;
+
   localparam HTRANS_IDLE = 2'b00;
   localparam HTRANS_BUSY = 2'b01;
   localparam HTRANS_NONSEQ = 2'b10;
