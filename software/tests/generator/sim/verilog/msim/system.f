@@ -1,1 +1,1 @@
-../../../bench/verilog/reader_ihex.sv
+../../../verification/verilog/reader_ihex.sv
