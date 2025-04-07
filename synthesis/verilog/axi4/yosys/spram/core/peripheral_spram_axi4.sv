@@ -38,7 +38,7 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
-module peripheral_spram_axi4 #(
+module peripheral_design #(
   parameter AXI_ID_WIDTH   = 10,
   parameter AXI_ADDR_WIDTH = 64,
   parameter AXI_DATA_WIDTH = 64,
