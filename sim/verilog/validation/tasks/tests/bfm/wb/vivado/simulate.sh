@@ -1,4 +1,4 @@
-source ../../../../../../settings64_vivado.sh
+source ../../../../../../../../settings64_vivado.sh
 
 make clean
 make

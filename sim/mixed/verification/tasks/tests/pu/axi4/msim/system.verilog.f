@@ -42,7 +42,7 @@
 ##                                                                               ##
 ###################################################################################
 
-+incdir+../../../../../../../rtl/verilog/pkg
++incdir+../../../../../../../../rtl/verilog/pkg
 
 ../../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
 ../../../../../../../../rtl/verilog/core/cache/pu_riscv_icache_core.sv
