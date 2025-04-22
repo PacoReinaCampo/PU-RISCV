@@ -284,19 +284,19 @@ module pu_riscv_mmio_if_axi4 #(
     .axi4_b_valid(axi4_b_valid),
     .axi4_b_ready(axi4_b_ready),
 
-    // AHB3 signals
-    .ahb3_hsel     (hsel),
-    .ahb3_haddr    (haddr),
-    .ahb3_hwdata   (hwdata),
-    .ahb3_hrdata   (hrdata),
-    .ahb3_hwrite   (hwrite),
-    .ahb3_hsize    (hsize),
-    .ahb3_hburst   (hburst),
-    .ahb3_hprot    (hprot),
-    .ahb3_htrans   (htrans),
-    .ahb3_hmastlock(hmastlock),
-    .ahb3_hreadyin (hreadyin),
-    .ahb3_hreadyout(hreadyout),
-    .ahb3_hresp    (hresp)
+    // AHB4 signals
+    .ahb4_hsel     (hsel),
+    .ahb4_haddr    (haddr),
+    .ahb4_hwdata   (hwdata),
+    .ahb4_hrdata   (hrdata),
+    .ahb4_hwrite   (hwrite),
+    .ahb4_hsize    (hsize),
+    .ahb4_hburst   (hburst),
+    .ahb4_hprot    (hprot),
+    .ahb4_htrans   (htrans),
+    .ahb4_hmastlock(hmastlock),
+    .ahb4_hreadyin (hreadyin),
+    .ahb4_hreadyout(hreadyout),
+    .ahb4_hresp    (hresp)
   );
 endmodule

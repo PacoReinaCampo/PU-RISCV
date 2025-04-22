@@ -460,20 +460,20 @@ module pu_riscv_memory_model_axi4 #(
         .axi4_b_valid(axi4_b_valid[u]),
         .axi4_b_ready(axi4_b_ready[u]),
 
-        // AHB3 signals
-        .ahb3_hsel     (hsel[u]),
-        .ahb3_haddr    (haddr[u]),
-        .ahb3_hwdata   (hwdata[u]),
-        .ahb3_hrdata   (hrdata[u]),
-        .ahb3_hwrite   (hwrite[u]),
-        .ahb3_hsize    (hsize[u]),
-        .ahb3_hburst   (hburst[u]),
-        .ahb3_hprot    (hprot[u]),
-        .ahb3_htrans   (htrans[u]),
-        .ahb3_hmastlock(hmastlock[u]),
-        .ahb3_hreadyin (hreadyin[u]),
-        .ahb3_hreadyout(hreadyout[u]),
-        .ahb3_hresp    (hresp[u])
+        // AHB4 signals
+        .ahb4_hsel     (hsel[u]),
+        .ahb4_haddr    (haddr[u]),
+        .ahb4_hwdata   (hwdata[u]),
+        .ahb4_hrdata   (hrdata[u]),
+        .ahb4_hwrite   (hwrite[u]),
+        .ahb4_hsize    (hsize[u]),
+        .ahb4_hburst   (hburst[u]),
+        .ahb4_hprot    (hprot[u]),
+        .ahb4_htrans   (htrans[u]),
+        .ahb4_hmastlock(hmastlock[u]),
+        .ahb4_hreadyin (hreadyin[u]),
+        .ahb4_hreadyout(hreadyout[u]),
+        .ahb4_hresp    (hresp[u])
       );
     end
   endgenerate

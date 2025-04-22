@@ -212,7 +212,7 @@ module pu_riscv_module_biu #(
     .pma_cfg_i(pma_cfg_i),
     .pma_adr_i(pma_adr_i),
 
-    // AHB3 instruction
+    // AHB4 instruction
     .biu_stb_o    (ibiu_stb),
     .biu_stb_ack_i(ibiu_stb_ack),
     .biu_d_ack_i  (ibiu_d_ack),
@@ -228,7 +228,7 @@ module pu_riscv_module_biu #(
     .biu_ack_i    (ibiu_ack),
     .biu_err_i    (ibiu_err)
 
-    // AHB3 data
+    // AHB4 data
     .biu_stb_o    (dbiu_stb),
     .biu_stb_ack_i(dbiu_stb_ack),
     .biu_d_ack_i  (dbiu_d_ack),

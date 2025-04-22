@@ -38,7 +38,7 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
-import peripheral_ahb3_verilog_pkg::*;
+import peripheral_ahb4_verilog_pkg::*;
 
 module pu_riscv_synthesis #(
   parameter            XLEN               = 32,
@@ -131,7 +131,7 @@ module pu_riscv_synthesis #(
   logic [PMA_CNT-1:0][    13:0] pma_cfg;
   logic [PMA_CNT-1:0][PLEN-1:0] pma_adr;
 
-  // AHB3 instruction
+  // AHB4 instruction
   logic                         ins_HSEL;
   logic              [PLEN-1:0] ins_HADDR;
   logic              [XLEN-1:0] ins_HWDATA;
@@ -145,7 +145,7 @@ module pu_riscv_synthesis #(
   logic                         ins_HREADY;
   logic                         ins_HRESP;
 
-  // AHB3 data
+  // AHB4 data
   logic                         dat_HSEL;
   logic              [PLEN-1:0] dat_HADDR;
   logic              [XLEN-1:0] dat_HWDATA;
@@ -182,7 +182,7 @@ module pu_riscv_synthesis #(
   assign pma_cfg[3] = {MEM_TYPE_MAIN, 8'b1111_0000, AMO_TYPE_NONE, TOR};
 
   // Processing Unit
-  pu_riscv_ahb3 #(
+  pu_riscv_ahb4 #(
     .XLEN             ( XLEN             ),
     .PLEN             ( PLEN             ),
     .PC_INIT          ( PC_INIT          ),
@@ -213,7 +213,7 @@ module pu_riscv_synthesis #(
     .pma_cfg_i ( pma_cfg ),
     .pma_adr_i ( pma_adr ),
 
-    // AHB3 instruction
+    // AHB4 instruction
     .ins_HSEL      ( ins_HSEL      ),
     .ins_HADDR     ( ins_HADDR     ),
     .ins_HWDATA    ( ins_HWDATA    ),
@@ -227,7 +227,7 @@ module pu_riscv_synthesis #(
     .ins_HREADY    ( ins_HREADY    ),
     .ins_HRESP     ( ins_HRESP     ),
 
-    // AHB3 data
+    // AHB4 data
     .dat_HSEL      ( dat_HSEL      ),
     .dat_HADDR     ( dat_HADDR     ),
     .dat_HWDATA    ( dat_HWDATA    ),
@@ -258,8 +258,8 @@ module pu_riscv_synthesis #(
     .dbg_bp    ( dbg_bp    )
   );
 
-  // Instruction AHB3
-  mpsoc_ahb3_spram #(
+  // Instruction AHB4
+  mpsoc_ahb4_spram #(
     .MEM_SIZE          ( 256 ),
     .MEM_DEPTH         ( 256 ),
     .PLEN              ( PLEN ),
@@ -267,7 +267,7 @@ module pu_riscv_synthesis #(
     .TECHNOLOGY        ( TECHNOLOGY ),
     .REGISTERED_OUTPUT ( "NO" )
   )
-  instruction_ahb3 (
+  instruction_ahb4 (
     .HRESETn   ( HRESETn ),
     .HCLK      ( HCLK    ),
 
@@ -286,8 +286,8 @@ module pu_riscv_synthesis #(
     .HRESP     ( ins_HRESP     )
   );
 
-  // Data AHB3
-  mpsoc_ahb3_spram #(
+  // Data AHB4
+  mpsoc_ahb4_spram #(
     .MEM_SIZE          ( 256 ),
     .MEM_DEPTH         ( 256 ),
     .PLEN              ( PLEN ),
@@ -295,7 +295,7 @@ module pu_riscv_synthesis #(
     .TECHNOLOGY        ( TECHNOLOGY ),
     .REGISTERED_OUTPUT ( "NO" )
   )
-  data_ahb3 (
+  data_ahb4 (
     .HRESETn   ( HRESETn ),
     .HCLK      ( HCLK    ),
 

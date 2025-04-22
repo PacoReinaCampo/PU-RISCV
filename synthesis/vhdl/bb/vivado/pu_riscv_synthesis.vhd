@@ -44,7 +44,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-use work.peripheral_ahb3_vhdl_pkg.all;
+use work.peripheral_ahb4_vhdl_pkg.all;
 use work.vhdl_pkg.all;
 
 entity pu_riscv_synthesis is
@@ -133,7 +133,7 @@ architecture rtl of pu_riscv_synthesis is
   -- Components
   ------------------------------------------------------------------------------
 
-  component pu_riscv_ahb3
+  component pu_riscv_ahb4
     generic (
       XLEN : integer := 64;
       PLEN : integer := 64;
@@ -243,7 +243,7 @@ architecture rtl of pu_riscv_synthesis is
     );
   end component;
 
-  component mpsoc_ahb3_spram
+  component mpsoc_ahb4_spram
     generic (
       MEM_SIZE          : integer := 256;  -- Memory in Bytes
       MEM_DEPTH         : integer := 256;  -- Memory depth
@@ -290,7 +290,7 @@ architecture rtl of pu_riscv_synthesis is
   signal pma_cfg : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
   signal pma_adr : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
-  -- AHB3 instruction
+  -- AHB4 instruction
   signal ins_HSEL      : std_logic;
   signal ins_HADDR     : std_logic_vector(PLEN-1 downto 0);
   signal ins_HWDATA    : std_logic_vector(XLEN-1 downto 0);
@@ -304,7 +304,7 @@ architecture rtl of pu_riscv_synthesis is
   signal ins_HREADY    : std_logic;
   signal ins_HRESP     : std_logic;
 
-  -- AHB3 data
+  -- AHB4 data
   signal dat_HSEL      : std_logic;
   signal dat_HADDR     : std_logic_vector(PLEN-1 downto 0);
   signal dat_HWDATA    : std_logic_vector(XLEN-1 downto 0);
@@ -334,7 +334,7 @@ begin
   dbg_dato_s <= X"00000000" & dbg_dato;
 
   -- Processing Unit
-  dut : pu_riscv_ahb3
+  dut : pu_riscv_ahb4
     generic map (
       XLEN => XLEN,
       PLEN => PLEN,
@@ -398,7 +398,7 @@ begin
       pma_cfg_i => pma_cfg,
       pma_adr_i => pma_adr,
 
-      -- AHB3 instruction
+      -- AHB4 instruction
       ins_HSEL      => ins_HSEL,
       ins_HADDR     => ins_HADDR,
       ins_HWDATA    => ins_HWDATA,
@@ -412,7 +412,7 @@ begin
       ins_HREADY    => ins_HREADY,
       ins_HRESP     => ins_HRESP,
 
-      -- AHB3 data
+      -- AHB4 data
       dat_HSEL      => dat_HSEL,
       dat_HADDR     => dat_HADDR,
       dat_HWDATA    => dat_HWDATA,
@@ -443,8 +443,8 @@ begin
       dbg_bp    => dbg_bp
     );
 
-  -- Instruction AHB3
-  instruction_ahb3 : mpsoc_ahb3_spram
+  -- Instruction AHB4
+  instruction_ahb4 : mpsoc_ahb4_spram
     generic map (
       MEM_SIZE          => 256,
       MEM_DEPTH         => 256,
@@ -472,8 +472,8 @@ begin
       HRESP     => ins_HRESP
     );
 
-  -- Data AHB3
-  data_ahb3 : mpsoc_ahb3_spram
+  -- Data AHB4
+  data_ahb4 : mpsoc_ahb4_spram
     generic map (
       MEM_SIZE          => 256,
       MEM_DEPTH         => 256,

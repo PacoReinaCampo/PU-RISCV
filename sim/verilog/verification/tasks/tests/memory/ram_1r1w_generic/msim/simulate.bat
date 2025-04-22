@@ -46,5 +46,5 @@ call ../../../../../../../../settings64_msim.bat
 
 vlib work
 vlog -sv -f system.f
-vsim -c -do run.do work.pu_riscv_testbench_ahb3
+vsim -c -do run.do work.pu_riscv_testbench_ahb4
 pause

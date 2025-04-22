@@ -1,0 +1,93 @@
+///////////////////////////////////////////////////////////////////////////////////
+//                                            __ _      _     _                  //
+//                                           / _(_)    | |   | |                 //
+//                __ _ _   _  ___  ___ _ __ | |_ _  ___| | __| |                 //
+//               / _` | | | |/ _ \/ _ \ '_ \|  _| |/ _ \ |/ _` |                 //
+//              | (_| | |_| |  __/  __/ | | | | | |  __/ | (_| |                 //
+//               \__, |\__,_|\___|\___|_| |_|_| |_|\___|_|\__,_|                 //
+//                  | |                                                          //
+//                  |_|                                                          //
+//                                                                               //
+//                                                                               //
+//              Peripheral for MPSoC                                             //
+//              Multi-Processor System on Chip                                   //
+//                                                                               //
+///////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////
+//                                                                               //
+// Copyright (c) 2015-2016 by the author(s)                                      //
+//                                                                               //
+// Permission is hereby granted, free of charge, to any person obtaining a copy  //
+// of this software and associated documentation files (the "Software"), to deal //
+// in the Software without restriction, including without limitation the rights  //
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell     //
+// copies of the Software, and to permit persons to whom the Software is         //
+// furnished to do so, subject to the following conditions:                      //
+//                                                                               //
+// The above copyright notice and this permission notice shall be included in    //
+// all copies or substantial portions of the Software.                           //
+//                                                                               //
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR    //
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,      //
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE   //
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER        //
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, //
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN     //
+// THE SOFTWARE.                                                                 //
+//                                                                               //
+// ============================================================================= //
+// Author(s):                                                                    //
+//   Paco Reina Campo <pacoreinacampo@queenfield.tech>                           //
+//                                                                               //
+///////////////////////////////////////////////////////////////////////////////////
+
+sv work ../../../../../../../rtl/verilog/pkg/peripheral/axi4/peripheral_axi4_pkg.sv
+
+sv work ../../../../../../../rtl/verilog/pkg/peripheral_ahb4_verilog_pkg.sv
+sv work ../../../../../../../rtl/verilog/pkg/peripheral_biu_verilog_pkg.sv
+sv work ../../../../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
+
+sv work ../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
+sv work ../../../../../../../rtl/verilog/core/cache/pu_riscv_dext.sv
+sv work ../../../../../../../rtl/verilog/core/cache/pu_riscv_icache_core.sv
+sv work ../../../../../../../rtl/verilog/core/cache/pu_riscv_noicache_core.sv
+sv work ../../../../../../../rtl/verilog/core/decode/pu_riscv_id.sv
+sv work ../../../../../../../rtl/verilog/core/execute/pu_riscv_alu.sv
+sv work ../../../../../../../rtl/verilog/core/execute/pu_riscv_bu.sv
+sv work ../../../../../../../rtl/verilog/core/execute/pu_riscv_divider.sv
+sv work ../../../../../../../rtl/verilog/core/execute/pu_riscv_execution.sv
+sv work ../../../../../../../rtl/verilog/core/execute/pu_riscv_lsu.sv
+sv work ../../../../../../../rtl/verilog/core/execute/pu_riscv_multiplier.sv
+sv work ../../../../../../../rtl/verilog/core/fetch/pu_riscv_if.sv
+sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_dmem_ctrl.sv
+sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_imem_ctrl.sv
+sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_membuf.sv
+sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_memmisaligned.sv
+sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_mmu.sv
+sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_mux.sv
+sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_pmachk.sv
+sv work ../../../../../../../rtl/verilog/core/memory/pu_riscv_pmpchk.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_bp.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_core.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_du.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_memory.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_rf.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_state.sv
+sv work ../../../../../../../rtl/verilog/core/main/pu_riscv_writeback.sv
+
+sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1r1w_generic.sv
+sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1r1w.sv
+sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1rw_generic.sv
+sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_1rw.sv
+sv work ../../../../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
+
+sv work ../../../../../../../rtl/verilog/module/ahb4/pu_riscv_biu2ahb4.sv
+sv work ../../../../../../../rtl/verilog/module/ahb4/pu_riscv_ahb4.sv
+
+sv work ../../../../../../../verification/uvm/application/pu/ahb4/main/pu_riscv_htif.sv
+sv work ../../../../../../../verification/uvm/application/pu/ahb4/main/pu_riscv_dbg_bfm.sv
+sv work ../../../../../../../verification/uvm/application/pu/ahb4/interface/pu_riscv_mmio_if_ahb4.sv
+sv work ../../../../../../../verification/uvm/application/pu/ahb4/interface/pu_riscv_memory_model_ahb4.sv
+
+sv work ../../../../../../../verification/uvm/library/pu/ahb4/peripheral_uvm_testbench.sv

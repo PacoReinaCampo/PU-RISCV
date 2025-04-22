@@ -201,7 +201,7 @@ architecture rtl of pu_riscv_testbench_apb4 is
       pma_cfg_i : std_logic_matrix(PMA_CNT-1 downto 0)(13 downto 0);
       pma_adr_i : std_logic_matrix(PMA_CNT-1 downto 0)(PLEN-1 downto 0);
 
-      -- AHB3 instruction
+      -- AHB4 instruction
       ins_HSEL      : out std_logic;
       ins_HADDR     : out std_logic_vector(PLEN-1 downto 0);
       ins_HWDATA    : out std_logic_vector(XLEN-1 downto 0);
@@ -215,7 +215,7 @@ architecture rtl of pu_riscv_testbench_apb4 is
       ins_HREADY    : in  std_logic;
       ins_HRESP     : in  std_logic;
 
-      -- AHB3 data
+      -- AHB4 data
       dat_HSEL      : out std_logic;
       dat_HADDR     : out std_logic_vector(PLEN-1 downto 0);
       dat_HWDATA    : out std_logic_vector(XLEN-1 downto 0);

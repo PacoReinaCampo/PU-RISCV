@@ -1,6 +1,6 @@
 library
 ├── bfm
-│   ├── ahb3
+│   ├── ahb4
 │   │   ├── peripheral_uvm_agent.sv
 │   │   ├── peripheral_uvm_coverage.sv
 │   │   ├── peripheral_uvm_driver.sv
@@ -170,7 +170,7 @@ library
 │       ├── peripheral_uvm_test.sv
 │       └── peripheral_uvm_transaction.sv
 └── pu
-    ├── ahb3
+    ├── ahb4
     │   ├── peripheral_uvm_agent.sv
     │   ├── peripheral_uvm_driver.sv
     │   ├── peripheral_uvm_environment.sv

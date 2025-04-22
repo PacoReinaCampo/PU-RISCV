@@ -98,7 +98,7 @@ module pu_riscv_bb #(
   input wire [PMA_CNT-1:0][    13:0] pma_cfg_i,
   input wire [PMA_CNT-1:0][XLEN-1:0] pma_adr_i,
 
-  // AHB3 instruction
+  // AHB4 instruction
   output            ins_HSEL,
   output [PLEN-1:0] ins_HADDR,
   output [XLEN-1:0] ins_HWDATA,
@@ -112,7 +112,7 @@ module pu_riscv_bb #(
   input             ins_HREADY,
   input             ins_HRESP,
 
-  // AHB3 data
+  // AHB4 data
   output            dat_HSEL,
   output [PLEN-1:0] dat_HADDR,
   output [XLEN-1:0] dat_HWDATA,

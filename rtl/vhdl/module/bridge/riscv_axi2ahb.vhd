@@ -103,20 +103,20 @@ entity riscv_axi2ahb is
     axi4_b_valid : out std_logic;
     axi4_b_ready : in  std_logic;
 
-    -- AHB3 signals
-    ahb3_hsel      : out std_logic;
-    ahb3_haddr     : out std_logic_vector(AHB_ADDR_WIDTH-1 downto 0);
-    ahb3_hwdata    : out std_logic_vector(AHB_DATA_WIDTH-1 downto 0);
-    ahb3_hrdata    : in  std_logic_vector(AHB_DATA_WIDTH-1 downto 0);
-    ahb3_hwrite    : out std_logic;
-    ahb3_hsize     : out std_logic_vector(2 downto 0);
-    ahb3_hburst    : out std_logic_vector(2 downto 0);
-    ahb3_hprot     : out std_logic_vector(3 downto 0);
-    ahb3_htrans    : out std_logic_vector(1 downto 0);
-    ahb3_hmastlock : out std_logic;
-    ahb3_hreadyin  : out std_logic;
-    ahb3_hreadyout : in  std_logic
-    ahb3_hresp     : in  std_logic
+    -- AHB4 signals
+    ahb4_hsel      : out std_logic;
+    ahb4_haddr     : out std_logic_vector(AHB_ADDR_WIDTH-1 downto 0);
+    ahb4_hwdata    : out std_logic_vector(AHB_DATA_WIDTH-1 downto 0);
+    ahb4_hrdata    : in  std_logic_vector(AHB_DATA_WIDTH-1 downto 0);
+    ahb4_hwrite    : out std_logic;
+    ahb4_hsize     : out std_logic_vector(2 downto 0);
+    ahb4_hburst    : out std_logic_vector(2 downto 0);
+    ahb4_hprot     : out std_logic_vector(3 downto 0);
+    ahb4_htrans    : out std_logic_vector(1 downto 0);
+    ahb4_hmastlock : out std_logic;
+    ahb4_hreadyin  : out std_logic;
+    ahb4_hreadyout : in  std_logic
+    ahb4_hresp     : in  std_logic
     );
   constant AXI_ID_WIDTH   : integer := 10;
   constant AXI_ADDR_WIDTH : integer := 64;
@@ -205,11 +205,11 @@ architecture rtl of riscv_axi2ahb is
   signal found               : std_logic;
 
   signal slave_valid_pre : std_logic;
-  signal ahb3_hready_q   : std_logic;
-  signal ahb3_hresp_q    : std_logic;
-  signal ahb3_htrans_q   : std_logic_vector(1 downto 0);
-  signal ahb3_hwrite_q   : std_logic;
-  signal ahb3_hrdata_q   : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+  signal ahb4_hready_q   : std_logic;
+  signal ahb4_hresp_q    : std_logic;
+  signal ahb4_htrans_q   : std_logic_vector(1 downto 0);
+  signal ahb4_hwrite_q   : std_logic;
+  signal ahb4_hrdata_q   : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
 
   signal slvbuf_write : std_logic;
   signal slvbuf_error : std_logic;
@@ -339,7 +339,7 @@ begin
     buf_cmd_byte_ptr    <= "000";
     slave_valid_pre     <= '0';
     master_ready        <= '0';
-    ahb3_htrans         <= '0';
+    ahb4_htrans         <= '0';
     slvbuf_wr_en        <= '0';
     bypass_en           <= '0';
     rd_bypass_idle      <= '0';
@@ -358,11 +358,11 @@ begin
                             when buf_write_in else master_addr(2 downto 0);
         bypass_en      <= buf_state_en;
         rd_bypass_idle <= bypass_en and (buf_nxtstate = CMD_RD);
-        ahb3_htrans    <= (bypass_en & bypass_en) and "10";
+        ahb4_htrans    <= (bypass_en & bypass_en) and "10";
       when CMD_RD =>
         buf_nxtstate <= STREAM_RD
                         when (master_valid and (master_opc = "000")) else DATA_RD;
-        buf_state_en     <= ahb3_hready_q and (ahb3_htrans_q(1 downto 0) /= '0') and not ahb3_hwrite_q;
+        buf_state_en     <= ahb4_hready_q and (ahb4_htrans_q(1 downto 0) /= '0') and not ahb4_hwrite_q;
         cmd_done         <= buf_state_en and not master_valid;
         slvbuf_wr_en     <= buf_state_en;
         master_ready     <= buf_state_en and (buf_nxtstate = STREAM_RD);
@@ -370,71 +370,71 @@ begin
         bypass_en        <= master_ready and master_valid;
         buf_cmd_byte_ptr <= master_addr(2 downto 0)
                             when bypass_en else buf_addr(2 downto 0);
-        ahb3_htrans <= "10" and (not buf_state_en or bypass_en & not buf_state_en or bypass_en);
+        ahb4_htrans <= "10" and (not buf_state_en or bypass_en & not buf_state_en or bypass_en);
       when STREAM_RD =>
-        master_ready <= (ahb3_hready_q and not ahb3_hresp_q) and not (master_valid and master_opc(2 downto 1) = "01");
+        master_ready <= (ahb4_hready_q and not ahb4_hresp_q) and not (master_valid and master_opc(2 downto 1) = "01");
         -- update the fifo if we are streaming the read commands
         buf_wr_en    <= (master_valid and master_ready and (master_opc = "000"));
         -- assuming that the master accpets the slave response right away.
         buf_nxtstate <= STREAM_ERR_RD
-                        when ahb3_hresp_q else STREAM_RD
+                        when ahb4_hresp_q else STREAM_RD
                         when buf_wr_en    else DATA_RD;
-        buf_state_en     <= (ahb3_hready_q or ahb3_hresp_q);
+        buf_state_en     <= (ahb4_hready_q or ahb4_hresp_q);
         buf_data_wr_en   <= buf_state_en;
-        slvbuf_error_in  <= ahb3_hresp_q;
+        slvbuf_error_in  <= ahb4_hresp_q;
         slvbuf_error_en  <= buf_state_en;
-        slave_valid_pre  <= buf_state_en and not ahb3_hresp_q;  -- send a response right away if we are not going through an error response.
+        slave_valid_pre  <= buf_state_en and not ahb4_hresp_q;  -- send a response right away if we are not going through an error response.
         cmd_done         <= buf_state_en and not master_valid;  -- last one of the stream should not send a htrans
         bypass_en        <= master_ready and master_valid and (buf_nxtstate = STREAM_RD) and buf_state_en;
         buf_cmd_byte_ptr <= master_addr(2 downto 0)
                             when bypass_en else buf_addr(2 downto 0);
-        ahb3_htrans  <= "10" and (not ((buf_nxtstate /= STREAM_RD) and buf_state_en) & not ((buf_nxtstate /= STREAM_RD) and buf_state_en));
+        ahb4_htrans  <= "10" and (not ((buf_nxtstate /= STREAM_RD) and buf_state_en) & not ((buf_nxtstate /= STREAM_RD) and buf_state_en));
         slvbuf_wr_en <= buf_wr_en;  -- shifting the contents from the buf to slv_buf for streaming cases
       -- case: STREAM_RD
       when STREAM_ERR_RD =>
         buf_nxtstate     <= DATA_RD;
-        buf_state_en     <= ahb3_hready_q and (ahb3_htrans_q(1 downto 0) /= '0') and not ahb3_hwrite_q;
+        buf_state_en     <= ahb4_hready_q and (ahb4_htrans_q(1 downto 0) /= '0') and not ahb4_hwrite_q;
         slave_valid_pre  <= buf_state_en;
         slvbuf_wr_en     <= buf_state_en;  -- Overwrite slvbuf with buffer
         buf_cmd_byte_ptr <= buf_addr(2 downto 0);
-        ahb3_htrans      <= "10" and (not buf_state_en & not buf_state_en);
+        ahb4_htrans      <= "10" and (not buf_state_en & not buf_state_en);
       when DATA_RD =>
         buf_nxtstate    <= DONE;
-        buf_state_en    <= (ahb3_hready_q or ahb3_hresp_q);
+        buf_state_en    <= (ahb4_hready_q or ahb4_hresp_q);
         buf_data_wr_en  <= buf_state_en;
-        slvbuf_error_in <= ahb3_hresp_q;
+        slvbuf_error_in <= ahb4_hresp_q;
         slvbuf_error_en <= buf_state_en;
         slvbuf_wr_en    <= buf_state_en;
       when CMD_WR =>
         buf_nxtstate        <= DATA_WR;
-        trxn_done           <= ahb3_hready_q and ahb3_hwrite_q and (ahb3_htrans_q(1 downto 0) /= '0');
+        trxn_done           <= ahb4_hready_q and ahb4_hwrite_q and (ahb4_htrans_q(1 downto 0) /= '0');
         buf_state_en        <= trxn_done;
         buf_cmd_byte_ptr_en <= buf_state_en;
         slvbuf_wr_en        <= buf_state_en;
         buf_cmd_byte_ptr    <= (null)(buf_cmd_byte_ptrQ(2 downto 0), buf_byteen(7 downto 0), '1')
                             when trxn_done else buf_cmd_byte_ptrQ;
         cmd_done    <= trxn_done and (buf_aligned or (buf_cmd_byte_ptrQ = "111") or (buf_byteen((null)(buf_cmd_byte_ptrQ(2 downto 0), buf_byteen(7 downto 0), '1')) = '0'));
-        ahb3_htrans <= (not (cmd_done or cmd_doneQ) & not (cmd_done or cmd_doneQ)) and "10";
+        ahb4_htrans <= (not (cmd_done or cmd_doneQ) & not (cmd_done or cmd_doneQ)) and "10";
       when DATA_WR =>
-        buf_state_en <= (cmd_doneQ and ahb3_hready_q) or ahb3_hresp_q;
-        master_ready <= buf_state_en and not ahb3_hresp_q and slave_ready;  -- Ready to accept new command if current command done and no error
+        buf_state_en <= (cmd_doneQ and ahb4_hready_q) or ahb4_hresp_q;
+        master_ready <= buf_state_en and not ahb4_hresp_q and slave_ready;  -- Ready to accept new command if current command done and no error
         buf_nxtstate <= DONE
-                        when (ahb3_hresp_q or not slave_ready) else CMD_WR
+                        when (ahb4_hresp_q or not slave_ready) else CMD_WR
                         when (master_opc(2 downto 1) = "01")   else CMD_RD
                         when (master_valid and master_ready)   else IDLE;
-        slvbuf_error_in <= ahb3_hresp_q;
+        slvbuf_error_in <= ahb4_hresp_q;
         slvbuf_error_en <= buf_state_en;
 
         buf_write_in   <= (master_opc(2 downto 1) = "01");
         buf_wr_en      <= buf_state_en and ((buf_nxtstate = CMD_WR) or (buf_nxtstate = CMD_RD));
         buf_data_wr_en <= buf_wr_en;
 
-        cmd_done        <= (ahb3_hresp_q or (ahb3_hready_q and (ahb3_htrans_q(1 downto 0) /= '0') and ((buf_cmd_byte_ptrQ = "111") or (buf_byteen((null)(buf_cmd_byte_ptrQ(2 downto 0), buf_byteen(7 downto 0), '1')) = '0'))));
+        cmd_done        <= (ahb4_hresp_q or (ahb4_hready_q and (ahb4_htrans_q(1 downto 0) /= '0') and ((buf_cmd_byte_ptrQ = "111") or (buf_byteen((null)(buf_cmd_byte_ptrQ(2 downto 0), buf_byteen(7 downto 0), '1')) = '0'))));
         bypass_en       <= buf_state_en and buf_write_in and (buf_nxtstate = CMD_WR);  -- Only bypass for writes for the time being
-        ahb3_htrans     <= ((not (cmd_done or cmd_doneQ) or bypass_en) & (not (cmd_done or cmd_doneQ) or bypass_en)) and "10";
+        ahb4_htrans     <= ((not (cmd_done or cmd_doneQ) or bypass_en) & (not (cmd_done or cmd_doneQ) or bypass_en)) and "10";
         slave_valid_pre <= buf_state_en and (buf_nxtstate /= DONE);
 
-        trxn_done           <= ahb3_hready_q and ahb3_hwrite_q and (ahb3_htrans_q(1 downto 0) /= '0');
+        trxn_done           <= ahb4_hready_q and ahb4_hwrite_q and (ahb4_htrans_q(1 downto 0) /= '0');
         buf_cmd_byte_ptr_en <= trxn_done or bypass_en;
         buf_cmd_byte_ptr    <= (null)('0', buf_byteen_in, '0')
                             when bypass_en else (null)(buf_cmd_byte_ptrQ(2 downto 0), buf_byteen(7 downto 0), '1')
@@ -454,7 +454,7 @@ begin
   buf_addr_in(31 downto 3) <= master_addr(31 downto 3);
   buf_tag_in               <= master_tag;
   buf_byteen_in            <= wrbuf_byteen(7 downto 0);
-  buf_data_in              <= ahb3_hrdata_q
+  buf_data_in              <= ahb4_hrdata_q
                  when (buf_state = DATA_RD) else master_wdata;
   buf_size_in(1 downto 0) <= (null)(wrbuf_byteen(7 downto 0))
                              when (buf_aligned_in and (master_size(1 downto 0) = "11") and (master_opc(2 downto 1) = "01")) else master_size(1 downto 0);
@@ -463,16 +463,16 @@ begin
   buf_aligned_in <= (master_opc = "000") or (master_size(1 downto 0) = '0') or (master_size(1 downto 0) = "01") or (master_size(1 downto 0) = "10") or ((master_size(1 downto 0) = "11") and ((wrbuf_byteen(7 downto 0) = X"3") or (wrbuf_byteen(7 downto 0) = X"c") or (wrbuf_byteen(7 downto 0) = X"30") or (wrbuf_byteen(7 downto 0) = X"c0") or (wrbuf_byteen(7 downto 0) = X"f") or (wrbuf_byteen(7 downto 0) = X"f0") or (wrbuf_byteen(7 downto 0) = X"ff")));
 
   -- Generate the ahb signals
-  ahb3_haddr <= (master_addr(31 downto 3) & buf_cmd_byte_ptr)
+  ahb4_haddr <= (master_addr(31 downto 3) & buf_cmd_byte_ptr)
                 when bypass_en else (buf_addr(31 downto 3) & buf_cmd_byte_ptr);
-  ahb3_hsize <= ('0' & ((buf_aligned_in & buf_aligned_in) and buf_size_in(1 downto 0)))
+  ahb4_hsize <= ('0' & ((buf_aligned_in & buf_aligned_in) and buf_size_in(1 downto 0)))
                 when bypass_en else ('0' & ((buf_aligned & buf_aligned) and buf_size(1 downto 0)));  -- Send the full size for aligned trxn
-  ahb3_hburst    <= "000";
-  ahb3_hmastlock <= '0';
-  ahb3_hprot     <= ("001" & not axi4_ar_prot(2));
-  ahb3_hwrite    <= (master_opc(2 downto 1) = "01")
+  ahb4_hburst    <= "000";
+  ahb4_hmastlock <= '0';
+  ahb4_hprot     <= ("001" & not axi4_ar_prot(2));
+  ahb4_hwrite    <= (master_opc(2 downto 1) = "01")
                  when bypass_en else buf_write;
-  ahb3_hwdata <= buf_data;
+  ahb4_hwdata <= buf_data;
 
   slave_valid           <= slave_valid_pre;
   slave_opc(3 downto 2) <= "11"
@@ -480,10 +480,10 @@ begin
   slave_opc(1 downto 0) <= (slvbuf_error & slvbuf_error) and "10";
   slave_rdata           <= (last_bus_addr & last_bus_addr)
                  when slvbuf_error       else buf_data
-                 when (buf_state = DONE) else ahb3_hrdata_q;
+                 when (buf_state = DONE) else ahb4_hrdata_q;
   slave_tag <= slvbuf_tag;
 
-  last_addr_en <= (ahb3_htrans /= '0') and ahb3_hreadyout and ahb3_hwrite;
+  last_addr_en <= (ahb4_htrans /= '0') and ahb4_hreadyout and ahb4_hwrite;
 
   processing_2 : process (bus_clk, rst_l)
   begin
@@ -688,52 +688,52 @@ begin
   processing_22 : process (ahbm_clk, rst_l)
   begin
     if (rst_l = 0) then
-      ahb3_hready_q <= 0;
+      ahb4_hready_q <= 0;
     elsif (rising_edge(ahbm_clk)) then
-      ahb3_hready_q <= ahb3_hreadyout;
+      ahb4_hready_q <= ahb4_hreadyout;
     end if;
   end process;
 
   processing_23 : process (ahbm_clk, rst_l)
   begin
     if (rst_l = 0) then
-      ahb3_htrans_q <= 0;
+      ahb4_htrans_q <= 0;
     elsif (rising_edge(ahbm_clk)) then
-      ahb3_htrans_q <= ahb3_htrans;
+      ahb4_htrans_q <= ahb4_htrans;
     end if;
   end process;
 
   processing_24 : process (ahbm_addr_clk, rst_l)
   begin
     if (rst_l = 0) then
-      ahb3_hwrite_q <= 0;
+      ahb4_hwrite_q <= 0;
     elsif (rising_edge(ahbm_addr_clk)) then
-      ahb3_hwrite_q <= ahb3_hwrite;
+      ahb4_hwrite_q <= ahb4_hwrite;
     end if;
   end process;
 
   processing_25 : process (ahbm_clk, rst_l)
   begin
     if (rst_l = 0) then
-      ahb3_hresp_q <= 0;
+      ahb4_hresp_q <= 0;
     elsif (rising_edge(ahbm_clk)) then
-      ahb3_hresp_q <= ahb3_hresp;
+      ahb4_hresp_q <= ahb4_hresp;
     end if;
   end process;
 
   processing_26 : process (ahbm_data_clk, rst_l)
   begin
     if (rst_l = 0) then
-      ahb3_hrdata_q <= 0;
+      ahb4_hrdata_q <= 0;
     elsif (rising_edge(ahbm_data_clk)) then
-      ahb3_hrdata_q <= ahb3_hrdata;
+      ahb4_hrdata_q <= ahb4_hrdata;
     end if;
   end process;
 
   -- Clock headers
   -- clock enables for ahbm addr/data
   buf_clken       <= bus_clk_en and (buf_wr_en or slvbuf_wr_en or clk_override);
-  ahbm_addr_clken <= bus_clk_en and ((ahb3_hreadyout and ahb3_htrans(1)) or clk_override);
+  ahbm_addr_clken <= bus_clk_en and ((ahb4_hreadyout and ahb4_htrans(1)) or clk_override);
   ahbm_data_clken <= bus_clk_en and ((buf_state /= IDLE) or clk_override);
 
   processing_27 : process (clk)

@@ -190,19 +190,19 @@ architecture rtl of pu_riscv_biu2axi4 is
       axi4_b_user    : std_logic_vector(? downto 0);
       axi4_b_valid   : std_logic_vector(? downto 0);
       axi4_b_ready   : std_logic_vector(? downto 0);
-      ahb3_hsel      : std_logic_vector(? downto 0);
-      ahb3_haddr     : std_logic_vector(? downto 0);
-      ahb3_hwdata    : std_logic_vector(? downto 0);
-      ahb3_hrdata    : std_logic_vector(? downto 0);
-      ahb3_hwrite    : std_logic_vector(? downto 0);
-      ahb3_hsize     : std_logic_vector(? downto 0);
-      ahb3_hburst    : std_logic_vector(? downto 0);
-      ahb3_hprot     : std_logic_vector(? downto 0);
-      ahb3_htrans    : std_logic_vector(? downto 0);
-      ahb3_hmastlock : std_logic_vector(? downto 0);
-      ahb3_hreadyin  : std_logic_vector(? downto 0);
-      ahb3_hreadyout : std_logic_vector(? downto 0);
-      ahb3_hresp     : std_logic_vector(? downto 0)
+      ahb4_hsel      : std_logic_vector(? downto 0);
+      ahb4_haddr     : std_logic_vector(? downto 0);
+      ahb4_hwdata    : std_logic_vector(? downto 0);
+      ahb4_hrdata    : std_logic_vector(? downto 0);
+      ahb4_hwrite    : std_logic_vector(? downto 0);
+      ahb4_hsize     : std_logic_vector(? downto 0);
+      ahb4_hburst    : std_logic_vector(? downto 0);
+      ahb4_hprot     : std_logic_vector(? downto 0);
+      ahb4_htrans    : std_logic_vector(? downto 0);
+      ahb4_hmastlock : std_logic_vector(? downto 0);
+      ahb4_hreadyin  : std_logic_vector(? downto 0);
+      ahb4_hreadyout : std_logic_vector(? downto 0);
+      ahb4_hresp     : std_logic_vector(? downto 0)
       );
   end component;
 
@@ -544,19 +544,19 @@ begin
       axi4_b_valid   => axi4_b_valid,
       axi4_b_ready   => axi4_b_ready,
 
-      -- AHB3 signals
-      ahb3_hsel      => hsel,
-      ahb3_haddr     => haddr,
-      ahb3_hwdata    => hwdata,
-      ahb3_hrdata    => hrdata,
-      ahb3_hwrite    => hwrite,
-      ahb3_hsize     => hsize,
-      ahb3_hburst    => hburst,
-      ahb3_hprot     => hprot,
-      ahb3_htrans    => htrans,
-      ahb3_hmastlock => hmastlock,
-      ahb3_hreadyin  => hreadyin,
-      ahb3_hreadyout => hreadyout,
-      ahb3_hresp     => hresp
+      -- AHB4 signals
+      ahb4_hsel      => hsel,
+      ahb4_haddr     => haddr,
+      ahb4_hwdata    => hwdata,
+      ahb4_hrdata    => hrdata,
+      ahb4_hwrite    => hwrite,
+      ahb4_hsize     => hsize,
+      ahb4_hburst    => hburst,
+      ahb4_hprot     => hprot,
+      ahb4_htrans    => htrans,
+      ahb4_hmastlock => hmastlock,
+      ahb4_hreadyin  => hreadyin,
+      ahb4_hreadyout => hreadyout,
+      ahb4_hresp     => hresp
       );
 end rtl;

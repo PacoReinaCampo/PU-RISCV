@@ -42,7 +42,7 @@
 ##                                                                               ##
 ###################################################################################
 
-../../../../../../../../../rtl/vhdl/pkg/peripheral_ahb3_vhdl_pkg.vhd
+../../../../../../../../../rtl/vhdl/pkg/peripheral_ahb4_vhdl_pkg.vhd
 ../../../../../../../../../rtl/vhdl/pkg/peripheral_biu_vhdl_pkg.vhd
 ../../../../../../../../../rtl/vhdl/pkg/pu_riscv_vhdl_pkg.vhd
 ../../../../../../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
@@ -81,11 +81,11 @@
 ../../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw_generic.vhd
 ../../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-../../../../../../../../../rtl/vhdl/module/ahb3/pu_riscv_biu2ahb3.vhd
-../../../../../../../../../rtl/vhdl/module/ahb3/pu_riscv_ahb3.vhd
+../../../../../../../../../rtl/vhdl/module/ahb4/pu_riscv_biu2ahb4.vhd
+../../../../../../../../../rtl/vhdl/module/ahb4/pu_riscv_ahb4.vhd
 
-../../../../../../../../../verification/tasks/vhdl/library/pu/ahb3/pu_riscv_memory_model_ahb3.vhd
-../../../../../../../../../verification/tasks/vhdl/library/pu/ahb3/pu_riscv_mmio_if_ahb3.vhd
-../../../../../../../../../verification/tasks/vhdl/library/pu/ahb3/pu_riscv_testbench_ahb3.vhd
+../../../../../../../../../verification/tasks/vhdl/library/pu/ahb4/pu_riscv_memory_model_ahb4.vhd
+../../../../../../../../../verification/tasks/vhdl/library/pu/ahb4/pu_riscv_mmio_if_ahb4.vhd
+../../../../../../../../../verification/tasks/vhdl/library/pu/ahb4/pu_riscv_testbench_ahb4.vhd
 ../../../../../../../../../verification/tasks/vhdl/library/bfm/pu_riscv_dbg_bfm.vhd
 ../../../../../../../../../verification/tasks/vhdl/library/bfm/pu_riscv_htif.vhd

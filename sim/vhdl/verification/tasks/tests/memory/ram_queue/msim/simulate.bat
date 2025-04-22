@@ -46,5 +46,5 @@ call ../../../../../../../../settings64_msim.bat
 
 vlib work
 vcom -2008 -f system.f
-vsim -c -do run.do work.pu_riscv_ahb3
+vsim -c -do run.do work.pu_riscv_ahb4
 pause

@@ -38,7 +38,7 @@
 // Author(s):
 //   Francisco Javier Reina Campo <pacoreinacampo@queenfield.tech>
 
-module pu_riscv_module_ahb3 #(
+module pu_riscv_module_ahb4 #(
   parameter AXI_ID_WIDTH   = 10,
   parameter AXI_ADDR_WIDTH = 64,
   parameter AXI_DATA_WIDTH = 64,
@@ -229,7 +229,7 @@ module pu_riscv_module_ahb3 #(
   //////////////////////////////////////////////////////////////////////////////
 
   // Instantiate RISC-V PU
-  pu_riscv_ahb3 #(
+  pu_riscv_ahb4 #(
     .XLEN     (XLEN),
     .PLEN     (PLEN),
     .PC_INIT  (PC_INIT),

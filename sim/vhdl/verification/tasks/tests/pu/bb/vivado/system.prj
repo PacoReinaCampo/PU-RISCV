@@ -81,7 +81,7 @@ vhdl work ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw_generic.vhd
 vhdl work ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_1rw.vhd
 vhdl work ../../../../../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
-vhdl work ../../../../../../../../rtl/vhdl/pu/bb/pu_riscv_bb2ahb3.vhd
+vhdl work ../../../../../../../../rtl/vhdl/pu/bb/pu_riscv_bb2ahb4.vhd
 vhdl work ../../../../../../../../rtl/vhdl/pu/bb/pu_riscv_bb.vhd
 
 vhdl work ../../../../../../../../verification/tasks/vhdl/library/pu/interface/bb/pu_riscv_memory_model_bb.vhd

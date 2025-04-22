@@ -1,6 +1,6 @@
 verilog
 ├── bfm
-│   ├── ahb3
+│   ├── ahb4
 │   │   └── peripheral_design.sv
 │   ├── apb4
 │   │   └── peripheral_design.sv
@@ -73,10 +73,10 @@ verilog
 │   ├── pu_riscv_ram_1rw.sv
 │   └── pu_riscv_ram_queue.sv
 ├── module
-│   ├── ahb3
-│   │   ├── pu_riscv_ahb3.sv
-│   │   ├── pu_riscv_biu2ahb3.sv
-│   │   └── pu_riscv_module_ahb3.sv
+│   ├── ahb4
+│   │   ├── pu_riscv_ahb4.sv
+│   │   ├── pu_riscv_biu2ahb4.sv
+│   │   └── pu_riscv_module_ahb4.sv
 │   ├── apb4
 │   │   ├── pu_riscv_apb4.sv
 │   │   ├── pu_riscv_biu2apb4.sv
@@ -100,7 +100,7 @@ verilog
 │       ├── pu_riscv_module_wb.sv
 │       └── pu_riscv_wb.sv
 ├── pkg
-│   ├── peripheral_ahb3_verilog_pkg.sv
+│   ├── peripheral_ahb4_verilog_pkg.sv
 │   ├── peripheral_apb4_verilog_pkg.sv
 │   ├── peripheral_axi4_verilog_pkg.sv
 │   ├── peripheral_biu_verilog_pkg.sv

@@ -56,7 +56,7 @@ entity pu_riscv_biu2apb4 is
     HRESETn : in std_logic;
     HCLK    : in std_logic;
 
-    -- AHB3 Lite Bus
+    -- AHB4 Lite Bus
     HSEL      : out std_logic;
     HADDR     : out std_logic_vector(PLEN-1 downto 0);
     HRDATA    : in  std_logic_vector(XLEN-1 downto 0);

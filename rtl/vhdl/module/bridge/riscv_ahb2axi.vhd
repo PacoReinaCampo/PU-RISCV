@@ -102,20 +102,20 @@ entity riscv_ahb2axi is
     axi4_b_valid : in  std_logic;
     axi4_b_ready : out std_logic;
 
-    -- AHB3 signals
-    ahb3_hsel      : in  std_logic;
-    ahb3_haddr     : in  std_logic_vector(AHB_ADDR_WIDTH-1 downto 0);
-    ahb3_hwdata    : in  std_logic_vector(AHB_DATA_WIDTH-1 downto 0);
-    ahb3_hrdata    : out std_logic_vector(AHB_DATA_WIDTH-1 downto 0);
-    ahb3_hwrite    : in  std_logic;
-    ahb3_hsize     : in  std_logic_vector(2 downto 0);
-    ahb3_hburst    : in  std_logic_vector(2 downto 0);
-    ahb3_hprot     : in  std_logic_vector(3 downto 0);
-    ahb3_htrans    : in  std_logic_vector(1 downto 0);
-    ahb3_hmastlock : in  std_logic;
-    ahb3_hreadyin  : in  std_logic;
-    ahb3_hreadyout : out std_logic
-    ahb3_hresp     : out std_logic
+    -- AHB4 signals
+    ahb4_hsel      : in  std_logic;
+    ahb4_haddr     : in  std_logic_vector(AHB_ADDR_WIDTH-1 downto 0);
+    ahb4_hwdata    : in  std_logic_vector(AHB_DATA_WIDTH-1 downto 0);
+    ahb4_hrdata    : out std_logic_vector(AHB_DATA_WIDTH-1 downto 0);
+    ahb4_hwrite    : in  std_logic;
+    ahb4_hsize     : in  std_logic_vector(2 downto 0);
+    ahb4_hburst    : in  std_logic_vector(2 downto 0);
+    ahb4_hprot     : in  std_logic_vector(3 downto 0);
+    ahb4_htrans    : in  std_logic_vector(1 downto 0);
+    ahb4_hmastlock : in  std_logic;
+    ahb4_hreadyin  : in  std_logic;
+    ahb4_hreadyout : out std_logic
+    ahb4_hresp     : out std_logic
     );
   constant AXI_ID_WIDTH   : integer := 10;
   constant AXI_ADDR_WIDTH : integer := 64;
@@ -160,25 +160,25 @@ architecture rtl of riscv_ahb2axi is
   signal buf_read_error    : std_logic;
   signal buf_rdata         : std_logic_vector(AHB_DATA_WIDTH-1 downto 0);
 
-  signal ahb3_hready    : std_logic;
-  signal ahb3_hready_q  : std_logic;
-  signal ahb3_htrans_in : std_logic_vector(1 downto 0);
-  signal ahb3_htrans_q  : std_logic_vector(1 downto 0);
-  signal ahb3_hsize_q   : std_logic_vector(2 downto 0);
-  signal ahb3_hwrite_q  : std_logic;
-  signal ahb3_haddr_q   : std_logic_vector(AHB_ADDR_WIDTH-1 downto 0);
-  signal ahb3_hwdata_q  : std_logic_vector(AHB_DATA_WIDTH-1 downto 0);
-  signal ahb3_hresp_q   : std_logic;
+  signal ahb4_hready    : std_logic;
+  signal ahb4_hready_q  : std_logic;
+  signal ahb4_htrans_in : std_logic_vector(1 downto 0);
+  signal ahb4_htrans_q  : std_logic_vector(1 downto 0);
+  signal ahb4_hsize_q   : std_logic_vector(2 downto 0);
+  signal ahb4_hwrite_q  : std_logic;
+  signal ahb4_haddr_q   : std_logic_vector(AHB_ADDR_WIDTH-1 downto 0);
+  signal ahb4_hwdata_q  : std_logic_vector(AHB_DATA_WIDTH-1 downto 0);
+  signal ahb4_hresp_q   : std_logic;
 
   -- Miscellaneous signals
-  signal ahb3_addr_in_dccm, ahb3_addr_in_iccm, ahb3_addr_in_pic                               : std_logic;
-  signal ahb3_addr_in_dccm_region_nc, ahb3_addr_in_iccm_region_nc, ahb3_addr_in_pic_region_nc : std_logic;
+  signal ahb4_addr_in_dccm, ahb4_addr_in_iccm, ahb4_addr_in_pic                               : std_logic;
+  signal ahb4_addr_in_dccm_region_nc, ahb4_addr_in_iccm_region_nc, ahb4_addr_in_pic_region_nc : std_logic;
 
   -- signals needed for the read data coming back from the core and to block any further commands as AHB is a blocking bus
   signal buf_rdata_en : std_logic;
 
-  signal ahb3_bus_addr_clk_en, buf_rdata_clk_en : std_logic;
-  signal ahb3_clk, ahb3_addr_clk, buf_rdata_clk : std_logic;
+  signal ahb4_bus_addr_clk_en, buf_rdata_clk_en : std_logic;
+  signal ahb4_clk, ahb4_addr_clk, buf_rdata_clk : std_logic;
 
   -- Command buffer is the holding station where we convert to AXI and send to core
   signal cmdbuf_wr_en : std_logic;
@@ -210,23 +210,23 @@ begin
       when IDLE =>
         -- No commands recieved
         buf_nxtstate <= WR
-                        when ahb3_hwrite else RD;
-        buf_state_en <= ahb3_hready and ahb3_htrans(1) and ahb3_hsel;  -- only transition on a valid hrtans
+                        when ahb4_hwrite else RD;
+        buf_state_en <= ahb4_hready and ahb4_htrans(1) and ahb4_hsel;  -- only transition on a valid hrtans
       when WR =>
         -- Write command recieved last cycle
         buf_nxtstate <= IDLE
-                        when (ahb3_hresp or (ahb3_htrans(1 downto 0) = '0') or not ahb3_hsel) else WR
-                        when ahb3_hwrite                                                      else RD;
-        buf_state_en <= (not cmdbuf_full or ahb3_hresp);
-        cmdbuf_wr_en <= not cmdbuf_full and not (ahb3_hresp or ((ahb3_htrans(1 downto 0) = "01") and ahb3_hsel));
+                        when (ahb4_hresp or (ahb4_htrans(1 downto 0) = '0') or not ahb4_hsel) else WR
+                        when ahb4_hwrite                                                      else RD;
+        buf_state_en <= (not cmdbuf_full or ahb4_hresp);
+        cmdbuf_wr_en <= not cmdbuf_full and not (ahb4_hresp or ((ahb4_htrans(1 downto 0) = "01") and ahb4_hsel));
       -- Don't send command to the buffer in case of an error or when the master is not ready with the data now.
       when RD =>
         -- Read command recieved last cycle.
         -- If error go to idle, else wait for read data
         buf_nxtstate <= IDLE
-                        when ahb3_hresp else PEND;
-        buf_state_en <= (not cmdbuf_full or ahb3_hresp);  -- only when command can go, or if its an error
-        cmdbuf_wr_en <= not ahb3_hresp and not cmdbuf_full;  -- send command only when no error
+                        when ahb4_hresp else PEND;
+        buf_state_en <= (not cmdbuf_full or ahb4_hresp);  -- only when command can go, or if its an error
+        cmdbuf_wr_en <= not ahb4_hresp and not cmdbuf_full;  -- send command only when no error
       when PEND =>
         -- Read Command has been sent. Waiting on Data.
         -- go back for next command and present data next cycle
@@ -237,25 +237,25 @@ begin
     end case;
   end process;
 
-  processing_1 : process (ahb3_clk, rst_l)
+  processing_1 : process (ahb4_clk, rst_l)
   begin
     if (rst_l = 0) then
       buf_state <= IDLE;
-    elsif (rising_edge(ahb3_clk)) then
+    elsif (rising_edge(ahb4_clk)) then
       buf_state <= buf_nxtstate
                    when buf_state_en else buf_state;
     end if;
   end process;
 
-  master_wstrb(7 downto 0) <= (concatenate(8, ahb3_hsize_q = "000") and ("0000_0001" sll ahb3_haddr_q(2 downto 0))) or (concatenate(8, ahb3_hsize_q = "001") and ("0000_0011" sll ahb3_haddr_q(2 downto 0))) or (concatenate(8, ahb3_hsize_q = "010") and ("0000_1111" sll ahb3_haddr_q(2 downto 0))) or (concatenate(8, ahb3_hsize_q = "011") and ("1111_1111"));
+  master_wstrb(7 downto 0) <= (concatenate(8, ahb4_hsize_q = "000") and ("0000_0001" sll ahb4_haddr_q(2 downto 0))) or (concatenate(8, ahb4_hsize_q = "001") and ("0000_0011" sll ahb4_haddr_q(2 downto 0))) or (concatenate(8, ahb4_hsize_q = "010") and ("0000_1111" sll ahb4_haddr_q(2 downto 0))) or (concatenate(8, ahb4_hsize_q = "011") and ("1111_1111"));
 
   -- AHB signals
-  ahb3_hreadyout <= (ahb3_hresp_q and not ahb3_hready_q)
-                    when ahb3_hresp else ((not cmdbuf_full or (buf_state = IDLE)) and not (buf_state = RD or buf_state = PEND) and not buf_read_error);
+  ahb4_hreadyout <= (ahb4_hresp_q and not ahb4_hready_q)
+                    when ahb4_hresp else ((not cmdbuf_full or (buf_state = IDLE)) and not (buf_state = RD or buf_state = PEND) and not buf_read_error);
 
-  ahb3_hready    <= ahb3_hreadyout and ahb3_hreadyin;
-  ahb3_htrans_in <= (ahb3_hsel & ahb3_hsel) and ahb3_htrans(1 downto 0);
-  ahb3_hrdata    <= buf_rdata(63 downto 0);
+  ahb4_hready    <= ahb4_hreadyout and ahb4_hreadyin;
+  ahb4_htrans_in <= (ahb4_hsel & ahb4_hsel) and ahb4_htrans(1 downto 0);
+  ahb4_hrdata    <= buf_rdata(63 downto 0);
   -- request not for ICCM or DCCM
   -- ICCM Rd/Wr OR DCCM Wr not the right size
   -- HW size but unaligned
@@ -263,7 +263,7 @@ begin
   -- DW size but unaligned
   -- Read ECC error
   -- This is for second cycle of hresp protocol
-  ahb3_hresp     <= ((ahb3_htrans_q(1 downto 0) /= '0') and (buf_state /= IDLE) and ((not (ahb3_addr_in_dccm or ahb3_addr_in_iccm)) or ((ahb3_addr_in_iccm or (ahb3_addr_in_dccm and ahb3_hwrite_q)) and not ((ahb3_hsize_q(1 downto 0) = "10") or (ahb3_hsize_q(1 downto 0) = "11"))) or ((ahb3_hsize_q = X"1") and ahb3_haddr_q(0)) or ((ahb3_hsize_q = X"2") and (or ahb3_haddr_q(1 downto 0))) or ((ahb3_hsize_q = X"3") and (or ahb3_haddr_q(2 downto 0))))) or buf_read_error or (ahb3_hresp_q and not ahb3_hready_q);
+  ahb4_hresp     <= ((ahb4_htrans_q(1 downto 0) /= '0') and (buf_state /= IDLE) and ((not (ahb4_addr_in_dccm or ahb4_addr_in_iccm)) or ((ahb4_addr_in_iccm or (ahb4_addr_in_dccm and ahb4_hwrite_q)) and not ((ahb4_hsize_q(1 downto 0) = "10") or (ahb4_hsize_q(1 downto 0) = "11"))) or ((ahb4_hsize_q = X"1") and ahb4_haddr_q(0)) or ((ahb4_hsize_q = X"2") and (or ahb4_haddr_q(1 downto 0))) or ((ahb4_hsize_q = X"3") and (or ahb4_haddr_q(2 downto 0))))) or buf_read_error or (ahb4_hresp_q and not ahb4_hready_q);
 
   -- Buffer signals - needed for the read data and ECC error response
   processing_2 : process (buf_rdata_clk, rst_l)
@@ -276,119 +276,119 @@ begin
   end process;
 
   -- buf_read_error will be high only one cycle
-  processing_3 : process (ahb3_clk, rst_l)
+  processing_3 : process (ahb4_clk, rst_l)
   begin
     if (rst_l = 0) then
       buf_read_error <= 0;
-    elsif (rising_edge(ahb3_clk)) then
+    elsif (rising_edge(ahb4_clk)) then
       buf_read_error <= buf_read_error_in;
     end if;
   end process;
 
   -- All the Master signals are captured before presenting it to the command buffer.
   -- We check for Hresp before sending it to the cmd buffer.
-  processing_4 : process (ahb3_clk, rst_l)
+  processing_4 : process (ahb4_clk, rst_l)
   begin
     if (rst_l = 0) then
-      ahb3_hresp_q <= 0;
-    elsif (rising_edge(ahb3_clk)) then
-      ahb3_hresp_q <= ahb3_hresp;
+      ahb4_hresp_q <= 0;
+    elsif (rising_edge(ahb4_clk)) then
+      ahb4_hresp_q <= ahb4_hresp;
     end if;
   end process;
 
-  processing_5 : process (ahb3_clk, rst_l)
+  processing_5 : process (ahb4_clk, rst_l)
   begin
     if (rst_l = 0) then
-      ahb3_hready_q <= 0;
-    elsif (rising_edge(ahb3_clk)) then
-      ahb3_hready_q <= ahb3_hready;
+      ahb4_hready_q <= 0;
+    elsif (rising_edge(ahb4_clk)) then
+      ahb4_hready_q <= ahb4_hready;
     end if;
   end process;
 
-  processing_6 : process (ahb3_clk, rst_l)
+  processing_6 : process (ahb4_clk, rst_l)
   begin
     if (rst_l = 0) then
-      ahb3_htrans_q <= 0;
-    elsif (rising_edge(ahb3_clk)) then
-      ahb3_htrans_q <= ahb3_htrans_in;
+      ahb4_htrans_q <= 0;
+    elsif (rising_edge(ahb4_clk)) then
+      ahb4_htrans_q <= ahb4_htrans_in;
     end if;
   end process;
 
-  processing_7 : process (ahb3_addr_clk, rst_l)
+  processing_7 : process (ahb4_addr_clk, rst_l)
   begin
     if (rst_l = 0) then
-      ahb3_hsize_q <= 0;
-    elsif (rising_edge(ahb3_addr_clk)) then
-      ahb3_hsize_q <= ahb3_hsize;
+      ahb4_hsize_q <= 0;
+    elsif (rising_edge(ahb4_addr_clk)) then
+      ahb4_hsize_q <= ahb4_hsize;
     end if;
   end process;
 
-  processing_8 : process (ahb3_addr_clk, rst_l)
+  processing_8 : process (ahb4_addr_clk, rst_l)
   begin
     if (rst_l = 0) then
-      ahb3_hwrite_q <= 0;
-    elsif (rising_edge(ahb3_addr_clk)) then
-      ahb3_hwrite_q <= ahb3_hwrite;
+      ahb4_hwrite_q <= 0;
+    elsif (rising_edge(ahb4_addr_clk)) then
+      ahb4_hwrite_q <= ahb4_hwrite;
     end if;
   end process;
 
-  processing_9 : process (ahb3_addr_clk, rst_l)
+  processing_9 : process (ahb4_addr_clk, rst_l)
   begin
     if (rst_l = 0) then
-      ahb3_haddr_q <= 0;
-    elsif (rising_edge(ahb3_addr_clk)) then
-      ahb3_haddr_q <= ahb3_haddr;
+      ahb4_haddr_q <= 0;
+    elsif (rising_edge(ahb4_addr_clk)) then
+      ahb4_haddr_q <= ahb4_haddr;
     end if;
   end process;
 
   -- Clock header logic
-  ahb3_bus_addr_clk_en <= bus_clk_en and (ahb3_hready and ahb3_htrans(1));
+  ahb4_bus_addr_clk_en <= bus_clk_en and (ahb4_hready and ahb4_htrans(1));
   buf_rdata_clk_en     <= bus_clk_en and buf_rdata_en;
 
   processing_10 : process (clk)
   begin
     if (falling_edge(clk)) then
-      ahb3_clk      <= (bus_clk_en or scan_mode);            -- clk &
-      ahb3_addr_clk <= (ahb3_bus_addr_clk_en or scan_mode);  -- clk &
+      ahb4_clk      <= (bus_clk_en or scan_mode);            -- clk &
+      ahb4_addr_clk <= (ahb4_bus_addr_clk_en or scan_mode);  -- clk &
       buf_rdata_clk <= (buf_rdata_clk_en or scan_mode);      -- clk &
     end if;
   end process;
 
   -- Address check  dccm
-  ahb3_addr_in_dccm_region_nc <= (ahb3_haddr_q(AHB_ADDR_WIDTH-1 downto (AHB_ADDR_WIDTH-REGION_BITS)) = RV_DCCM_SADR(AHB_ADDR_WIDTH-1 downto (AHB_ADDR_WIDTH-REGION_BITS)));
+  ahb4_addr_in_dccm_region_nc <= (ahb4_haddr_q(AHB_ADDR_WIDTH-1 downto (AHB_ADDR_WIDTH-REGION_BITS)) = RV_DCCM_SADR(AHB_ADDR_WIDTH-1 downto (AHB_ADDR_WIDTH-REGION_BITS)));
 
   if (RV_DCCM_SIZE = 48) generate
-    ahb3_addr_in_dccm <= (ahb3_haddr_q(AHB_ADDR_WIDTH-1 downto MASK_BITS) = RV_DCCM_SADR(AHB_ADDR_WIDTH-1 downto MASK_BITS)) and not (and ahb3_haddr_q(MASK_BITS-1 downto MASK_BITS-2));
+    ahb4_addr_in_dccm <= (ahb4_haddr_q(AHB_ADDR_WIDTH-1 downto MASK_BITS) = RV_DCCM_SADR(AHB_ADDR_WIDTH-1 downto MASK_BITS)) and not (and ahb4_haddr_q(MASK_BITS-1 downto MASK_BITS-2));
   else generate
-    ahb3_addr_in_dccm <= (ahb3_haddr_q(AHB_ADDR_WIDTH-1 downto MASK_BITS) = RV_DCCM_SADR(AHB_ADDR_WIDTH-1 downto MASK_BITS));
+    ahb4_addr_in_dccm <= (ahb4_haddr_q(AHB_ADDR_WIDTH-1 downto MASK_BITS) = RV_DCCM_SADR(AHB_ADDR_WIDTH-1 downto MASK_BITS));
   end generate;
 
   -- Address check  iccm
   RV_ICCM_ENABLE_GENERATING_0 : if (RV_ICCM_ENABLE = '1') generate
-    ahb3_addr_in_iccm_region_nc <= (ahb3_haddr_q(AHB_ADDR_WIDTH-1 downto (AHB_ADDR_WIDTH-REGION_BITS)) = RV_ICCM_SADR(AHB_ADDR_WIDTH-1 downto (AHB_ADDR_WIDTH-REGION_BITS)));
+    ahb4_addr_in_iccm_region_nc <= (ahb4_haddr_q(AHB_ADDR_WIDTH-1 downto (AHB_ADDR_WIDTH-REGION_BITS)) = RV_ICCM_SADR(AHB_ADDR_WIDTH-1 downto (AHB_ADDR_WIDTH-REGION_BITS)));
 
     if (RV_ICCM_SIZE = 48) generate
-      ahb3_addr_in_iccm <= (ahb3_haddr_q(AHB_ADDR_WIDTH-1 downto MASK_BITS) = RV_ICCM_SADR(AHB_ADDR_WIDTH-1 downto MASK_BITS)) and not (and ahb3_haddr_q(MASK_BITS-1 downto MASK_BITS-2));
+      ahb4_addr_in_iccm <= (ahb4_haddr_q(AHB_ADDR_WIDTH-1 downto MASK_BITS) = RV_ICCM_SADR(AHB_ADDR_WIDTH-1 downto MASK_BITS)) and not (and ahb4_haddr_q(MASK_BITS-1 downto MASK_BITS-2));
     else generate
-      ahb3_addr_in_iccm <= (ahb3_haddr_q(AHB_ADDR_WIDTH-1 downto MASK_BITS) = RV_ICCM_SADR(AHB_ADDR_WIDTH-1 downto MASK_BITS));
+      ahb4_addr_in_iccm <= (ahb4_haddr_q(AHB_ADDR_WIDTH-1 downto MASK_BITS) = RV_ICCM_SADR(AHB_ADDR_WIDTH-1 downto MASK_BITS));
     end generate;
   elsif (RV_ICCM_ENABLE = '0') generate
-    ahb3_addr_in_iccm           <= 0;
-    ahb3_addr_in_iccm_region_nc <= 0;
+    ahb4_addr_in_iccm           <= 0;
+    ahb4_addr_in_iccm_region_nc <= 0;
   end generate;
 
   -- PIC memory address check
-  ahb3_addr_in_pic_region_nc <= (ahb3_haddr_q(AHB_ADDR_WIDTH-1 downto (AHB_ADDR_WIDTH-REGION_BITS)) = RV_PIC_BASE_ADDR(AHB_ADDR_WIDTH-1 downto (AHB_ADDR_WIDTH-REGION_BITS)));
+  ahb4_addr_in_pic_region_nc <= (ahb4_haddr_q(AHB_ADDR_WIDTH-1 downto (AHB_ADDR_WIDTH-REGION_BITS)) = RV_PIC_BASE_ADDR(AHB_ADDR_WIDTH-1 downto (AHB_ADDR_WIDTH-REGION_BITS)));
 
   if (RV_PIC_SIZE = 48) generate
-    ahb3_addr_in_pic <= (ahb3_haddr_q(AHB_ADDR_WIDTH-1 downto MASK_BITS) = RV_PIC_BASE_ADDR(AHB_ADDR_WIDTH-1 downto MASK_BITS)) and not (and ahb3_haddr_q(MASK_BITS-1 downto MASK_BITS-2));
+    ahb4_addr_in_pic <= (ahb4_haddr_q(AHB_ADDR_WIDTH-1 downto MASK_BITS) = RV_PIC_BASE_ADDR(AHB_ADDR_WIDTH-1 downto MASK_BITS)) and not (and ahb4_haddr_q(MASK_BITS-1 downto MASK_BITS-2));
   else generate
-    ahb3_addr_in_pic <= (ahb3_haddr_q(AHB_ADDR_WIDTH-1 downto MASK_BITS) = RV_PIC_BASE_ADDR(AHB_ADDR_WIDTH-1 downto MASK_BITS));
+    ahb4_addr_in_pic <= (ahb4_haddr_q(AHB_ADDR_WIDTH-1 downto MASK_BITS) = RV_PIC_BASE_ADDR(AHB_ADDR_WIDTH-1 downto MASK_BITS));
   end generate;
 
   -- Command Buffer
   -- Holding for the commands to be sent for the AXI. It will be converted to the AXI signals.
-  cmdbuf_rst  <= (((axi4_aw_valid and axi4_aw_ready) or (axi4_ar_valid and axi4_ar_ready)) and not cmdbuf_wr_en) or (ahb3_hresp and not cmdbuf_write);
+  cmdbuf_rst  <= (((axi4_aw_valid and axi4_aw_ready) or (axi4_ar_valid and axi4_ar_ready)) and not cmdbuf_wr_en) or (ahb4_hresp and not cmdbuf_write);
   cmdbuf_full <= (cmdbuf_vld and not ((axi4_aw_valid and axi4_aw_ready) or (axi4_ar_valid and axi4_ar_ready)));
 
   processing_11 : process (bus_clk, rst_l)
@@ -406,7 +406,7 @@ begin
     if (rst_l = 0) then
       cmdbuf_write <= 0;
     elsif (rising_edge(bus_clk)) then
-      cmdbuf_write <= ahb3_hwrite_q
+      cmdbuf_write <= ahb4_hwrite_q
                       when cmdbuf_wr_en else cmdbuf_write;
     end if;
   end process;
@@ -416,7 +416,7 @@ begin
     if (rst_l = 0) then
       cmdbuf_size <= 0;
     elsif (rising_edge(bus_clk)) then
-      cmdbuf_size <= ahb3_hsize_q(1 downto 0)
+      cmdbuf_size <= ahb4_hsize_q(1 downto 0)
                      when cmdbuf_wr_en else cmdbuf_size;
     end if;
   end process;
@@ -436,7 +436,7 @@ begin
     if (rst_l = 0) then
       cmdbuf_addr <= 0;
     elsif (rising_edge(bus_clk)) then
-      cmdbuf_addr <= ahb3_haddr_q
+      cmdbuf_addr <= ahb4_haddr_q
                      when cmdbuf_wr_en else cmdbuf_addr;
     end if;
   end process;
@@ -446,7 +446,7 @@ begin
     if (rst_l = 0) then
       cmdbuf_wdata <= 0;
     elsif (rising_edge(bus_clk)) then
-      cmdbuf_wdata <= ahb3_hwdata
+      cmdbuf_wdata <= ahb4_hwdata
                       when cmdbuf_wr_en else cmdbuf_wdata;
     end if;
   end process;
