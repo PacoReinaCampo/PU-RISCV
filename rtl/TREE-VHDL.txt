@@ -17,6 +17,7 @@ vhdl
 │   ├── fetch
 │   │   └── pu_riscv_if.vhd
 │   ├── main
+│   │   ├── pu_riscv_biu.vhd
 │   │   ├── pu_riscv_bp.vhd
 │   │   ├── pu_riscv_core.vhd
 │   │   ├── pu_riscv_du.vhd
@@ -52,12 +53,12 @@ vhdl
 │   ├── bb
 │   │   ├── pu_riscv_bb.vhd
 │   │   └── pu_riscv_biu2bb.vhd
-│   ├── biu
-│   │   ├── pu_riscv_biu.vhd
-│   │   └── pu_riscv_module_biu.vhd
 │   ├── bridge
 │   │   ├── riscv_ahb2axi.vhd
 │   │   └── riscv_axi2ahb.vhd
+│   ├── tl
+│   │   ├── pu_riscv_tl.vhd
+│   │   └── pu_riscv_biu2tl.vhd
 │   └── wb
 │       ├── pu_riscv_biu2wb.vhd
 │       └── pu_riscv_wb.vhd
@@ -71,4 +72,4 @@ vhdl
 │   └── vhdl_pkg.vhd
 └── pu
 
-18 directories, 53 files
+19 directories, 54 files
