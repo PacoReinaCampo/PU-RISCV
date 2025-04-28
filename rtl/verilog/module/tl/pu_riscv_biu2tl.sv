@@ -383,18 +383,18 @@ module pu_riscv_biu2tl #(
     .tl_b_ready(tl_b_ready),
 
     // AHB4 signals
-    .ahb4_hsel     (hsel),
-    .ahb4_haddr    (haddr),
-    .ahb4_hwdata   (hwdata),
-    .ahb4_hrdata   (hrdata),
-    .ahb4_hwrite   (hwrite),
-    .ahb4_hsize    (hsize),
-    .ahb4_hburst   (hburst),
-    .ahb4_hprot    (hprot),
-    .ahb4_htrans   (htrans),
-    .ahb4_hmastlock(hmastlock),
-    .ahb4_hreadyin (hreadyin),
-    .ahb4_hreadyout(hreadyout),
-    .ahb4_hresp    (hresp)
+    .tl_hsel     (hsel),
+    .tl_haddr    (haddr),
+    .tl_hwdata   (hwdata),
+    .tl_hrdata   (hrdata),
+    .tl_hwrite   (hwrite),
+    .tl_hsize    (hsize),
+    .tl_hburst   (hburst),
+    .tl_hprot    (hprot),
+    .tl_htrans   (htrans),
+    .tl_hmastlock(hmastlock),
+    .tl_hreadyin (hreadyin),
+    .tl_hreadyout(hreadyout),
+    .tl_hresp    (hresp)
   );
 endmodule

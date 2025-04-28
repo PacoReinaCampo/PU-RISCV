@@ -190,19 +190,19 @@ architecture rtl of pu_riscv_biu2tl is
       tl_b_user    : std_logic_vector(? downto 0);
       tl_b_valid   : std_logic_vector(? downto 0);
       tl_b_ready   : std_logic_vector(? downto 0);
-      ahb4_hsel      : std_logic_vector(? downto 0);
-      ahb4_haddr     : std_logic_vector(? downto 0);
-      ahb4_hwdata    : std_logic_vector(? downto 0);
-      ahb4_hrdata    : std_logic_vector(? downto 0);
-      ahb4_hwrite    : std_logic_vector(? downto 0);
-      ahb4_hsize     : std_logic_vector(? downto 0);
-      ahb4_hburst    : std_logic_vector(? downto 0);
-      ahb4_hprot     : std_logic_vector(? downto 0);
-      ahb4_htrans    : std_logic_vector(? downto 0);
-      ahb4_hmastlock : std_logic_vector(? downto 0);
-      ahb4_hreadyin  : std_logic_vector(? downto 0);
-      ahb4_hreadyout : std_logic_vector(? downto 0);
-      ahb4_hresp     : std_logic_vector(? downto 0)
+      tl_hsel      : std_logic_vector(? downto 0);
+      tl_haddr     : std_logic_vector(? downto 0);
+      tl_hwdata    : std_logic_vector(? downto 0);
+      tl_hrdata    : std_logic_vector(? downto 0);
+      tl_hwrite    : std_logic_vector(? downto 0);
+      tl_hsize     : std_logic_vector(? downto 0);
+      tl_hburst    : std_logic_vector(? downto 0);
+      tl_hprot     : std_logic_vector(? downto 0);
+      tl_htrans    : std_logic_vector(? downto 0);
+      tl_hmastlock : std_logic_vector(? downto 0);
+      tl_hreadyin  : std_logic_vector(? downto 0);
+      tl_hreadyout : std_logic_vector(? downto 0);
+      tl_hresp     : std_logic_vector(? downto 0)
       );
   end component;
 
@@ -545,18 +545,18 @@ begin
       tl_b_ready   => tl_b_ready,
 
       -- AHB4 signals
-      ahb4_hsel      => hsel,
-      ahb4_haddr     => haddr,
-      ahb4_hwdata    => hwdata,
-      ahb4_hrdata    => hrdata,
-      ahb4_hwrite    => hwrite,
-      ahb4_hsize     => hsize,
-      ahb4_hburst    => hburst,
-      ahb4_hprot     => hprot,
-      ahb4_htrans    => htrans,
-      ahb4_hmastlock => hmastlock,
-      ahb4_hreadyin  => hreadyin,
-      ahb4_hreadyout => hreadyout,
-      ahb4_hresp     => hresp
+      tl_hsel      => hsel,
+      tl_haddr     => haddr,
+      tl_hwdata    => hwdata,
+      tl_hrdata    => hrdata,
+      tl_hwrite    => hwrite,
+      tl_hsize     => hsize,
+      tl_hburst    => hburst,
+      tl_hprot     => hprot,
+      tl_htrans    => htrans,
+      tl_hmastlock => hmastlock,
+      tl_hreadyin  => hreadyin,
+      tl_hreadyout => hreadyout,
+      tl_hresp     => hresp
       );
 end rtl;

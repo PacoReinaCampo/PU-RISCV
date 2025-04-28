@@ -44,7 +44,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-use work.peripheral_ahb4_vhdl_pkg.all;
+use work.peripheral_tl_vhdl_pkg.all;
 use work.vhdl_pkg.all;
 
 entity pu_riscv_synthesis is
@@ -133,7 +133,7 @@ architecture rtl of pu_riscv_synthesis is
   -- Components
   ------------------------------------------------------------------------------
 
-  component pu_riscv_ahb4
+  component pu_riscv_tl
     generic (
       XLEN : integer := 64;
       PLEN : integer := 64;
@@ -243,7 +243,7 @@ architecture rtl of pu_riscv_synthesis is
     );
   end component;
 
-  component mpsoc_ahb4_spram
+  component mpsoc_tl_spram
     generic (
       MEM_SIZE          : integer := 256;  -- Memory in Bytes
       MEM_DEPTH         : integer := 256;  -- Memory depth
@@ -334,7 +334,7 @@ begin
   dbg_dato_s <= X"00000000" & dbg_dato;
 
   -- Processing Unit
-  dut : pu_riscv_ahb4
+  dut : pu_riscv_tl
     generic map (
       XLEN => XLEN,
       PLEN => PLEN,
@@ -444,7 +444,7 @@ begin
     );
 
   -- Instruction AHB4
-  instruction_ahb4 : mpsoc_ahb4_spram
+  instruction_tl : mpsoc_tl_spram
     generic map (
       MEM_SIZE          => 256,
       MEM_DEPTH         => 256,
@@ -473,7 +473,7 @@ begin
     );
 
   -- Data AHB4
-  data_ahb4 : mpsoc_ahb4_spram
+  data_tl : mpsoc_tl_spram
     generic map (
       MEM_SIZE          => 256,
       MEM_DEPTH         => 256,

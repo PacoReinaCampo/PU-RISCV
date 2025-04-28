@@ -38,7 +38,7 @@
 // Author(s):
 //   Paco Reina Campo <pacoreinacampo@queenfield.tech>
 
-import peripheral_ahb4_verilog_pkg::*;
+import peripheral_tl_verilog_pkg::*;
 
 module pu_riscv_synthesis #(
   parameter            XLEN               = 32,
@@ -182,7 +182,7 @@ module pu_riscv_synthesis #(
   assign pma_cfg[3] = {MEM_TYPE_MAIN, 8'b1111_0000, AMO_TYPE_NONE, TOR};
 
   // Processing Unit
-  pu_riscv_ahb4 #(
+  pu_riscv_tl #(
     .XLEN             ( XLEN             ),
     .PLEN             ( PLEN             ),
     .PC_INIT          ( PC_INIT          ),
@@ -259,7 +259,7 @@ module pu_riscv_synthesis #(
   );
 
   // Instruction AHB4
-  mpsoc_ahb4_spram #(
+  mpsoc_tl_spram #(
     .MEM_SIZE          ( 256 ),
     .MEM_DEPTH         ( 256 ),
     .PLEN              ( PLEN ),
@@ -267,7 +267,7 @@ module pu_riscv_synthesis #(
     .TECHNOLOGY        ( TECHNOLOGY ),
     .REGISTERED_OUTPUT ( "NO" )
   )
-  instruction_ahb4 (
+  instruction_tl (
     .HRESETn   ( HRESETn ),
     .HCLK      ( HCLK    ),
 
@@ -287,7 +287,7 @@ module pu_riscv_synthesis #(
   );
 
   // Data AHB4
-  mpsoc_ahb4_spram #(
+  mpsoc_tl_spram #(
     .MEM_SIZE          ( 256 ),
     .MEM_DEPTH         ( 256 ),
     .PLEN              ( PLEN ),
@@ -295,7 +295,7 @@ module pu_riscv_synthesis #(
     .TECHNOLOGY        ( TECHNOLOGY ),
     .REGISTERED_OUTPUT ( "NO" )
   )
-  data_ahb4 (
+  data_tl (
     .HRESETn   ( HRESETn ),
     .HCLK      ( HCLK    ),
 
