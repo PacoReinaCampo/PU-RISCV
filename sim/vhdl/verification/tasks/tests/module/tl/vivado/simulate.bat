@@ -45,6 +45,6 @@
 call ../../../../../../../../settings64_vivado.bat
 
 xvhdl -prj system.prj
-xelab pu_riscv_testbench_ahb4
-xsim -R pu_riscv_testbench_ahb4
+xelab pu_riscv_testbench_tl
+xsim -R pu_riscv_testbench_tl
 pause

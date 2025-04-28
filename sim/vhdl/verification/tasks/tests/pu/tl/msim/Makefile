@@ -5,7 +5,7 @@ build:
 	vcom -2008 -f system.f
 
 simulate:
-	vsim -c -do run.do work.pu_riscv_ahb4
+	vsim -c -do run.do work.pu_riscv_tl
 
 clean:
 	rm -rf work transcript

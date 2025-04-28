@@ -6,7 +6,7 @@ build:
 	vcom -2008 -f system.vhdl.f
 
 simulate:
-	vsim -c -do run.do work.pu_riscv_testbench_ahb4
+	vsim -c -do run.do work.pu_riscv_testbench_tl
 
 clean:
 	rm -rf work transcript

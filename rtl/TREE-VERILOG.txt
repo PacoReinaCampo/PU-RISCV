@@ -110,4 +110,4 @@ verilog
 │   └── pu_riscv_verilog_pkg.sv
 └── pu
 
-28 directories, 83 files
+27 directories, 83 files
