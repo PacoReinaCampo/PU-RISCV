@@ -46,9 +46,9 @@
 # Package Sources
 #####################################################################
 PACKAGE_SRC_VLOG=$(ROOT_DIR)/rtl/verilog
-PACKAGE_VLOG = $(PACKAGE_SRC_VLOG)/pkg/peripheral_tl_verilog_pkg.sv \
-               $(PACKAGE_SRC_VLOG)/pkg/peripheral_biu_verilog_pkg.sv \
-               $(PACKAGE_SRC_VLOG)/pkg/pu_riscv_verilog_pkg.sv
+PACKAGE_VLOG = $(PACKAGE_SRC_VLOG)/pkg/module/peripheral_tl_verilog_pkg.sv \
+               $(PACKAGE_SRC_VLOG)/pkg/core/peripheral_biu_verilog_pkg.sv \
+               $(PACKAGE_SRC_VLOG)/pkg/core/pu_riscv_verilog_pkg.sv
 
 PACKAGE_VHDL = 
 

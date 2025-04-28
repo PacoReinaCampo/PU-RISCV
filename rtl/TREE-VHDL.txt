@@ -63,13 +63,16 @@ vhdl
 │       ├── pu_riscv_biu2wb.vhd
 │       └── pu_riscv_wb.vhd
 ├── pkg
-│   ├── peripheral_ahb4_vhdl_pkg.vhd
-│   ├── peripheral_apb4_vhdl_pkg.vhd
-│   ├── peripheral_axi4_vhdl_pkg.vhd
-│   ├── peripheral_biu_vhdl_pkg.vhd
-│   ├── peripheral_wb_vhdl_pkg.vhd
-│   ├── pu_riscv_vhdl_pkg.vhd
-│   └── vhdl_pkg.vhd
+│   ├── core
+│   │   ├── peripheral_biu_vhdl_pkg.vhd
+│   │   ├── pu_riscv_vhdl_pkg.vhd
+│   │   └── vhdl_pkg.vhd
+│   └── module
+│       ├── peripheral_ahb4_vhdl_pkg.vhd
+│       ├── peripheral_apb4_vhdl_pkg.vhd
+│       ├── peripheral_axi4_vhdl_pkg.vhd
+│       ├── peripheral_tl_vhdl_pkg.vhd
+│       └── peripheral_wb_vhdl_pkg.vhd
 └── pu
 
-18 directories, 54 files
+20 directories, 55 files

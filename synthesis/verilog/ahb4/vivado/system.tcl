@@ -42,9 +42,9 @@
 ##                                                                               ##
 ###################################################################################
 
-read_verilog -sv ../../../../rtl/verilog/pkg/peripheral_ahb4_verilog_pkg.sv
-read_verilog -sv ../../../../rtl/verilog/pkg/peripheral_ahb4_verilog_pkg.sv
-read_verilog -sv ../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
+read_verilog -sv ../../../../rtl/verilog/pkg/module/peripheral_ahb4_verilog_pkg.sv
+read_verilog -sv ../../../../rtl/verilog/pkg/module/peripheral_ahb4_verilog_pkg.sv
+read_verilog -sv ../../../../rtl/verilog/pkg/core/pu_riscv_verilog_pkg.sv
 
 read_verilog -sv ../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
 read_verilog -sv ../../../../rtl/verilog/core/cache/pu_riscv_dext.sv

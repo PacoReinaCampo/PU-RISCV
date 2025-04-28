@@ -43,8 +43,8 @@
 ###################################################################################
 
 ../../../../../../../../rtl/verilog/pkg/peripheral_bb_verilog_pkg.sv
-../../../../../../../../rtl/verilog/pkg/peripheral_biu_verilog_pkg.sv
-../../../../../../../../rtl/verilog/pkg/pu_riscv_verilog_pkg.sv
+../../../../../../../../rtl/verilog/pkg/core/peripheral_biu_verilog_pkg.sv
+../../../../../../../../rtl/verilog/pkg/core/pu_riscv_verilog_pkg.sv
 
 ../../../../../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
 ../../../../../../../../rtl/verilog/core/cache/pu_riscv_icache_core.sv

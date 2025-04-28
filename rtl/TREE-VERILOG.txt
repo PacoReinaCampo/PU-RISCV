@@ -102,12 +102,15 @@ verilog
 │       ├── pu_riscv_module_wb.sv
 │       └── pu_riscv_wb.sv
 ├── pkg
-│   ├── peripheral_ahb4_verilog_pkg.sv
-│   ├── peripheral_apb4_verilog_pkg.sv
-│   ├── peripheral_axi4_verilog_pkg.sv
-│   ├── peripheral_biu_verilog_pkg.sv
-│   ├── peripheral_wb_verilog_pkg.sv
-│   └── pu_riscv_verilog_pkg.sv
+│   ├── core
+│   │   ├── peripheral_biu_verilog_pkg.sv
+│   │   └── pu_riscv_verilog_pkg.sv
+│   └── module
+│       ├── peripheral_ahb4_verilog_pkg.sv
+│       ├── peripheral_apb4_verilog_pkg.sv
+│       ├── peripheral_axi4_verilog_pkg.sv
+│       ├── peripheral_tl_verilog_pkg.sv
+│       └── peripheral_wb_verilog_pkg.sv
 └── pu
 
-27 directories, 83 files
+29 directories, 84 files
