@@ -49,6 +49,31 @@ library
 │       ├── peripheral_osvvm_model_pkg.vhd
 │       ├── peripheral_osvvm_model.vhd
 │       └── peripheral_osvvm_testbench.vhd
+├── module
+│   ├── ahb4
+│   │   ├── peripheral_osvvm_model_pkg.vhd
+│   │   ├── peripheral_osvvm_model.vhd
+│   │   └── peripheral_osvvm_testbench.vhd
+│   ├── apb4
+│   │   ├── peripheral_osvvm_model_pkg.vhd
+│   │   ├── peripheral_osvvm_model.vhd
+│   │   └── peripheral_osvvm_testbench.vhd
+│   ├── axi4
+│   │   ├── peripheral_osvvm_model_pkg.vhd
+│   │   ├── peripheral_osvvm_model.vhd
+│   │   └── peripheral_osvvm_testbench.vhd
+│   ├── bb
+│   │   ├── peripheral_osvvm_model_pkg.vhd
+│   │   ├── peripheral_osvvm_model.vhd
+│   │   └── peripheral_osvvm_testbench.vhd
+│   ├── tl
+│   │   ├── peripheral_osvvm_model_pkg.vhd
+│   │   ├── peripheral_osvvm_model.vhd
+│   │   └── peripheral_osvvm_testbench.vhd
+│   └── wb
+│       ├── peripheral_osvvm_model_pkg.vhd
+│       ├── peripheral_osvvm_model.vhd
+│       └── peripheral_osvvm_testbench.vhd
 └── pu
     ├── ahb4
     │   ├── peripheral_osvvm_model_pkg.vhd
@@ -75,4 +100,4 @@ library
         ├── peripheral_osvvm_model.vhd
         └── peripheral_osvvm_testbench.vhd
 
-21 directories, 54 files
+28 directories, 72 files

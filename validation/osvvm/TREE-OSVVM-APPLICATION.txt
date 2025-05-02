@@ -37,6 +37,25 @@ application
 │   └── memory
 │       ├── peripheral_osvvm_design_pkg.vhd
 │       └── peripheral_osvvm_design.vhd
+├── module
+│   ├── ahb4
+│   │   ├── peripheral_osvvm_design_pkg.vhd
+│   │   └── peripheral_osvvm_design.vhd
+│   ├── apb4
+│   │   ├── peripheral_osvvm_design_pkg.vhd
+│   │   └── peripheral_osvvm_design.vhd
+│   ├── axi4
+│   │   ├── peripheral_osvvm_design_pkg.vhd
+│   │   └── peripheral_osvvm_design.vhd
+│   ├── bb
+│   │   ├── peripheral_osvvm_design_pkg.vhd
+│   │   └── peripheral_osvvm_design.vhd
+│   ├── tl
+│   │   ├── peripheral_osvvm_design_pkg.vhd
+│   │   └── peripheral_osvvm_design.vhd
+│   └── wb
+│       ├── peripheral_osvvm_design_pkg.vhd
+│       └── peripheral_osvvm_design.vhd
 └── pu
     ├── ahb4
     │   ├── peripheral_osvvm_design_pkg.vhd
@@ -57,4 +76,4 @@ application
         ├── peripheral_osvvm_design_pkg.vhd
         └── peripheral_osvvm_design.vhd
 
-21 directories, 36 files
+28 directories, 48 files

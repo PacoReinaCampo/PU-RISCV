@@ -37,6 +37,25 @@ application
 │   └── memory
 │       ├── peripheral_design.sv
 │       └── peripheral_testbench.sv
+├── module
+│   ├── ahb4
+│   │   ├── peripheral_design.sv
+│   │   └── peripheral_testbench.sv
+│   ├── apb4
+│   │   ├── peripheral_design.sv
+│   │   └── peripheral_testbench.sv
+│   ├── axi4
+│   │   ├── peripheral_design.sv
+│   │   └── peripheral_testbench.sv
+│   ├── bb
+│   │   ├── peripheral_design.sv
+│   │   └── peripheral_testbench.sv
+│   ├── tl
+│   │   ├── peripheral_design.sv
+│   │   └── peripheral_testbench.sv
+│   └── wb
+│       ├── peripheral_design.sv
+│       └── peripheral_testbench.sv
 └── pu
     ├── ahb4
     │   ├── peripheral_design.sv
@@ -57,4 +76,4 @@ application
         ├── peripheral_design.sv
         └── peripheral_testbench.sv
 
-21 directories, 36 files
+28 directories, 48 files
