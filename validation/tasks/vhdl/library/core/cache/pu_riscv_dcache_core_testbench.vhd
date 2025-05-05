@@ -11,7 +11,7 @@
 --                                                                            --
 --              MPSoC-RISCV CPU                                               --
 --              Core - Data Cache (Write Back)                                --
---              AMBA3 AHB-Lite Bus Interface                                  --
+--              AMBA4 AHB-Lite Bus Interface                                  --
 --                                                                            --
 --------------------------------------------------------------------------------
 

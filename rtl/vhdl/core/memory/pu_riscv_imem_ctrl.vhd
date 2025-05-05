@@ -11,7 +11,7 @@
 --                                                                            --
 --              MPSoC-RISCV CPU                                               --
 --              Core - Instruction Memory Access Block                        --
---              AMBA3 AHB-Lite Bus Interface                                  --
+--              AMBA4 AHB-Lite Bus Interface                                  --
 --                                                                            --
 --------------------------------------------------------------------------------
 

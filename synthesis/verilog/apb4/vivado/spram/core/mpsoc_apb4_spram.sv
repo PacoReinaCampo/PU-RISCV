@@ -11,7 +11,7 @@
 //                                                                            //
 //              MPSoC-RISCV CPU                                               //
 //              Single Port SRAM                                              //
-//              AMBA3 AHB-Lite Bus Interface                                  //
+//              AMBA4 AHB-Lite Bus Interface                                  //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2018-2019 by the author(s)

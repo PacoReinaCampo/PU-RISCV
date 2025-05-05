@@ -10,7 +10,7 @@
 --                                                                            --
 --                                                                            --
 --              MPSoC-RISCV CPU                                               --
---              AMBA3 AHB-Lite Bus Interface                                  --
+--              AMBA4 AHB-Lite Bus Interface                                  --
 --              AMBA4 AXI-Lite Bus Interface                                  --
 --                                                                            --
 --------------------------------------------------------------------------------

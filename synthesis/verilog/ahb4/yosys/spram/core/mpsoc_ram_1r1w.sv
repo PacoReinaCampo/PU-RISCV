@@ -11,7 +11,7 @@
 //                                                                            //
 //              MPSoC-RISCV CPU                                               //
 //              Memory - 1R1W RAM Block                                       //
-//              AMBA3 AHB-Lite Bus Interface                                  //
+//              AMBA4 AHB-Lite Bus Interface                                  //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2018-2019 by the author(s)

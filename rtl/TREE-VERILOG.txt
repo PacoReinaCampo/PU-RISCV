@@ -16,6 +16,15 @@ verilog
 │   │   └── peripheral_spram_tl.sv
 │   └── wb
 │       └── peripheral_design.sv
+├── bridge
+│   ├── riscv_ahb2axi.sv
+│   ├── riscv_apb2axi.sv
+│   ├── riscv_axi2ahb.sv
+│   ├── riscv_axi2apb.sv
+│   ├── riscv_bb2tl.sv
+│   ├── riscv_tl2bb.sv
+│   ├── riscv_tl2wb.sv
+│   └── riscv_wb2tl.sv
 ├── core
 │   ├── cache
 │   │   ├── pu_riscv_dcache_core.sv
@@ -90,9 +99,6 @@ verilog
 │   │   ├── pu_riscv_bb.sv
 │   │   ├── pu_riscv_biu2bb.sv
 │   │   └── pu_riscv_module_bb.sv
-│   ├── bridge
-│   │   ├── riscv_ahb2axi.sv
-│   │   └── riscv_axi2ahb.sv
 │   ├── tl
 │   │   ├── pu_riscv_biu2tl.sv
 │   │   ├── pu_riscv_module_tl.sv
@@ -113,4 +119,4 @@ verilog
 │       └── peripheral_wb_verilog_pkg.sv
 └── pu
 
-29 directories, 84 files
+29 directories, 90 files

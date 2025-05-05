@@ -11,7 +11,7 @@
 //                                                                            //
 //              MPSoC-RISCV CPU                                               //
 //              Core - Data External Access Logic                             //
-//              AMBA3 AHB-Lite Bus Interface                                  //
+//              AMBA4 AHB-Lite Bus Interface                                  //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2017-2018 by the author(s)
