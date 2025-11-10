@@ -71,11 +71,21 @@ module pu_riscv_memmisaligned #(
       misaligned = (HAS_RVC != 0) ? adr_i[0] : |adr_i[1:0];
     end else begin
       case (size_i)
-        BYTE:    misaligned = 1'b0;
-        HWORD:   misaligned = adr_i[0];
-        WORD:    misaligned = |adr_i[1:0];
-        DWORD:   misaligned = |adr_i[2:0];
-        default: misaligned = 1'b1;
+        BYTE: begin
+          misaligned = 1'b0;
+        end
+        HWORD: begin
+          misaligned = adr_i[0];
+        end
+        WORD: begin
+          misaligned = |adr_i[1:0];
+        end
+        DWORD: begin
+          misaligned = |adr_i[2:0];
+        end
+        default: begin
+          misaligned = 1'b1;
+        end
       endcase
     end
   end

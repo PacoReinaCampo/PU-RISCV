@@ -565,9 +565,15 @@ module pu_riscv_imem_ctrl #(
 
   always @(*) begin
     case ({ ext_ack, cache_ack, tcm_ack })
-      3'b001:  parcel_queue_d_parcel = tcm_q;
-      3'b010:  parcel_queue_d_parcel = cache_q;
-      default: parcel_queue_d_parcel = ext_q >> (16 * parcel_queue_d_pc[1 +: $clog2(XLEN/16)]);
+      3'b001: begin
+        parcel_queue_d_parcel = tcm_q;
+      end
+      3'b010: begin
+        parcel_queue_d_parcel = cache_q;
+      end
+      default: begin
+        parcel_queue_d_parcel = ext_q >> (16 * parcel_queue_d_pc[1 +: $clog2(XLEN/16)]);
+      end
     endcase
   end
 

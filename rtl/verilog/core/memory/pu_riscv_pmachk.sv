@@ -253,20 +253,36 @@ module pu_riscv_pmachk #(
       always @(*) begin
         case (pmacfg[i][1:0])
           // TOR after NAPOT ...
-          TOR:     pma_lb[i] = (i == 0) ? {PLEN - 2{1'b0}} : pmacfg[i-1][1:0] != TOR ? pma_ub[i-1] : pma_adr_i[i-1][PLEN-2 - 1:0];
-          NA4:     pma_lb[i] = napot_lb(1'b1, pma_adr_i[i]);
-          NAPOT:   pma_lb[i] = napot_lb(1'b0, pma_adr_i[i]);
-          default: pma_lb[i] = {$bits(pma_lb[i]) {1'bx}};
+          TOR: begin
+            pma_lb[i] = (i == 0) ? {PLEN - 2{1'b0}} : pmacfg[i-1][1:0] != TOR ? pma_ub[i-1] : pma_adr_i[i-1][PLEN-2 - 1:0];
+          end
+          NA4: begin
+            pma_lb[i] = napot_lb(1'b1, pma_adr_i[i]);
+          end
+          NAPOT: begin
+            pma_lb[i] = napot_lb(1'b0, pma_adr_i[i]);
+          end
+          default: begin
+            pma_lb[i] = {$bits(pma_lb[i]) {1'bx}};
+          end
         endcase
       end
 
       // upper bounds
       always @(*) begin
         case (pmacfg[i][1:0])
-          TOR:     pma_ub[i] = pma_adr_i[i][PLEN-2 - 1:0];
-          NA4:     pma_ub[i] = napot_ub(1'b1, pma_adr_i[i]);
-          NAPOT:   pma_ub[i] = napot_ub(1'b0, pma_adr_i[i]);
-          default: pma_ub[i] = {$bits(pma_ub[i]) {1'bx}};
+          TOR: begin
+            pma_ub[i] = pma_adr_i[i][PLEN-2 - 1:0];
+          end
+          NA4: begin
+            pma_ub[i] = napot_ub(1'b1, pma_adr_i[i]);
+          end
+          NAPOT: begin
+            pma_ub[i] = napot_ub(1'b0, pma_adr_i[i]);
+          end
+          default: begin
+            pma_ub[i] = {$bits(pma_ub[i]) {1'bx}};
+          end
         endcase
       end
 

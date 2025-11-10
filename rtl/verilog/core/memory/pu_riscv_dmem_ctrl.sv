@@ -514,9 +514,15 @@ module pu_riscv_dmem_ctrl #(
 
   always @(*) begin
     case ({ ext_ack, cache_ack, tcm_ack })
-      3'b001:  mem_q_o = tcm_q;
-      3'b010:  mem_q_o = cache_q;
-      default: mem_q_o = ext_q;
+      3'b001: begin
+        mem_q_o = tcm_q;
+      end
+      3'b010: begin
+        mem_q_o = cache_q;
+      end
+      default: begin
+        mem_q_o = ext_q;
+      end
     endcase
   end
 

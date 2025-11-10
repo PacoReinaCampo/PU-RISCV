@@ -231,20 +231,36 @@ module pu_riscv_pmpchk #(
       // lower bounds
       always @(*) begin
         case (st_pmpcfg_i[i][4:3])
-          TOR:     pmp_lb[i] = (i == 0) ? 0 : st_pmpcfg_i[i][4:3] != TOR ? pmp_ub[i] : st_pmpaddr_i[i][PLEN-3:0];
-          NA4:     pmp_lb[i] = napot_lb(1'b1, st_pmpaddr_i[i]);
-          NAPOT:   pmp_lb[i] = napot_lb(1'b0, st_pmpaddr_i[i]);
-          default: pmp_lb[i] = 'hx;
+          TOR: begin
+            pmp_lb[i] = (i == 0) ? 0 : st_pmpcfg_i[i][4:3] != TOR ? pmp_ub[i] : st_pmpaddr_i[i][PLEN-3:0];
+          end
+          NA4: begin
+            pmp_lb[i] = napot_lb(1'b1, st_pmpaddr_i[i]);
+          end
+          NAPOT: begin
+            pmp_lb[i] = napot_lb(1'b0, st_pmpaddr_i[i]);
+          end
+          default: begin
+            pmp_lb[i] = 'hx;
+          end
         endcase
       end
 
       // upper bounds
       always @(*) begin
         case (st_pmpcfg_i[i][4:3])
-          TOR:     pmp_ub[i] = st_pmpaddr_i[i][PLEN-3:0];
-          NA4:     pmp_ub[i] = napot_ub(1'b1, st_pmpaddr_i[i]);
-          NAPOT:   pmp_ub[i] = napot_ub(1'b0, st_pmpaddr_i[i]);
-          default: pmp_ub[i] = 'hx;
+          TOR: begin
+            pmp_ub[i] = st_pmpaddr_i[i][PLEN-3:0];
+          end
+          NA4: begin
+            pmp_ub[i] = napot_ub(1'b1, st_pmpaddr_i[i]);
+          end
+          NAPOT: begin
+            pmp_ub[i] = napot_ub(1'b0, st_pmpaddr_i[i]);
+          end
+          default: begin
+            pmp_ub[i] = 'hx;
+          end
         endcase
       end
 
