@@ -43,7 +43,7 @@
 ###################################################################################
 
 read_verilog -sv ../../../../rtl/verilog/pkg/module/peripheral_wb_verilog_pkg.sv
-read_verilog -sv ../../../../rtl/verilog/pkg/module/peripheral_wb_verilog_pkg.sv
+read_verilog -sv ../../../../rtl/verilog/pkg/core/peripheral_biu_verilog_pkg.sv
 read_verilog -sv ../../../../rtl/verilog/pkg/core/pu_riscv_verilog_pkg.sv
 
 read_verilog -sv ../../../../rtl/verilog/core/cache/pu_riscv_dcache_core.sv
@@ -80,11 +80,8 @@ read_verilog -sv ../../../../rtl/verilog/memory/pu_riscv_ram_1rw_generic.sv
 read_verilog -sv ../../../../rtl/verilog/memory/pu_riscv_ram_1rw.sv
 read_verilog -sv ../../../../rtl/verilog/memory/pu_riscv_ram_queue.sv
 
-read_verilog -sv ../../../../rtl/verilog/module/wb/pu_riscv_wb2wb.sv
+read_verilog -sv ../../../../rtl/verilog/module/wb/pu_riscv_biu2wb.sv
 read_verilog -sv ../../../../rtl/verilog/module/wb/pu_riscv_wb.sv
-
-read_verilog -sv spram/core/peripheral_ram_generic_wb.sv
-read_verilog -sv spram/core/peripheral_spram_wb.sv
 
 read_verilog -sv pu_riscv_synthesis.sv
 

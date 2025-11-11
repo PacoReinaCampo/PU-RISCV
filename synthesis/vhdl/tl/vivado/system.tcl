@@ -42,8 +42,8 @@
 ##                                                                               ##
 ###################################################################################
 
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/peripheral_biu_vhdl_pkg.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/peripheral_biu_vhdl_pkg.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/peripheral_tl_vhdl_pkg.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/peripheral_biu_verilog_pkg.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/pu_riscv_vhdl_pkg.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/pkg/vhdl_pkg.vhd
 
@@ -73,7 +73,7 @@ read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/main/pu_riscv_du.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/main/pu_riscv_memory.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/main/pu_riscv_rf.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/main/pu_riscv_state.vhd
-read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/main/pu_riscv_tl.vhd
+read_vhdl -vhdl2008 ../../../../rtl/vhdl/core/main/pu_riscv_writeback.vhd
 
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/pu_riscv_ram_1r1w_generic.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/pu_riscv_ram_1r1w.vhd
@@ -83,10 +83,6 @@ read_vhdl -vhdl2008 ../../../../rtl/vhdl/memory/pu_riscv_ram_queue.vhd
 
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/module/tl/pu_riscv_biu2tl.vhd
 read_vhdl -vhdl2008 ../../../../rtl/vhdl/module/tl/pu_riscv_tl.vhd
-
-read_vhdl -vhdl2008 spram/core/mpsoc_tl_spram.vhd
-read_vhdl -vhdl2008 spram/core/mpsoc_ram_1r1w.vhd
-read_vhdl -vhdl2008 spram/core/mpsoc_ram_1r1w_generic.vhd
 
 read_vhdl -vhdl2008 pu_riscv_synthesis.vhd
 
