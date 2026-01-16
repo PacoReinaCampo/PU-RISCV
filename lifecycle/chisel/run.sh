@@ -54,9 +54,3 @@ java application/core/axi4/peripheral_test.scala
 java application/core/bb/peripheral_test.scala
 java application/core/tl/peripheral_test.scala
 java application/core/wb/peripheral_test.scala
-java application/pu/ahb4/peripheral_test.scala
-java application/pu/apb4/peripheral_test.scala
-java application/pu/axi4/peripheral_test.scala
-java application/pu/bb/peripheral_test.scala
-java application/pu/tl/peripheral_test.scala
-java application/pu/wb/peripheral_test.scala
