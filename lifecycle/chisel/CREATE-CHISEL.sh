@@ -22,3 +22,15 @@ touch library/core/peripheral_tl_test.scala
 touch library/core/peripheral_wb_test.scala
 touch library/core/tl/peripheral_design.scala
 touch library/core/wb/peripheral_design.scala
+touch library/pu/ahb4/peripheral_design.scala
+touch library/pu/apb4/peripheral_design.scala
+touch library/pu/axi4/peripheral_design.scala
+touch library/pu/bb/peripheral_design.scala
+touch library/pu/peripheral_ahb4_test.scala
+touch library/pu/peripheral_apb4_test.scala
+touch library/pu/peripheral_axi4_test.scala
+touch library/pu/peripheral_bb_test.scala
+touch library/pu/peripheral_tl_test.scala
+touch library/pu/peripheral_wb_test.scala
+touch library/pu/tl/peripheral_design.scala
+touch library/pu/wb/peripheral_design.scala
