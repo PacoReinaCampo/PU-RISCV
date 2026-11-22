@@ -1,511 +1,722 @@
-```
-# format of a line in this file:
-# <instruction name> <args> <opcode>
-
-# <opcode> is given by specifying one or more range/value pairs:
-# hi..lo=value or bit=value or arg=value (e.g. 6..2=0x45 10=1 rd=0)
-
-# <args> is one of vd, vs3, vs1, vs2, vm, nf, wd, simm5, zimm10, zimm11
-```
-
-# Configuration Setting
-
-`https://github.com/riscv/riscv-v-spec/blob/master/vcfg-format.adoc`
-
-```
-ysetivli     31=1 30=1 zimm10    zimm5 14..12=0x7 rd 6..0=0x57
-ysetvli      31=0 zimm11          rs1 14..12=0x7 rd 6..0=0x57
-ysetvl       31=1 30..25=0x0 rs2  rs1 14..12=0x7 rd 6..0=0x57
-```
-
-# Vector Loads and Store
-
-`https://github.com/riscv/riscv-v-spec/blob/master/vmem-format.adoc`
-
-# Vector Unit-Stride Instructions (including segment part)
-
-`https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#74-vector-unit-stride-instructions`
-
-```
-ylm.v          31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0  vd 6..0=0x07
-ysm.v          31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0 vs3 6..0=0x27
-yle8.v         nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x0  vd 6..0=0x07
-yle16.v        nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x5  vd 6..0=0x07
-yle32.v        nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x6  vd 6..0=0x07
-yle64.v        nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x7  vd 6..0=0x07
-yse8.v         nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x0 vs3 6..0=0x27
-yse16.v        nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x5 vs3 6..0=0x27
-yse32.v        nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x6 vs3 6..0=0x27
-yse64.v        nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x7 vs3 6..0=0x27
-```
-
-# Vector Indexed-Unordered Instructions (including segment part)
-
-`https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#76-vector-indexed-instructions`
-
-```
-yluxei8.v      nf 28=0 27..26=1 vm vs2 rs1 14..12=0x0  vd 6..0=0x07
-yluxei16.v     nf 28=0 27..26=1 vm vs2 rs1 14..12=0x5  vd 6..0=0x07
-yluxei32.v     nf 28=0 27..26=1 vm vs2 rs1 14..12=0x6  vd 6..0=0x07
-yluxei64.v     nf 28=0 27..26=1 vm vs2 rs1 14..12=0x7  vd 6..0=0x07
-ysuxei8.v      nf 28=0 27..26=1 vm vs2 rs1 14..12=0x0 vs3 6..0=0x27
-ysuxei16.v     nf 28=0 27..26=1 vm vs2 rs1 14..12=0x5 vs3 6..0=0x27
-ysuxei32.v     nf 28=0 27..26=1 vm vs2 rs1 14..12=0x6 vs3 6..0=0x27
-ysuxei64.v     nf 28=0 27..26=1 vm vs2 rs1 14..12=0x7 vs3 6..0=0x27
-```
-
-# Vector Strided Instructions (including segment part)
-
-`https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#75-vector-strided-instructions`
-
-```
-ylse8.v         nf 28=0 27..26=2 vm rs2 rs1 14..12=0x0  vd 6..0=0x07
-ylse16.v        nf 28=0 27..26=2 vm rs2 rs1 14..12=0x5  vd 6..0=0x07
-ylse32.v        nf 28=0 27..26=2 vm rs2 rs1 14..12=0x6  vd 6..0=0x07
-ylse64.v        nf 28=0 27..26=2 vm rs2 rs1 14..12=0x7  vd 6..0=0x07
-ysse8.v         nf 28=0 27..26=2 vm rs2 rs1 14..12=0x0 vs3 6..0=0x27
-ysse16.v        nf 28=0 27..26=2 vm rs2 rs1 14..12=0x5 vs3 6..0=0x27
-ysse32.v        nf 28=0 27..26=2 vm rs2 rs1 14..12=0x6 vs3 6..0=0x27
-ysse64.v        nf 28=0 27..26=2 vm rs2 rs1 14..12=0x7 vs3 6..0=0x27
-```
-
-# Vector Indexed-Ordered Instructions (including segment part)
-
-`https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#76-vector-indexed-instructions`
-
-```
-yloxei8.v        nf 28=0 27..26=3 vm vs2 rs1 14..12=0x0  vd 6..0=0x07
-yloxei16.v       nf 28=0 27..26=3 vm vs2 rs1 14..12=0x5  vd 6..0=0x07
-yloxei32.v       nf 28=0 27..26=3 vm vs2 rs1 14..12=0x6  vd 6..0=0x07
-yloxei64.v       nf 28=0 27..26=3 vm vs2 rs1 14..12=0x7  vd 6..0=0x07
-ysoxei8.v        nf 28=0 27..26=3 vm vs2 rs1 14..12=0x0 vs3 6..0=0x27
-ysoxei16.v       nf 28=0 27..26=3 vm vs2 rs1 14..12=0x5 vs3 6..0=0x27
-ysoxei32.v       nf 28=0 27..26=3 vm vs2 rs1 14..12=0x6 vs3 6..0=0x27
-ysoxei64.v       nf 28=0 27..26=3 vm vs2 rs1 14..12=0x7 vs3 6..0=0x27
-```
-
-# Unit-stride Fault-Only-First Loads
-
-`https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#77-unit-stride-fault-only-first-loads`
-
-```
-yle8ff.v         nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x0  vd 6..0=0x07
-yle16ff.v        nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x5  vd 6..0=0x07
-yle32ff.v        nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x6  vd 6..0=0x07
-yle64ff.v        nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x7  vd 6..0=0x07
-```
-
-# Vector Load/Store Whole Registers
-
-`https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#79-vector-loadstore-whole-register-instructions`
-
-```
-yl1re8.v       31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07
-yl1re16.v      31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 vd  6..0=0x07
-yl1re32.v      31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 vd  6..0=0x07
-yl1re64.v      31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 vd  6..0=0x07
-yl2re8.v       31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07
-yl2re16.v      31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 vd  6..0=0x07
-yl2re32.v      31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 vd  6..0=0x07
-yl2re64.v      31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 vd  6..0=0x07
-yl4re8.v       31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07
-yl4re16.v      31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 vd  6..0=0x07
-yl4re32.v      31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 vd  6..0=0x07
-yl4re64.v      31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 vd  6..0=0x07
-yl8re8.v       31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07
-yl8re16.v      31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 vd  6..0=0x07
-yl8re32.v      31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 vd  6..0=0x07
-yl8re64.v      31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 vd  6..0=0x07
-ys1r.v         31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vs3 6..0=0x27
-ys2r.v         31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vs3 6..0=0x27
-ys4r.v         31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vs3 6..0=0x27
-ys8r.v         31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vs3 6..0=0x27
-```
-
-# Vector Floating-Point Instructions
-
-`https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#14-vector-floating-point-instructions`
-
-# OPFVF
-
-```
-yfadd.vf        31..26=0x00 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfsub.vf        31..26=0x02 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfmin.vf        31..26=0x04 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfmax.vf        31..26=0x06 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfsgnj.vf       31..26=0x08 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfsgnjn.vf      31..26=0x09 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfsgnjx.vf      31..26=0x0a vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfslide1up.vf   31..26=0x0e vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfslide1down.vf 31..26=0x0f vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfmv.s.f        31..26=0x10 25=1 24..20=0 rs1      14..12=0x5 vd 6..0=0x57
-
-yfmerge.vfm    31..26=0x17 25=0 vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfmv.v.f       31..26=0x17 25=1 24..20=0 rs1 14..12=0x5 vd 6..0=0x57
-ymfeq.vf       31..26=0x18 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-ymfle.vf       31..26=0x19 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-ymflt.vf       31..26=0x1b vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-ymfne.vf       31..26=0x1c vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-ymfgt.vf       31..26=0x1d vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-ymfge.vf       31..26=0x1f vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-
-yfdiv.vf       31..26=0x20 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfrdiv.vf      31..26=0x21 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfmul.vf       31..26=0x24 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfrsub.vf      31..26=0x27 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfmadd.vf      31..26=0x28 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfnmadd.vf     31..26=0x29 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfmsub.vf      31..26=0x2a vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfnmsub.vf     31..26=0x2b vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfmacc.vf      31..26=0x2c vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfnmacc.vf     31..26=0x2d vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfmsac.vf      31..26=0x2e vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfnmsac.vf     31..26=0x2f vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-
-yfwadd.vf      31..26=0x30 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfwsub.vf      31..26=0x32 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfwadd.wf      31..26=0x34 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfwsub.wf      31..26=0x36 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfwmul.vf      31..26=0x38 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfwmacc.vf     31..26=0x3c vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfwnmacc.vf    31..26=0x3d vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfwmsac.vf     31..26=0x3e vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-yfwnmsac.vf    31..26=0x3f vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-```
-
-# OPFVV
-
-```
-yfadd.vv       31..26=0x00 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfredusum.vs   31..26=0x01 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfsub.vv       31..26=0x02 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfredosum.vs   31..26=0x03 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfmin.vv       31..26=0x04 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfredmin.vs    31..26=0x05 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfmax.vv       31..26=0x06 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfredmax.vs    31..26=0x07 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfsgnj.vv      31..26=0x08 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfsgnjn.vv     31..26=0x09 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfsgnjx.vv     31..26=0x0a vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfmv.f.s       31..26=0x10 25=1 vs2      19..15=0 14..12=0x1 rd 6..0=0x57
-
-ymfeq.vv       31..26=0x18 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-ymfle.vv       31..26=0x19 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-ymflt.vv       31..26=0x1b vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-ymfne.vv       31..26=0x1c vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-
-yfdiv.vv       31..26=0x20 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfmul.vv       31..26=0x24 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfmadd.vv      31..26=0x28 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfnmadd.vv     31..26=0x29 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfmsub.vv      31..26=0x2a vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfnmsub.vv     31..26=0x2b vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfmacc.vv      31..26=0x2c vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfnmacc.vv     31..26=0x2d vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfmsac.vv      31..26=0x2e vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfnmsac.vv     31..26=0x2f vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-
-yfcvt.xu.f.v     31..26=0x12 vm vs2 19..15=0x00 14..12=0x1 vd 6..0=0x57
-yfcvt.x.f.v      31..26=0x12 vm vs2 19..15=0x01 14..12=0x1 vd 6..0=0x57
-yfcvt.f.xu.v     31..26=0x12 vm vs2 19..15=0x02 14..12=0x1 vd 6..0=0x57
-yfcvt.f.x.v      31..26=0x12 vm vs2 19..15=0x03 14..12=0x1 vd 6..0=0x57
-yfcvt.rtz.xu.f.v 31..26=0x12 vm vs2 19..15=0x06 14..12=0x1 vd 6..0=0x57
-yfcvt.rtz.x.f.v  31..26=0x12 vm vs2 19..15=0x07 14..12=0x1 vd 6..0=0x57
-
-yfwcvt.xu.f.v     31..26=0x12 vm vs2 19..15=0x08 14..12=0x1 vd 6..0=0x57
-yfwcvt.x.f.v      31..26=0x12 vm vs2 19..15=0x09 14..12=0x1 vd 6..0=0x57
-yfwcvt.f.xu.v     31..26=0x12 vm vs2 19..15=0x0A 14..12=0x1 vd 6..0=0x57
-yfwcvt.f.x.v      31..26=0x12 vm vs2 19..15=0x0B 14..12=0x1 vd 6..0=0x57
-yfwcvt.f.f.v      31..26=0x12 vm vs2 19..15=0x0C 14..12=0x1 vd 6..0=0x57
-yfwcvt.rtz.xu.f.v 31..26=0x12 vm vs2 19..15=0x0E 14..12=0x1 vd 6..0=0x57
-yfwcvt.rtz.x.f.v  31..26=0x12 vm vs2 19..15=0x0F 14..12=0x1 vd 6..0=0x57
-
-yfncvt.xu.f.w     31..26=0x12 vm vs2 19..15=0x10 14..12=0x1 vd 6..0=0x57
-yfncvt.x.f.w      31..26=0x12 vm vs2 19..15=0x11 14..12=0x1 vd 6..0=0x57
-yfncvt.f.xu.w     31..26=0x12 vm vs2 19..15=0x12 14..12=0x1 vd 6..0=0x57
-yfncvt.f.x.w      31..26=0x12 vm vs2 19..15=0x13 14..12=0x1 vd 6..0=0x57
-yfncvt.f.f.w      31..26=0x12 vm vs2 19..15=0x14 14..12=0x1 vd 6..0=0x57
-yfncvt.rod.f.f.w  31..26=0x12 vm vs2 19..15=0x15 14..12=0x1 vd 6..0=0x57
-yfncvt.rtz.xu.f.w 31..26=0x12 vm vs2 19..15=0x16 14..12=0x1 vd 6..0=0x57
-yfncvt.rtz.x.f.w  31..26=0x12 vm vs2 19..15=0x17 14..12=0x1 vd 6..0=0x57
-
-yfsqrt.v       31..26=0x13 vm vs2 19..15=0x00 14..12=0x1 vd 6..0=0x57
-yfrsqrt7.v     31..26=0x13 vm vs2 19..15=0x04 14..12=0x1 vd 6..0=0x57
-yfrec7.v       31..26=0x13 vm vs2 19..15=0x05 14..12=0x1 vd 6..0=0x57
-yfclass.v      31..26=0x13 vm vs2 19..15=0x10 14..12=0x1 vd 6..0=0x57
-
-yfwadd.vv      31..26=0x30 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfwredusum.vs  31..26=0x31 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfwsub.vv      31..26=0x32 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfwredosum.vs  31..26=0x33 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfwadd.wv      31..26=0x34 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfwsub.wv      31..26=0x36 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfwmul.vv      31..26=0x38 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfwmacc.vv     31..26=0x3c vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfwnmacc.vv    31..26=0x3d vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfwmsac.vv     31..26=0x3e vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-yfwnmsac.vv    31..26=0x3f vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-```
-
-# OPIVX
-
-```
-yadd.vx        31..26=0x00 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ysub.vx        31..26=0x02 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-yrsub.vx       31..26=0x03 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-yminu.vx       31..26=0x04 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymin.vx        31..26=0x05 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymaxu.vx       31..26=0x06 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymax.vx        31..26=0x07 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-yand.vx        31..26=0x09 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-yor.vx         31..26=0x0a vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-yxor.vx        31..26=0x0b vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-yrgather.vx    31..26=0x0c vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-yslideup.vx    31..26=0x0e vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-yslidedown.vx  31..26=0x0f vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-
-yadc.vxm       31..26=0x10 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymadc.vxm      31..26=0x11 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymadc.vx       31..26=0x11 25=1 vs2 rs1 14..12=0x4 vd 6..0=0x57
-ysbc.vxm       31..26=0x12 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymsbc.vxm      31..26=0x13 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymsbc.vx       31..26=0x13 25=1 vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymerge.vxm     31..26=0x17 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymv.v.x        31..26=0x17 25=1 24..20=0 rs1 14..12=0x4 vd 6..0=0x57
-ymseq.vx       31..26=0x18 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymsne.vx       31..26=0x19 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymsltu.vx      31..26=0x1a vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymslt.vx       31..26=0x1b vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymsleu.vx      31..26=0x1c vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymsle.vx       31..26=0x1d vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymsgtu.vx      31..26=0x1e vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ymsgt.vx       31..26=0x1f vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-
-ysaddu.vx      31..26=0x20 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ysadd.vx       31..26=0x21 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-yssubu.vx      31..26=0x22 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-yssub.vx       31..26=0x23 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ysll.vx        31..26=0x25 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ysmul.vx       31..26=0x27 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ysrl.vx        31..26=0x28 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ysra.vx        31..26=0x29 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-yssrl.vx       31..26=0x2a vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-yssra.vx       31..26=0x2b vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ynsrl.wx       31..26=0x2c vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ynsra.wx       31..26=0x2d vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ynclipu.wx     31..26=0x2e vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-ynclip.wx      31..26=0x2f vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-```
-
-# OPIVV
-
-```
-yadd.vv         31..26=0x00 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ysub.vv         31..26=0x02 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-yminu.vv        31..26=0x04 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ymin.vv         31..26=0x05 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ymaxu.vv        31..26=0x06 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ymax.vv         31..26=0x07 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-yand.vv         31..26=0x09 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-yor.vv          31..26=0x0a vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-yxor.vv         31..26=0x0b vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-yrgather.vv     31..26=0x0c vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-yrgatherei16.vv 31..26=0x0e vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-
-yadc.vvm       31..26=0x10 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57
-ymadc.vvm      31..26=0x11 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57
-ymadc.vv       31..26=0x11 25=1 vs2 vs1 14..12=0x0 vd 6..0=0x57
-ysbc.vvm       31..26=0x12 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57
-ymsbc.vvm      31..26=0x13 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57
-ymsbc.vv       31..26=0x13 25=1 vs2 vs1 14..12=0x0 vd 6..0=0x57
-ymerge.vvm     31..26=0x17 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57
-ymv.v.v        31..26=0x17 25=1 24..20=0 vs1 14..12=0x0 vd 6..0=0x57
-ymseq.vv       31..26=0x18 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ymsne.vv       31..26=0x19 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ymsltu.vv      31..26=0x1a vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ymslt.vv       31..26=0x1b vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ymsleu.vv      31..26=0x1c vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ymsle.vv       31..26=0x1d vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-
-ysaddu.vv      31..26=0x20 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ysadd.vv       31..26=0x21 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-yssubu.vv      31..26=0x22 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-yssub.vv       31..26=0x23 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ysll.vv        31..26=0x25 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ysmul.vv       31..26=0x27 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ysrl.vv        31..26=0x28 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ysra.vv        31..26=0x29 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-yssrl.vv       31..26=0x2a vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-yssra.vv       31..26=0x2b vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ynsrl.wv       31..26=0x2c vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ynsra.wv       31..26=0x2d vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ynclipu.wv     31..26=0x2e vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ynclip.wv      31..26=0x2f vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-
-ywredsumu.vs   31..26=0x30 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-ywredsum.vs    31..26=0x31 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-```
-
-# OPIVI
-
-```
-yadd.vi        31..26=0x00 vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-yrsub.vi       31..26=0x03 vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-yand.vi        31..26=0x09 vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-yor.vi         31..26=0x0a vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-yxor.vi        31..26=0x0b vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-yrgather.vi    31..26=0x0c vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-yslideup.vi    31..26=0x0e vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-yslidedown.vi  31..26=0x0f vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-
-yadc.vim       31..26=0x10 25=0 vs2 simm5 14..12=0x3 vd 6..0=0x57
-ymadc.vim      31..26=0x11 25=0 vs2 simm5 14..12=0x3 vd 6..0=0x57
-ymadc.vi       31..26=0x11 25=1 vs2 simm5 14..12=0x3 vd 6..0=0x57
-ymerge.vim     31..26=0x17 25=0 vs2 simm5 14..12=0x3 vd 6..0=0x57
-ymv.v.i        31..26=0x17 25=1 24..20=0 simm5 14..12=0x3 vd 6..0=0x57
-ymseq.vi       31..26=0x18 vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-ymsne.vi       31..26=0x19 vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-ymsleu.vi      31..26=0x1c vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-ymsle.vi       31..26=0x1d vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-ymsgtu.vi      31..26=0x1e vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-ymsgt.vi       31..26=0x1f vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-
-ysaddu.vi      31..26=0x20 vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-ysadd.vi       31..26=0x21 vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-ysll.vi        31..26=0x25 vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-ymv1r.v        31..26=0x27 25=1 vs2 19..15=0 14..12=0x3 vd 6..0=0x57
-ymv2r.v        31..26=0x27 25=1 vs2 19..15=1 14..12=0x3 vd 6..0=0x57
-ymv4r.v        31..26=0x27 25=1 vs2 19..15=3 14..12=0x3 vd 6..0=0x57
-ymv8r.v        31..26=0x27 25=1 vs2 19..15=7 14..12=0x3 vd 6..0=0x57
-ysrl.vi        31..26=0x28 vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-ysra.vi        31..26=0x29 vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-yssrl.vi       31..26=0x2a vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-yssra.vi       31..26=0x2b vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-ynsrl.wi       31..26=0x2c vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-ynsra.wi       31..26=0x2d vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-ynclipu.wi     31..26=0x2e vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-ynclip.wi      31..26=0x2f vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-```
-
-# Vector Integer Extension Instructions
-
-`https://github.com/riscv/riscv-v-spec/blob/e49574c92b072fd4d71e6cb20f7e8154de5b83fe/v-spec.adoc#123-vector-integer-extension`
-
-```
-yzext.vf8      31..26=0x12 vm vs2 19..15=2 14..12=0x2 vd 6..0=0x57
-ysext.vf8      31..26=0x12 vm vs2 19..15=3 14..12=0x2 vd 6..0=0x57
-yzext.vf4      31..26=0x12 vm vs2 19..15=4 14..12=0x2 vd 6..0=0x57
-ysext.vf4      31..26=0x12 vm vs2 19..15=5 14..12=0x2 vd 6..0=0x57
-yzext.vf2      31..26=0x12 vm vs2 19..15=6 14..12=0x2 vd 6..0=0x57
-ysext.vf2      31..26=0x12 vm vs2 19..15=7 14..12=0x2 vd 6..0=0x57
-
-ycompress.vm   31..26=0x17 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-ymandn.mm      31..26=0x18 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-ymand.mm       31..26=0x19 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-ymor.mm        31..26=0x1a 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-ymxor.mm       31..26=0x1b 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-ymorn.mm       31..26=0x1c 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-ymnand.mm      31..26=0x1d 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-ymnor.mm       31..26=0x1e 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-ymxnor.mm      31..26=0x1f 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-
-ymsbf.m        31..26=0x14 vm vs2 19..15=0x01 14..12=0x2 vd 6..0=0x57
-ymsof.m        31..26=0x14 vm vs2 19..15=0x02 14..12=0x2 vd 6..0=0x57
-ymsif.m        31..26=0x14 vm vs2 19..15=0x03 14..12=0x2 vd 6..0=0x57
-yiota.m        31..26=0x14 vm vs2 19..15=0x10 14..12=0x2 vd 6..0=0x57
-yid.v          31..26=0x14 vm 24..20=0 19..15=0x11 14..12=0x2 vd 6..0=0x57
-ycpop.m        31..26=0x10 vm vs2 19..15=0x10 14..12=0x2 rd 6..0=0x57
-yfirst.m       31..26=0x10 vm vs2 19..15=0x11 14..12=0x2 rd 6..0=0x57
-
-ydivu.vv       31..26=0x20 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ydiv.vv        31..26=0x21 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-yremu.vv       31..26=0x22 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-yrem.vv        31..26=0x23 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ymulhu.vv      31..26=0x24 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ymul.vv        31..26=0x25 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ymulhsu.vv     31..26=0x26 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ymulh.vv       31..26=0x27 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ymadd.vv       31..26=0x29 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ynmsub.vv      31..26=0x2b vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ymacc.vv       31..26=0x2d vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ynmsac.vv      31..26=0x2f vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-
-ywaddu.vv      31..26=0x30 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ywadd.vv       31..26=0x31 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ywsubu.vv      31..26=0x32 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ywsub.vv       31..26=0x33 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ywaddu.wv      31..26=0x34 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ywadd.wv       31..26=0x35 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ywsubu.wv      31..26=0x36 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ywsub.wv       31..26=0x37 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ywmulu.vv      31..26=0x38 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ywmulsu.vv     31..26=0x3a vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ywmul.vv       31..26=0x3b vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ywmaccu.vv     31..26=0x3c vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ywmacc.vv      31..26=0x3d vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-ywmaccsu.vv    31..26=0x3f vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-```
-
-# OPMVV
-
-```
-yredsum.vs     31..26=0x00 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-yredand.vs     31..26=0x01 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-yredor.vs      31..26=0x02 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-yredxor.vs     31..26=0x03 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-yredminu.vs    31..26=0x04 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-yredmin.vs     31..26=0x05 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-yredmaxu.vs    31..26=0x06 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-yredmax.vs     31..26=0x07 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-yaaddu.vv      31..26=0x08 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-yaadd.vv       31..26=0x09 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-yasubu.vv      31..26=0x0a vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-yasub.vv       31..26=0x0b vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-
-ymv.x.s        31..26=0x10 25=1 vs2 19..15=0 14..12=0x2 rd 6..0=0x57
-```
-
-# OPMVX
-
-```
-yaaddu.vx      31..26=0x08 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-yaadd.vx       31..26=0x09 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-yasubu.vx      31..26=0x0a vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-yasub.vx       31..26=0x0b vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-
-ymv.s.x        31..26=0x10 25=1 24..20=0 rs1 14..12=0x6 vd 6..0=0x57
-yslide1up.vx   31..26=0x0e vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-yslide1down.vx 31..26=0x0f vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-
-ydivu.vx       31..26=0x20 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ydiv.vx        31..26=0x21 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-yremu.vx       31..26=0x22 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-yrem.vx        31..26=0x23 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ymulhu.vx      31..26=0x24 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ymul.vx        31..26=0x25 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ymulhsu.vx     31..26=0x26 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ymulh.vx       31..26=0x27 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ymadd.vx       31..26=0x29 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ynmsub.vx      31..26=0x2b vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ymacc.vx       31..26=0x2d vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ynmsac.vx      31..26=0x2f vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-
-ywaddu.vx      31..26=0x30 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ywadd.vx       31..26=0x31 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ywsubu.vx      31..26=0x32 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ywsub.vx       31..26=0x33 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ywaddu.wx      31..26=0x34 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ywadd.wx       31..26=0x35 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ywsubu.wx      31..26=0x36 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ywsub.wx       31..26=0x37 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ywmulu.vx      31..26=0x38 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ywmulsu.vx     31..26=0x3a vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ywmul.vx       31..26=0x3b vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ywmaccu.vx     31..26=0x3c vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ywmacc.vx      31..26=0x3d vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ywmaccus.vx    31..26=0x3e vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-ywmaccsu.vx    31..26=0x3f vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-
-# vmv1r.v, vmv2r.v, vmv4r.v, vmv8r.v
-#@vmvnfr.v     31..26=0x27 25=1 vs2 simm5 14..12=0x3 vd 6..0=0x57
-```
+## INSTRUCTION OPCODES
+
+| **Extension** | **Name**               | **Variable-Fields**  | **Encoding**                       | **Match**    | **Mask**     |
+|:--------------|:-----------------------|:---------------------|:-----------------------------------|:-------------|:-------------|
+| `rv_y`        | `yaaddu_yy`            | `ym, ys2, ys1, yd`   | `001000-----------010-----0101011` | `0x2000202b` | `0xfc00707f` |
+| `rv_y`        | `yaaddu_yx`            | `ym, ys2, rs1, yd`   | `001000-----------110-----0101011` | `0x2000602b` | `0xfc00707f` |
+| `rv_y`        | `yaadd_yy`             | `ym, ys2, ys1, yd`   | `001001-----------010-----0101011` | `0x2400202b` | `0xfc00707f` |
+| `rv_y`        | `yaadd_yx`             | `ym, ys2, rs1, yd`   | `001001-----------110-----0101011` | `0x2400602b` | `0xfc00707f` |
+| `rv_y`        | `yadc_yim`             | `ys2, simm5, yd`     | `0100000----------011-----0101011` | `0x4000302b` | `0xfe00707f` |
+| `rv_y`        | `yadc_yym`             | `ys2, ys1, yd`       | `0100000----------000-----0101011` | `0x4000002b` | `0xfe00707f` |
+| `rv_y`        | `yadc_yxm`             | `ys2, rs1, yd`       | `0100000----------100-----0101011` | `0x4000402b` | `0xfe00707f` |
+| `rv_y`        | `yadd_yi`              | `ym, ys2, simm5, yd` | `000000-----------011-----0101011` | `0x0000302b` | `0xfc00707f` |
+| `rv_y`        | `yadd_yy`              | `ym, ys2, ys1, yd`   | `000000-----------000-----0101011` | `0x0000002b` | `0xfc00707f` |
+| `rv_y`        | `yadd_yx`              | `ym, ys2, rs1, yd`   | `000000-----------100-----0101011` | `0x0000402b` | `0xfc00707f` |
+| `rv_y`        | `yand_yi`              | `ym, ys2, simm5, yd` | `001001-----------011-----0101011` | `0x2400302b` | `0xfc00707f` |
+| `rv_y`        | `yand_yy`              | `ym, ys2, ys1, yd`   | `001001-----------000-----0101011` | `0x2400002b` | `0xfc00707f` |
+| `rv_y`        | `yand_yx`              | `ym, ys2, rs1, yd`   | `001001-----------100-----0101011` | `0x2400402b` | `0xfc00707f` |
+| `rv_y`        | `yasubu_yy`            | `ym, ys2, ys1, yd`   | `001010-----------010-----0101011` | `0x2800202b` | `0xfc00707f` |
+| `rv_y`        | `yasubu_yx`            | `ym, ys2, rs1, yd`   | `001010-----------110-----0101011` | `0x2800602b` | `0xfc00707f` |
+| `rv_y`        | `yasub_yy`             | `ym, ys2, ys1, yd`   | `001011-----------010-----0101011` | `0x2c00202b` | `0xfc00707f` |
+| `rv_y`        | `yasub_yx`             | `ym, ys2, rs1, yd`   | `001011-----------110-----0101011` | `0x2c00602b` | `0xfc00707f` |
+| `rv_y`        | `ycompress_ym`         | `ys2, ys1, yd`       | `0101111----------010-----0101011` | `0x5e00202b` | `0xfe00707f` |
+| `rv_y`        | `ycpop_m`              | `ym, ys2, rd`        | `010000------10000010-----0101011` | `0x4008202b` | `0xfc0ff07f` |
+| `rv_y`        | `ydivu_yy`             | `ym, ys2, ys1, yd`   | `100000-----------010-----0101011` | `0x8000202b` | `0xfc00707f` |
+| `rv_y`        | `ydivu_yx`             | `ym, ys2, rs1, yd`   | `100000-----------110-----0101011` | `0x8000602b` | `0xfc00707f` |
+| `rv_y`        | `ydiv_yy`              | `ym, ys2, ys1, yd`   | `100001-----------010-----0101011` | `0x8400202b` | `0xfc00707f` |
+| `rv_y`        | `ydiv_yx`              | `ym, ys2, rs1, yd`   | `100001-----------110-----0101011` | `0x8400602b` | `0xfc00707f` |
+| `rv_y`        | `yfadd_yf`             | `ym, ys2, rs1, yd`   | `000000-----------101-----0101011` | `0x0000502b` | `0xfc00707f` |
+| `rv_y`        | `yfadd_yy`             | `ym, ys2, ys1, yd`   | `000000-----------001-----0101011` | `0x0000102b` | `0xfc00707f` |
+| `rv_y`        | `yfclass_y`            | `ym, ys2, yd`        | `010011------10000001-----0101011` | `0x4c08102b` | `0xfc0ff07f` |
+| `rv_y`        | `yfcvt_f_xu_y`         | `ym, ys2, yd`        | `010010------00010001-----0101011` | `0x4801102b` | `0xfc0ff07f` |
+| `rv_y`        | `yfcvt_f_x_y`          | `ym, ys2, yd`        | `010010------00011001-----0101011` | `0x4801902b` | `0xfc0ff07f` |
+| `rv_y`        | `yfcvt_rtz_x_f_y`      | `ym, ys2, yd`        | `010010------00111001-----0101011` | `0x4803902b` | `0xfc0ff07f` |
+| `rv_y`        | `yfcvt_rtz_xu_f_y`     | `ym, ys2, yd`        | `010010------00110001-----0101011` | `0x4803102b` | `0xfc0ff07f` |
+| `rv_y`        | `yfcvt_x_f_y`          | `ym, ys2, yd`        | `010010------00001001-----0101011` | `0x4800902b` | `0xfc0ff07f` |
+| `rv_y`        | `yfcvt_xu_f_y`         | `ym, ys2, yd`        | `010010------00000001-----0101011` | `0x4800102b` | `0xfc0ff07f` |
+| `rv_y`        | `yfdiv_yf`             | `ym, ys2, rs1, yd`   | `100000-----------101-----0101011` | `0x8000502b` | `0xfc00707f` |
+| `rv_y`        | `yfdiv_yy`             | `ym, ys2, ys1, yd`   | `100000-----------001-----0101011` | `0x8000102b` | `0xfc00707f` |
+| `rv_y`        | `yfirst_m`             | `ym, ys2, rd`        | `010000------10001010-----0101011` | `0x4008a02b` | `0xfc0ff07f` |
+| `rv_y`        | `yfmacc_yf`            | `ym, ys2, rs1, yd`   | `101100-----------101-----0101011` | `0xb000502b` | `0xfc00707f` |
+| `rv_y`        | `yfmacc_yy`            | `ym, ys2, ys1, yd`   | `101100-----------001-----0101011` | `0xb000102b` | `0xfc00707f` |
+| `rv_y`        | `yfmadd_yf`            | `ym, ys2, rs1, yd`   | `101000-----------101-----0101011` | `0xa000502b` | `0xfc00707f` |
+| `rv_y`        | `yfmadd_yy`            | `ym, ys2, ys1, yd`   | `101000-----------001-----0101011` | `0xa000102b` | `0xfc00707f` |
+| `rv_y`        | `yfmax_yf`             | `ym, ys2, rs1, yd`   | `000110-----------101-----0101011` | `0x1800502b` | `0xfc00707f` |
+| `rv_y`        | `yfmax_yy`             | `ym, ys2, ys1, yd`   | `000110-----------001-----0101011` | `0x1800102b` | `0xfc00707f` |
+| `rv_y`        | `yfmerge_yfm`          | `ys2, rs1, yd`       | `0101110----------101-----0101011` | `0x5c00502b` | `0xfe00707f` |
+| `rv_y`        | `yfmin_yf`             | `ym, ys2, rs1, yd`   | `000100-----------101-----0101011` | `0x1000502b` | `0xfc00707f` |
+| `rv_y`        | `yfmin_yy`             | `ym, ys2, ys1, yd`   | `000100-----------001-----0101011` | `0x1000102b` | `0xfc00707f` |
+| `rv_y`        | `yfmsac_yf`            | `ym, ys2, rs1, yd`   | `101110-----------101-----0101011` | `0xb800502b` | `0xfc00707f` |
+| `rv_y`        | `yfmsac_yy`            | `ym, ys2, ys1, yd`   | `101110-----------001-----0101011` | `0xb800102b` | `0xfc00707f` |
+| `rv_y`        | `yfmsub_yf`            | `ym, ys2, rs1, yd`   | `101010-----------101-----0101011` | `0xa800502b` | `0xfc00707f` |
+| `rv_y`        | `yfmsub_yy`            | `ym, ys2, ys1, yd`   | `101010-----------001-----0101011` | `0xa800102b` | `0xfc00707f` |
+| `rv_y`        | `yfmul_yf`             | `ym, ys2, rs1, yd`   | `100100-----------101-----0101011` | `0x9000502b` | `0xfc00707f` |
+| `rv_y`        | `yfmul_yy`             | `ym, ys2, ys1, yd`   | `100100-----------001-----0101011` | `0x9000102b` | `0xfc00707f` |
+| `rv_y`        | `yfmv_f_s`             | `ys2, rd`            | `0100001-----00000001-----0101011` | `0x4200102b` | `0xfe0ff07f` |
+| `rv_y`        | `yfmv_s_f`             | `rs1, yd`            | `010000100000-----101-----0101011` | `0x4200502b` | `0xfff0707f` |
+| `rv_y`        | `yfmv_y_f`             | `rs1, yd`            | `010111100000-----101-----0101011` | `0x5e00502b` | `0xfff0707f` |
+| `rv_y`        | `yfncvt_f_f_wide`      | `ym, ys2, yd`        | `010010------10100001-----0101011` | `0x480a102b` | `0xfc0ff07f` |
+| `rv_y`        | `yfncvt_f_xu_wide`     | `ym, ys2, yd`        | `010010------10010001-----0101011` | `0x4809102b` | `0xfc0ff07f` |
+| `rv_y`        | `yfncvt_f_x_wide`      | `ym, ys2, yd`        | `010010------10011001-----0101011` | `0x4809902b` | `0xfc0ff07f` |
+| `rv_y`        | `yfncvt_rod_f_f_wide`  | `ym, ys2, yd`        | `010010------10101001-----0101011` | `0x480a902b` | `0xfc0ff07f` |
+| `rv_y`        | `yfncvt_rtz_x_f_wide`  | `ym, ys2, yd`        | `010010------10111001-----0101011` | `0x480b902b` | `0xfc0ff07f` |
+| `rv_y`        | `yfncvt_rtz_xu_f_wide` | `ym, ys2, yd`        | `010010------10110001-----0101011` | `0x480b102b` | `0xfc0ff07f` |
+| `rv_y`        | `yfncvt_x_f_wide`      | `ym, ys2, yd`        | `010010------10001001-----0101011` | `0x4808902b` | `0xfc0ff07f` |
+| `rv_y`        | `yfncvt_xu_f_wide`     | `ym, ys2, yd`        | `010010------10000001-----0101011` | `0x4808102b` | `0xfc0ff07f` |
+| `rv_y`        | `yfnmacc_yf`           | `ym, ys2, rs1, yd`   | `101101-----------101-----0101011` | `0xb400502b` | `0xfc00707f` |
+| `rv_y`        | `yfnmacc_yy`           | `ym, ys2, ys1, yd`   | `101101-----------001-----0101011` | `0xb400102b` | `0xfc00707f` |
+| `rv_y`        | `yfnmadd_yf`           | `ym, ys2, rs1, yd`   | `101001-----------101-----0101011` | `0xa400502b` | `0xfc00707f` |
+| `rv_y`        | `yfnmadd_yy`           | `ym, ys2, ys1, yd`   | `101001-----------001-----0101011` | `0xa400102b` | `0xfc00707f` |
+| `rv_y`        | `yfnmsac_yf`           | `ym, ys2, rs1, yd`   | `101111-----------101-----0101011` | `0xbc00502b` | `0xfc00707f` |
+| `rv_y`        | `yfnmsac_yy`           | `ym, ys2, ys1, yd`   | `101111-----------001-----0101011` | `0xbc00102b` | `0xfc00707f` |
+| `rv_y`        | `yfnmsub_yf`           | `ym, ys2, rs1, yd`   | `101011-----------101-----0101011` | `0xac00502b` | `0xfc00707f` |
+| `rv_y`        | `yfnmsub_yy`           | `ym, ys2, ys1, yd`   | `101011-----------001-----0101011` | `0xac00102b` | `0xfc00707f` |
+| `rv_y`        | `yfrdiv_yf`            | `ym, ys2, rs1, yd`   | `100001-----------101-----0101011` | `0x8400502b` | `0xfc00707f` |
+| `rv_y`        | `yfrec7_y`             | `ym, ys2, yd`        | `010011------00101001-----0101011` | `0x4c02902b` | `0xfc0ff07f` |
+| `rv_y`        | `yfredmax_ys`          | `ym, ys2, ys1, yd`   | `000111-----------001-----0101011` | `0x1c00102b` | `0xfc00707f` |
+| `rv_y`        | `yfredmin_ys`          | `ym, ys2, ys1, yd`   | `000101-----------001-----0101011` | `0x1400102b` | `0xfc00707f` |
+| `rv_y`        | `yfredosum_ys`         | `ym, ys2, ys1, yd`   | `000011-----------001-----0101011` | `0x0c00102b` | `0xfc00707f` |
+| `rv_y`        | `yfredusum_ys`         | `ym, ys2, ys1, yd`   | `000001-----------001-----0101011` | `0x0400102b` | `0xfc00707f` |
+| `rv_y`        | `yfrsqrt7_y`           | `ym, ys2, yd`        | `010011------00100001-----0101011` | `0x4c02102b` | `0xfc0ff07f` |
+| `rv_y`        | `yfrsub_yf`            | `ym, ys2, rs1, yd`   | `100111-----------101-----0101011` | `0x9c00502b` | `0xfc00707f` |
+| `rv_y`        | `yfsgnjn_yf`           | `ym, ys2, rs1, yd`   | `001001-----------101-----0101011` | `0x2400502b` | `0xfc00707f` |
+| `rv_y`        | `yfsgnjn_yy`           | `ym, ys2, ys1, yd`   | `001001-----------001-----0101011` | `0x2400102b` | `0xfc00707f` |
+| `rv_y`        | `yfsgnj_yf`            | `ym, ys2, rs1, yd`   | `001000-----------101-----0101011` | `0x2000502b` | `0xfc00707f` |
+| `rv_y`        | `yfsgnj_yy`            | `ym, ys2, ys1, yd`   | `001000-----------001-----0101011` | `0x2000102b` | `0xfc00707f` |
+| `rv_y`        | `yfsgnjx_yf`           | `ym, ys2, rs1, yd`   | `001010-----------101-----0101011` | `0x2800502b` | `0xfc00707f` |
+| `rv_y`        | `yfsgnjx_yy`           | `ym, ys2, ys1, yd`   | `001010-----------001-----0101011` | `0x2800102b` | `0xfc00707f` |
+| `rv_y`        | `yfslide1down_yf`      | `ym, ys2, rs1, yd`   | `001111-----------101-----0101011` | `0x3c00502b` | `0xfc00707f` |
+| `rv_y`        | `yfslide1up_yf`        | `ym, ys2, rs1, yd`   | `001110-----------101-----0101011` | `0x3800502b` | `0xfc00707f` |
+| `rv_y`        | `yfsqrt_y`             | `ym, ys2, yd`        | `010011------00000001-----0101011` | `0x4c00102b` | `0xfc0ff07f` |
+| `rv_y`        | `yfsub_yf`             | `ym, ys2, rs1, yd`   | `000010-----------101-----0101011` | `0x0800502b` | `0xfc00707f` |
+| `rv_y`        | `yfsub_yy`             | `ym, ys2, ys1, yd`   | `000010-----------001-----0101011` | `0x0800102b` | `0xfc00707f` |
+| `rv_y`        | `yfwadd_yf`            | `ym, ys2, rs1, yd`   | `110000-----------101-----0101011` | `0xc000502b` | `0xfc00707f` |
+| `rv_y`        | `yfwadd_yy`            | `ym, ys2, ys1, yd`   | `110000-----------001-----0101011` | `0xc000102b` | `0xfc00707f` |
+| `rv_y`        | `yfwadd_wide_yf`       | `ym, ys2, rs1, yd`   | `110100-----------101-----0101011` | `0xd000502b` | `0xfc00707f` |
+| `rv_y`        | `yfwadd_wide_yy`       | `ym, ys2, ys1, yd`   | `110100-----------001-----0101011` | `0xd000102b` | `0xfc00707f` |
+| `rv_y`        | `yfwcvt_f_f_y`         | `ym, ys2, yd`        | `010010------01100001-----0101011` | `0x4806102b` | `0xfc0ff07f` |
+| `rv_y`        | `yfwcvt_f_xu_y`        | `ym, ys2, yd`        | `010010------01010001-----0101011` | `0x4805102b` | `0xfc0ff07f` |
+| `rv_y`        | `yfwcvt_f_x_y`         | `ym, ys2, yd`        | `010010------01011001-----0101011` | `0x4805902b` | `0xfc0ff07f` |
+| `rv_y`        | `yfwcvt_rtz_x_f_y`     | `ym, ys2, yd`        | `010010------01111001-----0101011` | `0x4807902b` | `0xfc0ff07f` |
+| `rv_y`        | `yfwcvt_rtz_xu_f_y`    | `ym, ys2, yd`        | `010010------01110001-----0101011` | `0x4807102b` | `0xfc0ff07f` |
+| `rv_y`        | `yfwcvt_x_f_y`         | `ym, ys2, yd`        | `010010------01001001-----0101011` | `0x4804902b` | `0xfc0ff07f` |
+| `rv_y`        | `yfwcvt_xu_f_y`        | `ym, ys2, yd`        | `010010------01000001-----0101011` | `0x4804102b` | `0xfc0ff07f` |
+| `rv_y`        | `yfwmacc_yf`           | `ym, ys2, rs1, yd`   | `111100-----------101-----0101011` | `0xf000502b` | `0xfc00707f` |
+| `rv_y`        | `yfwmacc_yy`           | `ym, ys2, ys1, yd`   | `111100-----------001-----0101011` | `0xf000102b` | `0xfc00707f` |
+| `rv_y`        | `yfwmsac_yf`           | `ym, ys2, rs1, yd`   | `111110-----------101-----0101011` | `0xf800502b` | `0xfc00707f` |
+| `rv_y`        | `yfwmsac_yy`           | `ym, ys2, ys1, yd`   | `111110-----------001-----0101011` | `0xf800102b` | `0xfc00707f` |
+| `rv_y`        | `yfwmul_yf`            | `ym, ys2, rs1, yd`   | `111000-----------101-----0101011` | `0xe000502b` | `0xfc00707f` |
+| `rv_y`        | `yfwmul_yy`            | `ym, ys2, ys1, yd`   | `111000-----------001-----0101011` | `0xe000102b` | `0xfc00707f` |
+| `rv_y`        | `yfwnmacc_yf`          | `ym, ys2, rs1, yd`   | `111101-----------101-----0101011` | `0xf400502b` | `0xfc00707f` |
+| `rv_y`        | `yfwnmacc_yy`          | `ym, ys2, ys1, yd`   | `111101-----------001-----0101011` | `0xf400102b` | `0xfc00707f` |
+| `rv_y`        | `yfwnmsac_yf`          | `ym, ys2, rs1, yd`   | `111111-----------101-----0101011` | `0xfc00502b` | `0xfc00707f` |
+| `rv_y`        | `yfwnmsac_yy`          | `ym, ys2, ys1, yd`   | `111111-----------001-----0101011` | `0xfc00102b` | `0xfc00707f` |
+| `rv_y`        | `yfwredosum_ys`        | `ym, ys2, ys1, yd`   | `110011-----------001-----0101011` | `0xcc00102b` | `0xfc00707f` |
+| `rv_y`        | `yfwredusum_ys`        | `ym, ys2, ys1, yd`   | `110001-----------001-----0101011` | `0xc400102b` | `0xfc00707f` |
+| `rv_y`        | `yfwsub_yf`            | `ym, ys2, rs1, yd`   | `110010-----------101-----0101011` | `0xc800502b` | `0xfc00707f` |
+| `rv_y`        | `yfwsub_yy`            | `ym, ys2, ys1, yd`   | `110010-----------001-----0101011` | `0xc800102b` | `0xfc00707f` |
+| `rv_y`        | `yfwsub_wide_yf`       | `ym, ys2, rs1, yd`   | `110110-----------101-----0101011` | `0xd800502b` | `0xfc00707f` |
+| `rv_y`        | `yfwsub_wide_yy`       | `ym, ys2, ys1, yd`   | `110110-----------001-----0101011` | `0xd800102b` | `0xfc00707f` |
+| `rv_y`        | `yid_y`                | `ym, yd`             | `010100-0000010001010-----0101011` | `0x5008a02b` | `0xfdfff07f` |
+| `rv_y`        | `yiota_m`              | `ym, ys2, yd`        | `010100------10000010-----0101011` | `0x5008202b` | `0xfc0ff07f` |
+| `rv_y`        | `yl1re16_y`            | `rs1, yd`            | `000000101000-----101-----0000111` | `0x02805007` | `0xfff0707f` |
+| `rv_y`        | `yl1re32_y`            | `rs1, yd`            | `000000101000-----110-----0000111` | `0x02806007` | `0xfff0707f` |
+| `rv_y`        | `yl1re64_y`            | `rs1, yd`            | `000000101000-----111-----0000111` | `0x02807007` | `0xfff0707f` |
+| `rv_y`        | `yl1re8_y`             | `rs1, yd`            | `000000101000-----000-----0000111` | `0x02800007` | `0xfff0707f` |
+| `rv_y`        | `yl2re16_y`            | `rs1, yd`            | `001000101000-----101-----0000111` | `0x22805007` | `0xfff0707f` |
+| `rv_y`        | `yl2re32_y`            | `rs1, yd`            | `001000101000-----110-----0000111` | `0x22806007` | `0xfff0707f` |
+| `rv_y`        | `yl2re64_y`            | `rs1, yd`            | `001000101000-----111-----0000111` | `0x22807007` | `0xfff0707f` |
+| `rv_y`        | `yl2re8_y`             | `rs1, yd`            | `001000101000-----000-----0000111` | `0x22800007` | `0xfff0707f` |
+| `rv_y`        | `yl4re16_y`            | `rs1, yd`            | `011000101000-----101-----0000111` | `0x62805007` | `0xfff0707f` |
+| `rv_y`        | `yl4re32_y`            | `rs1, yd`            | `011000101000-----110-----0000111` | `0x62806007` | `0xfff0707f` |
+| `rv_y`        | `yl4re64_y`            | `rs1, yd`            | `011000101000-----111-----0000111` | `0x62807007` | `0xfff0707f` |
+| `rv_y`        | `yl4re8_y`             | `rs1, yd`            | `011000101000-----000-----0000111` | `0x62800007` | `0xfff0707f` |
+| `rv_y`        | `yl8re16_y`            | `rs1, yd`            | `111000101000-----101-----0000111` | `0xe2805007` | `0xfff0707f` |
+| `rv_y`        | `yl8re32_y`            | `rs1, yd`            | `111000101000-----110-----0000111` | `0xe2806007` | `0xfff0707f` |
+| `rv_y`        | `yl8re64_y`            | `rs1, yd`            | `111000101000-----111-----0000111` | `0xe2807007` | `0xfff0707f` |
+| `rv_y`        | `yl8re8_y`             | `rs1, yd`            | `111000101000-----000-----0000111` | `0xe2800007` | `0xfff0707f` |
+| `rv_y`        | `yle16ff_y`            | `ym, rs1, yd`        | `000000-10000-----101-----0000111` | `0x01005007` | `0xfdf0707f` |
+| `rv_y`        | `yle16_y`              | `ym, rs1, yd`        | `000000-00000-----101-----0000111` | `0x00005007` | `0xfdf0707f` |
+| `rv_y`        | `yle32ff_y`            | `ym, rs1, yd`        | `000000-10000-----110-----0000111` | `0x01006007` | `0xfdf0707f` |
+| `rv_y`        | `yle32_y`              | `ym, rs1, yd`        | `000000-00000-----110-----0000111` | `0x00006007` | `0xfdf0707f` |
+| `rv_y`        | `yle64ff_y`            | `ym, rs1, yd`        | `000000-10000-----111-----0000111` | `0x01007007` | `0xfdf0707f` |
+| `rv_y`        | `yle64_y`              | `ym, rs1, yd`        | `000000-00000-----111-----0000111` | `0x00007007` | `0xfdf0707f` |
+| `rv_y`        | `yle8ff_y`             | `ym, rs1, yd`        | `000000-10000-----000-----0000111` | `0x01000007` | `0xfdf0707f` |
+| `rv_y`        | `yle8_y`               | `ym, rs1, yd`        | `000000-00000-----000-----0000111` | `0x00000007` | `0xfdf0707f` |
+| `rv_y`        | `ylm_y`                | `rs1, yd`            | `000000101011-----000-----0000111` | `0x02b00007` | `0xfff0707f` |
+| `rv_y`        | `yloxei16_y`           | `ym, ys2, rs1, yd`   | `000011-----------101-----0000111` | `0x0c005007` | `0xfc00707f` |
+| `rv_y`        | `yloxei32_y`           | `ym, ys2, rs1, yd`   | `000011-----------110-----0000111` | `0x0c006007` | `0xfc00707f` |
+| `rv_y`        | `yloxei64_y`           | `ym, ys2, rs1, yd`   | `000011-----------111-----0000111` | `0x0c007007` | `0xfc00707f` |
+| `rv_y`        | `yloxei8_y`            | `ym, ys2, rs1, yd`   | `000011-----------000-----0000111` | `0x0c000007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg2ei16_y`       | `ym, ys2, rs1, yd`   | `001011-----------101-----0000111` | `0x2c005007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg2ei32_y`       | `ym, ys2, rs1, yd`   | `001011-----------110-----0000111` | `0x2c006007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg2ei64_y`       | `ym, ys2, rs1, yd`   | `001011-----------111-----0000111` | `0x2c007007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg2ei8_y`        | `ym, ys2, rs1, yd`   | `001011-----------000-----0000111` | `0x2c000007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg3ei16_y`       | `ym, ys2, rs1, yd`   | `010011-----------101-----0000111` | `0x4c005007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg3ei32_y`       | `ym, ys2, rs1, yd`   | `010011-----------110-----0000111` | `0x4c006007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg3ei64_y`       | `ym, ys2, rs1, yd`   | `010011-----------111-----0000111` | `0x4c007007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg3ei8_y`        | `ym, ys2, rs1, yd`   | `010011-----------000-----0000111` | `0x4c000007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg4ei16_y`       | `ym, ys2, rs1, yd`   | `011011-----------101-----0000111` | `0x6c005007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg4ei32_y`       | `ym, ys2, rs1, yd`   | `011011-----------110-----0000111` | `0x6c006007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg4ei64_y`       | `ym, ys2, rs1, yd`   | `011011-----------111-----0000111` | `0x6c007007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg4ei8_y`        | `ym, ys2, rs1, yd`   | `011011-----------000-----0000111` | `0x6c000007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg5ei16_y`       | `ym, ys2, rs1, yd`   | `100011-----------101-----0000111` | `0x8c005007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg5ei32_y`       | `ym, ys2, rs1, yd`   | `100011-----------110-----0000111` | `0x8c006007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg5ei64_y`       | `ym, ys2, rs1, yd`   | `100011-----------111-----0000111` | `0x8c007007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg5ei8_y`        | `ym, ys2, rs1, yd`   | `100011-----------000-----0000111` | `0x8c000007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg6ei16_y`       | `ym, ys2, rs1, yd`   | `101011-----------101-----0000111` | `0xac005007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg6ei32_y`       | `ym, ys2, rs1, yd`   | `101011-----------110-----0000111` | `0xac006007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg6ei64_y`       | `ym, ys2, rs1, yd`   | `101011-----------111-----0000111` | `0xac007007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg6ei8_y`        | `ym, ys2, rs1, yd`   | `101011-----------000-----0000111` | `0xac000007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg7ei16_y`       | `ym, ys2, rs1, yd`   | `110011-----------101-----0000111` | `0xcc005007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg7ei32_y`       | `ym, ys2, rs1, yd`   | `110011-----------110-----0000111` | `0xcc006007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg7ei64_y`       | `ym, ys2, rs1, yd`   | `110011-----------111-----0000111` | `0xcc007007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg7ei8_y`        | `ym, ys2, rs1, yd`   | `110011-----------000-----0000111` | `0xcc000007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg8ei16_y`       | `ym, ys2, rs1, yd`   | `111011-----------101-----0000111` | `0xec005007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg8ei32_y`       | `ym, ys2, rs1, yd`   | `111011-----------110-----0000111` | `0xec006007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg8ei64_y`       | `ym, ys2, rs1, yd`   | `111011-----------111-----0000111` | `0xec007007` | `0xfc00707f` |
+| `rv_y`        | `yloxseg8ei8_y`        | `ym, ys2, rs1, yd`   | `111011-----------000-----0000111` | `0xec000007` | `0xfc00707f` |
+| `rv_y`        | `ylse16_y`             | `ym, rs2, rs1, yd`   | `000010-----------101-----0000111` | `0x08005007` | `0xfc00707f` |
+| `rv_y`        | `ylse32_y`             | `ym, rs2, rs1, yd`   | `000010-----------110-----0000111` | `0x08006007` | `0xfc00707f` |
+| `rv_y`        | `ylse64_y`             | `ym, rs2, rs1, yd`   | `000010-----------111-----0000111` | `0x08007007` | `0xfc00707f` |
+| `rv_y`        | `ylse8_y`              | `ym, rs2, rs1, yd`   | `000010-----------000-----0000111` | `0x08000007` | `0xfc00707f` |
+| `rv_y`        | `ylseg2e16ff_y`        | `ym, rs1, yd`        | `001000-10000-----101-----0000111` | `0x21005007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg2e16_y`          | `ym, rs1, yd`        | `001000-00000-----101-----0000111` | `0x20005007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg2e32ff_y`        | `ym, rs1, yd`        | `001000-10000-----110-----0000111` | `0x21006007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg2e32_y`          | `ym, rs1, yd`        | `001000-00000-----110-----0000111` | `0x20006007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg2e64ff_y`        | `ym, rs1, yd`        | `001000-10000-----111-----0000111` | `0x21007007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg2e64_y`          | `ym, rs1, yd`        | `001000-00000-----111-----0000111` | `0x20007007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg2e8ff_y`         | `ym, rs1, yd`        | `001000-10000-----000-----0000111` | `0x21000007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg2e8_y`           | `ym, rs1, yd`        | `001000-00000-----000-----0000111` | `0x20000007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg3e16ff_y`        | `ym, rs1, yd`        | `010000-10000-----101-----0000111` | `0x41005007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg3e16_y`          | `ym, rs1, yd`        | `010000-00000-----101-----0000111` | `0x40005007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg3e32ff_y`        | `ym, rs1, yd`        | `010000-10000-----110-----0000111` | `0x41006007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg3e32_y`          | `ym, rs1, yd`        | `010000-00000-----110-----0000111` | `0x40006007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg3e64ff_y`        | `ym, rs1, yd`        | `010000-10000-----111-----0000111` | `0x41007007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg3e64_y`          | `ym, rs1, yd`        | `010000-00000-----111-----0000111` | `0x40007007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg3e8ff_y`         | `ym, rs1, yd`        | `010000-10000-----000-----0000111` | `0x41000007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg3e8_y`           | `ym, rs1, yd`        | `010000-00000-----000-----0000111` | `0x40000007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg4e16ff_y`        | `ym, rs1, yd`        | `011000-10000-----101-----0000111` | `0x61005007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg4e16_y`          | `ym, rs1, yd`        | `011000-00000-----101-----0000111` | `0x60005007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg4e32ff_y`        | `ym, rs1, yd`        | `011000-10000-----110-----0000111` | `0x61006007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg4e32_y`          | `ym, rs1, yd`        | `011000-00000-----110-----0000111` | `0x60006007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg4e64ff_y`        | `ym, rs1, yd`        | `011000-10000-----111-----0000111` | `0x61007007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg4e64_y`          | `ym, rs1, yd`        | `011000-00000-----111-----0000111` | `0x60007007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg4e8ff_y`         | `ym, rs1, yd`        | `011000-10000-----000-----0000111` | `0x61000007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg4e8_y`           | `ym, rs1, yd`        | `011000-00000-----000-----0000111` | `0x60000007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg5e16ff_y`        | `ym, rs1, yd`        | `100000-10000-----101-----0000111` | `0x81005007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg5e16_y`          | `ym, rs1, yd`        | `100000-00000-----101-----0000111` | `0x80005007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg5e32ff_y`        | `ym, rs1, yd`        | `100000-10000-----110-----0000111` | `0x81006007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg5e32_y`          | `ym, rs1, yd`        | `100000-00000-----110-----0000111` | `0x80006007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg5e64ff_y`        | `ym, rs1, yd`        | `100000-10000-----111-----0000111` | `0x81007007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg5e64_y`          | `ym, rs1, yd`        | `100000-00000-----111-----0000111` | `0x80007007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg5e8ff_y`         | `ym, rs1, yd`        | `100000-10000-----000-----0000111` | `0x81000007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg5e8_y`           | `ym, rs1, yd`        | `100000-00000-----000-----0000111` | `0x80000007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg6e16ff_y`        | `ym, rs1, yd`        | `101000-10000-----101-----0000111` | `0xa1005007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg6e16_y`          | `ym, rs1, yd`        | `101000-00000-----101-----0000111` | `0xa0005007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg6e32ff_y`        | `ym, rs1, yd`        | `101000-10000-----110-----0000111` | `0xa1006007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg6e32_y`          | `ym, rs1, yd`        | `101000-00000-----110-----0000111` | `0xa0006007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg6e64ff_y`        | `ym, rs1, yd`        | `101000-10000-----111-----0000111` | `0xa1007007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg6e64_y`          | `ym, rs1, yd`        | `101000-00000-----111-----0000111` | `0xa0007007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg6e8ff_y`         | `ym, rs1, yd`        | `101000-10000-----000-----0000111` | `0xa1000007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg6e8_y`           | `ym, rs1, yd`        | `101000-00000-----000-----0000111` | `0xa0000007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg7e16ff_y`        | `ym, rs1, yd`        | `110000-10000-----101-----0000111` | `0xc1005007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg7e16_y`          | `ym, rs1, yd`        | `110000-00000-----101-----0000111` | `0xc0005007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg7e32ff_y`        | `ym, rs1, yd`        | `110000-10000-----110-----0000111` | `0xc1006007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg7e32_y`          | `ym, rs1, yd`        | `110000-00000-----110-----0000111` | `0xc0006007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg7e64ff_y`        | `ym, rs1, yd`        | `110000-10000-----111-----0000111` | `0xc1007007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg7e64_y`          | `ym, rs1, yd`        | `110000-00000-----111-----0000111` | `0xc0007007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg7e8ff_y`         | `ym, rs1, yd`        | `110000-10000-----000-----0000111` | `0xc1000007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg7e8_y`           | `ym, rs1, yd`        | `110000-00000-----000-----0000111` | `0xc0000007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg8e16ff_y`        | `ym, rs1, yd`        | `111000-10000-----101-----0000111` | `0xe1005007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg8e16_y`          | `ym, rs1, yd`        | `111000-00000-----101-----0000111` | `0xe0005007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg8e32ff_y`        | `ym, rs1, yd`        | `111000-10000-----110-----0000111` | `0xe1006007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg8e32_y`          | `ym, rs1, yd`        | `111000-00000-----110-----0000111` | `0xe0006007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg8e64ff_y`        | `ym, rs1, yd`        | `111000-10000-----111-----0000111` | `0xe1007007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg8e64_y`          | `ym, rs1, yd`        | `111000-00000-----111-----0000111` | `0xe0007007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg8e8ff_y`         | `ym, rs1, yd`        | `111000-10000-----000-----0000111` | `0xe1000007` | `0xfdf0707f` |
+| `rv_y`        | `ylseg8e8_y`           | `ym, rs1, yd`        | `111000-00000-----000-----0000111` | `0xe0000007` | `0xfdf0707f` |
+| `rv_y`        | `ylsseg2e16_y`         | `ym, rs2, rs1, yd`   | `001010-----------101-----0000111` | `0x28005007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg2e32_y`         | `ym, rs2, rs1, yd`   | `001010-----------110-----0000111` | `0x28006007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg2e64_y`         | `ym, rs2, rs1, yd`   | `001010-----------111-----0000111` | `0x28007007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg2e8_y`          | `ym, rs2, rs1, yd`   | `001010-----------000-----0000111` | `0x28000007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg3e16_y`         | `ym, rs2, rs1, yd`   | `010010-----------101-----0000111` | `0x48005007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg3e32_y`         | `ym, rs2, rs1, yd`   | `010010-----------110-----0000111` | `0x48006007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg3e64_y`         | `ym, rs2, rs1, yd`   | `010010-----------111-----0000111` | `0x48007007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg3e8_y`          | `ym, rs2, rs1, yd`   | `010010-----------000-----0000111` | `0x48000007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg4e16_y`         | `ym, rs2, rs1, yd`   | `011010-----------101-----0000111` | `0x68005007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg4e32_y`         | `ym, rs2, rs1, yd`   | `011010-----------110-----0000111` | `0x68006007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg4e64_y`         | `ym, rs2, rs1, yd`   | `011010-----------111-----0000111` | `0x68007007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg4e8_y`          | `ym, rs2, rs1, yd`   | `011010-----------000-----0000111` | `0x68000007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg5e16_y`         | `ym, rs2, rs1, yd`   | `100010-----------101-----0000111` | `0x88005007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg5e32_y`         | `ym, rs2, rs1, yd`   | `100010-----------110-----0000111` | `0x88006007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg5e64_y`         | `ym, rs2, rs1, yd`   | `100010-----------111-----0000111` | `0x88007007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg5e8_y`          | `ym, rs2, rs1, yd`   | `100010-----------000-----0000111` | `0x88000007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg6e16_y`         | `ym, rs2, rs1, yd`   | `101010-----------101-----0000111` | `0xa8005007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg6e32_y`         | `ym, rs2, rs1, yd`   | `101010-----------110-----0000111` | `0xa8006007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg6e64_y`         | `ym, rs2, rs1, yd`   | `101010-----------111-----0000111` | `0xa8007007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg6e8_y`          | `ym, rs2, rs1, yd`   | `101010-----------000-----0000111` | `0xa8000007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg7e16_y`         | `ym, rs2, rs1, yd`   | `110010-----------101-----0000111` | `0xc8005007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg7e32_y`         | `ym, rs2, rs1, yd`   | `110010-----------110-----0000111` | `0xc8006007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg7e64_y`         | `ym, rs2, rs1, yd`   | `110010-----------111-----0000111` | `0xc8007007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg7e8_y`          | `ym, rs2, rs1, yd`   | `110010-----------000-----0000111` | `0xc8000007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg8e16_y`         | `ym, rs2, rs1, yd`   | `111010-----------101-----0000111` | `0xe8005007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg8e32_y`         | `ym, rs2, rs1, yd`   | `111010-----------110-----0000111` | `0xe8006007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg8e64_y`         | `ym, rs2, rs1, yd`   | `111010-----------111-----0000111` | `0xe8007007` | `0xfc00707f` |
+| `rv_y`        | `ylsseg8e8_y`          | `ym, rs2, rs1, yd`   | `111010-----------000-----0000111` | `0xe8000007` | `0xfc00707f` |
+| `rv_y`        | `yluxei16_y`           | `ym, ys2, rs1, yd`   | `000001-----------101-----0000111` | `0x04005007` | `0xfc00707f` |
+| `rv_y`        | `yluxei32_y`           | `ym, ys2, rs1, yd`   | `000001-----------110-----0000111` | `0x04006007` | `0xfc00707f` |
+| `rv_y`        | `yluxei64_y`           | `ym, ys2, rs1, yd`   | `000001-----------111-----0000111` | `0x04007007` | `0xfc00707f` |
+| `rv_y`        | `yluxei8_y`            | `ym, ys2, rs1, yd`   | `000001-----------000-----0000111` | `0x04000007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg2ei16_y`       | `ym, ys2, rs1, yd`   | `001001-----------101-----0000111` | `0x24005007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg2ei32_y`       | `ym, ys2, rs1, yd`   | `001001-----------110-----0000111` | `0x24006007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg2ei64_y`       | `ym, ys2, rs1, yd`   | `001001-----------111-----0000111` | `0x24007007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg2ei8_y`        | `ym, ys2, rs1, yd`   | `001001-----------000-----0000111` | `0x24000007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg3ei16_y`       | `ym, ys2, rs1, yd`   | `010001-----------101-----0000111` | `0x44005007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg3ei32_y`       | `ym, ys2, rs1, yd`   | `010001-----------110-----0000111` | `0x44006007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg3ei64_y`       | `ym, ys2, rs1, yd`   | `010001-----------111-----0000111` | `0x44007007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg3ei8_y`        | `ym, ys2, rs1, yd`   | `010001-----------000-----0000111` | `0x44000007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg4ei16_y`       | `ym, ys2, rs1, yd`   | `011001-----------101-----0000111` | `0x64005007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg4ei32_y`       | `ym, ys2, rs1, yd`   | `011001-----------110-----0000111` | `0x64006007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg4ei64_y`       | `ym, ys2, rs1, yd`   | `011001-----------111-----0000111` | `0x64007007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg4ei8_y`        | `ym, ys2, rs1, yd`   | `011001-----------000-----0000111` | `0x64000007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg5ei16_y`       | `ym, ys2, rs1, yd`   | `100001-----------101-----0000111` | `0x84005007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg5ei32_y`       | `ym, ys2, rs1, yd`   | `100001-----------110-----0000111` | `0x84006007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg5ei64_y`       | `ym, ys2, rs1, yd`   | `100001-----------111-----0000111` | `0x84007007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg5ei8_y`        | `ym, ys2, rs1, yd`   | `100001-----------000-----0000111` | `0x84000007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg6ei16_y`       | `ym, ys2, rs1, yd`   | `101001-----------101-----0000111` | `0xa4005007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg6ei32_y`       | `ym, ys2, rs1, yd`   | `101001-----------110-----0000111` | `0xa4006007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg6ei64_y`       | `ym, ys2, rs1, yd`   | `101001-----------111-----0000111` | `0xa4007007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg6ei8_y`        | `ym, ys2, rs1, yd`   | `101001-----------000-----0000111` | `0xa4000007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg7ei16_y`       | `ym, ys2, rs1, yd`   | `110001-----------101-----0000111` | `0xc4005007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg7ei32_y`       | `ym, ys2, rs1, yd`   | `110001-----------110-----0000111` | `0xc4006007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg7ei64_y`       | `ym, ys2, rs1, yd`   | `110001-----------111-----0000111` | `0xc4007007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg7ei8_y`        | `ym, ys2, rs1, yd`   | `110001-----------000-----0000111` | `0xc4000007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg8ei16_y`       | `ym, ys2, rs1, yd`   | `111001-----------101-----0000111` | `0xe4005007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg8ei32_y`       | `ym, ys2, rs1, yd`   | `111001-----------110-----0000111` | `0xe4006007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg8ei64_y`       | `ym, ys2, rs1, yd`   | `111001-----------111-----0000111` | `0xe4007007` | `0xfc00707f` |
+| `rv_y`        | `yluxseg8ei8_y`        | `ym, ys2, rs1, yd`   | `111001-----------000-----0000111` | `0xe4000007` | `0xfc00707f` |
+| `rv_y`        | `ymacc_yy`             | `ym, ys2, ys1, yd`   | `101101-----------010-----0101011` | `0xb400202b` | `0xfc00707f` |
+| `rv_y`        | `ymacc_yx`             | `ym, ys2, rs1, yd`   | `101101-----------110-----0101011` | `0xb400602b` | `0xfc00707f` |
+| `rv_y`        | `ymadc_yi`             | `ys2, simm5, yd`     | `0100011----------011-----0101011` | `0x4600302b` | `0xfe00707f` |
+| `rv_y`        | `ymadc_yim`            | `ys2, simm5, yd`     | `0100010----------011-----0101011` | `0x4400302b` | `0xfe00707f` |
+| `rv_y`        | `ymadc_yy`             | `ys2, ys1, yd`       | `0100011----------000-----0101011` | `0x4600002b` | `0xfe00707f` |
+| `rv_y`        | `ymadc_yym`            | `ys2, ys1, yd`       | `0100010----------000-----0101011` | `0x4400002b` | `0xfe00707f` |
+| `rv_y`        | `ymadc_yx`             | `ys2, rs1, yd`       | `0100011----------100-----0101011` | `0x4600402b` | `0xfe00707f` |
+| `rv_y`        | `ymadc_yxm`            | `ys2, rs1, yd`       | `0100010----------100-----0101011` | `0x4400402b` | `0xfe00707f` |
+| `rv_y`        | `ymadd_yy`             | `ym, ys2, ys1, yd`   | `101001-----------010-----0101011` | `0xa400202b` | `0xfc00707f` |
+| `rv_y`        | `ymadd_yx`             | `ym, ys2, rs1, yd`   | `101001-----------110-----0101011` | `0xa400602b` | `0xfc00707f` |
+| `rv_y`        | `ymand_mm`             | `ys2, ys1, yd`       | `0110011----------010-----0101011` | `0x6600202b` | `0xfe00707f` |
+| `rv_y`        | `ymandn_mm`            | `ys2, ys1, yd`       | `0110001----------010-----0101011` | `0x6200202b` | `0xfe00707f` |
+| `rv_y`        | `ymaxu_yy`             | `ym, ys2, ys1, yd`   | `000110-----------000-----0101011` | `0x1800002b` | `0xfc00707f` |
+| `rv_y`        | `ymaxu_yx`             | `ym, ys2, rs1, yd`   | `000110-----------100-----0101011` | `0x1800402b` | `0xfc00707f` |
+| `rv_y`        | `ymax_yy`              | `ym, ys2, ys1, yd`   | `000111-----------000-----0101011` | `0x1c00002b` | `0xfc00707f` |
+| `rv_y`        | `ymax_yx`              | `ym, ys2, rs1, yd`   | `000111-----------100-----0101011` | `0x1c00402b` | `0xfc00707f` |
+| `rv_y`        | `ymerge_yim`           | `ys2, simm5, yd`     | `0101110----------011-----0101011` | `0x5c00302b` | `0xfe00707f` |
+| `rv_y`        | `ymerge_yym`           | `ys2, ys1, yd`       | `0101110----------000-----0101011` | `0x5c00002b` | `0xfe00707f` |
+| `rv_y`        | `ymerge_yxm`           | `ys2, rs1, yd`       | `0101110----------100-----0101011` | `0x5c00402b` | `0xfe00707f` |
+| `rv_y`        | `ymfeq_yf`             | `ym, ys2, rs1, yd`   | `011000-----------101-----0101011` | `0x6000502b` | `0xfc00707f` |
+| `rv_y`        | `ymfeq_yy`             | `ym, ys2, ys1, yd`   | `011000-----------001-----0101011` | `0x6000102b` | `0xfc00707f` |
+| `rv_y`        | `ymfge_yf`             | `ym, ys2, rs1, yd`   | `011111-----------101-----0101011` | `0x7c00502b` | `0xfc00707f` |
+| `rv_y`        | `ymfgt_yf`             | `ym, ys2, rs1, yd`   | `011101-----------101-----0101011` | `0x7400502b` | `0xfc00707f` |
+| `rv_y`        | `ymfle_yf`             | `ym, ys2, rs1, yd`   | `011001-----------101-----0101011` | `0x6400502b` | `0xfc00707f` |
+| `rv_y`        | `ymfle_yy`             | `ym, ys2, ys1, yd`   | `011001-----------001-----0101011` | `0x6400102b` | `0xfc00707f` |
+| `rv_y`        | `ymflt_yf`             | `ym, ys2, rs1, yd`   | `011011-----------101-----0101011` | `0x6c00502b` | `0xfc00707f` |
+| `rv_y`        | `ymflt_yy`             | `ym, ys2, ys1, yd`   | `011011-----------001-----0101011` | `0x6c00102b` | `0xfc00707f` |
+| `rv_y`        | `ymfne_yf`             | `ym, ys2, rs1, yd`   | `011100-----------101-----0101011` | `0x7000502b` | `0xfc00707f` |
+| `rv_y`        | `ymfne_yy`             | `ym, ys2, ys1, yd`   | `011100-----------001-----0101011` | `0x7000102b` | `0xfc00707f` |
+| `rv_y`        | `yminu_yy`             | `ym, ys2, ys1, yd`   | `000100-----------000-----0101011` | `0x1000002b` | `0xfc00707f` |
+| `rv_y`        | `yminu_yx`             | `ym, ys2, rs1, yd`   | `000100-----------100-----0101011` | `0x1000402b` | `0xfc00707f` |
+| `rv_y`        | `ymin_yy`              | `ym, ys2, ys1, yd`   | `000101-----------000-----0101011` | `0x1400002b` | `0xfc00707f` |
+| `rv_y`        | `ymin_yx`              | `ym, ys2, rs1, yd`   | `000101-----------100-----0101011` | `0x1400402b` | `0xfc00707f` |
+| `rv_y`        | `ymnand_mm`            | `ys2, ys1, yd`       | `0111011----------010-----0101011` | `0x7600202b` | `0xfe00707f` |
+| `rv_y`        | `ymnor_mm`             | `ys2, ys1, yd`       | `0111101----------010-----0101011` | `0x7a00202b` | `0xfe00707f` |
+| `rv_y`        | `ymor_mm`              | `ys2, ys1, yd`       | `0110101----------010-----0101011` | `0x6a00202b` | `0xfe00707f` |
+| `rv_y`        | `ymorn_mm`             | `ys2, ys1, yd`       | `0111001----------010-----0101011` | `0x7200202b` | `0xfe00707f` |
+| `rv_y`        | `ymsbc_yy`             | `ys2, ys1, yd`       | `0100111----------000-----0101011` | `0x4e00002b` | `0xfe00707f` |
+| `rv_y`        | `ymsbc_yym`            | `ys2, ys1, yd`       | `0100110----------000-----0101011` | `0x4c00002b` | `0xfe00707f` |
+| `rv_y`        | `ymsbc_yx`             | `ys2, rs1, yd`       | `0100111----------100-----0101011` | `0x4e00402b` | `0xfe00707f` |
+| `rv_y`        | `ymsbc_yxm`            | `ys2, rs1, yd`       | `0100110----------100-----0101011` | `0x4c00402b` | `0xfe00707f` |
+| `rv_y`        | `ymsbf_m`              | `ym, ys2, yd`        | `010100------00001010-----0101011` | `0x5000a02b` | `0xfc0ff07f` |
+| `rv_y`        | `ymseq_yi`             | `ym, ys2, simm5, yd` | `011000-----------011-----0101011` | `0x6000302b` | `0xfc00707f` |
+| `rv_y`        | `ymseq_yy`             | `ym, ys2, ys1, yd`   | `011000-----------000-----0101011` | `0x6000002b` | `0xfc00707f` |
+| `rv_y`        | `ymseq_yx`             | `ym, ys2, rs1, yd`   | `011000-----------100-----0101011` | `0x6000402b` | `0xfc00707f` |
+| `rv_y`        | `ymsgtu_yi`            | `ym, ys2, simm5, yd` | `011110-----------011-----0101011` | `0x7800302b` | `0xfc00707f` |
+| `rv_y`        | `ymsgtu_yx`            | `ym, ys2, rs1, yd`   | `011110-----------100-----0101011` | `0x7800402b` | `0xfc00707f` |
+| `rv_y`        | `ymsgt_yi`             | `ym, ys2, simm5, yd` | `011111-----------011-----0101011` | `0x7c00302b` | `0xfc00707f` |
+| `rv_y`        | `ymsgt_yx`             | `ym, ys2, rs1, yd`   | `011111-----------100-----0101011` | `0x7c00402b` | `0xfc00707f` |
+| `rv_y`        | `ymsif_m`              | `ym, ys2, yd`        | `010100------00011010-----0101011` | `0x5001a02b` | `0xfc0ff07f` |
+| `rv_y`        | `ymsleu_yi`            | `ym, ys2, simm5, yd` | `011100-----------011-----0101011` | `0x7000302b` | `0xfc00707f` |
+| `rv_y`        | `ymsleu_yy`            | `ym, ys2, ys1, yd`   | `011100-----------000-----0101011` | `0x7000002b` | `0xfc00707f` |
+| `rv_y`        | `ymsleu_yx`            | `ym, ys2, rs1, yd`   | `011100-----------100-----0101011` | `0x7000402b` | `0xfc00707f` |
+| `rv_y`        | `ymsle_yi`             | `ym, ys2, simm5, yd` | `011101-----------011-----0101011` | `0x7400302b` | `0xfc00707f` |
+| `rv_y`        | `ymsle_yy`             | `ym, ys2, ys1, yd`   | `011101-----------000-----0101011` | `0x7400002b` | `0xfc00707f` |
+| `rv_y`        | `ymsle_yx`             | `ym, ys2, rs1, yd`   | `011101-----------100-----0101011` | `0x7400402b` | `0xfc00707f` |
+| `rv_y`        | `ymsltu_yy`            | `ym, ys2, ys1, yd`   | `011010-----------000-----0101011` | `0x6800002b` | `0xfc00707f` |
+| `rv_y`        | `ymsltu_yx`            | `ym, ys2, rs1, yd`   | `011010-----------100-----0101011` | `0x6800402b` | `0xfc00707f` |
+| `rv_y`        | `ymslt_yy`             | `ym, ys2, ys1, yd`   | `011011-----------000-----0101011` | `0x6c00002b` | `0xfc00707f` |
+| `rv_y`        | `ymslt_yx`             | `ym, ys2, rs1, yd`   | `011011-----------100-----0101011` | `0x6c00402b` | `0xfc00707f` |
+| `rv_y`        | `ymsne_yi`             | `ym, ys2, simm5, yd` | `011001-----------011-----0101011` | `0x6400302b` | `0xfc00707f` |
+| `rv_y`        | `ymsne_yy`             | `ym, ys2, ys1, yd`   | `011001-----------000-----0101011` | `0x6400002b` | `0xfc00707f` |
+| `rv_y`        | `ymsne_yx`             | `ym, ys2, rs1, yd`   | `011001-----------100-----0101011` | `0x6400402b` | `0xfc00707f` |
+| `rv_y`        | `ymsof_m`              | `ym, ys2, yd`        | `010100------00010010-----0101011` | `0x5001202b` | `0xfc0ff07f` |
+| `rv_y`        | `ymulhsu_yy`           | `ym, ys2, ys1, yd`   | `100110-----------010-----0101011` | `0x9800202b` | `0xfc00707f` |
+| `rv_y`        | `ymulhsu_yx`           | `ym, ys2, rs1, yd`   | `100110-----------110-----0101011` | `0x9800602b` | `0xfc00707f` |
+| `rv_y`        | `ymulhu_yy`            | `ym, ys2, ys1, yd`   | `100100-----------010-----0101011` | `0x9000202b` | `0xfc00707f` |
+| `rv_y`        | `ymulhu_yx`            | `ym, ys2, rs1, yd`   | `100100-----------110-----0101011` | `0x9000602b` | `0xfc00707f` |
+| `rv_y`        | `ymulh_yy`             | `ym, ys2, ys1, yd`   | `100111-----------010-----0101011` | `0x9c00202b` | `0xfc00707f` |
+| `rv_y`        | `ymulh_yx`             | `ym, ys2, rs1, yd`   | `100111-----------110-----0101011` | `0x9c00602b` | `0xfc00707f` |
+| `rv_y`        | `ymul_yy`              | `ym, ys2, ys1, yd`   | `100101-----------010-----0101011` | `0x9400202b` | `0xfc00707f` |
+| `rv_y`        | `ymul_yx`              | `ym, ys2, rs1, yd`   | `100101-----------110-----0101011` | `0x9400602b` | `0xfc00707f` |
+| `rv_y`        | `ymv1r_y`              | `ys2, yd`            | `1001111-----00000011-----0101011` | `0x9e00302b` | `0xfe0ff07f` |
+| `rv_y`        | `ymv2r_y`              | `ys2, yd`            | `1001111-----00001011-----0101011` | `0x9e00b02b` | `0xfe0ff07f` |
+| `rv_y`        | `ymv4r_y`              | `ys2, yd`            | `1001111-----00011011-----0101011` | `0x9e01b02b` | `0xfe0ff07f` |
+| `rv_y`        | `ymv8r_y`              | `ys2, yd`            | `1001111-----00111011-----0101011` | `0x9e03b02b` | `0xfe0ff07f` |
+| `rv_y`        | `ymv_s_x`              | `rs1, yd`            | `010000100000-----110-----0101011` | `0x4200602b` | `0xfff0707f` |
+| `rv_y`        | `ymv_y_i`              | `simm5, yd`          | `010111100000-----011-----0101011` | `0x5e00302b` | `0xfff0707f` |
+| `rv_y`        | `ymv_y_y`              | `ys1, yd`            | `010111100000-----000-----0101011` | `0x5e00002b` | `0xfff0707f` |
+| `rv_y`        | `ymv_y_x`              | `rs1, yd`            | `010111100000-----100-----0101011` | `0x5e00402b` | `0xfff0707f` |
+| `rv_y`        | `ymv_x_s`              | `ys2, rd`            | `0100001-----00000010-----0101011` | `0x4200202b` | `0xfe0ff07f` |
+| `rv_y`        | `ymxnor_mm`            | `ys2, ys1, yd`       | `0111111----------010-----0101011` | `0x7e00202b` | `0xfe00707f` |
+| `rv_y`        | `ymxor_mm`             | `ys2, ys1, yd`       | `0110111----------010-----0101011` | `0x6e00202b` | `0xfe00707f` |
+| `rv_y`        | `ynclipu_wide_yi`      | `ym, ys2, zimm5, yd` | `101110-----------011-----0101011` | `0xb800302b` | `0xfc00707f` |
+| `rv_y`        | `ynclipu_wide_yy`      | `ym, ys2, ys1, yd`   | `101110-----------000-----0101011` | `0xb800002b` | `0xfc00707f` |
+| `rv_y`        | `ynclipu_wide_yx`      | `ym, ys2, rs1, yd`   | `101110-----------100-----0101011` | `0xb800402b` | `0xfc00707f` |
+| `rv_y`        | `ynclip_wide_yi`       | `ym, ys2, zimm5, yd` | `101111-----------011-----0101011` | `0xbc00302b` | `0xfc00707f` |
+| `rv_y`        | `ynclip_wide_yy`       | `ym, ys2, ys1, yd`   | `101111-----------000-----0101011` | `0xbc00002b` | `0xfc00707f` |
+| `rv_y`        | `ynclip_wide_yx`       | `ym, ys2, rs1, yd`   | `101111-----------100-----0101011` | `0xbc00402b` | `0xfc00707f` |
+| `rv_y`        | `ynmsac_yy`            | `ym, ys2, ys1, yd`   | `101111-----------010-----0101011` | `0xbc00202b` | `0xfc00707f` |
+| `rv_y`        | `ynmsac_yx`            | `ym, ys2, rs1, yd`   | `101111-----------110-----0101011` | `0xbc00602b` | `0xfc00707f` |
+| `rv_y`        | `ynmsub_yy`            | `ym, ys2, ys1, yd`   | `101011-----------010-----0101011` | `0xac00202b` | `0xfc00707f` |
+| `rv_y`        | `ynmsub_yx`            | `ym, ys2, rs1, yd`   | `101011-----------110-----0101011` | `0xac00602b` | `0xfc00707f` |
+| `rv_y`        | `ynsra_wide_yi`        | `ym, ys2, zimm5, yd` | `101101-----------011-----0101011` | `0xb400302b` | `0xfc00707f` |
+| `rv_y`        | `ynsra_wide_yy`        | `ym, ys2, ys1, yd`   | `101101-----------000-----0101011` | `0xb400002b` | `0xfc00707f` |
+| `rv_y`        | `ynsra_wide_yx`        | `ym, ys2, rs1, yd`   | `101101-----------100-----0101011` | `0xb400402b` | `0xfc00707f` |
+| `rv_y`        | `ynsrl_wide_yi`        | `ym, ys2, zimm5, yd` | `101100-----------011-----0101011` | `0xb000302b` | `0xfc00707f` |
+| `rv_y`        | `ynsrl_wide_yy`        | `ym, ys2, ys1, yd`   | `101100-----------000-----0101011` | `0xb000002b` | `0xfc00707f` |
+| `rv_y`        | `ynsrl_wide_yx`        | `ym, ys2, rs1, yd`   | `101100-----------100-----0101011` | `0xb000402b` | `0xfc00707f` |
+| `rv_y`        | `yor_yi`               | `ym, ys2, simm5, yd` | `001010-----------011-----0101011` | `0x2800302b` | `0xfc00707f` |
+| `rv_y`        | `yor_yy`               | `ym, ys2, ys1, yd`   | `001010-----------000-----0101011` | `0x2800002b` | `0xfc00707f` |
+| `rv_y`        | `yor_yx`               | `ym, ys2, rs1, yd`   | `001010-----------100-----0101011` | `0x2800402b` | `0xfc00707f` |
+| `rv_y`        | `yredand_ys`           | `ym, ys2, ys1, yd`   | `000001-----------010-----0101011` | `0x0400202b` | `0xfc00707f` |
+| `rv_y`        | `yredmaxu_ys`          | `ym, ys2, ys1, yd`   | `000110-----------010-----0101011` | `0x1800202b` | `0xfc00707f` |
+| `rv_y`        | `yredmax_ys`           | `ym, ys2, ys1, yd`   | `000111-----------010-----0101011` | `0x1c00202b` | `0xfc00707f` |
+| `rv_y`        | `yredminu_ys`          | `ym, ys2, ys1, yd`   | `000100-----------010-----0101011` | `0x1000202b` | `0xfc00707f` |
+| `rv_y`        | `yredmin_ys`           | `ym, ys2, ys1, yd`   | `000101-----------010-----0101011` | `0x1400202b` | `0xfc00707f` |
+| `rv_y`        | `yredor_ys`            | `ym, ys2, ys1, yd`   | `000010-----------010-----0101011` | `0x0800202b` | `0xfc00707f` |
+| `rv_y`        | `yredsum_ys`           | `ym, ys2, ys1, yd`   | `000000-----------010-----0101011` | `0x0000202b` | `0xfc00707f` |
+| `rv_y`        | `yredxor_ys`           | `ym, ys2, ys1, yd`   | `000011-----------010-----0101011` | `0x0c00202b` | `0xfc00707f` |
+| `rv_y`        | `yremu_yy`             | `ym, ys2, ys1, yd`   | `100010-----------010-----0101011` | `0x8800202b` | `0xfc00707f` |
+| `rv_y`        | `yremu_yx`             | `ym, ys2, rs1, yd`   | `100010-----------110-----0101011` | `0x8800602b` | `0xfc00707f` |
+| `rv_y`        | `yrem_yy`              | `ym, ys2, ys1, yd`   | `100011-----------010-----0101011` | `0x8c00202b` | `0xfc00707f` |
+| `rv_y`        | `yrem_yx`              | `ym, ys2, rs1, yd`   | `100011-----------110-----0101011` | `0x8c00602b` | `0xfc00707f` |
+| `rv_y`        | `yrgatherei16_yy`      | `ym, ys2, ys1, yd`   | `001110-----------000-----0101011` | `0x3800002b` | `0xfc00707f` |
+| `rv_y`        | `yrgather_yi`          | `ym, ys2, zimm5, yd` | `001100-----------011-----0101011` | `0x3000302b` | `0xfc00707f` |
+| `rv_y`        | `yrgather_yy`          | `ym, ys2, ys1, yd`   | `001100-----------000-----0101011` | `0x3000002b` | `0xfc00707f` |
+| `rv_y`        | `yrgather_yx`          | `ym, ys2, rs1, yd`   | `001100-----------100-----0101011` | `0x3000402b` | `0xfc00707f` |
+| `rv_y`        | `yrsub_yi`             | `ym, ys2, simm5, yd` | `000011-----------011-----0101011` | `0x0c00302b` | `0xfc00707f` |
+| `rv_y`        | `yrsub_yx`             | `ym, ys2, rs1, yd`   | `000011-----------100-----0101011` | `0x0c00402b` | `0xfc00707f` |
+| `rv_y`        | `ys1r_y`               | `rs1, ys3`           | `000000101000-----000-----0100111` | `0x02800027` | `0xfff0707f` |
+| `rv_y`        | `ys2r_y`               | `rs1, ys3`           | `001000101000-----000-----0100111` | `0x22800027` | `0xfff0707f` |
+| `rv_y`        | `ys4r_y`               | `rs1, ys3`           | `011000101000-----000-----0100111` | `0x62800027` | `0xfff0707f` |
+| `rv_y`        | `ys8r_y`               | `rs1, ys3`           | `111000101000-----000-----0100111` | `0xe2800027` | `0xfff0707f` |
+| `rv_y`        | `ysaddu_yi`            | `ym, ys2, simm5, yd` | `100000-----------011-----0101011` | `0x8000302b` | `0xfc00707f` |
+| `rv_y`        | `ysaddu_yy`            | `ym, ys2, ys1, yd`   | `100000-----------000-----0101011` | `0x8000002b` | `0xfc00707f` |
+| `rv_y`        | `ysaddu_yx`            | `ym, ys2, rs1, yd`   | `100000-----------100-----0101011` | `0x8000402b` | `0xfc00707f` |
+| `rv_y`        | `ysadd_yi`             | `ym, ys2, simm5, yd` | `100001-----------011-----0101011` | `0x8400302b` | `0xfc00707f` |
+| `rv_y`        | `ysadd_yy`             | `ym, ys2, ys1, yd`   | `100001-----------000-----0101011` | `0x8400002b` | `0xfc00707f` |
+| `rv_y`        | `ysadd_yx`             | `ym, ys2, rs1, yd`   | `100001-----------100-----0101011` | `0x8400402b` | `0xfc00707f` |
+| `rv_y`        | `ysbc_yym`             | `ys2, ys1, yd`       | `0100100----------000-----0101011` | `0x4800002b` | `0xfe00707f` |
+| `rv_y`        | `ysbc_yxm`             | `ys2, rs1, yd`       | `0100100----------100-----0101011` | `0x4800402b` | `0xfe00707f` |
+| `rv_y`        | `yse16_y`              | `ym, rs1, ys3`       | `000000-00000-----101-----0100111` | `0x00005027` | `0xfdf0707f` |
+| `rv_y`        | `yse32_y`              | `ym, rs1, ys3`       | `000000-00000-----110-----0100111` | `0x00006027` | `0xfdf0707f` |
+| `rv_y`        | `yse64_y`              | `ym, rs1, ys3`       | `000000-00000-----111-----0100111` | `0x00007027` | `0xfdf0707f` |
+| `rv_y`        | `yse8_y`               | `ym, rs1, ys3`       | `000000-00000-----000-----0100111` | `0x00000027` | `0xfdf0707f` |
+| `rv_y`        | `ysetiyli`             | `zimm10, zimm5, rd`  | `11---------------111-----0101011` | `0xc000702b` | `0xc000707f` |
+| `rv_y`        | `ysetyl`               | `rs2, rs1, rd`       | `1000000----------111-----0101011` | `0x8000702b` | `0xfe00707f` |
+| `rv_y`        | `ysetyli`              | `zimm11, rs1, rd`    | `0----------------111-----0101011` | `0x0000702b` | `0x8000707f` |
+| `rv_y`        | `ysext_yf2`            | `ym, ys2, yd`        | `010010------00111010-----0101011` | `0x4803a02b` | `0xfc0ff07f` |
+| `rv_y`        | `ysext_yf4`            | `ym, ys2, yd`        | `010010------00101010-----0101011` | `0x4802a02b` | `0xfc0ff07f` |
+| `rv_y`        | `ysext_yf8`            | `ym, ys2, yd`        | `010010------00011010-----0101011` | `0x4801a02b` | `0xfc0ff07f` |
+| `rv_y`        | `yslide1down_yx`       | `ym, ys2, rs1, yd`   | `001111-----------110-----0101011` | `0x3c00602b` | `0xfc00707f` |
+| `rv_y`        | `yslide1up_yx`         | `ym, ys2, rs1, yd`   | `001110-----------110-----0101011` | `0x3800602b` | `0xfc00707f` |
+| `rv_y`        | `yslidedown_yi`        | `ym, ys2, zimm5, yd` | `001111-----------011-----0101011` | `0x3c00302b` | `0xfc00707f` |
+| `rv_y`        | `yslidedown_yx`        | `ym, ys2, rs1, yd`   | `001111-----------100-----0101011` | `0x3c00402b` | `0xfc00707f` |
+| `rv_y`        | `yslideup_yi`          | `ym, ys2, zimm5, yd` | `001110-----------011-----0101011` | `0x3800302b` | `0xfc00707f` |
+| `rv_y`        | `yslideup_yx`          | `ym, ys2, rs1, yd`   | `001110-----------100-----0101011` | `0x3800402b` | `0xfc00707f` |
+| `rv_y`        | `ysll_yi`              | `ym, ys2, zimm5, yd` | `100101-----------011-----0101011` | `0x9400302b` | `0xfc00707f` |
+| `rv_y`        | `ysll_yy`              | `ym, ys2, ys1, yd`   | `100101-----------000-----0101011` | `0x9400002b` | `0xfc00707f` |
+| `rv_y`        | `ysll_yx`              | `ym, ys2, rs1, yd`   | `100101-----------100-----0101011` | `0x9400402b` | `0xfc00707f` |
+| `rv_y`        | `ysmul_yy`             | `ym, ys2, ys1, yd`   | `100111-----------000-----0101011` | `0x9c00002b` | `0xfc00707f` |
+| `rv_y`        | `ysmul_yx`             | `ym, ys2, rs1, yd`   | `100111-----------100-----0101011` | `0x9c00402b` | `0xfc00707f` |
+| `rv_y`        | `ysm_y`                | `rs1, ys3`           | `000000101011-----000-----0100111` | `0x02b00027` | `0xfff0707f` |
+| `rv_y`        | `ysoxei16_y`           | `ym, ys2, rs1, ys3`  | `000011-----------101-----0100111` | `0x0c005027` | `0xfc00707f` |
+| `rv_y`        | `ysoxei32_y`           | `ym, ys2, rs1, ys3`  | `000011-----------110-----0100111` | `0x0c006027` | `0xfc00707f` |
+| `rv_y`        | `ysoxei64_y`           | `ym, ys2, rs1, ys3`  | `000011-----------111-----0100111` | `0x0c007027` | `0xfc00707f` |
+| `rv_y`        | `ysoxei8_y`            | `ym, ys2, rs1, ys3`  | `000011-----------000-----0100111` | `0x0c000027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg2ei16_y`       | `ym, ys2, rs1, ys3`  | `001011-----------101-----0100111` | `0x2c005027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg2ei32_y`       | `ym, ys2, rs1, ys3`  | `001011-----------110-----0100111` | `0x2c006027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg2ei64_y`       | `ym, ys2, rs1, ys3`  | `001011-----------111-----0100111` | `0x2c007027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg2ei8_y`        | `ym, ys2, rs1, ys3`  | `001011-----------000-----0100111` | `0x2c000027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg3ei16_y`       | `ym, ys2, rs1, ys3`  | `010011-----------101-----0100111` | `0x4c005027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg3ei32_y`       | `ym, ys2, rs1, ys3`  | `010011-----------110-----0100111` | `0x4c006027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg3ei64_y`       | `ym, ys2, rs1, ys3`  | `010011-----------111-----0100111` | `0x4c007027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg3ei8_y`        | `ym, ys2, rs1, ys3`  | `010011-----------000-----0100111` | `0x4c000027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg4ei16_y`       | `ym, ys2, rs1, ys3`  | `011011-----------101-----0100111` | `0x6c005027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg4ei32_y`       | `ym, ys2, rs1, ys3`  | `011011-----------110-----0100111` | `0x6c006027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg4ei64_y`       | `ym, ys2, rs1, ys3`  | `011011-----------111-----0100111` | `0x6c007027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg4ei8_y`        | `ym, ys2, rs1, ys3`  | `011011-----------000-----0100111` | `0x6c000027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg5ei16_y`       | `ym, ys2, rs1, ys3`  | `100011-----------101-----0100111` | `0x8c005027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg5ei32_y`       | `ym, ys2, rs1, ys3`  | `100011-----------110-----0100111` | `0x8c006027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg5ei64_y`       | `ym, ys2, rs1, ys3`  | `100011-----------111-----0100111` | `0x8c007027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg5ei8_y`        | `ym, ys2, rs1, ys3`  | `100011-----------000-----0100111` | `0x8c000027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg6ei16_y`       | `ym, ys2, rs1, ys3`  | `101011-----------101-----0100111` | `0xac005027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg6ei32_y`       | `ym, ys2, rs1, ys3`  | `101011-----------110-----0100111` | `0xac006027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg6ei64_y`       | `ym, ys2, rs1, ys3`  | `101011-----------111-----0100111` | `0xac007027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg6ei8_y`        | `ym, ys2, rs1, ys3`  | `101011-----------000-----0100111` | `0xac000027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg7ei16_y`       | `ym, ys2, rs1, ys3`  | `110011-----------101-----0100111` | `0xcc005027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg7ei32_y`       | `ym, ys2, rs1, ys3`  | `110011-----------110-----0100111` | `0xcc006027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg7ei64_y`       | `ym, ys2, rs1, ys3`  | `110011-----------111-----0100111` | `0xcc007027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg7ei8_y`        | `ym, ys2, rs1, ys3`  | `110011-----------000-----0100111` | `0xcc000027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg8ei16_y`       | `ym, ys2, rs1, ys3`  | `111011-----------101-----0100111` | `0xec005027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg8ei32_y`       | `ym, ys2, rs1, ys3`  | `111011-----------110-----0100111` | `0xec006027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg8ei64_y`       | `ym, ys2, rs1, ys3`  | `111011-----------111-----0100111` | `0xec007027` | `0xfc00707f` |
+| `rv_y`        | `ysoxseg8ei8_y`        | `ym, ys2, rs1, ys3`  | `111011-----------000-----0100111` | `0xec000027` | `0xfc00707f` |
+| `rv_y`        | `ysra_yi`              | `ym, ys2, zimm5, yd` | `101001-----------011-----0101011` | `0xa400302b` | `0xfc00707f` |
+| `rv_y`        | `ysra_yy`              | `ym, ys2, ys1, yd`   | `101001-----------000-----0101011` | `0xa400002b` | `0xfc00707f` |
+| `rv_y`        | `ysra_yx`              | `ym, ys2, rs1, yd`   | `101001-----------100-----0101011` | `0xa400402b` | `0xfc00707f` |
+| `rv_y`        | `ysrl_yi`              | `ym, ys2, zimm5, yd` | `101000-----------011-----0101011` | `0xa000302b` | `0xfc00707f` |
+| `rv_y`        | `ysrl_yy`              | `ym, ys2, ys1, yd`   | `101000-----------000-----0101011` | `0xa000002b` | `0xfc00707f` |
+| `rv_y`        | `ysrl_yx`              | `ym, ys2, rs1, yd`   | `101000-----------100-----0101011` | `0xa000402b` | `0xfc00707f` |
+| `rv_y`        | `ysse16_y`             | `ym, rs2, rs1, ys3`  | `000010-----------101-----0100111` | `0x08005027` | `0xfc00707f` |
+| `rv_y`        | `ysse32_y`             | `ym, rs2, rs1, ys3`  | `000010-----------110-----0100111` | `0x08006027` | `0xfc00707f` |
+| `rv_y`        | `ysse64_y`             | `ym, rs2, rs1, ys3`  | `000010-----------111-----0100111` | `0x08007027` | `0xfc00707f` |
+| `rv_y`        | `ysse8_y`              | `ym, rs2, rs1, ys3`  | `000010-----------000-----0100111` | `0x08000027` | `0xfc00707f` |
+| `rv_y`        | `ysseg2e16_y`          | `ym, rs1, ys3`       | `001000-00000-----101-----0100111` | `0x20005027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg2e32_y`          | `ym, rs1, ys3`       | `001000-00000-----110-----0100111` | `0x20006027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg2e64_y`          | `ym, rs1, ys3`       | `001000-00000-----111-----0100111` | `0x20007027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg2e8_y`           | `ym, rs1, ys3`       | `001000-00000-----000-----0100111` | `0x20000027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg3e16_y`          | `ym, rs1, ys3`       | `010000-00000-----101-----0100111` | `0x40005027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg3e32_y`          | `ym, rs1, ys3`       | `010000-00000-----110-----0100111` | `0x40006027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg3e64_y`          | `ym, rs1, ys3`       | `010000-00000-----111-----0100111` | `0x40007027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg3e8_y`           | `ym, rs1, ys3`       | `010000-00000-----000-----0100111` | `0x40000027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg4e16_y`          | `ym, rs1, ys3`       | `011000-00000-----101-----0100111` | `0x60005027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg4e32_y`          | `ym, rs1, ys3`       | `011000-00000-----110-----0100111` | `0x60006027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg4e64_y`          | `ym, rs1, ys3`       | `011000-00000-----111-----0100111` | `0x60007027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg4e8_y`           | `ym, rs1, ys3`       | `011000-00000-----000-----0100111` | `0x60000027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg5e16_y`          | `ym, rs1, ys3`       | `100000-00000-----101-----0100111` | `0x80005027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg5e32_y`          | `ym, rs1, ys3`       | `100000-00000-----110-----0100111` | `0x80006027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg5e64_y`          | `ym, rs1, ys3`       | `100000-00000-----111-----0100111` | `0x80007027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg5e8_y`           | `ym, rs1, ys3`       | `100000-00000-----000-----0100111` | `0x80000027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg6e16_y`          | `ym, rs1, ys3`       | `101000-00000-----101-----0100111` | `0xa0005027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg6e32_y`          | `ym, rs1, ys3`       | `101000-00000-----110-----0100111` | `0xa0006027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg6e64_y`          | `ym, rs1, ys3`       | `101000-00000-----111-----0100111` | `0xa0007027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg6e8_y`           | `ym, rs1, ys3`       | `101000-00000-----000-----0100111` | `0xa0000027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg7e16_y`          | `ym, rs1, ys3`       | `110000-00000-----101-----0100111` | `0xc0005027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg7e32_y`          | `ym, rs1, ys3`       | `110000-00000-----110-----0100111` | `0xc0006027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg7e64_y`          | `ym, rs1, ys3`       | `110000-00000-----111-----0100111` | `0xc0007027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg7e8_y`           | `ym, rs1, ys3`       | `110000-00000-----000-----0100111` | `0xc0000027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg8e16_y`          | `ym, rs1, ys3`       | `111000-00000-----101-----0100111` | `0xe0005027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg8e32_y`          | `ym, rs1, ys3`       | `111000-00000-----110-----0100111` | `0xe0006027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg8e64_y`          | `ym, rs1, ys3`       | `111000-00000-----111-----0100111` | `0xe0007027` | `0xfdf0707f` |
+| `rv_y`        | `ysseg8e8_y`           | `ym, rs1, ys3`       | `111000-00000-----000-----0100111` | `0xe0000027` | `0xfdf0707f` |
+| `rv_y`        | `yssra_yi`             | `ym, ys2, zimm5, yd` | `101011-----------011-----0101011` | `0xac00302b` | `0xfc00707f` |
+| `rv_y`        | `yssra_yy`             | `ym, ys2, ys1, yd`   | `101011-----------000-----0101011` | `0xac00002b` | `0xfc00707f` |
+| `rv_y`        | `yssra_yx`             | `ym, ys2, rs1, yd`   | `101011-----------100-----0101011` | `0xac00402b` | `0xfc00707f` |
+| `rv_y`        | `yssrl_yi`             | `ym, ys2, zimm5, yd` | `101010-----------011-----0101011` | `0xa800302b` | `0xfc00707f` |
+| `rv_y`        | `yssrl_yy`             | `ym, ys2, ys1, yd`   | `101010-----------000-----0101011` | `0xa800002b` | `0xfc00707f` |
+| `rv_y`        | `yssrl_yx`             | `ym, ys2, rs1, yd`   | `101010-----------100-----0101011` | `0xa800402b` | `0xfc00707f` |
+| `rv_y`        | `yssseg2e16_y`         | `ym, rs2, rs1, ys3`  | `001010-----------101-----0100111` | `0x28005027` | `0xfc00707f` |
+| `rv_y`        | `yssseg2e32_y`         | `ym, rs2, rs1, ys3`  | `001010-----------110-----0100111` | `0x28006027` | `0xfc00707f` |
+| `rv_y`        | `yssseg2e64_y`         | `ym, rs2, rs1, ys3`  | `001010-----------111-----0100111` | `0x28007027` | `0xfc00707f` |
+| `rv_y`        | `yssseg2e8_y`          | `ym, rs2, rs1, ys3`  | `001010-----------000-----0100111` | `0x28000027` | `0xfc00707f` |
+| `rv_y`        | `yssseg3e16_y`         | `ym, rs2, rs1, ys3`  | `010010-----------101-----0100111` | `0x48005027` | `0xfc00707f` |
+| `rv_y`        | `yssseg3e32_y`         | `ym, rs2, rs1, ys3`  | `010010-----------110-----0100111` | `0x48006027` | `0xfc00707f` |
+| `rv_y`        | `yssseg3e64_y`         | `ym, rs2, rs1, ys3`  | `010010-----------111-----0100111` | `0x48007027` | `0xfc00707f` |
+| `rv_y`        | `yssseg3e8_y`          | `ym, rs2, rs1, ys3`  | `010010-----------000-----0100111` | `0x48000027` | `0xfc00707f` |
+| `rv_y`        | `yssseg4e16_y`         | `ym, rs2, rs1, ys3`  | `011010-----------101-----0100111` | `0x68005027` | `0xfc00707f` |
+| `rv_y`        | `yssseg4e32_y`         | `ym, rs2, rs1, ys3`  | `011010-----------110-----0100111` | `0x68006027` | `0xfc00707f` |
+| `rv_y`        | `yssseg4e64_y`         | `ym, rs2, rs1, ys3`  | `011010-----------111-----0100111` | `0x68007027` | `0xfc00707f` |
+| `rv_y`        | `yssseg4e8_y`          | `ym, rs2, rs1, ys3`  | `011010-----------000-----0100111` | `0x68000027` | `0xfc00707f` |
+| `rv_y`        | `yssseg5e16_y`         | `ym, rs2, rs1, ys3`  | `100010-----------101-----0100111` | `0x88005027` | `0xfc00707f` |
+| `rv_y`        | `yssseg5e32_y`         | `ym, rs2, rs1, ys3`  | `100010-----------110-----0100111` | `0x88006027` | `0xfc00707f` |
+| `rv_y`        | `yssseg5e64_y`         | `ym, rs2, rs1, ys3`  | `100010-----------111-----0100111` | `0x88007027` | `0xfc00707f` |
+| `rv_y`        | `yssseg5e8_y`          | `ym, rs2, rs1, ys3`  | `100010-----------000-----0100111` | `0x88000027` | `0xfc00707f` |
+| `rv_y`        | `yssseg6e16_y`         | `ym, rs2, rs1, ys3`  | `101010-----------101-----0100111` | `0xa8005027` | `0xfc00707f` |
+| `rv_y`        | `yssseg6e32_y`         | `ym, rs2, rs1, ys3`  | `101010-----------110-----0100111` | `0xa8006027` | `0xfc00707f` |
+| `rv_y`        | `yssseg6e64_y`         | `ym, rs2, rs1, ys3`  | `101010-----------111-----0100111` | `0xa8007027` | `0xfc00707f` |
+| `rv_y`        | `yssseg6e8_y`          | `ym, rs2, rs1, ys3`  | `101010-----------000-----0100111` | `0xa8000027` | `0xfc00707f` |
+| `rv_y`        | `yssseg7e16_y`         | `ym, rs2, rs1, ys3`  | `110010-----------101-----0100111` | `0xc8005027` | `0xfc00707f` |
+| `rv_y`        | `yssseg7e32_y`         | `ym, rs2, rs1, ys3`  | `110010-----------110-----0100111` | `0xc8006027` | `0xfc00707f` |
+| `rv_y`        | `yssseg7e64_y`         | `ym, rs2, rs1, ys3`  | `110010-----------111-----0100111` | `0xc8007027` | `0xfc00707f` |
+| `rv_y`        | `yssseg7e8_y`          | `ym, rs2, rs1, ys3`  | `110010-----------000-----0100111` | `0xc8000027` | `0xfc00707f` |
+| `rv_y`        | `yssseg8e16_y`         | `ym, rs2, rs1, ys3`  | `111010-----------101-----0100111` | `0xe8005027` | `0xfc00707f` |
+| `rv_y`        | `yssseg8e32_y`         | `ym, rs2, rs1, ys3`  | `111010-----------110-----0100111` | `0xe8006027` | `0xfc00707f` |
+| `rv_y`        | `yssseg8e64_y`         | `ym, rs2, rs1, ys3`  | `111010-----------111-----0100111` | `0xe8007027` | `0xfc00707f` |
+| `rv_y`        | `yssseg8e8_y`          | `ym, rs2, rs1, ys3`  | `111010-----------000-----0100111` | `0xe8000027` | `0xfc00707f` |
+| `rv_y`        | `yssubu_yy`            | `ym, ys2, ys1, yd`   | `100010-----------000-----0101011` | `0x8800002b` | `0xfc00707f` |
+| `rv_y`        | `yssubu_yx`            | `ym, ys2, rs1, yd`   | `100010-----------100-----0101011` | `0x8800402b` | `0xfc00707f` |
+| `rv_y`        | `yssub_yy`             | `ym, ys2, ys1, yd`   | `100011-----------000-----0101011` | `0x8c00002b` | `0xfc00707f` |
+| `rv_y`        | `yssub_yx`             | `ym, ys2, rs1, yd`   | `100011-----------100-----0101011` | `0x8c00402b` | `0xfc00707f` |
+| `rv_y`        | `ysub_yy`              | `ym, ys2, ys1, yd`   | `000010-----------000-----0101011` | `0x0800002b` | `0xfc00707f` |
+| `rv_y`        | `ysub_yx`              | `ym, ys2, rs1, yd`   | `000010-----------100-----0101011` | `0x0800402b` | `0xfc00707f` |
+| `rv_y`        | `ysuxei16_y`           | `ym, ys2, rs1, ys3`  | `000001-----------101-----0100111` | `0x04005027` | `0xfc00707f` |
+| `rv_y`        | `ysuxei32_y`           | `ym, ys2, rs1, ys3`  | `000001-----------110-----0100111` | `0x04006027` | `0xfc00707f` |
+| `rv_y`        | `ysuxei64_y`           | `ym, ys2, rs1, ys3`  | `000001-----------111-----0100111` | `0x04007027` | `0xfc00707f` |
+| `rv_y`        | `ysuxei8_y`            | `ym, ys2, rs1, ys3`  | `000001-----------000-----0100111` | `0x04000027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg2ei16_y`       | `ym, ys2, rs1, ys3`  | `001001-----------101-----0100111` | `0x24005027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg2ei32_y`       | `ym, ys2, rs1, ys3`  | `001001-----------110-----0100111` | `0x24006027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg2ei64_y`       | `ym, ys2, rs1, ys3`  | `001001-----------111-----0100111` | `0x24007027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg2ei8_y`        | `ym, ys2, rs1, ys3`  | `001001-----------000-----0100111` | `0x24000027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg3ei16_y`       | `ym, ys2, rs1, ys3`  | `010001-----------101-----0100111` | `0x44005027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg3ei32_y`       | `ym, ys2, rs1, ys3`  | `010001-----------110-----0100111` | `0x44006027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg3ei64_y`       | `ym, ys2, rs1, ys3`  | `010001-----------111-----0100111` | `0x44007027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg3ei8_y`        | `ym, ys2, rs1, ys3`  | `010001-----------000-----0100111` | `0x44000027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg4ei16_y`       | `ym, ys2, rs1, ys3`  | `011001-----------101-----0100111` | `0x64005027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg4ei32_y`       | `ym, ys2, rs1, ys3`  | `011001-----------110-----0100111` | `0x64006027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg4ei64_y`       | `ym, ys2, rs1, ys3`  | `011001-----------111-----0100111` | `0x64007027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg4ei8_y`        | `ym, ys2, rs1, ys3`  | `011001-----------000-----0100111` | `0x64000027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg5ei16_y`       | `ym, ys2, rs1, ys3`  | `100001-----------101-----0100111` | `0x84005027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg5ei32_y`       | `ym, ys2, rs1, ys3`  | `100001-----------110-----0100111` | `0x84006027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg5ei64_y`       | `ym, ys2, rs1, ys3`  | `100001-----------111-----0100111` | `0x84007027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg5ei8_y`        | `ym, ys2, rs1, ys3`  | `100001-----------000-----0100111` | `0x84000027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg6ei16_y`       | `ym, ys2, rs1, ys3`  | `101001-----------101-----0100111` | `0xa4005027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg6ei32_y`       | `ym, ys2, rs1, ys3`  | `101001-----------110-----0100111` | `0xa4006027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg6ei64_y`       | `ym, ys2, rs1, ys3`  | `101001-----------111-----0100111` | `0xa4007027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg6ei8_y`        | `ym, ys2, rs1, ys3`  | `101001-----------000-----0100111` | `0xa4000027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg7ei16_y`       | `ym, ys2, rs1, ys3`  | `110001-----------101-----0100111` | `0xc4005027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg7ei32_y`       | `ym, ys2, rs1, ys3`  | `110001-----------110-----0100111` | `0xc4006027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg7ei64_y`       | `ym, ys2, rs1, ys3`  | `110001-----------111-----0100111` | `0xc4007027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg7ei8_y`        | `ym, ys2, rs1, ys3`  | `110001-----------000-----0100111` | `0xc4000027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg8ei16_y`       | `ym, ys2, rs1, ys3`  | `111001-----------101-----0100111` | `0xe4005027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg8ei32_y`       | `ym, ys2, rs1, ys3`  | `111001-----------110-----0100111` | `0xe4006027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg8ei64_y`       | `ym, ys2, rs1, ys3`  | `111001-----------111-----0100111` | `0xe4007027` | `0xfc00707f` |
+| `rv_y`        | `ysuxseg8ei8_y`        | `ym, ys2, rs1, ys3`  | `111001-----------000-----0100111` | `0xe4000027` | `0xfc00707f` |
+| `rv_y`        | `ywaddu_yy`            | `ym, ys2, ys1, yd`   | `110000-----------010-----0101011` | `0xc000202b` | `0xfc00707f` |
+| `rv_y`        | `ywaddu_yx`            | `ym, ys2, rs1, yd`   | `110000-----------110-----0101011` | `0xc000602b` | `0xfc00707f` |
+| `rv_y`        | `ywaddu_wide_yy`       | `ym, ys2, ys1, yd`   | `110100-----------010-----0101011` | `0xd000202b` | `0xfc00707f` |
+| `rv_y`        | `ywaddu_wide_yx`       | `ym, ys2, rs1, yd`   | `110100-----------110-----0101011` | `0xd000602b` | `0xfc00707f` |
+| `rv_y`        | `ywadd_yy`             | `ym, ys2, ys1, yd`   | `110001-----------010-----0101011` | `0xc400202b` | `0xfc00707f` |
+| `rv_y`        | `ywadd_yx`             | `ym, ys2, rs1, yd`   | `110001-----------110-----0101011` | `0xc400602b` | `0xfc00707f` |
+| `rv_y`        | `ywadd_wide_yy`        | `ym, ys2, ys1, yd`   | `110101-----------010-----0101011` | `0xd400202b` | `0xfc00707f` |
+| `rv_y`        | `ywadd_wide_yx`        | `ym, ys2, rs1, yd`   | `110101-----------110-----0101011` | `0xd400602b` | `0xfc00707f` |
+| `rv_y`        | `ywmaccsu_yy`          | `ym, ys2, ys1, yd`   | `111111-----------010-----0101011` | `0xfc00202b` | `0xfc00707f` |
+| `rv_y`        | `ywmaccsu_yx`          | `ym, ys2, rs1, yd`   | `111111-----------110-----0101011` | `0xfc00602b` | `0xfc00707f` |
+| `rv_y`        | `ywmaccus_yx`          | `ym, ys2, rs1, yd`   | `111110-----------110-----0101011` | `0xf800602b` | `0xfc00707f` |
+| `rv_y`        | `ywmaccu_yy`           | `ym, ys2, ys1, yd`   | `111100-----------010-----0101011` | `0xf000202b` | `0xfc00707f` |
+| `rv_y`        | `ywmaccu_yx`           | `ym, ys2, rs1, yd`   | `111100-----------110-----0101011` | `0xf000602b` | `0xfc00707f` |
+| `rv_y`        | `ywmacc_yy`            | `ym, ys2, ys1, yd`   | `111101-----------010-----0101011` | `0xf400202b` | `0xfc00707f` |
+| `rv_y`        | `ywmacc_yx`            | `ym, ys2, rs1, yd`   | `111101-----------110-----0101011` | `0xf400602b` | `0xfc00707f` |
+| `rv_y`        | `ywmulsu_yy`           | `ym, ys2, ys1, yd`   | `111010-----------010-----0101011` | `0xe800202b` | `0xfc00707f` |
+| `rv_y`        | `ywmulsu_yx`           | `ym, ys2, rs1, yd`   | `111010-----------110-----0101011` | `0xe800602b` | `0xfc00707f` |
+| `rv_y`        | `ywmulu_yy`            | `ym, ys2, ys1, yd`   | `111000-----------010-----0101011` | `0xe000202b` | `0xfc00707f` |
+| `rv_y`        | `ywmulu_yx`            | `ym, ys2, rs1, yd`   | `111000-----------110-----0101011` | `0xe000602b` | `0xfc00707f` |
+| `rv_y`        | `ywmul_yy`             | `ym, ys2, ys1, yd`   | `111011-----------010-----0101011` | `0xec00202b` | `0xfc00707f` |
+| `rv_y`        | `ywmul_yx`             | `ym, ys2, rs1, yd`   | `111011-----------110-----0101011` | `0xec00602b` | `0xfc00707f` |
+| `rv_y`        | `ywredsumu_ys`         | `ym, ys2, ys1, yd`   | `110000-----------000-----0101011` | `0xc000002b` | `0xfc00707f` |
+| `rv_y`        | `ywredsum_ys`          | `ym, ys2, ys1, yd`   | `110001-----------000-----0101011` | `0xc400002b` | `0xfc00707f` |
+| `rv_y`        | `ywsubu_yy`            | `ym, ys2, ys1, yd`   | `110010-----------010-----0101011` | `0xc800202b` | `0xfc00707f` |
+| `rv_y`        | `ywsubu_yx`            | `ym, ys2, rs1, yd`   | `110010-----------110-----0101011` | `0xc800602b` | `0xfc00707f` |
+| `rv_y`        | `ywsubu_wide_yy`       | `ym, ys2, ys1, yd`   | `110110-----------010-----0101011` | `0xd800202b` | `0xfc00707f` |
+| `rv_y`        | `ywsubu_wide_yx`       | `ym, ys2, rs1, yd`   | `110110-----------110-----0101011` | `0xd800602b` | `0xfc00707f` |
+| `rv_y`        | `ywsub_yy`             | `ym, ys2, ys1, yd`   | `110011-----------010-----0101011` | `0xcc00202b` | `0xfc00707f` |
+| `rv_y`        | `ywsub_yx`             | `ym, ys2, rs1, yd`   | `110011-----------110-----0101011` | `0xcc00602b` | `0xfc00707f` |
+| `rv_y`        | `ywsub_wide_yy`        | `ym, ys2, ys1, yd`   | `110111-----------010-----0101011` | `0xdc00202b` | `0xfc00707f` |
+| `rv_y`        | `ywsub_wide_yx`        | `ym, ys2, rs1, yd`   | `110111-----------110-----0101011` | `0xdc00602b` | `0xfc00707f` |
+| `rv_y`        | `yxor_yi`              | `ym, ys2, simm5, yd` | `001011-----------011-----0101011` | `0x2c00302b` | `0xfc00707f` |
+| `rv_y`        | `yxor_yy`              | `ym, ys2, ys1, yd`   | `001011-----------000-----0101011` | `0x2c00002b` | `0xfc00707f` |
+| `rv_y`        | `yxor_yx`              | `ym, ys2, rs1, yd`   | `001011-----------100-----0101011` | `0x2c00402b` | `0xfc00707f` |
+| `rv_y`        | `yzext_yf2`            | `ym, ys2, yd`        | `010010------00110010-----0101011` | `0x4803202b` | `0xfc0ff07f` |
+| `rv_y`        | `yzext_yf4`            | `ym, ys2, yd`        | `010010------00100010-----0101011` | `0x4802202b` | `0xfc0ff07f` |
+| `rv_y`        | `yzext_yf8`            | `ym, ys2, yd`        | `010010------00010010-----0101011` | `0x4801202b` | `0xfc0ff07f` |
+
+:RVY - Specific Extension for Tensor Operations
+
+| **Extension**      | **Name**                  | **Variable-Fields**             | **Encoding**                       | **Match**    | **Mask**     |
+|:-------------------|:--------------------------|:--------------------------------|:-----------------------------------|:-------------|:-------------|
+| `rv_zyabd`         | `yabdu_yy`                | `ym, ys2, ys1, yd`              | `010110-----------010-----0101011` | `0x5800202b` | `0xfc00707f` |
+| `rv_zyabd`         | `yabdu_yx`                | `ym, ys2, rs1, yd`              | `010110-----------110-----0101011` | `0x5800602b` | `0xfc00707f` |
+| `rv_zyabd`         | `yabd_yy`                 | `ym, ys2, ys1, yd`              | `010101-----------010-----0101011` | `0x5400202b` | `0xfc00707f` |
+| `rv_zyabd`         | `yabd_yx`                 | `ym, ys2, rs1, yd`              | `010101-----------110-----0101011` | `0x5400602b` | `0xfc00707f` |
+| `rv_zyabd`         | `ywabdau_yy`              | `ym, ys2, ys1, yd`              | `111110-----------000-----0101011` | `0xf800002b` | `0xfc00707f` |
+| `rv_zyabd`         | `ywabdau_yx`              | `ym, ys2, rs1, yd`              | `111110-----------100-----0101011` | `0xf800402b` | `0xfc00707f` |
+| `rv_zyabd`         | `ywabda_yy`               | `ym, ys2, ys1, yd`              | `111101-----------000-----0101011` | `0xf400002b` | `0xfc00707f` |
+| `rv_zyabd`         | `ywabda_yx`               | `ym, ys2, rs1, yd`              | `111101-----------100-----0101011` | `0xf400402b` | `0xfc00707f` |
+| `rv_zybb`          | `yandn_yy`                | `ym, ys2, ys1, yd`              | `000001-----------000-----0101011` | `0x0400002b` | `0xfc00707f` |
+| `rv_zybb`          | `yandn_yx`                | `ym, ys2, rs1, yd`              | `000001-----------100-----0101011` | `0x0400402b` | `0xfc00707f` |
+| `rv_zybb`          | `ybrev8_y`                | `ym, ys2, yd`                   | `010010------01000010-----0101011` | `0x4804202b` | `0xfc0ff07f` |
+| `rv_zybb`          | `ybrev_y`                 | `ym, ys2, yd`                   | `010010------01010010-----0101011` | `0x4805202b` | `0xfc0ff07f` |
+| `rv_zybb`          | `yclz_y`                  | `ym, ys2, yd`                   | `010010------01100010-----0101011` | `0x4806202b` | `0xfc0ff07f` |
+| `rv_zybb`          | `ycpop_y`                 | `ym, ys2, yd`                   | `010010------01110010-----0101011` | `0x4807202b` | `0xfc0ff07f` |
+| `rv_zybb`          | `yctz_y`                  | `ym, ys2, yd`                   | `010010------01101010-----0101011` | `0x4806a02b` | `0xfc0ff07f` |
+| `rv_zybb`          | `yrev8_y`                 | `ym, ys2, yd`                   | `010010------01001010-----0101011` | `0x4804a02b` | `0xfc0ff07f` |
+| `rv_zybb`          | `yrol_yy`                 | `ym, ys2, ys1, yd`              | `010101-----------000-----0101011` | `0x5400002b` | `0xfc00707f` |
+| `rv_zybb`          | `yrol_yx`                 | `ym, ys2, rs1, yd`              | `010101-----------100-----0101011` | `0x5400402b` | `0xfc00707f` |
+| `rv_zybb`          | `yror_yi`                 | `zimm6hi, ym, ys2, zimm6lo, yd` | `01010------------011-----0101011` | `0x5000302b` | `0xf800707f` |
+| `rv_zybb`          | `yror_yy`                 | `ym, ys2, ys1, yd`              | `010100-----------000-----0101011` | `0x5000002b` | `0xfc00707f` |
+| `rv_zybb`          | `yror_yx`                 | `ym, ys2, rs1, yd`              | `010100-----------100-----0101011` | `0x5000402b` | `0xfc00707f` |
+| `rv_zybb`          | `ywsll_yi`                | `ym, ys2, zimm5, yd`            | `110101-----------011-----0101011` | `0xd400302b` | `0xfc00707f` |
+| `rv_zybb`          | `ywsll_yy`                | `ym, ys2, ys1, yd`              | `110101-----------000-----0101011` | `0xd400002b` | `0xfc00707f` |
+| `rv_zybb`          | `ywsll_yx`                | `ym, ys2, rs1, yd`              | `110101-----------100-----0101011` | `0xd400402b` | `0xfc00707f` |
+| `rv_zybc`          | `yclmulh_yy`              | `ym, ys2, ys1, yd`              | `001101-----------010-----0101011` | `0x3400202b` | `0xfc00707f` |
+| `rv_zybc`          | `yclmulh_yx`              | `ym, ys2, rs1, yd`              | `001101-----------110-----0101011` | `0x3400602b` | `0xfc00707f` |
+| `rv_zybc`          | `yclmul_yy`               | `ym, ys2, ys1, yd`              | `001100-----------010-----0101011` | `0x3000202b` | `0xfc00707f` |
+| `rv_zybc`          | `yclmul_yx`               | `ym, ys2, rs1, yd`              | `001100-----------110-----0101011` | `0x3000602b` | `0xfc00707f` |
+| `rv_zydot4a`       | `ydot4asu_yy`             | `ym, ys2, ys1, yd`              | `101010-----------010-----0101011` | `0xa800202b` | `0xfc00707f` |
+| `rv_zydot4a`       | `ydot4asu_yx`             | `ym, ys2, rs1, yd`              | `101010-----------110-----0101011` | `0xa800602b` | `0xfc00707f` |
+| `rv_zydot4a`       | `ydot4aus_yx`             | `ym, ys2, rs1, yd`              | `101110-----------110-----0101011` | `0xb800602b` | `0xfc00707f` |
+| `rv_zydot4a`       | `ydot4au_yy`              | `ym, ys2, ys1, yd`              | `101000-----------010-----0101011` | `0xa000202b` | `0xfc00707f` |
+| `rv_zydot4a`       | `ydot4au_yx`              | `ym, ys2, rs1, yd`              | `101000-----------110-----0101011` | `0xa000602b` | `0xfc00707f` |
+| `rv_zydot4a`       | `ydot4a_yy`               | `ym, ys2, ys1, yd`              | `101100-----------010-----0101011` | `0xb000202b` | `0xfc00707f` |
+| `rv_zydot4a`       | `ydot4a_yx`               | `ym, ys2, rs1, yd`              | `101100-----------110-----0101011` | `0xb000602b` | `0xfc00707f` |
+| `rv_zyfbdota32f`   | `yfbdota_yy`              | `ym, ys2x8, ci, ys1, yd`        | `101011-----------001-----1111111` | `0xac00107f` | `0xfc00707f` |
+| `rv_zyfbfmin`      | `yfncvtbf16_f_f_wide`     | `ym, ys2, yd`                   | `010010------11101001-----0101011` | `0x480e902b` | `0xfc0ff07f` |
+| `rv_zyfbfmin`      | `yfwcvtbf16_f_f_y`        | `ym, ys2, yd`                   | `010010------01101001-----0101011` | `0x4806902b` | `0xfc0ff07f` |
+| `rv_zyfbfwma`      | `yfwmaccbf16_yf`          | `ym, ys2, rs1, yd`              | `111011-----------101-----0101011` | `0xec00502b` | `0xfc00707f` |
+| `rv_zyfbfwma`      | `yfwmaccbf16_yy`          | `ym, ys2, ys1, yd`              | `111011-----------001-----0101011` | `0xec00102b` | `0xfc00707f` |
+| `rv_zyfofp4min`    | `yfext_yf2`               | `ym, ys2, yd`                   | `010010------10110010-----0101011` | `0x480b202b` | `0xfc0ff07f` |
+| `rv_zyfofp8min`    | `yfncvtbf16_sat_f_f_wide` | `ym, ys2, yd`                   | `010010------11111001-----0101011` | `0x480f902b` | `0xfc0ff07f` |
+| `rv_zyfofp8min`    | `yfncvt_f_f_q`            | `ym, ys2, yd`                   | `010010------11001001-----0101011` | `0x480c902b` | `0xfc0ff07f` |
+| `rv_zyfofp8min`    | `yfncvt_sat_f_f_q`        | `ym, ys2, yd`                   | `010010------11011001-----0101011` | `0x480d902b` | `0xfc0ff07f` |
+| `rv_zyfqwbdota8f`  | `yfqwbdota_alt_yy`        | `ym, ys2x8, ci, ys1, yd`        | `101111-----------001-----1111111` | `0xbc00107f` | `0xfc00707f` |
+| `rv_zyfqwbdota8f`  | `yfqwbdota_yy`            | `ym, ys2x8, ci, ys1, yd`        | `101110-----------001-----1111111` | `0xb800107f` | `0xfc00707f` |
+| `rv_zyfqwdota8f`   | `yfqwdota_alt_yy`         | `ym, ys2, ys1, yd`              | `100111-----------001-----1111111` | `0x9c00107f` | `0xfc00707f` |
+| `rv_zyfqwdota8f`   | `yfqwdota_yy`             | `ym, ys2, ys1, yd`              | `100110-----------001-----1111111` | `0x9800107f` | `0xfc00707f` |
+| `rv_zyfwbdota16bf` | `yfwbdota_yy`             | `ym, ys2x8, ci, ys1, yd`        | `101100-----------001-----1111111` | `0xb000107f` | `0xfc00707f` |
+| `rv_zyfwdota16bf`  | `yfwdota_yy`              | `ym, ys2, ys1, yd`              | `100100-----------001-----1111111` | `0x9000107f` | `0xfc00707f` |
+| `rv_zyqwbdota8i`   | `yqwbdotas_yy`            | `ym, ys2x8, ci, ys1, yd`        | `101111-----------000-----1111111` | `0xbc00007f` | `0xfc00707f` |
+| `rv_zyqwbdota8i`   | `yqwbdotau_yy`            | `ym, ys2x8, ci, ys1, yd`        | `101110-----------000-----1111111` | `0xb800007f` | `0xfc00707f` |
+| `rv_zyqwdota8i`    | `yqwdotas_yy`             | `ym, ys2, ys1, yd`              | `100111-----------000-----1111111` | `0x9c00007f` | `0xfc00707f` |
+| `rv_zyqwdota8i`    | `yqwdotau_yy`             | `ym, ys2, ys1, yd`              | `100110-----------000-----1111111` | `0x9800007f` | `0xfc00707f` |
+| `rv_zyt16e`        | `ytle16`                  | `rs2, rs1`                      | `0011001----------111000000000111` | `0x32007007` | `0xfe007fff` |
+| `rv_zyt16e`        | `ytse16`                  | `rs2, rs1`                      | `0011001----------111000000100111` | `0x32007027` | `0xfe007fff` |
+| `rv_zyt64e`        | `ytle64`                  | `rs2, rs1`                      | `0111001----------111000000000111` | `0x72007007` | `0xfe007fff` |
+| `rv_zyt64e`        | `ytse64`                  | `rs2, rs1`                      | `0111001----------111000000100111` | `0x72007027` | `0xfe007fff` |
+| `rv_zyt8e`         | `ytle8`                   | `rs2, rs1`                      | `0001001----------111000000000111` | `0x12007007` | `0xfe007fff` |
+| `rv_zyt8e`         | `ytse8`                   | `rs2, rs1`                      | `0001001----------111000000100111` | `0x12007027` | `0xfe007fff` |
+| `rv_zytbase`       | `ymsetmtype`              | `rs2, rs1, rd`                  | `1000010----------111-----0101011` | `0x8400702b` | `0xfe00707f` |
+| `rv_zytbase`       | `ymsetmtypei`             | `altfmt, ysew, mtwiden, rd`     | `100-100--100000--111-----0101011` | `0x8840702b` | `0xee7e707f` |
+| `rv_zytbase`       | `ymsettk`                 | `rs1, rd`                       | `100010000010-----111-----0101011` | `0x8820702b` | `0xfff0707f` |
+| `rv_zytbase`       | `ymsettm`                 | `rs1, rd`                       | `100010000001-----111-----0101011` | `0x8810702b` | `0xfff0707f` |
+| `rv_zytbase`       | `ymsettn`                 | `rs1, rd`                       | `100010000000-----111-----0101011` | `0x8800702b` | `0xfff0707f` |
+| `rv_zytbase`       | `ytdiscard`               | `none`                          | `01000011110000000110000000101011` | `0x43c0602b` | `0xffffffff` |
+| `rv_zytbase`       | `ytle32`                  | `rs2, rs1`                      | `0101001----------111000000000111` | `0x52007007` | `0xfe007fff` |
+| `rv_zytbase`       | `ytmv_t_y`                | `ys2, rs1`                      | `0101111----------110000000101011` | `0x5e00602b` | `0xfe007fff` |
+| `rv_zytbase`       | `ytmv_y_t`                | `rs1, yd`                       | `010000111111-----110-----0101011` | `0x43f0602b` | `0xfff0707f` |
+| `rv_zytbase`       | `ytse32`                  | `rs2, rs1`                      | `0101001----------111000000100111` | `0x52007027` | `0xfe007fff` |
+| `rv_zytbase`       | `ytzero`                  | `zyt_mtd16`                     | `01000011111000000110----00101011` | `0x43e0602b` | `0xfffff0ff` |
+| `rv_zytbf16fmm`    | `ytfmm_alt_tyy`           | `ys2, ys1, zyt_mtd8`            | `1111001----------001---011111111` | `0xf20010ff` | `0xfe0071ff` |
+| `rv_zytdmm`        | `ytfmm_tyy`               | `ys2, ys1, zyt_mtd8`            | `1111001----------001---001111111` | `0xf200107f` | `0xfe0071ff` |
+| `rv_zytfmm`        | `ytfmm_tyy`               | `ys2, ys1, zyt_mtd8`            | `1111001----------001---001111111` | `0xf200107f` | `0xfe0071ff` |
+| `rv_zytfp16fmm`    | `ytfmm_tyy`               | `ys2, ys1, zyt_mtd8`            | `1111001----------001---001111111` | `0xf200107f` | `0xfe0071ff` |
+| `rv_zyti8i32mm`    | `ytmms_tyy`               | `ys2, ys1, zyt_mtd8`            | `1111001----------000---011111111` | `0xf20000ff` | `0xfe0071ff` |
+| `rv_zyti8i32mm`    | `ytmmu_tyy`               | `ys2, ys1, zyt_mtd8`            | `1111001----------000---001111111` | `0xf200007f` | `0xfe0071ff` |
+| `rv_zytofp8fmm`    | `ytfmm_alt_tyy`           | `ys2, ys1, zyt_mtd8`            | `1111001----------001---011111111` | `0xf20010ff` | `0xfe0071ff` |
+| `rv_zytofp8fmm`    | `ytfmm_tyy`               | `ys2, ys1, zyt_mtd8`            | `1111001----------001---001111111` | `0xf200107f` | `0xfe0071ff` |
+| `rv_zyzip`         | `ypaire_yy`               | `ym, ys2, ys1, yd`              | `001111-----------000-----0101011` | `0x3c00002b` | `0xfc00707f` |
+| `rv_zyzip`         | `ypairo_yy`               | `ym, ys2, ys1, yd`              | `001111-----------010-----0101011` | `0x3c00202b` | `0xfc00707f` |
+| `rv_zyzip`         | `yunzipe_y`               | `ym, ys2, yd`                   | `010010------01011010-----0101011` | `0x4805a02b` | `0xfc0ff07f` |
+| `rv_zyzip`         | `yunzipo_y`               | `ym, ys2, yd`                   | `010010------01111010-----0101011` | `0x4807a02b` | `0xfc0ff07f` |
+| `rv_zyzip`         | `yzip_yy`                 | `ym, ys2, ys1, yd`              | `111110-----------010-----0101011` | `0xf800202b` | `0xfc00707f` |
+
+:RVZY - Specific Extension for Tensor Operations

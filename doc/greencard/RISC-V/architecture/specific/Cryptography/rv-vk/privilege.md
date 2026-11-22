@@ -1,0 +1,67 @@
+## INSTRUCTION PRIVILEGE
+
+| **Extension** | **Name**     | **Privilege** |
+|:--------------|:-------------|:--------------|
+| `rv_zvkg`     | `vghsh_vv`   | `U`           |
+| `rv_zvkg`     | `vgmul_vv`   | `U`           |
+| `rv_zvkned`   | `vaesdf_vs`  | `U`           |
+| `rv_zvkned`   | `vaesdf_vv`  | `U`           |
+| `rv_zvkned`   | `vaesdm_vs`  | `U`           |
+| `rv_zvkned`   | `vaesdm_vv`  | `U`           |
+| `rv_zvkned`   | `vaesef_vs`  | `U`           |
+| `rv_zvkned`   | `vaesef_vv`  | `U`           |
+| `rv_zvkned`   | `vaesem_vs`  | `U`           |
+| `rv_zvkned`   | `vaesem_vv`  | `U`           |
+| `rv_zvkned`   | `vaeskf1_vi` | `U`           |
+| `rv_zvkned`   | `vaeskf2_vi` | `U`           |
+| `rv_zvkned`   | `vaesz_vs`   | `U`           |
+| `rv_zvknha`   | `vsha2ch_vv` | `U`           |
+| `rv_zvknha`   | `vsha2cl_vv` | `U`           |
+| `rv_zvknha`   | `vsha2ms_vv` | `U`           |
+| `rv_zvknhb`   | `vsha2ch_vv` | `U`           |
+| `rv_zvknhb`   | `vsha2cl_vv` | `U`           |
+| `rv_zvknhb`   | `vsha2ms_vv` | `U`           |
+| `rv_zvkn`     | `vaesdf_vs`  | `U`           |
+| `rv_zvkn`     | `vaesdf_vv`  | `U`           |
+| `rv_zvkn`     | `vaesdm_vs`  | `U`           |
+| `rv_zvkn`     | `vaesdm_vv`  | `U`           |
+| `rv_zvkn`     | `vaesef_vs`  | `U`           |
+| `rv_zvkn`     | `vaesef_vv`  | `U`           |
+| `rv_zvkn`     | `vaesem_vs`  | `U`           |
+| `rv_zvkn`     | `vaesem_vv`  | `U`           |
+| `rv_zvkn`     | `vaeskf1_vi` | `U`           |
+| `rv_zvkn`     | `vaeskf2_vi` | `U`           |
+| `rv_zvkn`     | `vaesz_vs`   | `U`           |
+| `rv_zvkn`     | `vandn_vv`   | `U`           |
+| `rv_zvkn`     | `vandn_vx`   | `U`           |
+| `rv_zvkn`     | `vbrev8_v`   | `U`           |
+| `rv_zvkn`     | `vrev8_v`    | `U`           |
+| `rv_zvkn`     | `vrol_vv`    | `U`           |
+| `rv_zvkn`     | `vrol_vx`    | `U`           |
+| `rv_zvkn`     | `vror_vi`    | `U`           |
+| `rv_zvkn`     | `vror_vv`    | `U`           |
+| `rv_zvkn`     | `vror_vx`    | `U`           |
+| `rv_zvkn`     | `vsha2ch_vv` | `U`           |
+| `rv_zvkn`     | `vsha2cl_vv` | `U`           |
+| `rv_zvkn`     | `vsha2ms_vv` | `U`           |
+| `rv_zvksed`   | `vsm4k_vi`   | `U`           |
+| `rv_zvksed`   | `vsm4r_vs`   | `U`           |
+| `rv_zvksed`   | `vsm4r_vv`   | `U`           |
+| `rv_zvksh`    | `vsm3c_vi`   | `U`           |
+| `rv_zvksh`    | `vsm3me_vv`  | `U`           |
+| `rv_zvks`     | `vandn_vv`   | `U`           |
+| `rv_zvks`     | `vandn_vx`   | `U`           |
+| `rv_zvks`     | `vbrev8_v`   | `U`           |
+| `rv_zvks`     | `vrev8_v`    | `U`           |
+| `rv_zvks`     | `vrol_vv`    | `U`           |
+| `rv_zvks`     | `vrol_vx`    | `U`           |
+| `rv_zvks`     | `vror_vi`    | `U`           |
+| `rv_zvks`     | `vror_vv`    | `U`           |
+| `rv_zvks`     | `vror_vx`    | `U`           |
+| `rv_zvks`     | `vsm3c_vi`   | `U`           |
+| `rv_zvks`     | `vsm3me_vv`  | `U`           |
+| `rv_zvks`     | `vsm4k_vi`   | `U`           |
+| `rv_zvks`     | `vsm4r_vs`   | `U`           |
+| `rv_zvks`     | `vsm4r_vv`   | `U`           |
+
+:RVZVK - Specific Extension for Vector Cryptography Instructions

@@ -1,629 +1,722 @@
 ## INSTRUCTION CLASSES
 
-**Matrix Instructions Formats**
-
-  | **Category** | **Operands**       | **Operation**   |
-  |:-------------|:-------------------|:----------------|
-  | `OPIWW`      | `matrix-matrix`    | `Integer`       |
-  | `OPIWX`      | `matrix-scalar`    | `Integer`       |
-  | `OPIWI`      | `matrix-immediate` | `Integer`       |
-  | `OPFWW`      | `matrix-matrix`    | `Float`         |
-  | `OPFWF`      | `matrix-scalar`    | `Float`         |
-  | `OPMWW`      | `matrix-matrix`    | `Mask`          |
-  | `OPMWX`      | `matrix-scalar`    | `Mask`          |
-  | `OPCFG`      | `scalars-imms`     | `Configuration` |
-
-  : Matrix Instructions Formats
-
-**OPCFG (Configuration Setting)**
-
-  | **Name**   | **Opcode / Argument**                              | **Class**              |
-  |:-----------|:---------------------------------------------------|:-----------------------|
-  | `wsetiwli` | `31=1 30=1 zimm10   zimm5 14..12=0x7 rd 6..0=0x57` | `matrix,configuration` |
-  | `wsetwli`  | `31=0 zimm11          rs1 14..12=0x7 rd 6..0=0x57` | `matrix,configuration` |
-  | `wsetwl`   | `31=1 30..25=0x0 rs2  rs1 14..12=0x7 rd 6..0=0x57` | `matrix,configuration` |
-
-  : Configuration Setting
-
-**OPLS (Matrix Loads and Store)**
-
-* **Matrix Unit-Stride Instructions (including segment part)**
-
-  | **Name**  | **Opcode / Argument**                                            | **Class**           |
-  |:----------|:-----------------------------------------------------------------|:--------------------|
-  | `wlm.v`   | `31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0  wd 6..0=0x07` | `matrix,load,mask`  |
-  | `wsm.v`   | `31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0 ws3 6..0=0x27` | `matrix,store,mask` |
-  | `wle8.v`  | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x0  wd 6..0=0x07`      | `matrix,load`       |
-  | `wle16.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x5  wd 6..0=0x07`      | `matrix,load`       |
-  | `wle32.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x6  wd 6..0=0x07`      | `matrix,load`       |
-  | `wle64.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x7  wd 6..0=0x07`      | `matrix,load`       |
-  | `wse8.v`  | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x0 ws3 6..0=0x27`      | `matrix,store`      |
-  | `wse16.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x5 ws3 6..0=0x27`      | `matrix,store`      |
-  | `wse32.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x6 ws3 6..0=0x27`      | `matrix,store`      |
-  | `wse64.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x7 ws3 6..0=0x27`      | `matrix,store`      |
-
-  : Matrix Unit-Stride Instructions (including segment part)
-
-* **Matrix Indexed-Unordered Instructions (including segment part)**
-
-  | **Name**     | **Opcode / Argument**                                  | **Class**      |
-  |:-------------|:-------------------------------------------------------|:---------------|
-  | `wluxei8.v`  | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x0  wd 6..0=0x07` | `matrix,load`  |
-  | `wluxei16.v` | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x5  wd 6..0=0x07` | `matrix,load`  |
-  | `wluxei32.v` | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x6  wd 6..0=0x07` | `matrix,load`  |
-  | `wluxei64.v` | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x7  wd 6..0=0x07` | `matrix,load`  |
-  | `wsuxei8.v`  | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x0 ws3 6..0=0x27` | `matrix,store` |
-  | `wsuxei16.v` | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x5 ws3 6..0=0x27` | `matrix,store` |
-  | `wsuxei32.v` | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x6 ws3 6..0=0x27` | `matrix,store` |
-  | `wsuxei64.v` | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x7 ws3 6..0=0x27` | `matrix,store` |
-
-  : Matrix Indexed-Unordered Instructions (including segment part)
-
-* **Matrix Strided Instructions (including segment part)**
-
-  | **Name**   | **Opcode / Argument**                                  | **Class**      |
-  |:-----------|:-------------------------------------------------------|:---------------|
-  | `wlse8.v`  | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x0  wd 6..0=0x07` | `matrix,load`  |
-  | `wlse16.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x5  wd 6..0=0x07` | `matrix,load`  |
-  | `wlse32.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x6  wd 6..0=0x07` | `matrix,load`  |
-  | `wlse64.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x7  wd 6..0=0x07` | `matrix,load`  |
-  | `wsse8.v`  | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x0 ws3 6..0=0x27` | `matrix,store` |
-  | `wsse16.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x5 ws3 6..0=0x27` | `matrix,store` |
-  | `wsse32.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x6 ws3 6..0=0x27` | `matrix,store` |
-  | `wsse64.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x7 ws3 6..0=0x27` | `matrix,store` |
-
-  : Matrix Strided Instructions (including segment part)
-
-* **Matrix Indexed-Ordered Instructions (including segment part)**
-
-  | **Name**     | **Opcode / Argument**                                  | **Class**      |
-  |:-------------|:-------------------------------------------------------|:---------------|
-  | `wloxei8.v`  | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x0  wd 6..0=0x07` | `matrix,load`  |
-  | `wloxei16.v` | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x5  wd 6..0=0x07` | `matrix,load`  |
-  | `wloxei32.v` | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x6  wd 6..0=0x07` | `matrix,load`  |
-  | `wloxei64.v` | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x7  wd 6..0=0x07` | `matrix,load`  |
-  | `wsoxei8.v`  | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x0 ws3 6..0=0x27` | `matrix,store` |
-  | `wsoxei16.v` | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x5 ws3 6..0=0x27` | `matrix,store` |
-  | `wsoxei32.v` | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x6 ws3 6..0=0x27` | `matrix,store` |
-  | `wsoxei64.v` | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x7 ws3 6..0=0x27` | `matrix,store` |
-
-  : Matrix Indexed-Ordered Instructions (including segment part)
-
-* **Unit-stride Fault-Only-First Loads**
-
-  | **Name**    | **Opcode / Argument**                                          | **Class**                      |
-  |:------------|:---------------------------------------------------------------|:-------------------------------|
-  | `wle8ff.v`  | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x0  wd 6..0=0x07` | `matrix,load,fault-only-first` |
-  | `wle16ff.v` | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x5  wd 6..0=0x07` | `matrix,load,fault-only-first` |
-  | `wle32ff.v` | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x6  wd 6..0=0x07` | `matrix,load,fault-only-first` |
-  | `wle64ff.v` | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x7  wd 6..0=0x07` | `matrix,load,fault-only-first` |
-
-  : Unit-stride Fault-Only-First Loads
-
-* **Matrix Load/Store Whole Registers**
-
-  | **Name**    | **Opcode / Argument**                                                  | **Class**                     |
-  |:------------|:-----------------------------------------------------------------------|:------------------------------|
-  | `wl1re8.v`  | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl1re16.v` | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl1re32.v` | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl1re64.v` | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl2re8.v`  | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl2re16.v` | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl2re32.v` | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl2re64.v` | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl4re8.v`  | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl4re16.v` | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl4re32.v` | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl4re64.v` | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl8re8.v`  | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl8re16.v` | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl8re32.v` | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `wl8re64.v` | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 wd  6..0=0x07` | `matrix,load,whole-register`  |
-  | `ws1r.v`    | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 ws3 6..0=0x27` | `matrix,store,whole-register` |
-  | `ws2r.v`    | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 ws3 6..0=0x27` | `matrix,store,whole-register` |
-  | `ws4r.v`    | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 ws3 6..0=0x27` | `matrix,store,whole-register` |
-  | `ws8r.v`    | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 ws3 6..0=0x27` | `matrix,store,whole-register` |
-
-  : Matrix Load/Store Whole Registers
-
-**Matrix Float-Point Instructions**
-
-* **OPFWF**
-
-  | **Name**          | **Opcode / Argument**                                   | **Class**                       |
-  |:------------------|:--------------------------------------------------------|:--------------------------------|
-  | `wfadd.vf`        | `31..26=0x00 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,alu,floating-point`     |
-  | `wfsub.vf`        | `31..26=0x02 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,alu,floating-point`     |
-  | `wfmin.vf`        | `31..26=0x04 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,alu,floating-point`     |
-  | `wfmax.vf`        | `31..26=0x06 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,alu,floating-point`     |
-  | `wfsgnj.vf`       | `31..26=0x08 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,logical,floating-point` |
-  | `wfsgnjn.vf`      | `31..26=0x09 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,logical,floating-point` |
-  | `wfsgnjx.vf`      | `31..26=0x0a vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,logical,floating-point` |
-  | `wfslide1up.vf`   | `31..26=0x0e vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,permute,floating-point` |
-  | `wfslide1down.vf` | `31..26=0x0f vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,permute,floating-point` |
-  | `wfmv.s.f`        | `31..26=0x10 25=1 24..20=0 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,move,floating-point`    |
-
-  : OPFWF I
-
-  | **Name**      | **Opcode / Argument**                                   | **Class**                            |
-  |:--------------|:--------------------------------------------------------|:-------------------------------------|
-  | `wfmerge.vfm` | `31..26=0x17 25=0 ws2 rs1 14..12=0x5 wd 6..0=0x57`      | `matrix,merge,floating-point`        |
-  | `wfmv.v.f`    | `31..26=0x17 25=1 24..20=0 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,move,floating-point`         |
-  | `wmfeq.vf`    | `31..26=0x18 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,compare,floating-point,mask` |
-  | `wmfle.vf`    | `31..26=0x19 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,compare,floating-point,mask` |
-  | `wmflt.vf`    | `31..26=0x1b vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,compare,floating-point,mask` |
-  | `wmfne.vf`    | `31..26=0x1c vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,compare,floating-point,mask` |
-  | `wmfgt.vf`    | `31..26=0x1d vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,compare,floating-point,mask` |
-  | `wmfge.vf`    | `31..26=0x1f vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `matrix,compare,floating-point,mask` |
-
-  : OPFWF II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                        |
-  |:-------------|:-------------------------------------------------|:---------------------------------|
-  | `wfdiv.vf`   | `31..26=0x20 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,alu,floating-point`      |
-  | `wfrdiv.vf`  | `31..26=0x21 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,alu,floating-point`      |
-  | `wfmul.vf`   | `31..26=0x24 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,alu,floating-point`      |
-  | `wfrsub.vf`  | `31..26=0x27 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,alu,floating-point`      |
-  | `wfmadd.vf`  | `31..26=0x28 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfnmadd.vf` | `31..26=0x29 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfmsub.vf`  | `31..26=0x2a vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfnmsub.vf` | `31..26=0x2b vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfmacc.vf`  | `31..26=0x2c vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfnmacc.vf` | `31..26=0x2d vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfmsac.vf`  | `31..26=0x2e vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfnmsac.vf` | `31..26=0x2f vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-
-  : OPFWF III
-
-  | **Name**      | **Opcode / Argument**                            | **Class**                        |
-  |:--------------|:-------------------------------------------------|:---------------------------------|
-  | `wfwadd.vf`   | `31..26=0x30 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,alu,floating-point`      |
-  | `wfwsub.vf`   | `31..26=0x32 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,alu,floating-point`      |
-  | `wfwadd.wf`   | `31..26=0x34 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,alu,floating-point`      |
-  | `wfwsub.wf`   | `31..26=0x36 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,alu,floating-point`      |
-  | `wfwmul.vf`   | `31..26=0x38 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,alu,floating-point`      |
-  | `wfwmacc.vf`  | `31..26=0x3c vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfwnmacc.vf` | `31..26=0x3d vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfwmsac.vf`  | `31..26=0x3e vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfwnmsac.vf` | `31..26=0x3f vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-
-  : OPFWF IV
-
-* **OPFWW**
-
-  | **Name**       | **Opcode / Argument**                                   | **Class**                         |
-  |:---------------|:--------------------------------------------------------|:----------------------------------|
-  | `wfadd.vv`     | `31..26=0x00 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `matrix,alu,floating-point`       |
-  | `wfredusum.ws` | `31..26=0x01 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `matrix,reduction,floating-point` |
-  | `wfsub.vv`     | `31..26=0x02 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `matrix,alu,floating-point`       |
-  | `wfredosum.ws` | `31..26=0x03 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `matrix,reduction,floating-point` |
-  | `wfmin.vv`     | `31..26=0x04 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `matrix,alu,floating-point`       |
-  | `wfredmin.ws`  | `31..26=0x05 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `matrix,reduction,floating-point` |
-  | `wfmax.vv`     | `31..26=0x06 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `matrix,alu,floating-point`       |
-  | `wfredmax.ws`  | `31..26=0x07 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `matrix,reduction,floating-point` |
-  | `wfsgnj.vv`    | `31..26=0x08 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `matrix,logical,floating-point`   |
-  | `wfsgnjn.vv`   | `31..26=0x09 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `matrix,logical,floating-point`   |
-  | `wfsgnjx.vv`   | `31..26=0x0a vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `matrix,logical,floating-point`   |
-  | `wfmv.f.s`     | `31..26=0x10 25=1 ws2 19..15=0 14..12=0x1 rd 6..0=0x57` | `matrix,move,floating-point`      |
-
-  : OPFWW I
-
-  | **Name**   | **Opcode / Argument**                            | **Class**                            |
-  |:-----------|:-------------------------------------------------|:-------------------------------------|
-  | `wmfeq.vv` | `31..26=0x18 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,compare,floating-point,mask` |
-  | `wmfle.vv` | `31..26=0x19 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,compare,floating-point,mask` |
-  | `wmflt.vv` | `31..26=0x1b vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,compare,floating-point,mask` |
-  | `wmfne.vv` | `31..26=0x1c vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,compare,floating-point,mask` |
-
-  : OPFWW II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                        |
-  |:-------------|:-------------------------------------------------|:---------------------------------|
-  | `wfdiv.vv`   | `31..26=0x20 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,alu,floating-point`      |
-  | `wfmul.vv`   | `31..26=0x24 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,alu,floating-point`      |
-  | `wfmadd.vv`  | `31..26=0x28 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfnmadd.vv` | `31..26=0x29 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfmsub.vv`  | `31..26=0x2a vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfnmsub.vv` | `31..26=0x2b vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfmacc.vv`  | `31..26=0x2c vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfnmacc.vv` | `31..26=0x2d vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfmsac.vv`  | `31..26=0x2e vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-  | `wfnmsac.vv` | `31..26=0x2f vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,multiply,floating-point` |
-
-  : OPFWW III
-
-  | **Name**           | **Opcode / Argument**                                    | **Class**                       |
-  |:-------------------|:---------------------------------------------------------|:--------------------------------|
-  | `wfcvt.xu.f.v`     | `31..26=0x12 vm ws2 19..15=0x00 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfcvt.x.f.v`      | `31..26=0x12 vm ws2 19..15=0x01 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfcvt.f.xu.v`     | `31..26=0x12 vm ws2 19..15=0x02 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfcvt.f.x.v`      | `31..26=0x12 vm ws2 19..15=0x03 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfcvt.rtz.xu.f.v` | `31..26=0x12 vm ws2 19..15=0x06 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfcvt.rtz.x.f.v`  | `31..26=0x12 vm ws2 19..15=0x07 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-
-  : OPFWW IV
-
-  | **Name**            | **Opcode / Argument**                                    | **Class**                       |
-  |:--------------------|:---------------------------------------------------------|:--------------------------------|
-  | `wfwcvt.xu.f.v`     | `31..26=0x12 vm ws2 19..15=0x08 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfwcvt.x.f.v`      | `31..26=0x12 vm ws2 19..15=0x09 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfwcvt.f.xu.v`     | `31..26=0x12 vm ws2 19..15=0x0A 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfwcvt.f.x.v`      | `31..26=0x12 vm ws2 19..15=0x0B 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfwcvt.f.f.v`      | `31..26=0x12 vm ws2 19..15=0x0C 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfwcvt.rtz.xu.f.v` | `31..26=0x12 vm ws2 19..15=0x0E 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfwcvt.rtz.x.f.v`  | `31..26=0x12 vm ws2 19..15=0x0F 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-
-  : OPFWW V
-
-  | **Name**            | **Opcode / Argument**                                    | **Class**                       |
-  |:--------------------|:---------------------------------------------------------|:--------------------------------|
-  | `wfncvt.xu.f.w`     | `31..26=0x12 vm ws2 19..15=0x10 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfncvt.x.f.w`      | `31..26=0x12 vm ws2 19..15=0x11 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfncvt.f.xu.w`     | `31..26=0x12 vm ws2 19..15=0x12 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfncvt.f.x.w`      | `31..26=0x12 vm ws2 19..15=0x13 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfncvt.f.f.w`      | `31..26=0x12 vm ws2 19..15=0x14 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfncvt.rod.f.f.w`  | `31..26=0x12 vm ws2 19..15=0x15 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfncvt.rtz.xu.f.w` | `31..26=0x12 vm ws2 19..15=0x16 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-  | `wfncvt.rtz.x.f.w`  | `31..26=0x12 vm ws2 19..15=0x17 14..12=0x1 wd 6..0=0x57` | `matrix,convert,floating-point` |
-
-  : OPFWW VI
-
-  | **Name**     | **Opcode / Argument**                                    | **Class**                        |
-  |:-------------|:---------------------------------------------------------|:---------------------------------|
-  | `wfsqrt.v`   | `31..26=0x13 vm ws2 19..15=0x00 14..12=0x1 wd 6..0=0x57` | `matrix,alu,floating-point`      |
-  | `wfrsqrt7.v` | `31..26=0x13 vm ws2 19..15=0x04 14..12=0x1 wd 6..0=0x57` | `matrix,alu,floating-point`      |
-  | `wfrec7.v`   | `31..26=0x13 vm ws2 19..15=0x05 14..12=0x1 wd 6..0=0x57` | `matrix,alu,floating-point`      |
-  | `wfclass.v`  | `31..26=0x13 vm ws2 19..15=0x10 14..12=0x1 wd 6..0=0x57` | `matrix,classify,floating-point` |
-
-  : OPFWW VII
-
-  | **Name**        | **Opcode / Argument**                            | **Class**                         |
-  |:----------------|:-------------------------------------------------|:----------------------------------|
-  | `wfwadd.vv`     | `31..26=0x30 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,alu,floating-point`       |
-  | `wfwredusum.ws` | `31..26=0x31 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,reduction,floating-point` |
-  | `wfwsub.vv`     | `31..26=0x32 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,alu,floating-point`       |
-  | `wfwredosum.ws` | `31..26=0x33 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,reduction,floating-point` |
-  | `wfwadd.wv`     | `31..26=0x34 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,alu,floating-point`       |
-  | `wfwsub.wv`     | `31..26=0x36 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,alu,floating-point`       |
-  | `wfwmul.vv`     | `31..26=0x38 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,alu,floating-point`       |
-  | `wfwmacc.vv`    | `31..26=0x3c vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,multiply,floating-point`  |
-  | `wfwnmacc.vv`   | `31..26=0x3d vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,multiply,floating-point`  |
-  | `wfwmsac.vv`    | `31..26=0x3e vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,multiply,floating-point`  |
-  | `wfwnmsac.vv`   | `31..26=0x3f vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `matrix,multiply,floating-point`  |
-
-  : OPFWW VIII
-
-**Matrix Integer Instructions**
-
-* **OPIWX**
-
-  | **Name**        | **Opcode / Argument**                            | **Class**            |
-  |:----------------|:-------------------------------------------------|:---------------------|
-  | `wadd.vx`       | `31..26=0x00 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wsub.vx`       | `31..26=0x02 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wrsub.vx`      | `31..26=0x03 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wminu.vx`      | `31..26=0x04 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wmin.vx`       | `31..26=0x05 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wmaxu.vx`      | `31..26=0x06 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wmax.vx`       | `31..26=0x07 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wand.vx`       | `31..26=0x09 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wor.vx`        | `31..26=0x0a vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wxor.vx`       | `31..26=0x0b vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wrgather.vx`   | `31..26=0x0c vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,permute`     |
-  | `wslideup.vx`   | `31..26=0x0e vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,permute`     |
-  | `wslidedown.vx` | `31..26=0x0f vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,permute`     |
-
-  : OPIWX I
-
-  | **Name**     | **Opcode / Argument**                                   | **Class**                     |
-  |:-------------|:--------------------------------------------------------|:------------------------------|
-  | `wadc.vxm`   | `31..26=0x10 25=0 ws2 rs1 14..12=0x4 wd 6..0=0x57`      | `matrix,alu,integer`          |
-  | `wmadc.vxm`  | `31..26=0x11 25=0 ws2 rs1 14..12=0x4 wd 6..0=0x57`      | `matrix,alu,integer,mask`     |
-  | `wmadc.vx`   | `31..26=0x11 25=1 ws2 rs1 14..12=0x4 wd 6..0=0x57`      | `matrix,alu,integer,mask`     |
-  | `wsbc.vxm`   | `31..26=0x12 25=0 ws2 rs1 14..12=0x4 wd 6..0=0x57`      | `matrix,alu,integer`          |
-  | `wmsbc.vxm`  | `31..26=0x13 25=0 ws2 rs1 14..12=0x4 wd 6..0=0x57`      | `matrix,alu,integer,mask`     |
-  | `wmsbc.vx`   | `31..26=0x13 25=1 ws2 rs1 14..12=0x4 wd 6..0=0x57`      | `matrix,alu,integer,mask`     |
-  | `wmerge.vxm` | `31..26=0x17 25=0 ws2 rs1 14..12=0x4 wd 6..0=0x57`      | `matrix,merge,integer`        |
-  | `wmv.v.x`    | `31..26=0x17 25=1 24..20=0 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,move,integer`         |
-  | `wmseq.vx`   | `31..26=0x18 vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsne.vx`   | `31..26=0x19 vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsltu.vx`  | `31..26=0x1a vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmslt.vx`   | `31..26=0x1b vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsleu.vx`  | `31..26=0x1c vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsle.vx`   | `31..26=0x1d vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsgtu.vx`  | `31..26=0x1e vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsgt.vx`   | `31..26=0x1f vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-
-  : OPIWX II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                |
-  |:-------------|:-------------------------------------------------|:-------------------------|
-  | `wsaddu.vx`  | `31..26=0x20 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wsadd.vx`   | `31..26=0x21 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wssubu.vx`  | `31..26=0x22 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wssub.vx`   | `31..26=0x23 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wsll.vx`    | `31..26=0x25 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer`     |
-  | `wsmul.vx`   | `31..26=0x27 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wsrl.vx`    | `31..26=0x28 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer`     |
-  | `wsra.vx`    | `31..26=0x29 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer`     |
-  | `wssrl.vx`   | `31..26=0x2a vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wssra.vx`   | `31..26=0x2b vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wnsrl.wx`   | `31..26=0x2c vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer`     |
-  | `wnsra.wx`   | `31..26=0x2d vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,integer`     |
-  | `wnclipu.wx` | `31..26=0x2e vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wnclip.wx`  | `31..26=0x2f vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-
-  : OPIWX III
-
-* **OPIWW**
-
-  | **Name**          | **Opcode / Argument**                            | **Class**            |
-  |:------------------|:-------------------------------------------------|:---------------------|
-  | `wadd.vv`         | `31..26=0x00 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wsub.vv`         | `31..26=0x02 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wminu.vv`        | `31..26=0x04 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wmin.vv`         | `31..26=0x05 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wmaxu.vv`        | `31..26=0x06 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wmax.vv`         | `31..26=0x07 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wand.vv`         | `31..26=0x09 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wor.vv`          | `31..26=0x0a vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wxor.vv`         | `31..26=0x0b vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wrgather.vv`     | `31..26=0x0c vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,permute`     |
-  | `wrgatherei16.vv` | `31..26=0x0e vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,permute`     |
-
-  : OPIWW I
-
-  | **Name**     | **Opcode / Argument**                                   | **Class**                     |
-  |:-------------|:--------------------------------------------------------|:------------------------------|
-  | `wadc.vvm`   | `31..26=0x10 25=0 ws2 ws1 14..12=0x0 wd 6..0=0x57`      | `matrix,alu,integer`          |
-  | `wmadc.vvm`  | `31..26=0x11 25=0 ws2 ws1 14..12=0x0 wd 6..0=0x57`      | `matrix,alu,integer,mask`     |
-  | `wmadc.vv`   | `31..26=0x11 25=1 ws2 ws1 14..12=0x0 wd 6..0=0x57`      | `matrix,alu,integer,mask`     |
-  | `wsbc.vvm`   | `31..26=0x12 25=0 ws2 ws1 14..12=0x0 wd 6..0=0x57`      | `matrix,alu,integer`          |
-  | `wmsbc.vvm`  | `31..26=0x13 25=0 ws2 ws1 14..12=0x0 wd 6..0=0x57`      | `matrix,alu,integer,mask`     |
-  | `wmsbc.vv`   | `31..26=0x13 25=1 ws2 ws1 14..12=0x0 wd 6..0=0x57`      | `matrix,alu,integer,mask`     |
-  | `wmerge.vvm` | `31..26=0x17 25=0 ws2 ws1 14..12=0x0 wd 6..0=0x57`      | `matrix,merge,integer`        |
-  | `wmv.v.v`    | `31..26=0x17 25=1 24..20=0 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,move,integer`         |
-  | `wmseq.vv`   | `31..26=0x18 vm ws2 ws1 14..12=0x0 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsne.vv`   | `31..26=0x19 vm ws2 ws1 14..12=0x0 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsltu.vv`  | `31..26=0x1a vm ws2 ws1 14..12=0x0 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmslt.vv`   | `31..26=0x1b vm ws2 ws1 14..12=0x0 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsleu.vv`  | `31..26=0x1c vm ws2 ws1 14..12=0x0 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsle.vv`   | `31..26=0x1d vm ws2 ws1 14..12=0x0 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-
-  : OPIWW II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                |
-  |:-------------|:-------------------------------------------------|:-------------------------|
-  | `wsaddu.vv`  | `31..26=0x20 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wsadd.vv`   | `31..26=0x21 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wssubu.vv`  | `31..26=0x22 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wssub.vv`   | `31..26=0x23 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wsll.vv`    | `31..26=0x25 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,integer`     |
-  | `wsmul.vv`   | `31..26=0x27 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wsrl.vv`    | `31..26=0x28 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,integer`     |
-  | `wsra.vv`    | `31..26=0x29 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,integer`     |
-  | `wssrl.vv`   | `31..26=0x2a vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wssra.vv`   | `31..26=0x2b vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wnsrl.wv`   | `31..26=0x2c vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,integer`     |
-  | `wnsra.wv`   | `31..26=0x2d vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,integer`     |
-  | `wnclipu.wv` | `31..26=0x2e vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wnclip.wv`  | `31..26=0x2f vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-
-  : OPIWW III
-
-  | **Name**       | **Opcode / Argument**                            | **Class**                  |
-  |:---------------|:-------------------------------------------------|:---------------------------|
-  | `wwredsumu.ws` | `31..26=0x30 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,reduction,integer` |
-  | `wwredsum.ws`  | `31..26=0x31 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `matrix,reduction,integer` |
-
-  : OPIWW IV
-
-* **OPIWI**
-
-  | **Name**        | **Opcode / Argument**                              | **Class**            |
-  |:----------------|:---------------------------------------------------|:---------------------|
-  | `wadd.vi`       | `31..26=0x00 vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wrsub.vi`      | `31..26=0x03 vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wand.vi`       | `31..26=0x09 vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wor.vi`        | `31..26=0x0a vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wxor.vi`       | `31..26=0x0b vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wrgather.vi`   | `31..26=0x0c vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `matrix,permute`     |
-  | `wslideup.vi`   | `31..26=0x0e vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `matrix,permute`     |
-  | `wslidedown.vi` | `31..26=0x0f vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `matrix,permute`     |
-
-  : OPIWI I
-
-  | **Name**     | **Opcode / Argument**                                     | **Class**                     |
-  |:-------------|:----------------------------------------------------------|:------------------------------|
-  | `wadc.vim`   | `31..26=0x10 25=0 ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,alu,integer`          |
-  | `wmadc.vim`  | `31..26=0x11 25=0 ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,alu,integer,mask`     |
-  | `wmadc.vi`   | `31..26=0x11 25=1 ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,alu,integer,mask`     |
-  | `wmerge.vim` | `31..26=0x17 25=0 ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,merge,integer`        |
-  | `wmv.v.i`    | `31..26=0x17 25=1 24..20=0 simm5 14..12=0x3 wd 6..0=0x57` | `matrix,move,integer`         |
-  | `wmseq.vi`   | `31..26=0x18 vm ws2 simm5 14..12=0x3 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsne.vi`   | `31..26=0x19 vm ws2 simm5 14..12=0x3 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsleu.vi`  | `31..26=0x1c vm ws2 simm5 14..12=0x3 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsle.vi`   | `31..26=0x1d vm ws2 simm5 14..12=0x3 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsgtu.vi`  | `31..26=0x1e vm ws2 simm5 14..12=0x3 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-  | `wmsgt.vi`   | `31..26=0x1f vm ws2 simm5 14..12=0x3 wd 6..0=0x57`        | `matrix,compare,integer,mask` |
-
-  : OPIWI II
-
-  | **Name**     | **Opcode / Argument**                                   | **Class**                    |
-  |:-------------|:--------------------------------------------------------|:-----------------------------|
-  | `wsaddu.vi`  | `31..26=0x20 vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,alu,fixed-point`     |
-  | `wsadd.vi`   | `31..26=0x21 vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,alu,fixed-point`     |
-  | `wsll.vi`    | `31..26=0x25 vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,alu,integer`         |
-  | `wmv1r.v`    | `31..26=0x27 25=1 ws2 19..15=0 14..12=0x3 wd 6..0=0x57` | `matrix,move,whole-register` |
-  | `wmv2r.v`    | `31..26=0x27 25=1 ws2 19..15=1 14..12=0x3 wd 6..0=0x57` | `matrix,move,whole-register` |
-  | `wmv4r.v`    | `31..26=0x27 25=1 ws2 19..15=3 14..12=0x3 wd 6..0=0x57` | `matrix,move,whole-register` |
-  | `wmv8r.v`    | `31..26=0x27 25=1 ws2 19..15=7 14..12=0x3 wd 6..0=0x57` | `matrix,move,whole-register` |
-  | `wsrl.vi`    | `31..26=0x28 vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,alu,integer`         |
-  | `wsra.vi`    | `31..26=0x29 vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,alu,integer`         |
-  | `wssrl.vi`   | `31..26=0x2a vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,alu,fixed-point`     |
-  | `wssra.vi`   | `31..26=0x2b vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,alu,fixed-point`     |
-  | `wnsrl.wi`   | `31..26=0x2c vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,alu,integer`         |
-  | `wnsra.wi`   | `31..26=0x2d vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,alu,integer`         |
-  | `wnclipu.wi` | `31..26=0x2e vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,alu,fixed-point`     |
-  | `wnclip.wi`  | `31..26=0x2f vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `matrix,alu,fixed-point`     |
-
-  : OPIWI III
-
-* **OPI (Matrix Integer Extension Instructions)**
-
-  | **Name**    | **Opcode / Argument**                                 | **Class**            |
-  |:------------|:------------------------------------------------------|:---------------------|
-  | `wzext.vf8` | `31..26=0x12 vm ws2 19..15=2 14..12=0x2 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wsext.vf8` | `31..26=0x12 vm ws2 19..15=3 14..12=0x2 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wzext.vf4` | `31..26=0x12 vm ws2 19..15=4 14..12=0x2 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wsext.vf4` | `31..26=0x12 vm ws2 19..15=5 14..12=0x2 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wzext.vf2` | `31..26=0x12 vm ws2 19..15=6 14..12=0x2 wd 6..0=0x57` | `matrix,alu,integer` |
-  | `wsext.vf2` | `31..26=0x12 vm ws2 19..15=7 14..12=0x2 wd 6..0=0x57` | `matrix,alu,integer` |
-
-  : Matrix Integer Extension Instructions I
-
-  | **Name**       | **Opcode / Argument**                              | **Class**                 |
-  |:---------------|:---------------------------------------------------|:--------------------------|
-  | `wcompress.vm` | `31..26=0x17 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,permute,compress` |
-  | `wmandn.mm`    | `31..26=0x18 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,logical,mask`     |
-  | `wmand.mm`     | `31..26=0x19 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,logical,mask`     |
-  | `wmor.mm`      | `31..26=0x1a 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,logical,mask`     |
-  | `wmxor.mm`     | `31..26=0x1b 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,logical,mask`     |
-  | `wmorn.mm`     | `31..26=0x1c 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,logical,mask`     |
-  | `wmnand.mm`    | `31..26=0x1d 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,logical,mask`     |
-  | `wmnor.mm`     | `31..26=0x1e 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,logical,mask`     |
-  | `wmxnor.mm`    | `31..26=0x1f 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,logical,mask`     |
-
-  : Matrix Integer Extension Instructions II
-
-  | **Name**   | **Opcode / Argument**                                         | **Class**            |
-  |:-----------|:--------------------------------------------------------------|:---------------------|
-  | `wmsbf.m`  | `31..26=0x14 vm ws2 19..15=0x01 14..12=0x2 wd 6..0=0x57`      | `matrix,mask,prefix` |
-  | `wmsof.m`  | `31..26=0x14 vm ws2 19..15=0x02 14..12=0x2 wd 6..0=0x57`      | `matrix,mask,prefix` |
-  | `wmsif.m`  | `31..26=0x14 vm ws2 19..15=0x03 14..12=0x2 wd 6..0=0x57`      | `matrix,mask,prefix` |
-  | `wiota.m`  | `31..26=0x14 vm ws2 19..15=0x10 14..12=0x2 wd 6..0=0x57`      | `matrix,mask,prefix` |
-  | `wid.v`    | `31..26=0x14 vm 24..20=0 19..15=0x11 14..12=0x2 wd 6..0=0x57` | `matrix,index`       |
-  | `wcpop.m`  | `31..26=0x10 vm ws2 19..15=0x10 14..12=0x2 rd 6..0=0x57`      | `matrix,mask,count`  |
-  | `wfirst.m` | `31..26=0x10 vm ws2 19..15=0x11 14..12=0x2 rd 6..0=0x57`      | `matrix,mask,search` |
-
-  : Matrix Integer Extension Instructions III
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                 |
-  |:-------------|:-------------------------------------------------|:--------------------------|
-  | `wdivu.vv`   | `31..26=0x20 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,divide,integer`   |
-  | `wdiv.vv`    | `31..26=0x21 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,divide,integer`   |
-  | `wremu.vv`   | `31..26=0x22 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,divide,integer`   |
-  | `wrem.vv`    | `31..26=0x23 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,divide,integer`   |
-  | `wmulhu.vv`  | `31..26=0x24 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wmul.vv`    | `31..26=0x25 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wmulhsu.vv` | `31..26=0x26 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wmulh.vv`   | `31..26=0x27 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wmadd.vv`   | `31..26=0x29 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wnmsub.vv`  | `31..26=0x2b vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wmacc.vv`   | `31..26=0x2d vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wnmsac.vv`  | `31..26=0x2f vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,multiply,integer` |
-
-  : Matrix Integer Extension Instructions IV
-
-  | **Name**      | **Opcode / Argument**                            | **Class**                 |
-  |:--------------|:-------------------------------------------------|:--------------------------|
-  | `wwaddu.vv`   | `31..26=0x30 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwadd.vv`    | `31..26=0x31 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwsubu.vv`   | `31..26=0x32 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwsub.vv`    | `31..26=0x33 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwaddu.wv`   | `31..26=0x34 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwadd.wv`    | `31..26=0x35 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwsubu.wv`   | `31..26=0x36 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwsub.wv`    | `31..26=0x37 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwmulu.vv`   | `31..26=0x38 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wwmulsu.vv`  | `31..26=0x3a vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wwmul.vv`    | `31..26=0x3b vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wwmaccu.vv`  | `31..26=0x3c vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wwmacc.vv`   | `31..26=0x3d vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wwmaccsu.vv` | `31..26=0x3f vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,multiply,integer` |
-
-  : Matrix Integer Extension Instructions V
-
-**Matrix Mask Instructions**
-
-* **OPMWW**
-
-  | **Name**      | **Opcode / Argument**                            | **Class**                  |
-  |:--------------|:-------------------------------------------------|:---------------------------|
-  | `wredsum.ws`  | `31..26=0x00 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,reduction,integer` |
-  | `wredand.ws`  | `31..26=0x01 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,reduction,integer` |
-  | `wredor.ws`   | `31..26=0x02 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,reduction,integer` |
-  | `wredxor.ws`  | `31..26=0x03 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,reduction,integer` |
-  | `wredminu.ws` | `31..26=0x04 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,reduction,integer` |
-  | `wredmin.ws`  | `31..26=0x05 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,reduction,integer` |
-  | `wredmaxu.ws` | `31..26=0x06 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,reduction,integer` |
-  | `wredmax.ws`  | `31..26=0x07 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,reduction,integer` |
-  | `waaddu.vv`   | `31..26=0x08 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,alu,fixed-point`   |
-  | `waadd.vv`    | `31..26=0x09 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,alu,fixed-point`   |
-  | `wasubu.vv`   | `31..26=0x0a vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,alu,fixed-point`   |
-  | `wasub.vv`    | `31..26=0x0b vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `matrix,alu,fixed-point`   |
-
-  : OPMWW I
-
-  | **Name**  | **Opcode / Argument**                                   | **Class**             |
-  |:----------|:--------------------------------------------------------|:----------------------|
-  | `wmv.x.s` | `31..26=0x10 25=1 ws2 19..15=0 14..12=0x2 rd 6..0=0x57` | `matrix,move,integer` |
-
-  : OPMWW II
-
-* **OPMWX**
-
-  | **Name**    | **Opcode / Argument**                            | **Class**                |
-  |:------------|:-------------------------------------------------|:-------------------------|
-  | `waaddu.vx` | `31..26=0x08 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `waadd.vx`  | `31..26=0x09 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wasubu.vx` | `31..26=0x0a vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-  | `wasub.vx`  | `31..26=0x0b vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,alu,fixed-point` |
-
-  : OPMWX I
-
-  | **Name**         | **Opcode / Argument**                                   | **Class**             |
-  |:-----------------|:--------------------------------------------------------|:----------------------|
-  | `wmv.s.x`        | `31..26=0x10 25=1 24..20=0 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,move,integer` |
-  | `wslide1up.vx`   | `31..26=0x0e vm ws2 rs1 14..12=0x6 wd 6..0=0x57`        | `matrix,permute`      |
-  | `wslide1down.vx` | `31..26=0x0f vm ws2 rs1 14..12=0x6 wd 6..0=0x57`        | `matrix,permute`      |
-
-  : OPMWX II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                 |
-  |:-------------|:-------------------------------------------------|:--------------------------|
-  | `wdivu.vx`   | `31..26=0x20 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,divide,integer`   |
-  | `wdiv.vx`    | `31..26=0x21 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,divide,integer`   |
-  | `wremu.vx`   | `31..26=0x22 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,divide,integer`   |
-  | `wrem.vx`    | `31..26=0x23 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,divide,integer`   |
-  | `wmulhu.vx`  | `31..26=0x24 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wmul.vx`    | `31..26=0x25 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wmulhsu.vx` | `31..26=0x26 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wmulh.vx`   | `31..26=0x27 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wmadd.vx`   | `31..26=0x29 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wnmsub.vx`  | `31..26=0x2b vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wmacc.vx`   | `31..26=0x2d vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wnmsac.vx`  | `31..26=0x2f vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-
-  : OPMWX III
-
-  | **Name**      | **Opcode / Argument**                            | **Class**                 |
-  |:--------------|:-------------------------------------------------|:--------------------------|
-  | `wwaddu.vx`   | `31..26=0x30 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwadd.vx`    | `31..26=0x31 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwsubu.vx`   | `31..26=0x32 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwsub.vx`    | `31..26=0x33 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwaddu.wx`   | `31..26=0x34 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwadd.wx`    | `31..26=0x35 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwsubu.wx`   | `31..26=0x36 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwsub.wx`    | `31..26=0x37 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,alu,integer`      |
-  | `wwmulu.vx`   | `31..26=0x38 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wwmulsu.vx`  | `31..26=0x3a vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wwmul.vx`    | `31..26=0x3b vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wwmaccu.vx`  | `31..26=0x3c vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wwmacc.vx`   | `31..26=0x3d vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wwmaccus.vx` | `31..26=0x3e vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-  | `wwmaccsu.vx` | `31..26=0x3f vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `matrix,multiply,integer` |
-
-  : OPMWX IV
+| **Extension** | **Name**               | **Variable-Fields**  | **Class**                                 |
+|:--------------|:-----------------------|:---------------------|:------------------------------------------|
+| `rv_w`        | `waaddu_ww`            | `wm, ws2, ws1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `waaddu_wx`            | `wm, ws2, rs1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `waadd_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `waadd_wx`             | `wm, ws2, rs1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wadc_wim`             | `ws2, simm5, wd`     | `matrix, alu, integer`                    |
+| `rv_w`        | `wadc_wwm`             | `ws2, ws1, wd`       | `matrix, alu, integer`                    |
+| `rv_w`        | `wadc_wxm`             | `ws2, rs1, wd`       | `matrix, alu, integer`                    |
+| `rv_w`        | `wadd_wi`              | `wm, ws2, simm5, wd` | `matrix, alu, integer`                    |
+| `rv_w`        | `wadd_ww`              | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wadd_wx`              | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wand_wi`              | `wm, ws2, simm5, wd` | `matrix, alu, integer`                    |
+| `rv_w`        | `wand_ww`              | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wand_wx`              | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wasubu_ww`            | `wm, ws2, ws1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wasubu_wx`            | `wm, ws2, rs1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wasub_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wasub_wx`             | `wm, ws2, rs1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wcompress_wm`         | `ws2, ws1, wd`       | `matrix, permute, compress`               |
+| `rv_w`        | `wcpop_m`              | `wm, ws2, rd`        | `matrix, mask, count`                     |
+| `rv_w`        | `wdivu_ww`             | `wm, ws2, ws1, wd`   | `matrix, divide, integer`                 |
+| `rv_w`        | `wdivu_wx`             | `wm, ws2, rs1, wd`   | `matrix, divide, integer`                 |
+| `rv_w`        | `wdiv_ww`              | `wm, ws2, ws1, wd`   | `matrix, divide, integer`                 |
+| `rv_w`        | `wdiv_wx`              | `wm, ws2, rs1, wd`   | `matrix, divide, integer`                 |
+| `rv_w`        | `wfadd_wf`             | `wm, ws2, rs1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfadd_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfclass_w`            | `wm, ws2, wd`        | `matrix, classify, floating-point`        |
+| `rv_w`        | `wfcvt_f_xu_w`         | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfcvt_f_x_w`          | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfcvt_rtz_x_f_w`      | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfcvt_rtz_xu_f_w`     | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfcvt_x_f_w`          | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfcvt_xu_f_w`         | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfdiv_wf`             | `wm, ws2, rs1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfdiv_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfirst_m`             | `wm, ws2, rd`        | `matrix, mask, search`                    |
+| `rv_w`        | `wfmacc_wf`            | `wm, ws2, rs1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfmacc_ww`            | `wm, ws2, ws1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfmadd_wf`            | `wm, ws2, rs1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfmadd_ww`            | `wm, ws2, ws1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfmax_wf`             | `wm, ws2, rs1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfmax_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfmerge_wfm`          | `ws2, rs1, wd`       | `matrix, merge, floating-point`           |
+| `rv_w`        | `wfmin_wf`             | `wm, ws2, rs1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfmin_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfmsac_wf`            | `wm, ws2, rs1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfmsac_ww`            | `wm, ws2, ws1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfmsub_wf`            | `wm, ws2, rs1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfmsub_ww`            | `wm, ws2, ws1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfmul_wf`             | `wm, ws2, rs1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfmul_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfmv_f_s`             | `ws2, rd`            | `matrix, move, floating-point`            |
+| `rv_w`        | `wfmv_s_f`             | `rs1, wd`            | `matrix, move, floating-point`            |
+| `rv_w`        | `wfmv_w_f`             | `rs1, wd`            | `matrix, move, floating-point`            |
+| `rv_w`        | `wfncvt_f_f_wide`      | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfncvt_f_xu_wide`     | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfncvt_f_x_wide`      | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfncvt_rod_f_f_wide`  | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfncvt_rtz_x_f_wide`  | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfncvt_rtz_xu_f_wide` | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfncvt_x_f_wide`      | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfncvt_xu_f_wide`     | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfnmacc_wf`           | `wm, ws2, rs1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfnmacc_ww`           | `wm, ws2, ws1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfnmadd_wf`           | `wm, ws2, rs1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfnmadd_ww`           | `wm, ws2, ws1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfnmsac_wf`           | `wm, ws2, rs1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfnmsac_ww`           | `wm, ws2, ws1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfnmsub_wf`           | `wm, ws2, rs1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfnmsub_ww`           | `wm, ws2, ws1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfrdiv_wf`            | `wm, ws2, rs1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfrec7_w`             | `wm, ws2, wd`        | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfredmax_ws`          | `wm, ws2, ws1, wd`   | `matrix, reduction, floating-point`       |
+| `rv_w`        | `wfredmin_ws`          | `wm, ws2, ws1, wd`   | `matrix, reduction, floating-point`       |
+| `rv_w`        | `wfredosum_ws`         | `wm, ws2, ws1, wd`   | `matrix, reduction, floating-point`       |
+| `rv_w`        | `wfredusum_ws`         | `wm, ws2, ws1, wd`   | `matrix, reduction, floating-point`       |
+| `rv_w`        | `wfrsqrt7_w`           | `wm, ws2, wd`        | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfrsub_wf`            | `wm, ws2, rs1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfsgnjn_wf`           | `wm, ws2, rs1, wd`   | `matrix, logical, floating-point`         |
+| `rv_w`        | `wfsgnjn_ww`           | `wm, ws2, ws1, wd`   | `matrix, logical, floating-point`         |
+| `rv_w`        | `wfsgnj_wf`            | `wm, ws2, rs1, wd`   | `matrix, logical, floating-point`         |
+| `rv_w`        | `wfsgnj_ww`            | `wm, ws2, ws1, wd`   | `matrix, logical, floating-point`         |
+| `rv_w`        | `wfsgnjx_wf`           | `wm, ws2, rs1, wd`   | `matrix, logical, floating-point`         |
+| `rv_w`        | `wfsgnjx_ww`           | `wm, ws2, ws1, wd`   | `matrix, logical, floating-point`         |
+| `rv_w`        | `wfslide1down_wf`      | `wm, ws2, rs1, wd`   | `matrix, permute, floating-point`         |
+| `rv_w`        | `wfslide1up_wf`        | `wm, ws2, rs1, wd`   | `matrix, permute, floating-point`         |
+| `rv_w`        | `wfsqrt_w`             | `wm, ws2, wd`        | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfsub_wf`             | `wm, ws2, rs1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfsub_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfwadd_wf`            | `wm, ws2, rs1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfwadd_ww`            | `wm, ws2, ws1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfwadd_wide_wf`       | `wm, ws2, rs1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfwadd_wide_ww`       | `wm, ws2, ws1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfwcvt_f_f_w`         | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfwcvt_f_xu_w`        | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfwcvt_f_x_w`         | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfwcvt_rtz_x_f_w`     | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfwcvt_rtz_xu_f_w`    | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfwcvt_x_f_w`         | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfwcvt_xu_f_w`        | `wm, ws2, wd`        | `matrix, convert, floating-point`         |
+| `rv_w`        | `wfwmacc_wf`           | `wm, ws2, rs1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfwmacc_ww`           | `wm, ws2, ws1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfwmsac_wf`           | `wm, ws2, rs1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfwmsac_ww`           | `wm, ws2, ws1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfwmul_wf`            | `wm, ws2, rs1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfwmul_ww`            | `wm, ws2, ws1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfwnmacc_wf`          | `wm, ws2, rs1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfwnmacc_ww`          | `wm, ws2, ws1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfwnmsac_wf`          | `wm, ws2, rs1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfwnmsac_ww`          | `wm, ws2, ws1, wd`   | `matrix, multiply, floating-point`        |
+| `rv_w`        | `wfwredosum_ws`        | `wm, ws2, ws1, wd`   | `matrix, reduction, floating-point`       |
+| `rv_w`        | `wfwredusum_ws`        | `wm, ws2, ws1, wd`   | `matrix, reduction, floating-point`       |
+| `rv_w`        | `wfwsub_wf`            | `wm, ws2, rs1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfwsub_ww`            | `wm, ws2, ws1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfwsub_wide_wf`       | `wm, ws2, rs1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wfwsub_wide_ww`       | `wm, ws2, ws1, wd`   | `matrix, alu, floating-point`             |
+| `rv_w`        | `wid_w`                | `wm, wd`             | `matrix, index`                           |
+| `rv_w`        | `wiota_m`              | `wm, ws2, wd`        | `matrix, mask, prefix`                    |
+| `rv_w`        | `wl1re16_w`            | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl1re32_w`            | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl1re64_w`            | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl1re8_w`             | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl2re16_w`            | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl2re32_w`            | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl2re64_w`            | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl2re8_w`             | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl4re16_w`            | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl4re32_w`            | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl4re64_w`            | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl4re8_w`             | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl8re16_w`            | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl8re32_w`            | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl8re64_w`            | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wl8re8_w`             | `rs1, wd`            | `matrix, load, whole-register`            |
+| `rv_w`        | `wle16ff_w`            | `wm, rs1, wd`        | `matrix, load, fault-only-first`          |
+| `rv_w`        | `wle16_w`              | `wm, rs1, wd`        | `matrix, load`                            |
+| `rv_w`        | `wle32ff_w`            | `wm, rs1, wd`        | `matrix, load, fault-only-first`          |
+| `rv_w`        | `wle32_w`              | `wm, rs1, wd`        | `matrix, load`                            |
+| `rv_w`        | `wle64ff_w`            | `wm, rs1, wd`        | `matrix, load, fault-only-first`          |
+| `rv_w`        | `wle64_w`              | `wm, rs1, wd`        | `matrix, load`                            |
+| `rv_w`        | `wle8ff_w`             | `wm, rs1, wd`        | `matrix, load, fault-only-first`          |
+| `rv_w`        | `wle8_w`               | `wm, rs1, wd`        | `matrix, load`                            |
+| `rv_w`        | `wlm_w`                | `rs1, wd`            | `matrix, load, mask`                      |
+| `rv_w`        | `wloxei16_w`           | `wm, ws2, rs1, wd`   | `matrix, load`                            |
+| `rv_w`        | `wloxei32_w`           | `wm, ws2, rs1, wd`   | `matrix, load`                            |
+| `rv_w`        | `wloxei64_w`           | `wm, ws2, rs1, wd`   | `matrix, load`                            |
+| `rv_w`        | `wloxei8_w`            | `wm, ws2, rs1, wd`   | `matrix, load`                            |
+| `rv_w`        | `wloxseg2ei16_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg2ei32_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg2ei64_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg2ei8_w`        | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg3ei16_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg3ei32_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg3ei64_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg3ei8_w`        | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg4ei16_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg4ei32_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg4ei64_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg4ei8_w`        | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg5ei16_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg5ei32_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg5ei64_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg5ei8_w`        | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg6ei16_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg6ei32_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg6ei64_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg6ei8_w`        | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg7ei16_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg7ei32_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg7ei64_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg7ei8_w`        | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg8ei16_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg8ei32_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg8ei64_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wloxseg8ei8_w`        | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlse16_w`             | `wm, rs2, rs1, wd`   | `matrix, load`                            |
+| `rv_w`        | `wlse32_w`             | `wm, rs2, rs1, wd`   | `matrix, load`                            |
+| `rv_w`        | `wlse64_w`             | `wm, rs2, rs1, wd`   | `matrix, load`                            |
+| `rv_w`        | `wlse8_w`              | `wm, rs2, rs1, wd`   | `matrix, load`                            |
+| `rv_w`        | `wlseg2e16ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg2e16_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg2e32ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg2e32_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg2e64ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg2e64_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg2e8ff_w`         | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg2e8_w`           | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg3e16ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg3e16_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg3e32ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg3e32_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg3e64ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg3e64_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg3e8ff_w`         | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg3e8_w`           | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg4e16ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg4e16_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg4e32ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg4e32_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg4e64ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg4e64_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg4e8ff_w`         | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg4e8_w`           | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg5e16ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg5e16_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg5e32ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg5e32_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg5e64ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg5e64_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg5e8ff_w`         | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg5e8_w`           | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg6e16ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg6e16_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg6e32ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg6e32_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg6e64ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg6e64_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg6e8ff_w`         | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg6e8_w`           | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg7e16ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg7e16_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg7e32ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg7e32_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg7e64ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg7e64_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg7e8ff_w`         | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg7e8_w`           | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg8e16ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg8e16_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg8e32ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg8e32_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg8e64ff_w`        | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg8e64_w`          | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlseg8e8ff_w`         | `wm, rs1, wd`        | `matrix, load, fault-only-first, segment` |
+| `rv_w`        | `wlseg8e8_w`           | `wm, rs1, wd`        | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg2e16_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg2e32_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg2e64_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg2e8_w`          | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg3e16_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg3e32_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg3e64_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg3e8_w`          | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg4e16_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg4e32_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg4e64_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg4e8_w`          | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg5e16_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg5e32_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg5e64_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg5e8_w`          | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg6e16_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg6e32_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg6e64_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg6e8_w`          | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg7e16_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg7e32_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg7e64_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg7e8_w`          | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg8e16_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg8e32_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg8e64_w`         | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wlsseg8e8_w`          | `wm, rs2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxei16_w`           | `wm, ws2, rs1, wd`   | `matrix, load`                            |
+| `rv_w`        | `wluxei32_w`           | `wm, ws2, rs1, wd`   | `matrix, load`                            |
+| `rv_w`        | `wluxei64_w`           | `wm, ws2, rs1, wd`   | `matrix, load`                            |
+| `rv_w`        | `wluxei8_w`            | `wm, ws2, rs1, wd`   | `matrix, load`                            |
+| `rv_w`        | `wluxseg2ei16_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg2ei32_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg2ei64_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg2ei8_w`        | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg3ei16_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg3ei32_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg3ei64_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg3ei8_w`        | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg4ei16_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg4ei32_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg4ei64_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg4ei8_w`        | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg5ei16_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg5ei32_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg5ei64_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg5ei8_w`        | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg6ei16_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg6ei32_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg6ei64_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg6ei8_w`        | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg7ei16_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg7ei32_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg7ei64_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg7ei8_w`        | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg8ei16_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg8ei32_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg8ei64_w`       | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wluxseg8ei8_w`        | `wm, ws2, rs1, wd`   | `matrix, load, segment`                   |
+| `rv_w`        | `wmacc_ww`             | `wm, ws2, ws1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wmacc_wx`             | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wmadc_wi`             | `ws2, simm5, wd`     | `matrix, alu, integer, mask`              |
+| `rv_w`        | `wmadc_wim`            | `ws2, simm5, wd`     | `matrix, alu, integer, mask`              |
+| `rv_w`        | `wmadc_ww`             | `ws2, ws1, wd`       | `matrix, alu, integer, mask`              |
+| `rv_w`        | `wmadc_wwm`            | `ws2, ws1, wd`       | `matrix, alu, integer, mask`              |
+| `rv_w`        | `wmadc_wx`             | `ws2, rs1, wd`       | `matrix, alu, integer, mask`              |
+| `rv_w`        | `wmadc_wxm`            | `ws2, rs1, wd`       | `matrix, alu, integer, mask`              |
+| `rv_w`        | `wmadd_ww`             | `wm, ws2, ws1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wmadd_wx`             | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wmand_mm`             | `ws2, ws1, wd`       | `matrix, logical, mask`                   |
+| `rv_w`        | `wmandn_mm`            | `ws2, ws1, wd`       | `matrix, logical, mask`                   |
+| `rv_w`        | `wmaxu_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wmaxu_wx`             | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wmax_ww`              | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wmax_wx`              | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wmerge_wim`           | `ws2, simm5, wd`     | `matrix, merge, integer`                  |
+| `rv_w`        | `wmerge_wwm`           | `ws2, ws1, wd`       | `matrix, merge, integer`                  |
+| `rv_w`        | `wmerge_wxm`           | `ws2, rs1, wd`       | `matrix, merge, integer`                  |
+| `rv_w`        | `wmfeq_wf`             | `wm, ws2, rs1, wd`   | `matrix, compare, floating-point, mask`   |
+| `rv_w`        | `wmfeq_ww`             | `wm, ws2, ws1, wd`   | `matrix, compare, floating-point, mask`   |
+| `rv_w`        | `wmfge_wf`             | `wm, ws2, rs1, wd`   | `matrix, compare, floating-point, mask`   |
+| `rv_w`        | `wmfgt_wf`             | `wm, ws2, rs1, wd`   | `matrix, compare, floating-point, mask`   |
+| `rv_w`        | `wmfle_wf`             | `wm, ws2, rs1, wd`   | `matrix, compare, floating-point, mask`   |
+| `rv_w`        | `wmfle_ww`             | `wm, ws2, ws1, wd`   | `matrix, compare, floating-point, mask`   |
+| `rv_w`        | `wmflt_wf`             | `wm, ws2, rs1, wd`   | `matrix, compare, floating-point, mask`   |
+| `rv_w`        | `wmflt_ww`             | `wm, ws2, ws1, wd`   | `matrix, compare, floating-point, mask`   |
+| `rv_w`        | `wmfne_wf`             | `wm, ws2, rs1, wd`   | `matrix, compare, floating-point, mask`   |
+| `rv_w`        | `wmfne_ww`             | `wm, ws2, ws1, wd`   | `matrix, compare, floating-point, mask`   |
+| `rv_w`        | `wminu_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wminu_wx`             | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wmin_ww`              | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wmin_wx`              | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wmnand_mm`            | `ws2, ws1, wd`       | `matrix, logical, mask`                   |
+| `rv_w`        | `wmnor_mm`             | `ws2, ws1, wd`       | `matrix, logical, mask`                   |
+| `rv_w`        | `wmor_mm`              | `ws2, ws1, wd`       | `matrix, logical, mask`                   |
+| `rv_w`        | `wmorn_mm`             | `ws2, ws1, wd`       | `matrix, logical, mask`                   |
+| `rv_w`        | `wmsbc_ww`             | `ws2, ws1, wd`       | `matrix, alu, integer, mask`              |
+| `rv_w`        | `wmsbc_wwm`            | `ws2, ws1, wd`       | `matrix, alu, integer, mask`              |
+| `rv_w`        | `wmsbc_wx`             | `ws2, rs1, wd`       | `matrix, alu, integer, mask`              |
+| `rv_w`        | `wmsbc_wxm`            | `ws2, rs1, wd`       | `matrix, alu, integer, mask`              |
+| `rv_w`        | `wmsbf_m`              | `wm, ws2, wd`        | `matrix, mask, prefix`                    |
+| `rv_w`        | `wmseq_wi`             | `wm, ws2, simm5, wd` | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmseq_ww`             | `wm, ws2, ws1, wd`   | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmseq_wx`             | `wm, ws2, rs1, wd`   | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsgtu_wi`            | `wm, ws2, simm5, wd` | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsgtu_wx`            | `wm, ws2, rs1, wd`   | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsgt_wi`             | `wm, ws2, simm5, wd` | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsgt_wx`             | `wm, ws2, rs1, wd`   | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsif_m`              | `wm, ws2, wd`        | `matrix, mask, prefix`                    |
+| `rv_w`        | `wmsleu_wi`            | `wm, ws2, simm5, wd` | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsleu_ww`            | `wm, ws2, ws1, wd`   | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsleu_wx`            | `wm, ws2, rs1, wd`   | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsle_wi`             | `wm, ws2, simm5, wd` | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsle_ww`             | `wm, ws2, ws1, wd`   | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsle_wx`             | `wm, ws2, rs1, wd`   | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsltu_ww`            | `wm, ws2, ws1, wd`   | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsltu_wx`            | `wm, ws2, rs1, wd`   | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmslt_ww`             | `wm, ws2, ws1, wd`   | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmslt_wx`             | `wm, ws2, rs1, wd`   | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsne_wi`             | `wm, ws2, simm5, wd` | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsne_ww`             | `wm, ws2, ws1, wd`   | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsne_wx`             | `wm, ws2, rs1, wd`   | `matrix, compare, integer, mask`          |
+| `rv_w`        | `wmsof_m`              | `wm, ws2, wd`        | `matrix, mask, prefix`                    |
+| `rv_w`        | `wmulhsu_ww`           | `wm, ws2, ws1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wmulhsu_wx`           | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wmulhu_ww`            | `wm, ws2, ws1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wmulhu_wx`            | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wmulh_ww`             | `wm, ws2, ws1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wmulh_wx`             | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wmul_ww`              | `wm, ws2, ws1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wmul_wx`              | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wmv1r_w`              | `ws2, wd`            | `matrix, move, whole-register`            |
+| `rv_w`        | `wmv2r_w`              | `ws2, wd`            | `matrix, move, whole-register`            |
+| `rv_w`        | `wmv4r_w`              | `ws2, wd`            | `matrix, move, whole-register`            |
+| `rv_w`        | `wmv8r_w`              | `ws2, wd`            | `matrix, move, whole-register`            |
+| `rv_w`        | `wmv_s_x`              | `rs1, wd`            | `matrix, move, integer`                   |
+| `rv_w`        | `wmv_w_i`              | `simm5, wd`          | `matrix, move, integer`                   |
+| `rv_w`        | `wmv_w_w`              | `ws1, wd`            | `matrix, move, integer`                   |
+| `rv_w`        | `wmv_w_x`              | `rs1, wd`            | `matrix, move, integer`                   |
+| `rv_w`        | `wmv_x_s`              | `ws2, rd`            | `matrix, move, integer`                   |
+| `rv_w`        | `wmxnor_mm`            | `ws2, ws1, wd`       | `matrix, logical, mask`                   |
+| `rv_w`        | `wmxor_mm`             | `ws2, ws1, wd`       | `matrix, logical, mask`                   |
+| `rv_w`        | `wnclipu_wide_wi`      | `wm, ws2, zimm5, wd` | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wnclipu_wide_ww`      | `wm, ws2, ws1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wnclipu_wide_wx`      | `wm, ws2, rs1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wnclip_wide_wi`       | `wm, ws2, zimm5, wd` | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wnclip_wide_ww`       | `wm, ws2, ws1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wnclip_wide_wx`       | `wm, ws2, rs1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wnmsac_ww`            | `wm, ws2, ws1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wnmsac_wx`            | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wnmsub_ww`            | `wm, ws2, ws1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wnmsub_wx`            | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wnsra_wide_wi`        | `wm, ws2, zimm5, wd` | `matrix, alu, integer`                    |
+| `rv_w`        | `wnsra_wide_ww`        | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wnsra_wide_wx`        | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wnsrl_wide_wi`        | `wm, ws2, zimm5, wd` | `matrix, alu, integer`                    |
+| `rv_w`        | `wnsrl_wide_ww`        | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wnsrl_wide_wx`        | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wor_wi`               | `wm, ws2, simm5, wd` | `matrix, alu, integer`                    |
+| `rv_w`        | `wor_ww`               | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wor_wx`               | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wredand_ws`           | `wm, ws2, ws1, wd`   | `matrix, reduction, integer`              |
+| `rv_w`        | `wredmaxu_ws`          | `wm, ws2, ws1, wd`   | `matrix, reduction, integer`              |
+| `rv_w`        | `wredmax_ws`           | `wm, ws2, ws1, wd`   | `matrix, reduction, integer`              |
+| `rv_w`        | `wredminu_ws`          | `wm, ws2, ws1, wd`   | `matrix, reduction, integer`              |
+| `rv_w`        | `wredmin_ws`           | `wm, ws2, ws1, wd`   | `matrix, reduction, integer`              |
+| `rv_w`        | `wredor_ws`            | `wm, ws2, ws1, wd`   | `matrix, reduction, integer`              |
+| `rv_w`        | `wredsum_ws`           | `wm, ws2, ws1, wd`   | `matrix, reduction, integer`              |
+| `rv_w`        | `wredxor_ws`           | `wm, ws2, ws1, wd`   | `matrix, reduction, integer`              |
+| `rv_w`        | `wremu_ww`             | `wm, ws2, ws1, wd`   | `matrix, divide, integer`                 |
+| `rv_w`        | `wremu_wx`             | `wm, ws2, rs1, wd`   | `matrix, divide, integer`                 |
+| `rv_w`        | `wrem_ww`              | `wm, ws2, ws1, wd`   | `matrix, divide, integer`                 |
+| `rv_w`        | `wrem_wx`              | `wm, ws2, rs1, wd`   | `matrix, divide, integer`                 |
+| `rv_w`        | `wrgatherei16_ww`      | `wm, ws2, ws1, wd`   | `matrix, permute`                         |
+| `rv_w`        | `wrgather_wi`          | `wm, ws2, zimm5, wd` | `matrix, permute`                         |
+| `rv_w`        | `wrgather_ww`          | `wm, ws2, ws1, wd`   | `matrix, permute`                         |
+| `rv_w`        | `wrgather_wx`          | `wm, ws2, rs1, wd`   | `matrix, permute`                         |
+| `rv_w`        | `wrsub_wi`             | `wm, ws2, simm5, wd` | `matrix, alu, integer`                    |
+| `rv_w`        | `wrsub_wx`             | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `ws1r_w`               | `rs1, ws3`           | `matrix, store, whole-register`           |
+| `rv_w`        | `ws2r_w`               | `rs1, ws3`           | `matrix, store, whole-register`           |
+| `rv_w`        | `ws4r_w`               | `rs1, ws3`           | `matrix, store, whole-register`           |
+| `rv_w`        | `ws8r_w`               | `rs1, ws3`           | `matrix, store, whole-register`           |
+| `rv_w`        | `wsaddu_wi`            | `wm, ws2, simm5, wd` | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wsaddu_ww`            | `wm, ws2, ws1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wsaddu_wx`            | `wm, ws2, rs1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wsadd_wi`             | `wm, ws2, simm5, wd` | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wsadd_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wsadd_wx`             | `wm, ws2, rs1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wsbc_wwm`             | `ws2, ws1, wd`       | `matrix, alu, integer`                    |
+| `rv_w`        | `wsbc_wxm`             | `ws2, rs1, wd`       | `matrix, alu, integer`                    |
+| `rv_w`        | `wse16_w`              | `wm, rs1, ws3`       | `matrix, store`                           |
+| `rv_w`        | `wse32_w`              | `wm, rs1, ws3`       | `matrix, store`                           |
+| `rv_w`        | `wse64_w`              | `wm, rs1, ws3`       | `matrix, store`                           |
+| `rv_w`        | `wse8_w`               | `wm, rs1, ws3`       | `matrix, store`                           |
+| `rv_w`        | `wsetiwli`             | `zimm10, zimm5, rd`  | `matrix, configuration`                   |
+| `rv_w`        | `wsetwl`               | `rs2, rs1, rd`       | `matrix, configuration`                   |
+| `rv_w`        | `wsetwli`              | `zimm11, rs1, rd`    | `matrix, configuration`                   |
+| `rv_w`        | `wsext_wf2`            | `wm, ws2, wd`        | `matrix, alu, integer`                    |
+| `rv_w`        | `wsext_wf4`            | `wm, ws2, wd`        | `matrix, alu, integer`                    |
+| `rv_w`        | `wsext_wf8`            | `wm, ws2, wd`        | `matrix, alu, integer`                    |
+| `rv_w`        | `wslide1down_wx`       | `wm, ws2, rs1, wd`   | `matrix, permute`                         |
+| `rv_w`        | `wslide1up_wx`         | `wm, ws2, rs1, wd`   | `matrix, permute`                         |
+| `rv_w`        | `wslidedown_wi`        | `wm, ws2, zimm5, wd` | `matrix, permute`                         |
+| `rv_w`        | `wslidedown_wx`        | `wm, ws2, rs1, wd`   | `matrix, permute`                         |
+| `rv_w`        | `wslideup_wi`          | `wm, ws2, zimm5, wd` | `matrix, permute`                         |
+| `rv_w`        | `wslideup_wx`          | `wm, ws2, rs1, wd`   | `matrix, permute`                         |
+| `rv_w`        | `wsll_wi`              | `wm, ws2, zimm5, wd` | `matrix, alu, integer`                    |
+| `rv_w`        | `wsll_ww`              | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wsll_wx`              | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wsmul_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wsmul_wx`             | `wm, ws2, rs1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wsm_w`                | `rs1, ws3`           | `matrix, store, mask`                     |
+| `rv_w`        | `wsoxei16_w`           | `wm, ws2, rs1, ws3`  | `matrix, store`                           |
+| `rv_w`        | `wsoxei32_w`           | `wm, ws2, rs1, ws3`  | `matrix, store`                           |
+| `rv_w`        | `wsoxei64_w`           | `wm, ws2, rs1, ws3`  | `matrix, store`                           |
+| `rv_w`        | `wsoxei8_w`            | `wm, ws2, rs1, ws3`  | `matrix, store`                           |
+| `rv_w`        | `wsoxseg2ei16_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg2ei32_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg2ei64_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg2ei8_w`        | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg3ei16_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg3ei32_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg3ei64_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg3ei8_w`        | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg4ei16_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg4ei32_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg4ei64_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg4ei8_w`        | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg5ei16_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg5ei32_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg5ei64_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg5ei8_w`        | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg6ei16_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg6ei32_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg6ei64_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg6ei8_w`        | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg7ei16_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg7ei32_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg7ei64_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg7ei8_w`        | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg8ei16_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg8ei32_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg8ei64_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsoxseg8ei8_w`        | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsra_wi`              | `wm, ws2, zimm5, wd` | `matrix, alu, integer`                    |
+| `rv_w`        | `wsra_ww`              | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wsra_wx`              | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wsrl_wi`              | `wm, ws2, zimm5, wd` | `matrix, alu, integer`                    |
+| `rv_w`        | `wsrl_ww`              | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wsrl_wx`              | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wsse16_w`             | `wm, rs2, rs1, ws3`  | `matrix, store`                           |
+| `rv_w`        | `wsse32_w`             | `wm, rs2, rs1, ws3`  | `matrix, store`                           |
+| `rv_w`        | `wsse64_w`             | `wm, rs2, rs1, ws3`  | `matrix, store`                           |
+| `rv_w`        | `wsse8_w`              | `wm, rs2, rs1, ws3`  | `matrix, store`                           |
+| `rv_w`        | `wsseg2e16_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg2e32_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg2e64_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg2e8_w`           | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg3e16_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg3e32_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg3e64_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg3e8_w`           | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg4e16_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg4e32_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg4e64_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg4e8_w`           | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg5e16_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg5e32_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg5e64_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg5e8_w`           | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg6e16_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg6e32_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg6e64_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg6e8_w`           | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg7e16_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg7e32_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg7e64_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg7e8_w`           | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg8e16_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg8e32_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg8e64_w`          | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wsseg8e8_w`           | `wm, rs1, ws3`       | `matrix, store, segment`                  |
+| `rv_w`        | `wssra_wi`             | `wm, ws2, zimm5, wd` | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wssra_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wssra_wx`             | `wm, ws2, rs1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wssrl_wi`             | `wm, ws2, zimm5, wd` | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wssrl_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wssrl_wx`             | `wm, ws2, rs1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wssseg2e16_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg2e32_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg2e64_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg2e8_w`          | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg3e16_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg3e32_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg3e64_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg3e8_w`          | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg4e16_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg4e32_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg4e64_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg4e8_w`          | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg5e16_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg5e32_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg5e64_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg5e8_w`          | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg6e16_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg6e32_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg6e64_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg6e8_w`          | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg7e16_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg7e32_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg7e64_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg7e8_w`          | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg8e16_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg8e32_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg8e64_w`         | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssseg8e8_w`          | `wm, rs2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wssubu_ww`            | `wm, ws2, ws1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wssubu_wx`            | `wm, ws2, rs1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wssub_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wssub_wx`             | `wm, ws2, rs1, wd`   | `matrix, alu, fixed-point`                |
+| `rv_w`        | `wsub_ww`              | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wsub_wx`              | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wsuxei16_w`           | `wm, ws2, rs1, ws3`  | `matrix, store`                           |
+| `rv_w`        | `wsuxei32_w`           | `wm, ws2, rs1, ws3`  | `matrix, store`                           |
+| `rv_w`        | `wsuxei64_w`           | `wm, ws2, rs1, ws3`  | `matrix, store`                           |
+| `rv_w`        | `wsuxei8_w`            | `wm, ws2, rs1, ws3`  | `matrix, store`                           |
+| `rv_w`        | `wsuxseg2ei16_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg2ei32_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg2ei64_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg2ei8_w`        | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg3ei16_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg3ei32_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg3ei64_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg3ei8_w`        | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg4ei16_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg4ei32_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg4ei64_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg4ei8_w`        | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg5ei16_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg5ei32_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg5ei64_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg5ei8_w`        | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg6ei16_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg6ei32_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg6ei64_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg6ei8_w`        | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg7ei16_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg7ei32_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg7ei64_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg7ei8_w`        | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg8ei16_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg8ei32_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg8ei64_w`       | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wsuxseg8ei8_w`        | `wm, ws2, rs1, ws3`  | `matrix, store, segment`                  |
+| `rv_w`        | `wwaddu_ww`            | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwaddu_wx`            | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwaddu_wide_ww`       | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwaddu_wide_wx`       | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwadd_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwadd_wx`             | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwadd_wide_ww`        | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwadd_wide_wx`        | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwmaccsu_ww`          | `wm, ws2, ws1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wwmaccsu_wx`          | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wwmaccus_wx`          | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wwmaccu_ww`           | `wm, ws2, ws1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wwmaccu_wx`           | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wwmacc_ww`            | `wm, ws2, ws1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wwmacc_wx`            | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wwmulsu_ww`           | `wm, ws2, ws1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wwmulsu_wx`           | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wwmulu_ww`            | `wm, ws2, ws1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wwmulu_wx`            | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wwmul_ww`             | `wm, ws2, ws1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wwmul_wx`             | `wm, ws2, rs1, wd`   | `matrix, multiply, integer`               |
+| `rv_w`        | `wwredsumu_ws`         | `wm, ws2, ws1, wd`   | `matrix, reduction, integer`              |
+| `rv_w`        | `wwredsum_ws`          | `wm, ws2, ws1, wd`   | `matrix, reduction, integer`              |
+| `rv_w`        | `wwsubu_ww`            | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwsubu_wx`            | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwsubu_wide_ww`       | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwsubu_wide_wx`       | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwsub_ww`             | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwsub_wx`             | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwsub_wide_ww`        | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wwsub_wide_wx`        | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wxor_wi`              | `wm, ws2, simm5, wd` | `matrix, alu, integer`                    |
+| `rv_w`        | `wxor_ww`              | `wm, ws2, ws1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wxor_wx`              | `wm, ws2, rs1, wd`   | `matrix, alu, integer`                    |
+| `rv_w`        | `wzext_wf2`            | `wm, ws2, wd`        | `matrix, alu, integer`                    |
+| `rv_w`        | `wzext_wf4`            | `wm, ws2, wd`        | `matrix, alu, integer`                    |
+| `rv_w`        | `wzext_wf8`            | `wm, ws2, wd`        | `matrix, alu, integer`                    |
+
+:RVW - Specific Extension for Matrix Operations
+
+| **Extension**      | **Name**                  | **Variable-Fields**             | **Class**                                         |
+|:-------------------|:--------------------------|:--------------------------------|:--------------------------------------------------|
+| `rv_zwabd`         | `wabdu_ww`                | `wm, ws2, ws1, wd`              | `matrix, alu, integer`                            |
+| `rv_zwabd`         | `wabdu_wx`                | `wm, ws2, rs1, wd`              | `matrix, alu, integer`                            |
+| `rv_zwabd`         | `wabd_ww`                 | `wm, ws2, ws1, wd`              | `matrix, alu, integer`                            |
+| `rv_zwabd`         | `wabd_wx`                 | `wm, ws2, rs1, wd`              | `matrix, alu, integer`                            |
+| `rv_zwabd`         | `wwabdau_ww`              | `wm, ws2, ws1, wd`              | `matrix, alu, integer`                            |
+| `rv_zwabd`         | `wwabdau_wx`              | `wm, ws2, rs1, wd`              | `matrix, alu, integer`                            |
+| `rv_zwabd`         | `wwabda_ww`               | `wm, ws2, ws1, wd`              | `matrix, alu, integer`                            |
+| `rv_zwabd`         | `wwabda_wx`               | `wm, ws2, rs1, wd`              | `matrix, alu, integer`                            |
+| `rv_zwbb`          | `wandn_ww`                | `wm, ws2, ws1, wd`              | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wandn_wx`                | `wm, ws2, rs1, wd`              | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wbrev8_w`                | `wm, ws2, wd`                   | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wbrev_w`                 | `wm, ws2, wd`                   | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wclz_w`                  | `wm, ws2, wd`                   | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wcpop_w`                 | `wm, ws2, wd`                   | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wctz_w`                  | `wm, ws2, wd`                   | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wrev8_w`                 | `wm, ws2, wd`                   | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wrol_ww`                 | `wm, ws2, ws1, wd`              | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wrol_wx`                 | `wm, ws2, rs1, wd`              | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wror_wi`                 | `zimm6hi, wm, ws2, zimm6lo, wd` | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wror_ww`                 | `wm, ws2, ws1, wd`              | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wror_wx`                 | `wm, ws2, rs1, wd`              | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wwsll_wi`                | `wm, ws2, zimm5, wd`            | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wwsll_ww`                | `wm, ws2, ws1, wd`              | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbb`          | `wwsll_wx`                | `wm, ws2, rs1, wd`              | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbc`          | `wclmulh_ww`              | `wm, ws2, ws1, wd`              | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbc`          | `wclmulh_wx`              | `wm, ws2, rs1, wd`              | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbc`          | `wclmul_ww`               | `wm, ws2, ws1, wd`              | `matrix, alu, bit-manipulation`                   |
+| `rv_zwbc`          | `wclmul_wx`               | `wm, ws2, rs1, wd`              | `matrix, alu, bit-manipulation`                   |
+| `rv_zwdot4a`       | `wdot4asu_ww`             | `wm, ws2, ws1, wd`              | `matrix, alu, integer, dot-product`               |
+| `rv_zwdot4a`       | `wdot4asu_wx`             | `wm, ws2, rs1, wd`              | `matrix, alu, integer, dot-product`               |
+| `rv_zwdot4a`       | `wdot4aus_wx`             | `wm, ws2, rs1, wd`              | `matrix, alu, integer, dot-product`               |
+| `rv_zwdot4a`       | `wdot4au_ww`              | `wm, ws2, ws1, wd`              | `matrix, alu, integer, dot-product`               |
+| `rv_zwdot4a`       | `wdot4au_wx`              | `wm, ws2, rs1, wd`              | `matrix, alu, integer, dot-product`               |
+| `rv_zwdot4a`       | `wdot4a_ww`               | `wm, ws2, ws1, wd`              | `matrix, alu, integer, dot-product`               |
+| `rv_zwdot4a`       | `wdot4a_wx`               | `wm, ws2, rs1, wd`              | `matrix, alu, integer, dot-product`               |
+| `rv_zwfbdota32f`   | `wfbdota_ww`              | `wm, ws2x8, ci, ws1, wd`        | `matrix, alu, floating-point, dot-product`        |
+| `rv_zwfbfmin`      | `wfncvtbf16_f_f_wide`     | `wm, ws2, wd`                   | `matrix, alu, floating-point, conversion`         |
+| `rv_zwfbfmin`      | `wfwcvtbf16_f_f_w`        | `wm, ws2, wd`                   | `matrix, alu, floating-point, conversion`         |
+| `rv_zwfbfwma`      | `wfwmaccbf16_wf`          | `wm, ws2, rs1, wd`              | `matrix, alu, floating-point, fused-multiply-add` |
+| `rv_zwfbfwma`      | `wfwmaccbf16_ww`          | `wm, ws2, ws1, wd`              | `matrix, alu, floating-point, fused-multiply-add` |
+| `rv_zwfofp4min`    | `wfext_wf2`               | `wm, ws2, wd`                   | `matrix, alu, floating-point, conversion`         |
+| `rv_zwfofp8min`    | `wfncvtbf16_sat_f_f_wide` | `wm, ws2, wd`                   | `matrix, alu, floating-point, conversion`         |
+| `rv_zwfofp8min`    | `wfncvt_f_f_q`            | `wm, ws2, wd`                   | `matrix, alu, floating-point, conversion`         |
+| `rv_zwfofp8min`    | `wfncvt_sat_f_f_q`        | `wm, ws2, wd`                   | `matrix, alu, floating-point, conversion`         |
+| `rv_zwfqwbdota8f`  | `wfqwbdota_alt_ww`        | `wm, ws2x8, ci, ws1, wd`        | `matrix, alu, floating-point, dot-product`        |
+| `rv_zwfqwbdota8f`  | `wfqwbdota_ww`            | `wm, ws2x8, ci, ws1, wd`        | `matrix, alu, floating-point, dot-product`        |
+| `rv_zwfqwdota8f`   | `wfqwdota_alt_ww`         | `wm, ws2, ws1, wd`              | `matrix, alu, floating-point, dot-product`        |
+| `rv_zwfqwdota8f`   | `wfqwdota_ww`             | `wm, ws2, ws1, wd`              | `matrix, alu, floating-point, dot-product`        |
+| `rv_zwfwbdota16bf` | `wfwbdota_ww`             | `wm, ws2x8, ci, ws1, wd`        | `matrix, alu, floating-point, dot-product`        |
+| `rv_zwfwdota16bf`  | `wfwdota_ww`              | `wm, ws2, ws1, wd`              | `matrix, alu, floating-point, dot-product`        |
+| `rv_zwqwbdota8i`   | `wqwbdotas_ww`            | `wm, ws2x8, ci, ws1, wd`        | `matrix, alu, integer, dot-product`               |
+| `rv_zwqwbdota8i`   | `wqwbdotau_ww`            | `wm, ws2x8, ci, ws1, wd`        | `matrix, alu, integer, dot-product`               |
+| `rv_zwqwdota8i`    | `wqwdotas_ww`             | `wm, ws2, ws1, wd`              | `matrix, alu, integer, dot-product`               |
+| `rv_zwqwdota8i`    | `wqwdotau_ww`             | `wm, ws2, ws1, wd`              | `matrix, alu, integer, dot-product`               |
+| `rv_zwt16e`        | `wtle16`                  | `rs2, rs1`                      | `matrix, tile, load`                              |
+| `rv_zwt16e`        | `wtse16`                  | `rs2, rs1`                      | `matrix, tile, store`                             |
+| `rv_zwt64e`        | `wtle64`                  | `rs2, rs1`                      | `matrix, tile, load`                              |
+| `rv_zwt64e`        | `wtse64`                  | `rs2, rs1`                      | `matrix, tile, store`                             |
+| `rv_zwt8e`         | `wtle8`                   | `rs2, rs1`                      | `matrix, tile, load`                              |
+| `rv_zwt8e`         | `wtse8`                   | `rs2, rs1`                      | `matrix, tile, store`                             |
+| `rv_zwtbase`       | `wmsetmtype`              | `rs2, rs1, rd`                  | `matrix, tile, configuration`                     |
+| `rv_zwtbase`       | `wmsetmtypei`             | `altfmt, wsew, mtwiden, rd`     | `matrix, tile, configuration`                     |
+| `rv_zwtbase`       | `wmsettk`                 | `rs1, rd`                       | `matrix, tile, configuration`                     |
+| `rv_zwtbase`       | `wmsettm`                 | `rs1, rd`                       | `matrix, tile, configuration`                     |
+| `rv_zwtbase`       | `wmsettn`                 | `rs1, rd`                       | `matrix, tile, configuration`                     |
+| `rv_zwtbase`       | `wtdiscard`               | `none`                          | `matrix, tile, context`                           |
+| `rv_zwtbase`       | `wtle32`                  | `rs2, rs1`                      | `matrix, tile, load`                              |
+| `rv_zwtbase`       | `wtmv_t_w`                | `ws2, rs1`                      | `matrix, tile, move`                              |
+| `rv_zwtbase`       | `wtmv_w_t`                | `rs1, wd`                       | `matrix, tile, move`                              |
+| `rv_zwtbase`       | `wtse32`                  | `rs2, rs1`                      | `matrix, tile, store`                             |
+| `rv_zwtbase`       | `wtzero`                  | `zwt_mtd16`                     | `matrix, tile, context`                           |
+| `rv_zwtbf16fmm`    | `wtfmm_alt_tww`           | `ws2, ws1, zwt_mtd8`            | `matrix, tile, multiply-accumulate`               |
+| `rv_zwtdmm`        | `wtfmm_tww`               | `ws2, ws1, zwt_mtd8`            | `matrix, tile, multiply-accumulate`               |
+| `rv_zwtfmm`        | `wtfmm_tww`               | `ws2, ws1, zwt_mtd8`            | `matrix, tile, multiply-accumulate`               |
+| `rv_zwtfp16fmm`    | `wtfmm_tww`               | `ws2, ws1, zwt_mtd8`            | `matrix, tile, multiply-accumulate`               |
+| `rv_zwti8i32mm`    | `wtmms_tww`               | `ws2, ws1, zwt_mtd8`            | `matrix, tile, multiply-accumulate`               |
+| `rv_zwti8i32mm`    | `wtmmu_tww`               | `ws2, ws1, zwt_mtd8`            | `matrix, tile, multiply-accumulate`               |
+| `rv_zwtofp8fmm`    | `wtfmm_alt_tww`           | `ws2, ws1, zwt_mtd8`            | `matrix, tile, multiply-accumulate`               |
+| `rv_zwtofp8fmm`    | `wtfmm_tww`               | `ws2, ws1, zwt_mtd8`            | `matrix, tile, multiply-accumulate`               |
+| `rv_zwzip`         | `wpaire_ww`               | `wm, ws2, ws1, wd`              | `matrix, permutation`                             |
+| `rv_zwzip`         | `wpairo_ww`               | `wm, ws2, ws1, wd`              | `matrix, permutation`                             |
+| `rv_zwzip`         | `wunzipe_w`               | `wm, ws2, wd`                   | `matrix, permutation`                             |
+| `rv_zwzip`         | `wunzipo_w`               | `wm, ws2, wd`                   | `matrix, permutation`                             |
+| `rv_zwzip`         | `wzip_ww`                 | `wm, ws2, ws1, wd`              | `matrix, permutation`                             |
+
+:RVZW - Specific Extension for Matrix Operations

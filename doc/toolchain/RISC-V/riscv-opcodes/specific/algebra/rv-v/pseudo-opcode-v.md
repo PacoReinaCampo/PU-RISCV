@@ -1,17 +1,23 @@
-```
-$pseudo_op rv_v::vl1re8.v vl1r.v 31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07
-$pseudo_op rv_v::vl2re8.v vl2r.v 31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07
-$pseudo_op rv_v::vl4re8.v vl4r.v 31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07
-$pseudo_op rv_v::vl8re8.v vl8r.v 31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07
+## PSEUDO-INSTRUCTIONS
 
-$pseudo_op rv_v::vlm.v vle1.v  31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0  vd 6..0=0x07
-$pseudo_op rv_v::vsm.v vse1.v  31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0 vs3 6..0=0x27
+| **Extension** | **Name**        | **Variable-Fields** | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:----------------|:--------------------|:-----------------------|:-----------------------------------|
+| `rv_v`        | `vcpop_m`       | `vm, vs2, rd`       | `vpopc_m`              | `010000------10000010-----1010111` |
+| `rv_v`        | `vfredusum_vs`  | `vm, vs2, vs1, vd`  | `vfredsum_vs`          | `000001-----------001-----1010111` |
+| `rv_v`        | `vfwredusum_vs` | `vm, vs2, vs1, vd`  | `vfwredsum_vs`         | `110001-----------001-----1010111` |
+| `rv_v`        | `vl1re8_v`      | `rs1, vd`           | `vl1r_v`               | `000000101000-----000-----0000111` |
+| `rv_v`        | `vl2re8_v`      | `rs1, vd`           | `vl2r_v`               | `001000101000-----000-----0000111` |
+| `rv_v`        | `vl4re8_v`      | `rs1, vd`           | `vl4r_v`               | `011000101000-----000-----0000111` |
+| `rv_v`        | `vl8re8_v`      | `rs1, vd`           | `vl8r_v`               | `111000101000-----000-----0000111` |
+| `rv_v`        | `vlm_v`         | `rs1, vd`           | `vle1_v`               | `000000101011-----000-----0000111` |
+| `rv_v`        | `vmandn_mm`     | `vs2, vs1, vd`      | `vmandnot_mm`          | `0110001----------010-----1010111` |
+| `rv_v`        | `vmorn_mm`      | `vs2, vs1, vd`      | `vmornot_mm`           | `0111001----------010-----1010111` |
+| `rv_v`        | `vsm_v`         | `rs1, vs3`          | `vse1_v`               | `000000101011-----000-----0100111` |
 
-$pseudo_op rv_v::vfredusum.vs  vfredsum.vs 31..26=0x01 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-$pseudo_op rv_v::vfwredusum.vs vfwredsum.vs 31..26=0x31 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
+:RVV - Specific Extension for Vector Operations
 
-$pseudo_op rv_v::vcpop.m vpopc.m  31..26=0x10 vm vs2 19..15=0x10 14..12=0x2 rd 6..0=0x57
+| **Extension** | **Name**  | **Variable-Fields** | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:----------|:--------------------|:-----------------------|:-----------------------------------|
+| `rv_zvabd`    | `vabd_vx` | `vm, vs2, vd`       | `vabs_v`               | `010101------00000110-----1010111` |
 
-$pseudo_op rv_v::vmorn.mm  vmornot.mm 31..26=0x1c vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-$pseudo_op rv_v::vmandn.mm vmandnot.mm  31..26=0x18 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-```
+:RVZV - Specific Extension for Vector Operations

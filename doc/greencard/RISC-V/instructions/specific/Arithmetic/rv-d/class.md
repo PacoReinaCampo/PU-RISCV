@@ -1,96 +1,60 @@
 ## INSTRUCTION CLASSES
 
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `flw`           | `fpu,load`  |
-| `fsw`           | `fpu,store` |
-| `fmadd.s`       | `fpu,fma`   |
-| `fmsub.s`       | `fpu,fma`   |
-| `fnmadd.s`      | `fpu,fma`   |
-| `fnmsub.s`      | `fpu,fma`   |
-| `fadd.s`        | `fpu`       |
-| `fsub.s`        | `fpu`       |
-| `fmul.s`        | `fpu`       |
-| `fdiv.s`        | `fpu,fdiv`  |
-| `fsgnj.s`       | `fpu`       |
-| `fsgnjn.s`      | `fpu`       |
-| `fsgnjx.s`      | `fpu`       |
-| `fmin.s`        | `fpu`       |
-| `fmax.s`        | `fpu`       |
-| `fsqrt.s`       | `fpu,fsqrt` |
-| `fle.s`         | `fpu`       |
-| `flt.s`         | `fpu`       |
-| `feq.s`         | `fpu`       |
-| `fcvt.w.s`      | `fpu,fcvt`  |
-| `fcvt.wu.s`     | `fpu,fcvt`  |
-| `fcvt.s.w`      | `fpu,fcvt`  |
-| `fcvt.s.wu`     | `fpu,fcvt`  |
-| `fmv.x.s`       | `fpu,fmove` |
-| `fclass.s`      | `fpu`       |
-| `fmv.s.x`       | `fpu,fmove` |
+| **Extension** | **Name**      | **Variable-Fields**          | **Class**    |
+|:--------------|:--------------|:-----------------------------|:-------------|
+| `rv_d`        | `fadd_d`      | `rd, rs1, rs2, rm`           | `fpu`        |
+| `rv_d`        | `fclass_d`    | `rd, rs1`                    | `fpu`        |
+| `rv_d`        | `fcvt_d_s`    | `rd, rs1, rm`                | `fpu, fcvt`  |
+| `rv_d`        | `fcvt_d_w`    | `rd, rs1, rm`                | `fpu, fcvt`  |
+| `rv_d`        | `fcvt_d_wu`   | `rd, rs1, rm`                | `fpu, fcvt`  |
+| `rv_d`        | `fcvt_s_d`    | `rd, rs1, rm`                | `fpu, fcvt`  |
+| `rv_d`        | `fcvt_w_d`    | `rd, rs1, rm`                | `fpu, fcvt`  |
+| `rv_d`        | `fcvt_wu_d`   | `rd, rs1, rm`                | `fpu, fcvt`  |
+| `rv_d`        | `fdiv_d`      | `rd, rs1, rs2, rm`           | `fpu, fdiv`  |
+| `rv_d`        | `feq_d`       | `rd, rs1, rs2`               | `fpu`        |
+| `rv_d`        | `fld`         | `rd, rs1, imm12`             | `fpu, load`  |
+| `rv_d`        | `fle_d`       | `rd, rs1, rs2`               | `fpu`        |
+| `rv_d`        | `flt_d`       | `rd, rs1, rs2`               | `fpu`        |
+| `rv_d`        | `fmadd_d`     | `rd, rs1, rs2, rs3, rm`      | `fpu, fma`   |
+| `rv_d`        | `fmax_d`      | `rd, rs1, rs2`               | `fpu`        |
+| `rv_d`        | `fmin_d`      | `rd, rs1, rs2`               | `fpu`        |
+| `rv_d`        | `fmsub_d`     | `rd, rs1, rs2, rs3, rm`      | `fpu, fma`   |
+| `rv_d`        | `fmul_d`      | `rd, rs1, rs2, rm`           | `fpu`        |
+| `rv_d`        | `fnmadd_d`    | `rd, rs1, rs2, rs3, rm`      | `fpu, fma`   |
+| `rv_d`        | `fnmsub_d`    | `rd, rs1, rs2, rs3, rm`      | `fpu, fma`   |
+| `rv_d`        | `fsd`         | `imm12hi, rs1, rs2, imm12lo` | `fpu, store` |
+| `rv_d`        | `fsgnj_d`     | `rd, rs1, rs2`               | `fpu`        |
+| `rv_d`        | `fsgnjn_d`    | `rd, rs1, rs2`               | `fpu`        |
+| `rv_d`        | `fsgnjx_d`    | `rd, rs1, rs2`               | `fpu`        |
+| `rv_d`        | `fsqrt_d`     | `rd, rs1, rm`                | `fpu, fsqrt` |
+| `rv_d`        | `fsub_d`      | `rd, rs1, rs2, rm`           | `fpu`        |
+| `rv_d_zfa`    | `fcvtmod_w_d` | `rd, rs1`                    | `fpu, fcvt`  |
+| `rv_d_zfa`    | `fleq_d`      | `rd, rs1, rs2`               | `fpu`        |
+| `rv_d_zfa`    | `fli_d`       | `rd, rs1`                    | `fpu, fmove` |
+| `rv_d_zfa`    | `fltq_d`      | `rd, rs1, rs2`               | `fpu`        |
+| `rv_d_zfa`    | `fmaxm_d`     | `rd, rs1, rs2`               | `fpu`        |
+| `rv_d_zfa`    | `fminm_d`     | `rd, rs1, rs2`               | `fpu`        |
+| `rv_d_zfa`    | `fround_d`    | `rd, rs1, rm`                | `fpu`        |
+| `rv_d_zfa`    | `froundnx_d`  | `rd, rs1, rm`                | `fpu`        |
+| `rv_d_zfhmin` | `fcvt_d_h`    | `rd, rs1, rm`                | `fpu, fcvt`  |
+| `rv_d_zfhmin` | `fcvt_h_d`    | `rd, rs1, rm`                | `fpu, fcvt`  |
 
-:RV32F - "RV32F Standard Extension for Single-Precision Floating-Point"
+:RVD - Specific Extension for Double-Precision Floating-Point Instructions
 
-| **Instruction** | **Class**  |
-|:----------------|:-----------|
-| `fcvt.l.s`      | `fpu,fcvt` |
-| `fcvt.lu.s`     | `fpu,fcvt` |
-| `fcvt.s.l`      | `fpu,fcvt` |
-| `fcvt.s.lu`     | `fpu,fcvt` |
+| **Extension** | **Name**   | **Variable-Fields** | **Class**    |
+|:--------------|:-----------|:--------------------|:-------------|
+| `rv32_d_zfa`  | `fmvh_x_d` | `rd, rs1`           | `fpu, fmove` |
+| `rv32_d_zfa`  | `fmvp_d_x` | `rd, rs1, rs2`      | `fpu, fmove` |
 
-:RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
+:RV32D - Specific Extension for Double-Precision Floating-Point Instructions (32 bit)
 
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `fld`           | `fpu,load`  |
-| `fsd`           | `fpu,store` |
-| `fmadd.d`       | `fpu,fma`   |
-| `fmsub.d`       | `fpu,fma`   |
-| `fnmadd.d`      | `fpu,fma`   |
-| `fnmsub.d`      | `fpu,fma`   |
-| `fadd.d`        | `fpu`       |
-| `fsub.d`        | `fpu`       |
-| `fmul.d`        | `fpu`       |
-| `fdiv.d`        | `fpu,fdiv`  |
-| `fsgnj.d`       | `fpu`       |
-| `fsgnjn.d`      | `fpu`       |
-| `fsgnjx.d`      | `fpu`       |
-| `fmin.d`        | `fpu`       |
-| `fmax.d`        | `fpu`       |
-| `fcvt.s.d`      | `fpu,fcvt`  |
-| `fcvt.d.s`      | `fpu,fcvt`  |
-| `fsqrt.d`       | `fpu,fsqrt` |
-| `fle.d`         | `fpu`       |
-| `flt.d`         | `fpu`       |
-| `feq.d`         | `fpu`       |
-| `fcvt.w.d`      | `fpu,fcvt`  |
-| `fcvt.wu.d`     | `fpu,fcvt`  |
-| `fcvt.d.w`      | `fpu,fcvt`  |
-| `fcvt.d.wu`     | `fpu,fcvt`  |
-| `fclass.d`      | `fpu`       |
+| **Extension** | **Name**    | **Variable-Fields** | **Class**    |
+|:--------------|:------------|:--------------------|:-------------|
+| `rv64_d`      | `fcvt_d_l`  | `rd, rs1, rm`       | `fpu, fcvt`  |
+| `rv64_d`      | `fcvt_d_lu` | `rd, rs1, rm`       | `fpu, fcvt`  |
+| `rv64_d`      | `fcvt_l_d`  | `rd, rs1, rm`       | `fpu, fcvt`  |
+| `rv64_d`      | `fcvt_lu_d` | `rd, rs1, rm`       | `fpu, fcvt`  |
+| `rv64_d`      | `fmv_d_x`   | `rd, rs1`           | `fpu, fmove` |
+| `rv64_d`      | `fmv_x_d`   | `rd, rs1`           | `fpu, fmove` |
 
-:RV32D - "RV32D Standard Extension for Double-Precision Floating-Point"
-
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `fcvt.l.d`      | `fpu,fcvt`  |
-| `fcvt.lu.d`     | `fpu,fcvt`  |
-| `fmv.x.d`       | `fpu,fmove` |
-| `fcvt.d.l`      | `fpu,fcvt`  |
-| `fcvt.d.lu`     | `fpu,fcvt`  |
-| `fmv.d.x`       | `fpu,fmove` |
-
-:RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32D)"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `frcsr`         | `csr`     |
-| `frrm`          | `csr`     |
-| `frflags`       | `csr`     |
-| `fscsr`         | `csr`     |
-| `fsrm`          | `csr`     |
-| `fsflags`       | `csr`     |
-| `fsrmi`         | `csr`     |
-| `fsflagsi`      | `csr`     |
-
-:RV32FD - "RV32F and RV32D Common Floating-Point Instructions"
+:RV64D - Specific Extension for Double-Precision Floating-Point Instructions (64 bit)

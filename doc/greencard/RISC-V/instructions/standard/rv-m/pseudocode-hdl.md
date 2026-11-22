@@ -1,24 +1,34 @@
 ## INSTRUCTION PSEUDO-CODE (HDL)
 
-| **Instruction** | **Instruction Pseudo-Code**        |
-|:----------------|:-----------------------------------|
-| `mul`           | `rd = ux(rs1) * ux(rs2)`           |
-| `mulh`          | `rd = (sx(rs1) * sx(rs2)) >> xlen` |
-| `mulhsu`        | `rd = (sx(rs1) * ux(rs2)) >> xlen` |
-| `mulhu`         | `rd = (ux(rs1) * ux(rs2)) >> xlen` |
-| `div`           | `rd = sx(rs1) / sx(rs2)`           |
-| `divu`          | `rd = ux(rs1) / ux(rs2)`           |
-| `rem`           | `rd = sx(rs1) mod sx(rs2)`         |
-| `remu`          | `rd = ux(rs1) mod ux(rs2)`         |
+| **Extension** | **Name** | **Variable-Fields** | **Pseudo-Code**                     |
+|:--------------|:---------|:--------------------|:------------------------------------|
+| `rv_m`        | `div`    | `rd, rs1, rs2`      | `rd = sx(rs1) / sx(rs2);`           |
+| `rv_m`        | `divu`   | `rd, rs1, rs2`      | `rd = ux(rs1) / ux(rs2);`           |
+| `rv_m`        | `mul`    | `rd, rs1, rs2`      | `rd = ux(rs1) * ux(rs2);`           |
+| `rv_m`        | `mulh`   | `rd, rs1, rs2`      | `rd = (sx(rs1) * sx(rs2)) >> XLEN;` |
+| `rv_m`        | `mulhsu` | `rd, rs1, rs2`      | `rd = (sx(rs1) * ux(rs2)) >> XLEN;` |
+| `rv_m`        | `mulhu`  | `rd, rs1, rs2`      | `rd = (ux(rs1) * ux(rs2)) >> XLEN;` |
+| `rv_m`        | `rem`    | `rd, rs1, rs2`      | `rd = sx(rs1) % sx(rs2);`           |
+| `rv_m`        | `remu`   | `rd, rs1, rs2`      | `rd = ux(rs1) % ux(rs2);`           |
 
-:RV32M - "RV32M Standard Extension for Integer Multiply and Divide"
+:RVM - Standard Extension for Integer Multiply and Divide
 
-| **Instruction** | **Instruction Pseudo-Code**  |
-|:----------------|:-----------------------------|
-| `mulw`          | `rd = u32(rs1) * u32(rs2)`   |
-| `divw`          | `rd = s32(rs1) / s32(rs2)`   |
-| `divuw`         | `rd = u32(rs1) / u32(rs2)`   |
-| `remw`          | `rd = s32(rs1) mod s32(rs2)` |
-| `remuw`         | `rd = u32(rs1) mod u32(rs2)` |
+| **Extension** | **Name** | **Variable-Fields** | **Pseudo-Code**             |
+|:--------------|:---------|:--------------------|:----------------------------|
+| `rv64_m`      | `divuw`  | `rd, rs1, rs2`      | `rd = u32(rs1) / u32(rs2);` |
+| `rv64_m`      | `divw`   | `rd, rs1, rs2`      | `rd = s32(rs1) / s32(rs2);` |
+| `rv64_m`      | `mulw`   | `rd, rs1, rs2`      | `rd = u32(rs1) * u32(rs2);` |
+| `rv64_m`      | `remuw`  | `rd, rs1, rs2`      | `rd = u32(rs1) % u32(rs2);` |
+| `rv64_m`      | `remw`   | `rd, rs1, rs2`      | `rd = s32(rs1) % s32(rs2);` |
 
-:RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
+:RV64M - Standard Extension for Integer Multiply and Divide (64 bit)
+
+| **Extension** | **Name** | **Variable-Fields** | **Pseudo-Code**             |
+|:--------------|:---------|:--------------------|:----------------------------|
+| `rv128_m`     | `divud`  | `rd, rs1, rs2`      | `rd = u64(rs1) / u64(rs2);` |
+| `rv128_m`     | `divd`   | `rd, rs1, rs2`      | `rd = s64(rs1) / s64(rs2);` |
+| `rv128_m`     | `muld`   | `rd, rs1, rs2`      | `rd = u64(rs1) * u64(rs2);` |
+| `rv128_m`     | `remud`  | `rd, rs1, rs2`      | `rd = u64(rs1) % u64(rs2);` |
+| `rv128_m`     | `remd`   | `rd, rs1, rs2`      | `rd = s64(rs1) % s64(rs2);` |
+
+:RV128M - Standard Extension for Integer Multiply and Divide (128 bit)

@@ -6,133 +6,133 @@
 // SPDX-License-Identifier: BSD-2-Clause
 // =======================================================================================
 
-function clause currentlyEnabled(Ext_Zvksed) = hartSupports(Ext_Zvksed) & currentlyEnabled(Ext_Zve32x)
+function xw_crypto_ksed_enabled() -> bool = (config extensions.Xw.crypto.ksed : bool) & xw_enabled()
 
-union clause instruction = VSM4K_VI : (vregidx, bits(5), vregidx)
+union clause instruction = XWK_WSM4K_WI : (wregidx, bits(5), wregidx)
 
-$[wavedrom "_ _ _ _ OPMVV _ OP-VE"]
-mapping clause encdec = VSM4K_VI(vs2, uimm, vd)
-  <-> 0b100001 @ 0b1 @ encdec_vreg(vs2) @ uimm @ 0b010 @ encdec_vreg(vd) @ 0b1110111
-  when currentlyEnabled(Ext_Zvksed) & get_sew() == 32 & zvk_check_encdec(128, 4)
+$[wavedrom "_ _ _ _ OPMWW _ CUSTOM-2"]
+mapping clause encdec = XWK_WSM4K_WI(ws2, uimm, wd)
+  <-> 0b100001 @ 0b1 @ encdec_wreg(ws2) @ uimm @ 0b010 @ encdec_wreg(wd) @ 0b1011011
+  when valid_wtype() & xw_crypto_ksed_enabled() & w_get_sew() == 32 & zwk_check_encdec(128, 4)
 
-function clause execute VSM4K_VI(vs2, uimm, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute XWK_WSM4K_WI(ws2, uimm, wd) = {
+  let SEW      = w_get_sew();
+  let LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(LMUL_pow, SEW);
 
-  if not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
+  if not(w_valid_reg_group(ws2, LMUL_pow)) |
+     not(w_valid_reg_group(wd, LMUL_pow))
   then return Illegal_Instruction();
 
   assert(SEW == 32);
 
-  let vs2_val = read_vreg(num_elem, SEW, LMUL_pow, vs2);
+  let ws2_val = read_wreg(num_elem, SEW, LMUL_pow, ws2);
 
-  let rnd = 0b00 @ uimm[2..0];
+  let ck_index : bits(5) = uimm[2..0] @ 0b00;
 
-  let eg_len   = (unsigned(vl) / 4);
-  let eg_start = (unsigned(vstart) / 4);
+  let group_count = (unsigned(wl) / 4);
+  let first_group = (unsigned(wstart) / 4);
 
-  foreach (i from eg_start to (eg_len - 1)) {
-    assert(i * 4 + 3 < num_elem);
+  foreach (group_index from first_group to (group_count - 1)) {
+    assert(group_index * 4 + 3 < num_elem);
 
-    let rk_in = get_velem_quad_vec(vs2_val, i);
+    let rk_in = get_welem_quad_vec(ws2_val, group_index);
 
     var rk_out : vector(4, bits(32)) = vector_init(zeros());
 
-    var B = rk_in[1] ^ rk_in[2] ^ rk_in[3] ^ zvk_sm4_sbox(rnd << 2);
-    var S = zvk_sm4_subword(B);
-    rk_out[0] = zvk_round_key(rk_in[0], S);
+    var B = rk_in[1] ^ rk_in[2] ^ rk_in[3] ^ zwk_sm4_ck(ck_index);
+    var S = zwk_sm4_subword(B);
+    rk_out[0] = zwk_round_key(rk_in[0], S);
 
-    B = rk_in[2]  ^ rk_in[3]  ^ rk_out[0] ^ zvk_sm4_sbox(rnd << 2 + 1);
-    S = zvk_sm4_subword(B);
-    rk_out[1] = zvk_round_key(rk_in[1], S);
+    B = rk_in[2]  ^ rk_in[3]  ^ rk_out[0] ^ zwk_sm4_ck(ck_index + to_bits(5, 1));
+    S = zwk_sm4_subword(B);
+    rk_out[1] = zwk_round_key(rk_in[1], S);
 
-    B = rk_in[3]  ^ rk_out[0] ^ rk_out[1] ^ zvk_sm4_sbox(rnd << 2 + 2);
-    S = zvk_sm4_subword(B);
-    rk_out[2] = zvk_round_key(rk_in[2], S);
+    B = rk_in[3]  ^ rk_out[0] ^ rk_out[1] ^ zwk_sm4_ck(ck_index + to_bits(5, 2));
+    S = zwk_sm4_subword(B);
+    rk_out[2] = zwk_round_key(rk_in[2], S);
 
-    B = rk_out[0] ^ rk_out[1] ^ rk_out[2] ^ zvk_sm4_sbox(rnd << 2 + 3);
-    S = zvk_sm4_subword(B);
-    rk_out[3] = zvk_round_key(rk_in[3], S);
+    B = rk_out[0] ^ rk_out[1] ^ rk_out[2] ^ zwk_sm4_ck(ck_index + to_bits(5, 3));
+    S = zwk_sm4_subword(B);
+    rk_out[3] = zwk_round_key(rk_in[3], S);
 
-    write_velem_quad_vec(vd, SEW, rk_out, i);
+    write_welem_quad_vec(wd, SEW, rk_out, group_index);
   };
 
-  set_vstart(zeros());
+  set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VSM4K_VI(vs2, uimm, vd)
-  <-> "vsm4k.vi" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ hex_bits_5(uimm)
+mapping clause assembly = XWK_WSM4K_WI(ws2, uimm, wd)
+  <-> "wsm4k.wi" ^ spc() ^ wreg_name(wd) ^ sep() ^ wreg_name(ws2) ^ sep() ^ hex_bits_5(uimm)
 
-union clause instruction = ZVKSM4RTYPE : (zvk_vsm4r_funct6, vregidx, vregidx)
+union clause instruction = XWK_ZWKSM4RTYPE : (zwk_wsm4r_funct6, wregidx, wregidx)
 
-$[wavedrom "_ _ _ _ OPMVV _ OP-VE"]
-mapping clause encdec = ZVKSM4RTYPE(ZVK_VSM4R_VV, vs2, vd)
-  <-> 0b101000 @ 0b1 @ encdec_vreg(vs2) @ 0b10000 @ 0b010 @ encdec_vreg(vd) @ 0b1110111
-  when currentlyEnabled(Ext_Zvksed) & get_sew() == 32 & zvk_check_encdec(128, 4)
+$[wavedrom "_ _ _ _ OPMWW _ CUSTOM-2"]
+mapping clause encdec = XWK_ZWKSM4RTYPE(XWK_ZWK_WSM4R_WW, ws2, wd)
+  <-> 0b101000 @ 0b1 @ encdec_wreg(ws2) @ 0b10000 @ 0b010 @ encdec_wreg(wd) @ 0b1011011
+  when valid_wtype() & xw_crypto_ksed_enabled() & w_get_sew() == 32 & zwk_check_encdec(128, 4)
 
-$[wavedrom "_ _ _ _ OPMVV _ OP-VE"]
-mapping clause encdec = ZVKSM4RTYPE(ZVK_VSM4R_VS, vs2, vd)
-  <-> 0b101001 @ 0b1 @ encdec_vreg(vs2) @ 0b10000 @ 0b010 @ encdec_vreg(vd) @ 0b1110111
-  when currentlyEnabled(Ext_Zvksed) & get_sew() == 32 & zvk_check_encdec(128, 4) & zvk_valid_reg_overlap(vs2, vd, get_lmul_pow())
+$[wavedrom "_ _ _ _ OPMWW _ CUSTOM-2"]
+mapping clause encdec = XWK_ZWKSM4RTYPE(XWK_ZWK_WSM4R_WS, ws2, wd)
+  <-> 0b101001 @ 0b1 @ encdec_wreg(ws2) @ 0b10000 @ 0b010 @ encdec_wreg(wd) @ 0b1011011
+  when valid_wtype() & xw_crypto_ksed_enabled() & w_get_sew() == 32 & zwk_check_encdec(128, 4) & zwk_valid_reg_overlap(ws2, wd, w_get_lmul_pow())
 
-function clause execute ZVKSM4RTYPE(funct6, vs2, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute XWK_ZWKSM4RTYPE(funct6, ws2, wd) = {
+  let SEW      = w_get_sew();
+  let LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(LMUL_pow, SEW);
 
-  if not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
+  if not(w_valid_reg_group(ws2, LMUL_pow)) |
+     not(w_valid_reg_group(wd, LMUL_pow))
   then return Illegal_Instruction();
 
   assert(SEW == 32);
 
-  let vs2_val = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  = read_vreg(num_elem, SEW, LMUL_pow, vd);
+  let ws2_val = read_wreg(num_elem, SEW, LMUL_pow, ws2);
+  let wd_val  = read_wreg(num_elem, SEW, LMUL_pow, wd);
 
-  let eg_len   = (unsigned(vl) / 4);
-  let eg_start = (unsigned(vstart) / 4);
+  let group_count = (unsigned(wl) / 4);
+  let first_group = (unsigned(wstart) / 4);
 
-  foreach (i from eg_start to (eg_len - 1)) {
-    assert(i * 4 + 3 < num_elem);
+  foreach (group_index from first_group to (group_count - 1)) {
+    assert(group_index * 4 + 3 < num_elem);
 
-    let rk_in = if funct6 == ZVK_VSM4R_VV
-                then get_velem_quad_vec(vs2_val, i)
-                else get_velem_quad_vec(vs2_val, 0);
+    let rk_in = if funct6 == XWK_ZWK_WSM4R_WW
+                then get_welem_quad_vec(ws2_val, group_index)
+                else get_welem_quad_vec(ws2_val, 0);
 
-    let x_in  = get_velem_quad_vec(vd_val, i);
+    let x_in  = get_welem_quad_vec(wd_val, group_index);
 
     var x_out : vector(4, bits(32)) = vector_init(zeros());
 
     var B = x_in[1] ^ x_in[2] ^ x_in[3] ^ rk_in[0];
-    var S = zvk_sm4_subword(B);
-    x_out[0] = zvk_sm4_round(x_in[0], S);
+    var S = zwk_sm4_subword(B);
+    x_out[0] = zwk_sm4_round(x_in[0], S);
 
     B = x_in[2]  ^ x_in[3]  ^ x_out[0] ^ rk_in[1];
-    S = zvk_sm4_subword(B);
-    x_out[1] = zvk_sm4_round(x_in[1], S);
+    S = zwk_sm4_subword(B);
+    x_out[1] = zwk_sm4_round(x_in[1], S);
 
     B = x_in[3]  ^ x_out[0] ^ x_out[1] ^ rk_in[2];
-    S = zvk_sm4_subword(B);
-    x_out[2] = zvk_sm4_round(x_in[2], S);
+    S = zwk_sm4_subword(B);
+    x_out[2] = zwk_sm4_round(x_in[2], S);
 
     B = x_out[0] ^ x_out[1] ^ x_out[2] ^ rk_in[3];
-    S = zvk_sm4_subword(B);
-    x_out[3] = zvk_sm4_round(x_in[3], S);
+    S = zwk_sm4_subword(B);
+    x_out[3] = zwk_sm4_round(x_in[3], S);
 
-    write_velem_quad_vec(vd, SEW, x_out, i);
+    write_welem_quad_vec(wd, SEW, x_out, group_index);
   };
 
-  set_vstart(zeros());
+  set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping vsm4r_mnemonic : zvk_vsm4r_funct6 <-> string = {
-   ZVK_VSM4R_VV <-> "vsm4r.vv",
-   ZVK_VSM4R_VS <-> "vsm4r.vs",
+mapping wk_sm4r_mnemonic : zwk_wsm4r_funct6 <-> string = {
+   XWK_ZWK_WSM4R_WW <-> "wsm4r.ww",
+   XWK_ZWK_WSM4R_WS <-> "wsm4r.ws",
 }
 
-mapping clause assembly = ZVKSM4RTYPE(funct6, vs2, vd)
-  <-> vsm4r_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2)
+mapping clause assembly = XWK_ZWKSM4RTYPE(funct6, ws2, wd)
+  <-> wk_sm4r_mnemonic(funct6) ^ spc() ^ wreg_name(wd) ^ sep() ^ wreg_name(ws2)

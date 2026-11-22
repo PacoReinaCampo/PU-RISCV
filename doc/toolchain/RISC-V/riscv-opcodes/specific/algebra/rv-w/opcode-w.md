@@ -1,511 +1,722 @@
-```
-# format of a line in this file:
-# <instruction name> <args> <opcode>
-
-# <opcode> is given by specifying one or more range/value pairs:
-# hi..lo=value or bit=value or arg=value (e.g. 6..2=0x45 10=1 rd=0)
-
-# <args> is one of vd, vs3, vs1, vs2, vm, nf, wd, simm5, zimm10, zimm11
-```
-
-# Configuration Setting
-
-`https://github.com/riscv/riscv-v-spec/blob/master/vcfg-format.adoc`
-
-```
-wsetivli     31=1 30=1 zimm10    zimm5 14..12=0x7 rd 6..0=0x57
-wsetvli      31=0 zimm11          rs1 14..12=0x7 rd 6..0=0x57
-wsetvl       31=1 30..25=0x0 rs2  rs1 14..12=0x7 rd 6..0=0x57
-```
-
-# Vector Loads and Store
-
-`https://github.com/riscv/riscv-v-spec/blob/master/vmem-format.adoc`
-
-# Vector Unit-Stride Instructions (including segment part)
-
-`https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#74-vector-unit-stride-instructions`
-
-```
-wlm.v          31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0  vd 6..0=0x07
-wsm.v          31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0 vs3 6..0=0x27
-wle8.v         nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x0  vd 6..0=0x07
-wle16.v        nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x5  vd 6..0=0x07
-wle32.v        nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x6  vd 6..0=0x07
-wle64.v        nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x7  vd 6..0=0x07
-wse8.v         nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x0 vs3 6..0=0x27
-wse16.v        nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x5 vs3 6..0=0x27
-wse32.v        nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x6 vs3 6..0=0x27
-wse64.v        nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x7 vs3 6..0=0x27
-```
-
-# Vector Indexed-Unordered Instructions (including segment part)
-
-`https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#76-vector-indexed-instructions`
-
-```
-wluxei8.v      nf 28=0 27..26=1 vm vs2 rs1 14..12=0x0  vd 6..0=0x07
-wluxei16.v     nf 28=0 27..26=1 vm vs2 rs1 14..12=0x5  vd 6..0=0x07
-wluxei32.v     nf 28=0 27..26=1 vm vs2 rs1 14..12=0x6  vd 6..0=0x07
-wluxei64.v     nf 28=0 27..26=1 vm vs2 rs1 14..12=0x7  vd 6..0=0x07
-wsuxei8.v      nf 28=0 27..26=1 vm vs2 rs1 14..12=0x0 vs3 6..0=0x27
-wsuxei16.v     nf 28=0 27..26=1 vm vs2 rs1 14..12=0x5 vs3 6..0=0x27
-wsuxei32.v     nf 28=0 27..26=1 vm vs2 rs1 14..12=0x6 vs3 6..0=0x27
-wsuxei64.v     nf 28=0 27..26=1 vm vs2 rs1 14..12=0x7 vs3 6..0=0x27
-```
-
-# Vector Strided Instructions (including segment part)
-
-`https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#75-vector-strided-instructions`
-
-```
-wlse8.v         nf 28=0 27..26=2 vm rs2 rs1 14..12=0x0  vd 6..0=0x07
-wlse16.v        nf 28=0 27..26=2 vm rs2 rs1 14..12=0x5  vd 6..0=0x07
-wlse32.v        nf 28=0 27..26=2 vm rs2 rs1 14..12=0x6  vd 6..0=0x07
-wlse64.v        nf 28=0 27..26=2 vm rs2 rs1 14..12=0x7  vd 6..0=0x07
-wsse8.v         nf 28=0 27..26=2 vm rs2 rs1 14..12=0x0 vs3 6..0=0x27
-wsse16.v        nf 28=0 27..26=2 vm rs2 rs1 14..12=0x5 vs3 6..0=0x27
-wsse32.v        nf 28=0 27..26=2 vm rs2 rs1 14..12=0x6 vs3 6..0=0x27
-wsse64.v        nf 28=0 27..26=2 vm rs2 rs1 14..12=0x7 vs3 6..0=0x27
-```
-
-# Vector Indexed-Ordered Instructions (including segment part)
-
-`https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#76-vector-indexed-instructions`
-
-```
-wloxei8.v        nf 28=0 27..26=3 vm vs2 rs1 14..12=0x0  vd 6..0=0x07
-wloxei16.v       nf 28=0 27..26=3 vm vs2 rs1 14..12=0x5  vd 6..0=0x07
-wloxei32.v       nf 28=0 27..26=3 vm vs2 rs1 14..12=0x6  vd 6..0=0x07
-wloxei64.v       nf 28=0 27..26=3 vm vs2 rs1 14..12=0x7  vd 6..0=0x07
-wsoxei8.v        nf 28=0 27..26=3 vm vs2 rs1 14..12=0x0 vs3 6..0=0x27
-wsoxei16.v       nf 28=0 27..26=3 vm vs2 rs1 14..12=0x5 vs3 6..0=0x27
-wsoxei32.v       nf 28=0 27..26=3 vm vs2 rs1 14..12=0x6 vs3 6..0=0x27
-wsoxei64.v       nf 28=0 27..26=3 vm vs2 rs1 14..12=0x7 vs3 6..0=0x27
-```
-
-# Unit-stride Fault-Only-First Loads
-
-`https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#77-unit-stride-fault-only-first-loads`
-
-```
-wle8ff.v         nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x0  vd 6..0=0x07
-wle16ff.v        nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x5  vd 6..0=0x07
-wle32ff.v        nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x6  vd 6..0=0x07
-wle64ff.v        nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x7  vd 6..0=0x07
-```
-
-# Vector Load/Store Whole Registers
-
-`https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#79-vector-loadstore-whole-register-instructions`
-
-```
-wl1re8.v       31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07
-wl1re16.v      31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 vd  6..0=0x07
-wl1re32.v      31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 vd  6..0=0x07
-wl1re64.v      31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 vd  6..0=0x07
-wl2re8.v       31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07
-wl2re16.v      31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 vd  6..0=0x07
-wl2re32.v      31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 vd  6..0=0x07
-wl2re64.v      31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 vd  6..0=0x07
-wl4re8.v       31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07
-wl4re16.v      31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 vd  6..0=0x07
-wl4re32.v      31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 vd  6..0=0x07
-wl4re64.v      31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 vd  6..0=0x07
-wl8re8.v       31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07
-wl8re16.v      31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 vd  6..0=0x07
-wl8re32.v      31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 vd  6..0=0x07
-wl8re64.v      31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 vd  6..0=0x07
-ws1r.v         31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vs3 6..0=0x27
-ws2r.v         31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vs3 6..0=0x27
-ws4r.v         31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vs3 6..0=0x27
-ws8r.v         31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vs3 6..0=0x27
-```
-
-# Vector Floating-Point Instructions
-
-`https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#14-vector-floating-point-instructions`
-
-# OPFVF
-
-```
-wfadd.vf        31..26=0x00 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfsub.vf        31..26=0x02 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfmin.vf        31..26=0x04 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfmax.vf        31..26=0x06 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfsgnj.vf       31..26=0x08 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfsgnjn.vf      31..26=0x09 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfsgnjx.vf      31..26=0x0a vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfslide1up.vf   31..26=0x0e vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfslide1down.vf 31..26=0x0f vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfmv.s.f        31..26=0x10 25=1 24..20=0 rs1      14..12=0x5 vd 6..0=0x57
-
-wfmerge.vfm    31..26=0x17 25=0 vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfmv.v.f       31..26=0x17 25=1 24..20=0 rs1 14..12=0x5 vd 6..0=0x57
-wmfeq.vf       31..26=0x18 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wmfle.vf       31..26=0x19 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wmflt.vf       31..26=0x1b vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wmfne.vf       31..26=0x1c vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wmfgt.vf       31..26=0x1d vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wmfge.vf       31..26=0x1f vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-
-wfdiv.vf       31..26=0x20 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfrdiv.vf      31..26=0x21 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfmul.vf       31..26=0x24 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfrsub.vf      31..26=0x27 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfmadd.vf      31..26=0x28 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfnmadd.vf     31..26=0x29 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfmsub.vf      31..26=0x2a vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfnmsub.vf     31..26=0x2b vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfmacc.vf      31..26=0x2c vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfnmacc.vf     31..26=0x2d vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfmsac.vf      31..26=0x2e vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfnmsac.vf     31..26=0x2f vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-
-wfwadd.vf      31..26=0x30 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfwsub.vf      31..26=0x32 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfwadd.wf      31..26=0x34 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfwsub.wf      31..26=0x36 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfwmul.vf      31..26=0x38 vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfwmacc.vf     31..26=0x3c vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfwnmacc.vf    31..26=0x3d vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfwmsac.vf     31..26=0x3e vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-wfwnmsac.vf    31..26=0x3f vm vs2 rs1 14..12=0x5 vd 6..0=0x57
-```
-
-# OPFVV
-
-```
-wfadd.vv       31..26=0x00 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfredusum.vs   31..26=0x01 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfsub.vv       31..26=0x02 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfredosum.vs   31..26=0x03 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfmin.vv       31..26=0x04 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfredmin.vs    31..26=0x05 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfmax.vv       31..26=0x06 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfredmax.vs    31..26=0x07 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfsgnj.vv      31..26=0x08 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfsgnjn.vv     31..26=0x09 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfsgnjx.vv     31..26=0x0a vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfmv.f.s       31..26=0x10 25=1 vs2      19..15=0 14..12=0x1 rd 6..0=0x57
-
-wmfeq.vv       31..26=0x18 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wmfle.vv       31..26=0x19 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wmflt.vv       31..26=0x1b vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wmfne.vv       31..26=0x1c vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-
-wfdiv.vv       31..26=0x20 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfmul.vv       31..26=0x24 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfmadd.vv      31..26=0x28 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfnmadd.vv     31..26=0x29 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfmsub.vv      31..26=0x2a vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfnmsub.vv     31..26=0x2b vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfmacc.vv      31..26=0x2c vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfnmacc.vv     31..26=0x2d vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfmsac.vv      31..26=0x2e vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfnmsac.vv     31..26=0x2f vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-
-wfcvt.xu.f.v     31..26=0x12 vm vs2 19..15=0x00 14..12=0x1 vd 6..0=0x57
-wfcvt.x.f.v      31..26=0x12 vm vs2 19..15=0x01 14..12=0x1 vd 6..0=0x57
-wfcvt.f.xu.v     31..26=0x12 vm vs2 19..15=0x02 14..12=0x1 vd 6..0=0x57
-wfcvt.f.x.v      31..26=0x12 vm vs2 19..15=0x03 14..12=0x1 vd 6..0=0x57
-wfcvt.rtz.xu.f.v 31..26=0x12 vm vs2 19..15=0x06 14..12=0x1 vd 6..0=0x57
-wfcvt.rtz.x.f.v  31..26=0x12 vm vs2 19..15=0x07 14..12=0x1 vd 6..0=0x57
-
-wfwcvt.xu.f.v     31..26=0x12 vm vs2 19..15=0x08 14..12=0x1 vd 6..0=0x57
-wfwcvt.x.f.v      31..26=0x12 vm vs2 19..15=0x09 14..12=0x1 vd 6..0=0x57
-wfwcvt.f.xu.v     31..26=0x12 vm vs2 19..15=0x0A 14..12=0x1 vd 6..0=0x57
-wfwcvt.f.x.v      31..26=0x12 vm vs2 19..15=0x0B 14..12=0x1 vd 6..0=0x57
-wfwcvt.f.f.v      31..26=0x12 vm vs2 19..15=0x0C 14..12=0x1 vd 6..0=0x57
-wfwcvt.rtz.xu.f.v 31..26=0x12 vm vs2 19..15=0x0E 14..12=0x1 vd 6..0=0x57
-wfwcvt.rtz.x.f.v  31..26=0x12 vm vs2 19..15=0x0F 14..12=0x1 vd 6..0=0x57
-
-wfncvt.xu.f.w     31..26=0x12 vm vs2 19..15=0x10 14..12=0x1 vd 6..0=0x57
-wfncvt.x.f.w      31..26=0x12 vm vs2 19..15=0x11 14..12=0x1 vd 6..0=0x57
-wfncvt.f.xu.w     31..26=0x12 vm vs2 19..15=0x12 14..12=0x1 vd 6..0=0x57
-wfncvt.f.x.w      31..26=0x12 vm vs2 19..15=0x13 14..12=0x1 vd 6..0=0x57
-wfncvt.f.f.w      31..26=0x12 vm vs2 19..15=0x14 14..12=0x1 vd 6..0=0x57
-wfncvt.rod.f.f.w  31..26=0x12 vm vs2 19..15=0x15 14..12=0x1 vd 6..0=0x57
-wfncvt.rtz.xu.f.w 31..26=0x12 vm vs2 19..15=0x16 14..12=0x1 vd 6..0=0x57
-wfncvt.rtz.x.f.w  31..26=0x12 vm vs2 19..15=0x17 14..12=0x1 vd 6..0=0x57
-
-wfsqrt.v       31..26=0x13 vm vs2 19..15=0x00 14..12=0x1 vd 6..0=0x57
-wfrsqrt7.v     31..26=0x13 vm vs2 19..15=0x04 14..12=0x1 vd 6..0=0x57
-wfrec7.v       31..26=0x13 vm vs2 19..15=0x05 14..12=0x1 vd 6..0=0x57
-wfclass.v      31..26=0x13 vm vs2 19..15=0x10 14..12=0x1 vd 6..0=0x57
-
-wfwadd.vv      31..26=0x30 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfwredusum.vs  31..26=0x31 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfwsub.vv      31..26=0x32 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfwredosum.vs  31..26=0x33 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfwadd.wv      31..26=0x34 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfwsub.wv      31..26=0x36 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfwmul.vv      31..26=0x38 vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfwmacc.vv     31..26=0x3c vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfwnmacc.vv    31..26=0x3d vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfwmsac.vv     31..26=0x3e vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-wfwnmsac.vv    31..26=0x3f vm vs2 vs1 14..12=0x1 vd 6..0=0x57
-```
-
-# OPIVX
-
-```
-wadd.vx        31..26=0x00 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wsub.vx        31..26=0x02 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wrsub.vx       31..26=0x03 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wminu.vx       31..26=0x04 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmin.vx        31..26=0x05 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmaxu.vx       31..26=0x06 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmax.vx        31..26=0x07 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wand.vx        31..26=0x09 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wor.vx         31..26=0x0a vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wxor.vx        31..26=0x0b vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wrgather.vx    31..26=0x0c vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wslideup.vx    31..26=0x0e vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wslidedown.vx  31..26=0x0f vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-
-wadc.vxm       31..26=0x10 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmadc.vxm      31..26=0x11 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmadc.vx       31..26=0x11 25=1 vs2 rs1 14..12=0x4 vd 6..0=0x57
-wsbc.vxm       31..26=0x12 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmsbc.vxm      31..26=0x13 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmsbc.vx       31..26=0x13 25=1 vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmerge.vxm     31..26=0x17 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmv.v.x        31..26=0x17 25=1 24..20=0 rs1 14..12=0x4 vd 6..0=0x57
-wmseq.vx       31..26=0x18 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmsne.vx       31..26=0x19 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmsltu.vx      31..26=0x1a vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmslt.vx       31..26=0x1b vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmsleu.vx      31..26=0x1c vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmsle.vx       31..26=0x1d vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmsgtu.vx      31..26=0x1e vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wmsgt.vx       31..26=0x1f vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-
-wsaddu.vx      31..26=0x20 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wsadd.vx       31..26=0x21 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wssubu.vx      31..26=0x22 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wssub.vx       31..26=0x23 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wsll.vx        31..26=0x25 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wsmul.vx       31..26=0x27 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wsrl.vx        31..26=0x28 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wsra.vx        31..26=0x29 vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wssrl.vx       31..26=0x2a vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wssra.vx       31..26=0x2b vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wnsrl.wx       31..26=0x2c vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wnsra.wx       31..26=0x2d vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wnclipu.wx     31..26=0x2e vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-wnclip.wx      31..26=0x2f vm vs2 rs1 14..12=0x4 vd 6..0=0x57
-```
-
-# OPIVV
-
-```
-wadd.vv         31..26=0x00 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wsub.vv         31..26=0x02 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wminu.vv        31..26=0x04 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wmin.vv         31..26=0x05 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wmaxu.vv        31..26=0x06 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wmax.vv         31..26=0x07 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wand.vv         31..26=0x09 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wor.vv          31..26=0x0a vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wxor.vv         31..26=0x0b vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wrgather.vv     31..26=0x0c vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wrgatherei16.vv 31..26=0x0e vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-
-wadc.vvm       31..26=0x10 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57
-wmadc.vvm      31..26=0x11 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57
-wmadc.vv       31..26=0x11 25=1 vs2 vs1 14..12=0x0 vd 6..0=0x57
-wsbc.vvm       31..26=0x12 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57
-wmsbc.vvm      31..26=0x13 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57
-wmsbc.vv       31..26=0x13 25=1 vs2 vs1 14..12=0x0 vd 6..0=0x57
-wmerge.vvm     31..26=0x17 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57
-wmv.v.v        31..26=0x17 25=1 24..20=0 vs1 14..12=0x0 vd 6..0=0x57
-wmseq.vv       31..26=0x18 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wmsne.vv       31..26=0x19 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wmsltu.vv      31..26=0x1a vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wmslt.vv       31..26=0x1b vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wmsleu.vv      31..26=0x1c vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wmsle.vv       31..26=0x1d vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-
-wsaddu.vv      31..26=0x20 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wsadd.vv       31..26=0x21 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wssubu.vv      31..26=0x22 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wssub.vv       31..26=0x23 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wsll.vv        31..26=0x25 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wsmul.vv       31..26=0x27 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wsrl.vv        31..26=0x28 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wsra.vv        31..26=0x29 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wssrl.vv       31..26=0x2a vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wssra.vv       31..26=0x2b vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wnsrl.wv       31..26=0x2c vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wnsra.wv       31..26=0x2d vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wnclipu.wv     31..26=0x2e vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wnclip.wv      31..26=0x2f vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-
-wwredsumu.vs   31..26=0x30 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-wwredsum.vs    31..26=0x31 vm vs2 vs1 14..12=0x0 vd 6..0=0x57
-```
-
-# OPIVI
-
-```
-wadd.vi        31..26=0x00 vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-wrsub.vi       31..26=0x03 vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-wand.vi        31..26=0x09 vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-wor.vi         31..26=0x0a vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-wxor.vi        31..26=0x0b vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-wrgather.vi    31..26=0x0c vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-wslideup.vi    31..26=0x0e vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-wslidedown.vi  31..26=0x0f vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-
-wadc.vim       31..26=0x10 25=0 vs2 simm5 14..12=0x3 vd 6..0=0x57
-wmadc.vim      31..26=0x11 25=0 vs2 simm5 14..12=0x3 vd 6..0=0x57
-wmadc.vi       31..26=0x11 25=1 vs2 simm5 14..12=0x3 vd 6..0=0x57
-wmerge.vim     31..26=0x17 25=0 vs2 simm5 14..12=0x3 vd 6..0=0x57
-wmv.v.i        31..26=0x17 25=1 24..20=0 simm5 14..12=0x3 vd 6..0=0x57
-wmseq.vi       31..26=0x18 vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-wmsne.vi       31..26=0x19 vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-wmsleu.vi      31..26=0x1c vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-wmsle.vi       31..26=0x1d vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-wmsgtu.vi      31..26=0x1e vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-wmsgt.vi       31..26=0x1f vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-
-wsaddu.vi      31..26=0x20 vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-wsadd.vi       31..26=0x21 vm vs2 simm5 14..12=0x3 vd 6..0=0x57
-wsll.vi        31..26=0x25 vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-wmv1r.v        31..26=0x27 25=1 vs2 19..15=0 14..12=0x3 vd 6..0=0x57
-wmv2r.v        31..26=0x27 25=1 vs2 19..15=1 14..12=0x3 vd 6..0=0x57
-wmv4r.v        31..26=0x27 25=1 vs2 19..15=3 14..12=0x3 vd 6..0=0x57
-wmv8r.v        31..26=0x27 25=1 vs2 19..15=7 14..12=0x3 vd 6..0=0x57
-wsrl.vi        31..26=0x28 vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-wsra.vi        31..26=0x29 vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-wssrl.vi       31..26=0x2a vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-wssra.vi       31..26=0x2b vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-wnsrl.wi       31..26=0x2c vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-wnsra.wi       31..26=0x2d vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-wnclipu.wi     31..26=0x2e vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-wnclip.wi      31..26=0x2f vm vs2 zimm5 14..12=0x3 vd 6..0=0x57
-```
-
-# Vector Integer Extension Instructions
-
-`https://github.com/riscv/riscv-v-spec/blob/e49574c92b072fd4d71e6cb20f7e8154de5b83fe/v-spec.adoc#123-vector-integer-extension`
-
-```
-wzext.vf8      31..26=0x12 vm vs2 19..15=2 14..12=0x2 vd 6..0=0x57
-wsext.vf8      31..26=0x12 vm vs2 19..15=3 14..12=0x2 vd 6..0=0x57
-wzext.vf4      31..26=0x12 vm vs2 19..15=4 14..12=0x2 vd 6..0=0x57
-wsext.vf4      31..26=0x12 vm vs2 19..15=5 14..12=0x2 vd 6..0=0x57
-wzext.vf2      31..26=0x12 vm vs2 19..15=6 14..12=0x2 vd 6..0=0x57
-wsext.vf2      31..26=0x12 vm vs2 19..15=7 14..12=0x2 vd 6..0=0x57
-
-wcompress.vm   31..26=0x17 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-wmandn.mm      31..26=0x18 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-wmand.mm       31..26=0x19 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-wmor.mm        31..26=0x1a 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-wmxor.mm       31..26=0x1b 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-wmorn.mm       31..26=0x1c 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-wmnand.mm      31..26=0x1d 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-wmnor.mm       31..26=0x1e 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-wmxnor.mm      31..26=0x1f 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57
-
-wmsbf.m        31..26=0x14 vm vs2 19..15=0x01 14..12=0x2 vd 6..0=0x57
-wmsof.m        31..26=0x14 vm vs2 19..15=0x02 14..12=0x2 vd 6..0=0x57
-wmsif.m        31..26=0x14 vm vs2 19..15=0x03 14..12=0x2 vd 6..0=0x57
-wiota.m        31..26=0x14 vm vs2 19..15=0x10 14..12=0x2 vd 6..0=0x57
-wid.v          31..26=0x14 vm 24..20=0 19..15=0x11 14..12=0x2 vd 6..0=0x57
-wcpop.m        31..26=0x10 vm vs2 19..15=0x10 14..12=0x2 rd 6..0=0x57
-wfirst.m       31..26=0x10 vm vs2 19..15=0x11 14..12=0x2 rd 6..0=0x57
-
-wdivu.vv       31..26=0x20 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wdiv.vv        31..26=0x21 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wremu.vv       31..26=0x22 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wrem.vv        31..26=0x23 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wmulhu.vv      31..26=0x24 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wmul.vv        31..26=0x25 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wmulhsu.vv     31..26=0x26 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wmulh.vv       31..26=0x27 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wmadd.vv       31..26=0x29 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wnmsub.vv      31..26=0x2b vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wmacc.vv       31..26=0x2d vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wnmsac.vv      31..26=0x2f vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-
-wwaddu.vv      31..26=0x30 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wwadd.vv       31..26=0x31 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wwsubu.vv      31..26=0x32 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wwsub.vv       31..26=0x33 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wwaddu.wv      31..26=0x34 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wwadd.wv       31..26=0x35 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wwsubu.wv      31..26=0x36 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wwsub.wv       31..26=0x37 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wwmulu.vv      31..26=0x38 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wwmulsu.vv     31..26=0x3a vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wwmul.vv       31..26=0x3b vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wwmaccu.vv     31..26=0x3c vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wwmacc.vv      31..26=0x3d vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wwmaccsu.vv    31..26=0x3f vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-```
-
-# OPMVV
-
-```
-wredsum.vs     31..26=0x00 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wredand.vs     31..26=0x01 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wredor.vs      31..26=0x02 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wredxor.vs     31..26=0x03 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wredminu.vs    31..26=0x04 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wredmin.vs     31..26=0x05 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wredmaxu.vs    31..26=0x06 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wredmax.vs     31..26=0x07 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-waaddu.vv      31..26=0x08 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-waadd.vv       31..26=0x09 vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wasubu.vv      31..26=0x0a vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-wasub.vv       31..26=0x0b vm vs2 vs1 14..12=0x2 vd 6..0=0x57
-
-wmv.x.s        31..26=0x10 25=1 vs2 19..15=0 14..12=0x2 rd 6..0=0x57
-```
-
-# OPMVX
-
-```
-waaddu.vx      31..26=0x08 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-waadd.vx       31..26=0x09 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wasubu.vx      31..26=0x0a vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wasub.vx       31..26=0x0b vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-
-wmv.s.x        31..26=0x10 25=1 24..20=0 rs1 14..12=0x6 vd 6..0=0x57
-wslide1up.vx   31..26=0x0e vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wslide1down.vx 31..26=0x0f vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-
-wdivu.vx       31..26=0x20 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wdiv.vx        31..26=0x21 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wremu.vx       31..26=0x22 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wrem.vx        31..26=0x23 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wmulhu.vx      31..26=0x24 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wmul.vx        31..26=0x25 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wmulhsu.vx     31..26=0x26 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wmulh.vx       31..26=0x27 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wmadd.vx       31..26=0x29 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wnmsub.vx      31..26=0x2b vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wmacc.vx       31..26=0x2d vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wnmsac.vx      31..26=0x2f vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-
-wwaddu.vx      31..26=0x30 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wwadd.vx       31..26=0x31 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wwsubu.vx      31..26=0x32 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wwsub.vx       31..26=0x33 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wwaddu.wx      31..26=0x34 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wwadd.wx       31..26=0x35 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wwsubu.wx      31..26=0x36 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wwsub.wx       31..26=0x37 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wwmulu.vx      31..26=0x38 vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wwmulsu.vx     31..26=0x3a vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wwmul.vx       31..26=0x3b vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wwmaccu.vx     31..26=0x3c vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wwmacc.vx      31..26=0x3d vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wwmaccus.vx    31..26=0x3e vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-wwmaccsu.vx    31..26=0x3f vm vs2 rs1 14..12=0x6 vd 6..0=0x57
-
-# vmv1r.v, vmv2r.v, vmv4r.v, vmv8r.v
-#@vmvnfr.v     31..26=0x27 25=1 vs2 simm5 14..12=0x3 vd 6..0=0x57
-```
+## INSTRUCTION OPCODES
+
+| **Extension** | **Name**               | **Variable-Fields**  | **Encoding**                       | **Match**    | **Mask**     |
+|:--------------|:-----------------------|:---------------------|:-----------------------------------|:-------------|:-------------|
+| `rv_w`        | `waaddu_ww`            | `wm, ws2, ws1, wd`   | `001000-----------010-----0001011` | `0x2000200b` | `0xfc00707f` |
+| `rv_w`        | `waaddu_wx`            | `wm, ws2, rs1, wd`   | `001000-----------110-----0001011` | `0x2000600b` | `0xfc00707f` |
+| `rv_w`        | `waadd_ww`             | `wm, ws2, ws1, wd`   | `001001-----------010-----0001011` | `0x2400200b` | `0xfc00707f` |
+| `rv_w`        | `waadd_wx`             | `wm, ws2, rs1, wd`   | `001001-----------110-----0001011` | `0x2400600b` | `0xfc00707f` |
+| `rv_w`        | `wadc_wim`             | `ws2, simm5, wd`     | `0100000----------011-----0001011` | `0x4000300b` | `0xfe00707f` |
+| `rv_w`        | `wadc_wwm`             | `ws2, ws1, wd`       | `0100000----------000-----0001011` | `0x4000000b` | `0xfe00707f` |
+| `rv_w`        | `wadc_wxm`             | `ws2, rs1, wd`       | `0100000----------100-----0001011` | `0x4000400b` | `0xfe00707f` |
+| `rv_w`        | `wadd_wi`              | `wm, ws2, simm5, wd` | `000000-----------011-----0001011` | `0x0000300b` | `0xfc00707f` |
+| `rv_w`        | `wadd_ww`              | `wm, ws2, ws1, wd`   | `000000-----------000-----0001011` | `0x0000000b` | `0xfc00707f` |
+| `rv_w`        | `wadd_wx`              | `wm, ws2, rs1, wd`   | `000000-----------100-----0001011` | `0x0000400b` | `0xfc00707f` |
+| `rv_w`        | `wand_wi`              | `wm, ws2, simm5, wd` | `001001-----------011-----0001011` | `0x2400300b` | `0xfc00707f` |
+| `rv_w`        | `wand_ww`              | `wm, ws2, ws1, wd`   | `001001-----------000-----0001011` | `0x2400000b` | `0xfc00707f` |
+| `rv_w`        | `wand_wx`              | `wm, ws2, rs1, wd`   | `001001-----------100-----0001011` | `0x2400400b` | `0xfc00707f` |
+| `rv_w`        | `wasubu_ww`            | `wm, ws2, ws1, wd`   | `001010-----------010-----0001011` | `0x2800200b` | `0xfc00707f` |
+| `rv_w`        | `wasubu_wx`            | `wm, ws2, rs1, wd`   | `001010-----------110-----0001011` | `0x2800600b` | `0xfc00707f` |
+| `rv_w`        | `wasub_ww`             | `wm, ws2, ws1, wd`   | `001011-----------010-----0001011` | `0x2c00200b` | `0xfc00707f` |
+| `rv_w`        | `wasub_wx`             | `wm, ws2, rs1, wd`   | `001011-----------110-----0001011` | `0x2c00600b` | `0xfc00707f` |
+| `rv_w`        | `wcompress_wm`         | `ws2, ws1, wd`       | `0101111----------010-----0001011` | `0x5e00200b` | `0xfe00707f` |
+| `rv_w`        | `wcpop_m`              | `wm, ws2, rd`        | `010000------10000010-----0001011` | `0x4008200b` | `0xfc0ff07f` |
+| `rv_w`        | `wdivu_ww`             | `wm, ws2, ws1, wd`   | `100000-----------010-----0001011` | `0x8000200b` | `0xfc00707f` |
+| `rv_w`        | `wdivu_wx`             | `wm, ws2, rs1, wd`   | `100000-----------110-----0001011` | `0x8000600b` | `0xfc00707f` |
+| `rv_w`        | `wdiv_ww`              | `wm, ws2, ws1, wd`   | `100001-----------010-----0001011` | `0x8400200b` | `0xfc00707f` |
+| `rv_w`        | `wdiv_wx`              | `wm, ws2, rs1, wd`   | `100001-----------110-----0001011` | `0x8400600b` | `0xfc00707f` |
+| `rv_w`        | `wfadd_wf`             | `wm, ws2, rs1, wd`   | `000000-----------101-----0001011` | `0x0000500b` | `0xfc00707f` |
+| `rv_w`        | `wfadd_ww`             | `wm, ws2, ws1, wd`   | `000000-----------001-----0001011` | `0x0000100b` | `0xfc00707f` |
+| `rv_w`        | `wfclass_w`            | `wm, ws2, wd`        | `010011------10000001-----0001011` | `0x4c08100b` | `0xfc0ff07f` |
+| `rv_w`        | `wfcvt_f_xu_w`         | `wm, ws2, wd`        | `010010------00010001-----0001011` | `0x4801100b` | `0xfc0ff07f` |
+| `rv_w`        | `wfcvt_f_x_w`          | `wm, ws2, wd`        | `010010------00011001-----0001011` | `0x4801900b` | `0xfc0ff07f` |
+| `rv_w`        | `wfcvt_rtz_x_f_w`      | `wm, ws2, wd`        | `010010------00111001-----0001011` | `0x4803900b` | `0xfc0ff07f` |
+| `rv_w`        | `wfcvt_rtz_xu_f_w`     | `wm, ws2, wd`        | `010010------00110001-----0001011` | `0x4803100b` | `0xfc0ff07f` |
+| `rv_w`        | `wfcvt_x_f_w`          | `wm, ws2, wd`        | `010010------00001001-----0001011` | `0x4800900b` | `0xfc0ff07f` |
+| `rv_w`        | `wfcvt_xu_f_w`         | `wm, ws2, wd`        | `010010------00000001-----0001011` | `0x4800100b` | `0xfc0ff07f` |
+| `rv_w`        | `wfdiv_wf`             | `wm, ws2, rs1, wd`   | `100000-----------101-----0001011` | `0x8000500b` | `0xfc00707f` |
+| `rv_w`        | `wfdiv_ww`             | `wm, ws2, ws1, wd`   | `100000-----------001-----0001011` | `0x8000100b` | `0xfc00707f` |
+| `rv_w`        | `wfirst_m`             | `wm, ws2, rd`        | `010000------10001010-----0001011` | `0x4008a00b` | `0xfc0ff07f` |
+| `rv_w`        | `wfmacc_wf`            | `wm, ws2, rs1, wd`   | `101100-----------101-----0001011` | `0xb000500b` | `0xfc00707f` |
+| `rv_w`        | `wfmacc_ww`            | `wm, ws2, ws1, wd`   | `101100-----------001-----0001011` | `0xb000100b` | `0xfc00707f` |
+| `rv_w`        | `wfmadd_wf`            | `wm, ws2, rs1, wd`   | `101000-----------101-----0001011` | `0xa000500b` | `0xfc00707f` |
+| `rv_w`        | `wfmadd_ww`            | `wm, ws2, ws1, wd`   | `101000-----------001-----0001011` | `0xa000100b` | `0xfc00707f` |
+| `rv_w`        | `wfmax_wf`             | `wm, ws2, rs1, wd`   | `000110-----------101-----0001011` | `0x1800500b` | `0xfc00707f` |
+| `rv_w`        | `wfmax_ww`             | `wm, ws2, ws1, wd`   | `000110-----------001-----0001011` | `0x1800100b` | `0xfc00707f` |
+| `rv_w`        | `wfmerge_wfm`          | `ws2, rs1, wd`       | `0101110----------101-----0001011` | `0x5c00500b` | `0xfe00707f` |
+| `rv_w`        | `wfmin_wf`             | `wm, ws2, rs1, wd`   | `000100-----------101-----0001011` | `0x1000500b` | `0xfc00707f` |
+| `rv_w`        | `wfmin_ww`             | `wm, ws2, ws1, wd`   | `000100-----------001-----0001011` | `0x1000100b` | `0xfc00707f` |
+| `rv_w`        | `wfmsac_wf`            | `wm, ws2, rs1, wd`   | `101110-----------101-----0001011` | `0xb800500b` | `0xfc00707f` |
+| `rv_w`        | `wfmsac_ww`            | `wm, ws2, ws1, wd`   | `101110-----------001-----0001011` | `0xb800100b` | `0xfc00707f` |
+| `rv_w`        | `wfmsub_wf`            | `wm, ws2, rs1, wd`   | `101010-----------101-----0001011` | `0xa800500b` | `0xfc00707f` |
+| `rv_w`        | `wfmsub_ww`            | `wm, ws2, ws1, wd`   | `101010-----------001-----0001011` | `0xa800100b` | `0xfc00707f` |
+| `rv_w`        | `wfmul_wf`             | `wm, ws2, rs1, wd`   | `100100-----------101-----0001011` | `0x9000500b` | `0xfc00707f` |
+| `rv_w`        | `wfmul_ww`             | `wm, ws2, ws1, wd`   | `100100-----------001-----0001011` | `0x9000100b` | `0xfc00707f` |
+| `rv_w`        | `wfmv_f_s`             | `ws2, rd`            | `0100001-----00000001-----0001011` | `0x4200100b` | `0xfe0ff07f` |
+| `rv_w`        | `wfmv_s_f`             | `rs1, wd`            | `010000100000-----101-----0001011` | `0x4200500b` | `0xfff0707f` |
+| `rv_w`        | `wfmv_w_f`             | `rs1, wd`            | `010111100000-----101-----0001011` | `0x5e00500b` | `0xfff0707f` |
+| `rv_w`        | `wfncvt_f_f_wide`      | `wm, ws2, wd`        | `010010------10100001-----0001011` | `0x480a100b` | `0xfc0ff07f` |
+| `rv_w`        | `wfncvt_f_xu_wide`     | `wm, ws2, wd`        | `010010------10010001-----0001011` | `0x4809100b` | `0xfc0ff07f` |
+| `rv_w`        | `wfncvt_f_x_wide`      | `wm, ws2, wd`        | `010010------10011001-----0001011` | `0x4809900b` | `0xfc0ff07f` |
+| `rv_w`        | `wfncvt_rod_f_f_wide`  | `wm, ws2, wd`        | `010010------10101001-----0001011` | `0x480a900b` | `0xfc0ff07f` |
+| `rv_w`        | `wfncvt_rtz_x_f_wide`  | `wm, ws2, wd`        | `010010------10111001-----0001011` | `0x480b900b` | `0xfc0ff07f` |
+| `rv_w`        | `wfncvt_rtz_xu_f_wide` | `wm, ws2, wd`        | `010010------10110001-----0001011` | `0x480b100b` | `0xfc0ff07f` |
+| `rv_w`        | `wfncvt_x_f_wide`      | `wm, ws2, wd`        | `010010------10001001-----0001011` | `0x4808900b` | `0xfc0ff07f` |
+| `rv_w`        | `wfncvt_xu_f_wide`     | `wm, ws2, wd`        | `010010------10000001-----0001011` | `0x4808100b` | `0xfc0ff07f` |
+| `rv_w`        | `wfnmacc_wf`           | `wm, ws2, rs1, wd`   | `101101-----------101-----0001011` | `0xb400500b` | `0xfc00707f` |
+| `rv_w`        | `wfnmacc_ww`           | `wm, ws2, ws1, wd`   | `101101-----------001-----0001011` | `0xb400100b` | `0xfc00707f` |
+| `rv_w`        | `wfnmadd_wf`           | `wm, ws2, rs1, wd`   | `101001-----------101-----0001011` | `0xa400500b` | `0xfc00707f` |
+| `rv_w`        | `wfnmadd_ww`           | `wm, ws2, ws1, wd`   | `101001-----------001-----0001011` | `0xa400100b` | `0xfc00707f` |
+| `rv_w`        | `wfnmsac_wf`           | `wm, ws2, rs1, wd`   | `101111-----------101-----0001011` | `0xbc00500b` | `0xfc00707f` |
+| `rv_w`        | `wfnmsac_ww`           | `wm, ws2, ws1, wd`   | `101111-----------001-----0001011` | `0xbc00100b` | `0xfc00707f` |
+| `rv_w`        | `wfnmsub_wf`           | `wm, ws2, rs1, wd`   | `101011-----------101-----0001011` | `0xac00500b` | `0xfc00707f` |
+| `rv_w`        | `wfnmsub_ww`           | `wm, ws2, ws1, wd`   | `101011-----------001-----0001011` | `0xac00100b` | `0xfc00707f` |
+| `rv_w`        | `wfrdiv_wf`            | `wm, ws2, rs1, wd`   | `100001-----------101-----0001011` | `0x8400500b` | `0xfc00707f` |
+| `rv_w`        | `wfrec7_w`             | `wm, ws2, wd`        | `010011------00101001-----0001011` | `0x4c02900b` | `0xfc0ff07f` |
+| `rv_w`        | `wfredmax_ws`          | `wm, ws2, ws1, wd`   | `000111-----------001-----0001011` | `0x1c00100b` | `0xfc00707f` |
+| `rv_w`        | `wfredmin_ws`          | `wm, ws2, ws1, wd`   | `000101-----------001-----0001011` | `0x1400100b` | `0xfc00707f` |
+| `rv_w`        | `wfredosum_ws`         | `wm, ws2, ws1, wd`   | `000011-----------001-----0001011` | `0x0c00100b` | `0xfc00707f` |
+| `rv_w`        | `wfredusum_ws`         | `wm, ws2, ws1, wd`   | `000001-----------001-----0001011` | `0x0400100b` | `0xfc00707f` |
+| `rv_w`        | `wfrsqrt7_w`           | `wm, ws2, wd`        | `010011------00100001-----0001011` | `0x4c02100b` | `0xfc0ff07f` |
+| `rv_w`        | `wfrsub_wf`            | `wm, ws2, rs1, wd`   | `100111-----------101-----0001011` | `0x9c00500b` | `0xfc00707f` |
+| `rv_w`        | `wfsgnjn_wf`           | `wm, ws2, rs1, wd`   | `001001-----------101-----0001011` | `0x2400500b` | `0xfc00707f` |
+| `rv_w`        | `wfsgnjn_ww`           | `wm, ws2, ws1, wd`   | `001001-----------001-----0001011` | `0x2400100b` | `0xfc00707f` |
+| `rv_w`        | `wfsgnj_wf`            | `wm, ws2, rs1, wd`   | `001000-----------101-----0001011` | `0x2000500b` | `0xfc00707f` |
+| `rv_w`        | `wfsgnj_ww`            | `wm, ws2, ws1, wd`   | `001000-----------001-----0001011` | `0x2000100b` | `0xfc00707f` |
+| `rv_w`        | `wfsgnjx_wf`           | `wm, ws2, rs1, wd`   | `001010-----------101-----0001011` | `0x2800500b` | `0xfc00707f` |
+| `rv_w`        | `wfsgnjx_ww`           | `wm, ws2, ws1, wd`   | `001010-----------001-----0001011` | `0x2800100b` | `0xfc00707f` |
+| `rv_w`        | `wfslide1down_wf`      | `wm, ws2, rs1, wd`   | `001111-----------101-----0001011` | `0x3c00500b` | `0xfc00707f` |
+| `rv_w`        | `wfslide1up_wf`        | `wm, ws2, rs1, wd`   | `001110-----------101-----0001011` | `0x3800500b` | `0xfc00707f` |
+| `rv_w`        | `wfsqrt_w`             | `wm, ws2, wd`        | `010011------00000001-----0001011` | `0x4c00100b` | `0xfc0ff07f` |
+| `rv_w`        | `wfsub_wf`             | `wm, ws2, rs1, wd`   | `000010-----------101-----0001011` | `0x0800500b` | `0xfc00707f` |
+| `rv_w`        | `wfsub_ww`             | `wm, ws2, ws1, wd`   | `000010-----------001-----0001011` | `0x0800100b` | `0xfc00707f` |
+| `rv_w`        | `wfwadd_wf`            | `wm, ws2, rs1, wd`   | `110000-----------101-----0001011` | `0xc000500b` | `0xfc00707f` |
+| `rv_w`        | `wfwadd_ww`            | `wm, ws2, ws1, wd`   | `110000-----------001-----0001011` | `0xc000100b` | `0xfc00707f` |
+| `rv_w`        | `wfwadd_wide_wf`       | `wm, ws2, rs1, wd`   | `110100-----------101-----0001011` | `0xd000500b` | `0xfc00707f` |
+| `rv_w`        | `wfwadd_wide_ww`       | `wm, ws2, ws1, wd`   | `110100-----------001-----0001011` | `0xd000100b` | `0xfc00707f` |
+| `rv_w`        | `wfwcvt_f_f_w`         | `wm, ws2, wd`        | `010010------01100001-----0001011` | `0x4806100b` | `0xfc0ff07f` |
+| `rv_w`        | `wfwcvt_f_xu_w`        | `wm, ws2, wd`        | `010010------01010001-----0001011` | `0x4805100b` | `0xfc0ff07f` |
+| `rv_w`        | `wfwcvt_f_x_w`         | `wm, ws2, wd`        | `010010------01011001-----0001011` | `0x4805900b` | `0xfc0ff07f` |
+| `rv_w`        | `wfwcvt_rtz_x_f_w`     | `wm, ws2, wd`        | `010010------01111001-----0001011` | `0x4807900b` | `0xfc0ff07f` |
+| `rv_w`        | `wfwcvt_rtz_xu_f_w`    | `wm, ws2, wd`        | `010010------01110001-----0001011` | `0x4807100b` | `0xfc0ff07f` |
+| `rv_w`        | `wfwcvt_x_f_w`         | `wm, ws2, wd`        | `010010------01001001-----0001011` | `0x4804900b` | `0xfc0ff07f` |
+| `rv_w`        | `wfwcvt_xu_f_w`        | `wm, ws2, wd`        | `010010------01000001-----0001011` | `0x4804100b` | `0xfc0ff07f` |
+| `rv_w`        | `wfwmacc_wf`           | `wm, ws2, rs1, wd`   | `111100-----------101-----0001011` | `0xf000500b` | `0xfc00707f` |
+| `rv_w`        | `wfwmacc_ww`           | `wm, ws2, ws1, wd`   | `111100-----------001-----0001011` | `0xf000100b` | `0xfc00707f` |
+| `rv_w`        | `wfwmsac_wf`           | `wm, ws2, rs1, wd`   | `111110-----------101-----0001011` | `0xf800500b` | `0xfc00707f` |
+| `rv_w`        | `wfwmsac_ww`           | `wm, ws2, ws1, wd`   | `111110-----------001-----0001011` | `0xf800100b` | `0xfc00707f` |
+| `rv_w`        | `wfwmul_wf`            | `wm, ws2, rs1, wd`   | `111000-----------101-----0001011` | `0xe000500b` | `0xfc00707f` |
+| `rv_w`        | `wfwmul_ww`            | `wm, ws2, ws1, wd`   | `111000-----------001-----0001011` | `0xe000100b` | `0xfc00707f` |
+| `rv_w`        | `wfwnmacc_wf`          | `wm, ws2, rs1, wd`   | `111101-----------101-----0001011` | `0xf400500b` | `0xfc00707f` |
+| `rv_w`        | `wfwnmacc_ww`          | `wm, ws2, ws1, wd`   | `111101-----------001-----0001011` | `0xf400100b` | `0xfc00707f` |
+| `rv_w`        | `wfwnmsac_wf`          | `wm, ws2, rs1, wd`   | `111111-----------101-----0001011` | `0xfc00500b` | `0xfc00707f` |
+| `rv_w`        | `wfwnmsac_ww`          | `wm, ws2, ws1, wd`   | `111111-----------001-----0001011` | `0xfc00100b` | `0xfc00707f` |
+| `rv_w`        | `wfwredosum_ws`        | `wm, ws2, ws1, wd`   | `110011-----------001-----0001011` | `0xcc00100b` | `0xfc00707f` |
+| `rv_w`        | `wfwredusum_ws`        | `wm, ws2, ws1, wd`   | `110001-----------001-----0001011` | `0xc400100b` | `0xfc00707f` |
+| `rv_w`        | `wfwsub_wf`            | `wm, ws2, rs1, wd`   | `110010-----------101-----0001011` | `0xc800500b` | `0xfc00707f` |
+| `rv_w`        | `wfwsub_ww`            | `wm, ws2, ws1, wd`   | `110010-----------001-----0001011` | `0xc800100b` | `0xfc00707f` |
+| `rv_w`        | `wfwsub_wide_wf`       | `wm, ws2, rs1, wd`   | `110110-----------101-----0001011` | `0xd800500b` | `0xfc00707f` |
+| `rv_w`        | `wfwsub_wide_ww`       | `wm, ws2, ws1, wd`   | `110110-----------001-----0001011` | `0xd800100b` | `0xfc00707f` |
+| `rv_w`        | `wid_w`                | `wm, wd`             | `010100-0000010001010-----0001011` | `0x5008a00b` | `0xfdfff07f` |
+| `rv_w`        | `wiota_m`              | `wm, ws2, wd`        | `010100------10000010-----0001011` | `0x5008200b` | `0xfc0ff07f` |
+| `rv_w`        | `wl1re16_w`            | `rs1, wd`            | `000000101000-----101-----0000111` | `0x02805007` | `0xfff0707f` |
+| `rv_w`        | `wl1re32_w`            | `rs1, wd`            | `000000101000-----110-----0000111` | `0x02806007` | `0xfff0707f` |
+| `rv_w`        | `wl1re64_w`            | `rs1, wd`            | `000000101000-----111-----0000111` | `0x02807007` | `0xfff0707f` |
+| `rv_w`        | `wl1re8_w`             | `rs1, wd`            | `000000101000-----000-----0000111` | `0x02800007` | `0xfff0707f` |
+| `rv_w`        | `wl2re16_w`            | `rs1, wd`            | `001000101000-----101-----0000111` | `0x22805007` | `0xfff0707f` |
+| `rv_w`        | `wl2re32_w`            | `rs1, wd`            | `001000101000-----110-----0000111` | `0x22806007` | `0xfff0707f` |
+| `rv_w`        | `wl2re64_w`            | `rs1, wd`            | `001000101000-----111-----0000111` | `0x22807007` | `0xfff0707f` |
+| `rv_w`        | `wl2re8_w`             | `rs1, wd`            | `001000101000-----000-----0000111` | `0x22800007` | `0xfff0707f` |
+| `rv_w`        | `wl4re16_w`            | `rs1, wd`            | `011000101000-----101-----0000111` | `0x62805007` | `0xfff0707f` |
+| `rv_w`        | `wl4re32_w`            | `rs1, wd`            | `011000101000-----110-----0000111` | `0x62806007` | `0xfff0707f` |
+| `rv_w`        | `wl4re64_w`            | `rs1, wd`            | `011000101000-----111-----0000111` | `0x62807007` | `0xfff0707f` |
+| `rv_w`        | `wl4re8_w`             | `rs1, wd`            | `011000101000-----000-----0000111` | `0x62800007` | `0xfff0707f` |
+| `rv_w`        | `wl8re16_w`            | `rs1, wd`            | `111000101000-----101-----0000111` | `0xe2805007` | `0xfff0707f` |
+| `rv_w`        | `wl8re32_w`            | `rs1, wd`            | `111000101000-----110-----0000111` | `0xe2806007` | `0xfff0707f` |
+| `rv_w`        | `wl8re64_w`            | `rs1, wd`            | `111000101000-----111-----0000111` | `0xe2807007` | `0xfff0707f` |
+| `rv_w`        | `wl8re8_w`             | `rs1, wd`            | `111000101000-----000-----0000111` | `0xe2800007` | `0xfff0707f` |
+| `rv_w`        | `wle16ff_w`            | `wm, rs1, wd`        | `000000-10000-----101-----0000111` | `0x01005007` | `0xfdf0707f` |
+| `rv_w`        | `wle16_w`              | `wm, rs1, wd`        | `000000-00000-----101-----0000111` | `0x00005007` | `0xfdf0707f` |
+| `rv_w`        | `wle32ff_w`            | `wm, rs1, wd`        | `000000-10000-----110-----0000111` | `0x01006007` | `0xfdf0707f` |
+| `rv_w`        | `wle32_w`              | `wm, rs1, wd`        | `000000-00000-----110-----0000111` | `0x00006007` | `0xfdf0707f` |
+| `rv_w`        | `wle64ff_w`            | `wm, rs1, wd`        | `000000-10000-----111-----0000111` | `0x01007007` | `0xfdf0707f` |
+| `rv_w`        | `wle64_w`              | `wm, rs1, wd`        | `000000-00000-----111-----0000111` | `0x00007007` | `0xfdf0707f` |
+| `rv_w`        | `wle8ff_w`             | `wm, rs1, wd`        | `000000-10000-----000-----0000111` | `0x01000007` | `0xfdf0707f` |
+| `rv_w`        | `wle8_w`               | `wm, rs1, wd`        | `000000-00000-----000-----0000111` | `0x00000007` | `0xfdf0707f` |
+| `rv_w`        | `wlm_w`                | `rs1, wd`            | `000000101011-----000-----0000111` | `0x02b00007` | `0xfff0707f` |
+| `rv_w`        | `wloxei16_w`           | `wm, ws2, rs1, wd`   | `000011-----------101-----0000111` | `0x0c005007` | `0xfc00707f` |
+| `rv_w`        | `wloxei32_w`           | `wm, ws2, rs1, wd`   | `000011-----------110-----0000111` | `0x0c006007` | `0xfc00707f` |
+| `rv_w`        | `wloxei64_w`           | `wm, ws2, rs1, wd`   | `000011-----------111-----0000111` | `0x0c007007` | `0xfc00707f` |
+| `rv_w`        | `wloxei8_w`            | `wm, ws2, rs1, wd`   | `000011-----------000-----0000111` | `0x0c000007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg2ei16_w`       | `wm, ws2, rs1, wd`   | `001011-----------101-----0000111` | `0x2c005007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg2ei32_w`       | `wm, ws2, rs1, wd`   | `001011-----------110-----0000111` | `0x2c006007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg2ei64_w`       | `wm, ws2, rs1, wd`   | `001011-----------111-----0000111` | `0x2c007007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg2ei8_w`        | `wm, ws2, rs1, wd`   | `001011-----------000-----0000111` | `0x2c000007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg3ei16_w`       | `wm, ws2, rs1, wd`   | `010011-----------101-----0000111` | `0x4c005007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg3ei32_w`       | `wm, ws2, rs1, wd`   | `010011-----------110-----0000111` | `0x4c006007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg3ei64_w`       | `wm, ws2, rs1, wd`   | `010011-----------111-----0000111` | `0x4c007007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg3ei8_w`        | `wm, ws2, rs1, wd`   | `010011-----------000-----0000111` | `0x4c000007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg4ei16_w`       | `wm, ws2, rs1, wd`   | `011011-----------101-----0000111` | `0x6c005007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg4ei32_w`       | `wm, ws2, rs1, wd`   | `011011-----------110-----0000111` | `0x6c006007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg4ei64_w`       | `wm, ws2, rs1, wd`   | `011011-----------111-----0000111` | `0x6c007007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg4ei8_w`        | `wm, ws2, rs1, wd`   | `011011-----------000-----0000111` | `0x6c000007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg5ei16_w`       | `wm, ws2, rs1, wd`   | `100011-----------101-----0000111` | `0x8c005007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg5ei32_w`       | `wm, ws2, rs1, wd`   | `100011-----------110-----0000111` | `0x8c006007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg5ei64_w`       | `wm, ws2, rs1, wd`   | `100011-----------111-----0000111` | `0x8c007007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg5ei8_w`        | `wm, ws2, rs1, wd`   | `100011-----------000-----0000111` | `0x8c000007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg6ei16_w`       | `wm, ws2, rs1, wd`   | `101011-----------101-----0000111` | `0xac005007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg6ei32_w`       | `wm, ws2, rs1, wd`   | `101011-----------110-----0000111` | `0xac006007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg6ei64_w`       | `wm, ws2, rs1, wd`   | `101011-----------111-----0000111` | `0xac007007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg6ei8_w`        | `wm, ws2, rs1, wd`   | `101011-----------000-----0000111` | `0xac000007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg7ei16_w`       | `wm, ws2, rs1, wd`   | `110011-----------101-----0000111` | `0xcc005007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg7ei32_w`       | `wm, ws2, rs1, wd`   | `110011-----------110-----0000111` | `0xcc006007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg7ei64_w`       | `wm, ws2, rs1, wd`   | `110011-----------111-----0000111` | `0xcc007007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg7ei8_w`        | `wm, ws2, rs1, wd`   | `110011-----------000-----0000111` | `0xcc000007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg8ei16_w`       | `wm, ws2, rs1, wd`   | `111011-----------101-----0000111` | `0xec005007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg8ei32_w`       | `wm, ws2, rs1, wd`   | `111011-----------110-----0000111` | `0xec006007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg8ei64_w`       | `wm, ws2, rs1, wd`   | `111011-----------111-----0000111` | `0xec007007` | `0xfc00707f` |
+| `rv_w`        | `wloxseg8ei8_w`        | `wm, ws2, rs1, wd`   | `111011-----------000-----0000111` | `0xec000007` | `0xfc00707f` |
+| `rv_w`        | `wlse16_w`             | `wm, rs2, rs1, wd`   | `000010-----------101-----0000111` | `0x08005007` | `0xfc00707f` |
+| `rv_w`        | `wlse32_w`             | `wm, rs2, rs1, wd`   | `000010-----------110-----0000111` | `0x08006007` | `0xfc00707f` |
+| `rv_w`        | `wlse64_w`             | `wm, rs2, rs1, wd`   | `000010-----------111-----0000111` | `0x08007007` | `0xfc00707f` |
+| `rv_w`        | `wlse8_w`              | `wm, rs2, rs1, wd`   | `000010-----------000-----0000111` | `0x08000007` | `0xfc00707f` |
+| `rv_w`        | `wlseg2e16ff_w`        | `wm, rs1, wd`        | `001000-10000-----101-----0000111` | `0x21005007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg2e16_w`          | `wm, rs1, wd`        | `001000-00000-----101-----0000111` | `0x20005007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg2e32ff_w`        | `wm, rs1, wd`        | `001000-10000-----110-----0000111` | `0x21006007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg2e32_w`          | `wm, rs1, wd`        | `001000-00000-----110-----0000111` | `0x20006007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg2e64ff_w`        | `wm, rs1, wd`        | `001000-10000-----111-----0000111` | `0x21007007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg2e64_w`          | `wm, rs1, wd`        | `001000-00000-----111-----0000111` | `0x20007007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg2e8ff_w`         | `wm, rs1, wd`        | `001000-10000-----000-----0000111` | `0x21000007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg2e8_w`           | `wm, rs1, wd`        | `001000-00000-----000-----0000111` | `0x20000007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg3e16ff_w`        | `wm, rs1, wd`        | `010000-10000-----101-----0000111` | `0x41005007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg3e16_w`          | `wm, rs1, wd`        | `010000-00000-----101-----0000111` | `0x40005007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg3e32ff_w`        | `wm, rs1, wd`        | `010000-10000-----110-----0000111` | `0x41006007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg3e32_w`          | `wm, rs1, wd`        | `010000-00000-----110-----0000111` | `0x40006007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg3e64ff_w`        | `wm, rs1, wd`        | `010000-10000-----111-----0000111` | `0x41007007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg3e64_w`          | `wm, rs1, wd`        | `010000-00000-----111-----0000111` | `0x40007007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg3e8ff_w`         | `wm, rs1, wd`        | `010000-10000-----000-----0000111` | `0x41000007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg3e8_w`           | `wm, rs1, wd`        | `010000-00000-----000-----0000111` | `0x40000007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg4e16ff_w`        | `wm, rs1, wd`        | `011000-10000-----101-----0000111` | `0x61005007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg4e16_w`          | `wm, rs1, wd`        | `011000-00000-----101-----0000111` | `0x60005007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg4e32ff_w`        | `wm, rs1, wd`        | `011000-10000-----110-----0000111` | `0x61006007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg4e32_w`          | `wm, rs1, wd`        | `011000-00000-----110-----0000111` | `0x60006007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg4e64ff_w`        | `wm, rs1, wd`        | `011000-10000-----111-----0000111` | `0x61007007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg4e64_w`          | `wm, rs1, wd`        | `011000-00000-----111-----0000111` | `0x60007007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg4e8ff_w`         | `wm, rs1, wd`        | `011000-10000-----000-----0000111` | `0x61000007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg4e8_w`           | `wm, rs1, wd`        | `011000-00000-----000-----0000111` | `0x60000007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg5e16ff_w`        | `wm, rs1, wd`        | `100000-10000-----101-----0000111` | `0x81005007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg5e16_w`          | `wm, rs1, wd`        | `100000-00000-----101-----0000111` | `0x80005007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg5e32ff_w`        | `wm, rs1, wd`        | `100000-10000-----110-----0000111` | `0x81006007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg5e32_w`          | `wm, rs1, wd`        | `100000-00000-----110-----0000111` | `0x80006007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg5e64ff_w`        | `wm, rs1, wd`        | `100000-10000-----111-----0000111` | `0x81007007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg5e64_w`          | `wm, rs1, wd`        | `100000-00000-----111-----0000111` | `0x80007007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg5e8ff_w`         | `wm, rs1, wd`        | `100000-10000-----000-----0000111` | `0x81000007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg5e8_w`           | `wm, rs1, wd`        | `100000-00000-----000-----0000111` | `0x80000007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg6e16ff_w`        | `wm, rs1, wd`        | `101000-10000-----101-----0000111` | `0xa1005007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg6e16_w`          | `wm, rs1, wd`        | `101000-00000-----101-----0000111` | `0xa0005007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg6e32ff_w`        | `wm, rs1, wd`        | `101000-10000-----110-----0000111` | `0xa1006007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg6e32_w`          | `wm, rs1, wd`        | `101000-00000-----110-----0000111` | `0xa0006007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg6e64ff_w`        | `wm, rs1, wd`        | `101000-10000-----111-----0000111` | `0xa1007007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg6e64_w`          | `wm, rs1, wd`        | `101000-00000-----111-----0000111` | `0xa0007007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg6e8ff_w`         | `wm, rs1, wd`        | `101000-10000-----000-----0000111` | `0xa1000007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg6e8_w`           | `wm, rs1, wd`        | `101000-00000-----000-----0000111` | `0xa0000007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg7e16ff_w`        | `wm, rs1, wd`        | `110000-10000-----101-----0000111` | `0xc1005007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg7e16_w`          | `wm, rs1, wd`        | `110000-00000-----101-----0000111` | `0xc0005007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg7e32ff_w`        | `wm, rs1, wd`        | `110000-10000-----110-----0000111` | `0xc1006007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg7e32_w`          | `wm, rs1, wd`        | `110000-00000-----110-----0000111` | `0xc0006007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg7e64ff_w`        | `wm, rs1, wd`        | `110000-10000-----111-----0000111` | `0xc1007007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg7e64_w`          | `wm, rs1, wd`        | `110000-00000-----111-----0000111` | `0xc0007007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg7e8ff_w`         | `wm, rs1, wd`        | `110000-10000-----000-----0000111` | `0xc1000007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg7e8_w`           | `wm, rs1, wd`        | `110000-00000-----000-----0000111` | `0xc0000007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg8e16ff_w`        | `wm, rs1, wd`        | `111000-10000-----101-----0000111` | `0xe1005007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg8e16_w`          | `wm, rs1, wd`        | `111000-00000-----101-----0000111` | `0xe0005007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg8e32ff_w`        | `wm, rs1, wd`        | `111000-10000-----110-----0000111` | `0xe1006007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg8e32_w`          | `wm, rs1, wd`        | `111000-00000-----110-----0000111` | `0xe0006007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg8e64ff_w`        | `wm, rs1, wd`        | `111000-10000-----111-----0000111` | `0xe1007007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg8e64_w`          | `wm, rs1, wd`        | `111000-00000-----111-----0000111` | `0xe0007007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg8e8ff_w`         | `wm, rs1, wd`        | `111000-10000-----000-----0000111` | `0xe1000007` | `0xfdf0707f` |
+| `rv_w`        | `wlseg8e8_w`           | `wm, rs1, wd`        | `111000-00000-----000-----0000111` | `0xe0000007` | `0xfdf0707f` |
+| `rv_w`        | `wlsseg2e16_w`         | `wm, rs2, rs1, wd`   | `001010-----------101-----0000111` | `0x28005007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg2e32_w`         | `wm, rs2, rs1, wd`   | `001010-----------110-----0000111` | `0x28006007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg2e64_w`         | `wm, rs2, rs1, wd`   | `001010-----------111-----0000111` | `0x28007007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg2e8_w`          | `wm, rs2, rs1, wd`   | `001010-----------000-----0000111` | `0x28000007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg3e16_w`         | `wm, rs2, rs1, wd`   | `010010-----------101-----0000111` | `0x48005007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg3e32_w`         | `wm, rs2, rs1, wd`   | `010010-----------110-----0000111` | `0x48006007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg3e64_w`         | `wm, rs2, rs1, wd`   | `010010-----------111-----0000111` | `0x48007007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg3e8_w`          | `wm, rs2, rs1, wd`   | `010010-----------000-----0000111` | `0x48000007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg4e16_w`         | `wm, rs2, rs1, wd`   | `011010-----------101-----0000111` | `0x68005007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg4e32_w`         | `wm, rs2, rs1, wd`   | `011010-----------110-----0000111` | `0x68006007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg4e64_w`         | `wm, rs2, rs1, wd`   | `011010-----------111-----0000111` | `0x68007007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg4e8_w`          | `wm, rs2, rs1, wd`   | `011010-----------000-----0000111` | `0x68000007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg5e16_w`         | `wm, rs2, rs1, wd`   | `100010-----------101-----0000111` | `0x88005007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg5e32_w`         | `wm, rs2, rs1, wd`   | `100010-----------110-----0000111` | `0x88006007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg5e64_w`         | `wm, rs2, rs1, wd`   | `100010-----------111-----0000111` | `0x88007007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg5e8_w`          | `wm, rs2, rs1, wd`   | `100010-----------000-----0000111` | `0x88000007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg6e16_w`         | `wm, rs2, rs1, wd`   | `101010-----------101-----0000111` | `0xa8005007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg6e32_w`         | `wm, rs2, rs1, wd`   | `101010-----------110-----0000111` | `0xa8006007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg6e64_w`         | `wm, rs2, rs1, wd`   | `101010-----------111-----0000111` | `0xa8007007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg6e8_w`          | `wm, rs2, rs1, wd`   | `101010-----------000-----0000111` | `0xa8000007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg7e16_w`         | `wm, rs2, rs1, wd`   | `110010-----------101-----0000111` | `0xc8005007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg7e32_w`         | `wm, rs2, rs1, wd`   | `110010-----------110-----0000111` | `0xc8006007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg7e64_w`         | `wm, rs2, rs1, wd`   | `110010-----------111-----0000111` | `0xc8007007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg7e8_w`          | `wm, rs2, rs1, wd`   | `110010-----------000-----0000111` | `0xc8000007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg8e16_w`         | `wm, rs2, rs1, wd`   | `111010-----------101-----0000111` | `0xe8005007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg8e32_w`         | `wm, rs2, rs1, wd`   | `111010-----------110-----0000111` | `0xe8006007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg8e64_w`         | `wm, rs2, rs1, wd`   | `111010-----------111-----0000111` | `0xe8007007` | `0xfc00707f` |
+| `rv_w`        | `wlsseg8e8_w`          | `wm, rs2, rs1, wd`   | `111010-----------000-----0000111` | `0xe8000007` | `0xfc00707f` |
+| `rv_w`        | `wluxei16_w`           | `wm, ws2, rs1, wd`   | `000001-----------101-----0000111` | `0x04005007` | `0xfc00707f` |
+| `rv_w`        | `wluxei32_w`           | `wm, ws2, rs1, wd`   | `000001-----------110-----0000111` | `0x04006007` | `0xfc00707f` |
+| `rv_w`        | `wluxei64_w`           | `wm, ws2, rs1, wd`   | `000001-----------111-----0000111` | `0x04007007` | `0xfc00707f` |
+| `rv_w`        | `wluxei8_w`            | `wm, ws2, rs1, wd`   | `000001-----------000-----0000111` | `0x04000007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg2ei16_w`       | `wm, ws2, rs1, wd`   | `001001-----------101-----0000111` | `0x24005007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg2ei32_w`       | `wm, ws2, rs1, wd`   | `001001-----------110-----0000111` | `0x24006007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg2ei64_w`       | `wm, ws2, rs1, wd`   | `001001-----------111-----0000111` | `0x24007007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg2ei8_w`        | `wm, ws2, rs1, wd`   | `001001-----------000-----0000111` | `0x24000007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg3ei16_w`       | `wm, ws2, rs1, wd`   | `010001-----------101-----0000111` | `0x44005007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg3ei32_w`       | `wm, ws2, rs1, wd`   | `010001-----------110-----0000111` | `0x44006007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg3ei64_w`       | `wm, ws2, rs1, wd`   | `010001-----------111-----0000111` | `0x44007007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg3ei8_w`        | `wm, ws2, rs1, wd`   | `010001-----------000-----0000111` | `0x44000007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg4ei16_w`       | `wm, ws2, rs1, wd`   | `011001-----------101-----0000111` | `0x64005007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg4ei32_w`       | `wm, ws2, rs1, wd`   | `011001-----------110-----0000111` | `0x64006007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg4ei64_w`       | `wm, ws2, rs1, wd`   | `011001-----------111-----0000111` | `0x64007007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg4ei8_w`        | `wm, ws2, rs1, wd`   | `011001-----------000-----0000111` | `0x64000007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg5ei16_w`       | `wm, ws2, rs1, wd`   | `100001-----------101-----0000111` | `0x84005007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg5ei32_w`       | `wm, ws2, rs1, wd`   | `100001-----------110-----0000111` | `0x84006007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg5ei64_w`       | `wm, ws2, rs1, wd`   | `100001-----------111-----0000111` | `0x84007007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg5ei8_w`        | `wm, ws2, rs1, wd`   | `100001-----------000-----0000111` | `0x84000007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg6ei16_w`       | `wm, ws2, rs1, wd`   | `101001-----------101-----0000111` | `0xa4005007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg6ei32_w`       | `wm, ws2, rs1, wd`   | `101001-----------110-----0000111` | `0xa4006007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg6ei64_w`       | `wm, ws2, rs1, wd`   | `101001-----------111-----0000111` | `0xa4007007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg6ei8_w`        | `wm, ws2, rs1, wd`   | `101001-----------000-----0000111` | `0xa4000007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg7ei16_w`       | `wm, ws2, rs1, wd`   | `110001-----------101-----0000111` | `0xc4005007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg7ei32_w`       | `wm, ws2, rs1, wd`   | `110001-----------110-----0000111` | `0xc4006007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg7ei64_w`       | `wm, ws2, rs1, wd`   | `110001-----------111-----0000111` | `0xc4007007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg7ei8_w`        | `wm, ws2, rs1, wd`   | `110001-----------000-----0000111` | `0xc4000007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg8ei16_w`       | `wm, ws2, rs1, wd`   | `111001-----------101-----0000111` | `0xe4005007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg8ei32_w`       | `wm, ws2, rs1, wd`   | `111001-----------110-----0000111` | `0xe4006007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg8ei64_w`       | `wm, ws2, rs1, wd`   | `111001-----------111-----0000111` | `0xe4007007` | `0xfc00707f` |
+| `rv_w`        | `wluxseg8ei8_w`        | `wm, ws2, rs1, wd`   | `111001-----------000-----0000111` | `0xe4000007` | `0xfc00707f` |
+| `rv_w`        | `wmacc_ww`             | `wm, ws2, ws1, wd`   | `101101-----------010-----0001011` | `0xb400200b` | `0xfc00707f` |
+| `rv_w`        | `wmacc_wx`             | `wm, ws2, rs1, wd`   | `101101-----------110-----0001011` | `0xb400600b` | `0xfc00707f` |
+| `rv_w`        | `wmadc_wi`             | `ws2, simm5, wd`     | `0100011----------011-----0001011` | `0x4600300b` | `0xfe00707f` |
+| `rv_w`        | `wmadc_wim`            | `ws2, simm5, wd`     | `0100010----------011-----0001011` | `0x4400300b` | `0xfe00707f` |
+| `rv_w`        | `wmadc_ww`             | `ws2, ws1, wd`       | `0100011----------000-----0001011` | `0x4600000b` | `0xfe00707f` |
+| `rv_w`        | `wmadc_wwm`            | `ws2, ws1, wd`       | `0100010----------000-----0001011` | `0x4400000b` | `0xfe00707f` |
+| `rv_w`        | `wmadc_wx`             | `ws2, rs1, wd`       | `0100011----------100-----0001011` | `0x4600400b` | `0xfe00707f` |
+| `rv_w`        | `wmadc_wxm`            | `ws2, rs1, wd`       | `0100010----------100-----0001011` | `0x4400400b` | `0xfe00707f` |
+| `rv_w`        | `wmadd_ww`             | `wm, ws2, ws1, wd`   | `101001-----------010-----0001011` | `0xa400200b` | `0xfc00707f` |
+| `rv_w`        | `wmadd_wx`             | `wm, ws2, rs1, wd`   | `101001-----------110-----0001011` | `0xa400600b` | `0xfc00707f` |
+| `rv_w`        | `wmand_mm`             | `ws2, ws1, wd`       | `0110011----------010-----0001011` | `0x6600200b` | `0xfe00707f` |
+| `rv_w`        | `wmandn_mm`            | `ws2, ws1, wd`       | `0110001----------010-----0001011` | `0x6200200b` | `0xfe00707f` |
+| `rv_w`        | `wmaxu_ww`             | `wm, ws2, ws1, wd`   | `000110-----------000-----0001011` | `0x1800000b` | `0xfc00707f` |
+| `rv_w`        | `wmaxu_wx`             | `wm, ws2, rs1, wd`   | `000110-----------100-----0001011` | `0x1800400b` | `0xfc00707f` |
+| `rv_w`        | `wmax_ww`              | `wm, ws2, ws1, wd`   | `000111-----------000-----0001011` | `0x1c00000b` | `0xfc00707f` |
+| `rv_w`        | `wmax_wx`              | `wm, ws2, rs1, wd`   | `000111-----------100-----0001011` | `0x1c00400b` | `0xfc00707f` |
+| `rv_w`        | `wmerge_wim`           | `ws2, simm5, wd`     | `0101110----------011-----0001011` | `0x5c00300b` | `0xfe00707f` |
+| `rv_w`        | `wmerge_wwm`           | `ws2, ws1, wd`       | `0101110----------000-----0001011` | `0x5c00000b` | `0xfe00707f` |
+| `rv_w`        | `wmerge_wxm`           | `ws2, rs1, wd`       | `0101110----------100-----0001011` | `0x5c00400b` | `0xfe00707f` |
+| `rv_w`        | `wmfeq_wf`             | `wm, ws2, rs1, wd`   | `011000-----------101-----0001011` | `0x6000500b` | `0xfc00707f` |
+| `rv_w`        | `wmfeq_ww`             | `wm, ws2, ws1, wd`   | `011000-----------001-----0001011` | `0x6000100b` | `0xfc00707f` |
+| `rv_w`        | `wmfge_wf`             | `wm, ws2, rs1, wd`   | `011111-----------101-----0001011` | `0x7c00500b` | `0xfc00707f` |
+| `rv_w`        | `wmfgt_wf`             | `wm, ws2, rs1, wd`   | `011101-----------101-----0001011` | `0x7400500b` | `0xfc00707f` |
+| `rv_w`        | `wmfle_wf`             | `wm, ws2, rs1, wd`   | `011001-----------101-----0001011` | `0x6400500b` | `0xfc00707f` |
+| `rv_w`        | `wmfle_ww`             | `wm, ws2, ws1, wd`   | `011001-----------001-----0001011` | `0x6400100b` | `0xfc00707f` |
+| `rv_w`        | `wmflt_wf`             | `wm, ws2, rs1, wd`   | `011011-----------101-----0001011` | `0x6c00500b` | `0xfc00707f` |
+| `rv_w`        | `wmflt_ww`             | `wm, ws2, ws1, wd`   | `011011-----------001-----0001011` | `0x6c00100b` | `0xfc00707f` |
+| `rv_w`        | `wmfne_wf`             | `wm, ws2, rs1, wd`   | `011100-----------101-----0001011` | `0x7000500b` | `0xfc00707f` |
+| `rv_w`        | `wmfne_ww`             | `wm, ws2, ws1, wd`   | `011100-----------001-----0001011` | `0x7000100b` | `0xfc00707f` |
+| `rv_w`        | `wminu_ww`             | `wm, ws2, ws1, wd`   | `000100-----------000-----0001011` | `0x1000000b` | `0xfc00707f` |
+| `rv_w`        | `wminu_wx`             | `wm, ws2, rs1, wd`   | `000100-----------100-----0001011` | `0x1000400b` | `0xfc00707f` |
+| `rv_w`        | `wmin_ww`              | `wm, ws2, ws1, wd`   | `000101-----------000-----0001011` | `0x1400000b` | `0xfc00707f` |
+| `rv_w`        | `wmin_wx`              | `wm, ws2, rs1, wd`   | `000101-----------100-----0001011` | `0x1400400b` | `0xfc00707f` |
+| `rv_w`        | `wmnand_mm`            | `ws2, ws1, wd`       | `0111011----------010-----0001011` | `0x7600200b` | `0xfe00707f` |
+| `rv_w`        | `wmnor_mm`             | `ws2, ws1, wd`       | `0111101----------010-----0001011` | `0x7a00200b` | `0xfe00707f` |
+| `rv_w`        | `wmor_mm`              | `ws2, ws1, wd`       | `0110101----------010-----0001011` | `0x6a00200b` | `0xfe00707f` |
+| `rv_w`        | `wmorn_mm`             | `ws2, ws1, wd`       | `0111001----------010-----0001011` | `0x7200200b` | `0xfe00707f` |
+| `rv_w`        | `wmsbc_ww`             | `ws2, ws1, wd`       | `0100111----------000-----0001011` | `0x4e00000b` | `0xfe00707f` |
+| `rv_w`        | `wmsbc_wwm`            | `ws2, ws1, wd`       | `0100110----------000-----0001011` | `0x4c00000b` | `0xfe00707f` |
+| `rv_w`        | `wmsbc_wx`             | `ws2, rs1, wd`       | `0100111----------100-----0001011` | `0x4e00400b` | `0xfe00707f` |
+| `rv_w`        | `wmsbc_wxm`            | `ws2, rs1, wd`       | `0100110----------100-----0001011` | `0x4c00400b` | `0xfe00707f` |
+| `rv_w`        | `wmsbf_m`              | `wm, ws2, wd`        | `010100------00001010-----0001011` | `0x5000a00b` | `0xfc0ff07f` |
+| `rv_w`        | `wmseq_wi`             | `wm, ws2, simm5, wd` | `011000-----------011-----0001011` | `0x6000300b` | `0xfc00707f` |
+| `rv_w`        | `wmseq_ww`             | `wm, ws2, ws1, wd`   | `011000-----------000-----0001011` | `0x6000000b` | `0xfc00707f` |
+| `rv_w`        | `wmseq_wx`             | `wm, ws2, rs1, wd`   | `011000-----------100-----0001011` | `0x6000400b` | `0xfc00707f` |
+| `rv_w`        | `wmsgtu_wi`            | `wm, ws2, simm5, wd` | `011110-----------011-----0001011` | `0x7800300b` | `0xfc00707f` |
+| `rv_w`        | `wmsgtu_wx`            | `wm, ws2, rs1, wd`   | `011110-----------100-----0001011` | `0x7800400b` | `0xfc00707f` |
+| `rv_w`        | `wmsgt_wi`             | `wm, ws2, simm5, wd` | `011111-----------011-----0001011` | `0x7c00300b` | `0xfc00707f` |
+| `rv_w`        | `wmsgt_wx`             | `wm, ws2, rs1, wd`   | `011111-----------100-----0001011` | `0x7c00400b` | `0xfc00707f` |
+| `rv_w`        | `wmsif_m`              | `wm, ws2, wd`        | `010100------00011010-----0001011` | `0x5001a00b` | `0xfc0ff07f` |
+| `rv_w`        | `wmsleu_wi`            | `wm, ws2, simm5, wd` | `011100-----------011-----0001011` | `0x7000300b` | `0xfc00707f` |
+| `rv_w`        | `wmsleu_ww`            | `wm, ws2, ws1, wd`   | `011100-----------000-----0001011` | `0x7000000b` | `0xfc00707f` |
+| `rv_w`        | `wmsleu_wx`            | `wm, ws2, rs1, wd`   | `011100-----------100-----0001011` | `0x7000400b` | `0xfc00707f` |
+| `rv_w`        | `wmsle_wi`             | `wm, ws2, simm5, wd` | `011101-----------011-----0001011` | `0x7400300b` | `0xfc00707f` |
+| `rv_w`        | `wmsle_ww`             | `wm, ws2, ws1, wd`   | `011101-----------000-----0001011` | `0x7400000b` | `0xfc00707f` |
+| `rv_w`        | `wmsle_wx`             | `wm, ws2, rs1, wd`   | `011101-----------100-----0001011` | `0x7400400b` | `0xfc00707f` |
+| `rv_w`        | `wmsltu_ww`            | `wm, ws2, ws1, wd`   | `011010-----------000-----0001011` | `0x6800000b` | `0xfc00707f` |
+| `rv_w`        | `wmsltu_wx`            | `wm, ws2, rs1, wd`   | `011010-----------100-----0001011` | `0x6800400b` | `0xfc00707f` |
+| `rv_w`        | `wmslt_ww`             | `wm, ws2, ws1, wd`   | `011011-----------000-----0001011` | `0x6c00000b` | `0xfc00707f` |
+| `rv_w`        | `wmslt_wx`             | `wm, ws2, rs1, wd`   | `011011-----------100-----0001011` | `0x6c00400b` | `0xfc00707f` |
+| `rv_w`        | `wmsne_wi`             | `wm, ws2, simm5, wd` | `011001-----------011-----0001011` | `0x6400300b` | `0xfc00707f` |
+| `rv_w`        | `wmsne_ww`             | `wm, ws2, ws1, wd`   | `011001-----------000-----0001011` | `0x6400000b` | `0xfc00707f` |
+| `rv_w`        | `wmsne_wx`             | `wm, ws2, rs1, wd`   | `011001-----------100-----0001011` | `0x6400400b` | `0xfc00707f` |
+| `rv_w`        | `wmsof_m`              | `wm, ws2, wd`        | `010100------00010010-----0001011` | `0x5001200b` | `0xfc0ff07f` |
+| `rv_w`        | `wmulhsu_ww`           | `wm, ws2, ws1, wd`   | `100110-----------010-----0001011` | `0x9800200b` | `0xfc00707f` |
+| `rv_w`        | `wmulhsu_wx`           | `wm, ws2, rs1, wd`   | `100110-----------110-----0001011` | `0x9800600b` | `0xfc00707f` |
+| `rv_w`        | `wmulhu_ww`            | `wm, ws2, ws1, wd`   | `100100-----------010-----0001011` | `0x9000200b` | `0xfc00707f` |
+| `rv_w`        | `wmulhu_wx`            | `wm, ws2, rs1, wd`   | `100100-----------110-----0001011` | `0x9000600b` | `0xfc00707f` |
+| `rv_w`        | `wmulh_ww`             | `wm, ws2, ws1, wd`   | `100111-----------010-----0001011` | `0x9c00200b` | `0xfc00707f` |
+| `rv_w`        | `wmulh_wx`             | `wm, ws2, rs1, wd`   | `100111-----------110-----0001011` | `0x9c00600b` | `0xfc00707f` |
+| `rv_w`        | `wmul_ww`              | `wm, ws2, ws1, wd`   | `100101-----------010-----0001011` | `0x9400200b` | `0xfc00707f` |
+| `rv_w`        | `wmul_wx`              | `wm, ws2, rs1, wd`   | `100101-----------110-----0001011` | `0x9400600b` | `0xfc00707f` |
+| `rv_w`        | `wmv1r_w`              | `ws2, wd`            | `1001111-----00000011-----0001011` | `0x9e00300b` | `0xfe0ff07f` |
+| `rv_w`        | `wmv2r_w`              | `ws2, wd`            | `1001111-----00001011-----0001011` | `0x9e00b00b` | `0xfe0ff07f` |
+| `rv_w`        | `wmv4r_w`              | `ws2, wd`            | `1001111-----00011011-----0001011` | `0x9e01b00b` | `0xfe0ff07f` |
+| `rv_w`        | `wmv8r_w`              | `ws2, wd`            | `1001111-----00111011-----0001011` | `0x9e03b00b` | `0xfe0ff07f` |
+| `rv_w`        | `wmv_s_x`              | `rs1, wd`            | `010000100000-----110-----0001011` | `0x4200600b` | `0xfff0707f` |
+| `rv_w`        | `wmv_w_i`              | `simm5, wd`          | `010111100000-----011-----0001011` | `0x5e00300b` | `0xfff0707f` |
+| `rv_w`        | `wmv_w_w`              | `ws1, wd`            | `010111100000-----000-----0001011` | `0x5e00000b` | `0xfff0707f` |
+| `rv_w`        | `wmv_w_x`              | `rs1, wd`            | `010111100000-----100-----0001011` | `0x5e00400b` | `0xfff0707f` |
+| `rv_w`        | `wmv_x_s`              | `ws2, rd`            | `0100001-----00000010-----0001011` | `0x4200200b` | `0xfe0ff07f` |
+| `rv_w`        | `wmxnor_mm`            | `ws2, ws1, wd`       | `0111111----------010-----0001011` | `0x7e00200b` | `0xfe00707f` |
+| `rv_w`        | `wmxor_mm`             | `ws2, ws1, wd`       | `0110111----------010-----0001011` | `0x6e00200b` | `0xfe00707f` |
+| `rv_w`        | `wnclipu_wide_wi`      | `wm, ws2, zimm5, wd` | `101110-----------011-----0001011` | `0xb800300b` | `0xfc00707f` |
+| `rv_w`        | `wnclipu_wide_ww`      | `wm, ws2, ws1, wd`   | `101110-----------000-----0001011` | `0xb800000b` | `0xfc00707f` |
+| `rv_w`        | `wnclipu_wide_wx`      | `wm, ws2, rs1, wd`   | `101110-----------100-----0001011` | `0xb800400b` | `0xfc00707f` |
+| `rv_w`        | `wnclip_wide_wi`       | `wm, ws2, zimm5, wd` | `101111-----------011-----0001011` | `0xbc00300b` | `0xfc00707f` |
+| `rv_w`        | `wnclip_wide_ww`       | `wm, ws2, ws1, wd`   | `101111-----------000-----0001011` | `0xbc00000b` | `0xfc00707f` |
+| `rv_w`        | `wnclip_wide_wx`       | `wm, ws2, rs1, wd`   | `101111-----------100-----0001011` | `0xbc00400b` | `0xfc00707f` |
+| `rv_w`        | `wnmsac_ww`            | `wm, ws2, ws1, wd`   | `101111-----------010-----0001011` | `0xbc00200b` | `0xfc00707f` |
+| `rv_w`        | `wnmsac_wx`            | `wm, ws2, rs1, wd`   | `101111-----------110-----0001011` | `0xbc00600b` | `0xfc00707f` |
+| `rv_w`        | `wnmsub_ww`            | `wm, ws2, ws1, wd`   | `101011-----------010-----0001011` | `0xac00200b` | `0xfc00707f` |
+| `rv_w`        | `wnmsub_wx`            | `wm, ws2, rs1, wd`   | `101011-----------110-----0001011` | `0xac00600b` | `0xfc00707f` |
+| `rv_w`        | `wnsra_wide_wi`        | `wm, ws2, zimm5, wd` | `101101-----------011-----0001011` | `0xb400300b` | `0xfc00707f` |
+| `rv_w`        | `wnsra_wide_ww`        | `wm, ws2, ws1, wd`   | `101101-----------000-----0001011` | `0xb400000b` | `0xfc00707f` |
+| `rv_w`        | `wnsra_wide_wx`        | `wm, ws2, rs1, wd`   | `101101-----------100-----0001011` | `0xb400400b` | `0xfc00707f` |
+| `rv_w`        | `wnsrl_wide_wi`        | `wm, ws2, zimm5, wd` | `101100-----------011-----0001011` | `0xb000300b` | `0xfc00707f` |
+| `rv_w`        | `wnsrl_wide_ww`        | `wm, ws2, ws1, wd`   | `101100-----------000-----0001011` | `0xb000000b` | `0xfc00707f` |
+| `rv_w`        | `wnsrl_wide_wx`        | `wm, ws2, rs1, wd`   | `101100-----------100-----0001011` | `0xb000400b` | `0xfc00707f` |
+| `rv_w`        | `wor_wi`               | `wm, ws2, simm5, wd` | `001010-----------011-----0001011` | `0x2800300b` | `0xfc00707f` |
+| `rv_w`        | `wor_ww`               | `wm, ws2, ws1, wd`   | `001010-----------000-----0001011` | `0x2800000b` | `0xfc00707f` |
+| `rv_w`        | `wor_wx`               | `wm, ws2, rs1, wd`   | `001010-----------100-----0001011` | `0x2800400b` | `0xfc00707f` |
+| `rv_w`        | `wredand_ws`           | `wm, ws2, ws1, wd`   | `000001-----------010-----0001011` | `0x0400200b` | `0xfc00707f` |
+| `rv_w`        | `wredmaxu_ws`          | `wm, ws2, ws1, wd`   | `000110-----------010-----0001011` | `0x1800200b` | `0xfc00707f` |
+| `rv_w`        | `wredmax_ws`           | `wm, ws2, ws1, wd`   | `000111-----------010-----0001011` | `0x1c00200b` | `0xfc00707f` |
+| `rv_w`        | `wredminu_ws`          | `wm, ws2, ws1, wd`   | `000100-----------010-----0001011` | `0x1000200b` | `0xfc00707f` |
+| `rv_w`        | `wredmin_ws`           | `wm, ws2, ws1, wd`   | `000101-----------010-----0001011` | `0x1400200b` | `0xfc00707f` |
+| `rv_w`        | `wredor_ws`            | `wm, ws2, ws1, wd`   | `000010-----------010-----0001011` | `0x0800200b` | `0xfc00707f` |
+| `rv_w`        | `wredsum_ws`           | `wm, ws2, ws1, wd`   | `000000-----------010-----0001011` | `0x0000200b` | `0xfc00707f` |
+| `rv_w`        | `wredxor_ws`           | `wm, ws2, ws1, wd`   | `000011-----------010-----0001011` | `0x0c00200b` | `0xfc00707f` |
+| `rv_w`        | `wremu_ww`             | `wm, ws2, ws1, wd`   | `100010-----------010-----0001011` | `0x8800200b` | `0xfc00707f` |
+| `rv_w`        | `wremu_wx`             | `wm, ws2, rs1, wd`   | `100010-----------110-----0001011` | `0x8800600b` | `0xfc00707f` |
+| `rv_w`        | `wrem_ww`              | `wm, ws2, ws1, wd`   | `100011-----------010-----0001011` | `0x8c00200b` | `0xfc00707f` |
+| `rv_w`        | `wrem_wx`              | `wm, ws2, rs1, wd`   | `100011-----------110-----0001011` | `0x8c00600b` | `0xfc00707f` |
+| `rv_w`        | `wrgatherei16_ww`      | `wm, ws2, ws1, wd`   | `001110-----------000-----0001011` | `0x3800000b` | `0xfc00707f` |
+| `rv_w`        | `wrgather_wi`          | `wm, ws2, zimm5, wd` | `001100-----------011-----0001011` | `0x3000300b` | `0xfc00707f` |
+| `rv_w`        | `wrgather_ww`          | `wm, ws2, ws1, wd`   | `001100-----------000-----0001011` | `0x3000000b` | `0xfc00707f` |
+| `rv_w`        | `wrgather_wx`          | `wm, ws2, rs1, wd`   | `001100-----------100-----0001011` | `0x3000400b` | `0xfc00707f` |
+| `rv_w`        | `wrsub_wi`             | `wm, ws2, simm5, wd` | `000011-----------011-----0001011` | `0x0c00300b` | `0xfc00707f` |
+| `rv_w`        | `wrsub_wx`             | `wm, ws2, rs1, wd`   | `000011-----------100-----0001011` | `0x0c00400b` | `0xfc00707f` |
+| `rv_w`        | `ws1r_w`               | `rs1, ws3`           | `000000101000-----000-----0100111` | `0x02800027` | `0xfff0707f` |
+| `rv_w`        | `ws2r_w`               | `rs1, ws3`           | `001000101000-----000-----0100111` | `0x22800027` | `0xfff0707f` |
+| `rv_w`        | `ws4r_w`               | `rs1, ws3`           | `011000101000-----000-----0100111` | `0x62800027` | `0xfff0707f` |
+| `rv_w`        | `ws8r_w`               | `rs1, ws3`           | `111000101000-----000-----0100111` | `0xe2800027` | `0xfff0707f` |
+| `rv_w`        | `wsaddu_wi`            | `wm, ws2, simm5, wd` | `100000-----------011-----0001011` | `0x8000300b` | `0xfc00707f` |
+| `rv_w`        | `wsaddu_ww`            | `wm, ws2, ws1, wd`   | `100000-----------000-----0001011` | `0x8000000b` | `0xfc00707f` |
+| `rv_w`        | `wsaddu_wx`            | `wm, ws2, rs1, wd`   | `100000-----------100-----0001011` | `0x8000400b` | `0xfc00707f` |
+| `rv_w`        | `wsadd_wi`             | `wm, ws2, simm5, wd` | `100001-----------011-----0001011` | `0x8400300b` | `0xfc00707f` |
+| `rv_w`        | `wsadd_ww`             | `wm, ws2, ws1, wd`   | `100001-----------000-----0001011` | `0x8400000b` | `0xfc00707f` |
+| `rv_w`        | `wsadd_wx`             | `wm, ws2, rs1, wd`   | `100001-----------100-----0001011` | `0x8400400b` | `0xfc00707f` |
+| `rv_w`        | `wsbc_wwm`             | `ws2, ws1, wd`       | `0100100----------000-----0001011` | `0x4800000b` | `0xfe00707f` |
+| `rv_w`        | `wsbc_wxm`             | `ws2, rs1, wd`       | `0100100----------100-----0001011` | `0x4800400b` | `0xfe00707f` |
+| `rv_w`        | `wse16_w`              | `wm, rs1, ws3`       | `000000-00000-----101-----0100111` | `0x00005027` | `0xfdf0707f` |
+| `rv_w`        | `wse32_w`              | `wm, rs1, ws3`       | `000000-00000-----110-----0100111` | `0x00006027` | `0xfdf0707f` |
+| `rv_w`        | `wse64_w`              | `wm, rs1, ws3`       | `000000-00000-----111-----0100111` | `0x00007027` | `0xfdf0707f` |
+| `rv_w`        | `wse8_w`               | `wm, rs1, ws3`       | `000000-00000-----000-----0100111` | `0x00000027` | `0xfdf0707f` |
+| `rv_w`        | `wsetiwli`             | `zimm10, zimm5, rd`  | `11---------------111-----0001011` | `0xc000700b` | `0xc000707f` |
+| `rv_w`        | `wsetwl`               | `rs2, rs1, rd`       | `1000000----------111-----0001011` | `0x8000700b` | `0xfe00707f` |
+| `rv_w`        | `wsetwli`              | `zimm11, rs1, rd`    | `0----------------111-----0001011` | `0x0000700b` | `0x8000707f` |
+| `rv_w`        | `wsext_wf2`            | `wm, ws2, wd`        | `010010------00111010-----0001011` | `0x4803a00b` | `0xfc0ff07f` |
+| `rv_w`        | `wsext_wf4`            | `wm, ws2, wd`        | `010010------00101010-----0001011` | `0x4802a00b` | `0xfc0ff07f` |
+| `rv_w`        | `wsext_wf8`            | `wm, ws2, wd`        | `010010------00011010-----0001011` | `0x4801a00b` | `0xfc0ff07f` |
+| `rv_w`        | `wslide1down_wx`       | `wm, ws2, rs1, wd`   | `001111-----------110-----0001011` | `0x3c00600b` | `0xfc00707f` |
+| `rv_w`        | `wslide1up_wx`         | `wm, ws2, rs1, wd`   | `001110-----------110-----0001011` | `0x3800600b` | `0xfc00707f` |
+| `rv_w`        | `wslidedown_wi`        | `wm, ws2, zimm5, wd` | `001111-----------011-----0001011` | `0x3c00300b` | `0xfc00707f` |
+| `rv_w`        | `wslidedown_wx`        | `wm, ws2, rs1, wd`   | `001111-----------100-----0001011` | `0x3c00400b` | `0xfc00707f` |
+| `rv_w`        | `wslideup_wi`          | `wm, ws2, zimm5, wd` | `001110-----------011-----0001011` | `0x3800300b` | `0xfc00707f` |
+| `rv_w`        | `wslideup_wx`          | `wm, ws2, rs1, wd`   | `001110-----------100-----0001011` | `0x3800400b` | `0xfc00707f` |
+| `rv_w`        | `wsll_wi`              | `wm, ws2, zimm5, wd` | `100101-----------011-----0001011` | `0x9400300b` | `0xfc00707f` |
+| `rv_w`        | `wsll_ww`              | `wm, ws2, ws1, wd`   | `100101-----------000-----0001011` | `0x9400000b` | `0xfc00707f` |
+| `rv_w`        | `wsll_wx`              | `wm, ws2, rs1, wd`   | `100101-----------100-----0001011` | `0x9400400b` | `0xfc00707f` |
+| `rv_w`        | `wsmul_ww`             | `wm, ws2, ws1, wd`   | `100111-----------000-----0001011` | `0x9c00000b` | `0xfc00707f` |
+| `rv_w`        | `wsmul_wx`             | `wm, ws2, rs1, wd`   | `100111-----------100-----0001011` | `0x9c00400b` | `0xfc00707f` |
+| `rv_w`        | `wsm_w`                | `rs1, ws3`           | `000000101011-----000-----0100111` | `0x02b00027` | `0xfff0707f` |
+| `rv_w`        | `wsoxei16_w`           | `wm, ws2, rs1, ws3`  | `000011-----------101-----0100111` | `0x0c005027` | `0xfc00707f` |
+| `rv_w`        | `wsoxei32_w`           | `wm, ws2, rs1, ws3`  | `000011-----------110-----0100111` | `0x0c006027` | `0xfc00707f` |
+| `rv_w`        | `wsoxei64_w`           | `wm, ws2, rs1, ws3`  | `000011-----------111-----0100111` | `0x0c007027` | `0xfc00707f` |
+| `rv_w`        | `wsoxei8_w`            | `wm, ws2, rs1, ws3`  | `000011-----------000-----0100111` | `0x0c000027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg2ei16_w`       | `wm, ws2, rs1, ws3`  | `001011-----------101-----0100111` | `0x2c005027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg2ei32_w`       | `wm, ws2, rs1, ws3`  | `001011-----------110-----0100111` | `0x2c006027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg2ei64_w`       | `wm, ws2, rs1, ws3`  | `001011-----------111-----0100111` | `0x2c007027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg2ei8_w`        | `wm, ws2, rs1, ws3`  | `001011-----------000-----0100111` | `0x2c000027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg3ei16_w`       | `wm, ws2, rs1, ws3`  | `010011-----------101-----0100111` | `0x4c005027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg3ei32_w`       | `wm, ws2, rs1, ws3`  | `010011-----------110-----0100111` | `0x4c006027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg3ei64_w`       | `wm, ws2, rs1, ws3`  | `010011-----------111-----0100111` | `0x4c007027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg3ei8_w`        | `wm, ws2, rs1, ws3`  | `010011-----------000-----0100111` | `0x4c000027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg4ei16_w`       | `wm, ws2, rs1, ws3`  | `011011-----------101-----0100111` | `0x6c005027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg4ei32_w`       | `wm, ws2, rs1, ws3`  | `011011-----------110-----0100111` | `0x6c006027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg4ei64_w`       | `wm, ws2, rs1, ws3`  | `011011-----------111-----0100111` | `0x6c007027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg4ei8_w`        | `wm, ws2, rs1, ws3`  | `011011-----------000-----0100111` | `0x6c000027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg5ei16_w`       | `wm, ws2, rs1, ws3`  | `100011-----------101-----0100111` | `0x8c005027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg5ei32_w`       | `wm, ws2, rs1, ws3`  | `100011-----------110-----0100111` | `0x8c006027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg5ei64_w`       | `wm, ws2, rs1, ws3`  | `100011-----------111-----0100111` | `0x8c007027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg5ei8_w`        | `wm, ws2, rs1, ws3`  | `100011-----------000-----0100111` | `0x8c000027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg6ei16_w`       | `wm, ws2, rs1, ws3`  | `101011-----------101-----0100111` | `0xac005027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg6ei32_w`       | `wm, ws2, rs1, ws3`  | `101011-----------110-----0100111` | `0xac006027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg6ei64_w`       | `wm, ws2, rs1, ws3`  | `101011-----------111-----0100111` | `0xac007027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg6ei8_w`        | `wm, ws2, rs1, ws3`  | `101011-----------000-----0100111` | `0xac000027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg7ei16_w`       | `wm, ws2, rs1, ws3`  | `110011-----------101-----0100111` | `0xcc005027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg7ei32_w`       | `wm, ws2, rs1, ws3`  | `110011-----------110-----0100111` | `0xcc006027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg7ei64_w`       | `wm, ws2, rs1, ws3`  | `110011-----------111-----0100111` | `0xcc007027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg7ei8_w`        | `wm, ws2, rs1, ws3`  | `110011-----------000-----0100111` | `0xcc000027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg8ei16_w`       | `wm, ws2, rs1, ws3`  | `111011-----------101-----0100111` | `0xec005027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg8ei32_w`       | `wm, ws2, rs1, ws3`  | `111011-----------110-----0100111` | `0xec006027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg8ei64_w`       | `wm, ws2, rs1, ws3`  | `111011-----------111-----0100111` | `0xec007027` | `0xfc00707f` |
+| `rv_w`        | `wsoxseg8ei8_w`        | `wm, ws2, rs1, ws3`  | `111011-----------000-----0100111` | `0xec000027` | `0xfc00707f` |
+| `rv_w`        | `wsra_wi`              | `wm, ws2, zimm5, wd` | `101001-----------011-----0001011` | `0xa400300b` | `0xfc00707f` |
+| `rv_w`        | `wsra_ww`              | `wm, ws2, ws1, wd`   | `101001-----------000-----0001011` | `0xa400000b` | `0xfc00707f` |
+| `rv_w`        | `wsra_wx`              | `wm, ws2, rs1, wd`   | `101001-----------100-----0001011` | `0xa400400b` | `0xfc00707f` |
+| `rv_w`        | `wsrl_wi`              | `wm, ws2, zimm5, wd` | `101000-----------011-----0001011` | `0xa000300b` | `0xfc00707f` |
+| `rv_w`        | `wsrl_ww`              | `wm, ws2, ws1, wd`   | `101000-----------000-----0001011` | `0xa000000b` | `0xfc00707f` |
+| `rv_w`        | `wsrl_wx`              | `wm, ws2, rs1, wd`   | `101000-----------100-----0001011` | `0xa000400b` | `0xfc00707f` |
+| `rv_w`        | `wsse16_w`             | `wm, rs2, rs1, ws3`  | `000010-----------101-----0100111` | `0x08005027` | `0xfc00707f` |
+| `rv_w`        | `wsse32_w`             | `wm, rs2, rs1, ws3`  | `000010-----------110-----0100111` | `0x08006027` | `0xfc00707f` |
+| `rv_w`        | `wsse64_w`             | `wm, rs2, rs1, ws3`  | `000010-----------111-----0100111` | `0x08007027` | `0xfc00707f` |
+| `rv_w`        | `wsse8_w`              | `wm, rs2, rs1, ws3`  | `000010-----------000-----0100111` | `0x08000027` | `0xfc00707f` |
+| `rv_w`        | `wsseg2e16_w`          | `wm, rs1, ws3`       | `001000-00000-----101-----0100111` | `0x20005027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg2e32_w`          | `wm, rs1, ws3`       | `001000-00000-----110-----0100111` | `0x20006027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg2e64_w`          | `wm, rs1, ws3`       | `001000-00000-----111-----0100111` | `0x20007027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg2e8_w`           | `wm, rs1, ws3`       | `001000-00000-----000-----0100111` | `0x20000027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg3e16_w`          | `wm, rs1, ws3`       | `010000-00000-----101-----0100111` | `0x40005027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg3e32_w`          | `wm, rs1, ws3`       | `010000-00000-----110-----0100111` | `0x40006027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg3e64_w`          | `wm, rs1, ws3`       | `010000-00000-----111-----0100111` | `0x40007027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg3e8_w`           | `wm, rs1, ws3`       | `010000-00000-----000-----0100111` | `0x40000027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg4e16_w`          | `wm, rs1, ws3`       | `011000-00000-----101-----0100111` | `0x60005027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg4e32_w`          | `wm, rs1, ws3`       | `011000-00000-----110-----0100111` | `0x60006027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg4e64_w`          | `wm, rs1, ws3`       | `011000-00000-----111-----0100111` | `0x60007027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg4e8_w`           | `wm, rs1, ws3`       | `011000-00000-----000-----0100111` | `0x60000027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg5e16_w`          | `wm, rs1, ws3`       | `100000-00000-----101-----0100111` | `0x80005027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg5e32_w`          | `wm, rs1, ws3`       | `100000-00000-----110-----0100111` | `0x80006027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg5e64_w`          | `wm, rs1, ws3`       | `100000-00000-----111-----0100111` | `0x80007027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg5e8_w`           | `wm, rs1, ws3`       | `100000-00000-----000-----0100111` | `0x80000027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg6e16_w`          | `wm, rs1, ws3`       | `101000-00000-----101-----0100111` | `0xa0005027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg6e32_w`          | `wm, rs1, ws3`       | `101000-00000-----110-----0100111` | `0xa0006027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg6e64_w`          | `wm, rs1, ws3`       | `101000-00000-----111-----0100111` | `0xa0007027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg6e8_w`           | `wm, rs1, ws3`       | `101000-00000-----000-----0100111` | `0xa0000027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg7e16_w`          | `wm, rs1, ws3`       | `110000-00000-----101-----0100111` | `0xc0005027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg7e32_w`          | `wm, rs1, ws3`       | `110000-00000-----110-----0100111` | `0xc0006027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg7e64_w`          | `wm, rs1, ws3`       | `110000-00000-----111-----0100111` | `0xc0007027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg7e8_w`           | `wm, rs1, ws3`       | `110000-00000-----000-----0100111` | `0xc0000027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg8e16_w`          | `wm, rs1, ws3`       | `111000-00000-----101-----0100111` | `0xe0005027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg8e32_w`          | `wm, rs1, ws3`       | `111000-00000-----110-----0100111` | `0xe0006027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg8e64_w`          | `wm, rs1, ws3`       | `111000-00000-----111-----0100111` | `0xe0007027` | `0xfdf0707f` |
+| `rv_w`        | `wsseg8e8_w`           | `wm, rs1, ws3`       | `111000-00000-----000-----0100111` | `0xe0000027` | `0xfdf0707f` |
+| `rv_w`        | `wssra_wi`             | `wm, ws2, zimm5, wd` | `101011-----------011-----0001011` | `0xac00300b` | `0xfc00707f` |
+| `rv_w`        | `wssra_ww`             | `wm, ws2, ws1, wd`   | `101011-----------000-----0001011` | `0xac00000b` | `0xfc00707f` |
+| `rv_w`        | `wssra_wx`             | `wm, ws2, rs1, wd`   | `101011-----------100-----0001011` | `0xac00400b` | `0xfc00707f` |
+| `rv_w`        | `wssrl_wi`             | `wm, ws2, zimm5, wd` | `101010-----------011-----0001011` | `0xa800300b` | `0xfc00707f` |
+| `rv_w`        | `wssrl_ww`             | `wm, ws2, ws1, wd`   | `101010-----------000-----0001011` | `0xa800000b` | `0xfc00707f` |
+| `rv_w`        | `wssrl_wx`             | `wm, ws2, rs1, wd`   | `101010-----------100-----0001011` | `0xa800400b` | `0xfc00707f` |
+| `rv_w`        | `wssseg2e16_w`         | `wm, rs2, rs1, ws3`  | `001010-----------101-----0100111` | `0x28005027` | `0xfc00707f` |
+| `rv_w`        | `wssseg2e32_w`         | `wm, rs2, rs1, ws3`  | `001010-----------110-----0100111` | `0x28006027` | `0xfc00707f` |
+| `rv_w`        | `wssseg2e64_w`         | `wm, rs2, rs1, ws3`  | `001010-----------111-----0100111` | `0x28007027` | `0xfc00707f` |
+| `rv_w`        | `wssseg2e8_w`          | `wm, rs2, rs1, ws3`  | `001010-----------000-----0100111` | `0x28000027` | `0xfc00707f` |
+| `rv_w`        | `wssseg3e16_w`         | `wm, rs2, rs1, ws3`  | `010010-----------101-----0100111` | `0x48005027` | `0xfc00707f` |
+| `rv_w`        | `wssseg3e32_w`         | `wm, rs2, rs1, ws3`  | `010010-----------110-----0100111` | `0x48006027` | `0xfc00707f` |
+| `rv_w`        | `wssseg3e64_w`         | `wm, rs2, rs1, ws3`  | `010010-----------111-----0100111` | `0x48007027` | `0xfc00707f` |
+| `rv_w`        | `wssseg3e8_w`          | `wm, rs2, rs1, ws3`  | `010010-----------000-----0100111` | `0x48000027` | `0xfc00707f` |
+| `rv_w`        | `wssseg4e16_w`         | `wm, rs2, rs1, ws3`  | `011010-----------101-----0100111` | `0x68005027` | `0xfc00707f` |
+| `rv_w`        | `wssseg4e32_w`         | `wm, rs2, rs1, ws3`  | `011010-----------110-----0100111` | `0x68006027` | `0xfc00707f` |
+| `rv_w`        | `wssseg4e64_w`         | `wm, rs2, rs1, ws3`  | `011010-----------111-----0100111` | `0x68007027` | `0xfc00707f` |
+| `rv_w`        | `wssseg4e8_w`          | `wm, rs2, rs1, ws3`  | `011010-----------000-----0100111` | `0x68000027` | `0xfc00707f` |
+| `rv_w`        | `wssseg5e16_w`         | `wm, rs2, rs1, ws3`  | `100010-----------101-----0100111` | `0x88005027` | `0xfc00707f` |
+| `rv_w`        | `wssseg5e32_w`         | `wm, rs2, rs1, ws3`  | `100010-----------110-----0100111` | `0x88006027` | `0xfc00707f` |
+| `rv_w`        | `wssseg5e64_w`         | `wm, rs2, rs1, ws3`  | `100010-----------111-----0100111` | `0x88007027` | `0xfc00707f` |
+| `rv_w`        | `wssseg5e8_w`          | `wm, rs2, rs1, ws3`  | `100010-----------000-----0100111` | `0x88000027` | `0xfc00707f` |
+| `rv_w`        | `wssseg6e16_w`         | `wm, rs2, rs1, ws3`  | `101010-----------101-----0100111` | `0xa8005027` | `0xfc00707f` |
+| `rv_w`        | `wssseg6e32_w`         | `wm, rs2, rs1, ws3`  | `101010-----------110-----0100111` | `0xa8006027` | `0xfc00707f` |
+| `rv_w`        | `wssseg6e64_w`         | `wm, rs2, rs1, ws3`  | `101010-----------111-----0100111` | `0xa8007027` | `0xfc00707f` |
+| `rv_w`        | `wssseg6e8_w`          | `wm, rs2, rs1, ws3`  | `101010-----------000-----0100111` | `0xa8000027` | `0xfc00707f` |
+| `rv_w`        | `wssseg7e16_w`         | `wm, rs2, rs1, ws3`  | `110010-----------101-----0100111` | `0xc8005027` | `0xfc00707f` |
+| `rv_w`        | `wssseg7e32_w`         | `wm, rs2, rs1, ws3`  | `110010-----------110-----0100111` | `0xc8006027` | `0xfc00707f` |
+| `rv_w`        | `wssseg7e64_w`         | `wm, rs2, rs1, ws3`  | `110010-----------111-----0100111` | `0xc8007027` | `0xfc00707f` |
+| `rv_w`        | `wssseg7e8_w`          | `wm, rs2, rs1, ws3`  | `110010-----------000-----0100111` | `0xc8000027` | `0xfc00707f` |
+| `rv_w`        | `wssseg8e16_w`         | `wm, rs2, rs1, ws3`  | `111010-----------101-----0100111` | `0xe8005027` | `0xfc00707f` |
+| `rv_w`        | `wssseg8e32_w`         | `wm, rs2, rs1, ws3`  | `111010-----------110-----0100111` | `0xe8006027` | `0xfc00707f` |
+| `rv_w`        | `wssseg8e64_w`         | `wm, rs2, rs1, ws3`  | `111010-----------111-----0100111` | `0xe8007027` | `0xfc00707f` |
+| `rv_w`        | `wssseg8e8_w`          | `wm, rs2, rs1, ws3`  | `111010-----------000-----0100111` | `0xe8000027` | `0xfc00707f` |
+| `rv_w`        | `wssubu_ww`            | `wm, ws2, ws1, wd`   | `100010-----------000-----0001011` | `0x8800000b` | `0xfc00707f` |
+| `rv_w`        | `wssubu_wx`            | `wm, ws2, rs1, wd`   | `100010-----------100-----0001011` | `0x8800400b` | `0xfc00707f` |
+| `rv_w`        | `wssub_ww`             | `wm, ws2, ws1, wd`   | `100011-----------000-----0001011` | `0x8c00000b` | `0xfc00707f` |
+| `rv_w`        | `wssub_wx`             | `wm, ws2, rs1, wd`   | `100011-----------100-----0001011` | `0x8c00400b` | `0xfc00707f` |
+| `rv_w`        | `wsub_ww`              | `wm, ws2, ws1, wd`   | `000010-----------000-----0001011` | `0x0800000b` | `0xfc00707f` |
+| `rv_w`        | `wsub_wx`              | `wm, ws2, rs1, wd`   | `000010-----------100-----0001011` | `0x0800400b` | `0xfc00707f` |
+| `rv_w`        | `wsuxei16_w`           | `wm, ws2, rs1, ws3`  | `000001-----------101-----0100111` | `0x04005027` | `0xfc00707f` |
+| `rv_w`        | `wsuxei32_w`           | `wm, ws2, rs1, ws3`  | `000001-----------110-----0100111` | `0x04006027` | `0xfc00707f` |
+| `rv_w`        | `wsuxei64_w`           | `wm, ws2, rs1, ws3`  | `000001-----------111-----0100111` | `0x04007027` | `0xfc00707f` |
+| `rv_w`        | `wsuxei8_w`            | `wm, ws2, rs1, ws3`  | `000001-----------000-----0100111` | `0x04000027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg2ei16_w`       | `wm, ws2, rs1, ws3`  | `001001-----------101-----0100111` | `0x24005027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg2ei32_w`       | `wm, ws2, rs1, ws3`  | `001001-----------110-----0100111` | `0x24006027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg2ei64_w`       | `wm, ws2, rs1, ws3`  | `001001-----------111-----0100111` | `0x24007027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg2ei8_w`        | `wm, ws2, rs1, ws3`  | `001001-----------000-----0100111` | `0x24000027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg3ei16_w`       | `wm, ws2, rs1, ws3`  | `010001-----------101-----0100111` | `0x44005027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg3ei32_w`       | `wm, ws2, rs1, ws3`  | `010001-----------110-----0100111` | `0x44006027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg3ei64_w`       | `wm, ws2, rs1, ws3`  | `010001-----------111-----0100111` | `0x44007027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg3ei8_w`        | `wm, ws2, rs1, ws3`  | `010001-----------000-----0100111` | `0x44000027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg4ei16_w`       | `wm, ws2, rs1, ws3`  | `011001-----------101-----0100111` | `0x64005027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg4ei32_w`       | `wm, ws2, rs1, ws3`  | `011001-----------110-----0100111` | `0x64006027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg4ei64_w`       | `wm, ws2, rs1, ws3`  | `011001-----------111-----0100111` | `0x64007027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg4ei8_w`        | `wm, ws2, rs1, ws3`  | `011001-----------000-----0100111` | `0x64000027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg5ei16_w`       | `wm, ws2, rs1, ws3`  | `100001-----------101-----0100111` | `0x84005027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg5ei32_w`       | `wm, ws2, rs1, ws3`  | `100001-----------110-----0100111` | `0x84006027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg5ei64_w`       | `wm, ws2, rs1, ws3`  | `100001-----------111-----0100111` | `0x84007027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg5ei8_w`        | `wm, ws2, rs1, ws3`  | `100001-----------000-----0100111` | `0x84000027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg6ei16_w`       | `wm, ws2, rs1, ws3`  | `101001-----------101-----0100111` | `0xa4005027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg6ei32_w`       | `wm, ws2, rs1, ws3`  | `101001-----------110-----0100111` | `0xa4006027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg6ei64_w`       | `wm, ws2, rs1, ws3`  | `101001-----------111-----0100111` | `0xa4007027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg6ei8_w`        | `wm, ws2, rs1, ws3`  | `101001-----------000-----0100111` | `0xa4000027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg7ei16_w`       | `wm, ws2, rs1, ws3`  | `110001-----------101-----0100111` | `0xc4005027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg7ei32_w`       | `wm, ws2, rs1, ws3`  | `110001-----------110-----0100111` | `0xc4006027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg7ei64_w`       | `wm, ws2, rs1, ws3`  | `110001-----------111-----0100111` | `0xc4007027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg7ei8_w`        | `wm, ws2, rs1, ws3`  | `110001-----------000-----0100111` | `0xc4000027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg8ei16_w`       | `wm, ws2, rs1, ws3`  | `111001-----------101-----0100111` | `0xe4005027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg8ei32_w`       | `wm, ws2, rs1, ws3`  | `111001-----------110-----0100111` | `0xe4006027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg8ei64_w`       | `wm, ws2, rs1, ws3`  | `111001-----------111-----0100111` | `0xe4007027` | `0xfc00707f` |
+| `rv_w`        | `wsuxseg8ei8_w`        | `wm, ws2, rs1, ws3`  | `111001-----------000-----0100111` | `0xe4000027` | `0xfc00707f` |
+| `rv_w`        | `wwaddu_ww`            | `wm, ws2, ws1, wd`   | `110000-----------010-----0001011` | `0xc000200b` | `0xfc00707f` |
+| `rv_w`        | `wwaddu_wx`            | `wm, ws2, rs1, wd`   | `110000-----------110-----0001011` | `0xc000600b` | `0xfc00707f` |
+| `rv_w`        | `wwaddu_wide_ww`       | `wm, ws2, ws1, wd`   | `110100-----------010-----0001011` | `0xd000200b` | `0xfc00707f` |
+| `rv_w`        | `wwaddu_wide_wx`       | `wm, ws2, rs1, wd`   | `110100-----------110-----0001011` | `0xd000600b` | `0xfc00707f` |
+| `rv_w`        | `wwadd_ww`             | `wm, ws2, ws1, wd`   | `110001-----------010-----0001011` | `0xc400200b` | `0xfc00707f` |
+| `rv_w`        | `wwadd_wx`             | `wm, ws2, rs1, wd`   | `110001-----------110-----0001011` | `0xc400600b` | `0xfc00707f` |
+| `rv_w`        | `wwadd_wide_ww`        | `wm, ws2, ws1, wd`   | `110101-----------010-----0001011` | `0xd400200b` | `0xfc00707f` |
+| `rv_w`        | `wwadd_wide_wx`        | `wm, ws2, rs1, wd`   | `110101-----------110-----0001011` | `0xd400600b` | `0xfc00707f` |
+| `rv_w`        | `wwmaccsu_ww`          | `wm, ws2, ws1, wd`   | `111111-----------010-----0001011` | `0xfc00200b` | `0xfc00707f` |
+| `rv_w`        | `wwmaccsu_wx`          | `wm, ws2, rs1, wd`   | `111111-----------110-----0001011` | `0xfc00600b` | `0xfc00707f` |
+| `rv_w`        | `wwmaccus_wx`          | `wm, ws2, rs1, wd`   | `111110-----------110-----0001011` | `0xf800600b` | `0xfc00707f` |
+| `rv_w`        | `wwmaccu_ww`           | `wm, ws2, ws1, wd`   | `111100-----------010-----0001011` | `0xf000200b` | `0xfc00707f` |
+| `rv_w`        | `wwmaccu_wx`           | `wm, ws2, rs1, wd`   | `111100-----------110-----0001011` | `0xf000600b` | `0xfc00707f` |
+| `rv_w`        | `wwmacc_ww`            | `wm, ws2, ws1, wd`   | `111101-----------010-----0001011` | `0xf400200b` | `0xfc00707f` |
+| `rv_w`        | `wwmacc_wx`            | `wm, ws2, rs1, wd`   | `111101-----------110-----0001011` | `0xf400600b` | `0xfc00707f` |
+| `rv_w`        | `wwmulsu_ww`           | `wm, ws2, ws1, wd`   | `111010-----------010-----0001011` | `0xe800200b` | `0xfc00707f` |
+| `rv_w`        | `wwmulsu_wx`           | `wm, ws2, rs1, wd`   | `111010-----------110-----0001011` | `0xe800600b` | `0xfc00707f` |
+| `rv_w`        | `wwmulu_ww`            | `wm, ws2, ws1, wd`   | `111000-----------010-----0001011` | `0xe000200b` | `0xfc00707f` |
+| `rv_w`        | `wwmulu_wx`            | `wm, ws2, rs1, wd`   | `111000-----------110-----0001011` | `0xe000600b` | `0xfc00707f` |
+| `rv_w`        | `wwmul_ww`             | `wm, ws2, ws1, wd`   | `111011-----------010-----0001011` | `0xec00200b` | `0xfc00707f` |
+| `rv_w`        | `wwmul_wx`             | `wm, ws2, rs1, wd`   | `111011-----------110-----0001011` | `0xec00600b` | `0xfc00707f` |
+| `rv_w`        | `wwredsumu_ws`         | `wm, ws2, ws1, wd`   | `110000-----------000-----0001011` | `0xc000000b` | `0xfc00707f` |
+| `rv_w`        | `wwredsum_ws`          | `wm, ws2, ws1, wd`   | `110001-----------000-----0001011` | `0xc400000b` | `0xfc00707f` |
+| `rv_w`        | `wwsubu_ww`            | `wm, ws2, ws1, wd`   | `110010-----------010-----0001011` | `0xc800200b` | `0xfc00707f` |
+| `rv_w`        | `wwsubu_wx`            | `wm, ws2, rs1, wd`   | `110010-----------110-----0001011` | `0xc800600b` | `0xfc00707f` |
+| `rv_w`        | `wwsubu_wide_ww`       | `wm, ws2, ws1, wd`   | `110110-----------010-----0001011` | `0xd800200b` | `0xfc00707f` |
+| `rv_w`        | `wwsubu_wide_wx`       | `wm, ws2, rs1, wd`   | `110110-----------110-----0001011` | `0xd800600b` | `0xfc00707f` |
+| `rv_w`        | `wwsub_ww`             | `wm, ws2, ws1, wd`   | `110011-----------010-----0001011` | `0xcc00200b` | `0xfc00707f` |
+| `rv_w`        | `wwsub_wx`             | `wm, ws2, rs1, wd`   | `110011-----------110-----0001011` | `0xcc00600b` | `0xfc00707f` |
+| `rv_w`        | `wwsub_wide_ww`        | `wm, ws2, ws1, wd`   | `110111-----------010-----0001011` | `0xdc00200b` | `0xfc00707f` |
+| `rv_w`        | `wwsub_wide_wx`        | `wm, ws2, rs1, wd`   | `110111-----------110-----0001011` | `0xdc00600b` | `0xfc00707f` |
+| `rv_w`        | `wxor_wi`              | `wm, ws2, simm5, wd` | `001011-----------011-----0001011` | `0x2c00300b` | `0xfc00707f` |
+| `rv_w`        | `wxor_ww`              | `wm, ws2, ws1, wd`   | `001011-----------000-----0001011` | `0x2c00000b` | `0xfc00707f` |
+| `rv_w`        | `wxor_wx`              | `wm, ws2, rs1, wd`   | `001011-----------100-----0001011` | `0x2c00400b` | `0xfc00707f` |
+| `rv_w`        | `wzext_wf2`            | `wm, ws2, wd`        | `010010------00110010-----0001011` | `0x4803200b` | `0xfc0ff07f` |
+| `rv_w`        | `wzext_wf4`            | `wm, ws2, wd`        | `010010------00100010-----0001011` | `0x4802200b` | `0xfc0ff07f` |
+| `rv_w`        | `wzext_wf8`            | `wm, ws2, wd`        | `010010------00010010-----0001011` | `0x4801200b` | `0xfc0ff07f` |
+
+:RVW - Specific Extension for Matrix Operations
+
+| **Extension**      | **Name**                  | **Variable-Fields**             | **Encoding**                       | **Match**    | **Mask**     |
+|:-------------------|:--------------------------|:--------------------------------|:-----------------------------------|:-------------|:-------------|
+| `rv_zwabd`         | `wabdu_ww`                | `wm, ws2, ws1, wd`              | `010110-----------010-----0001011` | `0x5800200b` | `0xfc00707f` |
+| `rv_zwabd`         | `wabdu_wx`                | `wm, ws2, rs1, wd`              | `010110-----------110-----0001011` | `0x5800600b` | `0xfc00707f` |
+| `rv_zwabd`         | `wabd_ww`                 | `wm, ws2, ws1, wd`              | `010101-----------010-----0001011` | `0x5400200b` | `0xfc00707f` |
+| `rv_zwabd`         | `wabd_wx`                 | `wm, ws2, rs1, wd`              | `010101-----------110-----0001011` | `0x5400600b` | `0xfc00707f` |
+| `rv_zwabd`         | `wwabdau_ww`              | `wm, ws2, ws1, wd`              | `111110-----------000-----0001011` | `0xf800000b` | `0xfc00707f` |
+| `rv_zwabd`         | `wwabdau_wx`              | `wm, ws2, rs1, wd`              | `111110-----------100-----0001011` | `0xf800400b` | `0xfc00707f` |
+| `rv_zwabd`         | `wwabda_ww`               | `wm, ws2, ws1, wd`              | `111101-----------000-----0001011` | `0xf400000b` | `0xfc00707f` |
+| `rv_zwabd`         | `wwabda_wx`               | `wm, ws2, rs1, wd`              | `111101-----------100-----0001011` | `0xf400400b` | `0xfc00707f` |
+| `rv_zwbb`          | `wandn_ww`                | `wm, ws2, ws1, wd`              | `000001-----------000-----0001011` | `0x0400000b` | `0xfc00707f` |
+| `rv_zwbb`          | `wandn_wx`                | `wm, ws2, rs1, wd`              | `000001-----------100-----0001011` | `0x0400400b` | `0xfc00707f` |
+| `rv_zwbb`          | `wbrev8_w`                | `wm, ws2, wd`                   | `010010------01000010-----0001011` | `0x4804200b` | `0xfc0ff07f` |
+| `rv_zwbb`          | `wbrev_w`                 | `wm, ws2, wd`                   | `010010------01010010-----0001011` | `0x4805200b` | `0xfc0ff07f` |
+| `rv_zwbb`          | `wclz_w`                  | `wm, ws2, wd`                   | `010010------01100010-----0001011` | `0x4806200b` | `0xfc0ff07f` |
+| `rv_zwbb`          | `wcpop_w`                 | `wm, ws2, wd`                   | `010010------01110010-----0001011` | `0x4807200b` | `0xfc0ff07f` |
+| `rv_zwbb`          | `wctz_w`                  | `wm, ws2, wd`                   | `010010------01101010-----0001011` | `0x4806a00b` | `0xfc0ff07f` |
+| `rv_zwbb`          | `wrev8_w`                 | `wm, ws2, wd`                   | `010010------01001010-----0001011` | `0x4804a00b` | `0xfc0ff07f` |
+| `rv_zwbb`          | `wrol_ww`                 | `wm, ws2, ws1, wd`              | `010101-----------000-----0001011` | `0x5400000b` | `0xfc00707f` |
+| `rv_zwbb`          | `wrol_wx`                 | `wm, ws2, rs1, wd`              | `010101-----------100-----0001011` | `0x5400400b` | `0xfc00707f` |
+| `rv_zwbb`          | `wror_wi`                 | `zimm6hi, wm, ws2, zimm6lo, wd` | `01010------------011-----0001011` | `0x5000300b` | `0xf800707f` |
+| `rv_zwbb`          | `wror_ww`                 | `wm, ws2, ws1, wd`              | `010100-----------000-----0001011` | `0x5000000b` | `0xfc00707f` |
+| `rv_zwbb`          | `wror_wx`                 | `wm, ws2, rs1, wd`              | `010100-----------100-----0001011` | `0x5000400b` | `0xfc00707f` |
+| `rv_zwbb`          | `wwsll_wi`                | `wm, ws2, zimm5, wd`            | `110101-----------011-----0001011` | `0xd400300b` | `0xfc00707f` |
+| `rv_zwbb`          | `wwsll_ww`                | `wm, ws2, ws1, wd`              | `110101-----------000-----0001011` | `0xd400000b` | `0xfc00707f` |
+| `rv_zwbb`          | `wwsll_wx`                | `wm, ws2, rs1, wd`              | `110101-----------100-----0001011` | `0xd400400b` | `0xfc00707f` |
+| `rv_zwbc`          | `wclmulh_ww`              | `wm, ws2, ws1, wd`              | `001101-----------010-----0001011` | `0x3400200b` | `0xfc00707f` |
+| `rv_zwbc`          | `wclmulh_wx`              | `wm, ws2, rs1, wd`              | `001101-----------110-----0001011` | `0x3400600b` | `0xfc00707f` |
+| `rv_zwbc`          | `wclmul_ww`               | `wm, ws2, ws1, wd`              | `001100-----------010-----0001011` | `0x3000200b` | `0xfc00707f` |
+| `rv_zwbc`          | `wclmul_wx`               | `wm, ws2, rs1, wd`              | `001100-----------110-----0001011` | `0x3000600b` | `0xfc00707f` |
+| `rv_zwdot4a`       | `wdot4asu_ww`             | `wm, ws2, ws1, wd`              | `101010-----------010-----0001011` | `0xa800200b` | `0xfc00707f` |
+| `rv_zwdot4a`       | `wdot4asu_wx`             | `wm, ws2, rs1, wd`              | `101010-----------110-----0001011` | `0xa800600b` | `0xfc00707f` |
+| `rv_zwdot4a`       | `wdot4aus_wx`             | `wm, ws2, rs1, wd`              | `101110-----------110-----0001011` | `0xb800600b` | `0xfc00707f` |
+| `rv_zwdot4a`       | `wdot4au_ww`              | `wm, ws2, ws1, wd`              | `101000-----------010-----0001011` | `0xa000200b` | `0xfc00707f` |
+| `rv_zwdot4a`       | `wdot4au_wx`              | `wm, ws2, rs1, wd`              | `101000-----------110-----0001011` | `0xa000600b` | `0xfc00707f` |
+| `rv_zwdot4a`       | `wdot4a_ww`               | `wm, ws2, ws1, wd`              | `101100-----------010-----0001011` | `0xb000200b` | `0xfc00707f` |
+| `rv_zwdot4a`       | `wdot4a_wx`               | `wm, ws2, rs1, wd`              | `101100-----------110-----0001011` | `0xb000600b` | `0xfc00707f` |
+| `rv_zwfbdota32f`   | `wfbdota_ww`              | `wm, ws2x8, ci, ws1, wd`        | `101011-----------001-----1011111` | `0xac00105f` | `0xfc00707f` |
+| `rv_zwfbfmin`      | `wfncvtbf16_f_f_wide`     | `wm, ws2, wd`                   | `010010------11101001-----0001011` | `0x480e900b` | `0xfc0ff07f` |
+| `rv_zwfbfmin`      | `wfwcvtbf16_f_f_w`        | `wm, ws2, wd`                   | `010010------01101001-----0001011` | `0x4806900b` | `0xfc0ff07f` |
+| `rv_zwfbfwma`      | `wfwmaccbf16_wf`          | `wm, ws2, rs1, wd`              | `111011-----------101-----0001011` | `0xec00500b` | `0xfc00707f` |
+| `rv_zwfbfwma`      | `wfwmaccbf16_ww`          | `wm, ws2, ws1, wd`              | `111011-----------001-----0001011` | `0xec00100b` | `0xfc00707f` |
+| `rv_zwfofp4min`    | `wfext_wf2`               | `wm, ws2, wd`                   | `010010------10110010-----0001011` | `0x480b200b` | `0xfc0ff07f` |
+| `rv_zwfofp8min`    | `wfncvtbf16_sat_f_f_wide` | `wm, ws2, wd`                   | `010010------11111001-----0001011` | `0x480f900b` | `0xfc0ff07f` |
+| `rv_zwfofp8min`    | `wfncvt_f_f_q`            | `wm, ws2, wd`                   | `010010------11001001-----0001011` | `0x480c900b` | `0xfc0ff07f` |
+| `rv_zwfofp8min`    | `wfncvt_sat_f_f_q`        | `wm, ws2, wd`                   | `010010------11011001-----0001011` | `0x480d900b` | `0xfc0ff07f` |
+| `rv_zwfqwbdota8f`  | `wfqwbdota_alt_ww`        | `wm, ws2x8, ci, ws1, wd`        | `101111-----------001-----1011111` | `0xbc00105f` | `0xfc00707f` |
+| `rv_zwfqwbdota8f`  | `wfqwbdota_ww`            | `wm, ws2x8, ci, ws1, wd`        | `101110-----------001-----1011111` | `0xb800105f` | `0xfc00707f` |
+| `rv_zwfqwdota8f`   | `wfqwdota_alt_ww`         | `wm, ws2, ws1, wd`              | `100111-----------001-----1011111` | `0x9c00105f` | `0xfc00707f` |
+| `rv_zwfqwdota8f`   | `wfqwdota_ww`             | `wm, ws2, ws1, wd`              | `100110-----------001-----1011111` | `0x9800105f` | `0xfc00707f` |
+| `rv_zwfwbdota16bf` | `wfwbdota_ww`             | `wm, ws2x8, ci, ws1, wd`        | `101100-----------001-----1011111` | `0xb000105f` | `0xfc00707f` |
+| `rv_zwfwdota16bf`  | `wfwdota_ww`              | `wm, ws2, ws1, wd`              | `100100-----------001-----1011111` | `0x9000105f` | `0xfc00707f` |
+| `rv_zwqwbdota8i`   | `wqwbdotas_ww`            | `wm, ws2x8, ci, ws1, wd`        | `101111-----------000-----1011111` | `0xbc00005f` | `0xfc00707f` |
+| `rv_zwqwbdota8i`   | `wqwbdotau_ww`            | `wm, ws2x8, ci, ws1, wd`        | `101110-----------000-----1011111` | `0xb800005f` | `0xfc00707f` |
+| `rv_zwqwdota8i`    | `wqwdotas_ww`             | `wm, ws2, ws1, wd`              | `100111-----------000-----1011111` | `0x9c00005f` | `0xfc00707f` |
+| `rv_zwqwdota8i`    | `wqwdotau_ww`             | `wm, ws2, ws1, wd`              | `100110-----------000-----1011111` | `0x9800005f` | `0xfc00707f` |
+| `rv_zwt16e`        | `wtle16`                  | `rs2, rs1`                      | `0011001----------111000000000111` | `0x32007007` | `0xfe007fff` |
+| `rv_zwt16e`        | `wtse16`                  | `rs2, rs1`                      | `0011001----------111000000100111` | `0x32007027` | `0xfe007fff` |
+| `rv_zwt64e`        | `wtle64`                  | `rs2, rs1`                      | `0111001----------111000000000111` | `0x72007007` | `0xfe007fff` |
+| `rv_zwt64e`        | `wtse64`                  | `rs2, rs1`                      | `0111001----------111000000100111` | `0x72007027` | `0xfe007fff` |
+| `rv_zwt8e`         | `wtle8`                   | `rs2, rs1`                      | `0001001----------111000000000111` | `0x12007007` | `0xfe007fff` |
+| `rv_zwt8e`         | `wtse8`                   | `rs2, rs1`                      | `0001001----------111000000100111` | `0x12007027` | `0xfe007fff` |
+| `rv_zwtbase`       | `wmsetmtype`              | `rs2, rs1, rd`                  | `1000010----------111-----0001011` | `0x8400700b` | `0xfe00707f` |
+| `rv_zwtbase`       | `wmsetmtypei`             | `altfmt, wsew, mtwiden, rd`     | `100-100--100000--111-----0001011` | `0x8840700b` | `0xee7e707f` |
+| `rv_zwtbase`       | `wmsettk`                 | `rs1, rd`                       | `100010000010-----111-----0001011` | `0x8820700b` | `0xfff0707f` |
+| `rv_zwtbase`       | `wmsettm`                 | `rs1, rd`                       | `100010000001-----111-----0001011` | `0x8810700b` | `0xfff0707f` |
+| `rv_zwtbase`       | `wmsettn`                 | `rs1, rd`                       | `100010000000-----111-----0001011` | `0x8800700b` | `0xfff0707f` |
+| `rv_zwtbase`       | `wtdiscard`               | `none`                          | `01000011110000000110000000001011` | `0x43c0600b` | `0xffffffff` |
+| `rv_zwtbase`       | `wtle32`                  | `rs2, rs1`                      | `0101001----------111000000000111` | `0x52007007` | `0xfe007fff` |
+| `rv_zwtbase`       | `wtmv_t_w`                | `ws2, rs1`                      | `0101111----------110000000001011` | `0x5e00600b` | `0xfe007fff` |
+| `rv_zwtbase`       | `wtmv_w_t`                | `rs1, wd`                       | `010000111111-----110-----0001011` | `0x43f0600b` | `0xfff0707f` |
+| `rv_zwtbase`       | `wtse32`                  | `rs2, rs1`                      | `0101001----------111000000100111` | `0x52007027` | `0xfe007fff` |
+| `rv_zwtbase`       | `wtzero`                  | `zwt_mtd16`                     | `01000011111000000110----00001011` | `0x43e0600b` | `0xfffff0ff` |
+| `rv_zwtbf16fmm`    | `wtfmm_alt_tww`           | `ws2, ws1, zwt_mtd8`            | `1111001----------001---011011111` | `0xf20010df` | `0xfe0071ff` |
+| `rv_zwtdmm`        | `wtfmm_tww`               | `ws2, ws1, zwt_mtd8`            | `1111001----------001---001011111` | `0xf200105f` | `0xfe0071ff` |
+| `rv_zwtfmm`        | `wtfmm_tww`               | `ws2, ws1, zwt_mtd8`            | `1111001----------001---001011111` | `0xf200105f` | `0xfe0071ff` |
+| `rv_zwtfp16fmm`    | `wtfmm_tww`               | `ws2, ws1, zwt_mtd8`            | `1111001----------001---001011111` | `0xf200105f` | `0xfe0071ff` |
+| `rv_zwti8i32mm`    | `wtmms_tww`               | `ws2, ws1, zwt_mtd8`            | `1111001----------000---011011111` | `0xf20000df` | `0xfe0071ff` |
+| `rv_zwti8i32mm`    | `wtmmu_tww`               | `ws2, ws1, zwt_mtd8`            | `1111001----------000---001011111` | `0xf200005f` | `0xfe0071ff` |
+| `rv_zwtofp8fmm`    | `wtfmm_alt_tww`           | `ws2, ws1, zwt_mtd8`            | `1111001----------001---011011111` | `0xf20010df` | `0xfe0071ff` |
+| `rv_zwtofp8fmm`    | `wtfmm_tww`               | `ws2, ws1, zwt_mtd8`            | `1111001----------001---001011111` | `0xf200105f` | `0xfe0071ff` |
+| `rv_zwzip`         | `wpaire_ww`               | `wm, ws2, ws1, wd`              | `001111-----------000-----0001011` | `0x3c00000b` | `0xfc00707f` |
+| `rv_zwzip`         | `wpairo_ww`               | `wm, ws2, ws1, wd`              | `001111-----------010-----0001011` | `0x3c00200b` | `0xfc00707f` |
+| `rv_zwzip`         | `wunzipe_w`               | `wm, ws2, wd`                   | `010010------01011010-----0001011` | `0x4805a00b` | `0xfc0ff07f` |
+| `rv_zwzip`         | `wunzipo_w`               | `wm, ws2, wd`                   | `010010------01111010-----0001011` | `0x4807a00b` | `0xfc0ff07f` |
+| `rv_zwzip`         | `wzip_ww`                 | `wm, ws2, ws1, wd`              | `111110-----------010-----0001011` | `0xf800200b` | `0xfc00707f` |
+
+:RVZW - Specific Extension for Matrix Operations

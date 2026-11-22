@@ -1,53 +1,67 @@
 ## INSTRUCTION TYPES
 
-| **Type** | **Type Name** | **Bit Encoding**                                                                            |
-|:---------|:--------------|:--------------------------------------------------------------------------------------------|
-| `32`     | `Base`        | `31:25                       24:20     19:15     14:12        11:7              6:0`        |
-| `r`      | `Register`    | `31:25=funct7                24:20=rs2 19:15=rs1 14:12=funct3 11:7=rd           6:0=opcode` |
-| `i`      | `Immediate`   | `31:20[11:0]=imm                       19:15=rs1 14:12=funct3 11:7=rd           6:0=opcode` |
-| `s`      | `Store`       | `31:25[11:5]=imm             24:20=rs2 19:15=rs1 14:12=funct3 11:7[4:0]=imm     6:0=opcode` |
-| `b`      | `Branch`      | `31:25[12-10:5]=imm          24:20=rs2 19:15=rs1 14:12=funct3 11:7[4:1-11]=imm  6:0=opcode` |
-| `u`      | `Upper`       | `31:12[31:12]=imm                                             11:7=rd           6:0=opcode` |
-| `j`      | `Jump`        | `31:12[20-10:1-11-19:12]=imm                                  11:7=rd           6:0=opcode` |
+| **Extension** | **Name**     | **Variable-Fields**             | **Encoding**                       | **Match**    | **Mask**     | **Type**  |
+|:--------------|:-------------|:--------------------------------|:-----------------------------------|:-------------|:-------------|:----------|
+| `rv_zvkg`     | `vghsh_vv`   | `vs2, vs1, vd`                  | `1011001----------010-----1110111` | `0xb2002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvkg`     | `vgmul_vv`   | `vs2, vd`                       | `1010001-----10001010-----1110111` | `0xa208a077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkned`   | `vaesdf_vs`  | `vs2, vd`                       | `1010011-----00001010-----1110111` | `0xa600a077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkned`   | `vaesdf_vv`  | `vs2, vd`                       | `1010001-----00001010-----1110111` | `0xa200a077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkned`   | `vaesdm_vs`  | `vs2, vd`                       | `1010011-----00000010-----1110111` | `0xa6002077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkned`   | `vaesdm_vv`  | `vs2, vd`                       | `1010001-----00000010-----1110111` | `0xa2002077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkned`   | `vaesef_vs`  | `vs2, vd`                       | `1010011-----00011010-----1110111` | `0xa601a077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkned`   | `vaesef_vv`  | `vs2, vd`                       | `1010001-----00011010-----1110111` | `0xa201a077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkned`   | `vaesem_vs`  | `vs2, vd`                       | `1010011-----00010010-----1110111` | `0xa6012077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkned`   | `vaesem_vv`  | `vs2, vd`                       | `1010001-----00010010-----1110111` | `0xa2012077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkned`   | `vaeskf1_vi` | `vs2, zimm5, vd`                | `1000101----------010-----1110111` | `0x8a002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvkned`   | `vaeskf2_vi` | `vs2, zimm5, vd`                | `1010101----------010-----1110111` | `0xaa002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvkned`   | `vaesz_vs`   | `vs2, vd`                       | `1010011-----00111010-----1110111` | `0xa603a077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvknha`   | `vsha2ch_vv` | `vs2, vs1, vd`                  | `1011101----------010-----1110111` | `0xba002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvknha`   | `vsha2cl_vv` | `vs2, vs1, vd`                  | `1011111----------010-----1110111` | `0xbe002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvknha`   | `vsha2ms_vv` | `vs2, vs1, vd`                  | `1011011----------010-----1110111` | `0xb6002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvknhb`   | `vsha2ch_vv` | `vs2, vs1, vd`                  | `1011101----------010-----1110111` | `0xba002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvknhb`   | `vsha2cl_vv` | `vs2, vs1, vd`                  | `1011111----------010-----1110111` | `0xbe002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvknhb`   | `vsha2ms_vv` | `vs2, vs1, vd`                  | `1011011----------010-----1110111` | `0xb6002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvkn`     | `vaesdf_vs`  | `vs2, vd`                       | `1010011-----00001010-----1110111` | `0xa600a077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkn`     | `vaesdf_vv`  | `vs2, vd`                       | `1010001-----00001010-----1110111` | `0xa200a077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkn`     | `vaesdm_vs`  | `vs2, vd`                       | `1010011-----00000010-----1110111` | `0xa6002077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkn`     | `vaesdm_vv`  | `vs2, vd`                       | `1010001-----00000010-----1110111` | `0xa2002077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkn`     | `vaesef_vs`  | `vs2, vd`                       | `1010011-----00011010-----1110111` | `0xa601a077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkn`     | `vaesef_vv`  | `vs2, vd`                       | `1010001-----00011010-----1110111` | `0xa201a077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkn`     | `vaesem_vs`  | `vs2, vd`                       | `1010011-----00010010-----1110111` | `0xa6012077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkn`     | `vaesem_vv`  | `vs2, vd`                       | `1010001-----00010010-----1110111` | `0xa2012077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkn`     | `vaeskf1_vi` | `vs2, zimm5, vd`                | `1000101----------010-----1110111` | `0x8a002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvkn`     | `vaeskf2_vi` | `vs2, zimm5, vd`                | `1010101----------010-----1110111` | `0xaa002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvkn`     | `vaesz_vs`   | `vs2, vd`                       | `1010011-----00111010-----1110111` | `0xa603a077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvkn`     | `vandn_vv`   | `vm, vs2, vs1, vd`              | `000001-----------000-----1010111` | `0x04000057` | `0xfc00707f` | `OPIVV`   |
+| `rv_zvkn`     | `vandn_vx`   | `vm, vs2, rs1, vd`              | `000001-----------100-----1010111` | `0x04004057` | `0xfc00707f` | `OPIVX`   |
+| `rv_zvkn`     | `vbrev8_v`   | `vm, vs2, vd`                   | `010010------01000010-----1010111` | `0x48042057` | `0xfc0ff07f` | `OPMVV`   |
+| `rv_zvkn`     | `vrev8_v`    | `vm, vs2, vd`                   | `010010------01001010-----1010111` | `0x4804a057` | `0xfc0ff07f` | `OPMVV`   |
+| `rv_zvkn`     | `vrol_vv`    | `vm, vs2, vs1, vd`              | `010101-----------000-----1010111` | `0x54000057` | `0xfc00707f` | `OPIVV`   |
+| `rv_zvkn`     | `vrol_vx`    | `vm, vs2, rs1, vd`              | `010101-----------100-----1010111` | `0x54004057` | `0xfc00707f` | `OPIVX`   |
+| `rv_zvkn`     | `vror_vi`    | `zimm6hi, vm, vs2, zimm6lo, vd` | `01010------------011-----1010111` | `0x50003057` | `0xf800707f` | `OPIVI`   |
+| `rv_zvkn`     | `vror_vv`    | `vm, vs2, vs1, vd`              | `010100-----------000-----1010111` | `0x50000057` | `0xfc00707f` | `OPIVV`   |
+| `rv_zvkn`     | `vror_vx`    | `vm, vs2, rs1, vd`              | `010100-----------100-----1010111` | `0x50004057` | `0xfc00707f` | `OPIVX`   |
+| `rv_zvkn`     | `vsha2ch_vv` | `vs2, vs1, vd`                  | `1011101----------010-----1110111` | `0xba002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvkn`     | `vsha2cl_vv` | `vs2, vs1, vd`                  | `1011111----------010-----1110111` | `0xbe002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvkn`     | `vsha2ms_vv` | `vs2, vs1, vd`                  | `1011011----------010-----1110111` | `0xb6002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvksed`   | `vsm4k_vi`   | `vs2, zimm5, vd`                | `1000011----------010-----1110111` | `0x86002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvksed`   | `vsm4r_vs`   | `vs2, vd`                       | `1010011-----10000010-----1110111` | `0xa6082077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvksed`   | `vsm4r_vv`   | `vs2, vd`                       | `1010001-----10000010-----1110111` | `0xa2082077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvksh`    | `vsm3c_vi`   | `vs2, zimm5, vd`                | `1010111----------010-----1110111` | `0xae002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvksh`    | `vsm3me_vv`  | `vs2, vs1, vd`                  | `1000001----------010-----1110111` | `0x82002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvks`     | `vandn_vv`   | `vm, vs2, vs1, vd`              | `000001-----------000-----1010111` | `0x04000057` | `0xfc00707f` | `OPIVV`   |
+| `rv_zvks`     | `vandn_vx`   | `vm, vs2, rs1, vd`              | `000001-----------100-----1010111` | `0x04004057` | `0xfc00707f` | `OPIVX`   |
+| `rv_zvks`     | `vbrev8_v`   | `vm, vs2, vd`                   | `010010------01000010-----1010111` | `0x48042057` | `0xfc0ff07f` | `OPMVV`   |
+| `rv_zvks`     | `vrev8_v`    | `vm, vs2, vd`                   | `010010------01001010-----1010111` | `0x4804a057` | `0xfc0ff07f` | `OPMVV`   |
+| `rv_zvks`     | `vrol_vv`    | `vm, vs2, vs1, vd`              | `010101-----------000-----1010111` | `0x54000057` | `0xfc00707f` | `OPIVV`   |
+| `rv_zvks`     | `vrol_vx`    | `vm, vs2, rs1, vd`              | `010101-----------100-----1010111` | `0x54004057` | `0xfc00707f` | `OPIVX`   |
+| `rv_zvks`     | `vror_vi`    | `zimm6hi, vm, vs2, zimm6lo, vd` | `01010------------011-----1010111` | `0x50003057` | `0xf800707f` | `OPIVI`   |
+| `rv_zvks`     | `vror_vv`    | `vm, vs2, vs1, vd`              | `010100-----------000-----1010111` | `0x50000057` | `0xfc00707f` | `OPIVV`   |
+| `rv_zvks`     | `vror_vx`    | `vm, vs2, rs1, vd`              | `010100-----------100-----1010111` | `0x50004057` | `0xfc00707f` | `OPIVX`   |
+| `rv_zvks`     | `vsm3c_vi`   | `vs2, zimm5, vd`                | `1010111----------010-----1110111` | `0xae002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvks`     | `vsm3me_vv`  | `vs2, vs1, vd`                  | `1000001----------010-----1110111` | `0x82002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvks`     | `vsm4k_vi`   | `vs2, zimm5, vd`                | `1000011----------010-----1110111` | `0x86002077` | `0xfe00707f` | `UNKNOWN` |
+| `rv_zvks`     | `vsm4r_vs`   | `vs2, vd`                       | `1010011-----10000010-----1110111` | `0xa6082077` | `0xfe0ff07f` | `UNKNOWN` |
+| `rv_zvks`     | `vsm4r_vv`   | `vs2, vd`                       | `1010001-----10000010-----1110111` | `0xa2082077` | `0xfe0ff07f` | `UNKNOWN` |
 
-:RISC-V Base 32-Bit Instruction Type
-
-| **Type** | **Type Name** | **Bit Encoding**                                                                |
-|:---------|:--------------|:--------------------------------------------------------------------------------|
-| `32`     | `Base`        | `31:25                     24:20     19:15     14:12        11:7    6:0`        |
-| `r4`     | `Register`    | `31:27=rs3    26:25=funct2 24:20=rs2 19:15=rs1 14:12=funct3 11:7=rd 6:0=opcode` |
-
-:RISC-V Float-Point 32-Bit Instruction Type
-
-| **Type** | **Type Name**          | **Bit Encoding**                                                      |
-|:---------|:-----------------------|:----------------------------------------------------------------------|
-| `16`     | `Compressed`           | `15:13        12:10             9:7      6:5     4:2      1:0`        |
-| `cr`     | `Register`             | `15:12=funct4           11:7=rd/rs1      6:2=rs2          1:0=opcode` |
-| `ci`     | `Immediate`            | `15:13=funct3 12=imm    11:7=rd/rs1      6:2=imm          1:0=opcode` |
-| `css`    | `Stack-relative Store` | `15:13=funct3 12:7=imm                   6:2=rs2          1:0=opcode` |
-| `ciw`    | `Wide Immediate`       | `15:13=funct3 12:5=imm                           4:2=rd'  1:0=opcode` |
-| `cl`     | `Load`                 | `15:13=funct3 12:10=imm         9:7=rs1' 6:5=imm 4:2=rd'  1:0=opcode` |
-| `cs`     | `Store`                | `15:13=funct3 12:10=imm         9:7=rs1' 6:5=imm 4:2=rs2' 1:0=opcode` |
-| `cb`     | `Branch`               | `15:13=funct3 12:10=imm         9:7=rs1' 6:2=imm          1:0=opcode` |
-| `cj`     | `Jump`                 | `15:13=funct3 12:2=imm                                    1:0=opcode` |
-
-:RISC-V Compressed 16-Bit Instruction Type
-
-| **Type** | **Type Name** | **Bit Encoding**                                                                             |
-|:---------|:--------------|:---------------------------------------------------------------------------------------------|
-| `64`     | `Extended`    | `63:48                       47:38     37:28     27:22        21:12             11:0`        |
-| `or`     | `Register`    | `63:54=funct16                                   27:22=funct6 21:12=rd          11:0=opcode` |
-| `oi`     | `Immediate`   | `63:38[21:0]=imm                       37:28=rs1 27:22=funct6 21:12=rd          11:0=opcode` |
-| `os`     | `Store`       | `63:48[21:10]=imm            47:38=rs2 37:28=rs1 27:22=funct6 21:12[9:0]=imm    11:0=opcode` |
-| `ob`     | `Branch`      | `63:48[22-20:10]=imm         47:38=rs2 37:28=rs1 27:22=funct6 21:12[9:1-21]=imm 11:0=opcode` |
-| `ou`     | `Upper`       | `63:22[63:22]=imm                                             21:12=rd          11:0=opcode` |
-| `oj`     | `Jump`        | `63:22[38-20:1-21-37:22]=imm                                  21:12=rd          11:0=opcode` |
-
-:RISC-V Extended 64-Bit Instruction Type
-
-| **Type** | **Type Name** | **Bit Encoding**                                                                   |
-|:---------|:--------------|:-----------------------------------------------------------------------------------|
-| `64`     | `Extended`    | `63:48                      47:38     37:28     27:22        21:12    11:0`        |
-| `or4`    | `Register`    | `63:54=rs3     53:48=funct6 47:38=rs2 37:28=rs1 27:22=funct6 21:12=rd 11:0=opcode` |
-
-:RISC-V Float-Point 64-Bit Instruction Type
+:RVZVK - Specific Extension for Vector Cryptography Instructions

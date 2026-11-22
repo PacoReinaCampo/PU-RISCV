@@ -1,7 +1,7 @@
-## OPCODE ENCODING INFORMATION
+## INSTRUCTION OPCODES
 
-| **Extension** | **Name** | **Encoding** | **Variable-Fields** | **Match** | **Mask** |
-|:--------------|:---------|:-------------|:--------------------|:----------|:---------|
-| `rv_n`        | `-`      | `-`          | `-`                 | `-`       | `-`      |
+| **Extension** | **Name** | **Variable-Fields** | **Encoding**                       | **Match**    | **Mask**     |
+|:--------------|:---------|:--------------------|:-----------------------------------|:-------------|:-------------|
+| `rv_n`        | `uret`   | `none`              | `00000000001000000000000001110011` | `0x00200073` | `0xffffffff` |
 
 :RVN - Specific Extension for User-level Interrupts Instructions

@@ -1,5 +1,5 @@
 // =======================================================================================
-// This Sail RISC-V architecture model, comprising all files and
+// This Sail RISC-W architecture model, comprising all files and
 // directories except where otherwise noted is subject the BSD
 // two-clause license in the LICENSE file.
 //
@@ -7,386 +7,459 @@
 // =======================================================================================
 
 // ******************************************************************************
-// This file implements part of the vector extension.
-// Chapter 15: vector mask instructions
+// This file implements part of the matrix extension.
+// Chapter 15: matrix mask instructions
 // ******************************************************************************
 
 // ****************************** OPMVV (MMTYPE) ********************************
-union clause instruction = MMTYPE : (mmfunct6, vregidx, vregidx, vregidx)
+union clause instruction = W_MMTYPE : (w_mmfunct6, wregidx, wregidx, wregidx)
 
-mapping encdec_mmfunct6 : mmfunct6 <-> bits(6) = {
-  MM_VMAND     <-> 0b011001,
-  MM_VMNAND    <-> 0b011101,
-  MM_VMANDN    <-> 0b011000,
-  MM_VMXOR     <-> 0b011011,
-  MM_VMOR      <-> 0b011010,
-  MM_VMNOR     <-> 0b011110,
-  MM_VMORN     <-> 0b011100,
-  MM_VMXNOR    <-> 0b011111
+mapping w_encdec_mmfunct6 : w_mmfunct6 <-> bits(6) = {
+ W_MM_WMAND     <-> 0b011001,
+ W_MM_WMNAND    <-> 0b011101,
+ W_MM_WMANDN    <-> 0b011000,
+ W_MM_WMXOR     <-> 0b011011,
+ W_MM_WMOR      <-> 0b011010,
+ W_MM_WMNOR     <-> 0b011110,
+ W_MM_WMORN     <-> 0b011100,
+ W_MM_WMXNOR    <-> 0b011111
 }
 
-mapping clause encdec = MMTYPE(funct6, vs2, vs1, vd)
-  <-> encdec_mmfunct6(funct6) @ 0b1 @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = W_MMTYPE(funct6, ws2, ws1, wd)
+ <-> w_encdec_mmfunct6(funct6) @ 0b1 @ w_encdec_wreg(ws2) @ w_encdec_wreg(ws1) @ 0b010 @ w_encdec_wreg(wd) @ 0b0001011
+ when (currentlyEnabled(Ext_W) & w_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_W) & welen >= 64) & w_get_sew() <= 64)
 
-function clause execute MMTYPE(funct6, vs2, vs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = vlen;
+function clause execute(W_MMTYPE(funct6, ws2, ws1, wd)) = {
+  let SEW = w_get_sew();
+  let num_elem = wlen;
 
-  if illegal_vd_unmasked() then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vs1_val : bits('n) = read_vmask(num_elem, 0b0, vs1);
-  let vs2_val : bits('n) = read_vmask(num_elem, 0b0, vs2);
-  let vd_val  : bits('n) = read_vmask(num_elem, 0b0, vd);
-
-  let (initial_result, mask) : (bits('n), bits('n)) = match init_masked_result_carry(num_elem, SEW, 0, vd_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if w_illegal_wd_unmasked() | w_illegal_wstart(W_WSTART_ARITH, num_elem, 0) then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ws1_val : bits('n) = w_read_wmask(num_elem, 0b0, ws1);
+  let ws2_val : bits('n) = w_read_wmask(num_elem, 0b0, ws2);
+  let wd_val : bits('n) = w_read_wmask(num_elem, 0b0, wd);
+
+  let (initial_result, mask) : (bits('n), bits('n)) = w_init_masked_result_carry(num_elem, SEW, 0, wd_val);
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        MM_VMAND     => (vs2_val & vs1_val)[i],
-        MM_VMNAND    => ~(vs2_val & vs1_val)[i],
-        MM_VMANDN    => (vs2_val & ~(vs1_val))[i],
-        MM_VMXOR     => (vs2_val ^ vs1_val)[i],
-        MM_VMOR      => (vs2_val | vs1_val)[i],
-        MM_VMNOR     => (~(vs2_val | vs1_val))[i],
-        MM_VMORN     => (vs2_val | ~(vs1_val))[i],
-        MM_VMXNOR    => (~(vs2_val ^ vs1_val))[i]
+  {
+    let mask_view = w_shape(mask, w_columns);
+    var result_view = w_shape(result, w_columns);
+    let ws1_val_view = w_shape(ws1_val, w_columns);
+    let ws2_val_view = w_shape(ws2_val, w_columns);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / w_columns;
+      let j = p % w_columns;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ws1_val_view));
+      assert(i < length(ws2_val_view));
+      assert(j < w_columns);
+
+      if mask_view[i][j] == 0b1 then {
+        result_view[i][j] = match funct6 {
+          W_MM_WMAND  => bool_to_bit((ws2_val_view[i][j] == bitone) & (ws1_val_view[i][j] == bitone)),
+          W_MM_WMNAND => bool_to_bit(not((ws2_val_view[i][j] == bitone) & (ws1_val_view[i][j] == bitone))),
+          W_MM_WMANDN => bool_to_bit((ws2_val_view[i][j] == bitone) & not(ws1_val_view[i][j] == bitone)),
+          W_MM_WMXOR  => bool_to_bit((ws2_val_view[i][j] == bitone) != (ws1_val_view[i][j] == bitone)),
+          W_MM_WMOR   => bool_to_bit((ws2_val_view[i][j] == bitone) | (ws1_val_view[i][j] == bitone)),
+          W_MM_WMNOR  => bool_to_bit(not((ws2_val_view[i][j] == bitone) | (ws1_val_view[i][j] == bitone))),
+          W_MM_WMORN  => bool_to_bit((ws2_val_view[i][j] == bitone) | not(ws1_val_view[i][j] == bitone)),
+          W_MM_WMXNOR => bool_to_bit((ws2_val_view[i][j] == bitone) == (ws1_val_view[i][j] == bitone)),
+        }
       }
-    }
-  };
-
-  write_vmask(num_elem, vd, result);
-  set_vstart(zeros());
-  RETIRE_SUCCESS
-}
-
-mapping mmtype_mnemonic : mmfunct6 <-> string = {
-  MM_VMAND     <-> "vmand.mm",
-  MM_VMNAND    <-> "vmnand.mm",
-  MM_VMANDN    <-> "vmandn.mm",
-  MM_VMXOR     <-> "vmxor.mm",
-  MM_VMOR      <-> "vmor.mm",
-  MM_VMNOR     <-> "vmnor.mm",
-  MM_VMORN     <-> "vmorn.mm",
-  MM_VMXNOR    <-> "vmxnor.mm"
-}
-
-mapping clause assembly = MMTYPE(funct6, vs2, vs1, vd)
-  <-> mmtype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1)
-
-// ************************ OPMVV (vcpop in VWXUNARY0) **************************
-union clause instruction = VCPOP_M : (bits(1), vregidx, regidx)
-
-mapping clause encdec = VCPOP_M(vm, vs2, rd)
-  <-> 0b010000 @ vm @ encdec_vreg(vs2) @ 0b10000 @ 0b010 @ encdec_reg(rd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
-
-function clause execute VCPOP_M(vm, vs2, rd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = vlen;
-
-  if illegal_vd_unmasked() | not(assert_vstart(0)) then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n) = read_vmask(num_elem, vm, zvreg);
-  let vs2_val : bits('n) = read_vmask(num_elem, 0b0, vs2);
-
-  let (_, mask) : (bits('n), bits('n)) = match init_masked_result_cmp(num_elem, SEW, 0, vs2_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-
-  var count : nat = 0;
-  foreach (i from 0 to (num_elem - 1)) {
-    if (mask & vs2_val)[i] == 0b1 then count = count + 1;
-  };
-
-  X(rd) = to_bits_unsafe(xlen, count);
-  set_vstart(zeros());
-  RETIRE_SUCCESS
-}
-
-mapping clause assembly = VCPOP_M(vm, vs2, rd)
-  <-> "vcpop.m" ^ spc() ^ reg_name(rd) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
-
-// ************************ OPMVV (vfirst in VWXUNARY0) *************************
-union clause instruction = VFIRST_M : (bits(1), vregidx, regidx)
-
-mapping clause encdec = VFIRST_M(vm, vs2, rd)
-  <-> 0b010000 @ vm @ encdec_vreg(vs2) @ 0b10001 @ 0b010 @ encdec_reg(rd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
-
-function clause execute VFIRST_M(vm, vs2, rd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = vlen;
-
-  if illegal_vd_unmasked() | not(assert_vstart(0)) then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n) = read_vmask(num_elem, vm, zvreg);
-  let vs2_val : bits('n) = read_vmask(num_elem, 0b0, vs2);
-
-  let (_, mask) : (bits('n), bits('n)) = match init_masked_result_cmp(num_elem, SEW, 0, vs2_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-
-  var index : int = -1;
-  foreach (i from 0 to (num_elem - 1)) {
-    if index == -1 then {
-      if (mask & vs2_val)[i] == 0b1 then index = i;
     };
+    result = w_unshape_bits(length(result), result_view, w_columns)
   };
 
-  X(rd) = to_bits_unsafe(xlen, index);
-  set_vstart(zeros());
+  w_write_wmask(num_elem, wd, result);
+  w_set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VFIRST_M(vm, vs2, rd)
-  <-> "vfirst.m" ^ spc() ^ reg_name(rd) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping w_mmtype_mnemonic : w_mmfunct6 <-> string = {
+ W_MM_WMAND     <-> "wmand.mm",
+ W_MM_WMNAND    <-> "wmnand.mm",
+ W_MM_WMANDN    <-> "wmandn.mm",
+ W_MM_WMXOR     <-> "wmxor.mm",
+ W_MM_WMOR      <-> "wmor.mm",
+ W_MM_WMNOR     <-> "wmnor.mm",
+ W_MM_WMORN     <-> "wmorn.mm",
+ W_MM_WMXNOR    <-> "wmxnor.mm"
+}
 
-// ************************* OPMVV (vmsbf in VMUNARY0) **************************
-union clause instruction = VMSBF_M : (bits(1), vregidx, vregidx)
+mapping clause assembly = W_MMTYPE(funct6, ws2, ws1, wd)
+ <-> w_mmtype_mnemonic(funct6) ^ spc() ^ w_wreg_name(wd) ^ sep() ^ w_wreg_name(ws2) ^ sep() ^ w_wreg_name(ws1)
 
-mapping clause encdec = VMSBF_M(vm, vs2, vd)
-  <-> 0b010100 @ vm @ encdec_vreg(vs2) @ 0b00001 @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+// ************************ OPMVV (vcpop in WWXUNARY0) **************************
+union clause instruction = W_WCPOP_M : (bits(1), wregidx, regidx)
 
-function clause execute VMSBF_M(vm, vs2, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = vlen;
+mapping clause encdec = W_WCPOP_M(wm, ws2, rd)
+ <-> 0b010000 @ wm @ w_encdec_wreg(ws2) @ 0b10000 @ 0b010 @ encdec_reg(rd) @ 0b0001011
+ when (currentlyEnabled(Ext_W) & w_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_W) & welen >= 64) & w_get_sew() <= 64)
 
-  if illegal_normal(vd, vm) | not(assert_vstart(0)) | vd == vs2
-  then return Illegal_Instruction();
+function clause execute(W_WCPOP_M(wm, ws2, rd)) = {
+  let num_elem = wlen;
 
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n) = read_vmask(num_elem, vm, zvreg);
-  let vs2_val : bits('n) = read_vmask(num_elem, 0b0, vs2);
-  let vd_val  : bits('n) = read_vmask(num_elem, 0b0, vd);
-
-  let (initial_result, mask) : (bits('n), bits('n)) = match init_masked_result_cmp(num_elem, SEW, 0, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-  var result = initial_result;
-
-  var found_elem : bool = false;
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      if vs2_val[i] == 0b1 then found_elem = true;
-      result[i] = bool_to_bit(not(found_elem))
-    }
+  if w_illegal_wd_unmasked() | w_illegal_wstart(W_WSTART_MANDATORY, num_elem, 0) then {
+    return Illegal_Instruction()
   };
 
-  write_vmask(num_elem, vd, result);
-  set_vstart(zeros());
+  let (n as 'n) = num_elem;
+
+  let wm_val : bits('n) = w_read_wmask(num_elem, wm, w_zwreg);
+  let ws2_val : bits('n) = w_read_wmask(num_elem, 0b0, ws2);
+
+  let mask : bits('n) = w_init_masked_source(num_elem, 0, wm_val);
+
+  X(rd) = to_bits(xlen, count_ones(mask & ws2_val));
+  w_set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VMSBF_M(vm, vs2, vd)
-  <-> "vmsbf.m" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping clause assembly = W_WCPOP_M(wm, ws2, rd)
+ <-> "wcpop.m" ^ spc() ^ reg_name(rd) ^ sep() ^ w_wreg_name(ws2) ^ w_maybe_wmask(wm)
 
-// ************************* OPMVV (vmsif in VMUNARY0) **************************
-union clause instruction = VMSIF_M : (bits(1), vregidx, vregidx)
+// ************************ OPMVV (vfirst in WWXUNARY0) *************************
+union clause instruction = W_WFIRST_M : (bits(1), wregidx, regidx)
 
-mapping clause encdec = VMSIF_M(vm, vs2, vd)
-  <-> 0b010100 @ vm @ encdec_vreg(vs2) @ 0b00011 @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = W_WFIRST_M(wm, ws2, rd)
+ <-> 0b010000 @ wm @ w_encdec_wreg(ws2) @ 0b10001 @ 0b010 @ encdec_reg(rd) @ 0b0001011
+ when (currentlyEnabled(Ext_W) & w_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_W) & welen >= 64) & w_get_sew() <= 64)
 
-function clause execute VMSIF_M(vm, vs2, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = vlen;
+function clause execute(W_WFIRST_M(wm, ws2, rd)) = {
+  let num_elem = wlen;
 
-  if illegal_normal(vd, vm) | not(assert_vstart(0)) | vd == vs2
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n) = read_vmask(num_elem, vm, zvreg);
-  let vs2_val : bits('n) = read_vmask(num_elem, 0b0, vs2);
-  let vd_val  : bits('n) = read_vmask(num_elem, 0b0, vd);
-
-  let (initial_result, mask) : (bits('n), bits('n)) = match init_masked_result_cmp(num_elem, SEW, 0, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-  var result = initial_result;
-
-  var found_elem : bool = false;
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = bool_to_bit(not(found_elem));
-      if vs2_val[i] == 0b1 then found_elem = true
-    }
+  if w_illegal_wd_unmasked() | w_illegal_wstart(W_WSTART_MANDATORY, num_elem, 0) then {
+    return Illegal_Instruction()
   };
 
-  write_vmask(num_elem, vd, result);
-  set_vstart(zeros());
+  let (n as 'n) = num_elem;
+
+  let wm_val : bits('n) = w_read_wmask(num_elem, wm, w_zwreg);
+  let ws2_val : bits('n) = w_read_wmask(num_elem, 0b0, ws2);
+
+  let mask : bits('n) = w_init_masked_source(num_elem, 0, wm_val);
+
+  let active = mask & ws2_val;
+
+  X(rd) =
+    if active == zeros() then {
+      ones()
+    } else {
+      to_bits(count_trailing_zeros(active))
+    };
+  w_set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VMSIF_M(vm, vs2, vd)
-  <-> "vmsif.m" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping clause assembly = W_WFIRST_M(wm, ws2, rd)
+ <-> "wfirst.m" ^ spc() ^ reg_name(rd) ^ sep() ^ w_wreg_name(ws2) ^ w_maybe_wmask(wm)
 
-// ************************* OPMVV (vmsof in VMUNARY0) **************************
-union clause instruction = VMSOF_M : (bits(1), vregidx, vregidx)
+// ************************* OPMVV (vmsbf in WMUNARY0) **************************
+union clause instruction = W_WMSBF_M : (bits(1), wregidx, wregidx)
 
-mapping clause encdec = VMSOF_M(vm, vs2, vd)
-  <-> 0b010100 @ vm @ encdec_vreg(vs2) @ 0b00010 @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = W_WMSBF_M(wm, ws2, wd)
+ <-> 0b010100 @ wm @ w_encdec_wreg(ws2) @ 0b00001 @ 0b010 @ w_encdec_wreg(wd) @ 0b0001011
+ when (currentlyEnabled(Ext_W) & w_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_W) & welen >= 64) & w_get_sew() <= 64)
 
-function clause execute VMSOF_M(vm, vs2, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = vlen;
+function clause execute(W_WMSBF_M(wm, ws2, wd)) = {
+  let SEW = w_get_sew();
+  let num_elem = wlen;
 
-  if illegal_normal(vd, vm) | not(assert_vstart(0)) | vd == vs2
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n) = read_vmask(num_elem, vm, zvreg);
-  let vs2_val : bits('n) = read_vmask(num_elem, 0b0, vs2);
-  let vd_val  : bits('n) = read_vmask(num_elem, 0b0, vd);
-
-  let (initial_result, mask) : (bits('n), bits('n)) = match init_masked_result_cmp(num_elem, SEW, 0, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if w_illegal_wstart(W_WSTART_MANDATORY, num_elem, 0) | w_illegal_normal(wd, wm) | wd == ws2 then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let wm_val : bits('n) = w_read_wmask(num_elem, wm, w_zwreg);
+  let ws2_val : bits('n) = w_read_wmask(num_elem, 0b0, ws2);
+  let wd_val : bits('n) = w_read_wmask(num_elem, 0b0, wd);
+
+  let (initial_result, mask) : (bits('n), bits('n)) = w_init_masked_result_cmp(num_elem, SEW, 0, wd_val, wm_val);
   var result = initial_result;
 
   var found_elem : bool = false;
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      if (vs2_val[i] == 0b1) & not(found_elem) then {
-        result[i] = 0b1;
-        found_elem = true
-      } else {
-        result[i] = 0b0
+  {
+    let mask_view = w_shape(mask, w_columns);
+    var result_view = w_shape(result, w_columns);
+    let ws2_val_view = w_shape(ws2_val, w_columns);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / w_columns;
+      let j = p % w_columns;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ws2_val_view));
+      assert(j < w_columns);
+
+      if mask_view[i][j] == 0b1 then {
+        if ws2_val_view[i][j] == 0b1 then {
+          found_elem = true
+        };
+        result_view[i][j] = bool_to_bit(not(found_elem))
       }
-    }
+    };
+    result = w_unshape_bits(length(result), result_view, w_columns)
   };
 
-  write_vmask(num_elem, vd, result);
-  set_vstart(zeros());
+  w_write_wmask(num_elem, wd, result);
+  w_set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VMSOF_M(vm, vs2, vd)
-  <-> "vmsof.m" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping clause assembly = W_WMSBF_M(wm, ws2, wd)
+ <-> "wmsbf.m" ^ spc() ^ w_wreg_name(wd) ^ sep() ^ w_wreg_name(ws2) ^ w_maybe_wmask(wm)
 
-// ************************* OPMVV (viota in VMUNARY0) **************************
-union clause instruction = VIOTA_M : (bits(1), vregidx, vregidx)
+// ************************* OPMVV (vmsif in WMUNARY0) **************************
+union clause instruction = W_WMSIF_M : (bits(1), wregidx, wregidx)
 
-mapping clause encdec = VIOTA_M(vm, vs2, vd)
-  <-> 0b010100 @ vm @ encdec_vreg(vs2) @ 0b10000 @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = W_WMSIF_M(wm, ws2, wd)
+ <-> 0b010100 @ wm @ w_encdec_wreg(ws2) @ 0b00011 @ 0b010 @ w_encdec_wreg(wd) @ 0b0001011
+ when (currentlyEnabled(Ext_W) & w_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_W) & welen >= 64) & w_get_sew() <= 64)
 
-function clause execute VIOTA_M(vm, vs2, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(W_WMSIF_M(wm, ws2, wd)) = {
+  let SEW = w_get_sew();
+  let num_elem = wlen;
 
-  if illegal_normal(vd, vm) |
-     not(assert_vstart(0)) |
-     not(valid_reg_group(vd, LMUL_pow)) |
-     vd == vs2
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vs2_val : bits('n)             = read_vmask(num_elem, 0b0, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if w_illegal_wstart(W_WSTART_MANDATORY, num_elem, 0) | w_illegal_normal(wd, wm) | wd == ws2 then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let wm_val : bits('n) = w_read_wmask(num_elem, wm, w_zwreg);
+  let ws2_val : bits('n) = w_read_wmask(num_elem, 0b0, ws2);
+  let wd_val : bits('n) = w_read_wmask(num_elem, 0b0, wd);
+
+  let (initial_result, mask) : (bits('n), bits('n)) = w_init_masked_result_cmp(num_elem, SEW, 0, wd_val, wm_val);
+  var result = initial_result;
+
+  var found_elem : bool = false;
+  {
+    let mask_view = w_shape(mask, w_columns);
+    var result_view = w_shape(result, w_columns);
+    let ws2_val_view = w_shape(ws2_val, w_columns);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / w_columns;
+      let j = p % w_columns;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ws2_val_view));
+      assert(j < w_columns);
+
+      if mask_view[i][j] == 0b1 then {
+        result_view[i][j] = bool_to_bit(not(found_elem));
+        if ws2_val_view[i][j] == 0b1 then {
+          found_elem = true
+        }
+      }
+    };
+    result = w_unshape_bits(length(result), result_view, w_columns)
+  };
+
+  w_write_wmask(num_elem, wd, result);
+  w_set_wstart(zeros());
+  RETIRE_SUCCESS
+}
+
+mapping clause assembly = W_WMSIF_M(wm, ws2, wd)
+ <-> "wmsif.m" ^ spc() ^ w_wreg_name(wd) ^ sep() ^ w_wreg_name(ws2) ^ w_maybe_wmask(wm)
+
+// ************************* OPMVV (vmsof in WMUNARY0) **************************
+union clause instruction = W_WMSOF_M : (bits(1), wregidx, wregidx)
+
+mapping clause encdec = W_WMSOF_M(wm, ws2, wd)
+ <-> 0b010100 @ wm @ w_encdec_wreg(ws2) @ 0b00010 @ 0b010 @ w_encdec_wreg(wd) @ 0b0001011
+ when (currentlyEnabled(Ext_W) & w_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_W) & welen >= 64) & w_get_sew() <= 64)
+
+function clause execute(W_WMSOF_M(wm, ws2, wd)) = {
+  let SEW = w_get_sew();
+  let num_elem = wlen;
+
+  if w_illegal_wstart(W_WSTART_MANDATORY, num_elem, 0) | w_illegal_normal(wd, wm) | wd == ws2 then {
+    return Illegal_Instruction()
+  };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let wm_val : bits('n) = w_read_wmask(num_elem, wm, w_zwreg);
+  let ws2_val : bits('n) = w_read_wmask(num_elem, 0b0, ws2);
+  let wd_val : bits('n) = w_read_wmask(num_elem, 0b0, wd);
+
+  let (initial_result, mask) : (bits('n), bits('n)) = w_init_masked_result_cmp(num_elem, SEW, 0, wd_val, wm_val);
+  var result = initial_result;
+
+  var found_elem : bool = false;
+  {
+    let mask_view = w_shape(mask, w_columns);
+    var result_view = w_shape(result, w_columns);
+    let ws2_val_view = w_shape(ws2_val, w_columns);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / w_columns;
+      let j = p % w_columns;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ws2_val_view));
+      assert(j < w_columns);
+
+      if mask_view[i][j] == 0b1 then {
+        if (ws2_val_view[i][j] == 0b1) & not(found_elem) then {
+          result_view[i][j] = 0b1;
+          found_elem = true
+        } else {
+          result_view[i][j] = 0b0
+        }
+      }
+    };
+    result = w_unshape_bits(length(result), result_view, w_columns)
+  };
+
+  w_write_wmask(num_elem, wd, result);
+  w_set_wstart(zeros());
+  RETIRE_SUCCESS
+}
+
+mapping clause assembly = W_WMSOF_M(wm, ws2, wd)
+ <-> "wmsof.m" ^ spc() ^ w_wreg_name(wd) ^ sep() ^ w_wreg_name(ws2) ^ w_maybe_wmask(wm)
+
+// ************************* OPMVV (viota in WMUNARY0) **************************
+union clause instruction = W_WIOTA_M : (bits(1), wregidx, wregidx)
+
+mapping clause encdec = W_WIOTA_M(wm, ws2, wd)
+ <-> 0b010100 @ wm @ w_encdec_wreg(ws2) @ 0b10000 @ 0b010 @ w_encdec_wreg(wd) @ 0b0001011
+ when (currentlyEnabled(Ext_W) & w_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_W) & welen >= 64) & w_get_sew() <= 64)
+
+function clause execute(W_WIOTA_M(wm, ws2, wd)) = {
+  let SEW = w_get_sew();
+  let W_LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(W_LMUL_pow, SEW);
+
+  if    w_illegal_wstart(W_WSTART_MANDATORY, num_elem, W_LMUL_pow)
+   |  w_illegal_normal(wd, wm)
+   |  not(w_valid_reg_group(wd, W_LMUL_pow))
+   |  wd
+   == ws2 then {
+    return Illegal_Instruction()
+  };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let wm_val : bits('n) = w_read_wmask(num_elem, wm, w_zwreg);
+  let ws2_val : bits('n) = w_read_wmask(num_elem, 0b0, ws2);
+  let wd_val : vector('n, bits('m)) = w_read_wreg(num_elem, SEW, W_LMUL_pow, wd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = w_init_masked_result(
+    num_elem,
+    SEW,
+    W_LMUL_pow,
+    wd_val,
+    wm_val,
+  );
   var result = initial_result;
 
   var sum : int = 0;
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = to_bits_unsafe(SEW, sum);
-      if vs2_val[i] == 0b1 then sum = sum + 1
-    }
+  {
+    let mask_view = w_shape(mask, w_columns);
+    var result_view = w_shape(result, w_columns);
+    let ws2_val_view = w_shape(ws2_val, w_columns);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / w_columns;
+      let j = p % w_columns;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ws2_val_view));
+      assert(j < w_columns);
+
+      if mask_view[i][j] == 0b1 then {
+        result_view[i][j] = to_bits_unsafe(SEW, sum);
+        if ws2_val_view[i][j] == 0b1 then {
+          sum = sum + 1
+        }
+      }
+    };
+    result = w_unshape_vector(length(result), result_view, w_columns)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  w_write_wreg(num_elem, SEW, W_LMUL_pow, wd, result);
+  w_set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VIOTA_M(vm, vs2, vd)
-  <-> "viota.m" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping clause assembly = W_WIOTA_M(wm, ws2, wd)
+ <-> "wiota.m" ^ spc() ^ w_wreg_name(wd) ^ sep() ^ w_wreg_name(ws2) ^ w_maybe_wmask(wm)
 
-// ************************** OPMVV (vid in VMUNARY0) ***************************
-union clause instruction = VID_V : (bits(1), vregidx)
+// ************************** OPMVV (vid in WMUNARY0) ***************************
+union clause instruction = W_WID_W : (bits(1), wregidx)
 
-mapping clause encdec = VID_V(vm, vd)
-  <-> 0b010100 @ vm @ 0b00000 @ 0b10001 @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = W_WID_W(wm, wd)
+ <-> 0b010100 @ wm @ 0b00000 @ 0b10001 @ 0b010 @ w_encdec_wreg(wd) @ 0b0001011
+ when (currentlyEnabled(Ext_W) & w_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_W) & welen >= 64) & w_get_sew() <= 64)
 
-function clause execute VID_V(vm, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(W_WID_W(wm, wd)) = {
+  let SEW = w_get_sew();
+  let W_LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(W_LMUL_pow, SEW);
 
-  if illegal_normal(vd, vm) | not(valid_reg_group(vd, LMUL_pow))
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)    => v,
-    Err(())  => return Illegal_Instruction()
+  if   w_illegal_wstart(W_WSTART_ARITH, num_elem, W_LMUL_pow)
+   | w_illegal_normal(wd, wm)
+   | not(w_valid_reg_group(wd, W_LMUL_pow)) then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let wm_val : bits('n) = w_read_wmask(num_elem, wm, w_zwreg);
+  let wd_val : vector('n, bits('m)) = w_read_wreg(num_elem, SEW, W_LMUL_pow, wd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = w_init_masked_result(
+    num_elem,
+    SEW,
+    W_LMUL_pow,
+    wd_val,
+    wm_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then result[i] = to_bits_unsafe(SEW, i)
+  {
+    let mask_view = w_shape(mask, w_columns);
+    var result_view = w_shape(result, w_columns);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / w_columns;
+      let j = p % w_columns;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(j < w_columns);
+
+      if mask_view[i][j] == 0b1 then {
+        result_view[i][j] = to_bits_unsafe(SEW, p)
+      }
+    };
+    result = w_unshape_vector(length(result), result_view, w_columns)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  w_write_wreg(num_elem, SEW, W_LMUL_pow, wd, result);
+  w_set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VID_V(vm, vd)
-  <-> "vid.v" ^ spc() ^ vreg_name(vd) ^ maybe_vmask(vm)
+mapping clause assembly = W_WID_W(wm, wd)
+ <-> "wid.w" ^ spc() ^ w_wreg_name(wd) ^ w_maybe_wmask(wm)

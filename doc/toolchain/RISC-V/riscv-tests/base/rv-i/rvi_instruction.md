@@ -31,10 +31,10 @@
 
 | **Name** | **Format** | **Type**     | **Extension** | **Format-Extension** |
 |:---------|:-----------|:-------------|:--------------|:---------------------|
-| `ADD`    | `R_FORMAT` | `ARITHMETIC` | `RV32I`       | `-`                  |
-| `ADDI`   | `I_FORMAT` | `ARITHMETIC` | `RV32I`       | `-`                  |
-| `NOP`    | `I_FORMAT` | `ARITHMETIC` | `RV32I`       | `-`                  |
-| `SUB`    | `R_FORMAT` | `ARITHMETIC` | `RV32I`       | `-`                  |
+| `ADD`    | `R_FORMAT` | `ARITHMETIC` | `RV32I`       | `none`               |
+| `ADDI`   | `I_FORMAT` | `ARITHMETIC` | `RV32I`       | `none`               |
+| `NOP`    | `I_FORMAT` | `ARITHMETIC` | `RV32I`       | `none`               |
+| `SUB`    | `R_FORMAT` | `ARITHMETIC` | `RV32I`       | `none`               |
 | `LUI`    | `U_FORMAT` | `ARITHMETIC` | `RV32I`       | `UIMM`               |
 | `AUIPC`  | `U_FORMAT` | `ARITHMETIC` | `RV32I`       | `UIMM`               |
 

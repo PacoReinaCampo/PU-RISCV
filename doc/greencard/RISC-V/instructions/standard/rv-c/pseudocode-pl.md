@@ -1,238 +1,97 @@
 ## INSTRUCTION PSEUDO-CODE (PL)
 
-| **Instruction** | **Instruction Pseudo-Code**                                                             |
-|:----------------|:----------------------------------------------------------------------------------------|
-| `lui`           | `rd = imm`                                                                              |
-| `auipc`         | `rd = pc + imm`                                                                         |
-| `jal`           | `rd = pc + length(inst); pc_offset = imm`                                               |
-| `jalr`          | `ux new_offset = (rs1 + imm - pc) & ~1; rd = pc + length(inst); pc_offset = new_offset` |
-| `beq`           | `if (sx(rs1) == sx(rs2)) pc_offset = imm`                                               |
-| `bne`           | `if (sx(rs1) != sx(rs2)) pc_offset = imm`                                               |
-| `blt`           | `if (sx(rs1) < sx(rs2)) pc_offset = imm`                                                |
-| `bge`           | `if (sx(rs1) >= sx(rs2)) pc_offset = imm`                                               |
-| `bltu`          | `if (ux(rs1) < ux(rs2)) pc_offset = imm`                                                |
-| `bgeu`          | `if (ux(rs1) >= ux(rs2)) pc_offset = imm`                                               |
-| `lb`            | `s8 t; mmu.load<s8>(rs1 + imm, t); rd = t; rd = sx(*(s8*)ptr(rs1 + imm))`               |
-| `lh`            | `s16 t; mmu.load<s16>(rs1 + imm, t); rd = t; rd = sx(*(s16*)ptr(rs1 + imm))`            |
-| `lw`            | `s32 t; mmu.load<s32>(rs1 + imm, t); rd = t; rd = sx(*(s32*)ptr(rs1 + imm))`            |
-| `lbu`           | `u8 t; mmu.load<u8>(rs1 + imm, t); rd = t; rd = ux(*(u8*)ptr(rs1 + imm))`               |
-| `lhu`           | `u16 t; mmu.load<u16>(rs1 + imm, t); rd = t; rd = ux(*(u16*)ptr(rs1 + imm))`            |
-| `lwu`           | `u32 t; mmu.load<u32>(rs1 + imm, t); rd = t; rd = ux(*(u32*)ptr(rs1 + imm))`            |
-| `sb`            | `mmu.store<s8>(rs1 + imm, s8(rs2)); *((u8*)ptr(rs1 + imm)) = rs2`                       |
-| `sh`            | `mmu.store<s16>(rs1 + imm, s16(rs2)); *((u16*)ptr(rs1 + imm)) = rs2`                    |
-| `sw`            | `mmu.store<s32>(rs1 + imm, s32(rs2)); *((u32*)ptr(rs1 + imm)) = rs2`                    |
-| `addi`          | `rd = sx(rs1) + sx(imm)`                                                                |
-| `slti`          | `rd = sx(rs1) < sx(imm)`                                                                |
-| `sltiu`         | `rd = ux(rs1) < ux(imm)`                                                                |
-| `xori`          | `rd = ux(rs1) ^ ux(imm)`                                                                |
-| `ori`           | `rd = ux(rs1) \| ux(imm)`                                                               |
-| `andi`          | `rd = ux(rs1) & ux(imm)`                                                                |
-| `slli`          | `rd = ux(rs1) << imm`                                                                   |
-| `srli`          | `rd = ux(rs1) >> imm`                                                                   |
-| `srai`          | `rd = sx(rs1) >> imm`                                                                   |
-| `add`           | `rd = sx(rs1) + sx(rs2)`                                                                |
-| `sub`           | `rd = sx(rs1) - sx(rs2)`                                                                |
-| `sll`           | `rd = ux(rs1) << (rs2 & 0b1111111); 7-bit mask for RV128I`                              |
-| `slt`           | `rd = sx(rs1) < sx(rs2)`                                                                |
-| `sltu`          | `rd = ux(rs1) < ux(rs2)`                                                                |
-| `xor`           | `rd = ux(rs1) ^ ux(rs2)`                                                                |
-| `srl`           | `rd = ux(rs1) >> (rs2 & 0b1111111); 7-bit mask for RV128I`                              |
-| `sra`           | `rd = sx(rs1) >> (rs2 & 0b1111111); 7-bit mask for RV128I`                              |
-| `or`            | `rd = ux(rs1) \| ux(rs2)`                                                               |
-| `and`           | `rd = ux(rs1) & ux(rs2)`                                                                |
-| `fence`         |                                                                                         |
-| `fence.i`       |                                                                                         |
+| **Extension** | **Name**     | **Variable-Fields**                  | **Pseudo-Code**                                                                                                            |
+|:--------------|:-------------|:-------------------------------------|:---------------------------------------------------------------------------------------------------------------------------|
+| `rv_c`        | `c_add`      | `rd_rs1_n0, c_rs2_n0`                | `x[rd_rs1_n0] = x[rd_rs1_n0] + x[c_rs2_n0];`                                                                               |
+| `rv_c`        | `c_addi`     | `rd_rs1_n0, c_nzimm6lo, c_nzimm6hi`  | `x[rd_rs1_n0] = x[rd_rs1_n0] + sx(decode_c_imm6(c_nzimm6hi, c_nzimm6lo));`                                                 |
+| `rv_c`        | `c_addi16sp` | `c_nzimm10hi, c_nzimm10lo`           | `sp = sp + decode_c_addi16sp(c_nzimm10hi, c_nzimm10lo);`                                                                   |
+| `rv_c`        | `c_addi4spn` | `rd_p, c_nzuimm10`                   | `x[8 + rd_p] = sp + ux(decode_c_addi4spn(c_nzuimm10));`                                                                    |
+| `rv_c`        | `c_and`      | `rd_rs1_p, rs2_p`                    | `x[8 + rd_rs1_p] = x[8 + rd_rs1_p] & x[8 + rs2_p];`                                                                        |
+| `rv_c`        | `c_andi`     | `rd_rs1_p, c_imm6hi, c_imm6lo`       | `x[8 + rd_rs1_p] = ux(x[8 + rd_rs1_p]) & ux(sx(decode_c_imm6(c_imm6hi, c_imm6lo)));`                                       |
+| `rv_c`        | `c_beqz`     | `rs1_p, c_bimm9lo, c_bimm9hi`        | `if (x[8 + rs1_p] == 0) pc_offset = sx(decode_c_branch(c_bimm9hi, c_bimm9lo));`                                            |
+| `rv_c`        | `c_bnez`     | `rs1_p, c_bimm9lo, c_bimm9hi`        | `if (x[8 + rs1_p] != 0) pc_offset = sx(decode_c_branch(c_bimm9hi, c_bimm9lo));`                                            |
+| `rv_c`        | `c_ebreak`   | `none`                               | `breakpoint_or_debug(CAUSE_BREAKPOINT);`                                                                                   |
+| `rv_c`        | `c_j`        | `c_imm12`                            | `pc_offset = sx(decode_c_jump(c_imm12));`                                                                                  |
+| `rv_c`        | `c_jalr`     | `c_rs1_n0`                           | `target = x[c_rs1_n0] & ~1; x[1] = pc + 2; pc_offset = target - pc;`                                                       |
+| `rv_c`        | `c_jr`       | `rs1_n0`                             | `target = x[rs1_n0] & ~1; pc_offset = target - pc;`                                                                        |
+| `rv_c`        | `c_li`       | `rd_n0, c_imm6lo, c_imm6hi`          | `x[rd_n0] = sx(decode_c_imm6(c_imm6hi, c_imm6lo));`                                                                        |
+| `rv_c`        | `c_lui`      | `rd_n2, c_nzimm18hi, c_nzimm18lo`    | `x[rd_n2] = sx(decode_c_lui(c_nzimm18hi, c_nzimm18lo));`                                                                   |
+| `rv_c`        | `c_lw`       | `rd_p, rs1_p, c_uimm7lo, c_uimm7hi`  | `u32_t t = load_u32(x[8 + rs1_p] + decode_c_word_offset(c_uimm7hi, c_uimm7lo)); x[8 + rd_p] = sx(s32(t));`                 |
+| `rv_c`        | `c_lwsp`     | `rd_n0, c_uimm8sphi, c_uimm8splo`    | `u32_t t = load_u32(sp + decode_c_lwsp(c_uimm8sphi, c_uimm8splo)); x[rd_n0] = sx(s32(t));`                                 |
+| `rv_c`        | `c_mv`       | `rd_n0, c_rs2_n0`                    | `x[rd_n0] = x[c_rs2_n0];`                                                                                                  |
+| `rv_c`        | `c_nop`      | `c_nzimm6hi, c_nzimm6lo`             | `ignore_fields(c_nzimm6hi, c_nzimm6lo); pc_offset = 2;`                                                                    |
+| `rv_c`        | `c_or`       | `rd_rs1_p, rs2_p`                    | `x[8 + rd_rs1_p] = x[8 + rd_rs1_p] \| x[8 + rs2_p];`                                                                       |
+| `rv_c`        | `c_sub`      | `rd_rs1_p, rs2_p`                    | `x[8 + rd_rs1_p] = x[8 + rd_rs1_p] - x[8 + rs2_p];`                                                                        |
+| `rv_c`        | `c_sw`       | `rs1_p, rs2_p, c_uimm7lo, c_uimm7hi` | `store_u32(x[8 + rs1_p] + decode_c_word_offset(c_uimm7hi, c_uimm7lo), u32(x[8 + rs2_p]));`                                 |
+| `rv_c`        | `c_swsp`     | `c_rs2, c_uimm8sp_s`                 | `store_u32(sp + decode_c_swsp(c_uimm8sp_s), u32(x[c_rs2]));`                                                               |
+| `rv_c`        | `c_xor`      | `rd_rs1_p, rs2_p`                    | `x[8 + rd_rs1_p] = x[8 + rd_rs1_p] ^ x[8 + rs2_p];`                                                                        |
+| `rv_c_d`      | `c_fld`      | `rd_p, rs1_p, c_uimm8lo, c_uimm8hi`  | `u64_t t = load_u64(x[8 + rs1_p] + decode_c_doubleword_offset(c_uimm8hi, c_uimm8lo)); f[8 + rd_p] = nan_box(t, 64, FLEN);` |
+| `rv_c_d`      | `c_fldsp`    | `rd, c_uimm9sphi, c_uimm9splo`       | `u64_t t = load_u64(sp + decode_c_ldsp(c_uimm9sphi, c_uimm9splo)); f[rd] = nan_box(t, 64, FLEN);`                          |
+| `rv_c_d`      | `c_fsd`      | `rs1_p, rs2_p, c_uimm8lo, c_uimm8hi` | `store_u64(x[8 + rs1_p] + decode_c_doubleword_offset(c_uimm8hi, c_uimm8lo), u64(f[8 + rs2_p]));`                           |
+| `rv_c_d`      | `c_fsdsp`    | `c_rs2, c_uimm9sp_s`                 | `store_u64(sp + decode_c_sdsp(c_uimm9sp_s), u64(f[c_rs2]));`                                                               |
 
-:RV32I - "RV32I Base Integer Instruction Set"
+:RVC - Standard Extension for Compressed Instructions
 
-| **Instruction** | **Instruction Pseudo-Code**                                                  |
-|:----------------|:-----------------------------------------------------------------------------|
-| `ld`            | `s64 t; mmu.load<s64>(rs1 + imm, t); rd = t; rd = sx(*(s64*)ptr(rs1 + imm))` |
-| `sd`            | `mmu.store<s64>(rs1 + imm, s64(rs2)); *(u64*)ptr(rs1 + imm) = rs2`           |
-| `addiw`         | `rd = s32(s32(rs1) + imm); clang requires -fwrapv`                           |
-| `slliw`         | `rd = s32(u32(rs1) << imm)`                                                  |
-| `srliw`         | `rd = s32(u32(rs1) >> imm)`                                                  |
-| `sraiw`         | `rd = s32(rs1) >> imm`                                                       |
-| `addw`          | `rd = s32(s32(rs1) + s32(rs2)); clang requires -fwrapv`                      |
-| `subw`          | `rd = s32(s32(rs1) - s32(rs2)); clang requires -fwrapv`                      |
-| `sllw`          | `rd = s32(u32(rs1) << (rs2 & 0b11111))`                                      |
-| `srlw`          | `rd = s32(u32(rs1) >> (rs2 & 0b11111))`                                      |
-| `sraw`          | `rd = s32(s32(rs1) >> (rs2 & 0b11111))`                                      |
+| **Extension** | **Name**  | **Variable-Fields**                  | **Pseudo-Code**                                                                                                      |
+|:--------------|:----------|:-------------------------------------|:---------------------------------------------------------------------------------------------------------------------|
+| `rv32_c`      | `c_jal`   | `c_imm12`                            | `x[1] = pc + 2; pc_offset = sx(decode_c_jump(c_imm12));`                                                             |
+| `rv32_c_f`    | `c_flw`   | `rd_p, rs1_p, c_uimm7lo, c_uimm7hi`  | `u32_t t = load_u32(x[8 + rs1_p] + decode_c_word_offset(c_uimm7hi, c_uimm7lo)); f[8 + rd_p] = nan_box(t, 32, FLEN);` |
+| `rv32_c_f`    | `c_flwsp` | `rd, c_uimm8sphi, c_uimm8splo`       | `u32_t t = load_u32(sp + decode_c_lwsp(c_uimm8sphi, c_uimm8splo)); f[rd] = nan_box(t, 32, FLEN);`                    |
+| `rv32_c_f`    | `c_fsw`   | `rs1_p, rs2_p, c_uimm7lo, c_uimm7hi` | `store_u32(x[8 + rs1_p] + decode_c_word_offset(c_uimm7hi, c_uimm7lo), u32(f[8 + rs2_p]));`                           |
+| `rv32_c_f`    | `c_fswsp` | `c_rs2, c_uimm8sp_s`                 | `store_u32(sp + decode_c_swsp(c_uimm8sp_s), u32(f[c_rs2]));`                                                         |
 
-:RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
+:RV32C - Standard Extension for Compressed Instructions (32 bit)
 
-| **Instruction** | **Instruction Pseudo-Code**                                                                          |
-|:----------------|:-----------------------------------------------------------------------------------------------------|
-| `mul`           | `rd = sx(rs1) * sx(rs2)`                                                                             |
-| `mulh`          | `rd = riscv::mulh(sx(rs1), sx(rs2))`                                                                 |
-| `mulhsu`        | `rd = riscv::mulhsu(sx(rs1), ux(rs2))`                                                               |
-| `mulhu`         | `rd = riscv::mulhu(ux(rs1), ux(rs2))`                                                                |
-| `div`           | `rd = sx(rs1) == sx(INT_MIN) && sx(rs2) == -1 ? sx(INT_MIN) : sx(rs2) == 0 ? -1 : sx(rs1) / sx(rs2)` |
-| `divu`          | `rd = sx(rs2) == 0 ? -1 : sx(ux(rs1) / ux(rs2))`                                                     |
-| `rem`           | `rd = sx(rs1) == sx(INT_MIN) && sx(rs2) == -1 ? 0 : sx(rs2) == 0 ? sx(rs1) : sx(rs1) % sx(rs2)`      |
-| `remu`          | `rd = sx(rs2) == 0 ? sx(rs1) : sx(ux(rs1) % ux(rs2))`                                                |
+| **Extension** | **Name**  | **Variable-Fields**                   | **Pseudo-Code**                                                                                                  |
+|:--------------|:----------|:--------------------------------------|:-----------------------------------------------------------------------------------------------------------------|
+| `rv64_c`      | `c_addiw` | `rd_rs1_n0, c_imm6lo, c_imm6hi`       | `x[rd_rs1_n0] = sx(s32(u32(x[rd_rs1_n0]) + u32(sx(decode_c_imm6(c_imm6hi, c_imm6lo)))));`                        |
+| `rv64_c`      | `c_addw`  | `rd_rs1_p, rs2_p`                     | `x[8 + rd_rs1_p] = sx(s32(u32(x[8 + rd_rs1_p]) + u32(x[8 + rs2_p])));`                                           |
+| `rv64_c`      | `c_ld`    | `rd_p, rs1_p, c_uimm8lo, c_uimm8hi`   | `u64_t t = load_u64(x[8 + rs1_p] + decode_c_doubleword_offset(c_uimm8hi, c_uimm8lo)); x[8 + rd_p] = sx(s64(t));` |
+| `rv64_c`      | `c_ldsp`  | `rd_n0, c_uimm9sphi, c_uimm9splo`     | `u64_t t = load_u64(sp + decode_c_ldsp(c_uimm9sphi, c_uimm9splo)); x[rd_n0] = sx(s64(t));`                       |
+| `rv64_c`      | `c_sd`    | `rs1_p, rs2_p, c_uimm8hi, c_uimm8lo`  | `store_u64(x[8 + rs1_p] + decode_c_doubleword_offset(c_uimm8hi, c_uimm8lo), u64(x[8 + rs2_p]));`                 |
+| `rv64_c`      | `c_sdsp`  | `c_rs2, c_uimm9sp_s`                  | `store_u64(sp + decode_c_sdsp(c_uimm9sp_s), u64(x[c_rs2]));`                                                     |
+| `rv64_c`      | `c_slli`  | `rd_rs1_n0, c_nzuimm6hi, c_nzuimm6lo` | `x[rd_rs1_n0] = ux(x[rd_rs1_n0]) << decode_c_shift(c_nzuimm6hi, c_nzuimm6lo);`                                   |
+| `rv64_c`      | `c_srai`  | `rd_rs1_p, c_nzuimm6lo, c_nzuimm6hi`  | `x[8 + rd_rs1_p] = sx(x[8 + rd_rs1_p]) >> decode_c_shift(c_nzuimm6hi, c_nzuimm6lo);`                             |
+| `rv64_c`      | `c_srli`  | `rd_rs1_p, c_nzuimm6lo, c_nzuimm6hi`  | `x[8 + rd_rs1_p] = ux(x[8 + rd_rs1_p]) >> decode_c_shift(c_nzuimm6hi, c_nzuimm6lo);`                             |
+| `rv64_c`      | `c_subw`  | `rd_rs1_p, rs2_p`                     | `x[8 + rd_rs1_p] = sx(s32(u32(x[8 + rd_rs1_p]) - u32(x[8 + rs2_p])));`                                           |
 
-:RV32M - "RV32M Standard Extension for Integer Multiply and Divide"
+:RV64C - Standard Extension for Compressed Instructions (64 bit)
 
-| **Instruction** | **Instruction Pseudo-Code**                                                                                 |
-|:----------------|:------------------------------------------------------------------------------------------------------------|
-| `mulw`          | `rd = s32(u32(rs1) * u32(rs2))`                                                                             |
-| `divw`          | `rd = s32(rs1) == s32(INT_MIN) && s32(rs2) == -1 ? s32(INT_MIN) : s32(rs2) == 0 ? -1 : s32(rs1) / s32(rs2)` |
-| `divuw`         | `rd = s32(rs2) == 0 ? -1 : s32(u32(rs1) / u32(rs2))`                                                        |
-| `remw`          | `rd = s32(rs1) == s32(INT_MIN) && s32(rs2) == -1 ? 0 : s32(rs2) == 0 ? s32(rs1) : s32(rs1) % s32(rs2)`      |
-| `remuw`         | `rd = s32(rs2) == 0 ? s32(rs1) : s32(u32(rs1) % u32(rs2))`                                                  |
+| **Extension** | **Name** | **Variable-Fields**   | **Pseudo-Code**                                  |
+|:--------------|:---------|:----------------------|:-------------------------------------------------|
+| `rv128_c`     | `c_lq`   | `crdq, crs1q, cimmq`  | `u128_t t = load_u128(crs1q + cimmq); crdq = t;` |
+| `rv128_c`     | `c_lqsp` | `crd, cimmlqsp`       | `u128_t t = load_u128(sp + cimmlqsp); crd = t;`  |
+| `rv128_c`     | `c_sq`   | `crs1q, crs2q, cimmq` | `store_u128(crs1q + cimmq, u128(crs2q));`        |
+| `rv128_c`     | `c_sqsp` | `crs2, cimmsqsp`      | `store_u128(sp + cimmsqsp, u128(crs2));`         |
 
-:RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
+:RV128C - Standard Extension for Compressed Instructions (128 bit)
 
-| **Instruction** | **Instruction Pseudo-Code**                                                        |
-|:----------------|:-----------------------------------------------------------------------------------|
-| `lr.w`          | `lr = rs1; s32 t; mmu.load<s32>(rs1, t); rd = t`                                   |
-| `sc.w`          | `ux res = 0; if (lr != rs1) res = 1; else mmu.store<s32>(rs1, s32(rs2)); rd = res` |
-| `amoswap.w`     | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoswap, rs1, t1, t2); rd = t1`               |
-| `amoadd.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoadd, rs1, t1, t2); rd = t1`                |
-| `amoxor.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoxor, rs1, t1, t2); rd = t1`                |
-| `amoor.w`       | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoor, rs1, t1, t2); rd = t1`                 |
-| `amoand.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoand, rs1, t1, t2); rd = t1`                |
-| `amomin.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amomin, rs1, t1, t2); rd = t1`                |
-| `amomax.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amomax, rs1, t1, t2); rd = t1`                |
-| `amominu.w`     | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amominu, rs1, t1, t2); rd = t1`               |
-| `amomaxu.w`     | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amomaxu, rs1, t1, t2); rd = t1`               |
+| **Extension** | **Name**     | **Variable-Fields**     | **Pseudo-Code**                                                                                                                          |
+|:--------------|:-------------|:------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------|
+| `rv_zcb`      | `c_lbu`      | `rd_p, rs1_p, c_uimm2`  | `rd_p = load_u8(rs1_p + decode_offset(c_uimm2));`                                                                                        |
+| `rv_zcb`      | `c_lh`       | `rd_p, rs1_p, c_uimm1`  | `rd_p = load_s16(rs1_p + decode_offset(c_uimm1));`                                                                                       |
+| `rv_zcb`      | `c_lhu`      | `rd_p, rs1_p, c_uimm1`  | `rd_p = load_u16(rs1_p + decode_offset(c_uimm1));`                                                                                       |
+| `rv_zcb`      | `c_mul`      | `rd_rs1_p, rs2_p`       | `rd_rs1_p = rd_rs1_p * rs2_p;`                                                                                                           |
+| `rv_zcb`      | `c_not`      | `rd_rs1_p`              | `rd_rs1_p = ~rd_rs1_p;`                                                                                                                  |
+| `rv_zcb`      | `c_sb`       | `rs2_p, rs1_p, c_uimm2` | `store_u8(rs1_p + decode_offset(c_uimm2), u8(rs2_p));`                                                                                   |
+| `rv_zcb`      | `c_sext_b`   | `rd_rs1_p`              | `rd_rs1_p = sx(s8(rd_rs1_p));`                                                                                                           |
+| `rv_zcb`      | `c_sext_h`   | `rd_rs1_p`              | `rd_rs1_p = sx(s16(rd_rs1_p));`                                                                                                          |
+| `rv_zcb`      | `c_sh`       | `rs2_p, rs1_p, c_uimm1` | `store_u16(rs1_p + decode_offset(c_uimm1), u16(rs2_p));`                                                                                 |
+| `rv_zcb`      | `c_zext_b`   | `rd_rs1_p`              | `rd_rs1_p = zx(u8(rd_rs1_p));`                                                                                                           |
+| `rv_zcb`      | `c_zext_h`   | `rd_rs1_p`              | `rd_rs1_p = zx(u16(rd_rs1_p));`                                                                                                          |
+| `rv_zcmop`    | `c_mop_N`    | `c_mop_t`               | `ignore_fields(c_mop_t); nop();`                                                                                                         |
+| `rv_zcmp`     | `cm_mva01s`  | `c_sreg1, c_sreg2`      | `parallel_move(a0, a1, sreg(c_sreg1), sreg(c_sreg2));`                                                                                   |
+| `rv_zcmp`     | `cm_mvsa01`  | `c_sreg1, c_sreg2`      | `parallel_move(sreg(c_sreg1), sreg(c_sreg2), a0, a1);`                                                                                   |
+| `rv_zcmp`     | `cm_pop`     | `c_rlist, c_spimm`      | `load_stack_regs(sp, c_rlist, c_spimm); sp = sp + stack_adjust(c_rlist, c_spimm);`                                                       |
+| `rv_zcmp`     | `cm_popret`  | `c_rlist, c_spimm`      | `load_stack_regs(sp, c_rlist, c_spimm); sp = sp + stack_adjust(c_rlist, c_spimm); pc_offset = (ra & ~1) - pc;`                           |
+| `rv_zcmp`     | `cm_popretz` | `c_rlist, c_spimm`      | `load_stack_regs(sp, c_rlist, c_spimm); sp = sp + stack_adjust(c_rlist, c_spimm); a0 = 0; pc_offset = (ra & ~1) - pc;`                   |
+| `rv_zcmp`     | `cm_push`    | `c_rlist, c_spimm`      | `store_stack_regs(sp, c_rlist); sp = sp - stack_adjust(c_rlist, c_spimm);`                                                               |
+| `rv_zcmt`     | `cm_jalt`    | `c_index`               | `ux_t target = instruction_fetch_XLEN(jvt_base + c_index * (XLEN / 8)); if (c_index >= 32) ra = pc + 2; pc_offset = (target & ~1) - pc;` |
 
-:RV32A - "RV32A Standard Extension for Atomic Instructions"
+:RVZC - Standard Extension for Compressed Instructions
 
-| **Instruction** | **Instruction Pseudo-Code**                                                        |
-|:----------------|:-----------------------------------------------------------------------------------|
-| `lr.d`          | `lr = rs1; s64 t; mmu.load<s64>(rs1, t); rd = t`                                   |
-| `sc.d`          | `ux res = 0; if (lr != rs1) res = 1; else mmu.store<s64>(rs1, s64(rs2)); rd = res` |
-| `amoswap.d`     | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoswap, rs1, t1, t2); rd = t1`               |
-| `amoadd.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoadd, rs1, t1, t2); rd = t1`                |
-| `amoxor.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoxor, rs1, t1, t2); rd = t1`                |
-| `amoor.d`       | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoor, rs1, t1, t2); rd = t1`                 |
-| `amoand.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoand, rs1, t1, t2); rd = t1`                |
-| `amomin.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amomin, rs1, t1, t2); rd = t1`                |
-| `amomax.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amomax, rs1, t1, t2); rd = t1`                |
-| `amominu.d`     | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amominu, rs1, t1, t2); rd = t1`               |
-| `amomaxu.d`     | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amomaxu, rs1, t1, t2); rd = t1`               |
+| **Extension** | **Name**   | **Variable-Fields** | **Pseudo-Code**                 |
+|:--------------|:-----------|:--------------------|:--------------------------------|
+| `rv64_zcb`    | `c_zext_w` | `rd_rs1_p`          | `rd_rs1_p = zx(u32(rd_rs1_p));` |
 
-:RV64A - "RV64A Standard Extension for Atomic Instructions (+ RV32A)"
-
-| **Instruction** | **Instruction Pseudo-Code** |
-|:----------------|:----------------------------|
-| `ecall`         |                             |
-| `ebreak`        |                             |
-| `uret`          |                             |
-| `sret`          |                             |
-| `hret`          |                             |
-| `mret`          |                             |
-| `dret`          |                             |
-| `sfence.vm`     |                             |
-| `wfi`           |                             |
-| `rdcycle`       |                             |
-| `rdtime`        |                             |
-| `rdinstret`     |                             |
-| `rdcycleh`      |                             |
-| `rdtimeh`       |                             |
-| `rdinstreth`    |                             |
-| `csrrw`         |                             |
-| `csrrs`         |                             |
-| `csrrc`         |                             |
-| `csrrwi`        |                             |
-| `csrrsi`        |                             |
-| `csrrci`        |                             |
-
-:RV32S - "RV32S Standard Extension for Supervisor-level Instructions"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                          |
-|:----------------|:-------------------------------------------------------------------------------------|
-| `flw`           | `u32 t; mmu.load<u32>(rs1 + imm, t); u32(frd) = t; f32(frd) = *(f32*)ptr(rs1 + imm)` |
-| `fsw`           | `mmu.store<f32>(rs1 + imm, f32(frs2)); *(f32*)ptr(rs1 + imm) = f32(frs2)`            |
-| `fmadd.s`       | `fenv_setrm(rm); f32(frd) = f32(frs1) * f32(frs2) + f32(frs3); -mfma`                |
-| `fmsub.s`       | `fenv_setrm(rm); f32(frd) = f32(frs1) * f32(frs2) - f32(frs3)`                       |
-| `fnmadd.s`      | `fenv_setrm(rm); f32(frd) = f32(frs1) * -f32(frs2) - f32(frs3)`                      |
-| `fnmsub.s`      | `fenv_setrm(rm); f32(frd) = f32(frs1) * -f32(frs2) + f32(frs3)`                      |
-| `fadd.s`        | `fenv_setrm(rm); f32(frd) = f32(frs1) + f32(frs2)`                                   |
-| `fsub.s`        | `fenv_setrm(rm); f32(frd) = f32(frs1) - f32(frs2)`                                   |
-| `fmul.s`        | `fenv_setrm(rm); f32(frd) = f32(frs1) * f32(frs2)`                                   |
-| `fdiv.s`        | `fenv_setrm(rm); f32(frd) = f32(frs1) / f32(frs2)`                                   |
-| `fsgnj.s`       | `u32(frd) = (u32(frs1) & u32(~(1U<<31))) \| (u32(frs2) & u32(1U<<31))`               |
-| `fsgnjn.s`      | `u32(frd) = (u32(frs1) & u32(~(1U<<31))) \| (~u32(frs2) & u32(1U<<31))`              |
-| `fsgnjx.s`      | `u32(frd) = u32(frs1) ^ (u32(frs2) & u32(1U<<31))`                                   |
-| `fmin.s`        | `f32(frd) = (f32(frs1) < f32(frs2)) \|\| isnan(f32(frs2)) ? f32(frs1) : f32(frs2)`   |
-| `fmax.s`        | `f32(frd) = (f32(frs1) > f32(frs2)) \|\| isnan(f32(frs2)) ? f32(frs1) : f32(frs2)`   |
-| `fsqrt.s`       | `fenv_setrm(rm); f32(frd) = riscv::f32_sqrt(f32(frs1))`                              |
-| `fle.s`         | `rd = f32(frs1) <= f32(frs2)`                                                        |
-| `flt.s`         | `rd = f32(frs1) < f32(frs2)`                                                         |
-| `feq.s`         | `rd = f32(frs1) == f32(frs2)`                                                        |
-| `fcvt.w.s`      | `fenv_setrm(rm); rd = riscv::fcvt_w(fcsr, f32(frs1)); s32(f32(frs1))`                |
-| `fcvt.wu.s`     | `fenv_setrm(rm); rd = riscv::fcvt_wu(fcsr, f32(frs1)); s32(u32(f32(frs1)))`          |
-| `fcvt.s.w`      | `fenv_setrm(rm); f32(frd) = f32(s32(rs1))`                                           |
-| `fcvt.s.wu`     | `fenv_setrm(rm); f32(frd) = f32(u32(rs1))`                                           |
-| `fmv.x.s`       | `rd = isnan(f32(frs1)) ? s32(u32(f32(NAN))) : s32(frs1); s32(frs1)`                  |
-| `fclass.s`      | `rd = f32_classify(f32(frs1))`                                                       |
-| `fmv.s.x`       | `u32(frd) = u32(rs1)`                                                                |
-
-:RV32F - "RV32F Standard Extension for Single-Precision Floating-Point"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                 |
-|:----------------|:----------------------------------------------------------------------------|
-| `fcvt.l.s`      | `fenv_setrm(rm); rd = riscv::fcvt_l(fcsr, f32(frs1)); s64(f32(frs1))`       |
-| `fcvt.lu.s`     | `fenv_setrm(rm); rd = riscv::fcvt_lu(fcsr, f32(frs1)); s64(u32(f32(frs1)))` |
-| `fcvt.s.l`      | `fenv_setrm(rm); f32(frd) = f32(s64(rs1))`                                  |
-| `fcvt.s.lu`     | `fenv_setrm(rm); f32(frd) = f32(u64(rs1))`                                  |
-
-:RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                          |
-|:----------------|:-------------------------------------------------------------------------------------|
-| `fld`           | `u64 t; mmu.load<u64>(rs1 + imm, t); u64(frd) = t; f64(frd) = *(f64*)ptr(rs1 + imm)` |
-| `fsd`           | `mmu.store<f64>(rs1 + imm, f64(frs2)); *(f64*)ptr(rs1 + imm) = f64(frs2)`            |
-| `fmadd.d`       | `fenv_setrm(rm); f64(frd) = f64(frs1) * f64(frs2) + f64(frs3)`                       |
-| `fmsub.d`       | `fenv_setrm(rm); f64(frd) = f64(frs1) * f64(frs2) - f64(frs3)`                       |
-| `fnmadd.d`      | `fenv_setrm(rm); f64(frd) = f64(frs1) * -f64(frs2) - f64(frs3)`                      |
-| `fnmsub.d`      | `fenv_setrm(rm); f64(frd) = f64(frs1) * -f64(frs2) + f64(frs3)`                      |
-| `fadd.d`        | `fenv_setrm(rm); f64(frd) = f64(frs1) + f64(frs2)`                                   |
-| `fsub.d`        | `fenv_setrm(rm); f64(frd) = f64(frs1) - f64(frs2)`                                   |
-| `fmul.d`        | `fenv_setrm(rm); f64(frd) = f64(frs1) * f64(frs2)`                                   |
-| `fdiv.d`        | `fenv_setrm(rm); f64(frd) = f64(frs1) / f64(frs2)`                                   |
-| `fsgnj.d`       | `u64(frd) = (u64(frs1) & u64(~(1ULL<<63))) \| (u64(frs2) & u64(1ULL<<63))`           |
-| `fsgnjn.d`      | `u64(frd) = (u64(frs1) & u64(~(1ULL<<63))) \| (~u64(frs2) & u64(1ULL<<63))`          |
-| `fsgnjx.d`      | `u64(frd) = u64(frs1) ^ (u64(frs2) & u64(1ULL<<63))`                                 |
-| `fmin.d`        | `f64(frd) = (f64(frs1) < f64(frs2)) \|\| isnan(f64(frs2)) ? f64(frs1) : f64(frs2)`   |
-| `fmax.d`        | `f64(frd) = (f64(frs1) > f64(frs2)) \|\| isnan(f64(frs2)) ? f64(frs1) : f64(frs2)`   |
-| `fcvt.s.d`      | `fenv_setrm(rm); f32(frd) = f32(f64(frs1))`                                          |
-| `fcvt.d.s`      | `fenv_setrm(rm); f64(frd) = f64(f32(frs1))`                                          |
-| `fsqrt.d`       | `fenv_setrm(rm); f64(frd) = riscv::f64_sqrt(f64(frs1))`                              |
-| `fle.d`         | `rd = f64(frs1) <= f64(frs2)`                                                        |
-| `flt.d`         | `rd = f64(frs1) < f64(frs2)`                                                         |
-| `feq.d`         | `rd = f64(frs1) == f64(frs2)`                                                        |
-| `fcvt.w.d`      | `fenv_setrm(rm); rd = riscv::fcvt_w(fcsr, f64(frs1)); s32(f64(frs1))`                |
-| `fcvt.wu.d`     | `fenv_setrm(rm); rd = riscv::fcvt_wu(fcsr, f64(frs1)); s32(u32(f64(frs1)))`          |
-| `fcvt.d.w`      | `fenv_setrm(rm); f64(frd) = f64(s32(rs1))`                                           |
-| `fcvt.d.wu`     | `fenv_setrm(rm); f64(frd) = f64(u32(rs1))`                                           |
-| `fclass.d`      | `rd = f64_classify(f64(frs1))`                                                       |
-
-:RV32D - "RV32D Standard Extension for Double-Precision Floating-Point"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                 |
-|:----------------|:----------------------------------------------------------------------------|
-| `fcvt.l.d`      | `fenv_setrm(rm); rd = riscv::fcvt_l(fcsr, f64(frs1)); s64(f64(frs1))`       |
-| `fcvt.lu.d`     | `fenv_setrm(rm); rd = riscv::fcvt_lu(fcsr, f64(frs1)); s64(u64(f64(frs1)))` |
-| `fmv.x.d`       | `rd = isnan(f64(frs1)) ? s64(u64(f64(NAN))) : s64(frs1); s64(frs1)`         |
-| `fcvt.d.l`      | `fenv_setrm(rm); f64(frd) = f64(s64(rs1))`                                  |
-| `fcvt.d.lu`     | `fenv_setrm(rm); f64(frd) = f64(u64(rs1))`                                  |
-| `fmv.d.x`       | `u64(frd) = u64(rs1)`                                                       |
-
-:RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32F)"
-
-| **Instruction** | **Instruction Pseudo-Code** |
-|:----------------|:----------------------------|
-| `frcsr`         |                             |
-| `frrm`          |                             |
-| `frflags`       |                             |
-| `fscsr`         |                             |
-| `fsrm`          |                             |
-| `fsflags`       |                             |
-| `fsrmi`         |                             |
-| `fsflagsi`      |                             |
-
-:RV32FD - "RV32F and RV32D Common Floating-Point Instructions"
+:RV64ZC - Standard Extension for Compressed Instructions (64 bit)

@@ -1,1 +1,5 @@
-# RV A Instructions Code
+## PSEUDO-INSTRUCTIONS
+
+`INCLUDE TABLE`
+
+:RVA - RVA Standard Extension for Atomic Instructions

@@ -1,10 +1,12 @@
-# quadrant 1
+## PSEUDO-INSTRUCTIONS
 
-```
-$pseudo_op rv64_c::c.srli c.srli rd_rs1_p c_nzuimm5  1..0=1 15..13=4 12..10=0
-$pseudo_op rv64_c::c.srai c.srai rd_rs1_p c_nzuimm5  1..0=1 15..13=4 12..10=1
-$pseudo_op rv64_c::c.slli c.slli rd_rs1_n0 c_nzuimm6lo  1..0=2 15..12=0
-$pseudo_op rv64_c::c.srli c.srli_rv32 rd_rs1_p c_nzuimm5  1..0=1 15..13=4 12..10=0
-$pseudo_op rv64_c::c.srai c.srai_rv32 rd_rs1_p c_nzuimm5  1..0=1 15..13=4 12..10=1
-$pseudo_op rv64_c::c.slli c.slli_rv32 rd_rs1_n0 c_nzuimm6lo  1..0=2 15..12=0
-```
+| **Extension** | **Name** | **Variable-Fields**      | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:---------|:-------------------------|:-----------------------|:-----------------------------------|
+| `rv64_c`      | `c_srli` | `rd_rs1_p, c_nzuimm5`    | `c_srli`               | `----------------100000--------01` |
+| `rv64_c`      | `c_srai` | `rd_rs1_p, c_nzuimm5`    | `c_srai`               | `----------------100001--------01` |
+| `rv64_c`      | `c_slli` | `rd_rs1_n0, c_nzuimm6lo` | `c_slli`               | `----------------0000----------10` |
+| `rv64_c`      | `c_srli` | `rd_rs1_p, c_nzuimm5`    | `c_srli_rv32`          | `----------------100000--------01` |
+| `rv64_c`      | `c_srai` | `rd_rs1_p, c_nzuimm5`    | `c_srai_rv32`          | `----------------100001--------01` |
+| `rv64_c`      | `c_slli` | `rd_rs1_n0, c_nzuimm6lo` | `c_slli_rv32`          | `----------------0000----------10` |
+
+:RV64C - RV64C Standard Extension for Compressed Instructions (+ RV32C)

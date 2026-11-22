@@ -1,96 +1,60 @@
 ## INSTRUCTION FULL-NAMES
 
-| **Instruction** | **Instruction Full-Name**                |
-|:----------------|:-----------------------------------------|
-| `flw`           | `FP Load (SP)`                           |
-| `fsw`           | `FP Store (SP)`                          |
-| `fmadd.s`       | `FP Fused Multiply Add (SP)`             |
-| `fmsub.s`       | `FP Fused Multiply Subtract (SP)`        |
-| `fnmadd.s`      | `FP Negate fused Multiply Add (SP)`      |
-| `fnmsub.s`      | `FP Negate fused Multiply Subtract (SP)` |
-| `fadd.s`        | `FP Add (SP)`                            |
-| `fsub.s`        | `FP Subtract (SP)`                       |
-| `fmul.s`        | `FP Multiply (SP)`                       |
-| `fdiv.s`        | `FP Divide (SP)`                         |
-| `fsgnj.s`       | `FP Sign-injection (SP)`                 |
-| `fsgnjn.s`      | `FP Sign-injection Negate (SP)`          |
-| `fsgnjx.s`      | `FP Sign-injection Xor (SP)`             |
-| `fmin.s`        | `FP Minimum (SP)`                        |
-| `fmax.s`        | `FP Maximum (SP)`                        |
-| `fsqrt.s`       | `FP Square Root (SP)`                    |
-| `fle.s`         | `FP Less Than Equal (SP)`                |
-| `flt.s`         | `FP Less Than (SP)`                      |
-| `feq.s`         | `FP Equal (SP)`                          |
-| `fcvt.w.s`      | `FP Convert Float to Word (SP)`          |
-| `fcvt.wu.s`     | `FP Convert Float to Word Unsigned (SP)` |
-| `fcvt.s.w`      | `FP Convert Word to Float (SP)`          |
-| `fcvt.s.wu`     | `FP Convert Word Unsigned to Float (SP)` |
-| `fmv.x.s`       | `FP Move to Integer Register (SP)`       |
-| `fclass.s`      | `FP Classify (SP)`                       |
-| `fmv.s.x`       | `FP Move from Integer Register (SP)`     |
+| **Extension** | **Name**      | **Variable-Fields**          | **Full-Name**                                 |
+|:--------------|:--------------|:-----------------------------|:----------------------------------------------|
+| `rv_d`        | `fadd_d`      | `rd, rs1, rs2, rm`           | `FP Add (DP)`                                 |
+| `rv_d`        | `fclass_d`    | `rd, rs1`                    | `FP Classify (DP)`                            |
+| `rv_d`        | `fcvt_d_s`    | `rd, rs1, rm`                | `FP Convert SP to DP`                         |
+| `rv_d`        | `fcvt_d_w`    | `rd, rs1, rm`                | `FP Convert Word to Float (DP)`               |
+| `rv_d`        | `fcvt_d_wu`   | `rd, rs1, rm`                | `FP Convert Word Unsigned to Float (DP)`      |
+| `rv_d`        | `fcvt_s_d`    | `rd, rs1, rm`                | `FP Convert DP to SP`                         |
+| `rv_d`        | `fcvt_w_d`    | `rd, rs1, rm`                | `FP Convert Float to Word (DP)`               |
+| `rv_d`        | `fcvt_wu_d`   | `rd, rs1, rm`                | `FP Convert Float to Word Unsigned (DP)`      |
+| `rv_d`        | `fdiv_d`      | `rd, rs1, rs2, rm`           | `FP Divide (DP)`                              |
+| `rv_d`        | `feq_d`       | `rd, rs1, rs2`               | `FP Equal (DP)`                               |
+| `rv_d`        | `fld`         | `rd, rs1, imm12`             | `FP Load (DP)`                                |
+| `rv_d`        | `fle_d`       | `rd, rs1, rs2`               | `FP Less Than Equal (DP)`                     |
+| `rv_d`        | `flt_d`       | `rd, rs1, rs2`               | `FP Less Than (DP)`                           |
+| `rv_d`        | `fmadd_d`     | `rd, rs1, rs2, rs3, rm`      | `FP Fused Multiply Add (DP)`                  |
+| `rv_d`        | `fmax_d`      | `rd, rs1, rs2`               | `FP Maximum (DP)`                             |
+| `rv_d`        | `fmin_d`      | `rd, rs1, rs2`               | `FP Minimum (DP)`                             |
+| `rv_d`        | `fmsub_d`     | `rd, rs1, rs2, rs3, rm`      | `FP Fused Multiply Subtract (DP)`             |
+| `rv_d`        | `fmul_d`      | `rd, rs1, rs2, rm`           | `FP Multiply (DP)`                            |
+| `rv_d`        | `fnmadd_d`    | `rd, rs1, rs2, rs3, rm`      | `FP Negate fused Multiply Add (DP)`           |
+| `rv_d`        | `fnmsub_d`    | `rd, rs1, rs2, rs3, rm`      | `FP Negate fused Multiply Subtract (DP)`      |
+| `rv_d`        | `fsd`         | `imm12hi, rs1, rs2, imm12lo` | `FP Store (DP)`                               |
+| `rv_d`        | `fsgnj_d`     | `rd, rs1, rs2`               | `FP to Sign-injection (DP)`                   |
+| `rv_d`        | `fsgnjn_d`    | `rd, rs1, rs2`               | `FP to Sign-injection Negate (DP)`            |
+| `rv_d`        | `fsgnjx_d`    | `rd, rs1, rs2`               | `FP to Sign-injection Xor (DP)`               |
+| `rv_d`        | `fsqrt_d`     | `rd, rs1, rm`                | `Floating Square Root (DP)`                   |
+| `rv_d`        | `fsub_d`      | `rd, rs1, rs2, rm`           | `FP Subtract (DP)`                            |
+| `rv_d_zfa`    | `fcvtmod_w_d` | `rd, rs1`                    | `FP Convert Double to Word Modulo (DP)`       |
+| `rv_d_zfa`    | `fleq_d`      | `rd, rs1, rs2`               | `FP Quiet Compare Less Than Or Equal To (DP)` |
+| `rv_d_zfa`    | `fli_d`       | `rd, rs1`                    | `FP Load Immediate (DP)`                      |
+| `rv_d_zfa`    | `fltq_d`      | `rd, rs1, rs2`               | `FP Quiet Compare Less Than (DP)`             |
+| `rv_d_zfa`    | `fmaxm_d`     | `rd, rs1, rs2`               | `FP Maximum with NaN Propagation (DP)`        |
+| `rv_d_zfa`    | `fminm_d`     | `rd, rs1, rs2`               | `FP Minimum with NaN Propagation (DP)`        |
+| `rv_d_zfa`    | `fround_d`    | `rd, rs1, rm`                | `FP Round to Integer (DP)`                    |
+| `rv_d_zfa`    | `froundnx_d`  | `rd, rs1, rm`                | `FP Round to Integer with Inexact (DP)`       |
+| `rv_d_zfhmin` | `fcvt_d_h`    | `rd, rs1, rm`                | `FP Convert Half to Double`                   |
+| `rv_d_zfhmin` | `fcvt_h_d`    | `rd, rs1, rm`                | `FP Convert Double to Half`                   |
 
-:RV32F - "RV32F Standard Extension for Single-Precision Floating-Point"
+:RVD - Specific Extension for Double-Precision Floating-Point Instructions
 
-| **Instruction** | **Instruction Full-Name**                       |
-|:----------------|:------------------------------------------------|
-| `fcvt.l.s`      | `FP Convert Float to Double Word (SP)`          |
-| `fcvt.lu.s`     | `FP Convert Float to Double Word Unsigned (SP)` |
-| `fcvt.s.l`      | `FP Convert Double Word to Float (SP)`          |
-| `fcvt.s.lu`     | `FP Convert Double Word Unsigned to Float (SP)` |
+| **Extension** | **Name**   | **Variable-Fields** | **Full-Name**                                |
+|:--------------|:-----------|:--------------------|:---------------------------------------------|
+| `rv32_d_zfa`  | `fmvh_x_d` | `rd, rs1`           | `FP Move High Half to Integer Register (DP)` |
+| `rv32_d_zfa`  | `fmvp_d_x` | `rd, rs1, rs2`      | `FP Move from Two Integer Registers (DP)`    |
 
-:RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
+:RV32D - Specific Extension for Double-Precision Floating-Point Instructions (32 bit)
 
-| **Instruction** | **Instruction Full-Name**                |
-|:----------------|:-----------------------------------------|
-| `fld`           | `FP Load (DP)`                           |
-| `fsd`           | `FP Store (DP)`                          |
-| `fmadd.d`       | `FP Fused Multiply Add (DP)`             |
-| `fmsub.d`       | `FP Fused Multiply Subtract (DP)`        |
-| `fnmadd.d`      | `FP Negate fused Multiply Add (DP)`      |
-| `fnmsub.d`      | `FP Negate fused Multiply Subtract (DP)` |
-| `fadd.d`        | `FP Add (DP)`                            |
-| `fsub.d`        | `FP Subtract (DP)`                       |
-| `fmul.d`        | `FP Multiply (DP)`                       |
-| `fdiv.d`        | `FP Divide (DP)`                         |
-| `fsgnj.d`       | `FP to Sign-injection (DP)`              |
-| `fsgnjn.d`      | `FP to Sign-injection Negate (DP)`       |
-| `fsgnjx.d`      | `FP to Sign-injection Xor (DP)`          |
-| `fmin.d`        | `FP Minimum (DP)`                        |
-| `fmax.d`        | `FP Maximum (DP)`                        |
-| `fcvt.s.d`      | `FP Convert DP to SP`                    |
-| `fcvt.d.s`      | `FP Convert SP to DP`                    |
-| `fsqrt.d`       | `Floating Square Root (DP)`              |
-| `fle.d`         | `FP Less Than Equal (DP)`                |
-| `flt.d`         | `FP Less Than (DP)`                      |
-| `feq.d`         | `FP Equal (DP)`                          |
-| `fcvt.w.d`      | `FP Convert Float to Word (DP)`          |
-| `fcvt.wu.d`     | `FP Convert Float to Word Unsigned (DP)` |
-| `fcvt.d.w`      | `FP Convert Word to Float (DP)`          |
-| `fcvt.d.wu`     | `FP Convert Word Unsigned to Float (DP)` |
-| `fclass.d`      | `FP Classify (DP)`                       |
+| **Extension** | **Name**    | **Variable-Fields** | **Full-Name**                                   |
+|:--------------|:------------|:--------------------|:------------------------------------------------|
+| `rv64_d`      | `fcvt_d_l`  | `rd, rs1, rm`       | `FP Convert Double Word to Float (DP)`          |
+| `rv64_d`      | `fcvt_d_lu` | `rd, rs1, rm`       | `FP Convert Double Word Unsigned Float (DP)`    |
+| `rv64_d`      | `fcvt_l_d`  | `rd, rs1, rm`       | `FP Convert Float to Double Word (DP)`          |
+| `rv64_d`      | `fcvt_lu_d` | `rd, rs1, rm`       | `FP Convert Float to Double Word Unsigned (DP)` |
+| `rv64_d`      | `fmv_d_x`   | `rd, rs1`           | `FP Move from Integer Register (DP)`            |
+| `rv64_d`      | `fmv_x_d`   | `rd, rs1`           | `FP Move to Integer Register (DP)`              |
 
-:RV32D - "RV32D Standard Extension for Double-Precision Floating-Point"
-
-| **Instruction** | **Instruction Full-Name**                       |
-|:----------------|:------------------------------------------------|
-| `fcvt.l.d`      | `FP Convert Float to Double Word (DP)`          |
-| `fcvt.lu.d`     | `FP Convert Float to Double Word Unsigned (DP)` |
-| `fmv.x.d`       | `FP Move to Integer Register (DP)`              |
-| `fcvt.d.l`      | `FP Convert Double Word to Float (DP)`          |
-| `fcvt.d.lu`     | `FP Convert Double Word Unsigned Float (DP)`    |
-| `fmv.d.x`       | `FP Move from Integer Register (DP)`            |
-
-:RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32D)"
-
-| **Instruction** | **Instruction Full-Name**                  |
-|:----------------|:-------------------------------------------|
-| `frcsr`         | `Read FP Control and Status Register`      |
-| `frrm`          | `Read FP Rounding Mode`                    |
-| `frflags`       | `Read FP Accrued Exception Flags`          |
-| `fscsr`         | `Set FP Control and Status Register`       |
-| `fsrm`          | `Set FP Rounding Mode`                     |
-| `fsflags`       | `Set FP Accrued Exception Flags`           |
-| `fsrmi`         | `Set FP Rounding Mode Immediate`           |
-| `fsflagsi`      | `Set FP Accrued Exception Flags Immediate` |
-
-:RV32FD - "RV32F and RV32D Common Floating-Point Instructions"
+:RV64D - Specific Extension for Double-Precision Floating-Point Instructions (64 bit)

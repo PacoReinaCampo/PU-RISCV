@@ -1,238 +1,80 @@
 ## INSTRUCTION PSEUDO-CODE (PL)
 
-| **Instruction** | **Instruction Pseudo-Code**                                                             |
-|:----------------|:----------------------------------------------------------------------------------------|
-| `lui`           | `rd = imm`                                                                              |
-| `auipc`         | `rd = pc + imm`                                                                         |
-| `jal`           | `rd = pc + length(inst); pc_offset = imm`                                               |
-| `jalr`          | `ux new_offset = (rs1 + imm - pc) & ~1; rd = pc + length(inst); pc_offset = new_offset` |
-| `beq`           | `if (sx(rs1) == sx(rs2)) pc_offset = imm`                                               |
-| `bne`           | `if (sx(rs1) != sx(rs2)) pc_offset = imm`                                               |
-| `blt`           | `if (sx(rs1) < sx(rs2)) pc_offset = imm`                                                |
-| `bge`           | `if (sx(rs1) >= sx(rs2)) pc_offset = imm`                                               |
-| `bltu`          | `if (ux(rs1) < ux(rs2)) pc_offset = imm`                                                |
-| `bgeu`          | `if (ux(rs1) >= ux(rs2)) pc_offset = imm`                                               |
-| `lb`            | `s8 t; mmu.load<s8>(rs1 + imm, t); rd = t; rd = sx(*(s8*)ptr(rs1 + imm))`               |
-| `lh`            | `s16 t; mmu.load<s16>(rs1 + imm, t); rd = t; rd = sx(*(s16*)ptr(rs1 + imm))`            |
-| `lw`            | `s32 t; mmu.load<s32>(rs1 + imm, t); rd = t; rd = sx(*(s32*)ptr(rs1 + imm))`            |
-| `lbu`           | `u8 t; mmu.load<u8>(rs1 + imm, t); rd = t; rd = ux(*(u8*)ptr(rs1 + imm))`               |
-| `lhu`           | `u16 t; mmu.load<u16>(rs1 + imm, t); rd = t; rd = ux(*(u16*)ptr(rs1 + imm))`            |
-| `lwu`           | `u32 t; mmu.load<u32>(rs1 + imm, t); rd = t; rd = ux(*(u32*)ptr(rs1 + imm))`            |
-| `sb`            | `mmu.store<s8>(rs1 + imm, s8(rs2)); *((u8*)ptr(rs1 + imm)) = rs2`                       |
-| `sh`            | `mmu.store<s16>(rs1 + imm, s16(rs2)); *((u16*)ptr(rs1 + imm)) = rs2`                    |
-| `sw`            | `mmu.store<s32>(rs1 + imm, s32(rs2)); *((u32*)ptr(rs1 + imm)) = rs2`                    |
-| `addi`          | `rd = sx(rs1) + sx(imm)`                                                                |
-| `slti`          | `rd = sx(rs1) < sx(imm)`                                                                |
-| `sltiu`         | `rd = ux(rs1) < ux(imm)`                                                                |
-| `xori`          | `rd = ux(rs1) ^ ux(imm)`                                                                |
-| `ori`           | `rd = ux(rs1) \| ux(imm)`                                                               |
-| `andi`          | `rd = ux(rs1) & ux(imm)`                                                                |
-| `slli`          | `rd = ux(rs1) << imm`                                                                   |
-| `srli`          | `rd = ux(rs1) >> imm`                                                                   |
-| `srai`          | `rd = sx(rs1) >> imm`                                                                   |
-| `add`           | `rd = sx(rs1) + sx(rs2)`                                                                |
-| `sub`           | `rd = sx(rs1) - sx(rs2)`                                                                |
-| `sll`           | `rd = ux(rs1) << (rs2 & 0b1111111); 7-bit mask for RV128I`                              |
-| `slt`           | `rd = sx(rs1) < sx(rs2)`                                                                |
-| `sltu`          | `rd = ux(rs1) < ux(rs2)`                                                                |
-| `xor`           | `rd = ux(rs1) ^ ux(rs2)`                                                                |
-| `srl`           | `rd = ux(rs1) >> (rs2 & 0b1111111); 7-bit mask for RV128I`                              |
-| `sra`           | `rd = sx(rs1) >> (rs2 & 0b1111111); 7-bit mask for RV128I`                              |
-| `or`            | `rd = ux(rs1) \| ux(rs2)`                                                               |
-| `and`           | `rd = ux(rs1) & ux(rs2)`                                                                |
-| `fence`         |                                                                                         |
-| `fence.i`       |                                                                                         |
+| **Extension** | **Name**  | **Variable-Fields** | **Pseudo-Code**                                                                                                                                                           |
+|:--------------|:----------|:--------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv_zba`      | `sh1add`  | `rd, rs1, rs2`      | `rd = rs2 + (rs1 << 1);`                                                                                                                                                  |
+| `rv_zba`      | `sh2add`  | `rd, rs1, rs2`      | `rd = rs2 + (rs1 << 2);`                                                                                                                                                  |
+| `rv_zba`      | `sh3add`  | `rd, rs1, rs2`      | `rd = rs2 + (rs1 << 3);`                                                                                                                                                  |
+| `rv_zbb`      | `andn`    | `rd, rs1, rs2`      | `rd = rs1 & ~rs2;`                                                                                                                                                        |
+| `rv_zbb`      | `clz`     | `rd, rs1`           | `rd = count_leading_zeros(rs1);`                                                                                                                                          |
+| `rv_zbb`      | `cpop`    | `rd, rs1`           | `rd = count_ones(rs1);`                                                                                                                                                   |
+| `rv_zbb`      | `ctz`     | `rd, rs1`           | `rd = count_trailing_zeros(rs1);`                                                                                                                                         |
+| `rv_zbb`      | `max`     | `rd, rs1, rs2`      | `rd = sx(rs1) > sx(rs2) ? rs1 : rs2;`                                                                                                                                     |
+| `rv_zbb`      | `maxu`    | `rd, rs1, rs2`      | `rd = ux(rs1) > ux(rs2) ? rs1 : rs2;`                                                                                                                                     |
+| `rv_zbb`      | `min`     | `rd, rs1, rs2`      | `rd = sx(rs1) < sx(rs2) ? rs1 : rs2;`                                                                                                                                     |
+| `rv_zbb`      | `minu`    | `rd, rs1, rs2`      | `rd = ux(rs1) < ux(rs2) ? rs1 : rs2;`                                                                                                                                     |
+| `rv_zbb`      | `orc_b`   | `rd, rs1`           | `for (i = 0; i < XLEN/8; ++i) { set_bits(&result, 8*i+7, 8*i, bits(rs1, 8*i+7, 8*i) != 0 ? 0xff : 0); } rd = result;`                                                     |
+| `rv_zbb`      | `orn`     | `rd, rs1, rs2`      | `rd = rs1 \| ~rs2;`                                                                                                                                                       |
+| `rv_zbb`      | `rol`     | `rd, rs1, rs2`      | `rd = rotate_left(rs1, rs2 & (XLEN - 1), XLEN);`                                                                                                                          |
+| `rv_zbb`      | `ror`     | `rd, rs1, rs2`      | `rd = rotate_right(rs1, rs2 & (XLEN - 1), XLEN);`                                                                                                                         |
+| `rv_zbb`      | `sext_b`  | `rd, rs1`           | `rd = EXTS(bits(rs1, 7, 0));`                                                                                                                                             |
+| `rv_zbb`      | `sext_h`  | `rd, rs1`           | `rd = EXTS(bits(rs1, 15, 0));`                                                                                                                                            |
+| `rv_zbb`      | `xnor`    | `rd, rs1, rs2`      | `rd = ~(rs1 ^ rs2);`                                                                                                                                                      |
+| `rv_zbc`      | `clmul`   | `rd, rs1, rs2`      | `result = 0; for (i = 0; i < XLEN; ++i) { if (rs2[i]) result = result ^ (rs1 << i); } rd = result;`                                                                       |
+| `rv_zbc`      | `clmulh`  | `rd, rs1, rs2`      | `result = 0; for (i = 1; i < XLEN; ++i) { if (rs2[i]) result = result ^ (rs1 >> (XLEN - i)); } rd = result;`                                                              |
+| `rv_zbc`      | `clmulr`  | `rd, rs1, rs2`      | `result = 0; for (i = 0; i < XLEN; ++i) { if (rs2[i]) result = result ^ (rs1 >> (XLEN - 1 - i)); } rd = result;`                                                          |
+| `rv_zbkb`     | `andn`    | `rd, rs1, rs2`      | `rd = rs1 & ~rs2;`                                                                                                                                                        |
+| `rv_zbkb`     | `brev8`   | `rd, rs1`           | `for (i = 0; i < XLEN/8; ++i) { for (j = 0; j < 8; ++j) { result[8*i+j] = rs1[8*i+7-j]; }; } rd = result;`                                                                |
+| `rv_zbkb`     | `orn`     | `rd, rs1, rs2`      | `rd = rs1 \| ~rs2;`                                                                                                                                                       |
+| `rv_zbkb`     | `pack`    | `rd, rs1, rs2`      | `lo_half = bits(rs1, XLEN/2-1, 0); hi_half = bits(rs2, XLEN/2-1, 0); rd = EXTZ(concat_bits(hi_half, lo_half));`                                                           |
+| `rv_zbkb`     | `packh`   | `rd, rs1, rs2`      | `lo_half = bits(rs1, 7, 0); hi_half = bits(rs2, 7, 0); rd = EXTZ(concat_bits(hi_half, lo_half));`                                                                         |
+| `rv_zbkb`     | `rol`     | `rd, rs1, rs2`      | `rd = rotate_left(rs1, rs2 & (XLEN - 1), XLEN);`                                                                                                                          |
+| `rv_zbkb`     | `ror`     | `rd, rs1, rs2`      | `rd = rotate_right(rs1, rs2 & (XLEN - 1), XLEN);`                                                                                                                         |
+| `rv_zbkb`     | `xnor`    | `rd, rs1, rs2`      | `rd = ~(rs1 ^ rs2);`                                                                                                                                                      |
+| `rv_zbkc`     | `clmul`   | `rd, rs1, rs2`      | `result = 0; for (i = 0; i < XLEN; ++i) { if (rs2[i]) result = result ^ (rs1 << i); } rd = result;`                                                                       |
+| `rv_zbkc`     | `clmulh`  | `rd, rs1, rs2`      | `result = 0; for (i = 1; i < XLEN; ++i) { if (rs2[i]) result = result ^ (rs1 >> (XLEN - i)); } rd = result;`                                                              |
+| `rv_zbkx`     | `xperm4`  | `rd, rs1, rs2`      | `for (i = 0; i < XLEN; i += 4) { index = bits(rs2, i + 3, i); set_bits(&result, i + 3, i, index < XLEN / 4 ? bits(rs1, 4*index + 3, 4*index) : 0); } rd = result;`        |
+| `rv_zbkx`     | `xperm8`  | `rd, rs1, rs2`      | `for (i = 0; i < XLEN; i += 8) { index = bits(rs2, i + 7, i); set_bits(&result, i + 7, i, index < XLEN / 8 ? bits(rs1, 8*index + 7, 8*index) : 0); } rd = result;`        |
+| `rv_zbp`      | `xperm16` | `rd, rs1, rs2`      | `for (i = 0; i < XLEN; i += 16) { index = bits(rs2, i + 15, i); set_bits(&result, i + 15, i, index < XLEN / 16 ? bits(rs1, 16*index + 15, 16*index) : 0); } rd = result;` |
+| `rv_zbs`      | `bclr`    | `rd, rs1, rs2`      | `rd = rs1 & ~(1 << (rs2 & (XLEN - 1)));`                                                                                                                                  |
+| `rv_zbs`      | `bext`    | `rd, rs1, rs2`      | `rd = (rs1 >> (rs2 & (XLEN - 1))) & 1;`                                                                                                                                   |
+| `rv_zbs`      | `binv`    | `rd, rs1, rs2`      | `rd = rs1 ^ (1 << (rs2 & (XLEN - 1)));`                                                                                                                                   |
+| `rv_zbs`      | `bset`    | `rd, rs1, rs2`      | `rd = rs1 \| (1 << (rs2 & (XLEN - 1)));`                                                                                                                                  |
 
-:RV32I - "RV32I Base Integer Instruction Set"
+:RVZB - Specific Extension for Bit Instructions
 
-| **Instruction** | **Instruction Pseudo-Code**                                                  |
-|:----------------|:-----------------------------------------------------------------------------|
-| `ld`            | `s64 t; mmu.load<s64>(rs1 + imm, t); rd = t; rd = sx(*(s64*)ptr(rs1 + imm))` |
-| `sd`            | `mmu.store<s64>(rs1 + imm, s64(rs2)); *(u64*)ptr(rs1 + imm) = rs2`           |
-| `addiw`         | `rd = s32(s32(rs1) + imm); clang requires -fwrapv`                           |
-| `slliw`         | `rd = s32(u32(rs1) << imm)`                                                  |
-| `srliw`         | `rd = s32(u32(rs1) >> imm)`                                                  |
-| `sraiw`         | `rd = s32(rs1) >> imm`                                                       |
-| `addw`          | `rd = s32(s32(rs1) + s32(rs2)); clang requires -fwrapv`                      |
-| `subw`          | `rd = s32(s32(rs1) - s32(rs2)); clang requires -fwrapv`                      |
-| `sllw`          | `rd = s32(u32(rs1) << (rs2 & 0b11111))`                                      |
-| `srlw`          | `rd = s32(u32(rs1) >> (rs2 & 0b11111))`                                      |
-| `sraw`          | `rd = s32(s32(rs1) >> (rs2 & 0b11111))`                                      |
+| **Extension** | **Name**    | **Variable-Fields** | **Pseudo-Code**                                                                                                   |
+|:--------------|:------------|:--------------------|:------------------------------------------------------------------------------------------------------------------|
+| `rv32_zbkb`   | `rev8_rv32` | `rd, rs1`           | `for (i = 0; i < XLEN/8; ++i) { set_bits(&result, 8*i+7, 8*i, bits(rs1, XLEN-8*i-1, XLEN-8*i-8)); } rd = result;` |
+| `rv32_zbkb`   | `unzip`     | `rd, rs1`           | `for (i = 0; i < XLEN/2; ++i) { result[i] = rs1[2*i]; result[i+XLEN/2] = rs1[2*i+1]; } rd = result;`              |
+| `rv32_zbkb`   | `zip`       | `rd, rs1`           | `for (i = 0; i < XLEN/2; ++i) { result[2*i] = rs1[i]; result[2*i+1] = rs1[i+XLEN/2]; } rd = result;`              |
 
-:RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
+:RV32ZB - Specific Extension for Bit Instructions (32 bit)
 
-| **Instruction** | **Instruction Pseudo-Code**                                                                          |
-|:----------------|:-----------------------------------------------------------------------------------------------------|
-| `mul`           | `rd = sx(rs1) * sx(rs2)`                                                                             |
-| `mulh`          | `rd = riscv::mulh(sx(rs1), sx(rs2))`                                                                 |
-| `mulhsu`        | `rd = riscv::mulhsu(sx(rs1), ux(rs2))`                                                               |
-| `mulhu`         | `rd = riscv::mulhu(ux(rs1), ux(rs2))`                                                                |
-| `div`           | `rd = sx(rs1) == sx(INT_MIN) && sx(rs2) == -1 ? sx(INT_MIN) : sx(rs2) == 0 ? -1 : sx(rs1) / sx(rs2)` |
-| `divu`          | `rd = sx(rs2) == 0 ? -1 : sx(ux(rs1) / ux(rs2))`                                                     |
-| `rem`           | `rd = sx(rs1) == sx(INT_MIN) && sx(rs2) == -1 ? 0 : sx(rs2) == 0 ? sx(rs1) : sx(rs1) % sx(rs2)`      |
-| `remu`          | `rd = sx(rs2) == 0 ? sx(rs1) : sx(ux(rs1) % ux(rs2))`                                                |
+| **Extension** | **Name**    | **Variable-Fields** | **Pseudo-Code**                                                                                                                                                           |
+|:--------------|:------------|:--------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv64_zba`    | `add_uw`    | `rd, rs1, rs2`      | `base = rs2; index = EXTZ(bits(rs1, 31, 0)); rd = base + index;`                                                                                                          |
+| `rv64_zba`    | `sh1add_uw` | `rd, rs1, rs2`      | `base = rs2; index = EXTZ(bits(rs1, 31, 0)); rd = base + (index << 1);`                                                                                                   |
+| `rv64_zba`    | `sh2add_uw` | `rd, rs1, rs2`      | `base = rs2; index = EXTZ(bits(rs1, 31, 0)); rd = base + (index << 2);`                                                                                                   |
+| `rv64_zba`    | `sh3add_uw` | `rd, rs1, rs2`      | `base = rs2; index = EXTZ(bits(rs1, 31, 0)); rd = base + (index << 3);`                                                                                                   |
+| `rv64_zba`    | `slli_uw`   | `rd, rs1, shamtd`   | `rd = (EXTZ(bits(rs1, 31, 0)) << shamtd);`                                                                                                                                |
+| `rv64_zbb`    | `clzw`      | `rd, rs1`           | `rd = count_leading_zeros(bits(rs1, 31, 0));`                                                                                                                             |
+| `rv64_zbb`    | `cpopw`     | `rd, rs1`           | `rd = count_ones(bits(rs1, 31, 0));`                                                                                                                                      |
+| `rv64_zbb`    | `ctzw`      | `rd, rs1`           | `rd = count_trailing_zeros(bits(rs1, 31, 0));`                                                                                                                            |
+| `rv64_zbb`    | `rev8`      | `rd, rs1`           | `for (i = 0; i < XLEN/8; ++i) { set_bits(&result, 8*i+7, 8*i, bits(rs1, XLEN-8*i-1, XLEN-8*i-8)); } rd = result;`                                                         |
+| `rv64_zbb`    | `rolw`      | `rd, rs1, rs2`      | `rd = sx(s32(rotate_left(bits(rs1, 31, 0), rs2 & (32 - 1), 32)));`                                                                                                        |
+| `rv64_zbb`    | `rori`      | `rd, rs1, shamtd`   | `rd = rotate_right(rs1, shamtd & (XLEN - 1), XLEN);`                                                                                                                      |
+| `rv64_zbb`    | `roriw`     | `rd, rs1, shamtw`   | `rd = sx(s32(rotate_right(bits(rs1, 31, 0), shamtw & (32 - 1), 32)));`                                                                                                    |
+| `rv64_zbb`    | `rorw`      | `rd, rs1, rs2`      | `rd = sx(s32(rotate_right(bits(rs1, 31, 0), rs2 & (32 - 1), 32)));`                                                                                                       |
+| `rv64_zbkb`   | `packw`     | `rd, rs1, rs2`      | `lo_half = bits(rs1, 15, 0); hi_half = bits(rs2, 15, 0); rd = EXTS(concat_bits(hi_half, lo_half));`                                                                       |
+| `rv64_zbkb`   | `rolw`      | `rd, rs1, rs2`      | `rd = sx(s32(rotate_left(bits(rs1, 31, 0), rs2 & (32 - 1), 32)));`                                                                                                        |
+| `rv64_zbkb`   | `rori`      | `rd, rs1, shamtd`   | `rd = rotate_right(rs1, shamtd & (XLEN - 1), XLEN);`                                                                                                                      |
+| `rv64_zbkb`   | `roriw`     | `rd, rs1, shamtw`   | `rd = sx(s32(rotate_right(bits(rs1, 31, 0), shamtw & (32 - 1), 32)));`                                                                                                    |
+| `rv64_zbkb`   | `rorw`      | `rd, rs1, rs2`      | `rd = sx(s32(rotate_right(bits(rs1, 31, 0), rs2 & (32 - 1), 32)));`                                                                                                       |
+| `rv64_zbp`    | `xperm32`   | `rd, rs1, rs2`      | `for (i = 0; i < XLEN; i += 32) { index = bits(rs2, i + 31, i); set_bits(&result, i + 31, i, index < XLEN / 32 ? bits(rs1, 32*index + 31, 32*index) : 0); } rd = result;` |
+| `rv64_zbs`    | `bclri`     | `rd, rs1, shamtd`   | `rd = rs1 & ~(1 << (shamtd & (XLEN - 1)));`                                                                                                                               |
+| `rv64_zbs`    | `bexti`     | `rd, rs1, shamtd`   | `rd = (rs1 >> (shamtd & (XLEN - 1))) & 1;`                                                                                                                                |
+| `rv64_zbs`    | `binvi`     | `rd, rs1, shamtd`   | `rd = rs1 ^ (1 << (shamtd & (XLEN - 1)));`                                                                                                                                |
+| `rv64_zbs`    | `bseti`     | `rd, rs1, shamtd`   | `rd = rs1 \| (1 << (shamtd & (XLEN - 1)));`                                                                                                                               |
 
-:RV32M - "RV32M Standard Extension for Integer Multiply and Divide"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                                                 |
-|:----------------|:------------------------------------------------------------------------------------------------------------|
-| `mulw`          | `rd = s32(u32(rs1) * u32(rs2))`                                                                             |
-| `divw`          | `rd = s32(rs1) == s32(INT_MIN) && s32(rs2) == -1 ? s32(INT_MIN) : s32(rs2) == 0 ? -1 : s32(rs1) / s32(rs2)` |
-| `divuw`         | `rd = s32(rs2) == 0 ? -1 : s32(u32(rs1) / u32(rs2))`                                                        |
-| `remw`          | `rd = s32(rs1) == s32(INT_MIN) && s32(rs2) == -1 ? 0 : s32(rs2) == 0 ? s32(rs1) : s32(rs1) % s32(rs2)`      |
-| `remuw`         | `rd = s32(rs2) == 0 ? s32(rs1) : s32(u32(rs1) % u32(rs2))`                                                  |
-
-:RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                        |
-|:----------------|:-----------------------------------------------------------------------------------|
-| `lr.w`          | `lr = rs1; s32 t; mmu.load<s32>(rs1, t); rd = t`                                   |
-| `sc.w`          | `ux res = 0; if (lr != rs1) res = 1; else mmu.store<s32>(rs1, s32(rs2)); rd = res` |
-| `amoswap.w`     | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoswap, rs1, t1, t2); rd = t1`               |
-| `amoadd.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoadd, rs1, t1, t2); rd = t1`                |
-| `amoxor.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoxor, rs1, t1, t2); rd = t1`                |
-| `amoor.w`       | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoor, rs1, t1, t2); rd = t1`                 |
-| `amoand.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoand, rs1, t1, t2); rd = t1`                |
-| `amomin.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amomin, rs1, t1, t2); rd = t1`                |
-| `amomax.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amomax, rs1, t1, t2); rd = t1`                |
-| `amominu.w`     | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amominu, rs1, t1, t2); rd = t1`               |
-| `amomaxu.w`     | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amomaxu, rs1, t1, t2); rd = t1`               |
-
-:RV32A - "RV32A Standard Extension for Atomic Instructions"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                        |
-|:----------------|:-----------------------------------------------------------------------------------|
-| `lr.d`          | `lr = rs1; s64 t; mmu.load<s64>(rs1, t); rd = t`                                   |
-| `sc.d`          | `ux res = 0; if (lr != rs1) res = 1; else mmu.store<s64>(rs1, s64(rs2)); rd = res` |
-| `amoswap.d`     | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoswap, rs1, t1, t2); rd = t1`               |
-| `amoadd.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoadd, rs1, t1, t2); rd = t1`                |
-| `amoxor.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoxor, rs1, t1, t2); rd = t1`                |
-| `amoor.d`       | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoor, rs1, t1, t2); rd = t1`                 |
-| `amoand.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoand, rs1, t1, t2); rd = t1`                |
-| `amomin.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amomin, rs1, t1, t2); rd = t1`                |
-| `amomax.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amomax, rs1, t1, t2); rd = t1`                |
-| `amominu.d`     | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amominu, rs1, t1, t2); rd = t1`               |
-| `amomaxu.d`     | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amomaxu, rs1, t1, t2); rd = t1`               |
-
-:RV64A - "RV64A Standard Extension for Atomic Instructions (+ RV32A)"
-
-| **Instruction** | **Instruction Pseudo-Code** |
-|:----------------|:----------------------------|
-| `ecall`         |                             |
-| `ebreak`        |                             |
-| `uret`          |                             |
-| `sret`          |                             |
-| `hret`          |                             |
-| `mret`          |                             |
-| `dret`          |                             |
-| `sfence.vm`     |                             |
-| `wfi`           |                             |
-| `rdcycle`       |                             |
-| `rdtime`        |                             |
-| `rdinstret`     |                             |
-| `rdcycleh`      |                             |
-| `rdtimeh`       |                             |
-| `rdinstreth`    |                             |
-| `csrrw`         |                             |
-| `csrrs`         |                             |
-| `csrrc`         |                             |
-| `csrrwi`        |                             |
-| `csrrsi`        |                             |
-| `csrrci`        |                             |
-
-:RV32S - "RV32S Standard Extension for Supervisor-level Instructions"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                          |
-|:----------------|:-------------------------------------------------------------------------------------|
-| `flw`           | `u32 t; mmu.load<u32>(rs1 + imm, t); u32(frd) = t; f32(frd) = *(f32*)ptr(rs1 + imm)` |
-| `fsw`           | `mmu.store<f32>(rs1 + imm, f32(frs2)); *(f32*)ptr(rs1 + imm) = f32(frs2)`            |
-| `fmadd.s`       | `fenv_setrm(rm); f32(frd) = f32(frs1) * f32(frs2) + f32(frs3); -mfma`                |
-| `fmsub.s`       | `fenv_setrm(rm); f32(frd) = f32(frs1) * f32(frs2) - f32(frs3)`                       |
-| `fnmadd.s`      | `fenv_setrm(rm); f32(frd) = f32(frs1) * -f32(frs2) - f32(frs3)`                      |
-| `fnmsub.s`      | `fenv_setrm(rm); f32(frd) = f32(frs1) * -f32(frs2) + f32(frs3)`                      |
-| `fadd.s`        | `fenv_setrm(rm); f32(frd) = f32(frs1) + f32(frs2)`                                   |
-| `fsub.s`        | `fenv_setrm(rm); f32(frd) = f32(frs1) - f32(frs2)`                                   |
-| `fmul.s`        | `fenv_setrm(rm); f32(frd) = f32(frs1) * f32(frs2)`                                   |
-| `fdiv.s`        | `fenv_setrm(rm); f32(frd) = f32(frs1) / f32(frs2)`                                   |
-| `fsgnj.s`       | `u32(frd) = (u32(frs1) & u32(~(1U<<31))) \| (u32(frs2) & u32(1U<<31))`               |
-| `fsgnjn.s`      | `u32(frd) = (u32(frs1) & u32(~(1U<<31))) \| (~u32(frs2) & u32(1U<<31))`              |
-| `fsgnjx.s`      | `u32(frd) = u32(frs1) ^ (u32(frs2) & u32(1U<<31))`                                   |
-| `fmin.s`        | `f32(frd) = (f32(frs1) < f32(frs2)) \|\| isnan(f32(frs2)) ? f32(frs1) : f32(frs2)`   |
-| `fmax.s`        | `f32(frd) = (f32(frs1) > f32(frs2)) \|\| isnan(f32(frs2)) ? f32(frs1) : f32(frs2)`   |
-| `fsqrt.s`       | `fenv_setrm(rm); f32(frd) = riscv::f32_sqrt(f32(frs1))`                              |
-| `fle.s`         | `rd = f32(frs1) <= f32(frs2)`                                                        |
-| `flt.s`         | `rd = f32(frs1) < f32(frs2)`                                                         |
-| `feq.s`         | `rd = f32(frs1) == f32(frs2)`                                                        |
-| `fcvt.w.s`      | `fenv_setrm(rm); rd = riscv::fcvt_w(fcsr, f32(frs1)); s32(f32(frs1))`                |
-| `fcvt.wu.s`     | `fenv_setrm(rm); rd = riscv::fcvt_wu(fcsr, f32(frs1)); s32(u32(f32(frs1)))`          |
-| `fcvt.s.w`      | `fenv_setrm(rm); f32(frd) = f32(s32(rs1))`                                           |
-| `fcvt.s.wu`     | `fenv_setrm(rm); f32(frd) = f32(u32(rs1))`                                           |
-| `fmv.x.s`       | `rd = isnan(f32(frs1)) ? s32(u32(f32(NAN))) : s32(frs1); s32(frs1)`                  |
-| `fclass.s`      | `rd = f32_classify(f32(frs1))`                                                       |
-| `fmv.s.x`       | `u32(frd) = u32(rs1)`                                                                |
-
-:RV32F - "RV32F Standard Extension for Single-Precision Floating-Point"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                 |
-|:----------------|:----------------------------------------------------------------------------|
-| `fcvt.l.s`      | `fenv_setrm(rm); rd = riscv::fcvt_l(fcsr, f32(frs1)); s64(f32(frs1))`       |
-| `fcvt.lu.s`     | `fenv_setrm(rm); rd = riscv::fcvt_lu(fcsr, f32(frs1)); s64(u32(f32(frs1)))` |
-| `fcvt.s.l`      | `fenv_setrm(rm); f32(frd) = f32(s64(rs1))`                                  |
-| `fcvt.s.lu`     | `fenv_setrm(rm); f32(frd) = f32(u64(rs1))`                                  |
-
-:RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                          |
-|:----------------|:-------------------------------------------------------------------------------------|
-| `fld`           | `u64 t; mmu.load<u64>(rs1 + imm, t); u64(frd) = t; f64(frd) = *(f64*)ptr(rs1 + imm)` |
-| `fsd`           | `mmu.store<f64>(rs1 + imm, f64(frs2)); *(f64*)ptr(rs1 + imm) = f64(frs2)`            |
-| `fmadd.d`       | `fenv_setrm(rm); f64(frd) = f64(frs1) * f64(frs2) + f64(frs3)`                       |
-| `fmsub.d`       | `fenv_setrm(rm); f64(frd) = f64(frs1) * f64(frs2) - f64(frs3)`                       |
-| `fnmadd.d`      | `fenv_setrm(rm); f64(frd) = f64(frs1) * -f64(frs2) - f64(frs3)`                      |
-| `fnmsub.d`      | `fenv_setrm(rm); f64(frd) = f64(frs1) * -f64(frs2) + f64(frs3)`                      |
-| `fadd.d`        | `fenv_setrm(rm); f64(frd) = f64(frs1) + f64(frs2)`                                   |
-| `fsub.d`        | `fenv_setrm(rm); f64(frd) = f64(frs1) - f64(frs2)`                                   |
-| `fmul.d`        | `fenv_setrm(rm); f64(frd) = f64(frs1) * f64(frs2)`                                   |
-| `fdiv.d`        | `fenv_setrm(rm); f64(frd) = f64(frs1) / f64(frs2)`                                   |
-| `fsgnj.d`       | `u64(frd) = (u64(frs1) & u64(~(1ULL<<63))) \| (u64(frs2) & u64(1ULL<<63))`           |
-| `fsgnjn.d`      | `u64(frd) = (u64(frs1) & u64(~(1ULL<<63))) \| (~u64(frs2) & u64(1ULL<<63))`          |
-| `fsgnjx.d`      | `u64(frd) = u64(frs1) ^ (u64(frs2) & u64(1ULL<<63))`                                 |
-| `fmin.d`        | `f64(frd) = (f64(frs1) < f64(frs2)) \|\| isnan(f64(frs2)) ? f64(frs1) : f64(frs2)`   |
-| `fmax.d`        | `f64(frd) = (f64(frs1) > f64(frs2)) \|\| isnan(f64(frs2)) ? f64(frs1) : f64(frs2)`   |
-| `fcvt.s.d`      | `fenv_setrm(rm); f32(frd) = f32(f64(frs1))`                                          |
-| `fcvt.d.s`      | `fenv_setrm(rm); f64(frd) = f64(f32(frs1))`                                          |
-| `fsqrt.d`       | `fenv_setrm(rm); f64(frd) = riscv::f64_sqrt(f64(frs1))`                              |
-| `fle.d`         | `rd = f64(frs1) <= f64(frs2)`                                                        |
-| `flt.d`         | `rd = f64(frs1) < f64(frs2)`                                                         |
-| `feq.d`         | `rd = f64(frs1) == f64(frs2)`                                                        |
-| `fcvt.w.d`      | `fenv_setrm(rm); rd = riscv::fcvt_w(fcsr, f64(frs1)); s32(f64(frs1))`                |
-| `fcvt.wu.d`     | `fenv_setrm(rm); rd = riscv::fcvt_wu(fcsr, f64(frs1)); s32(u32(f64(frs1)))`          |
-| `fcvt.d.w`      | `fenv_setrm(rm); f64(frd) = f64(s32(rs1))`                                           |
-| `fcvt.d.wu`     | `fenv_setrm(rm); f64(frd) = f64(u32(rs1))`                                           |
-| `fclass.d`      | `rd = f64_classify(f64(frs1))`                                                       |
-
-:RV32D - "RV32D Standard Extension for Double-Precision Floating-Point"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                 |
-|:----------------|:----------------------------------------------------------------------------|
-| `fcvt.l.d`      | `fenv_setrm(rm); rd = riscv::fcvt_l(fcsr, f64(frs1)); s64(f64(frs1))`       |
-| `fcvt.lu.d`     | `fenv_setrm(rm); rd = riscv::fcvt_lu(fcsr, f64(frs1)); s64(u64(f64(frs1)))` |
-| `fmv.x.d`       | `rd = isnan(f64(frs1)) ? s64(u64(f64(NAN))) : s64(frs1); s64(frs1)`         |
-| `fcvt.d.l`      | `fenv_setrm(rm); f64(frd) = f64(s64(rs1))`                                  |
-| `fcvt.d.lu`     | `fenv_setrm(rm); f64(frd) = f64(u64(rs1))`                                  |
-| `fmv.d.x`       | `u64(frd) = u64(rs1)`                                                       |
-
-:RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32F)"
-
-| **Instruction** | **Instruction Pseudo-Code** |
-|:----------------|:----------------------------|
-| `frcsr`         |                             |
-| `frrm`          |                             |
-| `frflags`       |                             |
-| `fscsr`         |                             |
-| `fsrm`          |                             |
-| `fsflags`       |                             |
-| `fsrmi`         |                             |
-| `fsflagsi`      |                             |
-
-:RV32FD - "RV32F and RV32D Common Floating-Point Instructions"
+:RV64ZB - Specific Extension for Bit Instructions (64 bit)

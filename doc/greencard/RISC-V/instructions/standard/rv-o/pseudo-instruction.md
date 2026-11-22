@@ -1,62 +1,33 @@
 ## PSEUDO-INSTRUCTIONS
 
-| **Pseudo**   | **Opcode**              | **Format**       | **Constraint**                   |
-|:-------------|:------------------------|:-----------------|:---------------------------------|
-| `nop`        | `addi`                  | `none`           | `rd_eq_x0 rs1_eq_x0 imm_eq_zero` |
-| `#lla,la`    | `{lui,slli,addi,addiw}` | `rd,symbol`      | `-`                              |
-| `#la`        | `auipc,{ld,lw}`         | `rd,symbol`      | `-`                              |
-| `#lla,la`    | `auipc,addi`            | `rd,symbol`      | `-`                              |
-| `#la.tls.gd` | `auipc,addi`            | `rd,symbol`      | `-`                              |
-| `#la.tls.ie` | `auipc,{ld,lw}`         | `rd,symbol`      | `-`                              |
-| `#li`        | `{lui,slli,addi,addiw}` | `rd,rs1`         | `-`                              |
-| `mv`         | `addi`                  | `rd,rs1`         | `imm_eq_zero`                    |
-| `not`        | `xori`                  | `rd,rs1`         | `imm_eq_n1`                      |
-| `neg`        | `sub`                   | `rd,rs2`         | `rs1_eq_x0`                      |
-| `negw`       | `subw`                  | `rd,rs2`         | `rs1_eq_x0`                      |
-| `sext.w`     | `addiw`                 | `rd,rs1`         | `imm_eq_zero`                    |
-| `seqz`       | `sltiu`                 | `rd,rs1`         | `imm_eq_p1`                      |
-| `snez`       | `sltu`                  | `rd,rs2`         | `rs1_eq_x0`                      |
-| `sltz`       | `slt`                   | `rd,rs1`         | `rs2_eq_x0`                      |
-| `sgtz`       | `slt`                   | `rd,rs2`         | `rs1_eq_x0`                      |
-| `fmv.s`      | `fsgnj.s`               | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fabs.s`     | `fsgnjx.s`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fneg.s`     | `fsgnjn.s`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fmv.d`      | `fsgnj.d`               | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fabs.d`     | `fsgnjx.d`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fneg.d`     | `fsgnjn.d`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fmv.q`      | `fsgnj.q`               | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fabs.q`     | `fsgnjx.q`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fneg.q`     | `fsgnjn.q`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `beqz`       | `beq`                   | `rs1,offset`     | `rs2_eq_x0`                      |
-| `bnez`       | `bne`                   | `rs1,offset`     | `rs2_eq_x0`                      |
-| `blez`       | `bge`                   | `rs2,offset`     | `rs1_eq_x0`                      |
-| `bgez`       | `bge`                   | `rs1,offset`     | `rs2_eq_x0`                      |
-| `bltz`       | `blt`                   | `rs1,offset`     | `rs2_eq_x0`                      |
-| `bgtz`       | `blt`                   | `rs2,offset`     | `rs1_eq_x0`                      |
-| `ble`        | `bge`                   | `rs2,rs1,offset` | `-`                              |
-| `bleu`       | `bgeu`                  | `rs2,rs1,offset` | `-`                              |
-| `bgt`        | `blt`                   | `rs2,rs1,offset` | `-`                              |
-| `bgtu`       | `bltu`                  | `rs2,rs1,offset` | `-`                              |
-| `j`          | `jal`                   | `offset`         | `rd_eq_x0`                       |
-| `jal`        | `jal`                   | `offset`         | `rd_eq_ra`                       |
-| `ret`        | `jalr`                  | `none`           | `rd_eq_x0 rs1_eq_ra`             |
-| `jr`         | `jalr`                  | `rs1`            | `rd_eq_x0 imm_eq_zero`           |
-| `jalr`       | `jalr`                  | `rs1`            | `rd_eq_ra imm_eq_zero`           |
-| `#call`      | `{auipc,jalr}`          | `offset`         | `-`                              |
-| `#tail`      | `{auipc,jalr}`          | `offset`         | `-`                              |
-| `rdcycle`    | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc00`         |
-| `rdtime`     | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc01`         |
-| `rdinstret`  | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc02`         |
-| `rdcycleh`   | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc80`         |
-| `rdtimeh`    | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc81`         |
-| `rdinstreth` | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc82`         |
-| `frcsr`      | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0x003`         |
-| `frrm`       | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0x002`         |
-| `frflags`    | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0x001`         |
-| `fscsr`      | `csrrw`                 | `rd,rs1`         | `csr_eq_0x003`                   |
-| `fsrm`       | `csrrw`                 | `rd,rs1`         | `csr_eq_0x002`                   |
-| `fsflags`    | `csrrw`                 | `rd,rs1`         | `csr_eq_0x001`                   |
-| `fsrmi`      | `csrrwi`                | `rd,zimm`        | `csr_eq_0x002`                   |
-| `fsflagsi`   | `csrrwi`                | `rd,zimm`        | `csr_eq_0x001`                   |
+| **Extension** | **Name** | **Variable-Fields**            | **Pseudo-Instruction** | **Encoding**                                                       |
+|:--------------|:---------|:-------------------------------|:-----------------------|:-------------------------------------------------------------------|
+| `rv_o`        | `fence`  | `rs1, rd`                      | `fence_tso`            | `00000000000000000000000000000000100000110011-----000-----0001111` |
+| `rv_o`        | `fence`  | `none`                         | `pause`                | `0000000000000000000000000000000000000001000000000000000000001111` |
+| `rv_o`        | `ecall`  | `none`                         | `scall`                | `0000000000000000000000000000000000000000000000000000000001110011` |
+| `rv_o`        | `ebreak` | `none`                         | `sbreak`               | `0000000000000000000000000000000000000000000100000000000001110011` |
+| `rv_o`        | `addi`   | `rd, rs1`                      | `mv`                   | `00000000000000000000000000000000000000000000-----000-----0010011` |
+| `rv_o`        | `sub`    | `rd, rs2`                      | `neg`                  | `000000000000000000000000000000000100000-----00000000-----0110011` |
+| `rv_o`        | `addi`   | `none`                         | `nop`                  | `0000000000000000000000000000000000000000000000000000000000010011` |
+| `rv_o`        | `andi`   | `rd, rs1`                      | `zext_b`               | `00000000000000000000000000000000000011111111-----111-----0010011` |
+| `rv_o`        | `jalr`   | `none`                         | `ret`                  | `0000000000000000000000000000000000000000000000001000000001100111` |
+| `rv_o`        | `bgeu`   | `bimm12hi, rs2, rs1, bimm12lo` | `bleu`                 | `00000000000000000000000000000000-----------------111-----1100011` |
+| `rv_o`        | `bltu`   | `bimm12hi, rs2, rs1, bimm12lo` | `bgtu`                 | `00000000000000000000000000000000-----------------110-----1100011` |
+| `rv_o`        | `bge`    | `bimm12hi, rs2, rs1, bimm12lo` | `ble`                  | `00000000000000000000000000000000-----------------101-----1100011` |
+| `rv_o`        | `bge`    | `bimm12hi, rs1, bimm12lo`      | `bgez`                 | `00000000000000000000000000000000-------00000-----101-----1100011` |
+| `rv_o`        | `bge`    | `bimm12hi, rs2, bimm12lo`      | `blez`                 | `00000000000000000000000000000000------------00000101-----1100011` |
+| `rv_o`        | `blt`    | `bimm12hi, rs2, rs1, bimm12lo` | `bgt`                  | `00000000000000000000000000000000-----------------100-----1100011` |
+| `rv_o`        | `blt`    | `bimm12hi, rs2, bimm12lo`      | `bgtz`                 | `00000000000000000000000000000000------------00000100-----1100011` |
+| `rv_o`        | `blt`    | `bimm12hi, rs1, bimm12lo`      | `bltz`                 | `00000000000000000000000000000000-------00000-----100-----1100011` |
+| `rv_o`        | `bne`    | `bimm12hi, rs1, bimm12lo`      | `bnez`                 | `00000000000000000000000000000000-------00000-----001-----1100011` |
+| `rv_o`        | `beq`    | `bimm12hi, rs1, bimm12lo`      | `beqz`                 | `00000000000000000000000000000000-------00000-----000-----1100011` |
+| `rv_o`        | `sltiu`  | `rd, rs1`                      | `seqz`                 | `00000000000000000000000000000000000000000001-----011-----0010011` |
+| `rv_o`        | `sltu`   | `rd, rs2`                      | `snez`                 | `000000000000000000000000000000000000000-----00000011-----0110011` |
+| `rv_o`        | `slt`    | `rd, rs1`                      | `sltz`                 | `00000000000000000000000000000000000000000000-----010-----0110011` |
+| `rv_o`        | `slt`    | `rd, rs2`                      | `sgtz`                 | `000000000000000000000000000000000000000-----00000010-----0110011` |
+| `rv_o`        | `jalr`   | `rs1`                          | `jalr`                 | `00000000000000000000000000000000000000000000-----000000011100111` |
+| `rv_o`        | `jalr`   | `rs1`                          | `jr`                   | `00000000000000000000000000000000000000000000-----000000001100111` |
+| `rv_o`        | `jal`    | `jimm20`                       | `jal`                  | `00000000000000000000000000000000--------------------000011101111` |
+| `rv_o`        | `jal`    | `jimm20`                       | `j`                    | `00000000000000000000000000000000--------------------000001101111` |
 
-:Pseudo-Instructions
+:RVO - RVO Standard Extension for Extended Instructions

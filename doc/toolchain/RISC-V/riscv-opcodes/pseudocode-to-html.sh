@@ -6,7 +6,7 @@ pandoc -f markdown -t html5 -o specific/algebra/rv-y/software-description.html s
 pandoc -f markdown -t html5 -o specific/arithmetic/rv-d/software-description.html specific/arithmetic/rv-d/software-description.md -c "style.css"
 pandoc -f markdown -t html5 -o specific/arithmetic/rv-f/software-description.html specific/arithmetic/rv-f/software-description.md -c "style.css"
 pandoc -f markdown -t html5 -o specific/arithmetic/rv-q/software-description.html specific/arithmetic/rv-q/software-description.md -c "style.css"
-pandoc -f markdown -t html5 -o specific/cryptography/rv-sk/software-description.html specific/cryptography/rv-sk/software-description.md -c "style.css"
+pandoc -f markdown -t html5 -o specific/cryptography/rv-xk/software-description.html specific/cryptography/rv-xk/software-description.md -c "style.css"
 pandoc -f markdown -t html5 -o specific/cryptography/rv-vk/software-description.html specific/cryptography/rv-vk/software-description.md -c "style.css"
 pandoc -f markdown -t html5 -o specific/cryptography/rv-wk/software-description.html specific/cryptography/rv-wk/software-description.md -c "style.css"
 pandoc -f markdown -t html5 -o specific/cryptography/rv-yk/software-description.html specific/cryptography/rv-yk/software-description.md -c "style.css"
@@ -20,3 +20,5 @@ pandoc -f markdown -t html5 -o standard/rv-a/software-description.html standard/
 pandoc -f markdown -t html5 -o standard/rv-c/software-description.html standard/rv-c/software-description.md -c "style.css"
 pandoc -f markdown -t html5 -o standard/rv-m/software-description.html standard/rv-m/software-description.md -c "style.css"
 pandoc -f markdown -t html5 -o standard/rv-o/software-description.html standard/rv-o/software-description.md -c "style.css"
+
+pandoc -f markdown -t html5 -o opcodes.html opcodes.md -c "style.css"

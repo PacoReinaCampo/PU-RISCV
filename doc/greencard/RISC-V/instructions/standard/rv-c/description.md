@@ -1,317 +1,97 @@
 ## INSTRUCTION DESCRIPTIONS
 
-| **Instruction Name** | **Instruction Description**                                                                                              |
-|:---------------------|:-------------------------------------------------------------------------------------------------------------------------|
-| `lui`                | `Set and sign extend the 20-bit immediate (shited 12 bits left) and zero the bottom 12 bits into rd`                     |
-| `auipc`              | `Place the PC plus the 20-bit signed immediate (shited 12 bits left) into rd (used before JALR)`                         |
-| `jal`                | `Jump to the PC plus 20-bit signed immediate while saving PC+4 into rd`                                                  |
-| `jalr`               | `Jump to rs1 plus the 12-bit signed immediate while saving PC+4 into rd`                                                 |
-| `beq`                | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 == rs2`                                       |
-| `bne`                | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 != rs2`                                       |
-| `blt`                | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 < rs2 (signed)`                               |
-| `bge`                | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 >= rs2 (signed)`                              |
-| `bltu`               | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 < rs2 (unsigned)`                             |
-| `bgeu`               | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 >= rs2 (unsigned)`                            |
-| `lb`                 | `Load 8-bit value from addr in rs1 plus the 12-bit signed immediate and place sign-extended result into rd`              |
-| `lh`                 | `Load 16-bit value from addr in rs1 plus the 12-bit signed immediate and place sign-extended result into rd`             |
-| `lw`                 | `Load 32-bit value from addr in rs1 plus the 12-bit signed immediate and place sign-extended result into rd`             |
-| `lbu`                | `Load 8-bit value from addr in rs1 plus the 12-bit signed immediate and place zero-extended result into rd`              |
-| `lhu`                | `Load 32-bit value from addr in rs1 plus the 12-bit signed immediate and place zero-extended result into rd`             |
-| `lwu`                | `Load 32-bit value from addr in rs1 plus the 12-bit signed immediate and place zero-extended result into rd`             |
-| `sb`                 | `Store 8-bit value from the low bits of rs2 to addr in rs1 plus the 12-bit signed immediate`                             |
-| `sh`                 | `Store 16-bit value from the low bits of rs2 to addr in rs1 plus the 12-bit signed immediate`                            |
-| `sw`                 | `Store 32-bit value from the low bits of rs2 to addr in rs1 plus the 12-bit signed immediate`                            |
-| `addi`               | `Add sign-extended 12-bit immediate to register rs1 and place the result in rd`                                          |
-| `slti`               | `Set rd to 1 if rs1 is less than the sign-extended 12-bit immediate, otherwise set rd to 0 (signed)`                     |
-| `sltiu`              | `Set rd to 1 if rs1 is less than the sign-extended 12-bit immediate, otherwise set rd to 0 (unsigned)`                   |
-| `xori`               | `Set rd to the bitwise xor of rs1 with the sign-extended 12-bit immediate`                                               |
-| `ori`                | `Set rd to the bitwise or of rs1 with the sign-extended 12-bit immediate`                                                |
-| `andi`               | `Set rd to the bitwise and of rs1 with the sign-extended 12-bit immediate`                                               |
-| `slli`               | `Shift rs1 left by the 5 or 6 (RV32/64) bit (RV64) immediate and place the result into rd`                               |
-| `srli`               | `Shift rs1 right by the 5 or 6 (RV32/64) bit immediate and place the result into rd`                                     |
-| `srai`               | `Shift rs1 right by the 5 or 6 (RV32/64) bit immediate and place the result into rd while retaining the sign`            |
-| `add`                | `Add rs2 to rs1 and place the result into rd`                                                                            |
-| `sub`                | `Subtract rs2 from rs1 and place the result into rd`                                                                     |
-| `sll`                | `Shift rs1 left by the by the lower 5 or 6 (RV32/64) bits in rs2 and place the result into rd`                           |
-| `slt`                | `Set rd to 1 if rs1 is less than rs2, otherwise set rd to 0 (signed)`                                                    |
-| `sltu`               | `Set rd to 1 if rs1 is less than rs2, otherwise set rd to 0 (unsigned)`                                                  |
-| `xor`                | `Set rd to the bitwise xor of rs1 and rs2`                                                                               |
-| `srl`                | `Shift rs1 right by the by the lower 5 or 6 (RV32/64) bits in rs2 and place the result into rd`                          |
-| `sra`                | `Shift rs1 right by the by the lower 5 or 6 (RV32/64) bits in rs2 and place the result into rd while retaining the sign` |
-| `or`                 | `Set rd to the bitwise or of rs1 and rs2`                                                                                |
-| `and`                | `Set rd to the bitwise and of rs1 and rs2`                                                                               |
-| `fence`              | `Order device I/O and memory accesses viewed by other threads and devices`                                               |
-| `fence.i`            | `Synchronize the instruction and data streams`                                                                           |
+| **Extension** | **Name**     | **Variable-Fields**                  | **Description**                                                                                                                                            |
+|:--------------|:-------------|:-------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv_c`        | `c_add`      | `rd_rs1_n0, c_rs2_n0`                | `Add x[c_rs2_n0] to x[rd_rs1_n0] and write back the result`                                                                                                |
+| `rv_c`        | `c_addi`     | `rd_rs1_n0, c_nzimm6lo, c_nzimm6hi`  | `Add the signed displacement encoded by c_nzimm6hi and c_nzimm6lo to x[rd_rs1_n0] and write back the result`                                               |
+| `rv_c`        | `c_addi16sp` | `c_nzimm10hi, c_nzimm10lo`           | `Add the signed displacement encoded by c_nzimm10hi and c_nzimm10lo to SP and write back the result.`                                                      |
+| `rv_c`        | `c_addi4spn` | `rd_p, c_nzuimm10`                   | `Add the unsigned displacement encoded by c_nzuimm10 to SP and place the result into x[8 + rd_p]`                                                          |
+| `rv_c`        | `c_and`      | `rd_rs1_p, rs2_p`                    | `Set x[8 + rd_rs1_p] to the bitwise AND of x[8 + rd_rs1_p] and x[8 + rs2_p]`                                                                               |
+| `rv_c`        | `c_andi`     | `rd_rs1_p, c_imm6hi, c_imm6lo`       | `Set x[8 + rd_rs1_p] to its bitwise AND with the sign-extended displacement encoded by c_imm6hi and c_imm6lo, which may be zero`                           |
+| `rv_c`        | `c_beqz`     | `rs1_p, c_bimm9lo, c_bimm9hi`        | `Branch to the PC plus the signed displacement encoded by c_bimm9hi and c_bimm9lo if x[8 + rs1_p] is zero`                                                 |
+| `rv_c`        | `c_bnez`     | `rs1_p, c_bimm9lo, c_bimm9hi`        | `Branch to the PC plus the signed displacement encoded by c_bimm9hi and c_bimm9lo if x[8 + rs1_p] is nonzero`                                              |
+| `rv_c`        | `c_ebreak`   | `none`                               | `Raise CAUSE_BREAKPOINT or enter Debug Mode when enabled.`                                                                                                 |
+| `rv_c`        | `c_j`        | `c_imm12`                            | `Jump to the PC plus the signed displacement encoded by c_imm12`                                                                                           |
+| `rv_c`        | `c_jalr`     | `c_rs1_n0`                           | `Jump to the address in c_rs1_n0 with bit 0 cleared and write PC + 2 to RA`                                                                                |
+| `rv_c`        | `c_jr`       | `rs1_n0`                             | `Jump to the address in rs1_n0 with bit 0 cleared`                                                                                                         |
+| `rv_c`        | `c_li`       | `rd_n0, c_imm6lo, c_imm6hi`          | `Load the signed displacement encoded by c_imm6hi and c_imm6lo into x[rd_n0]`                                                                              |
+| `rv_c`        | `c_lui`      | `rd_n2, c_nzimm18hi, c_nzimm18lo`    | `Load the signed upper displacement encoded by c_nzimm18hi and c_nzimm18lo into x[rd_n2] with its low 12 bits cleared`                                     |
+| `rv_c`        | `c_lw`       | `rd_p, rs1_p, c_uimm7lo, c_uimm7hi`  | `Load a 32-bit value from x[8 + rs1_p] + the value encoded by c_uimm7hi and c_uimm7lo and sign-extend the result into x[8 + rd_p]`                         |
+| `rv_c`        | `c_lwsp`     | `rd_n0, c_uimm8sphi, c_uimm8splo`    | `Load a 32-bit value from SP + the value encoded by c_uimm8sphi and c_uimm8splo and sign-extend the result into x[rd_n0]`                                  |
+| `rv_c`        | `c_mv`       | `rd_n0, c_rs2_n0`                    | `Copy x[c_rs2_n0] into x[rd_n0]`                                                                                                                           |
+| `rv_c`        | `c_nop`      | `c_nzimm6hi, c_nzimm6lo`             | `Advance the PC by 2 bytes. The c_nzimm6hi and c_nzimm6lo fields encode the immediate, with nonzero values designated as HINTs.`                           |
+| `rv_c`        | `c_or`       | `rd_rs1_p, rs2_p`                    | `Set x[8 + rd_rs1_p] to the bitwise OR of x[8 + rd_rs1_p] and x[8 + rs2_p]`                                                                                |
+| `rv_c`        | `c_sub`      | `rd_rs1_p, rs2_p`                    | `Subtract x[8 + rs2_p] from x[8 + rd_rs1_p] and write back the result`                                                                                     |
+| `rv_c`        | `c_sw`       | `rs1_p, rs2_p, c_uimm7lo, c_uimm7hi` | `Store the low 32 bits of x[8 + rs2_p] to x[8 + rs1_p] + the value encoded by c_uimm7hi and c_uimm7lo`                                                     |
+| `rv_c`        | `c_swsp`     | `c_rs2, c_uimm8sp_s`                 | `Store the low 32 bits of x[c_rs2] to SP + the value encoded by c_uimm8sp_s`                                                                               |
+| `rv_c`        | `c_xor`      | `rd_rs1_p, rs2_p`                    | `Set x[8 + rd_rs1_p] to the bitwise XOR of x[8 + rd_rs1_p] and x[8 + rs2_p]`                                                                               |
+| `rv_c_d`      | `c_fld`      | `rd_p, rs1_p, c_uimm8lo, c_uimm8hi`  | `Load a 64-bit floating-point value from x[8 + rs1_p] + the value encoded by c_uimm8hi and c_uimm8lo into f[8 + rd_p], NaN-boxing it when FLEN exceeds 64` |
+| `rv_c_d`      | `c_fldsp`    | `rd, c_uimm9sphi, c_uimm9splo`       | `Load a 64-bit floating-point value from SP + the value encoded by c_uimm9sphi and c_uimm9splo into f[rd], NaN-boxing it when FLEN exceeds 64`             |
+| `rv_c_d`      | `c_fsd`      | `rs1_p, rs2_p, c_uimm8lo, c_uimm8hi` | `Store the low 64 bits of f[8 + rs2_p] to x[8 + rs1_p] + the value encoded by c_uimm8hi and c_uimm8lo`                                                     |
+| `rv_c_d`      | `c_fsdsp`    | `c_rs2, c_uimm9sp_s`                 | `Store the low 64 bits of f[c_rs2] to SP + the value encoded by c_uimm9sp_s`                                                                               |
 
-:RV32I - "RV32I Base Integer Instruction Set"
+:RVC - Standard Extension for Compressed Instructions
 
-| **Instruction Name** | **Instruction Description**                                                                                                      |
-|:---------------------|:---------------------------------------------------------------------------------------------------------------------------------|
-| `ld`                 | `Load 64-bit value from addr in rs1 plus 12-bit signed immediate and place sign-extended result into rd`                         |
-| `sd`                 | `Store 64-bit value from the low bits of rs2 to addr in rs1 plus the 12-bit signed immediate`                                    |
-| `addiw`              | `Add sign-extended 12-bit immediate to register rs1 and place 32-bit sign extended result in rs2 zeroing upper bits`             |
-| `slliw`              | `Shift 32-bit value in rs1 left by the 5 bit immediate and place the result into rd while zeroing upper bits`                    |
-| `srliw`              | `Shift 32-bit value in rs1 right by the 5 bit immediate and place the result into rd while zeroing upper bits`                   |
-| `sraiw`              | `Shift 32-bit value in rs1 right by the 5 bit immediate and place the result into rd and retaining the sign`                     |
-| `addw`               | `Add 32-bit value in rs2 to rs1 and place the 32-bit result into rd`                                                             |
-| `subw`               | `Subtract 32-bit value in rs2 from rs1 and place the 32-bit result into rd`                                                      |
-| `sllw`               | `Shift 32-bit value in rs1 left by the by the lower 5 bits in rs2 and place the 32-bit result into rd`                           |
-| `srlw`               | `Shift 32-bit value in rs1 right by the by the lower 5 bits in rs2 and place the 32-bit result into rd`                          |
-| `sraw`               | `Shift 32-bit value in rs1 right by the by the lower 5 bits in rs2 and place the 32-bit result into rd while retaining the sign` |
+| **Extension** | **Name**  | **Variable-Fields**                  | **Description**                                                                                                                                            |
+|:--------------|:----------|:-------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv32_c`      | `c_jal`   | `c_imm12`                            | `Jump to the PC plus the value encoded by c_imm12 and save PC+2 into RA`                                                                                   |
+| `rv32_c_f`    | `c_flw`   | `rd_p, rs1_p, c_uimm7lo, c_uimm7hi`  | `Load a 32-bit floating-point value from x[8 + rs1_p] + the value encoded by c_uimm7hi and c_uimm7lo into f[8 + rd_p], NaN-boxing it when FLEN exceeds 32` |
+| `rv32_c_f`    | `c_flwsp` | `rd, c_uimm8sphi, c_uimm8splo`       | `Load a 32-bit floating-point value from SP + the value encoded by c_uimm8sphi and c_uimm8splo into f[rd], NaN-boxing it when FLEN exceeds 32`             |
+| `rv32_c_f`    | `c_fsw`   | `rs1_p, rs2_p, c_uimm7lo, c_uimm7hi` | `Store the low 32 bits of f[8 + rs2_p] to x[8 + rs1_p] + the value encoded by c_uimm7hi and c_uimm7lo`                                                     |
+| `rv32_c_f`    | `c_fswsp` | `c_rs2, c_uimm8sp_s`                 | `Store the low 32 bits of f[c_rs2] to SP + the value encoded by c_uimm8sp_s`                                                                               |
 
-:RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
+:RV32C - Standard Extension for Compressed Instructions (32 bit)
 
-| **Instruction Name** | **Instruction Description**                                                         |
-|:---------------------|:------------------------------------------------------------------------------------|
-| `mul`                | `Multiply rs1 by rs2 and place the result in rd`                                    |
-| `mulh`               | `Multiply signed rs1 by signed rs2 and place the high bits of the result in rd`     |
-| `mulhsu`             | `Multiply signed rs1 by unsigned rs2 and place the high bits of the result in rd`   |
-| `mulhu`              | `Multiply unsigned rs1 by unsigned rs2 and place the high bits of the result in rd` |
-| `div`                | `Divide rs1 (dividend) by rs2 (divisor) and place the quotient in rd (signed)`      |
-| `divu`               | `Divide rs1 (dividend) by rs2 (divisor) and place the quotient in rd (unsigned)`    |
-| `rem`                | `Divide rs1 (dividend) by rs2 (divisor) and place the remainder in rd (signed)`     |
-| `remu`               | `Divide rs1 (dividend) by rs2 (divisor) and place the remainder in rd (unsigned)`   |
+| **Extension** | **Name**  | **Variable-Fields**                   | **Description**                                                                                                                                     |
+|:--------------|:----------|:--------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv64_c`      | `c_addiw` | `rd_rs1_n0, c_imm6lo, c_imm6hi`       | `Add the signed displacement encoded by c_imm6hi and c_imm6lo to x[rd_rs1_n0] and sign-extend the low 32 bits of the result back into x[rd_rs1_n0]` |
+| `rv64_c`      | `c_addw`  | `rd_rs1_p, rs2_p`                     | `Add the low 32 bits of x[8 + rs2_p] to the low 32 bits of x[8 + rd_rs1_p] and sign-extend the 32-bit result back into x[8 + rd_rs1_p]`             |
+| `rv64_c`      | `c_ld`    | `rd_p, rs1_p, c_uimm8lo, c_uimm8hi`   | `Load a 64-bit value from x[8 + rs1_p] + the value encoded by c_uimm8hi and c_uimm8lo and sign-extend the result into x[8 + rd_p]`                  |
+| `rv64_c`      | `c_ldsp`  | `rd_n0, c_uimm9sphi, c_uimm9splo`     | `Load a 64-bit value from SP + the value encoded by c_uimm9sphi and c_uimm9splo and sign-extend the result into x[rd_n0]`                           |
+| `rv64_c`      | `c_sd`    | `rs1_p, rs2_p, c_uimm8hi, c_uimm8lo`  | `Store the low 64 bits of x[8 + rs2_p] to x[8 + rs1_p] + the value encoded by c_uimm8hi and c_uimm8lo`                                              |
+| `rv64_c`      | `c_sdsp`  | `c_rs2, c_uimm9sp_s`                  | `Store the low 64 bits of x[c_rs2] to SP + the value encoded by c_uimm9sp_s`                                                                        |
+| `rv64_c`      | `c_slli`  | `rd_rs1_n0, c_nzuimm6hi, c_nzuimm6lo` | `Shift x[rd_rs1_n0] left with zero fill by the value encoded by c_nzuimm6hi and c_nzuimm6lo and write back the result`                              |
+| `rv64_c`      | `c_srai`  | `rd_rs1_p, c_nzuimm6lo, c_nzuimm6hi`  | `Shift x[8 + rd_rs1_p] right with sign fill by the value encoded by c_nzuimm6hi and c_nzuimm6lo and write back the result`                          |
+| `rv64_c`      | `c_srli`  | `rd_rs1_p, c_nzuimm6lo, c_nzuimm6hi`  | `Shift x[8 + rd_rs1_p] right with zero fill by the value encoded by c_nzuimm6hi and c_nzuimm6lo and write back the result`                          |
+| `rv64_c`      | `c_subw`  | `rd_rs1_p, rs2_p`                     | `Subtract the low 32 bits of x[8 + rs2_p] from the low 32 bits of x[8 + rd_rs1_p] and sign-extend the 32-bit result back into x[8 + rd_rs1_p]`      |
 
-:RV32M - "RV32M Standard Extension for Integer Multiply and Divide"
+:RV64C - Standard Extension for Compressed Instructions (64 bit)
 
-| **Instruction Name** | **Instruction Description**                                                                                         |
-|:---------------------|:--------------------------------------------------------------------------------------------------------------------|
-| `mulw`               | `Multiply with lower 32-bits of rs1 by the lower 32-bits of rs2 and place the result in rd`                         |
-| `divw`               | `Divide lower 32-bits of rs1 (dividend) by lower 32-bits of rs2 (divisor) and place the quotient in rd (signed)`    |
-| `divuw`              | `Divide lower 32-bits of rs1 (dividend) by lower 32-bits of rs2 (divisor) and place the quotient in rd (unsigned)`  |
-| `remw`               | `Divide lower 32-bits of rs1 (dividend) by lower 32-bits of rs2 (divisor) and place the remainder in rd (signed)`   |
-| `remuw`              | `Divide lower 32-bits of rs1 (dividend) by lower 32-bits of rs2 (divisor) and place the remainder in rd (unsigned)` |
+| **Extension** | **Name** | **Variable-Fields**   | **Description**                                         |
+|:--------------|:---------|:----------------------|:--------------------------------------------------------|
+| `rv128_c`     | `c_lq`   | `crdq, crs1q, cimmq`  | `Load the 128-bit value at crs1q plus cimmq into crdq.` |
+| `rv128_c`     | `c_lqsp` | `crd, cimmlqsp`       | `Load the 128-bit value at SP plus cimmlqsp into crd.`  |
+| `rv128_c`     | `c_sq`   | `crs1q, crs2q, cimmq` | `Store the 128-bit value in crs2q at crs1q plus cimmq.` |
+| `rv128_c`     | `c_sqsp` | `crs2, cimmsqsp`      | `Store the 128-bit value in crs2 at SP plus cimmsqsp.`  |
 
-:RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
+:RV128C - Standard Extension for Compressed Instructions (128 bit)
 
-| **Instruction Name** | **Instruction Description**                                                                                            |
-|:---------------------|:-----------------------------------------------------------------------------------------------------------------------|
-| `lr.w`               | `Load word from address in rs1, place the sign-extended result in rd and register a reservation on the memory word`    |
-| `sc.w`               | `Write word in rs1 to the address in rs2 if a valid reservation exists, write 0 on success or 1 on failure to rd`      |
-| `amoswap.w`          | `Load word from address in rs1 into rd, swap rd and rs2, write the result to the address in rs1`                       |
-| `amoadd.w`           | `Load word from address in rs1 into rd, add rd and rs2, write the result to the address in rs1`                        |
-| `amoxor.w`           | `Load word from address in rs1 into rd, xor rd and rs2, write the result to the address in rs1`                        |
-| `amoor.w`            | `Load word from address in rs1 into rd, or rd and rs2, write the result to the address in rs1`                         |
-| `amoand.w`           | `Load word from address in rs1 into rd, and rd and rs2, write the result to the address in rs1`                        |
-| `amomin.w`           | `Load word from address in rs1 into rd, find minimum of rd and rs2, write the result to the address in rs1 (signed)`   |
-| `amomax.w`           | `Load word from address in rs1 into rd, find maximum of rd and rs2, write the result to the address in rs1 (signed)`   |
-| `amominu.w`          | `Load word from address in rs1 into rd, find minimum of rd and rs2, write the result to the address in rs1 (unsigned)` |
-| `amomaxu.w`          | `Load word from address in rs1 into rd, find maximum of rd and rs2, write the result to the address in rs1 (unsigned)` |
+| **Extension** | **Name**     | **Variable-Fields**     | **Description**                                                                                                                                        |
+|:--------------|:-------------|:------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv_zcb`      | `c_lbu`      | `rd_p, rs1_p, c_uimm2`  | `Load 8 bits from rs1_p plus the decoded unsigned byte offset and zero-extend into rd_p. c_uimm2 supplies the encoded immediate.`                      |
+| `rv_zcb`      | `c_lh`       | `rd_p, rs1_p, c_uimm1`  | `Load 16 bits from rs1_p plus the decoded unsigned byte offset and sign-extend into rd_p. c_uimm1 supplies the encoded immediate.`                     |
+| `rv_zcb`      | `c_lhu`      | `rd_p, rs1_p, c_uimm1`  | `Load 16 bits from rs1_p plus the decoded unsigned byte offset and zero-extend into rd_p. c_uimm1 supplies the encoded immediate.`                     |
+| `rv_zcb`      | `c_mul`      | `rd_rs1_p, rs2_p`       | `Multiply rd_rs1_p by rs2_p and retain the low XLEN bits`                                                                                              |
+| `rv_zcb`      | `c_not`      | `rd_rs1_p`              | `Invert every bit of rd_rs1_p`                                                                                                                         |
+| `rv_zcb`      | `c_sb`       | `rs2_p, rs1_p, c_uimm2` | `Store the low 8 bits of rs2_p at rs1_p plus the decoded unsigned byte offset. c_uimm2 supplies the encoded immediate.`                                |
+| `rv_zcb`      | `c_sext_b`   | `rd_rs1_p`              | `Sign-extend the low 8 bits of rd_rs1_p to XLEN`                                                                                                       |
+| `rv_zcb`      | `c_sext_h`   | `rd_rs1_p`              | `Sign-extend the low 16 bits of rd_rs1_p to XLEN`                                                                                                      |
+| `rv_zcb`      | `c_sh`       | `rs2_p, rs1_p, c_uimm1` | `Store the low 16 bits of rs2_p at rs1_p plus the decoded unsigned byte offset. c_uimm1 supplies the encoded immediate.`                               |
+| `rv_zcb`      | `c_zext_b`   | `rd_rs1_p`              | `Zero-extend the low 8 bits of rd_rs1_p to XLEN`                                                                                                       |
+| `rv_zcb`      | `c_zext_h`   | `rd_rs1_p`              | `Zero-extend the low 16 bits of rd_rs1_p to XLEN`                                                                                                      |
+| `rv_zcmop`    | `c_mop_N`    | `c_mop_t`               | `Select the Zcmop minor encoding with c_mop_t and make no architectural state changes under Zcmop.`                                                    |
+| `rv_zcmp`     | `cm_mva01s`  | `c_sreg1, c_sreg2`      | `Copy the two selected saved registers into A0 and A1 atomically. The encoding supplies c_sreg1, c_sreg2.`                                             |
+| `rv_zcmp`     | `cm_mvsa01`  | `c_sreg1, c_sreg2`      | `Copy A0 and A1 into the two selected saved registers atomically. The encoding supplies c_sreg1, c_sreg2.`                                             |
+| `rv_zcmp`     | `cm_pop`     | `c_rlist, c_spimm`      | `Restore the selected registers and release the stack frame. The encoding supplies c_rlist, c_spimm.`                                                  |
+| `rv_zcmp`     | `cm_popret`  | `c_rlist, c_spimm`      | `Restore the selected registers and release the stack frame and return through RA. The encoding supplies c_rlist, c_spimm.`                            |
+| `rv_zcmp`     | `cm_popretz` | `c_rlist, c_spimm`      | `Restore the selected registers and release the stack frame and return through RA with A0 set to zero. The encoding supplies c_rlist, c_spimm.`        |
+| `rv_zcmp`     | `cm_push`    | `c_rlist, c_spimm`      | `Save the registers selected by c_rlist and allocate the stack frame. c_spimm supplies the encoded immediate.`                                         |
+| `rv_zcmt`     | `cm_jalt`    | `c_index`               | `Jump to the indexed JVT entry and save PC+2 in RA for indices 32 through 255. Indices below 32 encode CM.JT. c_index supplies the encoded immediate.` |
 
-:RV32A - "RV32A Standard Extension for Atomic Instructions"
+:RVZC - Standard Extension for Compressed Instructions
 
-| **Instruction Name** | **Instruction Description**                                                                                                   |
-|:---------------------|:------------------------------------------------------------------------------------------------------------------------------|
-| `lr.d`               | `Load double word from address in rs1, place the sign-extended result in rd and register a reservation on the memory word`    |
-| `sc.d`               | `Write double word in rs1 to the address in rs2 if a valid reservation exists, write 0 on success or 1 on failure to rd`      |
-| `amoswap.d`          | `Load double word from address in rs1 into rd, swap rd and rs2, write the result to the address in rs1`                       |
-| `amoadd.d`           | `Load double word from address in rs1 into rd, add rd and rs2, write the result to the address in rs1`                        |
-| `amoxor.d`           | `Load double word from address in rs1 into rd, xor rd and rs2, write the result to the address in rs1`                        |
-| `amoor.d`            | `Load double word from address in rs1 into rd, or rd and rs2, write the result to the address in rs1`                         |
-| `amoand.d`           | `Load double word from address in rs1 into rd, and rd and rs2, write the result to the address in rs1`                        |
-| `amomin.d`           | `Load double word from address in rs1 into rd, find minimum of rd and rs2, write the result to the address in rs1 (signed)`   |
-| `amomax.d`           | `Load double word from address in rs1 into rd, find maximum of rd and rs2, write the result to the address in rs1 (signed)`   |
-| `amominu.d`          | `Load double word from address in rs1 into rd, find minimum of rd and rs2, write the result to the address in rs1 (unsigned)` |
-| `amomaxu.d`          | `Load double word from address in rs1 into rd, find maximum of rd and rs2, write the result to the address in rs1 (unsigned)` |
+| **Extension** | **Name**   | **Variable-Fields** | **Description**                                   |
+|:--------------|:-----------|:--------------------|:--------------------------------------------------|
+| `rv64_zcb`    | `c_zext_w` | `rd_rs1_p`          | `Zero-extend the low 32 bits of rd_rs1_p to XLEN` |
 
-:RV64A - "RV64A Standard Extension for Atomic Instructions (+ RV32A)"
-
-| **Instruction Name** | **Instruction Description**                                                                                           |
-|:---------------------|:----------------------------------------------------------------------------------------------------------------------|
-| `scall`              | `System call is used to make a request to a higher privilege level`                                                   |
-| `sbreak`             | `Break to Debugger causes control to be transferred back to the debugging environment via a breakpoint exception`     |
-| `sret`               | `System Return returns to the supervisor mode privilege level after handling a trap`                                  |
-| `sfence.vm`          | `Supervisor memory-management fence synchronizes updates to in-memory memory-management data structures`              |
-| `wfi`                | `Wait for Interrupt indicates the hart can be stalled until an interrupt needs servicing`                             |
-| `rdcycle`            | `Read cycle counter status register`                                                                                  |
-| `rdtime`             | `Read timer status register`                                                                                          |
-| `rdinstret`          | `Read instructions retired status register`                                                                           |
-| `rdcycleh`           | `Read cycle counter status register (upper 32-bits on RV32)`                                                          |
-| `rdtimeh`            | `Read timer status register (upper 32-bits on RV32)`                                                                  |
-| `rdinstreth`         | `Read instructions retired status register (upper 32-bits on RV32)`                                                   |
-| `csrrw`              | `CSR Atomic Read Write writes the value in rs1 to the CSR, and writes previous value to rd`                           |
-| `csrrs`              | `CSR Atomic Set Bit reads the CSR, sets CSR bits set in rs1, and writes previous value to rd`                         |
-| `csrrc`              | `CSR Atomic Clear Bit reads the CSR, clears CSR bits set in rs1, and writes previous value to rd`                     |
-| `csrrwi`             | `CSR Atomic Read Write Immediate writes the immediate value to the CSR, and writes previous value to rd`              |
-| `csrrsi`             | `CSR Atomic Set Bit Immediate reads the CSR, sets CSR bits set in the immediate, and writes previous value to rd`     |
-| `csrrci`             | `CSR Atomic Clear Bit Immediate reads the CSR, clears CSR bits set in the immediate, and writes previous value to rd` |
-
-:RV32S - "RV32S Standard Extension for Supervisor-level Instructions"
-
-| **Instruction Name** | **Instruction Description**                                                                                                 |
-|:---------------------|:----------------------------------------------------------------------------------------------------------------------------|
-| `flw`                | `Loads a single-precision foating-point value from memory into foating-point register frd`                                  |
-| `fsw`                | `Stores a single-precision foating-point value from foating-point register frs2 to memory`                                  |
-| `fmadd.s`            | `Multiply the single-precision values in frs1 and frs2, then add rs3 and write the result to frd`                           |
-| `fmsub.s`            | `Multiply the single-precision values in frs1 and frs2, then subtract rs3 and write the result to frd`                      |
-| `fnmsub.s`           | `Multiply the single-precision value in frs1 with the negated value in frs2, then add rs3 and write the result to frd`      |
-| `fnmadd.s`           | `Multiply the single-precision value in frs1 with the negated value in frs2, then subtract rs3 and write the result to frd` |
-| `fadd.s`             | `Add the single-precision values in frs1 and frs2, then write the result to frd`                                            |
-| `fsub.s`             | `Subtract the single-precision values in frs1 from frs2, then write the result to frd`                                      |
-| `fmul.s`             | `Multiply the single-precision values in frs1 and frs2, then write the result to frd`                                       |
-| `fdiv.s`             | `Divide the single-precision value in frs1 into frs2, then write the result to frd`                                         |
-| `fsgnj.s`            | `Take the single-precision value from frs1 and inject the sign bit from frs2, then write the result to frd`                 |
-| `fsgnjn.s`           | `Take the single-precision value from frs1 and inject the negated sign bit from frs2, then write the result to frd`         |
-| `fsgnjx.s`           | `Take the single-precision value from frs1 and inject the xor of the sign bits frs1 and frs2, then write the result to frd` |
-| `fmin.s`             | `Take the smaller single-precision value from frs1 and frs2, then write the result to frd`                                  |
-| `fmax.s`             | `Take the larger single-precision value from frs1 and frs2, then write the result to frd`                                   |
-| `fsqrt.s`            | `Calculate the square root of the single-precision value in frs1, then write the result to frd`                             |
-| `fle.s`              | `Set rd to 1 if the single-precision value in frs1 is less than or equal to frs2, otherwise set rd to 0`                    |
-| `flt.s`              | `Set rd to 1 if the single-precision value in frs1 is less than frs2, otherwise set rd to 0`                                |
-| `feq.s`              | `Set rd to 1 if the single-precision value in frs1 is equal to frs2, otherwise set rd to 0`                                 |
-| `fcvt.w.s`           | `Convert the single-precision value in frs1 to a 32-bit signed integer, then write the result to rd`                        |
-| `fcvt.wu.s`          | `Convert the single-precision value in frs1 to a 32-bit unsigned integer, then write the result to rd`                      |
-| `fcvt.s.w`           | `Convert the 32-bit signed integer in rs1 to a single-precision value, then write the result to frd`                        |
-| `fcvt.s.wu`          | `Convert the 32-bit unsigned integer in rs1 to a single-precision value, then write the result to frd`                      |
-| `fclass.s`           | `Set rd to a 10-bit mask indicating the class of the single-precision value in frs1`                                        |
-
-:RV32F - "RV32F Standard Extension for Single-Precision Floating-Point"
-
-| **Instruction Name** | **Instruction Description**                                                                            |
-|:---------------------|:-------------------------------------------------------------------------------------------------------|
-| `fcvt.l.s`           | `Convert the single-precision value in frs1 to a 64-bit signed integer, then write the result to rd`   |
-| `fcvt.lu.s`          | `Convert the single-precision value in frs1 to a 64-bit unsigned integer, then write the result to rd` |
-| `fmv.x.s`            | `Write the sign extended single-precision value in frs1 into the integer register rd`                  |
-| `fcvt.s.l`           | `Convert the 64-bit signed integer in rs1 to a single-precision value, then write the result to frd`   |
-| `fcvt.s.lu`          | `Convert the 64-bit unsigned integer in rs1 to a single-precision value, then write the result to frd` |
-| `fmv.s.x`            | `Write the lower 32-bits of the integer register rs1 into the single-precision register frd`           |
-
-:RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
-
-| **Instruction Name** | **Instruction Description**                                                                                                 |
-|:---------------------|:----------------------------------------------------------------------------------------------------------------------------|
-| `fld`                | `Loads a double-precision foating-point value from memory into foating-point register frd`                                  |
-| `fsd`                | `Stores a double-precision foating-point value from foating-point register frs2 to memory`                                  |
-| `fmadd.d`            | `Multiply the double-precision values in frs1 and frs2, then add rs3 and write the result to frd`                           |
-| `fmsub.d`            | `Multiply the double-precision values in frs1 and frs2, then subtract rs3 and write the result to frd`                      |
-| `fnmsub.d`           | `Multiply the double-precision value in frs1 with the negated value in frs2, then add rs3 and write the result to frd`      |
-| `fnmadd.d`           | `Multiply the double-precision value in frs1 with the negated value in frs2, then subtract rs3 and write the result to frd` |
-| `fadd.d`             | `Add the double-precision values in frs1 and frs2, then write the result to frd`                                            |
-| `fsub.d`             | `Subtract the double-precision values in frs1 from frs2, then write the result to frd`                                      |
-| `fmul.d`             | `Multiply the double-precision values in frs1 and frs2, then write the result to frd`                                       |
-| `fdiv.d`             | `Divide the double-precision value in frs1 into frs2, then write the result to frd`                                         |
-| `fsgnj.d`            | `Take the double-precision value from frs1 and inject the sign bit from frs2, then write the result to frd`                 |
-| `fsgnjn.d`           | `Take the double-precision value from frs1 and inject the negated sign bit from frs2, then write the result to frd`         |
-| `fsgnjx.d`           | `Take the double-precision value from frs1 and inject the xor of the sign bits frs1 and frs2, then write the result to frd` |
-| `fmin.s`             | `Take the smaller double-precision value from frs1 and frs2, then write the result to frd`                                  |
-| `fmax.s`             | `Take the larger double-precision value from frs1 and frs2, then write the result to frd`                                   |
-| `fcvt.s.d`           | `Convert the double-precision value in frs1 to single-precision, then write the result to frd`                              |
-| `fcvt.d.s`           | `Convert the single-precision value in frs1 to double-precision, then write the result to frd`                              |
-| `fsqrt.d`            | `Calculate the square root of the double-precision value in frs1, then write the result to frd`                             |
-| `fle.d`              | `Set rd to 1 if frs1 is less than or equal to frs2, otherwise set rd to 0`                                                  |
-| `flt.d`              | `Set rd to 1 if frs1 is less than frs2, otherwise set rd to 0`                                                              |
-| `feq.d`              | `Set rd to 1 if frs1 is equal to frs2, otherwise set rd to 0`                                                               |
-| `fcvt.w.d`           | `Convert the double-precision value in frs1 to a 32-bit signed integer, then write the result to rd`                        |
-| `fcvt.wu.d`          | `Convert the double-precision value in frs1 to a 32-bit unsigned integer, then write the result to rd`                      |
-| `fcvt.d.w`           | `Convert the 64-bit signed integer in rs1 to a double-precision value, then write the result to frd`                        |
-| `fcvt.d.wu`          | `Convert the 64-bit unsigned integer in rs1 to a double-precision value, then write the result to frd`                      |
-| `fmv.x.d`            | `Write the sign extended double-precision value in frs1 into integer register rd`                                           |
-| `fclass.d`           | `Set rd to a 10-bit mask indicating the class of the double-precision value in frs1`                                        |
-| `fmv.d.x`            | `Write the 64-bit integer register rs1 into the double-precision register frd`                                              |
-
-:RV32D - "RV32D Standard Extension for Double-Precision Floating-Point"
-
-| **Instruction Name** | **Instruction Description**                                                                            |
-|:---------------------|:-------------------------------------------------------------------------------------------------------|
-| `fcvt.l.d`           | `Convert the double-precision value in frs1 to a 64-bit signed integer, then write the result to rd`   |
-| `fcvt.lu.d`          | `Convert the double-precision value in frs1 to a 64-bit unsigned integer, then write the result to rd` |
-| `fcvt.d.l`           | `Convert the 64-bit signed integer in rs1 to a double-precision value, then write the result to frd`   |
-| `fcvt.d.lu`          | `Convert the 64-bit unsigned integer in rs1 to a double-precision value, then write the result to frd` |
-
-:RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32D)"
-
-| **Instruction Name** | **Instruction Description**                                                               |
-|:---------------------|:------------------------------------------------------------------------------------------|
-| `frcsr`              | `Read FP Control and Status Register`                                                     |
-| `frrm`               | `Read FP Rounding Mode (Bits 7:5 of fcsr Control and Status Register)`                    |
-| `frflags`            | `Read FP Accrued Exception Flags (Bits 4:0 of fcsr Control and Status Register)`          |
-| `fscsr`              | `Read FP Control and Status Register`                                                     |
-| `fsrm`               | `Set FP Rounding Mode (Bits 7:5 of fcsr Control and Status Register)`                     |
-| `fsflags`            | `Set FP Accrued Exception Flags (Bits 4:0 of fcsr Control and Status Register)`           |
-| `fsrmi`              | `Set FP Rounding Mode Immediate (Bits 7:5 of fcsr Control and Status Register)`           |
-| `fsflagsi`           | `Set FP Accrued Exception Flags Immediate (Bits 4:0 of fcsr Control and Status Register)` |
-
-:RV32FD - "RV32F and RV32D Common Floating-Point Instructions"
-
-| **Instruction Name** | **Instruction Description**                                                                                                    |
-|:---------------------|:-------------------------------------------------------------------------------------------------------------------------------|
-| `flq`                | `Loads a quadruple-precision foating-point value from memory into foating-point register frd`                                  |
-| `fsq`                | `Stores a quadruple-precision foating-point value from foating-point register frs2 to memory`                                  |
-| `fmadd.q`            | `Multiply the quadruple-precision values in frs1 and frs2, then add rs3 and write the result to frd`                           |
-| `fmsub.q`            | `Multiply the quadruple-precision values in frs1 and frs2, then subtract rs3 and write the result to frd`                      |
-| `fnmsub.q`           | `Multiply the quadruple-precision value in frs1 with the negated value in frs2, then add rs3 and write the result to frd`      |
-| `fnmadd.q`           | `Multiply the quadruple-precision value in frs1 with the negated value in frs2, then subtract rs3 and write the result to frd` |
-| `fadd.q`             | `Add the quadruple-precision values in frs1 and frs2, then write the result to frd`                                            |
-| `fsub.q`             | `Subtract the quadruple-precision values in frs1 from frs2, then write the result to frd`                                      |
-| `fmul.q`             | `Multiply the quadruple-precision values in frs1 and frs2, then write the result to frd`                                       |
-| `fdiv.q`             | `Divide the quadruple-precision value in frs1 into frs2, then write the result to frd`                                         |
-| `fsgnj.q`            | `Take the quadruple-precision value from frs1 and inject the sign bit from frs2, then write the result to frd`                 |
-| `fsgnjn.q`           | `Take the quadruple-precision value from frs1 and inject the negated sign bit from frs2, then write the result to frd`         |
-| `fsgnjx.q`           | `Take the quadruple-precision value from frs1 and inject the xor of the sign bits frs1 and frs2, then write the result to frd` |
-| `fmin.s`             | `Take the smaller quadruple-precision value from frs1 and frs2, then write the result to frd`                                  |
-| `fmax.s`             | `Take the larger quadruple-precision value from frs1 and frs2, then write the result to frd`                                   |
-| `fcvt.s.q`           | `Convert the quadruple-precision value in frs1 to single-precision, then write the result to frd`                              |
-| `fcvt.q.s`           | `Convert the single-precision value in frs1 to quadruple-precision, then write the result to frd`                              |
-| `fcvt.d.q`           | `Convert the quadruple-precision value in frs1 to double-precision, then write the result to frd`                              |
-| `fcvt.q.d`           | `Convert the double-precision value in frs1 to quadruple-precision, then write the result to frd`                              |
-| `fsqrt.q`            | `Calculate the square root of the quadruple-precision value in frs1, then write the result to frd`                             |
-| `fle.q`              | `Set rd to 1 if frs1 is less than or equal to frs2, otherwise set rd to 0`                                                     |
-| `flt.q`              | `Set rd to 1 if frs1 is less than frs2, otherwise set rd to 0`                                                                 |
-| `feq.q`              | `Set rd to 1 if frs1 is equal to frs2, otherwise set rd to 0`                                                                  |
-| `fcvt.w.q`           | `Convert the quadruple-precision value in frs1 to a 32-bit signed integer, then write the result to rd`                        |
-| `fcvt.wu.q`          | `Convert the quadruple-precision value in frs1 to a 32-bit unsigned integer, then write the result to rd`                      |
-| `fcvt.q.w`           | `Convert the 64-bit signed integer in rs1 to a quadruple-precision value, then write the result to frd`                        |
-| `fcvt.q.wu`          | `Convert the 64-bit unsigned integer in rs1 to a quadruple-precision value, then write the result to frd`                      |
-| `fclass.q`           | `Set rd to a 10-bit mask indicating the class of the quadruple-precision value in frs1`                                        |
-
-:RV32Q - "RV32Q Standard Extension for Quadruple-Precision Floating-Point"
-
-| **Instruction Name** | **Instruction Description**                                                                               |
-|:---------------------|:----------------------------------------------------------------------------------------------------------|
-| `fcvt.l.q`           | `Convert the quadruple-precision value in frs1 to a 64-bit signed integer, then write the result to rd`   |
-| `fcvt.lu.q`          | `Convert the quadruple-precision value in frs1 to a 64-bit unsigned integer, then write the result to rd` |
-| `fcvt.q.l`           | `Convert the 64-bit signed integer in rs1 to a quadruple-precision value, then write the result to frd`   |
-| `fcvt.q.lu`          | `Convert the 64-bit unsigned integer in rs1 to a quadruple-precision value, then write the result to frd` |
-
-:RV64Q - "RV64Q Standard Extension for Quadruple-Precision Floating-Point (+ RV32Q)"
-
-| **Instruction Name** | **Instruction Description**                                                          |
-|:---------------------|:-------------------------------------------------------------------------------------|
-| `fmv.x.q`            | `Write the sign extended quadruple-precision value in frs1 into integer register rd` |
-| `fmv.q.x`            | `Write the 64-bit integer register rs1 into the quadruple-precision register frd`    |
-
-:RV128Q - "RV128Q Standard Extension for Quadruple-Precision Floating-Point (+ RV64Q)"
-
-| **Instruction Name** | **Instruction Description**          |
-|:---------------------|:-------------------------------------|
-| `nop`                | `No operation`                       |
-| `#li`                | `Load immediate`                     |
-| `mv`                 | `Copy register`                      |
-| `not`                | `One's complement`                   |
-| `neg`                | `Two's complement`                   |
-| `negw`               | `Two's complement Word`              |
-| `sext.w`             | `Sign extend Word`                   |
-| `seqz`               | `Set if = zero`                      |
-| `snez`               | `Set if != zero`                     |
-| `sltz`               | `Set if < zero`                      |
-| `sgtz`               | `Set if > zero`                      |
-| `fmv.s`              | `Single-precision move`              |
-| `fabs.s`             | `Single-precision absolute value`    |
-| `fneg.s`             | `Single-precision negate`            |
-| `fmv.d`              | `Double-precision move`              |
-| `fabs.d`             | `Double-precision absolute value`    |
-| `fneg.d`             | `Double-precision negate`            |
-| `fmv.q`              | `Quadruple-precision move`           |
-| `fabs.q`             | `Quadruple-precision absolute value` |
-| `fneg.q`             | `Quadruple-precision negate`         |
-| `beqz`               | `Branch if = zero`                   |
-| `bnez`               | `Branch if != zero`                  |
-| `blez`               | `Branch if <= zero`                  |
-| `bgez`               | `Branch if >= zero`                  |
-| `bltz`               | `Branch if < zero`                   |
-| `bgtz`               | `Branch if > zero`                   |
-| `j`                  | `Jump`                               |
-| `jr`                 | `Jump register`                      |
-| `ret`                | `Return from subroutine`             |
-
-:Pseudo-Instructions
+:RV64ZC - Standard Extension for Compressed Instructions (64 bit)

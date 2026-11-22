@@ -1,62 +1,131 @@
 ## INSTRUCTION DESCRIPTIONS
 
-| **Instruction Name** | **Instruction Description**                                                                                              |
-|:---------------------|:-------------------------------------------------------------------------------------------------------------------------|
-| `lui`                | `Set and sign extend the 20-bit immediate (shited 12 bits left) and zero the bottom 12 bits into rd`                     |
-| `auipc`              | `Place the PC plus the 20-bit signed immediate (shited 12 bits left) into rd (used before JALR)`                         |
-| `jal`                | `Jump to the PC plus 20-bit signed immediate while saving PC+4 into rd`                                                  |
-| `jalr`               | `Jump to rs1 plus the 12-bit signed immediate while saving PC+4 into rd`                                                 |
-| `beq`                | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 == rs2`                                       |
-| `bne`                | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 != rs2`                                       |
-| `blt`                | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 < rs2 (signed)`                               |
-| `bge`                | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 >= rs2 (signed)`                              |
-| `bltu`               | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 < rs2 (unsigned)`                             |
-| `bgeu`               | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 >= rs2 (unsigned)`                            |
-| `lb`                 | `Load 8-bit value from addr in rs1 plus the 12-bit signed immediate and place sign-extended result into rd`              |
-| `lh`                 | `Load 16-bit value from addr in rs1 plus the 12-bit signed immediate and place sign-extended result into rd`             |
-| `lw`                 | `Load 32-bit value from addr in rs1 plus the 12-bit signed immediate and place sign-extended result into rd`             |
-| `lbu`                | `Load 8-bit value from addr in rs1 plus the 12-bit signed immediate and place zero-extended result into rd`              |
-| `lhu`                | `Load 32-bit value from addr in rs1 plus the 12-bit signed immediate and place zero-extended result into rd`             |
-| `lwu`                | `Load 32-bit value from addr in rs1 plus the 12-bit signed immediate and place zero-extended result into rd`             |
-| `sb`                 | `Store 8-bit value from the low bits of rs2 to addr in rs1 plus the 12-bit signed immediate`                             |
-| `sh`                 | `Store 16-bit value from the low bits of rs2 to addr in rs1 plus the 12-bit signed immediate`                            |
-| `sw`                 | `Store 32-bit value from the low bits of rs2 to addr in rs1 plus the 12-bit signed immediate`                            |
-| `addi`               | `Add sign-extended 12-bit immediate to register rs1 and place the result in rd`                                          |
-| `slti`               | `Set rd to 1 if rs1 is less than the sign-extended 12-bit immediate, otherwise set rd to 0 (signed)`                     |
-| `sltiu`              | `Set rd to 1 if rs1 is less than the sign-extended 12-bit immediate, otherwise set rd to 0 (unsigned)`                   |
-| `xori`               | `Set rd to the bitwise xor of rs1 with the sign-extended 12-bit immediate`                                               |
-| `ori`                | `Set rd to the bitwise or of rs1 with the sign-extended 12-bit immediate`                                                |
-| `andi`               | `Set rd to the bitwise and of rs1 with the sign-extended 12-bit immediate`                                               |
-| `slli`               | `Shift rs1 left by the 5 or 6 (RV32/64) bit (RV64) immediate and place the result into rd`                               |
-| `srli`               | `Shift rs1 right by the 5 or 6 (RV32/64) bit immediate and place the result into rd`                                     |
-| `srai`               | `Shift rs1 right by the 5 or 6 (RV32/64) bit immediate and place the result into rd while retaining the sign`            |
-| `add`                | `Add rs2 to rs1 and place the result into rd`                                                                            |
-| `sub`                | `Subtract rs2 from rs1 and place the result into rd`                                                                     |
-| `sll`                | `Shift rs1 left by the by the lower 5 or 6 (RV32/64) bits in rs2 and place the result into rd`                           |
-| `slt`                | `Set rd to 1 if rs1 is less than rs2, otherwise set rd to 0 (signed)`                                                    |
-| `sltu`               | `Set rd to 1 if rs1 is less than rs2, otherwise set rd to 0 (unsigned)`                                                  |
-| `xor`                | `Set rd to the bitwise xor of rs1 and rs2`                                                                               |
-| `srl`                | `Shift rs1 right by the by the lower 5 or 6 (RV32/64) bits in rs2 and place the result into rd`                          |
-| `sra`                | `Shift rs1 right by the by the lower 5 or 6 (RV32/64) bits in rs2 and place the result into rd while retaining the sign` |
-| `or`                 | `Set rd to the bitwise or of rs1 and rs2`                                                                                |
-| `and`                | `Set rd to the bitwise and of rs1 and rs2`                                                                               |
-| `fence`              | `Order device I/O and memory accesses viewed by other threads and devices`                                               |
-| `fence.i`            | `Synchronize the instruction and data streams`                                                                           |
+| **Extension** | **Name** | **Variable-Fields**            | **Description**                                                                                                                                                                |
+|:--------------|:---------|:-------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv_i`        | `add`    | `rd, rs1, rs2`                 | `Add rs2 to rs1 and place the result into rd`                                                                                                                                  |
+| `rv_i`        | `addi`   | `rd, rs1, imm12`               | `Add sign-extended 12-bit immediate imm12 to register rs1 and place the result in rd`                                                                                          |
+| `rv_i`        | `and`    | `rd, rs1, rs2`                 | `Set rd to the bitwise and of rs1 and rs2`                                                                                                                                     |
+| `rv_i`        | `andi`   | `rd, rs1, imm12`               | `Set rd to the bitwise and of rs1 with the sign-extended 12-bit immediate imm12`                                                                                               |
+| `rv_i`        | `auipc`  | `rd, imm20`                    | `Form a signed offset from imm20 with the low 12 bits set to zero, add it to the PC, and place the result into rd`                                                             |
+| `rv_i`        | `beq`    | `bimm12hi, rs1, rs2, bimm12lo` | `Branch to the PC plus the signed displacement encoded by bimm12hi and bimm12lo if rs1 == rs2`                                                                                 |
+| `rv_i`        | `bge`    | `bimm12hi, rs1, rs2, bimm12lo` | `Branch to the PC plus the signed displacement encoded by bimm12hi and bimm12lo if rs1 >= rs2 (signed)`                                                                        |
+| `rv_i`        | `bgeu`   | `bimm12hi, rs1, rs2, bimm12lo` | `Branch to the PC plus the signed displacement encoded by bimm12hi and bimm12lo if rs1 >= rs2 (unsigned)`                                                                      |
+| `rv_i`        | `blt`    | `bimm12hi, rs1, rs2, bimm12lo` | `Branch to the PC plus the signed displacement encoded by bimm12hi and bimm12lo if rs1 < rs2 (signed)`                                                                         |
+| `rv_i`        | `bltu`   | `bimm12hi, rs1, rs2, bimm12lo` | `Branch to the PC plus the signed displacement encoded by bimm12hi and bimm12lo if rs1 < rs2 (unsigned)`                                                                       |
+| `rv_i`        | `bne`    | `bimm12hi, rs1, rs2, bimm12lo` | `Branch to the PC plus the signed displacement encoded by bimm12hi and bimm12lo if rs1 != rs2`                                                                                 |
+| `rv_i`        | `ebreak` | `none`                         | `Raise CAUSE_BREAKPOINT or enter Debug Mode when enabled.`                                                                                                                     |
+| `rv_i`        | `ecall`  | `none`                         | `Raise CAUSE_USER_ECALL, CAUSE_SUPERVISOR_ECALL, CAUSE_VIRTUAL_SUPERVISOR_ECALL or CAUSE_MACHINE_ECALL according to the current privilege and virtualization state.`           |
+| `rv_i`        | `fence`  | `fm, pred, succ, rs1, rd`      | `Order the predecessor accesses selected by pred before the successor accesses selected by succ according to fm. The base instruction ignores the reserved rs1 and rd fields.` |
+| `rv_i`        | `jal`    | `rd, jimm20`                   | `Jump to the PC plus the signed offset jimm20 and save PC+4 into rd`                                                                                                           |
+| `rv_i`        | `jalr`   | `rd, rs1, imm12`               | `Jump to rs1 plus the signed 12-bit offset imm12 with the low bit cleared and save PC+4 into rd`                                                                               |
+| `rv_i`        | `lb`     | `rd, rs1, imm12`               | `Load 8-bit value from addr in rs1 plus the signed 12-bit offset imm12 and place sign-extended result into rd`                                                                 |
+| `rv_i`        | `lbu`    | `rd, rs1, imm12`               | `Load 8-bit value from addr in rs1 plus the signed 12-bit offset imm12 and place zero-extended result into rd`                                                                 |
+| `rv_i`        | `lh`     | `rd, rs1, imm12`               | `Load 16-bit value from addr in rs1 plus the signed 12-bit offset imm12 and place sign-extended result into rd`                                                                |
+| `rv_i`        | `lhu`    | `rd, rs1, imm12`               | `Load 16-bit value from addr in rs1 plus the signed 12-bit offset imm12 and place zero-extended result into rd`                                                                |
+| `rv_i`        | `lui`    | `rd, imm20`                    | `Place imm20 in the upper 20 bits of a 32-bit value, clear its low 12 bits, and sign-extend the result into rd`                                                                |
+| `rv_i`        | `lw`     | `rd, rs1, imm12`               | `Load 32-bit value from addr in rs1 plus the signed 12-bit offset imm12 and place sign-extended result into rd`                                                                |
+| `rv_i`        | `or`     | `rd, rs1, rs2`                 | `Set rd to the bitwise or of rs1 and rs2`                                                                                                                                      |
+| `rv_i`        | `ori`    | `rd, rs1, imm12`               | `Set rd to the bitwise or of rs1 with the sign-extended 12-bit immediate imm12`                                                                                                |
+| `rv_i`        | `sb`     | `imm12hi, rs1, rs2, imm12lo`   | `Store 8-bit value from the low bits of rs2 to addr in rs1 plus the signed 12-bit displacement encoded by imm12hi and imm12lo`                                                 |
+| `rv_i`        | `sh`     | `imm12hi, rs1, rs2, imm12lo`   | `Store 16-bit value from the low bits of rs2 to addr in rs1 plus the signed 12-bit displacement encoded by imm12hi and imm12lo`                                                |
+| `rv_i`        | `sll`    | `rd, rs1, rs2`                 | `Shift rs1 left by the by the lower 5 or 6 (RV32/64) bits in rs2 and place the result into rd`                                                                                 |
+| `rv_i`        | `slt`    | `rd, rs1, rs2`                 | `Set rd to 1 if rs1 is less than rs2, otherwise set rd to 0 (signed)`                                                                                                          |
+| `rv_i`        | `slti`   | `rd, rs1, imm12`               | `Set rd to 1 if rs1 is less than the sign-extended 12-bit immediate imm12, otherwise set rd to 0 (signed)`                                                                     |
+| `rv_i`        | `sltiu`  | `rd, rs1, imm12`               | `Set rd to 1 if rs1 is less than the sign-extended 12-bit immediate imm12, otherwise set rd to 0 (unsigned)`                                                                   |
+| `rv_i`        | `sltu`   | `rd, rs1, rs2`                 | `Set rd to 1 if rs1 is less than rs2, otherwise set rd to 0 (unsigned)`                                                                                                        |
+| `rv_i`        | `sra`    | `rd, rs1, rs2`                 | `Shift rs1 right by the by the lower 5 or 6 (RV32/64) bits in rs2 and place the result into rd while retaining the sign`                                                       |
+| `rv_i`        | `srl`    | `rd, rs1, rs2`                 | `Shift rs1 right by the by the lower 5 or 6 (RV32/64) bits in rs2 and place the result into rd`                                                                                |
+| `rv_i`        | `sub`    | `rd, rs1, rs2`                 | `Subtract rs2 from rs1 and place the result into rd`                                                                                                                           |
+| `rv_i`        | `sw`     | `imm12hi, rs1, rs2, imm12lo`   | `Store 32-bit value from the low bits of rs2 to addr in rs1 plus the signed 12-bit displacement encoded by imm12hi and imm12lo`                                                |
+| `rv_i`        | `xor`    | `rd, rs1, rs2`                 | `Set rd to the bitwise xor of rs1 and rs2`                                                                                                                                     |
+| `rv_i`        | `xori`   | `rd, rs1, imm12`               | `Set rd to the bitwise xor of rs1 with the sign-extended 12-bit immediate imm12`                                                                                               |
 
-:RV32I - "RV32I Base Integer Instruction Set"
+:RVI - Base Integer Instruction Set
 
-| **Instruction Name** | **Instruction Description**                                                                                                      |
-|:---------------------|:---------------------------------------------------------------------------------------------------------------------------------|
-| `ld`                 | `Load 64-bit value from addr in rs1 plus 12-bit signed immediate and place sign-extended result into rd`                         |
-| `sd`                 | `Store 64-bit value from the low bits of rs2 to addr in rs1 plus the 12-bit signed immediate`                                    |
-| `addiw`              | `Add sign-extended 12-bit immediate to register rs1 and place 32-bit sign extended result in rs2 zeroing upper bits`             |
-| `slliw`              | `Shift 32-bit value in rs1 left by the 5 bit immediate and place the result into rd while zeroing upper bits`                    |
-| `srliw`              | `Shift 32-bit value in rs1 right by the 5 bit immediate and place the result into rd while zeroing upper bits`                   |
-| `sraiw`              | `Shift 32-bit value in rs1 right by the 5 bit immediate and place the result into rd and retaining the sign`                     |
-| `addw`               | `Add 32-bit value in rs2 to rs1 and place the 32-bit result into rd`                                                             |
-| `subw`               | `Subtract 32-bit value in rs2 from rs1 and place the 32-bit result into rd`                                                      |
-| `sllw`               | `Shift 32-bit value in rs1 left by the by the lower 5 bits in rs2 and place the 32-bit result into rd`                           |
-| `srlw`               | `Shift 32-bit value in rs1 right by the by the lower 5 bits in rs2 and place the 32-bit result into rd`                          |
-| `sraw`               | `Shift 32-bit value in rs1 right by the by the lower 5 bits in rs2 and place the 32-bit result into rd while retaining the sign` |
+| **Extension** | **Name** | **Variable-Fields**          | **Description**                                                                                                                  |
+|:--------------|:---------|:-----------------------------|:---------------------------------------------------------------------------------------------------------------------------------|
+| `rv64_i`      | `addiw`  | `rd, rs1, imm12`             | `Add the sign-extended 12-bit immediate imm12 to rs1 and sign-extend the low 32 bits of the result into rd`                      |
+| `rv64_i`      | `addw`   | `rd, rs1, rs2`               | `Add 32-bit value in rs2 to rs1 and place the 32-bit result into rd`                                                             |
+| `rv64_i`      | `ld`     | `rd, rs1, imm12`             | `Load 64-bit value from addr in rs1 plus signed 12-bit offset imm12 and place sign-extended result into rd`                      |
+| `rv64_i`      | `lwu`    | `rd, rs1, imm12`             | `Load 32-bit value from addr in rs1 plus the signed 12-bit offset imm12 and place zero-extended result into rd`                  |
+| `rv64_i`      | `sd`     | `imm12hi, rs1, rs2, imm12lo` | `Store 64-bit value from the low bits of rs2 to addr in rs1 plus the signed 12-bit displacement encoded by imm12hi and imm12lo`  |
+| `rv64_i`      | `slli`   | `rd, rs1, shamtd`            | `Shift rs1 left by the 6-bit immediate shamtd and place the result into rd`                                                      |
+| `rv64_i`      | `slliw`  | `rd, rs1, shamtw`            | `Shift the low 32 bits of rs1 left by shamtw and sign-extend the 32-bit result into rd`                                          |
+| `rv64_i`      | `sllw`   | `rd, rs1, rs2`               | `Shift 32-bit value in rs1 left by the by the lower 5 bits in rs2 and place the 32-bit result into rd`                           |
+| `rv64_i`      | `srai`   | `rd, rs1, shamtd`            | `Shift rs1 right by the 6-bit immediate shamtd with sign fill and place the result into rd`                                      |
+| `rv64_i`      | `sraiw`  | `rd, rs1, shamtw`            | `Shift the low 32 bits of rs1 right by shamtw with sign fill and sign-extend the 32-bit result into rd`                          |
+| `rv64_i`      | `sraw`   | `rd, rs1, rs2`               | `Shift 32-bit value in rs1 right by the by the lower 5 bits in rs2 and place the 32-bit result into rd while retaining the sign` |
+| `rv64_i`      | `srli`   | `rd, rs1, shamtd`            | `Shift rs1 right by the 6-bit immediate shamtd with zero fill and place the result into rd`                                      |
+| `rv64_i`      | `srliw`  | `rd, rs1, shamtw`            | `Shift the low 32 bits of rs1 right by shamtw with zero fill and sign-extend the 32-bit result into rd`                          |
+| `rv64_i`      | `srlw`   | `rd, rs1, rs2`               | `Shift 32-bit value in rs1 right by the by the lower 5 bits in rs2 and place the 32-bit result into rd`                          |
+| `rv64_i`      | `subw`   | `rd, rs1, rs2`               | `Subtract 32-bit value in rs2 from rs1 and place the 32-bit result into rd`                                                      |
 
-:RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
+:RV64I - Base Integer Instruction Set (64 bit)
+
+| **Extension** | **Name** | **Variable-Fields**          | **Description**                                                                                                             |
+|:--------------|:---------|:-----------------------------|:----------------------------------------------------------------------------------------------------------------------------|
+| `rv128_i`     | `addid`  | `rd, rs1, imm12`             | `Add the signed 12-bit immediate imm12 to the low 64 bits of rs1 and sign-extend the low 64 bits of the result into rd`     |
+| `rv128_i`     | `addd`   | `rd, rs1, rs2`               | `Add the low 64 bits of rs1 and rs2 and sign-extend the low 64 bits of the result into rd`                                  |
+| `rv128_i`     | `lq`     | `rd, rs1, imm12`             | `Load a 128-bit value from the address in rs1 plus the signed 12-bit offset imm12 and place the result into rd`             |
+| `rv128_i`     | `ldu`    | `rd, rs1, imm12`             | `Load a 64-bit value from the address in rs1 plus the signed 12-bit offset imm12 and zero-extend the result into rd`        |
+| `rv128_i`     | `sq`     | `imm12hi, rs1, rs2, imm12lo` | `Store the 128-bit value from rs2 to the address in rs1 plus the signed displacement encoded by imm12hi and imm12lo.`       |
+| `rv128_i`     | `slli`   | `rd, rs1, shamt7`            | `Shift rs1 left by the 7-bit immediate shamt7 and place the result into rd`                                                 |
+| `rv128_i`     | `sllid`  | `rd, rs1, shamt6`            | `Shift the low 64 bits of rs1 left by the 6-bit immediate shamt6 and sign-extend the 64-bit result into rd`                 |
+| `rv128_i`     | `slld`   | `rd, rs1, rs2`               | `Shift the low 64 bits of rs1 left by the low 6 bits of rs2 and sign-extend the 64-bit result into rd`                      |
+| `rv128_i`     | `srai`   | `rd, rs1, shamt7`            | `Shift rs1 right by the 7-bit immediate shamt7 with sign fill and place the result into rd`                                 |
+| `rv128_i`     | `sraid`  | `rd, rs1, shamt6`            | `Shift the low 64 bits of rs1 right by the 6-bit immediate shamt6 with sign fill and sign-extend the 64-bit result into rd` |
+| `rv128_i`     | `srad`   | `rd, rs1, rs2`               | `Shift the low 64 bits of rs1 right by the low 6 bits of rs2 with sign fill and sign-extend the 64-bit result into rd`      |
+| `rv128_i`     | `srli`   | `rd, rs1, shamt7`            | `Shift rs1 right by the 7-bit immediate shamt7 with zero fill and place the result into rd`                                 |
+| `rv128_i`     | `srlid`  | `rd, rs1, shamt6`            | `Shift the low 64 bits of rs1 right by the 6-bit immediate shamt6 with zero fill and sign-extend the 64-bit result into rd` |
+| `rv128_i`     | `srld`   | `rd, rs1, rs2`               | `Shift the low 64 bits of rs1 right by the low 6 bits of rs2 with zero fill and sign-extend the 64-bit result into rd`      |
+| `rv128_i`     | `subd`   | `rd, rs1, rs2`               | `Subtract the low 64 bits of rs2 from the low 64 bits of rs1 and sign-extend the low 64 bits of the result into rd`         |
+
+:RV128I - Base Integer Instruction Set (128 bit)
+
+| **Extension** | **Name**      | **Variable-Fields**                                 | **Description**                                                                                                                                                                             |
+|:--------------|:--------------|:----------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv_zibi`     | `beqi`        | `imm12hi, imm5, rs1, imm12lo`                       | `Branch by the signed displacement decoded from imm12hi and imm12lo if rs1 is equal to the decoded imm5 value. An imm5 field of zero represents -1.`                                        |
+| `rv_zibi`     | `bnei`        | `imm12hi, imm5, rs1, imm12lo`                       | `Branch by the signed displacement decoded from imm12hi and imm12lo if rs1 is different from the decoded imm5 value. An imm5 field of zero represents -1.`                                  |
+| `rv_zicbo`    | `cbo_clean`   | `rs1`                                               | `Write back modified data in the addressed cache block. rs1 supplies the cache-block address.`                                                                                              |
+| `rv_zicbo`    | `cbo_flush`   | `rs1`                                               | `Write back modified data in the addressed cache block and invalidate its cached copies. rs1 supplies the cache-block address.`                                                             |
+| `rv_zicbo`    | `cbo_inval`   | `rs1`                                               | `Invalidate the addressed cache block subject to privilege controls. rs1 supplies the cache-block address.`                                                                                 |
+| `rv_zicbo`    | `cbo_zero`    | `rs1`                                               | `Set every byte in the addressed cache block to zero. rs1 supplies the cache-block address.`                                                                                                |
+| `rv_zicfiss`  | `ssamoswap_d` | `rd, rs1, rs2, aq, rl`                              | `Atomically exchange a shadow stack doubleword at rs1 with the low 64 bits of rs2 and sign-extend the old value into rd. aq requests acquire ordering and rl requests release ordering.`    |
+| `rv_zicfiss`  | `ssamoswap_w` | `rd, rs1, rs2, aq, rl`                              | `Atomically exchange a shadow stack word at rs1 with the low 32 bits of rs2 and sign-extend the old value into rd. aq requests acquire ordering and rl requests release ordering.`          |
+| `rv_zicond`   | `czero_eqz`   | `rd, rs1, rs2`                                      | `Place zero in rd if rs2 is equal to zero, otherwise copy rs1 into rd`                                                                                                                      |
+| `rv_zicond`   | `czero_nez`   | `rd, rs1, rs2`                                      | `Place zero in rd if rs2 is not equal to zero, otherwise copy rs1 into rd`                                                                                                                  |
+| `rv_zicsr`    | `csrrc`       | `rd, rs1, csr`                                      | `Return the old value of CSR csr in rd and clear the bits selected by the source mask using rs1. Skip the CSR write when rs1 is zero.`                                                      |
+| `rv_zicsr`    | `csrrci`      | `rd, csr, zimm5`                                    | `Return the old value of CSR csr in rd and clear the bits selected by the source mask using zero-extended zimm5. Skip the CSR write when zimm5 is zero.`                                    |
+| `rv_zicsr`    | `csrrs`       | `rd, rs1, csr`                                      | `Return the old value of CSR csr in rd and set the bits selected by the source mask using rs1. Skip the CSR write when rs1 is zero.`                                                        |
+| `rv_zicsr`    | `csrrsi`      | `rd, csr, zimm5`                                    | `Return the old value of CSR csr in rd and set the bits selected by the source mask using zero-extended zimm5. Skip the CSR write when zimm5 is zero.`                                      |
+| `rv_zicsr`    | `csrrw`       | `rd, rs1, csr`                                      | `Return the old value of CSR csr in rd and write the source value using rs1. Skip the CSR read when rd is X0.`                                                                              |
+| `rv_zicsr`    | `csrrwi`      | `rd, csr, zimm5`                                    | `Return the old value of CSR csr in rd and write the source value using zero-extended zimm5. Skip the CSR read when rd is X0.`                                                              |
+| `rv_zifencei` | `fence_i`     | `imm12, rs1, rd`                                    | `Synchronize prior stores with subsequent instruction fetches on the same hart. The base instruction ignores the reserved imm12, rs1 and rd fields.`                                        |
+| `rv_zilx`     | `lxh`         | `rd, rs1, rs2`                                      | `Load a 16-bit value from x[rs2] plus the index in x[rs1]. Write the sign-extended value to rd.`                                                                                            |
+| `rv_zilx`     | `lxhu`        | `rd, rs1, rs2`                                      | `Load a 16-bit value from x[rs2] plus the index in x[rs1]. Write the zero-extended value to rd.`                                                                                            |
+| `rv_zilx`     | `lxsb`        | `rd, rs1, rs2`                                      | `Load a 8-bit value from x[rs2] plus the index in x[rs1] scaled by the element size in bytes. Write the sign-extended value to rd.`                                                         |
+| `rv_zilx`     | `lxsbu`       | `rd, rs1, rs2`                                      | `Load a 8-bit value from x[rs2] plus the index in x[rs1] scaled by the element size in bytes. Write the zero-extended value to rd.`                                                         |
+| `rv_zilx`     | `lxsh`        | `rd, rs1, rs2`                                      | `Load a 16-bit value from x[rs2] plus the index in x[rs1] scaled by the element size in bytes. Write the sign-extended value to rd.`                                                        |
+| `rv_zilx`     | `lxshu`       | `rd, rs1, rs2`                                      | `Load a 16-bit value from x[rs2] plus the index in x[rs1] scaled by the element size in bytes. Write the zero-extended value to rd.`                                                        |
+| `rv_zilx`     | `lxsw`        | `rd, rs1, rs2`                                      | `Load a 32-bit value from x[rs2] plus the index in x[rs1] scaled by the element size in bytes. Write the sign-extended value to rd.`                                                        |
+| `rv_zilx`     | `lxw`         | `rd, rs1, rs2`                                      | `Load a 32-bit value from x[rs2] plus the index in x[rs1]. Write the sign-extended value to rd.`                                                                                            |
+| `rv_zimop`    | `mop_r_N`     | `mop_r_t_30, mop_r_t_27_26, mop_r_t_21_20, rd, rs1` | `Write zero to rd under Zimop. The fields mop_r_t_30, mop_r_t_27_26, mop_r_t_21_20 select the minor encoding, and the base operation ignores rs1. An extension can redefine this encoding.` |
+| `rv_zimop`    | `mop_rr_N`    | `mop_rr_t_30, mop_rr_t_27_26, rd, rs1, rs2`         | `Write zero to rd under Zimop. The fields mop_rr_t_30, mop_rr_t_27_26 select the minor encoding, and the base operation ignores rs1 and rs2. An extension can redefine this encoding.`      |
+
+:RVZI - Base Integer Instruction Set
+
+| **Extension** | **Name**  | **Variable-Fields** | **Description**                                                                                                                                          |
+|:--------------|:----------|:--------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv64_zilx`   | `lxd`     | `rd, rs1, rs2`      | `Load a 64-bit value from x[rs2] plus the index in x[rs1]. Write the sign-extended value to rd.`                                                         |
+| `rv64_zilx`   | `lxsd`    | `rd, rs1, rs2`      | `Load a 64-bit value from x[rs2] plus the index in x[rs1] scaled by the element size in bytes. Write the sign-extended value to rd.`                     |
+| `rv64_zilx`   | `lxsuwb`  | `rd, rs1, rs2`      | `Load a 8-bit value from x[rs2] plus the zero-extended low 32 bits of x[rs1] scaled by the element size in bytes. Write the sign-extended value to rd.`  |
+| `rv64_zilx`   | `lxsuwbu` | `rd, rs1, rs2`      | `Load a 8-bit value from x[rs2] plus the zero-extended low 32 bits of x[rs1] scaled by the element size in bytes. Write the zero-extended value to rd.`  |
+| `rv64_zilx`   | `lxsuwd`  | `rd, rs1, rs2`      | `Load a 64-bit value from x[rs2] plus the zero-extended low 32 bits of x[rs1] scaled by the element size in bytes. Write the sign-extended value to rd.` |
+| `rv64_zilx`   | `lxsuwh`  | `rd, rs1, rs2`      | `Load a 16-bit value from x[rs2] plus the zero-extended low 32 bits of x[rs1] scaled by the element size in bytes. Write the sign-extended value to rd.` |
+| `rv64_zilx`   | `lxsuwhu` | `rd, rs1, rs2`      | `Load a 16-bit value from x[rs2] plus the zero-extended low 32 bits of x[rs1] scaled by the element size in bytes. Write the zero-extended value to rd.` |
+| `rv64_zilx`   | `lxsuww`  | `rd, rs1, rs2`      | `Load a 32-bit value from x[rs2] plus the zero-extended low 32 bits of x[rs1] scaled by the element size in bytes. Write the sign-extended value to rd.` |
+| `rv64_zilx`   | `lxsuwwu` | `rd, rs1, rs2`      | `Load a 32-bit value from x[rs2] plus the zero-extended low 32 bits of x[rs1] scaled by the element size in bytes. Write the zero-extended value to rd.` |
+| `rv64_zilx`   | `lxswu`   | `rd, rs1, rs2`      | `Load a 32-bit value from x[rs2] plus the index in x[rs1] scaled by the element size in bytes. Write the zero-extended value to rd.`                     |
+| `rv64_zilx`   | `lxwu`    | `rd, rs1, rs2`      | `Load a 32-bit value from x[rs2] plus the index in x[rs1]. Write the zero-extended value to rd.`                                                         |
+
+:RV64ZI - Base Integer Instruction Set (64 bit)

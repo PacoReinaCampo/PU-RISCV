@@ -1,17 +1,23 @@
-```
-$pseudo_op rv_y::yl1re8.y yl1r.y 31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 yd  6..0=0x07
-$pseudo_op rv_y::yl2re8.y yl2r.y 31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 yd  6..0=0x07
-$pseudo_op rv_y::yl4re8.y yl4r.y 31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 yd  6..0=0x07
-$pseudo_op rv_y::yl8re8.y yl8r.y 31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 yd  6..0=0x07
+## PSEUDO-INSTRUCTIONS
 
-$pseudo_op rv_y::ylm.y yle1.y  31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0  yd 6..0=0x07
-$pseudo_op rv_y::ysm.y yse1.y  31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0 ys3 6..0=0x27
+| **Extension** | **Name**        | **Variable-Fields** | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:----------------|:--------------------|:-----------------------|:-----------------------------------|
+| `rv_y`        | `ycpop_m`       | `ym, ys2, rd`       | `ypopc_m`              | `010000------10000010-----0101011` |
+| `rv_y`        | `yfredusum_ys`  | `ym, ys2, ys1, yd`  | `yfredsum_ys`          | `000001-----------001-----0101011` |
+| `rv_y`        | `yfwredusum_ys` | `ym, ys2, ys1, yd`  | `yfwredsum_ys`         | `110001-----------001-----0101011` |
+| `rv_y`        | `yl1re8_y`      | `rs1, yd`           | `yl1r_y`               | `000000101000-----000-----0000111` |
+| `rv_y`        | `yl2re8_y`      | `rs1, yd`           | `yl2r_y`               | `001000101000-----000-----0000111` |
+| `rv_y`        | `yl4re8_y`      | `rs1, yd`           | `yl4r_y`               | `011000101000-----000-----0000111` |
+| `rv_y`        | `yl8re8_y`      | `rs1, yd`           | `yl8r_y`               | `111000101000-----000-----0000111` |
+| `rv_y`        | `ylm_y`         | `rs1, yd`           | `yle1_y`               | `000000101011-----000-----0000111` |
+| `rv_y`        | `ymandn_mm`     | `ys2, ys1, yd`      | `ymandnot_mm`          | `0110001----------010-----0101011` |
+| `rv_y`        | `ymorn_mm`      | `ys2, ys1, yd`      | `ymornot_mm`           | `0111001----------010-----0101011` |
+| `rv_y`        | `ysm_y`         | `rs1, ys3`          | `yse1_y`               | `000000101011-----000-----0100111` |
 
-$pseudo_op rv_y::yfredusum.ys  yfredsum.ys 31..26=0x01 ym ys2 ys1 14..12=0x1 yd 6..0=0x0b
-$pseudo_op rv_y::yfwredusum.ys yfwredsum.ys 31..26=0x31 ym ys2 ys1 14..12=0x1 yd 6..0=0x0b
+:RVY - Specific Extension for Tensor Operations
 
-$pseudo_op rv_y::ycpop.m ypopc.m  31..26=0x10 ym ys2 19..15=0x10 14..12=0x2 rd 6..0=0x0b
+| **Extension** | **Name**  | **Variable-Fields** | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:----------|:--------------------|:-----------------------|:-----------------------------------|
+| `rv_zyabd`    | `yabd_yx` | `ym, ys2, yd`       | `yabs_y`               | `010101------00000110-----0101011` |
 
-$pseudo_op rv_y::ymorn.mm  ymornot.mm 31..26=0x1c ym ys2 ys1 14..12=0x2 yd 6..0=0x0b
-$pseudo_op rv_y::ymandn.mm ymandnot.mm  31..26=0x18 ym ys2 ys1 14..12=0x2 yd 6..0=0x0b
-```
+:RVZY - Specific Extension for Tensor Operations

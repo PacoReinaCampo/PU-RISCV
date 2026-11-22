@@ -1,0 +1,67 @@
+## INSTRUCTION LENGTHS
+
+| **Extension** | **Name**     | **Length** |
+|:--------------|:-------------|:-----------|
+| `rv_zwkg`     | `wghsh_ww`   | `WLEN`     |
+| `rv_zwkg`     | `wgmul_ww`   | `WLEN`     |
+| `rv_zwkned`   | `waesdf_ws`  | `WLEN`     |
+| `rv_zwkned`   | `waesdf_ww`  | `WLEN`     |
+| `rv_zwkned`   | `waesdm_ws`  | `WLEN`     |
+| `rv_zwkned`   | `waesdm_ww`  | `WLEN`     |
+| `rv_zwkned`   | `waesef_ws`  | `WLEN`     |
+| `rv_zwkned`   | `waesef_ww`  | `WLEN`     |
+| `rv_zwkned`   | `waesem_ws`  | `WLEN`     |
+| `rv_zwkned`   | `waesem_ww`  | `WLEN`     |
+| `rv_zwkned`   | `waeskf1_wi` | `WLEN`     |
+| `rv_zwkned`   | `waeskf2_wi` | `WLEN`     |
+| `rv_zwkned`   | `waesz_ws`   | `WLEN`     |
+| `rv_zwknha`   | `wsha2ch_ww` | `WLEN`     |
+| `rv_zwknha`   | `wsha2cl_ww` | `WLEN`     |
+| `rv_zwknha`   | `wsha2ms_ww` | `WLEN`     |
+| `rv_zwknhb`   | `wsha2ch_ww` | `WLEN`     |
+| `rv_zwknhb`   | `wsha2cl_ww` | `WLEN`     |
+| `rv_zwknhb`   | `wsha2ms_ww` | `WLEN`     |
+| `rv_zwkn`     | `waesdf_ws`  | `WLEN`     |
+| `rv_zwkn`     | `waesdf_ww`  | `WLEN`     |
+| `rv_zwkn`     | `waesdm_ws`  | `WLEN`     |
+| `rv_zwkn`     | `waesdm_ww`  | `WLEN`     |
+| `rv_zwkn`     | `waesef_ws`  | `WLEN`     |
+| `rv_zwkn`     | `waesef_ww`  | `WLEN`     |
+| `rv_zwkn`     | `waesem_ws`  | `WLEN`     |
+| `rv_zwkn`     | `waesem_ww`  | `WLEN`     |
+| `rv_zwkn`     | `waeskf1_wi` | `WLEN`     |
+| `rv_zwkn`     | `waeskf2_wi` | `WLEN`     |
+| `rv_zwkn`     | `waesz_ws`   | `WLEN`     |
+| `rv_zwkn`     | `wandn_ww`   | `WLEN`     |
+| `rv_zwkn`     | `wandn_wx`   | `WLEN`     |
+| `rv_zwkn`     | `wbrev8_w`   | `WLEN`     |
+| `rv_zwkn`     | `wrev8_w`    | `WLEN`     |
+| `rv_zwkn`     | `wrol_ww`    | `WLEN`     |
+| `rv_zwkn`     | `wrol_wx`    | `WLEN`     |
+| `rv_zwkn`     | `wror_wi`    | `WLEN`     |
+| `rv_zwkn`     | `wror_ww`    | `WLEN`     |
+| `rv_zwkn`     | `wror_wx`    | `WLEN`     |
+| `rv_zwkn`     | `wsha2ch_ww` | `WLEN`     |
+| `rv_zwkn`     | `wsha2cl_ww` | `WLEN`     |
+| `rv_zwkn`     | `wsha2ms_ww` | `WLEN`     |
+| `rv_zwksed`   | `wsm4k_wi`   | `WLEN`     |
+| `rv_zwksed`   | `wsm4r_ws`   | `WLEN`     |
+| `rv_zwksed`   | `wsm4r_ww`   | `WLEN`     |
+| `rv_zwksh`    | `wsm3c_wi`   | `WLEN`     |
+| `rv_zwksh`    | `wsm3me_ww`  | `WLEN`     |
+| `rv_zwks`     | `wandn_ww`   | `WLEN`     |
+| `rv_zwks`     | `wandn_wx`   | `WLEN`     |
+| `rv_zwks`     | `wbrev8_w`   | `WLEN`     |
+| `rv_zwks`     | `wrev8_w`    | `WLEN`     |
+| `rv_zwks`     | `wrol_ww`    | `WLEN`     |
+| `rv_zwks`     | `wrol_wx`    | `WLEN`     |
+| `rv_zwks`     | `wror_wi`    | `WLEN`     |
+| `rv_zwks`     | `wror_ww`    | `WLEN`     |
+| `rv_zwks`     | `wror_wx`    | `WLEN`     |
+| `rv_zwks`     | `wsm3c_wi`   | `WLEN`     |
+| `rv_zwks`     | `wsm3me_ww`  | `WLEN`     |
+| `rv_zwks`     | `wsm4k_wi`   | `WLEN`     |
+| `rv_zwks`     | `wsm4r_ws`   | `WLEN`     |
+| `rv_zwks`     | `wsm4r_ww`   | `WLEN`     |
+
+:RVZWK - Specific Extension for Matrix Cryptography Instructions

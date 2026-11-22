@@ -1,287 +1,97 @@
 ## INSTRUCTION PSEUDO-CODE (HDL)
 
-| **Instruction** | **Instruction Pseudo-Code**                      |
-|:----------------|:-------------------------------------------------|
-| `lui`           | `rd = imm`                                       |
-| `auipc`         | `rd = pc + imm`                                  |
-| `jal`           | `rd = pc + length(inst) ; pc = pc + imm`         |
-| `jalr`          | `rd = pc + length(inst) ; pc = (rs1 + imm) & -2` |
-| `beq`           | `if rs1 = rs2 then pc = pc + imm`                |
-| `bne`           | `if rs1 != rs2 then pc = pc + imm`               |
-| `blt`           | `if rs1 < rs2 then pc = pc + imm`                |
-| `bge`           | `if rs1 >= rs2 then pc = pc + imm`               |
-| `bltu`          | `if rs1 < rs2 then pc = pc + imm`                |
-| `bgeu`          | `if rs1 >= rs2 then pc = pc + imm`               |
-| `lb`            | `rd = s8[rs1 + imm]`                             |
-| `lh`            | `rd = s16[rs1 + imm]`                            |
-| `lw`            | `rd = s32[rs1 + imm]`                            |
-| `lbu`           | `rd = u8[rs1 + imm]`                             |
-| `lhu`           | `rd = u16[rs1 + imm]`                            |
-| `lwu`           | `rd = u32[rs1 + imm]`                            |
-| `sb`            | `u8[rs1 + imm] = rs2`                            |
-| `sh`            | `u16[rs1 + imm] = rs2`                           |
-| `sw`            | `u32[rs1 + imm] = rs2`                           |
-| `addi`          | `rd = rs1 + sx(imm)`                             |
-| `slti`          | `rd = sx(rs1) < sx(imm)`                         |
-| `sltiu`         | `rd = ux(rs1) < ux(imm)`                         |
-| `xori`          | `rd = ux(rs1) ^ ux(imm)`                         |
-| `ori`           | `rd = ux(rs1) \| ux(imm)`                        |
-| `andi`          | `rd = ux(rs1) & ux(imm)`                         |
-| `slli`          | `rd = ux(rs1) << ux(imm)`                        |
-| `srli`          | `rd = ux(rs1) >> ux(imm)`                        |
-| `srai`          | `rd = sx(rs1) >> ux(imm)`                        |
-| `add`           | `rd = sx(rs1) + sx(rs2)`                         |
-| `sub`           | `rd = sx(rs1) - sx(rs2); rs1 + ~rs2 + 1`         |
-| `sll`           | `rd = ux(rs1) << rs2`                            |
-| `slt`           | `rd = sx(rs1) < sx(rs2)`                         |
-| `sltu`          | `rd = ux(rs1) < ux(rs2)`                         |
-| `xor`           | `rd = ux(rs1) ^ ux(rs2)`                         |
-| `srl`           | `rd = ux(rs1) >> rs2`                            |
-| `sra`           | `rd = sx(rs1) >> rs2`                            |
-| `or`            | `rd = ux(rs1) \| ux(rs2)`                        |
-| `and`           | `rd = ux(rs1) & ux(rs2)`                         |
-| `fence`         |                                                  |
-| `fence.i`       |                                                  |
+| **Extension** | **Name**     | **Variable-Fields**                  | **Pseudo-Code**                                                                                          |
+|:--------------|:-------------|:-------------------------------------|:---------------------------------------------------------------------------------------------------------|
+| `rv_c`        | `c_add`      | `rd_rs1_n0, c_rs2_n0`                | `x[rd_rs1_n0] = x[rd_rs1_n0] + x[c_rs2_n0];`                                                             |
+| `rv_c`        | `c_addi`     | `rd_rs1_n0, c_nzimm6lo, c_nzimm6hi`  | `x[rd_rs1_n0] = x[rd_rs1_n0] + sx(decode_c_imm6(c_nzimm6hi, c_nzimm6lo));`                               |
+| `rv_c`        | `c_addi16sp` | `c_nzimm10hi, c_nzimm10lo`           | `sp = sp + decode_c_addi16sp(c_nzimm10hi, c_nzimm10lo);`                                                 |
+| `rv_c`        | `c_addi4spn` | `rd_p, c_nzuimm10`                   | `x[8 + rd_p] = sp + ux(decode_c_addi4spn(c_nzuimm10));`                                                  |
+| `rv_c`        | `c_and`      | `rd_rs1_p, rs2_p`                    | `x[8 + rd_rs1_p] = x[8 + rd_rs1_p] & x[8 + rs2_p];`                                                      |
+| `rv_c`        | `c_andi`     | `rd_rs1_p, c_imm6hi, c_imm6lo`       | `x[8 + rd_rs1_p] = ux(x[8 + rd_rs1_p]) & ux(sx(decode_c_imm6(c_imm6hi, c_imm6lo)));`                     |
+| `rv_c`        | `c_beqz`     | `rs1_p, c_bimm9lo, c_bimm9hi`        | `if (x[8 + rs1_p] == 0) pc = pc + sx(decode_c_branch(c_bimm9hi, c_bimm9lo));`                            |
+| `rv_c`        | `c_bnez`     | `rs1_p, c_bimm9lo, c_bimm9hi`        | `if (x[8 + rs1_p] != 0) pc = pc + sx(decode_c_branch(c_bimm9hi, c_bimm9lo));`                            |
+| `rv_c`        | `c_ebreak`   | `none`                               | `breakpoint_or_debug(CAUSE_BREAKPOINT);`                                                                 |
+| `rv_c`        | `c_j`        | `c_imm12`                            | `pc = pc + sx(decode_c_jump(c_imm12));`                                                                  |
+| `rv_c`        | `c_jalr`     | `c_rs1_n0`                           | `target = x[c_rs1_n0] & ~1; x[1] = pc + 2; pc = target;`                                                 |
+| `rv_c`        | `c_jr`       | `rs1_n0`                             | `target = x[rs1_n0] & ~1; pc = target;`                                                                  |
+| `rv_c`        | `c_li`       | `rd_n0, c_imm6lo, c_imm6hi`          | `x[rd_n0] = sx(decode_c_imm6(c_imm6hi, c_imm6lo));`                                                      |
+| `rv_c`        | `c_lui`      | `rd_n2, c_nzimm18hi, c_nzimm18lo`    | `x[rd_n2] = sx(decode_c_lui(c_nzimm18hi, c_nzimm18lo));`                                                 |
+| `rv_c`        | `c_lw`       | `rd_p, rs1_p, c_uimm7lo, c_uimm7hi`  | `x[8 + rd_p] = sx(s32(u32[x[8 + rs1_p] + decode_c_word_offset(c_uimm7hi, c_uimm7lo)]));`                 |
+| `rv_c`        | `c_lwsp`     | `rd_n0, c_uimm8sphi, c_uimm8splo`    | `x[rd_n0] = sx(s32(u32[sp + decode_c_lwsp(c_uimm8sphi, c_uimm8splo)]));`                                 |
+| `rv_c`        | `c_mv`       | `rd_n0, c_rs2_n0`                    | `x[rd_n0] = x[c_rs2_n0];`                                                                                |
+| `rv_c`        | `c_nop`      | `c_nzimm6hi, c_nzimm6lo`             | `ignore_fields(c_nzimm6hi, c_nzimm6lo); pc = pc + 2;`                                                    |
+| `rv_c`        | `c_or`       | `rd_rs1_p, rs2_p`                    | `x[8 + rd_rs1_p] = x[8 + rd_rs1_p] \| x[8 + rs2_p];`                                                     |
+| `rv_c`        | `c_sub`      | `rd_rs1_p, rs2_p`                    | `x[8 + rd_rs1_p] = x[8 + rd_rs1_p] - x[8 + rs2_p];`                                                      |
+| `rv_c`        | `c_sw`       | `rs1_p, rs2_p, c_uimm7lo, c_uimm7hi` | `u32[x[8 + rs1_p] + decode_c_word_offset(c_uimm7hi, c_uimm7lo)] = u32(x[8 + rs2_p]);`                    |
+| `rv_c`        | `c_swsp`     | `c_rs2, c_uimm8sp_s`                 | `u32[sp + decode_c_swsp(c_uimm8sp_s)] = u32(x[c_rs2]);`                                                  |
+| `rv_c`        | `c_xor`      | `rd_rs1_p, rs2_p`                    | `x[8 + rd_rs1_p] = x[8 + rd_rs1_p] ^ x[8 + rs2_p];`                                                      |
+| `rv_c_d`      | `c_fld`      | `rd_p, rs1_p, c_uimm8lo, c_uimm8hi`  | `f[8 + rd_p] = nan_box(u64[x[8 + rs1_p] + decode_c_doubleword_offset(c_uimm8hi, c_uimm8lo)], 64, FLEN);` |
+| `rv_c_d`      | `c_fldsp`    | `rd, c_uimm9sphi, c_uimm9splo`       | `f[rd] = nan_box(u64[sp + decode_c_ldsp(c_uimm9sphi, c_uimm9splo)], 64, FLEN);`                          |
+| `rv_c_d`      | `c_fsd`      | `rs1_p, rs2_p, c_uimm8lo, c_uimm8hi` | `u64[x[8 + rs1_p] + decode_c_doubleword_offset(c_uimm8hi, c_uimm8lo)] = u64(f[8 + rs2_p]);`              |
+| `rv_c_d`      | `c_fsdsp`    | `c_rs2, c_uimm9sp_s`                 | `u64[sp + decode_c_sdsp(c_uimm9sp_s)] = u64(f[c_rs2]);`                                                  |
 
-:RV32I - "RV32I Base Integer Instruction Set"
+:RVC - Standard Extension for Compressed Instructions
 
-| **Instruction** | **Instruction Pseudo-Code** |
-|:----------------|:----------------------------|
-| `ld`            | `rd = u64[rs1 + imm]`       |
-| `sd`            | `u64[rs1 + imm] = rs2`      |
-| `addiw`         | `rd = s32(rs1) + imm`       |
-| `slliw`         | `rd = s32(u32(rs1) << imm)` |
-| `srliw`         | `rd = s32(u32(rs1) >> imm)` |
-| `sraiw`         | `rd = s32(rs1) >> imm`      |
-| `addw`          | `rd = s32(rs1) + s32(rs2)`  |
-| `subw`          | `rd = s32(rs1) - s32(rs2)`  |
-| `sllw`          | `rd = s32(u32(rs1) << rs2)` |
-| `srlw`          | `rd = s32(u32(rs1) >> rs2)` |
-| `sraw`          | `rd = s32(rs1) >> rs2`      |
+| **Extension** | **Name**  | **Variable-Fields**                  | **Pseudo-Code**                                                                                    |
+|:--------------|:----------|:-------------------------------------|:---------------------------------------------------------------------------------------------------|
+| `rv32_c`      | `c_jal`   | `c_imm12`                            | `x[1] = pc + 2; pc = pc + sx(decode_c_jump(c_imm12));`                                             |
+| `rv32_c_f`    | `c_flw`   | `rd_p, rs1_p, c_uimm7lo, c_uimm7hi`  | `f[8 + rd_p] = nan_box(u32[x[8 + rs1_p] + decode_c_word_offset(c_uimm7hi, c_uimm7lo)], 32, FLEN);` |
+| `rv32_c_f`    | `c_flwsp` | `rd, c_uimm8sphi, c_uimm8splo`       | `f[rd] = nan_box(u32[sp + decode_c_lwsp(c_uimm8sphi, c_uimm8splo)], 32, FLEN);`                    |
+| `rv32_c_f`    | `c_fsw`   | `rs1_p, rs2_p, c_uimm7lo, c_uimm7hi` | `u32[x[8 + rs1_p] + decode_c_word_offset(c_uimm7hi, c_uimm7lo)] = u32(f[8 + rs2_p]);`              |
+| `rv32_c_f`    | `c_fswsp` | `c_rs2, c_uimm8sp_s`                 | `u32[sp + decode_c_swsp(c_uimm8sp_s)] = u32(f[c_rs2]);`                                            |
 
-:RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
+:RV32C - Standard Extension for Compressed Instructions (32 bit)
 
-| **Instruction** | **Instruction Pseudo-Code**        |
-|:----------------|:-----------------------------------|
-| `mul`           | `rd = ux(rs1) * ux(rs2)`           |
-| `mulh`          | `rd = (sx(rs1) * sx(rs2)) >> xlen` |
-| `mulhsu`        | `rd = (sx(rs1) * ux(rs2)) >> xlen` |
-| `mulhu`         | `rd = (ux(rs1) * ux(rs2)) >> xlen` |
-| `div`           | `rd = sx(rs1) / sx(rs2)`           |
-| `divu`          | `rd = ux(rs1) / ux(rs2)`           |
-| `rem`           | `rd = sx(rs1) mod sx(rs2)`         |
-| `remu`          | `rd = ux(rs1) mod ux(rs2)`         |
+| **Extension** | **Name**  | **Variable-Fields**                   | **Pseudo-Code**                                                                                |
+|:--------------|:----------|:--------------------------------------|:-----------------------------------------------------------------------------------------------|
+| `rv64_c`      | `c_addiw` | `rd_rs1_n0, c_imm6lo, c_imm6hi`       | `x[rd_rs1_n0] = sx(s32(u32(x[rd_rs1_n0]) + u32(sx(decode_c_imm6(c_imm6hi, c_imm6lo)))));`      |
+| `rv64_c`      | `c_addw`  | `rd_rs1_p, rs2_p`                     | `x[8 + rd_rs1_p] = sx(s32(u32(x[8 + rd_rs1_p]) + u32(x[8 + rs2_p])));`                         |
+| `rv64_c`      | `c_ld`    | `rd_p, rs1_p, c_uimm8lo, c_uimm8hi`   | `x[8 + rd_p] = sx(s64(u64[x[8 + rs1_p] + decode_c_doubleword_offset(c_uimm8hi, c_uimm8lo)]));` |
+| `rv64_c`      | `c_ldsp`  | `rd_n0, c_uimm9sphi, c_uimm9splo`     | `x[rd_n0] = sx(s64(u64[sp + decode_c_ldsp(c_uimm9sphi, c_uimm9splo)]));`                       |
+| `rv64_c`      | `c_sd`    | `rs1_p, rs2_p, c_uimm8hi, c_uimm8lo`  | `u64[x[8 + rs1_p] + decode_c_doubleword_offset(c_uimm8hi, c_uimm8lo)] = u64(x[8 + rs2_p]);`    |
+| `rv64_c`      | `c_sdsp`  | `c_rs2, c_uimm9sp_s`                  | `u64[sp + decode_c_sdsp(c_uimm9sp_s)] = u64(x[c_rs2]);`                                        |
+| `rv64_c`      | `c_slli`  | `rd_rs1_n0, c_nzuimm6hi, c_nzuimm6lo` | `x[rd_rs1_n0] = ux(x[rd_rs1_n0]) << ux(decode_c_shift(c_nzuimm6hi, c_nzuimm6lo));`             |
+| `rv64_c`      | `c_srai`  | `rd_rs1_p, c_nzuimm6lo, c_nzuimm6hi`  | `x[8 + rd_rs1_p] = sx(x[8 + rd_rs1_p]) >> ux(decode_c_shift(c_nzuimm6hi, c_nzuimm6lo));`       |
+| `rv64_c`      | `c_srli`  | `rd_rs1_p, c_nzuimm6lo, c_nzuimm6hi`  | `x[8 + rd_rs1_p] = ux(x[8 + rd_rs1_p]) >> ux(decode_c_shift(c_nzuimm6hi, c_nzuimm6lo));`       |
+| `rv64_c`      | `c_subw`  | `rd_rs1_p, rs2_p`                     | `x[8 + rd_rs1_p] = sx(s32(u32(x[8 + rd_rs1_p]) - u32(x[8 + rs2_p])));`                         |
 
-:RV32M - "RV32M Standard Extension for Integer Multiply and Divide"
+:RV64C - Standard Extension for Compressed Instructions (64 bit)
 
-| **Instruction** | **Instruction Pseudo-Code**  |
-|:----------------|:-----------------------------|
-| `mulw`          | `rd = u32(rs1) * u32(rs2)`   |
-| `divw`          | `rd = s32(rs1) / s32(rs2)`   |
-| `divuw`         | `rd = u32(rs1) / u32(rs2)`   |
-| `remw`          | `rd = s32(rs1) mod s32(rs2)` |
-| `remuw`         | `rd = u32(rs1) mod u32(rs2)` |
+| **Extension** | **Name** | **Variable-Fields**   | **Pseudo-Code**                      |
+|:--------------|:---------|:----------------------|:-------------------------------------|
+| `rv128_c`     | `c_lq`   | `crdq, crs1q, cimmq`  | `crdq = u128[crs1q + cimmq];`        |
+| `rv128_c`     | `c_lqsp` | `crd, cimmlqsp`       | `crd = u128[sp + cimmlqsp];`         |
+| `rv128_c`     | `c_sq`   | `crs1q, crs2q, cimmq` | `u128[crs1q + cimmq] = u128(crs2q);` |
+| `rv128_c`     | `c_sqsp` | `crs2, cimmsqsp`      | `u128[sp + cimmsqsp] = u128(crs2);`  |
 
-:RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
+:RV128C - Standard Extension for Compressed Instructions (128 bit)
 
-| **Instruction** | **Instruction Pseudo-Code**                                |
-|:----------------|:-----------------------------------------------------------|
-| `lr.w`          | `lr = rs1 , rd = sx(s32[rs1])`                             |
-| `sc.w`          | `if lr = rs1 then u32[rs1] = u32(rs2); rd = 0 else rd = 1` |
-| `amoswap.w`     | `rd = s32[rs1] , u32[rs1] = s32(rs2)`                      |
-| `amoadd.w`      | `rd = s32[rs1] , u32[rs1] = s32(rs2) + s32[rs1]`           |
-| `amoxor.w`      | `rd = s32[rs1] , u32[rs1] = s32(rs2) ^ s32[rs1]`           |
-| `amoor.w`       | `rd = s32[rs1] , u32[rs1] = s32(rs2) \| s32[rs1]`          |
-| `amoand.w`      | `rd = s32[rs1] , u32[rs1] = s32(rs2) & s32[rs1]`           |
-| `amomin.w`      | `rd = s32[rs1] , u32[rs1] = s32_min(s32(rs2), s32[rs1])`   |
-| `amomax.w`      | `rd = s32[rs1] , u32[rs1] = s32_max(s32(rs2), s32[rs1])`   |
-| `amominu.w`     | `rd = s32[rs1] , u32[rs1] = u32_min(u32(rs2), u32[rs1])`   |
-| `amomaxu.w`     | `rd = s32[rs1] , u32[rs1] = u32_max(u32(rs2), u32[rs1])`   |
+| **Extension** | **Name**     | **Variable-Fields**     | **Pseudo-Code**                                                                                                       |
+|:--------------|:-------------|:------------------------|:----------------------------------------------------------------------------------------------------------------------|
+| `rv_zcb`      | `c_lbu`      | `rd_p, rs1_p, c_uimm2`  | `rd_p = zx(u8[rs1_p + decode_offset(c_uimm2)]);`                                                                      |
+| `rv_zcb`      | `c_lh`       | `rd_p, rs1_p, c_uimm1`  | `rd_p = sx(s16[rs1_p + decode_offset(c_uimm1)]);`                                                                     |
+| `rv_zcb`      | `c_lhu`      | `rd_p, rs1_p, c_uimm1`  | `rd_p = zx(u16[rs1_p + decode_offset(c_uimm1)]);`                                                                     |
+| `rv_zcb`      | `c_mul`      | `rd_rs1_p, rs2_p`       | `rd_rs1_p = rd_rs1_p * rs2_p;`                                                                                        |
+| `rv_zcb`      | `c_not`      | `rd_rs1_p`              | `rd_rs1_p = ~ rd_rs1_p;`                                                                                              |
+| `rv_zcb`      | `c_sb`       | `rs2_p, rs1_p, c_uimm2` | `u8[rs1_p + decode_offset(c_uimm2)] = rs2_p[7:0];`                                                                    |
+| `rv_zcb`      | `c_sext_b`   | `rd_rs1_p`              | `rd_rs1_p = sx(rd_rs1_p[7:0]);`                                                                                       |
+| `rv_zcb`      | `c_sext_h`   | `rd_rs1_p`              | `rd_rs1_p = sx(rd_rs1_p[15:0]);`                                                                                      |
+| `rv_zcb`      | `c_sh`       | `rs2_p, rs1_p, c_uimm1` | `u16[rs1_p + decode_offset(c_uimm1)] = rs2_p[15:0];`                                                                  |
+| `rv_zcb`      | `c_zext_b`   | `rd_rs1_p`              | `rd_rs1_p = zx(rd_rs1_p[7:0]);`                                                                                       |
+| `rv_zcb`      | `c_zext_h`   | `rd_rs1_p`              | `rd_rs1_p = zx(rd_rs1_p[15:0]);`                                                                                      |
+| `rv_zcmop`    | `c_mop_N`    | `c_mop_t`               | `ignore_fields(c_mop_t); nop();`                                                                                      |
+| `rv_zcmp`     | `cm_mva01s`  | `c_sreg1, c_sreg2`      | `{a0, a1} = {sreg(c_sreg1), sreg(c_sreg2)};`                                                                          |
+| `rv_zcmp`     | `cm_mvsa01`  | `c_sreg1, c_sreg2`      | `parallel_move(sreg(c_sreg1), sreg(c_sreg2), a0, a1);`                                                                |
+| `rv_zcmp`     | `cm_pop`     | `c_rlist, c_spimm`      | `load_stack_regs(sp, c_rlist, c_spimm); sp = sp + stack_adjust(c_rlist, c_spimm);`                                    |
+| `rv_zcmp`     | `cm_popret`  | `c_rlist, c_spimm`      | `load_stack_regs(sp, c_rlist, c_spimm); sp = sp + stack_adjust(c_rlist, c_spimm); pc = ra & -2;`                      |
+| `rv_zcmp`     | `cm_popretz` | `c_rlist, c_spimm`      | `load_stack_regs(sp, c_rlist, c_spimm); sp = sp + stack_adjust(c_rlist, c_spimm); a0 = 0; pc = ra & -2;`              |
+| `rv_zcmp`     | `cm_push`    | `c_rlist, c_spimm`      | `store_stack_regs(sp, c_rlist); sp = sp - stack_adjust(c_rlist, c_spimm);`                                            |
+| `rv_zcmt`     | `cm_jalt`    | `c_index`               | `target = instruction_fetch_XLEN(jvt_base + c_index * (XLEN / 8)); if (c_index >= 32) ra = pc + 2; pc = target & -2;` |
 
-:RV32A - "RV32A Standard Extension for Atomic Instructions"
+:RVZC - Standard Extension for Compressed Instructions
 
-| **Instruction** | **Instruction Pseudo-Code**                                |
-|:----------------|:-----------------------------------------------------------|
-| `lr.d`          | `lr = rs1 , rd = sx(s64[rs1])`                             |
-| `sc.d`          | `if lr = rs1 then u64[rs1] = u64(rs2); rd = 0 else rd = 1` |
-| `amoswap.d`     | `rd = s64[rs1] , u64[rs1] = s64(rs2)`                      |
-| `amoadd.d`      | `rd = s64[rs1] , u64[rs1] = s64(rs2) + s64[rs1]`           |
-| `amoxor.d`      | `rd = s64[rs1] , u64[rs1] = s64(rs2) ^ s64[rs1]`           |
-| `amoor.d`       | `rd = s64[rs1] , u64[rs1] = s64(rs2) \| s64[rs1]`          |
-| `amoand.d`      | `rd = s64[rs1] , u64[rs1] = s64(rs2) & s64[rs1]`           |
-| `amomin.d`      | `rd = s64[rs1] , u64[rs1] = s64_min(s64(rs2), s64[rs1])`   |
-| `amomax.d`      | `rd = s64[rs1] , u64[rs1] = s64_max(s64(rs2), s64[rs1])`   |
-| `amominu.d`     | `rd = s64[rs1] , u64[rs1] = u64_min(u64(rs2), u64[rs1])`   |
-| `amomaxu.d`     | `rd = s64[rs1] , u64[rs1] = u64_max(u64(rs2), u64[rs1])`   |
+| **Extension** | **Name**   | **Variable-Fields** | **Pseudo-Code**                  |
+|:--------------|:-----------|:--------------------|:---------------------------------|
+| `rv64_zcb`    | `c_zext_w` | `rd_rs1_p`          | `rd_rs1_p = zx(rd_rs1_p[31:0]);` |
 
-:RV64A - "RV64A Standard Extension for Atomic Instructions (+ RV32A)"
-
-| **Instruction** | **Instruction Pseudo-Code** |
-|:----------------|:----------------------------|
-| `ecall`         |                             |
-| `ebreak`        |                             |
-| `uret`          |                             |
-| `sret`          |                             |
-| `hret`          |                             |
-| `mret`          |                             |
-| `dret`          |                             |
-| `sfence.vm`     |                             |
-| `wfi`           |                             |
-| `rdcycle`       |                             |
-| `rdtime`        |                             |
-| `rdinstret`     |                             |
-| `rdcycleh`      |                             |
-| `rdtimeh`       |                             |
-| `rdinstreth`    |                             |
-| `csrrw`         |                             |
-| `csrrs`         |                             |
-| `csrrc`         |                             |
-| `csrrwi`        |                             |
-| `csrrsi`        |                             |
-| `csrrci`        |                             |
-
-:RV32S - "RV32S Standard Extension for Supervisor-level Instructions"
-
-| **Instruction** | **Instruction Pseudo-Code**                                       |
-|:----------------|:------------------------------------------------------------------|
-| `flw`           | `frd = f32[rs1 + imm]`                                            |
-| `fsw`           | `f32[rs1 + imm] = f32(frs2)`                                      |
-| `fmadd.s`       | `frm = rm ; frd = f32(frs1) * f32(frs2) + f32(frs3)`              |
-| `fmsub.s`       | `frm = rm ; frd = f32(frs1) * f32(frs2) - f32(frs3)`              |
-| `fnmadd.s`      | `frm = rm ; frd = f32(frs1) * -f32(frs2) - f32(frs3)`             |
-| `fnmsub.s`      | `frm = rm ; frd = f32(frs1) * -f32(frs2) + f32(frs3)`             |
-| `fadd.s`        | `frm = rm ; frd = f32(frs1) + f32(frs2)`                          |
-| `fsub.s`        | `frm = rm ; frd = f32(frs1) - f32(frs2)`                          |
-| `fmul.s`        | `frm = rm ; frd = f32(frs1) * f32(frs2)`                          |
-| `fdiv.s`        | `frm = rm ; frd = f32(frs1) / f32(frs2)`                          |
-| `fsgnj.s`       | `frd = f32_copysign(f32(frs1), f32(frs2))`                        |
-| `fsgnjn.s`      | `frd = f32_copysign(f32(frs1), -f32(frs2))`                       |
-| `fsgnjx.s`      | `frd = f32_xorsign(f32(frs1), f32(frs2))`                         |
-| `fmin.s`        | `frd = f32_min(f32(frs1), f32(frs2))`                             |
-| `fmax.s`        | `frd = f32_max(f32(frs1), f32(frs2))`                             |
-| `fsqrt.s`       | `frm = rm ; frd = f32_sqrt(f32(frs1))`                            |
-| `fle.s`         | `if f32(frs1) <= f32(frs2) then rd = 1 else rd = 0`               |
-| `flt.s`         | `if f32(frs1) < f32(frs2) then rd = 1 else rd = 0`                |
-| `feq.s`         | `if f32(frs1) = f32(frs2) then rd = 1 else rd = 0`                |
-| `fcvt.w.s`      | `frm = rm ; rd = s32(f32(frs1))`                                  |
-| `fcvt.wu.s`     | `frm = rm ; if f32(frs1) > 0 then rd = u32(f32(frs1) else rd = 0` |
-| `fcvt.s.w`      | `frm = rm ; frd = f32(s32(rs1))`                                  |
-| `fcvt.s.wu`     | `frm = rm ; frd = f32(u32(rs1))`                                  |
-| `fmv.x.s`       | `rd = s32(frs1)`                                                  |
-| `fclass.s`      | `rd = f32_classify(f32(frs1))`                                    |
-| `fmv.s.x`       | `frd = s32(rs1)`                                                  |
-
-:RV32F - "RV32F Standard Extension for Single-Precision Floating-Point"
-
-| **Instruction** | **Instruction Pseudo-Code**      |
-|:----------------|:---------------------------------|
-| `fcvt.l.s`      | `frm = rm ; rd = s64(f32(frs1))` |
-| `fcvt.lu.s`     | `frm = rm ; rd = u64(f32(frs1))` |
-| `fcvt.s.l`      | `frm = rm ; frd = f32(s64(rs1))` |
-| `fcvt.s.lu`     | `frm = rm ; frd = f32(u64(rs1))` |
-
-:RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
-
-| **Instruction** | **Instruction Pseudo-Code**                                       |
-|:----------------|:------------------------------------------------------------------|
-| `fld`           | `frd = f64[rs1 + imm]`                                            |
-| `fsd`           | `f64[rs1 + imm] = f64(frs2)`                                      |
-| `fmadd.d`       | `frm = rm ; frd = f64(frs1) * f64(frs2) + f64(frs3)`              |
-| `fmsub.d`       | `frm = rm ; frd = f64(frs1) * f64(frs2) - f64(frs3)`              |
-| `fnmadd.d`      | `frm = rm ; frd = f64(frs1) * -f64(frs2) - f64(frs3)`             |
-| `fnmsub.d`      | `frm = rm ; frd = f64(frs1) * -f64(frs2) + f64(frs3)`             |
-| `fadd.d`        | `frm = rm ; frd = f64(frs1) + f64(frs2)`                          |
-| `fsub.d`        | `frm = rm ; frd = f64(frs1) - f64(frs2)`                          |
-| `fmul.d`        | `frm = rm ; frd = f64(frs1) * f64(frs2)`                          |
-| `fdiv.d`        | `frm = rm ; frd = f64(frs1) / f64(frs2)`                          |
-| `fsgnj.d`       | `frd = f64_copysign(f64(frs1), f64(frs2))`                        |
-| `fsgnjn.d`      | `frd = f64_copysign(f64(frs1), -f64(frs2))`                       |
-| `fsgnjx.d`      | `frd = f64_xorsign(f64(frs1), f64(frs2))`                         |
-| `fmin.d`        | `frd = f64_min(f64(frs1), f64(frs2))`                             |
-| `fmax.d`        | `frd = f64_max(f64(frs1), f64(frs2))`                             |
-| `fcvt.s.d`      | `frm = rm ; frd = f32(f64(frs1))`                                 |
-| `fcvt.d.s`      | `frm = rm ; frd = f64(f32(frs1))`                                 |
-| `fsqrt.d`       | `frm = rm ; frd = f64_sqrt(f64(frs1))`                            |
-| `fle.d`         | `if f64(frs1) <= f64(frs2) then rd = 1 else rd = 0`               |
-| `flt.d`         | `if f64(frs1) < f64(frs2) then rd = 1 else rd = 0`                |
-| `feq.d`         | `if f64(frs1) = f64(frs2) then rd = 1 else rd = 0`                |
-| `fcvt.w.d`      | `frm = rm ; rd = s32(f64(frs1))`                                  |
-| `fcvt.wu.d`     | `frm = rm ; if f64(frs1) > 0 then rd = u32(f64(frs1) else rd = 0` |
-| `fcvt.d.w`      | `frm = rm ; frd = f64(s32(rs1))`                                  |
-| `fcvt.d.wu`     | `frm = rm ; frd = f64(u32(rs1))`                                  |
-| `fclass.d`      | `rd = rd = f64_classify(f64(frs1))`                               |
-
-:RV32D - "RV32D Standard Extension for Double-Precision Floating-Point"
-
-| **Instruction** | **Instruction Pseudo-Code**                                       |
-|:----------------|:------------------------------------------------------------------|
-| `fcvt.l.d`      | `frm = rm ; rd = s64(f64(frs1))`                                  |
-| `fcvt.lu.d`     | `frm = rm ; if f64(frs1) > 0 then rd = u64(f64(frs1) else rd = 0` |
-| `fmv.x.d`       | `rd = s64(frs1)`                                                  |
-| `fcvt.d.l`      | `frm = rm ; frd = f64(u64(rs1))`                                  |
-| `fcvt.d.lu`     | `frm = rm ; frd = f64(s64(rs1))`                                  |
-| `fmv.d.x`       | `frd = u64(rs1)`                                                  |
-
-:RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32D)"
-
-| **Instruction** | **Instruction Pseudo-Code** |
-|:----------------|:----------------------------|
-| `frcsr`         |                             |
-| `frrm`          |                             |
-| `frflags`       |                             |
-| `fscsr`         |                             |
-| `fsrm`          |                             |
-| `fsflags`       |                             |
-| `fsrmi`         |                             |
-| `fsflagsi`      |                             |
-
-:RV32FD - "RV32F and RV32D Common Floating-Point Instructions"
-
-| **Instruction** | **Instruction Pseudo-Code**                                         |
-|:----------------|:--------------------------------------------------------------------|
-| `flq`           | `frd = f128[rs1 + imm]`                                             |
-| `fsq`           | `f128[rs1 + imm] = f128(frs2)`                                      |
-| `fmadd.q`       | `frm = rm ; frd = f128(frs1) * f128(frs2) + f128(frs3)`             |
-| `fmsub.q`       | `frm = rm ; frd = f128(frs1) * f128(frs2) - f128(frs3)`             |
-| `fnmadd.q`      | `frm = rm ; frd = f128(frs1) * -f128(frs2) - f128(frs3)`            |
-| `fnmsub.q`      | `frm = rm ; frd = f128(frs1) * -f128(frs2) + f128(frs3)`            |
-| `fadd.q`        | `frm = rm ; frd = f128(frs1) + f128(frs2)`                          |
-| `fsub.q`        | `frm = rm ; frd = f128(frs1) - f128(frs2)`                          |
-| `fmul.q`        | `frm = rm ; frd = f128(frs1) * f128(frs2)`                          |
-| `fdiv.q`        | `frm = rm ; frd = f128(frs1) / f128(frs2)`                          |
-| `fsgnj.q`       | `frd = f128_copysign(f128(frs1), f128(frs2))`                       |
-| `fsgnjn.q`      | `frd = f128_copysign(f128(frs1), -f128(frs2))`                      |
-| `fsgnjx.q`      | `frd = f128_xorsign(f128(frs1), f128(frs2))`                        |
-| `fmin.q`        | `frd = f128_min(f128(frs1), f128(frs2))`                            |
-| `fmax.q`        | `frd = f128_max(f128(frs1), f128(frs2))`                            |
-| `fcvt.s.q`      | `frm = rm ; frd = f32(f128(frs1))`                                  |
-| `fcvt.q.s`      | `frm = rm ; frd = f128(f32(frs1))`                                  |
-| `fcvt.d.q`      | `frm = rm ; frd = f64(f128(frs1))`                                  |
-| `fcvt.q.d`      | `frm = rm ; frd = f128(f64(frs1))`                                  |
-| `fsqrt.q`       | `frm = rm ; frd = f128_sqrt(f128(frs1))`                            |
-| `fle.q`         | `if f128(frs1) <= f128(frs2) then rd = 1 else rd = 0`               |
-| `flt.q`         | `if f128(frs1) < f128(frs2) then rd = 1 else rd = 0`                |
-| `feq.q`         | `if f128(frs1) = f128(frs2) then rd = 1 else rd = 0`                |
-| `fcvt.w.q`      | `frm = rm ; rd = s32(f128(frs1))`                                   |
-| `fcvt.wu.q`     | `frm = rm ; if f128(frs1) > 0 then rd = u32(f128(frs1) else rd = 0` |
-| `fcvt.q.w`      | `frm = rm ; frd = f128(s32(rs1))`                                   |
-| `fcvt.q.wu`     | `frm = rm ; frd = f128(u32(rs1))`                                   |
-| `fclass.q`      | `rd = rd = f128_classify(f128(frs1))`                               |
-
-:RV32Q - "RV32Q Standard Extension for Quadruple-Precision Floating-Point"
-
-| **Instruction** | **Instruction Pseudo-Code**                                         |
-|:----------------|:--------------------------------------------------------------------|
-| `fcvt.l.q`      | `frm = rm ; rd = s64(f128(frs1))`                                   |
-| `fcvt.lu.q`     | `frm = rm ; if f128(frs1) > 0 then rd = u64(f128(frs1) else rd = 0` |
-| `fcvt.q.l`      | `frm = rm ; frd = f128(u64(rs1))`                                   |
-| `fcvt.q.lu`     | `frm = rm ; frd = f128(s64(rs1))`                                   |
-
-:RV64Q - "RV64Q Standard Extension for Quadruple-Precision Floating-Point (+ RV32Q)"
-
-| **Instruction** | **Instruction Pseudo-Code** |
-|:----------------|:----------------------------|
-| `fmv.x.q`       | `rd = s64(frs1)`            |
-| `fmv.q.x`       | `frd = u64(rs1)`            |
-
-:RV128Q - "RV128Q Standard Extension for Quadruple-Precision Floating-Point (+ RV64Q)"
+:RV64ZC - Standard Extension for Compressed Instructions (64 bit)

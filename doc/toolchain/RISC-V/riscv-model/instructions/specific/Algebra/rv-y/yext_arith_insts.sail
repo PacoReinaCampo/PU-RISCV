@@ -1,5 +1,5 @@
 // =======================================================================================
-// This Sail RISC-V architecture model, comprising all files and
+// This Sail RISC-Y architecture model, comprising all files and
 // directories except where otherwise noted is subject the BSD
 // two-clause license in the LICENSE file.
 //
@@ -7,1352 +7,1857 @@
 // =======================================================================================
 
 // ******************************************************************************
-// This file implements part of the vector extension.
-// Chapter 11: Vector Integer Arithmetic Instructions
-// Chapter 12: Vector Fixed-Point Arithmetic Instructions
-// Chapter 16: Vector Permutation Instructions (integer part)
+// This file implements part of the tensor extension.
+// Chapter 11: Tensor Integer Arithmetic Instructions
+// Chapter 12: Tensor Fixed-Point Arithmetic Instructions
+// Chapter 16: Tensor Permutation Instructions (integer part)
 // ******************************************************************************
 
-// ****************************** OPIVV (VVTYPE) ********************************
-union clause instruction = VVTYPE : (vvfunct6, bits(1), vregidx, vregidx, vregidx)
+// ****************************** OPIVV (YYTYPE) ********************************
+union clause instruction = Y_YYTYPE : (y_yyfunct6, bits(1), yregidx, yregidx, yregidx)
 
-mapping encdec_vvfunct6 : vvfunct6 <-> bits(6) = {
-  VV_VADD          <-> 0b000000,
-  VV_VSUB          <-> 0b000010,
-  VV_VMINU         <-> 0b000100,
-  VV_VMIN          <-> 0b000101,
-  VV_VMAXU         <-> 0b000110,
-  VV_VMAX          <-> 0b000111,
-  VV_VAND          <-> 0b001001,
-  VV_VOR           <-> 0b001010,
-  VV_VXOR          <-> 0b001011,
-  VV_VRGATHER      <-> 0b001100,
-  VV_VRGATHEREI16  <-> 0b001110,
-  VV_VSADDU        <-> 0b100000,
-  VV_VSADD         <-> 0b100001,
-  VV_VSSUBU        <-> 0b100010,
-  VV_VSSUB         <-> 0b100011,
-  VV_VSLL          <-> 0b100101,
-  VV_VSMUL         <-> 0b100111,
-  VV_VSRL          <-> 0b101000,
-  VV_VSRA          <-> 0b101001,
-  VV_VSSRL         <-> 0b101010,
-  VV_VSSRA         <-> 0b101011
+mapping y_encdec_yyfunct6 : y_yyfunct6 <-> bits(6) = {
+ Y_YY_YADD          <-> 0b000000,
+ Y_YY_YSUB          <-> 0b000010,
+ Y_YY_YMINU         <-> 0b000100,
+ Y_YY_YMIN          <-> 0b000101,
+ Y_YY_YMAXU         <-> 0b000110,
+ Y_YY_YMAX          <-> 0b000111,
+ Y_YY_YAND          <-> 0b001001,
+ Y_YY_YOR           <-> 0b001010,
+ Y_YY_YXOR          <-> 0b001011,
+ Y_YY_YRGATHER      <-> 0b001100,
+ Y_YY_YRGATHEREI16  <-> 0b001110,
+ Y_YY_YSADDU        <-> 0b100000,
+ Y_YY_YSADD         <-> 0b100001,
+ Y_YY_YSSUBU        <-> 0b100010,
+ Y_YY_YSSUB         <-> 0b100011,
+ Y_YY_YSLL          <-> 0b100101,
+ Y_YY_YSMUL         <-> 0b100111,
+ Y_YY_YSRL          <-> 0b101000,
+ Y_YY_YSRA          <-> 0b101001,
+ Y_YY_YSSRL         <-> 0b101010,
+ Y_YY_YSSRA         <-> 0b101011
 }
 
-mapping clause encdec = VVTYPE(funct6, vm, vs2, vs1, vd)
-  <-> encdec_vvfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b000 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64 & valid_wide_vvtype(funct6))
+mapping clause encdec = Y_YYTYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_encdec_yyfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ y_encdec_yreg(ys1) @ 0b000 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64 & y_valid_wide_yytype(funct6))
 
-function clause execute VVTYPE(funct6, vm, vs2, vs1, vd) = {
-  let SEW_pow  = get_sew_pow();
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_YYTYPE(funct6, ym, ys2, ys1, yd)) = {
+  let Y_SEW_pow = y_get_sew_pow();
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
   // "The vrgatherei16.vv form uses SEW/LMUL for the data in vs2 but
   // EEW=16 and EMUL = (16/SEW)*LMUL for the indices in vs1."  Other
   // than that, all the other instructions here use a uniform SEW/LMUL
-  // for their vector operands.  Also, "For any vrgather instruction,
+  // for their tensor operands.  Also, "For any vrgather instruction,
   // the destination vector register group cannot overlap with the
   // source vector register groups, otherwise the instruction encoding
   // is reserved."
 
+  let ys1_emul_pow = if funct6 == Y_YY_YRGATHEREI16 then {
+      4 + Y_LMUL_pow - Y_SEW_pow
+    } else {
+      Y_LMUL_pow
+    };
+
   // Check for source destination overlaps for vrgather instructions.
-  let src_dst_overlap : bool = if funct6 == VV_VRGATHER | funct6 == VV_VRGATHEREI16
-                               then vs1 == vd | vs2 == vd
-                               else false;
+  let src_dst_overlap : bool = if funct6 == Y_YY_YRGATHER then {
+      ys1 == yd | ys2 == yd
+    } else {
+      if funct6 == Y_YY_YRGATHEREI16 then {
+        not(y_valid_disjoint_reg_groups(ys1, yd, ys1_emul_pow, Y_LMUL_pow)) | ys2 == yd
+      } else {
+        false
+      }
+    };
 
-  let vs1_emul_pow = if funct6 == VV_VRGATHEREI16 then 4 + LMUL_pow - SEW_pow else LMUL_pow;
+  let src_mask_overlap = not(y_valid_ym_src_overlap(ym, ys1, SEW)) | not(y_valid_ym_src_overlap(ym, ys2, SEW));
 
-  if illegal_normal(vd, vm) |
-     not(valid_reg_overlap(vs1, vd, vs1_emul_pow, LMUL_pow)) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     src_dst_overlap
-  then return Illegal_Instruction();
+  let src_src_overlap : bool = if funct6 == Y_YY_YRGATHEREI16 then {
+      not(y_valid_src_overlap(ys1, 16, ys1_emul_pow, ys2, SEW, Y_LMUL_pow))
+    } else {
+      false
+    };
 
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vs1_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs1); // not used for VV_VRGATHEREI16.
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  // See above for the vs1 operand of vrgatherei16.vv.  This is a
-  // different variable from `vs1_val` due to its different type.
-  let vs1_val_vrgatherei16 : vector('n, bits(16)) = if funct6 == VV_VRGATHEREI16
-                                                    then read_vreg(num_elem, 16, vs1_emul_pow, vs1)
-                                                    else vector_init(zeros());
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_normal(yd, ym)
+   | not(y_valid_reg_overlap(ys1, yd, ys1_emul_pow, Y_LMUL_pow))
+   | not(y_valid_reg_group(ys2, Y_LMUL_pow))
+   | src_dst_overlap
+   | src_src_overlap
+   | src_mask_overlap then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let ys1_val : vector('n, bits('m)) = if funct6 == Y_YY_YRGATHEREI16 then {
+      vector_init(zeros())
+    } else {
+      y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys1)
+    };
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+
+  // See above for the ys1 operand of vrgatherei16.yy.  This is a
+  // different variable from `ys1_val` due to its different type.
+  let ys1_val_yrgatherei16 : vector('n, bits(16)) = if funct6 == Y_YY_YRGATHEREI16 then {
+      y_read_yreg(num_elem, 16, ys1_emul_pow, ys1)
+    } else {
+      vector_init(zeros())
+    };
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        VV_VADD          => vs2_val[i] + vs1_val[i],
-        VV_VSUB          => vs2_val[i] - vs1_val[i],
-        VV_VAND          => vs2_val[i] & vs1_val[i],
-        VV_VOR           => vs2_val[i] | vs1_val[i],
-        VV_VXOR          => vs2_val[i] ^ vs1_val[i],
-        VV_VSADDU        => unsigned_saturation('m, zero_extend('m + 1, vs2_val[i]) + zero_extend('m + 1, vs1_val[i])),
-        VV_VSADD         => signed_saturation('m, sign_extend('m + 1, vs2_val[i]) + sign_extend('m + 1, vs1_val[i])),
-        VV_VSSUBU        => {
-                              if unsigned(vs2_val[i]) < unsigned(vs1_val[i]) then zeros()
-                              else unsigned_saturation('m, zero_extend('m + 1, vs2_val[i]) - zero_extend('m + 1, vs1_val[i]))
-                            },
-        VV_VSSUB         => signed_saturation('m, sign_extend('m + 1, vs2_val[i]) - sign_extend('m + 1, vs1_val[i])),
-        VV_VSMUL         => {
-                              let result_mul = to_bits_unsafe('m * 2, signed(vs2_val[i]) * signed(vs1_val[i]));
-                              let rounding_incr = get_fixed_rounding_incr(result_mul, 'm - 1);
-                              let result_wide = (result_mul >> ('m - 1)) + zero_extend('m * 2, rounding_incr);
-                              signed_saturation('m, result_wide['m..0])
-                            },
-        VV_VSLL          => {
-                              let shift_amount = get_shift_amount(vs1_val[i], SEW);
-                              vs2_val[i] << shift_amount
-                            },
-        VV_VSRL          => {
-                              let shift_amount = get_shift_amount(vs1_val[i], SEW);
-                              vs2_val[i] >> shift_amount
-                            },
-        VV_VSRA          => {
-                              let shift_amount = get_shift_amount(vs1_val[i], SEW);
-                              let v_double : bits('m * 2) = sign_extend(vs2_val[i]);
-                              (v_double >> shift_amount)[SEW - 1 .. 0]
-                            },
-        VV_VSSRL         => {
-                              let shift_amount = get_shift_amount(vs1_val[i], SEW);
-                              let rounding_incr = get_fixed_rounding_incr(vs2_val[i], shift_amount);
-                              (vs2_val[i] >> shift_amount) + zero_extend('m, rounding_incr)
-                            },
-        VV_VSSRA         => {
-                              let shift_amount = get_shift_amount(vs1_val[i], SEW);
-                              let rounding_incr = get_fixed_rounding_incr(vs2_val[i], shift_amount);
-                              let v_double : bits('m * 2) = sign_extend(vs2_val[i]);
-                              (v_double >> shift_amount)[SEW - 1 .. 0] + zero_extend('m, rounding_incr)
-                            },
-        VV_VMINU         => to_bits_unsafe(SEW, min(unsigned(vs2_val[i]), unsigned(vs1_val[i]))),
-        VV_VMIN          => to_bits_unsafe(SEW, min(signed(vs2_val[i]), signed(vs1_val[i]))),
-        VV_VMAXU         => to_bits_unsafe(SEW, max(unsigned(vs2_val[i]), unsigned(vs1_val[i]))),
-        VV_VMAX          => to_bits_unsafe(SEW, max(signed(vs2_val[i]), signed(vs1_val[i]))),
-        VV_VRGATHER      => {
-                              let idx = unsigned(vs1_val[i]);
-                              assert(LMUL_pow + vlen_exp - SEW_pow >= 0);
-                              let VLMAX = 2 ^ (LMUL_pow + vlen_exp - SEW_pow);
-                              assert(VLMAX <= 'n);
-                              if idx < VLMAX then vs2_val[idx] else zeros()
-                            },
-        VV_VRGATHEREI16  => {
-                              let idx = unsigned(vs1_val_vrgatherei16[i]);
-                              assert(LMUL_pow + vlen_exp - SEW_pow >= 0);
-                              let VLMAX = 2 ^ (LMUL_pow + vlen_exp - SEW_pow);
-                              assert(VLMAX <= 'n);
-                              if idx < VLMAX then vs2_val[idx] else zeros()
-                            }
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys1_val_view = y_shape(ys1_val, y_columns, y_depth);
+    let ys1_val_yrgatherei16_view = y_shape(ys1_val_yrgatherei16, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys1_val_view));
+      assert(i < length(ys1_val_yrgatherei16_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_YY_YADD         => ys2_val_view[i][j][k] + ys1_val_view[i][j][k],
+          Y_YY_YSUB         => ys2_val_view[i][j][k] - ys1_val_view[i][j][k],
+          Y_YY_YAND         => ys2_val_view[i][j][k] & ys1_val_view[i][j][k],
+          Y_YY_YOR          => ys2_val_view[i][j][k] | ys1_val_view[i][j][k],
+          Y_YY_YXOR         => ys2_val_view[i][j][k] ^ ys1_val_view[i][j][k],
+          Y_YY_YSADDU       => y_unsigned_saturation(
+            sizeof('m),
+            zero_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) +
+              zero_extend(sizeof('m) + 1, ys1_val_view[i][j][k]),
+          ),
+          Y_YY_YSADD        => y_signed_saturation(
+            sizeof('m),
+            sign_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) +
+              sign_extend(sizeof('m) + 1, ys1_val_view[i][j][k]),
+          ),
+          Y_YY_YSSUBU       => {
+            if unsigned(ys2_val_view[i][j][k]) < unsigned(ys1_val_view[i][j][k]) then {
+              y_write_yxsat(0b1);
+              zeros()
+            } else {
+              y_unsigned_saturation(
+                sizeof('m),
+                zero_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) -
+                  zero_extend(sizeof('m) + 1, ys1_val_view[i][j][k]),
+              )
+            }
+          },
+          Y_YY_YSSUB        => y_signed_saturation(
+            sizeof('m),
+            sign_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) -
+              sign_extend(sizeof('m) + 1, ys1_val_view[i][j][k]),
+          ),
+          Y_YY_YSMUL        => {
+            let result_mul = to_bits_unsafe(
+              sizeof('m) * 2,
+              signed(ys2_val_view[i][j][k]) * signed(ys1_val_view[i][j][k]),
+            );
+            let rounding_incr = y_get_fixed_rounding_incr(result_mul, sizeof('m) - 1);
+            let result_wide = (result_mul >> (sizeof('m) - 1)) + zero_extend(sizeof('m) * 2, rounding_incr);
+            y_signed_saturation(sizeof('m), result_wide[sizeof('m) .. 0])
+          },
+          Y_YY_YSLL         => {
+            let shift_amount = y_get_shift_amount(ys1_val_view[i][j][k], SEW);
+            ys2_val_view[i][j][k] << shift_amount
+          },
+          Y_YY_YSRL         => {
+            let shift_amount = y_get_shift_amount(ys1_val_view[i][j][k], SEW);
+            ys2_val_view[i][j][k] >> shift_amount
+          },
+          Y_YY_YSRA         => {
+            let shift_amount = y_get_shift_amount(ys1_val_view[i][j][k], SEW);
+            let y_double : bits('m * 2) = sign_extend(ys2_val_view[i][j][k]);
+            (y_double >> shift_amount)[SEW - 1 .. 0]
+          },
+          Y_YY_YSSRL        => {
+            let shift_amount = y_get_shift_amount(ys1_val_view[i][j][k], SEW);
+            let rounding_incr = y_get_fixed_rounding_incr(ys2_val_view[i][j][k], shift_amount);
+            (ys2_val_view[i][j][k] >> shift_amount) + zero_extend(sizeof('m), rounding_incr)
+          },
+          Y_YY_YSSRA        => {
+            let shift_amount = y_get_shift_amount(ys1_val_view[i][j][k], SEW);
+            let rounding_incr = y_get_fixed_rounding_incr(ys2_val_view[i][j][k], shift_amount);
+            let y_double : bits('m * 2) = sign_extend(ys2_val_view[i][j][k]);
+            (y_double >> shift_amount)[SEW - 1 .. 0] + zero_extend(sizeof('m), rounding_incr)
+          },
+          Y_YY_YMINU        => to_bits_unsafe(
+            SEW,
+            min(unsigned(ys2_val_view[i][j][k]), unsigned(ys1_val_view[i][j][k])),
+          ),
+          Y_YY_YMIN         => to_bits_unsafe(SEW, min(signed(ys2_val_view[i][j][k]), signed(ys1_val_view[i][j][k]))),
+          Y_YY_YMAXU        => to_bits_unsafe(
+            SEW,
+            max(unsigned(ys2_val_view[i][j][k]), unsigned(ys1_val_view[i][j][k])),
+          ),
+          Y_YY_YMAX         => to_bits_unsafe(SEW, max(signed(ys2_val_view[i][j][k]), signed(ys1_val_view[i][j][k]))),
+          Y_YY_YRGATHER     => {
+            let idx = unsigned(ys1_val_view[i][j][k]);
+            assert(Y_LMUL_pow + ylen_exp - Y_SEW_pow >= 0);
+            let YLMAX = 2 ^ (Y_LMUL_pow + ylen_exp - Y_SEW_pow);
+            assert(YLMAX <= sizeof('n));
+            if idx < YLMAX then {
+              ys2_val_view[idx / (y_columns * y_depth)][(idx / y_depth) % y_columns][idx % y_depth]
+            } else {
+              zeros()
+            }
+          },
+          Y_YY_YRGATHEREI16 => {
+            let idx = unsigned(ys1_val_yrgatherei16_view[i][j][k]);
+            assert(Y_LMUL_pow + ylen_exp - Y_SEW_pow >= 0);
+            let YLMAX = 2 ^ (Y_LMUL_pow + ylen_exp - Y_SEW_pow);
+            assert(YLMAX <= sizeof('n));
+            if idx < YLMAX then {
+              ys2_val_view[idx / (y_columns * y_depth)][(idx / y_depth) % y_columns][idx % y_depth]
+            } else {
+              zeros()
+            }
+          },
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping vvtype_mnemonic : vvfunct6 <-> string = {
-  VV_VADD          <-> "vadd.vv",
-  VV_VSUB          <-> "vsub.vv",
-  VV_VAND          <-> "vand.vv",
-  VV_VOR           <-> "vor.vv",
-  VV_VXOR          <-> "vxor.vv",
-  VV_VRGATHER      <-> "vrgather.vv",
-  VV_VRGATHEREI16  <-> "vrgatherei16.vv",
-  VV_VSADDU        <-> "vsaddu.vv",
-  VV_VSADD         <-> "vsadd.vv",
-  VV_VSSUBU        <-> "vssubu.vv",
-  VV_VSSUB         <-> "vssub.vv",
-  VV_VSLL          <-> "vsll.vv",
-  VV_VSMUL         <-> "vsmul.vv",
-  VV_VSRL          <-> "vsrl.vv",
-  VV_VSRA          <-> "vsra.vv",
-  VV_VSSRL         <-> "vssrl.vv",
-  VV_VSSRA         <-> "vssra.vv",
-  VV_VMINU         <-> "vminu.vv",
-  VV_VMIN          <-> "vmin.vv",
-  VV_VMAXU         <-> "vmaxu.vv",
-  VV_VMAX          <-> "vmax.vv"
+mapping y_yytype_mnemonic : y_yyfunct6 <-> string = {
+ Y_YY_YADD          <-> "yadd.yy",
+ Y_YY_YSUB          <-> "ysub.yy",
+ Y_YY_YAND          <-> "yand.yy",
+ Y_YY_YOR           <-> "yor.yy",
+ Y_YY_YXOR          <-> "yxor.yy",
+ Y_YY_YRGATHER      <-> "yrgather.yy",
+ Y_YY_YRGATHEREI16  <-> "yrgatherei16.yy",
+ Y_YY_YSADDU        <-> "ysaddu.yy",
+ Y_YY_YSADD         <-> "ysadd.yy",
+ Y_YY_YSSUBU        <-> "yssubu.yy",
+ Y_YY_YSSUB         <-> "yssub.yy",
+ Y_YY_YSLL          <-> "ysll.yy",
+ Y_YY_YSMUL         <-> "ysmul.yy",
+ Y_YY_YSRL          <-> "ysrl.yy",
+ Y_YY_YSRA          <-> "ysra.yy",
+ Y_YY_YSSRL         <-> "yssrl.yy",
+ Y_YY_YSSRA         <-> "yssra.yy",
+ Y_YY_YMINU         <-> "yminu.yy",
+ Y_YY_YMIN          <-> "ymin.yy",
+ Y_YY_YMAXU         <-> "ymaxu.yy",
+ Y_YY_YMAX          <-> "ymax.yy"
 }
 
-mapping clause assembly = VVTYPE(funct6, vm, vs2, vs1, vd)
-  <-> vvtype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1) ^ maybe_vmask(vm)
+mapping clause assembly = Y_YYTYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_yytype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ y_yreg_name(ys1) ^ y_maybe_ymask(ym)
 
-// ************************* OPIVV (WVTYPE Narrowing) ***************************
-// ************* Vector Narrowing Integer Right Shift Instructions **************
-union clause instruction = NVSTYPE : (nvsfunct6, bits(1), vregidx, vregidx, vregidx)
+// ************************* OPIVV (WIDE_YTYPE Narrowing) ***************************
+// ************* Tensor Narrowing Integer Right Shift Instructions **************
+union clause instruction = Y_NYSTYPE : (y_nysfunct6, bits(1), yregidx, yregidx, yregidx)
 
-mapping encdec_nvsfunct6 : nvsfunct6 <-> bits(6) = {
-  NVS_VNSRL       <-> 0b101100,
-  NVS_VNSRA       <-> 0b101101
+mapping y_encdec_nysfunct6 : y_nysfunct6 <-> bits(6) = {
+ Y_NYS_YNSRL       <-> 0b101100,
+ Y_NYS_YNSRA       <-> 0b101101
 }
 
-mapping clause encdec = NVSTYPE(funct6, vm, vs2, vs1, vd)
-  <-> encdec_nvsfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b000 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 16)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 32)
+mapping clause encdec = Y_NYSTYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_encdec_nysfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ y_encdec_yreg(ys1) @ 0b000 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 16)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 32)
 
-function clause execute NVSTYPE(funct6, vm, vs2, vs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_NYSTYPE(funct6, ym, ys2, ys1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  let SEW_widen      = SEW * 2;
-  let LMUL_pow_widen = LMUL_pow + 1;
+  let SEW_widen = SEW * 2;
+  let LMUL_pow_widen = Y_LMUL_pow + 1;
 
-  if  illegal_variable_width(vd, vm, SEW_widen, LMUL_pow_widen) |
-      not(valid_reg_overlap(vs2, vd, LMUL_pow_widen, LMUL_pow)) |
-      not(valid_reg_group(vs1, LMUL_pow))
-  then return Illegal_Instruction();
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_variable_width(yd, ym, SEW_widen, LMUL_pow_widen)
+   | not(y_valid_reg_overlap(ys2, yd, LMUL_pow_widen, Y_LMUL_pow))
+   | not(y_valid_src_overlap(ys2, SEW_widen, LMUL_pow_widen, ys1, SEW, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys1, SEW))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW_widen)) then {
+    return Illegal_Instruction()
+  };
 
   assert(SEW_widen <= 64);
   assert(LMUL_pow_widen <= 3);
 
-  let 'n = num_elem;
-  let 'm = SEW;
-  let 'o = SEW_widen;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+  let (o as 'o) = SEW_widen;
 
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-  let vs1_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs1);
-  let vs2_val : vector('n, bits('o)) = read_vreg(num_elem, SEW_widen, LMUL_pow_widen, vs2);
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+  let ys1_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys1);
+  let ys2_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_widen, LMUL_pow_widen, ys2);
 
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        NVS_VNSRL  => {
-                        let shift_amount = get_shift_amount(vs1_val[i], SEW_widen);
-                        (vs2_val[i] >> shift_amount)[SEW - 1 .. 0]
-                      },
-        NVS_VNSRA  => {
-                        let shift_amount = get_shift_amount(vs1_val[i], SEW_widen);
-                        let v_double : bits('o * 2) = sign_extend(vs2_val[i]);
-                        let arith_shifted : bits('o) = (v_double >> shift_amount)[SEW_widen - 1 .. 0];
-                        (arith_shifted)[SEW - 1 .. 0]
-                      }
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys1_val_view = y_shape(ys1_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys1_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_NYS_YNSRL => {
+            let shift_amount = y_get_shift_amount(ys1_val_view[i][j][k], SEW_widen);
+            (ys2_val_view[i][j][k] >> shift_amount)[SEW - 1 .. 0]
+          },
+          Y_NYS_YNSRA => {
+            let shift_amount = y_get_shift_amount(ys1_val_view[i][j][k], SEW_widen);
+            let y_double : bits('o * 2) = sign_extend(ys2_val_view[i][j][k]);
+            let arith_shifted : bits('o) = (y_double >> shift_amount)[SEW_widen - 1 .. 0];
+            arith_shifted[SEW - 1 .. 0]
+          },
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping nvstype_mnemonic : nvsfunct6 <-> string = {
-  NVS_VNSRL       <-> "vnsrl.wv",
-  NVS_VNSRA       <-> "vnsra.wv"
+mapping y_nystype_mnemonic : y_nysfunct6 <-> string = {
+ Y_NYS_YNSRL       <-> "ynsrl.wide.yy",
+ Y_NYS_YNSRA       <-> "ynsra.wide.yy"
 }
 
-mapping clause assembly = NVSTYPE(funct6, vm, vs2, vs1, vd)
-  <-> nvstype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1) ^ maybe_vmask(vm)
+mapping clause assembly = Y_NYSTYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_nystype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ y_yreg_name(ys1) ^ y_maybe_ymask(ym)
 
-// ************************* OPIVV (WVTYPE Narrowing) ***************************
-// ************** Vector Narrowing Fixed-Point Clip Instructions ****************
-union clause instruction = NVTYPE : (nvfunct6, bits(1), vregidx, vregidx, vregidx)
+// ************************* OPIVV (WIDE_YTYPE Narrowing) ***************************
+// ************** Tensor Narrowing Fixed-Point Clip Instructions ****************
+union clause instruction = Y_NYTYPE : (y_nyfunct6, bits(1), yregidx, yregidx, yregidx)
 
-mapping encdec_nvfunct6 : nvfunct6 <-> bits(6) = {
-  NV_VNCLIPU     <-> 0b101110,
-  NV_VNCLIP      <-> 0b101111
+mapping y_encdec_nyfunct6 : y_nyfunct6 <-> bits(6) = {
+ Y_NY_YNCLIPU     <-> 0b101110,
+ Y_NY_YNCLIP      <-> 0b101111
 }
 
-mapping clause encdec = NVTYPE(funct6, vm, vs2, vs1, vd)
-  <-> encdec_nvfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b000 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 16)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 32)
+mapping clause encdec = Y_NYTYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_encdec_nyfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ y_encdec_yreg(ys1) @ 0b000 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 16)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 32)
 
-function clause execute NVTYPE(funct6, vm, vs2, vs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_NYTYPE(funct6, ym, ys2, ys1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  let SEW_widen      = SEW * 2;
-  let LMUL_pow_widen = LMUL_pow + 1;
+  let SEW_widen = SEW * 2;
+  let LMUL_pow_widen = Y_LMUL_pow + 1;
 
-  if  illegal_variable_width(vd, vm, SEW_widen, LMUL_pow_widen) |
-      not(valid_reg_overlap(vs2, vd, LMUL_pow_widen, LMUL_pow)) |
-      not(valid_reg_group(vs1, LMUL_pow))
-  then return Illegal_Instruction();
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_variable_width(yd, ym, SEW_widen, LMUL_pow_widen)
+   | not(y_valid_reg_overlap(ys2, yd, LMUL_pow_widen, Y_LMUL_pow))
+   | not(y_valid_src_overlap(ys2, SEW_widen, LMUL_pow_widen, ys1, SEW, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys1, SEW))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW_widen)) then {
+    return Illegal_Instruction()
+  };
 
   assert(SEW_widen <= 64);
   assert(LMUL_pow_widen <= 3);
 
-  let 'n = num_elem;
-  let 'm = SEW;
-  let 'o = SEW_widen;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+  let (o as 'o) = SEW_widen;
 
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-  let vs1_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs1);
-  let vs2_val : vector('n, bits('o)) = read_vreg(num_elem, SEW_widen, LMUL_pow_widen, vs2);
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+  let ys1_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys1);
+  let ys2_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_widen, LMUL_pow_widen, ys2);
 
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      let shift_amount = get_shift_amount(vs1_val[i], SEW_widen);
-      let rounding_incr = get_fixed_rounding_incr(vs2_val[i], shift_amount);
-      result[i] = match funct6 {
-        NV_VNCLIPU => {
-                        let result_wide = (vs2_val[i] >> shift_amount) + zero_extend('o, rounding_incr);
-                        unsigned_saturation('m, result_wide);
-                      },
-        NV_VNCLIP  => {
-                        let v_double : bits('m * 4) = sign_extend(vs2_val[i]);
-                        let result_wide = (v_double >> shift_amount)['o - 1 .. 0] + zero_extend('o, rounding_incr);
-                        signed_saturation('m, result_wide);
-                      }
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys1_val_view = y_shape(ys1_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys1_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        let shift_amount = y_get_shift_amount(ys1_val_view[i][j][k], SEW_widen);
+        let rounding_incr = y_get_fixed_rounding_incr(ys2_val_view[i][j][k], shift_amount);
+        result_view[i][j][k] = match funct6 {
+          Y_NY_YNCLIPU => {
+            let result_wide = (ys2_val_view[i][j][k] >> shift_amount) +
+                zero_extend(sizeof('o), rounding_incr);
+            y_unsigned_saturation(sizeof('m), result_wide)
+          },
+          Y_NY_YNCLIP  => {
+            let y_double : bits('m * 4) = sign_extend(ys2_val_view[i][j][k]);
+            let result_wide = (y_double >> shift_amount)[sizeof('o) - 1 .. 0] +
+                zero_extend(sizeof('o), rounding_incr);
+            y_signed_saturation(sizeof('m), result_wide)
+          },
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping nvtype_mnemonic : nvfunct6 <-> string = {
-  NV_VNCLIPU     <-> "vnclipu.wv",
-  NV_VNCLIP      <-> "vnclip.wv"
+mapping y_nytype_mnemonic : y_nyfunct6 <-> string = {
+ Y_NY_YNCLIPU     <-> "ynclipu.wide.yy",
+ Y_NY_YNCLIP      <-> "ynclip.wide.yy"
 }
 
-mapping clause assembly = NVTYPE(funct6, vm, vs2, vs1, vd)
-  <-> nvtype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1) ^ maybe_vmask(vm)
+mapping clause assembly = Y_NYTYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_nytype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ y_yreg_name(ys1) ^ y_maybe_ymask(ym)
 
 // ********************* OPIVV (Integer Merge Instruction) **********************
-union clause instruction = MASKTYPEV : (vregidx, vregidx, vregidx)
+union clause instruction = Y_MASKTYPEY : (yregidx, yregidx, yregidx)
 
-mapping clause encdec = MASKTYPEV (vs2, vs1,  vd)
-  <-> 0b010111 @ 0b0 @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b000 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_MASKTYPEY (ys2, ys1,  yd)
+ <-> 0b010111 @ 0b0 @ y_encdec_yreg(ys2) @ y_encdec_yreg(ys1) @ 0b000 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute MASKTYPEV(vs2, vs1, vd) = {
-  let start_element : nat = match get_start_element() {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-  let end_element   = get_end_element();
-  let SEW           = get_sew();
-  let LMUL_pow      = get_lmul_pow();
-  let num_elem      = get_num_elem(LMUL_pow, SEW); // max(VLMAX,VLEN/SEW))
-  let real_num_elem = if LMUL_pow >= 0 then num_elem else num_elem / (0 - LMUL_pow); // VLMAX
-
-  if illegal_vd_masked(vd) |
-     not(valid_reg_group(vs1, LMUL_pow)) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, 0b0, zvreg);
-  let vs1_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs1);
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-  var result  : vector('n, bits('m)) = vector_init(zeros());
-
-  let tail_ag : agtype = get_vtype_vta();
-  foreach (i from 0 to (num_elem - 1)) {
-    if i < start_element then {
-      result[i] = vd_val[i]
-    } else if i > end_element | i >= real_num_elem then {
-      result[i] = match tail_ag {
-        UNDISTURBED => vd_val[i],
-        AGNOSTIC    => vd_val[i] // TODO: configuration support
-      }
+function clause execute(Y_MASKTYPEY(ys2, ys1, yd)) = {
+  let start_element = y_get_start_element();
+  let end_element = y_get_end_element();
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW); // max(YLMAX,YLEN/SEW))
+  let real_num_elem = if Y_LMUL_pow >= 0 then {
+      num_elem
     } else {
-      // the merge operates on all body elements
-      result[i] = if vm_val[i] == 0b1 then vs1_val[i] else vs2_val[i]
-    }
+      num_elem / (0 - Y_LMUL_pow)
+    }; // YLMAX
+
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_yd_masked(yd)
+   | not(y_valid_reg_group(ys1, Y_LMUL_pow))
+   | not(y_valid_reg_group(ys2, Y_LMUL_pow))
+   | not(y_valid_reg_group(yd, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(0b0, ys1, SEW))
+   | not(y_valid_ym_src_overlap(0b0, ys2, SEW)) then {
+    return Illegal_Instruction()
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, 0b0, y_zyreg);
+  let ys1_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys1);
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+  var result : vector('n, bits('m)) = vector_init(zeros());
+
+  let tail_ag : y_agtype = y_get_ytype_yta();
+  {
+    var result_view = y_shape(result, y_columns, y_depth);
+    let yd_val_view = y_shape(yd_val, y_columns, y_depth);
+    let ym_val_view = y_shape(ym_val, y_columns, y_depth);
+    let ys1_val_view = y_shape(ys1_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(result_view));
+      assert(i < length(yd_val_view));
+      assert(i < length(ym_val_view));
+      assert(i < length(ys1_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if p < start_element then {
+        result_view[i][j][k] = yd_val_view[i][j][k]
+      } else {
+        if p > end_element | p >= real_num_elem then {
+          result_view[i][j][k] = match tail_ag {
+            Y_UNDISTURBED => yd_val_view[i][j][k],
+            Y_AGNOSTIC    => yd_val_view[i][j][k], // TODO: configuration support
+          }
+        } else {
+          // the merge operates on all body elements
+          result_view[i][j][k] =
+            if ym_val_view[i][j][k] == 0b1 then {
+              ys1_val_view[i][j][k]
+            } else {
+              ys2_val_view[i][j][k]
+            }
+        }
+      }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
+  };
+
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = MASKTYPEV(vs2, vs1, vd)
-<-> "vmerge.vvm" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1) ^ sep() ^ "v0"
+mapping clause assembly = Y_MASKTYPEY(ys2, ys1, yd)
+<-> "ymerge.yym" ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ y_yreg_name(ys1) ^ sep() ^ "y0"
 
 // ********************* OPIVV (Integer Move Instruction) ***********************
-union clause instruction = MOVETYPEV : (vregidx, vregidx)
+union clause instruction = Y_MOVETYPEY : (yregidx, yregidx)
 
-mapping clause encdec = MOVETYPEV (vs1, vd)
-  <-> 0b010111 @ 0b1 @ 0b00000 @ encdec_vreg(vs1) @ 0b000 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_MOVETYPEY (ys1, yd)
+ <-> 0b010111 @ 0b1 @ 0b00000 @ y_encdec_yreg(ys1) @ 0b000 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute MOVETYPEV(vs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_MOVETYPEY(ys1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  if illegal_vd_unmasked() |
-     not(valid_reg_group(vs1, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vs1_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs1);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, ones()) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_yd_unmasked()
+   | not(y_valid_reg_group(ys1, Y_LMUL_pow))
+   | not(y_valid_reg_group(yd, Y_LMUL_pow)) then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ys1_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys1);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ones(),
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then result[i] = vs1_val[i]
-  };
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys1_val_view = y_shape(ys1_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys1_val_view));
+      assert(j < y_columns & k < y_depth);
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
-  RETIRE_SUCCESS
-}
-
-mapping clause assembly = MOVETYPEV(vs1, vd)
-  <-> "vmv.v.v" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs1)
-
-// ****************************** OPIVX (VXTYPE) ********************************
-union clause instruction = VXTYPE : (vxfunct6, bits(1), vregidx, regidx, vregidx)
-
-mapping encdec_vxfunct6 : vxfunct6 <-> bits(6) = {
-  VX_VADD       <-> 0b000000,
-  VX_VSUB       <-> 0b000010,
-  VX_VRSUB      <-> 0b000011,
-  VX_VMINU      <-> 0b000100,
-  VX_VMIN       <-> 0b000101,
-  VX_VMAXU      <-> 0b000110,
-  VX_VMAX       <-> 0b000111,
-  VX_VAND       <-> 0b001001,
-  VX_VOR        <-> 0b001010,
-  VX_VXOR       <-> 0b001011,
-  VX_VSADDU     <-> 0b100000,
-  VX_VSADD      <-> 0b100001,
-  VX_VSSUBU     <-> 0b100010,
-  VX_VSSUB      <-> 0b100011,
-  VX_VSLL       <-> 0b100101,
-  VX_VSMUL      <-> 0b100111,
-  VX_VSRL       <-> 0b101000,
-  VX_VSRA       <-> 0b101001,
-  VX_VSSRL      <-> 0b101010,
-  VX_VSSRA      <-> 0b101011
-}
-
-mapping clause encdec = VXTYPE(funct6, vm, vs2, rs1, vd)
-  <-> encdec_vxfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_reg(rs1) @ 0b100 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64 & valid_wide_vxtype(funct6))
-
-function clause execute VXTYPE(funct6, vm, vs2, rs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
-
-  if illegal_normal(vd, vm) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let rs1_val : bits('m)             = get_scalar(rs1, SEW);
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-  var result = initial_result;
-
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        VX_VADD    => vs2_val[i] + rs1_val,
-        VX_VSUB    => vs2_val[i] - rs1_val,
-        VX_VRSUB   => rs1_val - vs2_val[i],
-        VX_VAND    => vs2_val[i] & rs1_val,
-        VX_VOR     => vs2_val[i] | rs1_val,
-        VX_VXOR    => vs2_val[i] ^ rs1_val,
-        VX_VSADDU  => unsigned_saturation('m, zero_extend('m + 1, vs2_val[i]) + zero_extend('m + 1, rs1_val) ),
-        VX_VSADD   => signed_saturation('m, sign_extend('m + 1, vs2_val[i]) + sign_extend('m + 1, rs1_val) ),
-        VX_VSSUBU  => {
-                        if unsigned(vs2_val[i]) < unsigned(rs1_val) then zeros()
-                        else unsigned_saturation('m, zero_extend('m + 1, vs2_val[i]) - zero_extend('m + 1, rs1_val) )
-                      },
-        VX_VSSUB   => signed_saturation('m, sign_extend('m + 1, vs2_val[i]) - sign_extend('m + 1, rs1_val) ),
-        VX_VSMUL   => {
-                        let result_mul = to_bits_unsafe('m * 2, signed(vs2_val[i]) * signed(rs1_val));
-                        let rounding_incr = get_fixed_rounding_incr(result_mul, 'm - 1);
-                        let result_wide = (result_mul >> ('m - 1)) + zero_extend('m * 2, rounding_incr);
-                        signed_saturation('m, result_wide['m..0])
-                      },
-        VX_VSLL    => {
-                        let shift_amount = get_shift_amount(rs1_val, SEW);
-                        vs2_val[i] << shift_amount
-                      },
-        VX_VSRL    => {
-                        let shift_amount = get_shift_amount(rs1_val, SEW);
-                        vs2_val[i] >> shift_amount
-                      },
-        VX_VSRA    => {
-                        let shift_amount = get_shift_amount(rs1_val, SEW);
-                        let v_double : bits('m * 2) = sign_extend(vs2_val[i]);
-                        (v_double >> shift_amount)[SEW - 1 .. 0]
-                      },
-        VX_VSSRL   => {
-                        let shift_amount = get_shift_amount(rs1_val, SEW);
-                        let rounding_incr = get_fixed_rounding_incr(vs2_val[i], shift_amount);
-                        (vs2_val[i] >> shift_amount) + zero_extend('m, rounding_incr)
-                      },
-        VX_VSSRA   => {
-                        let shift_amount = get_shift_amount(rs1_val, SEW);
-                        let rounding_incr = get_fixed_rounding_incr(vs2_val[i], shift_amount);
-                        let v_double : bits('m * 2) = sign_extend(vs2_val[i]);
-                        (v_double >> shift_amount)[SEW - 1 .. 0] + zero_extend('m, rounding_incr)
-                      },
-        VX_VMINU   => to_bits_unsafe(SEW, min(unsigned(vs2_val[i]), unsigned(rs1_val))),
-        VX_VMIN    => to_bits_unsafe(SEW, min(signed(vs2_val[i]), signed(rs1_val))),
-        VX_VMAXU   => to_bits_unsafe(SEW, max(unsigned(vs2_val[i]), unsigned(rs1_val))),
-        VX_VMAX    => to_bits_unsafe(SEW, max(signed(vs2_val[i]), signed(rs1_val)))
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = ys1_val_view[i][j][k]
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping vxtype_mnemonic : vxfunct6 <-> string = {
-  VX_VADD       <-> "vadd.vx",
-  VX_VSUB       <-> "vsub.vx",
-  VX_VRSUB      <-> "vrsub.vx",
-  VX_VAND       <-> "vand.vx",
-  VX_VOR        <-> "vor.vx",
-  VX_VXOR       <-> "vxor.vx",
-  VX_VSADDU     <-> "vsaddu.vx",
-  VX_VSADD      <-> "vsadd.vx",
-  VX_VSSUBU     <-> "vssubu.vx",
-  VX_VSSUB      <-> "vssub.vx",
-  VX_VSLL       <-> "vsll.vx",
-  VX_VSMUL      <-> "vsmul.vx",
-  VX_VSRL       <-> "vsrl.vx",
-  VX_VSRA       <-> "vsra.vx",
-  VX_VSSRL      <-> "vssrl.vx",
-  VX_VSSRA      <-> "vssra.vx",
-  VX_VMINU      <-> "vminu.vx",
-  VX_VMIN       <-> "vmin.vx",
-  VX_VMAXU      <-> "vmaxu.vx",
-  VX_VMAX       <-> "vmax.vx"
+mapping clause assembly = Y_MOVETYPEY(ys1, yd)
+ <-> "ymv.y.y" ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys1)
+
+// ****************************** OPIVX (YXTYPE) ********************************
+union clause instruction = Y_YXTYPE : (y_yxfunct6, bits(1), yregidx, regidx, yregidx)
+
+mapping y_encdec_yxfunct6 : y_yxfunct6 <-> bits(6) = {
+ Y_YX_YADD       <-> 0b000000,
+ Y_YX_YSUB       <-> 0b000010,
+ Y_YX_YRSUB      <-> 0b000011,
+ Y_YX_YMINU      <-> 0b000100,
+ Y_YX_YMIN       <-> 0b000101,
+ Y_YX_YMAXU      <-> 0b000110,
+ Y_YX_YMAX       <-> 0b000111,
+ Y_YX_YAND       <-> 0b001001,
+ Y_YX_YOR        <-> 0b001010,
+ Y_YX_YXOR       <-> 0b001011,
+ Y_YX_YSADDU     <-> 0b100000,
+ Y_YX_YSADD      <-> 0b100001,
+ Y_YX_YSSUBU     <-> 0b100010,
+ Y_YX_YSSUB      <-> 0b100011,
+ Y_YX_YSLL       <-> 0b100101,
+ Y_YX_YSMUL      <-> 0b100111,
+ Y_YX_YSRL       <-> 0b101000,
+ Y_YX_YSRA       <-> 0b101001,
+ Y_YX_YSSRL      <-> 0b101010,
+ Y_YX_YSSRA      <-> 0b101011
 }
 
-mapping clause assembly = VXTYPE(funct6, vm, vs2, rs1, vd)
-  <-> vxtype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ reg_name(rs1) ^ maybe_vmask(vm)
+mapping clause encdec = Y_YXTYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_encdec_yxfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ encdec_reg(rs1) @ 0b100 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64 & y_valid_wide_yxtype(funct6))
 
-// ************************* OPIVX (WXTYPE Narrowing) ***************************
-// ************* Vector Narrowing Integer Right Shift Instructions **************
-union clause instruction = NXSTYPE : (nxsfunct6, bits(1), vregidx, regidx, vregidx)
+function clause execute(Y_YXTYPE(funct6, ym, ys2, rs1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-mapping encdec_nxsfunct6 : nxsfunct6 <-> bits(6) = {
-  NXS_VNSRL       <-> 0b101100,
-  NXS_VNSRA       <-> 0b101101
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_normal(yd, ym)
+   | not(y_valid_reg_group(ys2, Y_LMUL_pow))
+   | not(y_valid_reg_group(yd, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW)) then {
+    return Illegal_Instruction()
+  };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let rs1_val : bits('m) = y_get_scalar(rs1, SEW);
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
+  var result = initial_result;
+
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_YX_YADD   => ys2_val_view[i][j][k] + rs1_val,
+          Y_YX_YSUB   => ys2_val_view[i][j][k] - rs1_val,
+          Y_YX_YRSUB  => rs1_val - ys2_val_view[i][j][k],
+          Y_YX_YAND   => ys2_val_view[i][j][k] & rs1_val,
+          Y_YX_YOR    => ys2_val_view[i][j][k] | rs1_val,
+          Y_YX_YXOR   => ys2_val_view[i][j][k] ^ rs1_val,
+          Y_YX_YSADDU => y_unsigned_saturation(
+            sizeof('m),
+            zero_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) + zero_extend(sizeof('m) + 1, rs1_val),
+          ),
+          Y_YX_YSADD  => y_signed_saturation(
+            sizeof('m),
+            sign_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) + sign_extend(sizeof('m) + 1, rs1_val),
+          ),
+          Y_YX_YSSUBU => {
+            if unsigned(ys2_val_view[i][j][k]) < unsigned(rs1_val) then {
+              y_write_yxsat(0b1);
+              zeros()
+            } else {
+              y_unsigned_saturation(
+                sizeof('m),
+                zero_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) -
+                  zero_extend(sizeof('m) + 1, rs1_val),
+              )
+            }
+          },
+          Y_YX_YSSUB  => y_signed_saturation(
+            sizeof('m),
+            sign_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) - sign_extend(sizeof('m) + 1, rs1_val),
+          ),
+          Y_YX_YSMUL  => {
+            let result_mul = to_bits_unsafe(sizeof('m) * 2, signed(ys2_val_view[i][j][k]) * signed(rs1_val));
+            let rounding_incr = y_get_fixed_rounding_incr(result_mul, sizeof('m) - 1);
+            let result_wide = (result_mul >> (sizeof('m) - 1)) + zero_extend(sizeof('m) * 2, rounding_incr);
+            y_signed_saturation(sizeof('m), result_wide[sizeof('m) .. 0])
+          },
+          Y_YX_YSLL   => {
+            let shift_amount = y_get_shift_amount(rs1_val, SEW);
+            ys2_val_view[i][j][k] << shift_amount
+          },
+          Y_YX_YSRL   => {
+            let shift_amount = y_get_shift_amount(rs1_val, SEW);
+            ys2_val_view[i][j][k] >> shift_amount
+          },
+          Y_YX_YSRA   => {
+            let shift_amount = y_get_shift_amount(rs1_val, SEW);
+            let y_double : bits('m * 2) = sign_extend(ys2_val_view[i][j][k]);
+            (y_double >> shift_amount)[SEW - 1 .. 0]
+          },
+          Y_YX_YSSRL  => {
+            let shift_amount = y_get_shift_amount(rs1_val, SEW);
+            let rounding_incr = y_get_fixed_rounding_incr(ys2_val_view[i][j][k], shift_amount);
+            (ys2_val_view[i][j][k] >> shift_amount) + zero_extend(sizeof('m), rounding_incr)
+          },
+          Y_YX_YSSRA  => {
+            let shift_amount = y_get_shift_amount(rs1_val, SEW);
+            let rounding_incr = y_get_fixed_rounding_incr(ys2_val_view[i][j][k], shift_amount);
+            let y_double : bits('m * 2) = sign_extend(ys2_val_view[i][j][k]);
+            (y_double >> shift_amount)[SEW - 1 .. 0] + zero_extend(sizeof('m), rounding_incr)
+          },
+          Y_YX_YMINU  => to_bits_unsafe(SEW, min(unsigned(ys2_val_view[i][j][k]), unsigned(rs1_val))),
+          Y_YX_YMIN   => to_bits_unsafe(SEW, min(signed(ys2_val_view[i][j][k]), signed(rs1_val))),
+          Y_YX_YMAXU  => to_bits_unsafe(SEW, max(unsigned(ys2_val_view[i][j][k]), unsigned(rs1_val))),
+          Y_YX_YMAX   => to_bits_unsafe(SEW, max(signed(ys2_val_view[i][j][k]), signed(rs1_val))),
+        }
+      }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
+  };
+
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
+  RETIRE_SUCCESS
 }
 
-mapping clause encdec = NXSTYPE(funct6, vm, vs2, rs1, vd)
-  <-> encdec_nxsfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_reg(rs1) @ 0b100 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 16)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 32)
+mapping y_yxtype_mnemonic : y_yxfunct6 <-> string = {
+ Y_YX_YADD       <-> "yadd.yx",
+ Y_YX_YSUB       <-> "ysub.yx",
+ Y_YX_YRSUB      <-> "yrsub.yx",
+ Y_YX_YAND       <-> "yand.yx",
+ Y_YX_YOR        <-> "yor.yx",
+ Y_YX_YXOR       <-> "yxor.yx",
+ Y_YX_YSADDU     <-> "ysaddu.yx",
+ Y_YX_YSADD      <-> "ysadd.yx",
+ Y_YX_YSSUBU     <-> "yssubu.yx",
+ Y_YX_YSSUB      <-> "yssub.yx",
+ Y_YX_YSLL       <-> "ysll.yx",
+ Y_YX_YSMUL      <-> "ysmul.yx",
+ Y_YX_YSRL       <-> "ysrl.yx",
+ Y_YX_YSRA       <-> "ysra.yx",
+ Y_YX_YSSRL      <-> "yssrl.yx",
+ Y_YX_YSSRA      <-> "yssra.yx",
+ Y_YX_YMINU      <-> "yminu.yx",
+ Y_YX_YMIN       <-> "ymin.yx",
+ Y_YX_YMAXU      <-> "ymaxu.yx",
+ Y_YX_YMAX       <-> "ymax.yx"
+}
 
-function clause execute NXSTYPE(funct6, vm, vs2, rs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+mapping clause assembly = Y_YXTYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_yxtype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ reg_name(rs1) ^ y_maybe_ymask(ym)
 
-  let SEW_widen      = SEW * 2;
-  let LMUL_pow_widen = LMUL_pow + 1;
+// ************************* OPIVX (WIDE_XTYPE Narrowing) ***************************
+// ************* Tensor Narrowing Integer Right Shift Instructions **************
+union clause instruction = Y_NXSTYPE : (y_nxsfunct6, bits(1), yregidx, regidx, yregidx)
 
-  if  illegal_variable_width(vd, vm, SEW_widen, LMUL_pow_widen) |
-      not(valid_reg_overlap(vs2, vd, LMUL_pow_widen, LMUL_pow))
-  then return Illegal_Instruction();
+mapping y_encdec_nxsfunct6 : y_nxsfunct6 <-> bits(6) = {
+ Y_NXS_YNSRL       <-> 0b101100,
+ Y_NXS_YNSRA       <-> 0b101101
+}
+
+mapping clause encdec = Y_NXSTYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_encdec_nxsfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ encdec_reg(rs1) @ 0b100 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 16)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 32)
+
+function clause execute(Y_NXSTYPE(funct6, ym, ys2, rs1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
+
+  let SEW_widen = SEW * 2;
+  let LMUL_pow_widen = Y_LMUL_pow + 1;
+
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_variable_width(yd, ym, SEW_widen, LMUL_pow_widen)
+   | not(y_valid_reg_overlap(ys2, yd, LMUL_pow_widen, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW_widen)) then {
+    return Illegal_Instruction()
+  };
 
   assert(SEW_widen <= 64);
   assert(LMUL_pow_widen <= 3);
 
-  let 'n = num_elem;
-  let 'm = SEW;
-  let 'o = SEW_widen;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+  let (o as 'o) = SEW_widen;
 
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-  let rs1_val : bits('m)             = get_scalar(rs1, SEW);
-  let vs2_val : vector('n, bits('o)) = read_vreg(num_elem, SEW_widen, LMUL_pow_widen, vs2);
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+  let rs1_val : bits('m) = y_get_scalar(rs1, SEW);
+  let ys2_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_widen, LMUL_pow_widen, ys2);
 
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        NXS_VNSRL  => {
-                        let shift_amount = get_shift_amount(rs1_val, SEW_widen);
-                        (vs2_val[i] >> shift_amount)[SEW - 1 .. 0]
-                      },
-        NXS_VNSRA  => {
-                        let shift_amount = get_shift_amount(rs1_val, SEW_widen);
-                        let v_double : bits('o * 2) = sign_extend(vs2_val[i]);
-                        let arith_shifted : bits('o) = (v_double >> shift_amount)[SEW_widen - 1 .. 0];
-                        arith_shifted[SEW - 1 .. 0]
-                      }
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_NXS_YNSRL => {
+            let shift_amount = y_get_shift_amount(rs1_val, SEW_widen);
+            (ys2_val_view[i][j][k] >> shift_amount)[SEW - 1 .. 0]
+          },
+          Y_NXS_YNSRA => {
+            let shift_amount = y_get_shift_amount(rs1_val, SEW_widen);
+            let y_double : bits('o * 2) = sign_extend(ys2_val_view[i][j][k]);
+            let arith_shifted : bits('o) = (y_double >> shift_amount)[SEW_widen - 1 .. 0];
+            arith_shifted[SEW - 1 .. 0]
+          },
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping nxstype_mnemonic : nxsfunct6 <-> string = {
-  NXS_VNSRL       <-> "vnsrl.wx",
-  NXS_VNSRA       <-> "vnsra.wx"
+mapping y_nxstype_mnemonic : y_nxsfunct6 <-> string = {
+ Y_NXS_YNSRL       <-> "ynsrl.wide.yx",
+ Y_NXS_YNSRA       <-> "ynsra.wide.yx"
 }
 
-mapping clause assembly = NXSTYPE(funct6, vm, vs2, rs1, vd)
-  <-> nxstype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ reg_name(rs1) ^ maybe_vmask(vm)
+mapping clause assembly = Y_NXSTYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_nxstype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ reg_name(rs1) ^ y_maybe_ymask(ym)
 
-// ************************* OPIVX (WXTYPE Narrowing) ***************************
-// ************** Vector Narrowing Fixed-Point Clip Instructions ****************
-union clause instruction = NXTYPE : (nxfunct6, bits(1), vregidx, regidx, vregidx)
+// ************************* OPIVX (WIDE_XTYPE Narrowing) ***************************
+// ************** Tensor Narrowing Fixed-Point Clip Instructions ****************
+union clause instruction = Y_NXTYPE : (y_nxfunct6, bits(1), yregidx, regidx, yregidx)
 
-mapping encdec_nxfunct6 : nxfunct6 <-> bits(6) = {
-  NX_VNCLIPU     <-> 0b101110,
-  NX_VNCLIP      <-> 0b101111
+mapping y_encdec_nxfunct6 : y_nxfunct6 <-> bits(6) = {
+ Y_NX_YNCLIPU     <-> 0b101110,
+ Y_NX_YNCLIP      <-> 0b101111
 }
 
-mapping clause encdec = NXTYPE(funct6, vm, vs2, rs1, vd)
-  <-> encdec_nxfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_reg(rs1) @ 0b100 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 16)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 32)
+mapping clause encdec = Y_NXTYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_encdec_nxfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ encdec_reg(rs1) @ 0b100 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 16)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 32)
 
-function clause execute NXTYPE(funct6, vm, vs2, rs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_NXTYPE(funct6, ym, ys2, rs1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  let SEW_widen      = SEW * 2;
-  let LMUL_pow_widen = LMUL_pow + 1;
+  let SEW_widen = SEW * 2;
+  let LMUL_pow_widen = Y_LMUL_pow + 1;
 
-  if  illegal_variable_width(vd, vm, SEW_widen, LMUL_pow_widen) |
-      not(valid_reg_overlap(vs2, vd, LMUL_pow_widen, LMUL_pow))
-  then return Illegal_Instruction();
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_variable_width(yd, ym, SEW_widen, LMUL_pow_widen)
+   | not(y_valid_reg_overlap(ys2, yd, LMUL_pow_widen, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW_widen)) then {
+    return Illegal_Instruction()
+  };
 
   assert(SEW_widen <= 64);
   assert(LMUL_pow_widen <= 3);
 
-  let 'n = num_elem;
-  let 'm = SEW;
-  let 'o = SEW_widen;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+  let (o as 'o) = SEW_widen;
 
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-  let rs1_val : bits('m)             = get_scalar(rs1, SEW);
-  let vs2_val : vector('n, bits('o)) = read_vreg(num_elem, SEW_widen, LMUL_pow_widen, vs2);
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+  let rs1_val : bits('m) = y_get_scalar(rs1, SEW);
+  let ys2_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_widen, LMUL_pow_widen, ys2);
 
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      let shift_amount = get_shift_amount(rs1_val, SEW_widen);
-      let rounding_incr = get_fixed_rounding_incr(vs2_val[i], shift_amount);
-      result[i] = match funct6 {
-        NX_VNCLIPU => {
-                        let result_wide = (vs2_val[i] >> shift_amount) + zero_extend('o, rounding_incr);
-                        unsigned_saturation('m, result_wide)
-                      },
-        NX_VNCLIP  => {
-                        let v_double : bits('m * 4) = sign_extend(vs2_val[i]);
-                        let result_wide = (v_double >> shift_amount)['o - 1 .. 0] + zero_extend('o, rounding_incr);
-                        signed_saturation('m, result_wide)
-                      }
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        let shift_amount = y_get_shift_amount(rs1_val, SEW_widen);
+        let rounding_incr = y_get_fixed_rounding_incr(ys2_val_view[i][j][k], shift_amount);
+        result_view[i][j][k] = match funct6 {
+          Y_NX_YNCLIPU => {
+            let result_wide = (ys2_val_view[i][j][k] >> shift_amount) +
+                zero_extend(sizeof('o), rounding_incr);
+            y_unsigned_saturation(sizeof('m), result_wide)
+          },
+          Y_NX_YNCLIP  => {
+            let y_double : bits('m * 4) = sign_extend(ys2_val_view[i][j][k]);
+            let result_wide = (y_double >> shift_amount)[sizeof('o) - 1 .. 0] +
+                zero_extend(sizeof('o), rounding_incr);
+            y_signed_saturation(sizeof('m), result_wide)
+          },
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping nxtype_mnemonic : nxfunct6 <-> string = {
-  NX_VNCLIPU     <-> "vnclipu.wx",
-  NX_VNCLIP      <-> "vnclip.wx"
+mapping y_nxtype_mnemonic : y_nxfunct6 <-> string = {
+ Y_NX_YNCLIPU     <-> "ynclipu.wide.yx",
+ Y_NX_YNCLIP      <-> "ynclip.wide.yx"
 }
 
-mapping clause assembly = NXTYPE(funct6, vm, vs2, rs1, vd)
-  <-> nxtype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ reg_name(rs1) ^ maybe_vmask(vm)
+mapping clause assembly = Y_NXTYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_nxtype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ reg_name(rs1) ^ y_maybe_ymask(ym)
 
-// **************** OPIVX (Vector Slide & Gather Instructions) ******************
+// **************** OPIVX (Tensor Slide & Gather Instructions) ******************
 // Slide and gather instructions extend rs1/imm to XLEN instead of SEW bits
-union clause instruction = VXSG : (vxsgfunct6, bits(1), vregidx, regidx, vregidx)
+union clause instruction = Y_YXSG : (y_yxsgfunct6, bits(1), yregidx, regidx, yregidx)
 
-mapping encdec_vxsgfunct6 : vxsgfunct6 <-> bits(6) = {
-  VX_VSLIDEUP     <-> 0b001110,
-  VX_VSLIDEDOWN   <-> 0b001111,
-  VX_VRGATHER     <-> 0b001100
+mapping y_encdec_yxsgfunct6 : y_yxsgfunct6 <-> bits(6) = {
+ Y_YX_YSLIDEUP     <-> 0b001110,
+ Y_YX_YSLIDEDOWN   <-> 0b001111,
+ Y_YX_YRGATHER     <-> 0b001100
 }
 
-mapping clause encdec = VXSG(funct6, vm, vs2, rs1, vd)
-  <-> encdec_vxsgfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_reg(rs1) @ 0b100 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_YXSG(funct6, ym, ys2, rs1, yd)
+ <-> y_encdec_yxsgfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ encdec_reg(rs1) @ 0b100 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute VXSG(funct6, vm, vs2, rs1, vd) = {
-  let SEW_pow  = get_sew_pow();
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_YXSG(funct6, ym, ys2, rs1, yd)) = {
+  let Y_SEW_pow = y_get_sew_pow();
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
   // For `vslideup` and `vrgather`, "the destination vector register
   // group cannot overlap with the source vector register groups,
   // otherwise the instruction encoding is reserved."
   let src_dst_overlap : bool = match funct6 {
-    VX_VSLIDEUP   => vd == vs2,
-    VX_VSLIDEDOWN => false,
-    VX_VRGATHER   => vd == vs2,
+    Y_YX_YSLIDEUP   => yd == ys2,
+    Y_YX_YSLIDEDOWN => false,
+    Y_YX_YRGATHER   => yd == ys2,
   };
-  if illegal_normal(vd, vm) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow)) |
-     src_dst_overlap
-  then return Illegal_Instruction();
 
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let rs1_val : nat                  = unsigned(X(rs1));
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_normal(yd, ym)
+   | not(y_valid_reg_group(ys2, Y_LMUL_pow))
+   | not(y_valid_reg_group(yd, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW))
+   | src_dst_overlap then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let rs1_val : nat = unsigned(X(rs1));
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        VX_VSLIDEUP    => {
-                            if i >= rs1_val then vs2_val[i - rs1_val] else vd_val[i]
-                          },
-        VX_VSLIDEDOWN  => {
-                            assert(LMUL_pow + vlen_exp - SEW_pow >= 0);
-                            let VLMAX = 2 ^ (LMUL_pow + vlen_exp - SEW_pow);
-                            assert(VLMAX > 0 & VLMAX <= 'n);
-                            if i + rs1_val < VLMAX then vs2_val[i + rs1_val] else zeros()
-                          },
-        VX_VRGATHER    => {
-                            assert(LMUL_pow + vlen_exp - SEW_pow >= 0);
-                            let VLMAX = 2 ^ (LMUL_pow + vlen_exp - SEW_pow);
-                            assert(VLMAX > 0 & VLMAX <= 'n);
-                            if rs1_val < VLMAX then vs2_val[rs1_val] else zeros()
-                          }
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let yd_val_view = y_shape(yd_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(yd_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_YX_YSLIDEUP   => {
+            if p >= rs1_val then {
+              ys2_val_view[(p - rs1_val) / (y_columns * y_depth)][((p - rs1_val) / y_depth) % y_columns][
+                (p - rs1_val) % y_depth
+              ]
+            } else {
+              yd_val_view[i][j][k]
+            }
+          },
+          Y_YX_YSLIDEDOWN => {
+            assert(Y_LMUL_pow + ylen_exp - Y_SEW_pow >= 0);
+            let YLMAX = 2 ^ (Y_LMUL_pow + ylen_exp - Y_SEW_pow);
+            assert(YLMAX > 0 & YLMAX <= sizeof('n));
+            if p + rs1_val < YLMAX then {
+              ys2_val_view[(p + rs1_val) / (y_columns * y_depth)][((p + rs1_val) / y_depth) % y_columns][
+                (p + rs1_val) % y_depth
+              ]
+            } else {
+              zeros()
+            }
+          },
+          Y_YX_YRGATHER   => {
+            assert(Y_LMUL_pow + ylen_exp - Y_SEW_pow >= 0);
+            let YLMAX = 2 ^ (Y_LMUL_pow + ylen_exp - Y_SEW_pow);
+            assert(YLMAX > 0 & YLMAX <= sizeof('n));
+            if rs1_val < YLMAX then {
+              ys2_val_view[rs1_val / (y_columns * y_depth)][(rs1_val / y_depth) % y_columns][
+                rs1_val % y_depth
+              ]
+            } else {
+              zeros()
+            }
+          },
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping vxsg_mnemonic : vxsgfunct6 <-> string = {
-  VX_VSLIDEUP     <-> "vslideup.vx",
-  VX_VSLIDEDOWN   <-> "vslidedown.vx",
-  VX_VRGATHER     <-> "vrgather.vx"
+mapping y_yxsg_mnemonic : y_yxsgfunct6 <-> string = {
+ Y_YX_YSLIDEUP     <-> "yslideup.yx",
+ Y_YX_YSLIDEDOWN   <-> "yslidedown.yx",
+ Y_YX_YRGATHER     <-> "yrgather.yx"
 }
 
-mapping clause assembly = VXSG(funct6, vm, vs2, rs1, vd)
-  <-> vxsg_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ reg_name(rs1) ^ maybe_vmask(vm)
+mapping clause assembly = Y_YXSG(funct6, ym, ys2, rs1, yd)
+ <-> y_yxsg_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ reg_name(rs1) ^ y_maybe_ymask(ym)
 
 // ********************* OPIVX (Integer Merge Instruction) **********************
-union clause instruction = MASKTYPEX : (vregidx, regidx, vregidx)
+union clause instruction = Y_MASKTYPEX : (yregidx, regidx, yregidx)
 
-mapping clause encdec = MASKTYPEX(vs2, rs1, vd)
-  <-> 0b010111 @ 0b0 @ encdec_vreg(vs2) @ encdec_reg(rs1) @ 0b100 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_MASKTYPEX(ys2, rs1, yd)
+ <-> 0b010111 @ 0b0 @ y_encdec_yreg(ys2) @ encdec_reg(rs1) @ 0b100 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute MASKTYPEX(vs2, rs1, vd) = {
-  let start_element : nat = match get_start_element() {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-
-  let end_element   = get_end_element();
-  let SEW           = get_sew();
-  let LMUL_pow      = get_lmul_pow();
-  let num_elem      = get_num_elem(LMUL_pow, SEW); // max(VLMAX,VLEN/SEW))
-  let real_num_elem = if LMUL_pow >= 0 then num_elem else num_elem / (0 - LMUL_pow); // VLMAX
-
-  if illegal_vd_masked(vd) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, 0b0, zvreg);
-  let rs1_val : bits('m)             = get_scalar(rs1, SEW);
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-  var result  : vector('n, bits('m)) = vector_init(zeros());
-
-  let tail_ag : agtype = get_vtype_vta();
-  foreach (i from 0 to (num_elem - 1)) {
-    if i < start_element then {
-      result[i] = vd_val[i]
-    } else if i > end_element | i >= real_num_elem then {
-      result[i] = match tail_ag {
-        UNDISTURBED => vd_val[i],
-        AGNOSTIC    => vd_val[i] // TODO: configuration support
-      }
+function clause execute(Y_MASKTYPEX(ys2, rs1, yd)) = {
+  let start_element = y_get_start_element();
+  let end_element = y_get_end_element();
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW); // max(YLMAX,YLEN/SEW))
+  let real_num_elem = if Y_LMUL_pow >= 0 then {
+      num_elem
     } else {
-      // the merge operates on all body elements
-      result[i] = if vm_val[i] == 0b1 then rs1_val else vs2_val[i]
-    }
+      num_elem / (0 - Y_LMUL_pow)
+    }; // YLMAX
+
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_yd_masked(yd)
+   | not(y_valid_reg_group(ys2, Y_LMUL_pow))
+   | not(y_valid_reg_group(yd, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(0b0, ys2, SEW)) then {
+    return Illegal_Instruction()
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, 0b0, y_zyreg);
+  let rs1_val : bits('m) = y_get_scalar(rs1, SEW);
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+  var result : vector('n, bits('m)) = vector_init(zeros());
+
+  let tail_ag : y_agtype = y_get_ytype_yta();
+  {
+    var result_view = y_shape(result, y_columns, y_depth);
+    let yd_val_view = y_shape(yd_val, y_columns, y_depth);
+    let ym_val_view = y_shape(ym_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(result_view));
+      assert(i < length(yd_val_view));
+      assert(i < length(ym_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if p < start_element then {
+        result_view[i][j][k] = yd_val_view[i][j][k]
+      } else {
+        if p > end_element | p >= real_num_elem then {
+          result_view[i][j][k] = match tail_ag {
+            Y_UNDISTURBED => yd_val_view[i][j][k],
+            Y_AGNOSTIC    => yd_val_view[i][j][k], // TODO: configuration support
+          }
+        } else {
+          // the merge operates on all body elements
+          result_view[i][j][k] =
+            if ym_val_view[i][j][k] == 0b1 then {
+              rs1_val
+            } else {
+              ys2_val_view[i][j][k]
+            }
+        }
+      }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
+  };
+
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = MASKTYPEX(vs2, rs1, vd)
-  <-> "vmerge.vxm" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ reg_name(rs1) ^ sep() ^ "v0"
+mapping clause assembly = Y_MASKTYPEX(ys2, rs1, yd)
+ <-> "ymerge.yxm" ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ reg_name(rs1) ^ sep() ^ "y0"
 
 // ********************* OPIVX (Integer Move Instruction) ***********************
-union clause instruction = MOVETYPEX : (regidx, vregidx)
+union clause instruction = Y_MOVETYPEX : (regidx, yregidx)
 
-mapping clause encdec = MOVETYPEX (rs1, vd)
-  <-> 0b010111 @ 0b1 @ 0b00000 @ encdec_reg(rs1) @ 0b100 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_MOVETYPEX (rs1, yd)
+ <-> 0b010111 @ 0b1 @ 0b00000 @ encdec_reg(rs1) @ 0b100 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute MOVETYPEX(rs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_MOVETYPEX(rs1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  if illegal_vd_unmasked() | not(valid_reg_group(vd, LMUL_pow))
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let rs1_val : bits('m)             = get_scalar(rs1, 'm);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, ones()) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_yd_unmasked()
+   | not(y_valid_reg_group(yd, Y_LMUL_pow)) then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let rs1_val : bits('m) = y_get_scalar(rs1, sizeof('m));
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ones(),
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then result[i] = rs1_val
-  };
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(j < y_columns & k < y_depth);
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
-  RETIRE_SUCCESS
-}
-
-mapping clause assembly = MOVETYPEX(rs1, vd)
-  <-> "vmv.v.x" ^ spc() ^ vreg_name(vd) ^ sep() ^ reg_name(rs1)
-
-// ****************************** OPIVI (VITYPE) ********************************
-union clause instruction = VITYPE : (vifunct6, bits(1), vregidx, bits(5), vregidx)
-
-mapping encdec_vifunct6 : vifunct6 <-> bits(6) = {
-  VI_VADD       <-> 0b000000,
-  VI_VRSUB      <-> 0b000011,
-  VI_VAND       <-> 0b001001,
-  VI_VOR        <-> 0b001010,
-  VI_VXOR       <-> 0b001011,
-  VI_VSADDU     <-> 0b100000,
-  VI_VSADD      <-> 0b100001,
-  VI_VSLL       <-> 0b100101,
-  VI_VSRL       <-> 0b101000,
-  VI_VSRA       <-> 0b101001,
-  VI_VSSRL      <-> 0b101010,
-  VI_VSSRA      <-> 0b101011
-}
-
-mapping clause encdec = VITYPE(funct6, vm, vs2, simm, vd)
-  <-> encdec_vifunct6(funct6) @ vm @ encdec_vreg(vs2) @ simm @ 0b011 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
-
-function clause execute VITYPE(funct6, vm, vs2, simm, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
-
-  if illegal_normal(vd, vm) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let imm_val : bits('m)             = sign_extend(simm);
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-  var result = initial_result;
-
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        VI_VADD    => vs2_val[i] + imm_val,
-        VI_VRSUB   => imm_val - vs2_val[i],
-        VI_VAND    => vs2_val[i] & imm_val,
-        VI_VOR     => vs2_val[i] | imm_val,
-        VI_VXOR    => vs2_val[i] ^ imm_val,
-        VI_VSADDU  => unsigned_saturation('m, zero_extend('m + 1, vs2_val[i]) + zero_extend('m + 1, imm_val) ),
-        VI_VSADD   => signed_saturation('m, sign_extend('m + 1, vs2_val[i]) + sign_extend('m + 1, imm_val) ),
-        VI_VSLL    => {
-                        let shift_amount = get_shift_amount(zero_extend('m, simm), SEW);
-                        vs2_val[i] << shift_amount
-                      },
-        VI_VSRL    => {
-                        let shift_amount = get_shift_amount(zero_extend('m, simm), SEW);
-                        vs2_val[i] >> shift_amount
-                      },
-        VI_VSRA    => {
-                        let shift_amount = get_shift_amount(zero_extend('m, simm), SEW);
-                        let v_double : bits('m * 2) = sign_extend(vs2_val[i]);
-                        (v_double >> shift_amount)[SEW - 1 .. 0]
-                      },
-        VI_VSSRL   => {
-                        let shift_amount = get_shift_amount(zero_extend('m, simm), SEW);
-                        let rounding_incr = get_fixed_rounding_incr(vs2_val[i], shift_amount);
-                        (vs2_val[i] >> shift_amount) + zero_extend('m, rounding_incr)
-                      },
-        VI_VSSRA   => {
-                        let shift_amount = get_shift_amount(zero_extend('m, simm), SEW);
-                        let rounding_incr = get_fixed_rounding_incr(vs2_val[i], shift_amount);
-                        let v_double : bits('m * 2) = sign_extend(vs2_val[i]);
-                        (v_double >> shift_amount)[SEW - 1 .. 0] + zero_extend('m, rounding_incr)
-                      }
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = rs1_val
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping vitype_mnemonic : vifunct6 <-> string = {
-  VI_VADD   <-> "vadd.vi",
-  VI_VRSUB  <-> "vrsub.vi",
-  VI_VAND   <-> "vand.vi",
-  VI_VOR    <-> "vor.vi",
-  VI_VXOR   <-> "vxor.vi",
-  VI_VSADDU <-> "vsaddu.vi",
-  VI_VSADD  <-> "vsadd.vi",
-  VI_VSLL   <-> "vsll.vi",
-  VI_VSRL   <-> "vsrl.vi",
-  VI_VSRA   <-> "vsra.vi",
-  VI_VSSRL  <-> "vssrl.vi",
-  VI_VSSRA  <-> "vssra.vi"
+mapping clause assembly = Y_MOVETYPEX(rs1, yd)
+ <-> "ymv.y.x" ^ spc() ^ y_yreg_name(yd) ^ sep() ^ reg_name(rs1)
+
+// ****************************** OPIVI (YITYPE) ********************************
+union clause instruction = Y_YITYPE : (y_yifunct6, bits(1), yregidx, bits(5), yregidx)
+
+mapping y_encdec_yifunct6 : y_yifunct6 <-> bits(6) = {
+ Y_YI_YADD       <-> 0b000000,
+ Y_YI_YRSUB      <-> 0b000011,
+ Y_YI_YAND       <-> 0b001001,
+ Y_YI_YOR        <-> 0b001010,
+ Y_YI_YXOR       <-> 0b001011,
+ Y_YI_YSADDU     <-> 0b100000,
+ Y_YI_YSADD      <-> 0b100001,
+ Y_YI_YSLL       <-> 0b100101,
+ Y_YI_YSRL       <-> 0b101000,
+ Y_YI_YSRA       <-> 0b101001,
+ Y_YI_YSSRL      <-> 0b101010,
+ Y_YI_YSSRA      <-> 0b101011
 }
 
-mapping clause assembly = VITYPE(funct6, vm, vs2, simm, vd)
-  <-> vitype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ hex_bits_signed_5(simm) ^ maybe_vmask(vm)
+mapping clause encdec = Y_YITYPE(funct6, ym, ys2, simm, yd)
+ <-> y_encdec_yifunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ simm @ 0b011 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
+
+function clause execute(Y_YITYPE(funct6, ym, ys2, simm, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
+
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_normal(yd, ym)
+   | not(y_valid_reg_group(ys2, Y_LMUL_pow))
+   | not(y_valid_reg_group(yd, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW)) then {
+    return Illegal_Instruction()
+  };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let imm_val : bits('m) = sign_extend(simm);
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
+  var result = initial_result;
+
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_YI_YADD   => ys2_val_view[i][j][k] + imm_val,
+          Y_YI_YRSUB  => imm_val - ys2_val_view[i][j][k],
+          Y_YI_YAND   => ys2_val_view[i][j][k] & imm_val,
+          Y_YI_YOR    => ys2_val_view[i][j][k] | imm_val,
+          Y_YI_YXOR   => ys2_val_view[i][j][k] ^ imm_val,
+          Y_YI_YSADDU => y_unsigned_saturation(
+            sizeof('m),
+            zero_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) + zero_extend(sizeof('m) + 1, imm_val),
+          ),
+          Y_YI_YSADD  => y_signed_saturation(
+            sizeof('m),
+            sign_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) + sign_extend(sizeof('m) + 1, imm_val),
+          ),
+          Y_YI_YSLL   => {
+            let shift_amount = y_get_shift_amount(zero_extend(sizeof('m), simm), SEW);
+            ys2_val_view[i][j][k] << shift_amount
+          },
+          Y_YI_YSRL   => {
+            let shift_amount = y_get_shift_amount(zero_extend(sizeof('m), simm), SEW);
+            ys2_val_view[i][j][k] >> shift_amount
+          },
+          Y_YI_YSRA   => {
+            let shift_amount = y_get_shift_amount(zero_extend(sizeof('m), simm), SEW);
+            let y_double : bits('m * 2) = sign_extend(ys2_val_view[i][j][k]);
+            (y_double >> shift_amount)[SEW - 1 .. 0]
+          },
+          Y_YI_YSSRL  => {
+            let shift_amount = y_get_shift_amount(zero_extend(sizeof('m), simm), SEW);
+            let rounding_incr = y_get_fixed_rounding_incr(ys2_val_view[i][j][k], shift_amount);
+            (ys2_val_view[i][j][k] >> shift_amount) + zero_extend(sizeof('m), rounding_incr)
+          },
+          Y_YI_YSSRA  => {
+            let shift_amount = y_get_shift_amount(zero_extend(sizeof('m), simm), SEW);
+            let rounding_incr = y_get_fixed_rounding_incr(ys2_val_view[i][j][k], shift_amount);
+            let y_double : bits('m * 2) = sign_extend(ys2_val_view[i][j][k]);
+            (y_double >> shift_amount)[SEW - 1 .. 0] + zero_extend(sizeof('m), rounding_incr)
+          },
+        }
+      }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
+  };
+
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
+  RETIRE_SUCCESS
+}
+
+mapping y_yitype_mnemonic : y_yifunct6 <-> string = {
+ Y_YI_YADD   <-> "yadd.yi",
+ Y_YI_YRSUB  <-> "yrsub.yi",
+ Y_YI_YAND   <-> "yand.yi",
+ Y_YI_YOR    <-> "yor.yi",
+ Y_YI_YXOR   <-> "yxor.yi",
+ Y_YI_YSADDU <-> "ysaddu.yi",
+ Y_YI_YSADD  <-> "ysadd.yi",
+ Y_YI_YSLL   <-> "ysll.yi",
+ Y_YI_YSRL   <-> "ysrl.yi",
+ Y_YI_YSRA   <-> "ysra.yi",
+ Y_YI_YSSRL  <-> "yssrl.yi",
+ Y_YI_YSSRA  <-> "yssra.yi"
+}
+
+mapping clause assembly = Y_YITYPE(funct6, ym, ys2, simm, yd)
+ <-> y_yitype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ hex_bits_signed_5(simm) ^ y_maybe_ymask(ym)
 
 // ************************* OPIVI (WITYPE Narrowing) ***************************
-// ************* Vector Narrowing Integer Right Shift Instructions **************
-union clause instruction = NISTYPE : (nisfunct6, bits(1), vregidx, bits(5), vregidx)
+// ************* Tensor Narrowing Integer Right Shift Instructions **************
+union clause instruction = Y_NISTYPE : (y_nisfunct6, bits(1), yregidx, bits(5), yregidx)
 
-mapping encdec_nisfunct6 : nisfunct6 <-> bits(6) = {
-  NIS_VNSRL       <-> 0b101100,
-  NIS_VNSRA       <-> 0b101101
+mapping y_encdec_nisfunct6 : y_nisfunct6 <-> bits(6) = {
+ Y_NIS_YNSRL       <-> 0b101100,
+ Y_NIS_YNSRA       <-> 0b101101
 }
 
-mapping clause encdec = NISTYPE(funct6, vm, vs2, uimm, vd)
-  <-> encdec_nisfunct6(funct6) @ vm @ encdec_vreg(vs2) @ uimm @ 0b011 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 16)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 32)
+mapping clause encdec = Y_NISTYPE(funct6, ym, ys2, uimm, yd)
+ <-> y_encdec_nisfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ uimm @ 0b011 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 16)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 32)
 
-function clause execute NISTYPE(funct6, vm, vs2, uimm, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_NISTYPE(funct6, ym, ys2, uimm, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  let SEW_widen      = SEW * 2;
-  let LMUL_pow_widen = LMUL_pow + 1;
+  let SEW_widen = SEW * 2;
+  let LMUL_pow_widen = Y_LMUL_pow + 1;
 
-  if  illegal_variable_width(vd, vm, SEW_widen, LMUL_pow_widen) |
-      not(valid_reg_overlap(vs2, vd, LMUL_pow_widen, LMUL_pow))
-  then return Illegal_Instruction();
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_variable_width(yd, ym, SEW_widen, LMUL_pow_widen)
+   | not(y_valid_reg_overlap(ys2, yd, LMUL_pow_widen, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW_widen)) then {
+    return Illegal_Instruction()
+  };
 
   assert(SEW_widen <= 64);
   assert(LMUL_pow_widen <= 3);
 
-  let 'n = num_elem;
-  let 'm = SEW;
-  let 'o = SEW_widen;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+  let (o as 'o) = SEW_widen;
 
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-  let imm_val : bits('m)             = zero_extend(uimm);
-  let vs2_val : vector('n, bits('o)) = read_vreg(num_elem, SEW_widen, LMUL_pow_widen, vs2);
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+  let imm_val : bits('m) = zero_extend(uimm);
+  let ys2_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_widen, LMUL_pow_widen, ys2);
 
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        NIS_VNSRL  => {
-                        let shift_amount = get_shift_amount(imm_val, SEW_widen);
-                        (vs2_val[i] >> shift_amount)[SEW - 1 .. 0]
-                      },
-        NIS_VNSRA  => {
-                        let shift_amount = get_shift_amount(imm_val, SEW_widen);
-                        let v_double : bits('o * 2) = sign_extend(vs2_val[i]);
-                        let arith_shifted : bits('o) = (v_double >> shift_amount)[SEW_widen - 1 .. 0];
-                        (arith_shifted)[SEW - 1 .. 0]
-                      }
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_NIS_YNSRL => {
+            let shift_amount = y_get_shift_amount(imm_val, SEW_widen);
+            (ys2_val_view[i][j][k] >> shift_amount)[SEW - 1 .. 0]
+          },
+          Y_NIS_YNSRA => {
+            let shift_amount = y_get_shift_amount(imm_val, SEW_widen);
+            let y_double : bits('o * 2) = sign_extend(ys2_val_view[i][j][k]);
+            let arith_shifted : bits('o) = (y_double >> shift_amount)[SEW_widen - 1 .. 0];
+            arith_shifted[SEW - 1 .. 0]
+          },
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping nistype_mnemonic : nisfunct6 <-> string = {
-  NIS_VNSRL       <-> "vnsrl.wi",
-  NIS_VNSRA       <-> "vnsra.wi"
+mapping y_nistype_mnemonic : y_nisfunct6 <-> string = {
+ Y_NIS_YNSRL       <-> "ynsrl.wide.yi",
+ Y_NIS_YNSRA       <-> "ynsra.wide.yi"
 }
 
-mapping clause assembly = NISTYPE(funct6, vm, vs2, uimm, vd)
-  <-> nistype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ hex_bits_5(uimm) ^ maybe_vmask(vm)
+mapping clause assembly = Y_NISTYPE(funct6, ym, ys2, uimm, yd)
+ <-> y_nistype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ hex_bits_5(uimm) ^ y_maybe_ymask(ym)
 
 // ************************* OPIVI (WITYPE Narrowing) ***************************
-// ************** Vector Narrowing Fixed-Point Clip Instructions ****************
-union clause instruction = NITYPE : (nifunct6, bits(1), vregidx, bits(5), vregidx)
+// ************** Tensor Narrowing Fixed-Point Clip Instructions ****************
+union clause instruction = Y_NITYPE : (y_nifunct6, bits(1), yregidx, bits(5), yregidx)
 
-mapping encdec_nifunct6 : nifunct6 <-> bits(6) = {
-  NI_VNCLIPU     <-> 0b101110,
-  NI_VNCLIP      <-> 0b101111
+mapping y_encdec_nifunct6 : y_nifunct6 <-> bits(6) = {
+ Y_NI_YNCLIPU     <-> 0b101110,
+ Y_NI_YNCLIP      <-> 0b101111
 }
 
-mapping clause encdec = NITYPE(funct6, vm, vs2, uimm, vd)
-  <-> encdec_nifunct6(funct6) @ vm @ encdec_vreg(vs2) @ uimm @ 0b011 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 16)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 32)
+mapping clause encdec = Y_NITYPE(funct6, ym, ys2, uimm, yd)
+ <-> y_encdec_nifunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ uimm @ 0b011 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 16)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 32)
 
-function clause execute NITYPE(funct6, vm, vs2, uimm, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_NITYPE(funct6, ym, ys2, uimm, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  let SEW_widen      = SEW * 2;
-  let LMUL_pow_widen = LMUL_pow + 1;
+  let SEW_widen = SEW * 2;
+  let LMUL_pow_widen = Y_LMUL_pow + 1;
 
-  if  illegal_variable_width(vd, vm, SEW_widen, LMUL_pow_widen) |
-      not(valid_reg_overlap(vs2, vd, LMUL_pow_widen, LMUL_pow))
-  then return Illegal_Instruction();
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_variable_width(yd, ym, SEW_widen, LMUL_pow_widen)
+   | not(y_valid_reg_overlap(ys2, yd, LMUL_pow_widen, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW_widen)) then {
+    return Illegal_Instruction()
+  };
 
   assert(SEW_widen <= 64);
   assert(LMUL_pow_widen <= 3);
 
-  let 'n = num_elem;
-  let 'm = SEW;
-  let 'o = SEW_widen;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+  let (o as 'o) = SEW_widen;
 
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-  let imm_val : bits('m)             = zero_extend(uimm);
-  let vs2_val : vector('n, bits('o)) = read_vreg(num_elem, SEW_widen, LMUL_pow_widen, vs2);
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+  let imm_val : bits('m) = zero_extend(uimm);
+  let ys2_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_widen, LMUL_pow_widen, ys2);
 
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      let shift_amount = get_shift_amount(imm_val, SEW_widen);
-      let rounding_incr = get_fixed_rounding_incr(vs2_val[i], shift_amount);
-      result[i] = match funct6 {
-        NI_VNCLIPU => {
-                        let result_wide = (vs2_val[i] >> shift_amount) + zero_extend('o, rounding_incr);
-                        unsigned_saturation('m, result_wide)
-                      },
-        NI_VNCLIP  => {
-                        let v_double : bits('m * 4) = sign_extend(vs2_val[i]);
-                        let result_wide = (v_double >> shift_amount)['o - 1 .. 0] + zero_extend('o, rounding_incr);
-                        signed_saturation('m, result_wide)
-                      }
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        let shift_amount = y_get_shift_amount(imm_val, SEW_widen);
+        let rounding_incr = y_get_fixed_rounding_incr(ys2_val_view[i][j][k], shift_amount);
+        result_view[i][j][k] = match funct6 {
+          Y_NI_YNCLIPU => {
+            let result_wide = (ys2_val_view[i][j][k] >> shift_amount) +
+                zero_extend(sizeof('o), rounding_incr);
+            y_unsigned_saturation(sizeof('m), result_wide)
+          },
+          Y_NI_YNCLIP  => {
+            let y_double : bits('m * 4) = sign_extend(ys2_val_view[i][j][k]);
+            let result_wide = (y_double >> shift_amount)[sizeof('o) - 1 .. 0] +
+                zero_extend(sizeof('o), rounding_incr);
+            y_signed_saturation(sizeof('m), result_wide)
+          },
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping nitype_mnemonic : nifunct6 <-> string = {
-  NI_VNCLIPU     <-> "vnclipu.wi",
-  NI_VNCLIP      <-> "vnclip.wi"
+mapping y_nitype_mnemonic : y_nifunct6 <-> string = {
+ Y_NI_YNCLIPU     <-> "ynclipu.wide.yi",
+ Y_NI_YNCLIP      <-> "ynclip.wide.yi"
 }
 
-mapping clause assembly = NITYPE(funct6, vm, vs2, uimm, vd)
-  <-> nitype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ hex_bits_5(uimm) ^ maybe_vmask(vm)
+mapping clause assembly = Y_NITYPE(funct6, ym, ys2, uimm, yd)
+ <-> y_nitype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ hex_bits_5(uimm) ^ y_maybe_ymask(ym)
 
-// **************** OPIVI (Vector Slide & Gather Instructions) ******************
+// **************** OPIVI (Tensor Slide & Gather Instructions) ******************
 // Slide and gather instructions extend rs1/imm to XLEN instead of SEW bits
-union clause instruction = VISG : (visgfunct6, bits(1), vregidx, bits(5), vregidx)
+union clause instruction = Y_YISG : (y_yisgfunct6, bits(1), yregidx, bits(5), yregidx)
 
-mapping encdec_visgfunct6 : visgfunct6 <-> bits(6) = {
-  VI_VSLIDEUP     <-> 0b001110,
-  VI_VSLIDEDOWN   <-> 0b001111,
-  VI_VRGATHER     <-> 0b001100
+mapping y_encdec_yisgfunct6 : y_yisgfunct6 <-> bits(6) = {
+ Y_YI_YSLIDEUP     <-> 0b001110,
+ Y_YI_YSLIDEDOWN   <-> 0b001111,
+ Y_YI_YRGATHER     <-> 0b001100
 }
 
-mapping clause encdec = VISG(funct6, vm, vs2, simm, vd)
-  <-> encdec_visgfunct6(funct6) @ vm @ encdec_vreg(vs2) @ simm @ 0b011 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_YISG(funct6, ym, ys2, simm, yd)
+ <-> y_encdec_yisgfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ simm @ 0b011 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute VISG(funct6, vm, vs2, simm, vd) = {
-  let SEW_pow  = get_sew_pow();
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_YISG(funct6, ym, ys2, simm, yd)) = {
+  let Y_SEW_pow = y_get_sew_pow();
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
   // For `vslideup` and `vrgather`, "the destination vector register
   // group cannot overlap with the source vector register groups,
   // otherwise the instruction encoding is reserved."
   let src_dst_overlap : bool = match funct6 {
-    VI_VSLIDEUP   => vd == vs2,
-    VI_VSLIDEDOWN => false,
-    VI_VRGATHER   => vd == vs2,
+    Y_YI_YSLIDEUP   => yd == ys2,
+    Y_YI_YSLIDEDOWN => false,
+    Y_YI_YRGATHER   => yd == ys2,
   };
-  if illegal_normal(vd, vm) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow)) |
-     src_dst_overlap
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let imm_val : nat                  = unsigned(zero_extend(xlen, simm));
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_normal(yd, ym)
+   | not(y_valid_reg_group(ys2, Y_LMUL_pow))
+   | not(y_valid_reg_group(yd, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW))
+   | src_dst_overlap then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let imm_val : nat = unsigned(zero_extend(xlen, simm));
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        VI_VSLIDEUP    => {
-                            if i >= imm_val then vs2_val[i - imm_val] else vd_val[i]
-                          },
-        VI_VSLIDEDOWN  => {
-                            assert(LMUL_pow + vlen_exp - SEW_pow >= 0);
-                            let VLMAX = 2 ^ (LMUL_pow + vlen_exp - SEW_pow);
-                            assert(VLMAX > 0 & VLMAX <= 'n);
-                            if i + imm_val < VLMAX then vs2_val[i + imm_val] else zeros()
-                          },
-        VI_VRGATHER    => {
-                            assert(LMUL_pow + vlen_exp - SEW_pow >= 0);
-                            let VLMAX = 2 ^ (LMUL_pow + vlen_exp - SEW_pow);
-                            assert(VLMAX > 0 & VLMAX <= 'n);
-                            if imm_val < VLMAX then vs2_val[imm_val] else zeros()
-                          }
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let yd_val_view = y_shape(yd_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(yd_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_YI_YSLIDEUP   => {
+            if p >= imm_val then {
+              ys2_val_view[(p - imm_val) / (y_columns * y_depth)][((p - imm_val) / y_depth) % y_columns][
+                (p - imm_val) % y_depth
+              ]
+            } else {
+              yd_val_view[i][j][k]
+            }
+          },
+          Y_YI_YSLIDEDOWN => {
+            assert(Y_LMUL_pow + ylen_exp - Y_SEW_pow >= 0);
+            let YLMAX = 2 ^ (Y_LMUL_pow + ylen_exp - Y_SEW_pow);
+            assert(YLMAX > 0 & YLMAX <= sizeof('n));
+            if p + imm_val < YLMAX then {
+              ys2_val_view[(p + imm_val) / (y_columns * y_depth)][((p + imm_val) / y_depth) % y_columns][
+                (p + imm_val) % y_depth
+              ]
+            } else {
+              zeros()
+            }
+          },
+          Y_YI_YRGATHER   => {
+            assert(Y_LMUL_pow + ylen_exp - Y_SEW_pow >= 0);
+            let YLMAX = 2 ^ (Y_LMUL_pow + ylen_exp - Y_SEW_pow);
+            assert(YLMAX > 0 & YLMAX <= sizeof('n));
+            if imm_val < YLMAX then {
+              ys2_val_view[imm_val / (y_columns * y_depth)][(imm_val / y_depth) % y_columns][
+                imm_val % y_depth
+              ]
+            } else {
+              zeros()
+            }
+          },
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping visg_mnemonic : visgfunct6 <-> string = {
-  VI_VSLIDEUP     <-> "vslideup.vi",
-  VI_VSLIDEDOWN   <-> "vslidedown.vi",
-  VI_VRGATHER     <-> "vrgather.vi"
+mapping y_yisg_mnemonic : y_yisgfunct6 <-> string = {
+ Y_YI_YSLIDEUP     <-> "yslideup.yi",
+ Y_YI_YSLIDEDOWN   <-> "yslidedown.yi",
+ Y_YI_YRGATHER     <-> "yrgather.yi"
 }
 
-mapping clause assembly = VISG(funct6, vm, vs2, simm, vd)
-  <-> visg_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ hex_bits_signed_5(simm) ^ maybe_vmask(vm)
+mapping clause assembly = Y_YISG(funct6, ym, ys2, simm, yd)
+ <-> y_yisg_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ hex_bits_signed_5(simm) ^ y_maybe_ymask(ym)
 
 // ********************* OPIVI (Integer Merge Instruction) **********************
-union clause instruction = MASKTYPEI : (vregidx, bits(5), vregidx)
+union clause instruction = Y_MASKTYPEI : (yregidx, bits(5), yregidx)
 
-mapping clause encdec = MASKTYPEI(vs2, simm, vd)
-  <-> 0b010111 @ 0b0 @ encdec_vreg(vs2) @ simm @ 0b011 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_MASKTYPEI(ys2, simm, yd)
+ <-> 0b010111 @ 0b0 @ y_encdec_yreg(ys2) @ simm @ 0b011 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute MASKTYPEI(vs2, simm, vd) = {
-  let start_element : nat = match get_start_element() {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-
-  let end_element   = get_end_element();
-  let SEW           = get_sew();
-  let LMUL_pow      = get_lmul_pow();
-  let num_elem      = get_num_elem(LMUL_pow, SEW); // max(VLMAX,VLEN/SEW))
-  let real_num_elem = if LMUL_pow >= 0 then num_elem else num_elem / (0 - LMUL_pow); // VLMAX
-
-  if illegal_vd_masked(vd) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, 0b0, zvreg);
-  let imm_val : bits('m)             = sign_extend(simm);
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-  var result  : vector('n, bits('m)) = vector_init(zeros());
-
-  let tail_ag : agtype = get_vtype_vta();
-  foreach (i from 0 to (num_elem - 1)) {
-    if i < start_element then {
-      result[i] = vd_val[i]
-    } else if i > end_element | i >= real_num_elem then {
-      result[i] = match tail_ag {
-        UNDISTURBED => vd_val[i],
-        AGNOSTIC    => vd_val[i] // TODO: configuration support
-      }
+function clause execute(Y_MASKTYPEI(ys2, simm, yd)) = {
+  let start_element = y_get_start_element();
+  let end_element = y_get_end_element();
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW); // max(YLMAX,YLEN/SEW))
+  let real_num_elem = if Y_LMUL_pow >= 0 then {
+      num_elem
     } else {
-      // the merge operates on all body elements
-      result[i] = if vm_val[i] == 0b1 then imm_val else vs2_val[i]
-    }
+      num_elem / (0 - Y_LMUL_pow)
+    }; // YLMAX
+
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_yd_masked(yd)
+   | not(y_valid_reg_group(ys2, Y_LMUL_pow))
+   | not(y_valid_reg_group(yd, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(0b0, ys2, SEW)) then {
+    return Illegal_Instruction()
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, 0b0, y_zyreg);
+  let imm_val : bits('m) = sign_extend(simm);
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+  var result : vector('n, bits('m)) = vector_init(zeros());
+
+  let tail_ag : y_agtype = y_get_ytype_yta();
+  {
+    var result_view = y_shape(result, y_columns, y_depth);
+    let yd_val_view = y_shape(yd_val, y_columns, y_depth);
+    let ym_val_view = y_shape(ym_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(result_view));
+      assert(i < length(yd_val_view));
+      assert(i < length(ym_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if p < start_element then {
+        result_view[i][j][k] = yd_val_view[i][j][k]
+      } else {
+        if p > end_element | p >= real_num_elem then {
+          result_view[i][j][k] = match tail_ag {
+            Y_UNDISTURBED => yd_val_view[i][j][k],
+            Y_AGNOSTIC    => yd_val_view[i][j][k], // TODO: configuration support
+          }
+        } else {
+          // the merge operates on all body elements
+          result_view[i][j][k] =
+            if ym_val_view[i][j][k] == 0b1 then {
+              imm_val
+            } else {
+              ys2_val_view[i][j][k]
+            }
+        }
+      }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
+  };
+
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = MASKTYPEI(vs2, simm, vd)
-  <-> "vmerge.vim" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ hex_bits_signed_5(simm) ^ sep() ^ "v0"
+mapping clause assembly = Y_MASKTYPEI(ys2, simm, yd)
+ <-> "ymerge.yim" ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ hex_bits_signed_5(simm) ^ sep() ^ "y0"
 
 // ********************* OPIVI (Integer Move Instruction) ***********************
-union clause instruction = MOVETYPEI : (vregidx, bits(5))
+union clause instruction = Y_MOVETYPEI : (yregidx, bits(5))
 
-mapping clause encdec = MOVETYPEI (vd, simm)
-  <-> 0b010111 @ 0b1 @ 0b00000 @ simm @ 0b011 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_MOVETYPEI (yd, simm)
+ <-> 0b010111 @ 0b1 @ 0b00000 @ simm @ 0b011 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute MOVETYPEI(vd, simm) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_MOVETYPEI(yd, simm)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  if illegal_vd_unmasked() | not(valid_reg_group(vd, LMUL_pow))
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let imm_val : bits('m)             = sign_extend(simm);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, ones()) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_yd_unmasked()
+   | not(y_valid_reg_group(yd, Y_LMUL_pow)) then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let imm_val : bits('m) = sign_extend(simm);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ones(),
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then result[i] = imm_val
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = imm_val
+      }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = MOVETYPEI(vd, simm)
-  <-> "vmv.v.i" ^ spc() ^ vreg_name(vd) ^ sep() ^ hex_bits_signed_5(simm)
+mapping clause assembly = Y_MOVETYPEI(yd, simm)
+ <-> "ymv.y.i" ^ spc() ^ y_yreg_name(yd) ^ sep() ^ hex_bits_signed_5(simm)
 
-// ******************** OPIVI (Whole Vector Register Move) **********************
-union clause instruction = VMVRTYPE : (vregidx, {1, 2, 4, 8}, vregidx)
+// ******************** OPIVI (Whole Tensor Register Move) **********************
+union clause instruction = Y_YMVRTYPE : (yregidx, {1, 2, 4, 8}, yregidx)
 
 // "The number of vector registers to copy is encoded in the low three
 // bits of the simm field (simm[2:0]) using the same encoding as the nf[2:0]
@@ -1360,25 +1865,22 @@ union clause instruction = VMVRTYPE : (vregidx, {1, 2, 4, 8}, vregidx)
 //
 // The value of NREG must be 1, 2, 4, or 8, and values of simm[4:0] other
 // than 0, 1, 3, and 7 are reserved."
-mapping encdec_nreg : bits(5) <-> {1, 2, 4, 8} = {
-  0b00000 <-> 1,
-  0b00001 <-> 2,
-  0b00011 <-> 4,
-  0b00111 <-> 8,
+mapping y_encdec_nreg : bits(5) <-> {1, 2, 4, 8} = {
+ 0b00000 <-> 1,
+ 0b00001 <-> 2,
+ 0b00011 <-> 4,
+ 0b00111 <-> 8,
 }
 
-mapping clause encdec = VMVRTYPE(vs2, nreg, vd)
-  <-> 0b100111 @ 0b1 @ encdec_vreg(vs2) @ encdec_nreg(nreg) @ 0b011 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_YMVRTYPE(ys2, nreg, yd)
+ <-> 0b100111 @ 0b1 @ y_encdec_yreg(ys2) @ y_encdec_nreg(nreg) @ 0b011 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute VMVRTYPE(vs2, nreg, vd) = {
-  let start_element : nat = match get_start_element() {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-  let SEW     = get_sew();
-  let EMUL    = nreg;
+function clause execute(Y_YMVRTYPE(ys2, nreg, yd)) = {
+  let start_element = y_get_start_element();
+  let SEW = y_get_sew();
+  let EMUL = nreg;
 
   let EMUL_pow : range(0, 3) = match EMUL {
     1 => 0,
@@ -1386,1125 +1888,1616 @@ function clause execute VMVRTYPE(vs2, nreg, vd) = {
     4 => 2,
     8 => 3,
   };
+  let num_elem = y_get_num_elem(EMUL_pow, SEW);
 
-  if not(valid_reg_group(vs2, EMUL_pow)) | not(valid_reg_group(vd, EMUL_pow))
-  then return Illegal_Instruction();
-
-  let num_elem = get_num_elem(EMUL_pow, SEW);
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, EMUL_pow, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, EMUL_pow, vd);
-  var result  : vector('n, bits('m)) = vector_init(zeros());
-
-  foreach (i from 0 to (num_elem - 1)) {
-    result[i] = if i < start_element then vd_val[i] else vs2_val[i]
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, EMUL_pow)
+   | y_illegal_yd_unmasked()
+   | not(y_valid_reg_group(ys2, EMUL_pow))
+   | not(y_valid_reg_group(yd, EMUL_pow)) then {
+    return Illegal_Instruction()
   };
 
-  write_vreg(num_elem, SEW, EMUL_pow, vd, result);
-  set_vstart(zeros());
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, EMUL_pow, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, EMUL_pow, yd);
+  var result : vector('n, bits('m)) = vector_init(zeros());
+
+  {
+    var result_view = y_shape(result, y_columns, y_depth);
+    let yd_val_view = y_shape(yd_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(result_view));
+      assert(i < length(yd_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      result_view[i][j][k] =
+        if p < start_element then {
+          yd_val_view[i][j][k]
+        } else {
+          ys2_val_view[i][j][k]
+        }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
+  };
+
+  y_write_yreg(num_elem, SEW, EMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
 // This is unfortunate. See https://github.com/rems-project/sail/issues/768
-mapping nreg_string : {1, 2, 4, 8} <-> string = {
-  1 <-> "1",
-  2 <-> "2",
-  4 <-> "4",
-  8 <-> "8",
+mapping y_nreg_string : {1, 2, 4, 8} <-> string = {
+ 1 <-> "1",
+ 2 <-> "2",
+ 4 <-> "4",
+ 8 <-> "8",
 }
 
-mapping clause assembly = VMVRTYPE(vs2, nreg, vd)
-  <-> "vmv" ^ nreg_string(nreg) ^ "r.v" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2)
+mapping clause assembly = Y_YMVRTYPE(ys2, nreg, yd)
+ <-> "ymv" ^ y_nreg_string(nreg) ^ "r.y" ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2)
 
-// ****************************** OPMVV (VVTYPE) ********************************
-union clause instruction = MVVTYPE : (mvvfunct6, bits(1), vregidx, vregidx, vregidx)
+// ****************************** OPMVV (YYTYPE) ********************************
+union clause instruction = Y_MYYTYPE : (y_myyfunct6, bits(1), yregidx, yregidx, yregidx)
 
-mapping encdec_mvvfunct6 : mvvfunct6 <-> bits(6) = {
-  MVV_VAADDU      <-> 0b001000,
-  MVV_VAADD       <-> 0b001001,
-  MVV_VASUBU      <-> 0b001010,
-  MVV_VASUB       <-> 0b001011,
-  MVV_VMUL        <-> 0b100101,
-  MVV_VMULH       <-> 0b100111,
-  MVV_VMULHU      <-> 0b100100,
-  MVV_VMULHSU     <-> 0b100110,
-  MVV_VDIVU       <-> 0b100000,
-  MVV_VDIV        <-> 0b100001,
-  MVV_VREMU       <-> 0b100010,
-  MVV_VREM        <-> 0b100011
+mapping y_encdec_myyfunct6 : y_myyfunct6 <-> bits(6) = {
+ Y_MYY_YAADDU      <-> 0b001000,
+ Y_MYY_YAADD       <-> 0b001001,
+ Y_MYY_YASUBU      <-> 0b001010,
+ Y_MYY_YASUB       <-> 0b001011,
+ Y_MYY_YMUL        <-> 0b100101,
+ Y_MYY_YMULH       <-> 0b100111,
+ Y_MYY_YMULHU      <-> 0b100100,
+ Y_MYY_YMULHSU     <-> 0b100110,
+ Y_MYY_YDIVU       <-> 0b100000,
+ Y_MYY_YDIV        <-> 0b100001,
+ Y_MYY_YREMU       <-> 0b100010,
+ Y_MYY_YREM        <-> 0b100011
 }
 
-mapping clause encdec = MVVTYPE(funct6, vm, vs2, vs1, vd)
-  <-> encdec_mvvfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64 & valid_wide_mvvtype(funct6))
+mapping clause encdec = Y_MYYTYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_encdec_myyfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ y_encdec_yreg(ys1) @ 0b010 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64 & y_valid_wide_myytype(funct6))
 
-function clause execute MVVTYPE(funct6, vm, vs2, vs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_MYYTYPE(funct6, ym, ys2, ys1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  if illegal_normal(vd, vm) |
-     not(valid_reg_group(vs1, LMUL_pow)) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vs1_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs1);
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_normal(yd, ym)
+   | not(y_valid_reg_group(ys1, Y_LMUL_pow))
+   | not(y_valid_reg_group(ys2, Y_LMUL_pow))
+   | not(y_valid_reg_group(yd, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys1, SEW))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW)) then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let ys1_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys1);
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        MVV_VAADDU   => {
-                          let result_add = zero_extend('m + 1, vs2_val[i]) + zero_extend('m + 1, vs1_val[i]);
-                          let rounding_incr = get_fixed_rounding_incr(result_add, 1);
-                          (result_add >> 1)['m - 1 .. 0] + zero_extend('m, rounding_incr)
-                        },
-        MVV_VAADD    => {
-                          let result_add = sign_extend('m + 1, vs2_val[i]) + sign_extend('m + 1, vs1_val[i]);
-                          let rounding_incr = get_fixed_rounding_incr(result_add, 1);
-                          (result_add >> 1)['m - 1 .. 0] + zero_extend('m, rounding_incr)
-                        },
-        MVV_VASUBU   => {
-                          let result_sub = zero_extend('m + 1, vs2_val[i]) - zero_extend('m + 1, vs1_val[i]);
-                          let rounding_incr = get_fixed_rounding_incr(result_sub, 1);
-                          (result_sub >> 1)['m - 1 .. 0] + zero_extend('m, rounding_incr)
-                        },
-        MVV_VASUB    => {
-                          let result_sub = sign_extend('m + 1, vs2_val[i]) - sign_extend('m + 1, vs1_val[i]);
-                          let rounding_incr = get_fixed_rounding_incr(result_sub, 1);
-                          (result_sub >> 1)['m - 1 .. 0] + zero_extend('m, rounding_incr)
-                        },
-        MVV_VMUL     => mult_to_bits_half(SEW, Signed, Signed, vs2_val[i], vs1_val[i], Low),
-        MVV_VMULH    => mult_to_bits_half(SEW, Signed, Signed, vs2_val[i], vs1_val[i], High),
-        MVV_VMULHU   => mult_to_bits_half(SEW, Unsigned, Unsigned, vs2_val[i], vs1_val[i], High),
-        MVV_VMULHSU  => mult_to_bits_half(SEW, Signed, Unsigned, vs2_val[i], vs1_val[i], High),
-        MVV_VDIVU    => {
-                          let divisor = unsigned(vs1_val[i]);
-                          let dividend = unsigned(vs2_val[i]);
-                          let q : int = if divisor == 0 then -1 else quot_round_zero(dividend, divisor);
-                          to_bits_unsafe(SEW, q)
-                        },
-        MVV_VDIV     => {
-                          let elem_max : int = 2 ^ (SEW - 1) - 1;
-                          let elem_min : int = 0 - 2 ^ (SEW - 1);
-                          let divisor = signed(vs1_val[i]);
-                          let dividend = signed(vs2_val[i]);
-                          let q : int = if divisor == 0 then -1 else quot_round_zero(dividend, divisor);
-                          // check for signed overflow
-                          let q' : int = if q > elem_max then elem_min else q;
-                          to_bits_unsafe(SEW, q')
-                        },
-        MVV_VREMU    => {
-                          let divisor = unsigned(vs1_val[i]);
-                          let dividend = unsigned(vs2_val[i]);
-                          let r : int = if divisor == 0 then dividend else rem_round_zero(dividend, divisor);
-                          // signed overflow case returns zero naturally as required due to -1 divisor
-                          to_bits_unsafe(SEW, r)
-                        },
-        MVV_VREM     => {
-                          let divisor = signed(vs1_val[i]);
-                          let dividend = signed(vs2_val[i]);
-                          let r : int = if divisor == 0 then dividend else rem_round_zero(dividend, divisor);
-                          // signed overflow case returns zero naturally as required due to -1 divisor
-                          to_bits_unsafe(SEW, r)
-                        }
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys1_val_view = y_shape(ys1_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys1_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_MYY_YAADDU  => {
+            let result_add = zero_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) +
+                zero_extend(sizeof('m) + 1, ys1_val_view[i][j][k]);
+            let rounding_incr = y_get_fixed_rounding_incr(result_add, 1);
+            (result_add >> 1)[sizeof('m) - 1 .. 0] + zero_extend(sizeof('m), rounding_incr)
+          },
+          Y_MYY_YAADD   => {
+            let result_add = sign_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) +
+                sign_extend(sizeof('m) + 1, ys1_val_view[i][j][k]);
+            let rounding_incr = y_get_fixed_rounding_incr(result_add, 1);
+            (result_add >> 1)[sizeof('m) - 1 .. 0] + zero_extend(sizeof('m), rounding_incr)
+          },
+          Y_MYY_YASUBU  => {
+            let result_sub = zero_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) -
+                zero_extend(sizeof('m) + 1, ys1_val_view[i][j][k]);
+            let rounding_incr = y_get_fixed_rounding_incr(result_sub, 1);
+            (result_sub >> 1)[sizeof('m) - 1 .. 0] + zero_extend(sizeof('m), rounding_incr)
+          },
+          Y_MYY_YASUB   => {
+            let result_sub = sign_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) -
+                sign_extend(sizeof('m) + 1, ys1_val_view[i][j][k]);
+            let rounding_incr = y_get_fixed_rounding_incr(result_sub, 1);
+            (result_sub >> 1)[sizeof('m) - 1 .. 0] + zero_extend(sizeof('m), rounding_incr)
+          },
+          Y_MYY_YMUL    => mult_to_bits_half(
+            SEW,
+            Signed,
+            Signed,
+            ys2_val_view[i][j][k],
+            ys1_val_view[i][j][k],
+            Low,
+          ),
+          Y_MYY_YMULH   => mult_to_bits_half(
+            SEW,
+            Signed,
+            Signed,
+            ys2_val_view[i][j][k],
+            ys1_val_view[i][j][k],
+            High,
+          ),
+          Y_MYY_YMULHU  => mult_to_bits_half(
+            SEW,
+            Unsigned,
+            Unsigned,
+            ys2_val_view[i][j][k],
+            ys1_val_view[i][j][k],
+            High,
+          ),
+          Y_MYY_YMULHSU => mult_to_bits_half(
+            SEW,
+            Signed,
+            Unsigned,
+            ys2_val_view[i][j][k],
+            ys1_val_view[i][j][k],
+            High,
+          ),
+          Y_MYY_YDIVU   => {
+            let divisor = unsigned(ys1_val_view[i][j][k]);
+            let dividend = unsigned(ys2_val_view[i][j][k]);
+            let q : int = if divisor == 0 then {
+                -1
+              } else {
+                quot_round_zero(dividend, divisor)
+              };
+            to_bits_unsafe(SEW, q)
+          },
+          Y_MYY_YDIV    => {
+            let elem_max : int = 2 ^ (SEW - 1) - 1;
+            let elem_min : int = 0 - 2 ^ (SEW - 1);
+            let divisor = signed(ys1_val_view[i][j][k]);
+            let dividend = signed(ys2_val_view[i][j][k]);
+            let q : int = if divisor == 0 then {
+                -1
+              } else {
+                quot_round_zero(dividend, divisor)
+              };
+
+            // check for signed overflow
+            let q' : int = if q > elem_max then { elem_min } else { q };
+            to_bits_unsafe(SEW, q')
+          },
+          Y_MYY_YREMU   => {
+            let divisor = unsigned(ys1_val_view[i][j][k]);
+            let dividend = unsigned(ys2_val_view[i][j][k]);
+            let r : int = if divisor == 0 then {
+                dividend
+              } else {
+                rem_round_zero(dividend, divisor)
+              };
+
+            // signed overflow case returns zero naturally as required due to -1 divisor
+            to_bits_unsafe(SEW, r)
+          },
+          Y_MYY_YREM    => {
+            let divisor = signed(ys1_val_view[i][j][k]);
+            let dividend = signed(ys2_val_view[i][j][k]);
+            let r : int = if divisor == 0 then {
+                dividend
+              } else {
+                rem_round_zero(dividend, divisor)
+              };
+
+            // signed overflow case returns zero naturally as required due to -1 divisor
+            to_bits_unsafe(SEW, r)
+          },
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping mvvtype_mnemonic : mvvfunct6 <-> string = {
-  MVV_VAADDU   <-> "vaaddu.vv",
-  MVV_VAADD    <-> "vaadd.vv",
-  MVV_VASUBU   <-> "vasubu.vv",
-  MVV_VASUB    <-> "vasub.vv",
-  MVV_VMUL     <-> "vmul.vv",
-  MVV_VMULH    <-> "vmulh.vv",
-  MVV_VMULHU   <-> "vmulhu.vv",
-  MVV_VMULHSU  <-> "vmulhsu.vv",
-  MVV_VDIVU    <-> "vdivu.vv",
-  MVV_VDIV     <-> "vdiv.vv",
-  MVV_VREMU    <-> "vremu.vv",
-  MVV_VREM     <-> "vrem.vv"
+mapping y_myytype_mnemonic : y_myyfunct6 <-> string = {
+ Y_MYY_YAADDU   <-> "yaaddu.yy",
+ Y_MYY_YAADD    <-> "yaadd.yy",
+ Y_MYY_YASUBU   <-> "yasubu.yy",
+ Y_MYY_YASUB    <-> "yasub.yy",
+ Y_MYY_YMUL     <-> "ymul.yy",
+ Y_MYY_YMULH    <-> "ymulh.yy",
+ Y_MYY_YMULHU   <-> "ymulhu.yy",
+ Y_MYY_YMULHSU  <-> "ymulhsu.yy",
+ Y_MYY_YDIVU    <-> "ydivu.yy",
+ Y_MYY_YDIV     <-> "ydiv.yy",
+ Y_MYY_YREMU    <-> "yremu.yy",
+ Y_MYY_YREM     <-> "yrem.yy"
 }
 
-mapping clause assembly = MVVTYPE(funct6, vm, vs2, vs1, vd)
-  <-> mvvtype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1) ^ maybe_vmask(vm)
+mapping clause assembly = Y_MYYTYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_myytype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ y_yreg_name(ys1) ^ y_maybe_ymask(ym)
 
-// ************************ OPMVV (VVtype Multiply-Add) *************************
-// Multiply-Add instructions switch the order of source operands in assembly (vs1/rs1 before vs2)
-union clause instruction = MVVMATYPE : (mvvmafunct6, bits(1), vregidx, vregidx, vregidx)
+// ************************ OPMVV (yytype Multiply-Add) *************************
+// Multiply-Add instructions switch the order of source operands in assembly (ys1/rs1 before ys2)
+union clause instruction = Y_MYYMATYPE : (y_myymafunct6, bits(1), yregidx, yregidx, yregidx)
 
-mapping encdec_mvvmafunct6 : mvvmafunct6 <-> bits(6) = {
-  MVV_VMACC       <-> 0b101101,
-  MVV_VNMSAC      <-> 0b101111,
-  MVV_VMADD       <-> 0b101001,
-  MVV_VNMSUB      <-> 0b101011
+mapping y_encdec_myymafunct6 : y_myymafunct6 <-> bits(6) = {
+ Y_MYY_YMACC       <-> 0b101101,
+ Y_MYY_YNMSAC      <-> 0b101111,
+ Y_MYY_YMADD       <-> 0b101001,
+ Y_MYY_YNMSUB      <-> 0b101011
 }
 
-mapping clause encdec = MVVMATYPE(funct6, vm, vs2, vs1, vd)
-  <-> encdec_mvvmafunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_MYYMATYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_encdec_myymafunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ y_encdec_yreg(ys1) @ 0b010 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute MVVMATYPE(funct6, vm, vs2, vs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_MYYMATYPE(funct6, ym, ys2, ys1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  if illegal_normal(vd, vm) |
-     not(valid_reg_group(vs1, LMUL_pow)) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vs1_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs1);
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_normal(yd, ym)
+   | not(y_valid_reg_group(ys1, Y_LMUL_pow))
+   | not(y_valid_reg_group(ys2, Y_LMUL_pow))
+   | not(y_valid_reg_group(yd, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys1, SEW))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW)) then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let ys1_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys1);
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        MVV_VMACC  => mult_to_bits_half(SEW, Signed, Signed, vs1_val[i], vs2_val[i], Low) + vd_val[i],
-        MVV_VNMSAC => vd_val[i] - mult_to_bits_half(SEW, Signed, Signed, vs1_val[i], vs2_val[i], Low),
-        MVV_VMADD  => mult_to_bits_half(SEW, Signed, Signed, vs1_val[i], vd_val[i], Low) + vs2_val[i],
-        MVV_VNMSUB => vs2_val[i] - mult_to_bits_half(SEW, Signed, Signed, vs1_val[i], vd_val[i], Low),
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let yd_val_view = y_shape(yd_val, y_columns, y_depth);
+    let ys1_val_view = y_shape(ys1_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(yd_val_view));
+      assert(i < length(ys1_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_MYY_YMACC  => mult_to_bits_half(
+            SEW,
+            Signed,
+            Signed,
+            ys1_val_view[i][j][k],
+            ys2_val_view[i][j][k],
+            Low,
+          ) +
+            yd_val_view[i][j][k],
+          Y_MYY_YNMSAC => yd_val_view[i][j][k] -
+            mult_to_bits_half(SEW, Signed, Signed, ys1_val_view[i][j][k], ys2_val_view[i][j][k], Low),
+          Y_MYY_YMADD  => mult_to_bits_half(
+            SEW,
+            Signed,
+            Signed,
+            ys1_val_view[i][j][k],
+            yd_val_view[i][j][k],
+            Low,
+          ) +
+            ys2_val_view[i][j][k],
+          Y_MYY_YNMSUB => ys2_val_view[i][j][k] -
+            mult_to_bits_half(SEW, Signed, Signed, ys1_val_view[i][j][k], yd_val_view[i][j][k], Low),
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping mvvmatype_mnemonic : mvvmafunct6 <-> string = {
-  MVV_VMACC    <-> "vmacc.vv",
-  MVV_VNMSAC   <-> "vnmsac.vv",
-  MVV_VMADD    <-> "vmadd.vv",
-  MVV_VNMSUB   <-> "vnmsub.vv"
+mapping y_myymatype_mnemonic : y_myymafunct6 <-> string = {
+ Y_MYY_YMACC    <-> "ymacc.yy",
+ Y_MYY_YNMSAC   <-> "ynmsac.yy",
+ Y_MYY_YMADD    <-> "ymadd.yy",
+ Y_MYY_YNMSUB   <-> "ynmsub.yy"
 }
 
-mapping clause assembly = MVVMATYPE(funct6, vm, vs2, vs1, vd)
-  <-> mvvmatype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs1) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping clause assembly = Y_MYYMATYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_myymatype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys1) ^ sep() ^ y_yreg_name(ys2) ^ y_maybe_ymask(ym)
 
-// ************************** OPMVV (VVTYPE Widening) ***************************
-union clause instruction = WVVTYPE : (wvvfunct6, bits(1), vregidx, vregidx, vregidx)
-mapping encdec_wvvfunct6 : wvvfunct6 <-> bits(6) = {
-  WVV_VADD       <-> 0b110001,
-  WVV_VSUB       <-> 0b110011,
-  WVV_VADDU      <-> 0b110000,
-  WVV_VSUBU      <-> 0b110010,
-  WVV_VWMUL      <-> 0b111011,
-  WVV_VWMULU     <-> 0b111000,
-  WVV_VWMULSU    <-> 0b111010
+// ************************** OPMVV (YYTYPE Widening) ***************************
+union clause instruction = Y_WIDE_YYTYPE : (y_wide_yyfunct6, bits(1), yregidx, yregidx, yregidx)
+mapping y_encdec_wide_yyfunct6 : y_wide_yyfunct6 <-> bits(6) = {
+ Y_WIDE_YY_YADD       <-> 0b110001,
+ Y_WIDE_YY_YSUB       <-> 0b110011,
+ Y_WIDE_YY_YADDU      <-> 0b110000,
+ Y_WIDE_YY_YSUBU      <-> 0b110010,
+ Y_WIDE_YY_YWMUL      <-> 0b111011,
+ Y_WIDE_YY_YWMULU     <-> 0b111000,
+ Y_WIDE_YY_YWMULSU    <-> 0b111010
 }
 
-mapping clause encdec = WVVTYPE(funct6, vm, vs2, vs1, vd)
-  <-> encdec_wvvfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 16)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 32)
+mapping clause encdec = Y_WIDE_YYTYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_encdec_wide_yyfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ y_encdec_yreg(ys1) @ 0b010 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 16)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 32)
 
-function clause execute WVVTYPE(funct6, vm, vs2, vs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_WIDE_YYTYPE(funct6, ym, ys2, ys1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  let SEW_widen      = SEW * 2;
-  let LMUL_pow_widen = LMUL_pow + 1;
+  let SEW_widen = SEW * 2;
+  let LMUL_pow_widen = Y_LMUL_pow + 1;
 
-  if  illegal_variable_width(vd, vm, SEW_widen, LMUL_pow_widen) |
-      not(valid_reg_overlap(vs1, vd, LMUL_pow, LMUL_pow_widen)) |
-      not(valid_reg_overlap(vs2, vd, LMUL_pow, LMUL_pow_widen))
-  then return Illegal_Instruction();
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_variable_width(yd, ym, SEW_widen, LMUL_pow_widen)
+   | not(y_valid_reg_overlap(ys1, yd, Y_LMUL_pow, LMUL_pow_widen))
+   | not(y_valid_reg_overlap(ys2, yd, Y_LMUL_pow, LMUL_pow_widen))
+   | not(y_valid_ym_src_overlap(ym, ys1, SEW))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW)) then {
+    return Illegal_Instruction()
+  };
 
   assert(SEW_widen <= 64);
   assert(LMUL_pow_widen <= 3);
 
-  let 'n = num_elem;
-  let 'm = SEW;
-  let 'o = SEW_widen;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+  let (o as 'o) = SEW_widen;
 
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('o)) = read_vreg(num_elem, SEW_widen, LMUL_pow_widen, vd);
-  let vs1_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs1);
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let yd_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_widen, LMUL_pow_widen, yd);
+  let ys1_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys1);
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
 
-  let (initial_result, mask) : (vector('n, bits('o)), bits('n)) = match init_masked_result(num_elem, SEW_widen, LMUL_pow_widen, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
+  let (initial_result, mask) : (vector('n, bits('o)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW_widen,
+    LMUL_pow_widen,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        WVV_VADD    => to_bits_unsafe(SEW_widen, signed(vs2_val[i]) + signed(vs1_val[i])),
-        WVV_VSUB    => to_bits_unsafe(SEW_widen, signed(vs2_val[i]) - signed(vs1_val[i])),
-        WVV_VADDU   => to_bits_unsafe(SEW_widen, unsigned(vs2_val[i]) + unsigned(vs1_val[i])),
-        WVV_VSUBU   => to_bits_unsafe(SEW_widen, unsigned(vs2_val[i]) - unsigned(vs1_val[i])),
-        WVV_VWMUL   => to_bits_unsafe(SEW_widen, signed(vs2_val[i]) * signed(vs1_val[i])),
-        WVV_VWMULU  => to_bits_unsafe(SEW_widen, unsigned(vs2_val[i]) * unsigned(vs1_val[i])),
-        WVV_VWMULSU => to_bits_unsafe(SEW_widen, signed(vs2_val[i]) * unsigned(vs1_val[i]))
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys1_val_view = y_shape(ys1_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys1_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_WIDE_YY_YADD    => to_bits_unsafe(
+            SEW_widen,
+            signed(ys2_val_view[i][j][k]) + signed(ys1_val_view[i][j][k]),
+          ),
+          Y_WIDE_YY_YSUB    => to_bits_unsafe(
+            SEW_widen,
+            signed(ys2_val_view[i][j][k]) - signed(ys1_val_view[i][j][k]),
+          ),
+          Y_WIDE_YY_YADDU   => to_bits_unsafe(
+            SEW_widen,
+            unsigned(ys2_val_view[i][j][k]) + unsigned(ys1_val_view[i][j][k]),
+          ),
+          Y_WIDE_YY_YSUBU   => to_bits_unsafe(
+            SEW_widen,
+            unsigned(ys2_val_view[i][j][k]) - unsigned(ys1_val_view[i][j][k]),
+          ),
+          Y_WIDE_YY_YWMUL   => to_bits_unsafe(
+            SEW_widen,
+            signed(ys2_val_view[i][j][k]) * signed(ys1_val_view[i][j][k]),
+          ),
+          Y_WIDE_YY_YWMULU  => to_bits_unsafe(
+            SEW_widen,
+            unsigned(ys2_val_view[i][j][k]) * unsigned(ys1_val_view[i][j][k]),
+          ),
+          Y_WIDE_YY_YWMULSU => to_bits_unsafe(
+            SEW_widen,
+            signed(ys2_val_view[i][j][k]) * unsigned(ys1_val_view[i][j][k]),
+          ),
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW_widen, LMUL_pow_widen, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW_widen, LMUL_pow_widen, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping wvvtype_mnemonic : wvvfunct6 <-> string = {
-  WVV_VADD       <-> "vwadd.vv",
-  WVV_VSUB       <-> "vwsub.vv",
-  WVV_VADDU      <-> "vwaddu.vv",
-  WVV_VSUBU      <-> "vwsubu.vv",
-  WVV_VWMUL      <-> "vwmul.vv",
-  WVV_VWMULU     <-> "vwmulu.vv",
-  WVV_VWMULSU    <-> "vwmulsu.vv"
+mapping y_wide_yytype_mnemonic : y_wide_yyfunct6 <-> string = {
+ Y_WIDE_YY_YADD       <-> "ywadd.yy",
+ Y_WIDE_YY_YSUB       <-> "ywsub.yy",
+ Y_WIDE_YY_YADDU      <-> "ywaddu.yy",
+ Y_WIDE_YY_YSUBU      <-> "ywsubu.yy",
+ Y_WIDE_YY_YWMUL      <-> "ywmul.yy",
+ Y_WIDE_YY_YWMULU     <-> "ywmulu.yy",
+ Y_WIDE_YY_YWMULSU    <-> "ywmulsu.yy"
 }
 
-mapping clause assembly = WVVTYPE(funct6, vm, vs2, vs1, vd)
-  <-> wvvtype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1) ^ maybe_vmask(vm)
+mapping clause assembly = Y_WIDE_YYTYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_wide_yytype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ y_yreg_name(ys1) ^ y_maybe_ymask(ym)
 
-// ************************** OPMVV (WVTYPE Widening) ***************************
-union clause instruction = WVTYPE : (wvfunct6, bits(1), vregidx, vregidx, vregidx)
+// ************************** OPMVV (WIDE_YTYPE Widening) ***************************
+union clause instruction = Y_WIDE_YTYPE : (y_wide_yfunct6, bits(1), yregidx, yregidx, yregidx)
 
-mapping encdec_wvfunct6 : wvfunct6 <-> bits(6) = {
-  WV_VADD       <-> 0b110101,
-  WV_VSUB       <-> 0b110111,
-  WV_VADDU      <-> 0b110100,
-  WV_VSUBU      <-> 0b110110
+mapping y_encdec_wide_yfunct6 : y_wide_yfunct6 <-> bits(6) = {
+ Y_WIDE_Y_YADD       <-> 0b110101,
+ Y_WIDE_Y_YSUB       <-> 0b110111,
+ Y_WIDE_Y_YADDU      <-> 0b110100,
+ Y_WIDE_Y_YSUBU      <-> 0b110110
 }
 
-mapping clause encdec = WVTYPE(funct6, vm, vs2, vs1, vd)
-  <-> encdec_wvfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 16)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 32)
+mapping clause encdec = Y_WIDE_YTYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_encdec_wide_yfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ y_encdec_yreg(ys1) @ 0b010 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 16)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 32)
 
-function clause execute WVTYPE(funct6, vm, vs2, vs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_WIDE_YTYPE(funct6, ym, ys2, ys1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  let SEW_widen      = SEW * 2;
-  let LMUL_pow_widen = LMUL_pow + 1;
+  let SEW_widen = SEW * 2;
+  let LMUL_pow_widen = Y_LMUL_pow + 1;
 
-  if  illegal_variable_width(vd, vm, SEW_widen, LMUL_pow_widen) |
-      not(valid_reg_overlap(vs1, vd, LMUL_pow, LMUL_pow_widen)) |
-      not(valid_reg_group(vs2, LMUL_pow_widen))
-  then return Illegal_Instruction();
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_variable_width(yd, ym, SEW_widen, LMUL_pow_widen)
+   | not(y_valid_reg_overlap(ys1, yd, Y_LMUL_pow, LMUL_pow_widen))
+   | not(y_valid_src_overlap(ys2, SEW_widen, LMUL_pow_widen, ys1, SEW, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys1, SEW))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW_widen)) then {
+    return Illegal_Instruction()
+  };
 
   assert(SEW_widen <= 64);
   assert(LMUL_pow_widen <= 3);
 
-  let 'n = num_elem;
-  let 'm = SEW;
-  let 'o = SEW_widen;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+  let (o as 'o) = SEW_widen;
 
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('o)) = read_vreg(num_elem, SEW_widen, LMUL_pow_widen, vd);
-  let vs1_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs1);
-  let vs2_val : vector('n, bits('o)) = read_vreg(num_elem, SEW_widen, LMUL_pow_widen, vs2);
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let yd_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_widen, LMUL_pow_widen, yd);
+  let ys1_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys1);
+  let ys2_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_widen, LMUL_pow_widen, ys2);
 
-  let (initial_result, mask) : (vector('n, bits('o)), bits('n)) = match init_masked_result(num_elem, SEW_widen, LMUL_pow_widen, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
+  let (initial_result, mask) : (vector('n, bits('o)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW_widen,
+    LMUL_pow_widen,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        WV_VADD  => to_bits_unsafe(SEW_widen, signed(vs2_val[i]) + signed(vs1_val[i])),
-        WV_VSUB  => to_bits_unsafe(SEW_widen, signed(vs2_val[i]) - signed(vs1_val[i])),
-        WV_VADDU => to_bits_unsafe(SEW_widen, unsigned(vs2_val[i]) + unsigned(vs1_val[i])),
-        WV_VSUBU => to_bits_unsafe(SEW_widen, unsigned(vs2_val[i]) - unsigned(vs1_val[i]))
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys1_val_view = y_shape(ys1_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys1_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_WIDE_Y_YADD  => to_bits_unsafe(
+            SEW_widen,
+            signed(ys2_val_view[i][j][k]) + signed(ys1_val_view[i][j][k]),
+          ),
+          Y_WIDE_Y_YSUB  => to_bits_unsafe(
+            SEW_widen,
+            signed(ys2_val_view[i][j][k]) - signed(ys1_val_view[i][j][k]),
+          ),
+          Y_WIDE_Y_YADDU => to_bits_unsafe(
+            SEW_widen,
+            unsigned(ys2_val_view[i][j][k]) + unsigned(ys1_val_view[i][j][k]),
+          ),
+          Y_WIDE_Y_YSUBU => to_bits_unsafe(
+            SEW_widen,
+            unsigned(ys2_val_view[i][j][k]) - unsigned(ys1_val_view[i][j][k]),
+          ),
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW_widen, LMUL_pow_widen, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW_widen, LMUL_pow_widen, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping wvtype_mnemonic : wvfunct6 <-> string = {
-  WV_VADD       <-> "vwadd.wv",
-  WV_VSUB       <-> "vwsub.wv",
-  WV_VADDU      <-> "vwaddu.wv",
-  WV_VSUBU      <-> "vwsubu.wv"
+mapping y_wide_ytype_mnemonic : y_wide_yfunct6 <-> string = {
+ Y_WIDE_Y_YADD       <-> "ywadd.wide.yy",
+ Y_WIDE_Y_YSUB       <-> "ywsub.wide.yy",
+ Y_WIDE_Y_YADDU      <-> "ywaddu.wide.yy",
+ Y_WIDE_Y_YSUBU      <-> "ywsubu.wide.yy"
 }
 
-mapping clause assembly = WVTYPE(funct6, vm, vs2, vs1, vd)
-  <-> wvtype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1) ^ maybe_vmask(vm)
+mapping clause assembly = Y_WIDE_YTYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_wide_ytype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ y_yreg_name(ys1) ^ y_maybe_ymask(ym)
 
-// ******************* OPMVV (VVtype Widening Multiply-Add) *********************
-// Multiply-Add instructions switch the order of source operands in assembly (vs1/rs1 before vs2)
-union clause instruction = WMVVTYPE : (wmvvfunct6, bits(1), vregidx, vregidx, vregidx)
+// ******************* OPMVV (yytype Widening Multiply-Add) *********************
+// Multiply-Add instructions switch the order of source operands in assembly (ys1/rs1 before ys2)
+union clause instruction = Y_WIDE_MYYTYPE : (y_wide_myyfunct6, bits(1), yregidx, yregidx, yregidx)
 
-mapping encdec_wmvvfunct6 : wmvvfunct6 <-> bits(6) = {
-  WMVV_VWMACCU   <-> 0b111100,
-  WMVV_VWMACC     <-> 0b111101,
-  WMVV_VWMACCSU  <-> 0b111111
+mapping y_encdec_wide_myyfunct6 : y_wide_myyfunct6 <-> bits(6) = {
+ Y_WIDE_MYY_YWMACCU   <-> 0b111100,
+ Y_WIDE_MYY_YWMACC    <-> 0b111101,
+ Y_WIDE_MYY_YWMACCSU  <-> 0b111111
 }
 
-mapping clause encdec =  WMVVTYPE(funct6, vm, vs2, vs1, vd)
-  <-> encdec_wmvvfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 16)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 32)
+mapping clause encdec =  Y_WIDE_MYYTYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_encdec_wide_myyfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ y_encdec_yreg(ys1) @ 0b010 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 16)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 32)
 
-function clause execute WMVVTYPE(funct6, vm, vs2, vs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_WIDE_MYYTYPE(funct6, ym, ys2, ys1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  let SEW_widen      = SEW * 2;
-  let LMUL_pow_widen = LMUL_pow + 1;
+  let SEW_widen = SEW * 2;
+  let LMUL_pow_widen = Y_LMUL_pow + 1;
 
-  if  illegal_variable_width(vd, vm, SEW_widen, LMUL_pow_widen) |
-      not(valid_reg_overlap(vs1, vd, LMUL_pow, LMUL_pow_widen)) |
-      not(valid_reg_overlap(vs2, vd, LMUL_pow, LMUL_pow_widen))
-  then return Illegal_Instruction();
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_variable_width(yd, ym, SEW_widen, LMUL_pow_widen)
+   | not(y_valid_reg_overlap(ys1, yd, Y_LMUL_pow, LMUL_pow_widen))
+   | not(y_valid_reg_overlap(ys2, yd, Y_LMUL_pow, LMUL_pow_widen))
+   | // yd is also a source register
+    not(y_valid_src_overlap(ys1, SEW, Y_LMUL_pow, yd, SEW_widen, LMUL_pow_widen))
+   | not(y_valid_src_overlap(ys2, SEW, Y_LMUL_pow, yd, SEW_widen, LMUL_pow_widen))
+   | not(y_valid_ym_src_overlap(ym, ys1, SEW))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW)) then {
+    return Illegal_Instruction()
+  };
 
   assert(SEW_widen <= 64);
   assert(LMUL_pow_widen <= 3);
 
-  let 'n = num_elem;
-  let 'm = SEW;
-  let 'o = SEW_widen;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+  let (o as 'o) = SEW_widen;
 
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('o)) = read_vreg(num_elem, SEW_widen, LMUL_pow_widen, vd);
-  let vs1_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs1);
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let yd_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_widen, LMUL_pow_widen, yd);
+  let ys1_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys1);
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
 
-  let (initial_result, mask) : (vector('n, bits('o)), bits('n)) = match init_masked_result(num_elem, SEW_widen, LMUL_pow_widen, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
+  let (initial_result, mask) : (vector('n, bits('o)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW_widen,
+    LMUL_pow_widen,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        WMVV_VWMACC   => to_bits_unsafe(SEW_widen, signed(vs1_val[i]) * signed(vs2_val[i])) + vd_val[i],
-        WMVV_VWMACCU  => to_bits_unsafe(SEW_widen, unsigned(vs1_val[i]) * unsigned(vs2_val[i])) + vd_val[i],
-        WMVV_VWMACCSU => to_bits_unsafe(SEW_widen, signed(vs1_val[i]) * unsigned(vs2_val[i]))+ vd_val[i]
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let yd_val_view = y_shape(yd_val, y_columns, y_depth);
+    let ys1_val_view = y_shape(ys1_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(yd_val_view));
+      assert(i < length(ys1_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_WIDE_MYY_YWMACC   => to_bits_unsafe(
+            SEW_widen,
+            signed(ys1_val_view[i][j][k]) * signed(ys2_val_view[i][j][k]),
+          ) +
+            yd_val_view[i][j][k],
+          Y_WIDE_MYY_YWMACCU  => to_bits_unsafe(
+            SEW_widen,
+            unsigned(ys1_val_view[i][j][k]) * unsigned(ys2_val_view[i][j][k]),
+          ) +
+            yd_val_view[i][j][k],
+          Y_WIDE_MYY_YWMACCSU => to_bits_unsafe(
+            SEW_widen,
+            signed(ys1_val_view[i][j][k]) * unsigned(ys2_val_view[i][j][k]),
+          ) +
+            yd_val_view[i][j][k],
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW_widen, LMUL_pow_widen, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW_widen, LMUL_pow_widen, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping wmvvtype_mnemonic : wmvvfunct6 <-> string = {
-  WMVV_VWMACCU     <-> "vwmaccu.vv",
-  WMVV_VWMACC      <-> "vwmacc.vv",
-  WMVV_VWMACCSU    <-> "vwmaccsu.vv"
+mapping y_wide_myytype_mnemonic : y_wide_myyfunct6 <-> string = {
+ Y_WIDE_MYY_YWMACCU     <-> "ywmaccu.yy",
+ Y_WIDE_MYY_YWMACC      <-> "ywmacc.yy",
+ Y_WIDE_MYY_YWMACCSU    <-> "ywmaccsu.yy"
 }
 
-mapping clause assembly = WMVVTYPE(funct6, vm, vs2, vs1, vd)
-  <-> wmvvtype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs1) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping clause assembly = Y_WIDE_MYYTYPE(funct6, ym, ys2, ys1, yd)
+ <-> y_wide_myytype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys1) ^ sep() ^ y_yreg_name(ys2) ^ y_maybe_ymask(ym)
 
-// ***************************** OPMVV (VXUNARY0) *******************************
-// ****************** Vector Integer Extension (SEW/2 source) *******************
-union clause instruction = VEXTTYPE : (vextfunct6, bits(1), vregidx, vregidx)
+// ***************************** OPMVV (YXUNARY0) *******************************
+// ****************** Tensor Integer Extension (SEW/2 source) *******************
+union clause instruction = Y_YEXTTYPE : (y_yextfunct6, bits(1), yregidx, yregidx)
 
-mapping vext_vs1 : vextfunct6 <-> bits(5) = {
-  VEXT2_ZVF2  <-> 0b00110,
-  VEXT2_SVF2  <-> 0b00111,
-  VEXT4_ZVF4  <-> 0b00100,
-  VEXT4_SVF4  <-> 0b00101,
-  VEXT8_ZVF8  <-> 0b00010,
-  VEXT8_SVF8  <-> 0b00011,
+mapping y_yext_ys1 : y_yextfunct6 <-> bits(5) = {
+ Y_YEXT2_ZVF2  <-> 0b00110,
+ Y_YEXT2_SVF2  <-> 0b00111,
+ Y_YEXT4_ZVF4  <-> 0b00100,
+ Y_YEXT4_SVF4  <-> 0b00101,
+ Y_YEXT8_ZVF8  <-> 0b00010,
+ Y_YEXT8_SVF8  <-> 0b00011,
 }
 
-mapping clause encdec = VEXTTYPE(funct6, vm, vs2, vd)
-  <-> 0b010010 @ vm @ encdec_vreg(vs2) @ vext_vs1(funct6) @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_YEXTTYPE(funct6, ym, ys2, yd)
+ <-> 0b010010 @ ym @ y_encdec_yreg(ys2) @ y_yext_ys1(funct6) @ 0b010 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute VEXTTYPE(funct6, vm, vs2, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_YEXTTYPE(funct6, ym, ys2, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
   let SEW_frac_pow : {1, 2, 3} = match funct6 {
-    VEXT2_ZVF2  =>  1,
-    VEXT2_SVF2  =>  1,
-    VEXT4_ZVF4  =>  2,
-    VEXT4_SVF4  =>  2,
-    VEXT8_ZVF8  =>  3,
-    VEXT8_SVF8  =>  3,
+    Y_YEXT2_ZVF2 => 1,
+    Y_YEXT2_SVF2 => 1,
+    Y_YEXT4_ZVF4 => 2,
+    Y_YEXT4_SVF4 => 2,
+    Y_YEXT8_ZVF8 => 3,
+    Y_YEXT8_SVF8 => 3,
   };
-  let LMUL_pow_div = LMUL_pow - SEW_frac_pow;
+  let LMUL_pow_div = Y_LMUL_pow - SEW_frac_pow;
   let SEW_div = SEW / (2 ^ SEW_frac_pow);
 
-  if  illegal_variable_width(vd, vm, SEW_div, LMUL_pow_div) |
-      not(valid_reg_overlap(vs2, vd, LMUL_pow_div, LMUL_pow))
-  then return Illegal_Instruction();
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_variable_width(yd, ym, SEW_div, LMUL_pow_div)
+   | not(y_valid_reg_overlap(ys2, yd, LMUL_pow_div, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW_div)) then {
+    return Illegal_Instruction()
+  };
 
   assert(SEW_div >= 8);
 
-  let 'n = num_elem;
-  let 'm = SEW;
-  let 'o = SEW_div;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+  let (o as 'o) = SEW_div;
 
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-  let vs2_val : vector('n, bits('o)) = read_vreg(num_elem, SEW_div, LMUL_pow_div, vs2);
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+  let ys2_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_div, LMUL_pow_div, ys2);
 
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        VEXT2_ZVF2 => zero_extend(vs2_val[i]),
-        VEXT2_SVF2 => sign_extend(vs2_val[i]),
-        VEXT4_ZVF4 => zero_extend(vs2_val[i]),
-        VEXT4_SVF4 => sign_extend(vs2_val[i]),
-        VEXT8_ZVF8 => zero_extend(vs2_val[i]),
-        VEXT8_SVF8 => sign_extend(vs2_val[i]),
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_YEXT2_ZVF2 => zero_extend(ys2_val_view[i][j][k]),
+          Y_YEXT2_SVF2 => sign_extend(ys2_val_view[i][j][k]),
+          Y_YEXT4_ZVF4 => zero_extend(ys2_val_view[i][j][k]),
+          Y_YEXT4_SVF4 => sign_extend(ys2_val_view[i][j][k]),
+          Y_YEXT8_ZVF8 => zero_extend(ys2_val_view[i][j][k]),
+          Y_YEXT8_SVF8 => sign_extend(ys2_val_view[i][j][k]),
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping vexttype_mnemonic : vextfunct6 <-> string = {
-  VEXT2_ZVF2  <-> "vzext.vf2",
-  VEXT2_SVF2  <-> "vsext.vf2",
-  VEXT4_ZVF4  <-> "vzext.vf4",
-  VEXT4_SVF4  <-> "vsext.vf4",
-  VEXT8_ZVF8  <-> "vzext.vf8",
-  VEXT8_SVF8  <-> "vsext.vf8",
+mapping y_yexttype_mnemonic : y_yextfunct6 <-> string = {
+ Y_YEXT2_ZVF2  <-> "yzext.yf2",
+ Y_YEXT2_SVF2  <-> "ysext.yf2",
+ Y_YEXT4_ZVF4  <-> "yzext.yf4",
+ Y_YEXT4_SVF4  <-> "ysext.yf4",
+ Y_YEXT8_ZVF8  <-> "yzext.yf8",
+ Y_YEXT8_SVF8  <-> "ysext.yf8",
 }
 
-mapping clause assembly = VEXTTYPE(funct6, vm, vs2, vd)
-  <-> vexttype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping clause assembly = Y_YEXTTYPE(funct6, ym, ys2, yd)
+ <-> y_yexttype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ y_maybe_ymask(ym)
 
-// *********************** OPMVV (vmv.x.s in VWXUNARY0) *************************
-union clause instruction = VMVXS : (vregidx, regidx)
+// *********************** OPMVV (vmv.x.s in YWXUNARY0) *************************
+union clause instruction = Y_YMVXS : (yregidx, regidx)
 
-mapping clause encdec = VMVXS(vs2, rd)
-  <-> 0b010000 @ 0b1 @ encdec_vreg(vs2) @ 0b00000 @ 0b010 @ encdec_reg(rd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_YMVXS(ys2, rd)
+ <-> 0b010000 @ 0b1 @ y_encdec_yreg(ys2) @ 0b00000 @ 0b010 @ encdec_reg(rd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute VMVXS(vs2, rd) = {
-  let SEW      = get_sew();
-  let num_elem = get_num_elem(0, SEW);
+function clause execute(Y_YMVXS(ys2, rd)) = {
+  let SEW = y_get_sew();
+  let num_elem = y_get_num_elem(0, SEW);
 
-  if illegal_vd_unmasked() then return Illegal_Instruction();
+  // Scalar move instructions disregard LMUL, but for the purposes of finding an illegal ystart,
+  // some implementations use LMUL for the bounds check, and this helps match those implementations.
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem_ystart = y_get_num_elem(Y_LMUL_pow, SEW);
+
+  if y_illegal_ystart(Y_YSTART_SCALAR_MOVE, num_elem_ystart, Y_LMUL_pow) | y_illegal_yd_unmasked() then {
+    return Illegal_Instruction()
+  };
 
   assert(num_elem > 0);
 
-  let 'n = num_elem;
-  let 'm = SEW;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
 
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, 0, vs2);
-  X(rd) = if xlen < SEW then vs2_val[0][xlen - 1 .. 0]
-          else if xlen > SEW then sign_extend(vs2_val[0])
-          else vs2_val[0];
-  set_vstart(zeros());
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, 0, ys2);
+  X(rd) =
+    if xlen < SEW then {
+      y_shape(ys2_val, y_columns, y_depth)[0][0][0][xlen - 1 .. 0]
+    } else {
+      if xlen > SEW then {
+        sign_extend(y_shape(ys2_val, y_columns, y_depth)[0][0][0])
+      } else {
+        y_shape(ys2_val, y_columns, y_depth)[0][0][0]
+      }
+    };
+  y_set_ystart(zeros());
 
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VMVXS(vs2, rd)
-  <-> "vmv.x.s" ^ spc() ^ reg_name(rd) ^ sep() ^ vreg_name(vs2)
+mapping clause assembly = Y_YMVXS(ys2, rd)
+ <-> "ymv.x.s" ^ spc() ^ reg_name(rd) ^ sep() ^ y_yreg_name(ys2)
 
-// ******************** OPMVV (Vector Compress Instruction) *********************
-union clause instruction = MVVCOMPRESS : (vregidx, vregidx, vregidx)
+// ******************** OPMVV (Tensor Compress Instruction) *********************
+union clause instruction = Y_MYYCOMPRESS : (yregidx, yregidx, yregidx)
 
-mapping clause encdec = MVVCOMPRESS(vs2, vs1, vd)
-  <-> 0b010111 @ 0b1 @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_MYYCOMPRESS(ys2, ys1, yd)
+ <-> 0b010111 @ 0b1 @ y_encdec_yreg(ys2) @ y_encdec_yreg(ys1) @ 0b010 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute MVVCOMPRESS(vs2, vs1, vd) = {
-  let start_element : nat = match get_start_element() {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+function clause execute(Y_MYYCOMPRESS(ys2, ys1, yd)) = {
+  let start_element = y_get_start_element();
+  let end_element = y_get_end_element();
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
+
+  if    y_illegal_ystart(Y_YSTART_MANDATORY, num_elem, Y_LMUL_pow)
+   |  y_illegal_yd_unmasked()
+   |  not(y_valid_disjoint_reg_groups(ys1, yd, 0, Y_LMUL_pow))
+   |  ys2
+   == yd
+   |  not(y_valid_src_overlap(ys2, SEW, Y_LMUL_pow, ys1, 1, 0)) then {
+    return Illegal_Instruction()
   };
-  let end_element = get_end_element();
-  let SEW         = get_sew();
-  let LMUL_pow    = get_lmul_pow();
-  let num_elem    = get_num_elem(LMUL_pow, SEW);
 
-  // vcompress should always be executed with a vstart of 0
-  if start_element != 0 |
-     vs1 == vd |
-     vs2 == vd |
-     illegal_vd_unmasked() |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
-  then return Illegal_Instruction();
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
 
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vs1_val : bits('n)             = read_vmask(num_elem, 0b0, vs1);
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-  var result  : vector('n, bits('m)) = vector_init(zeros());
+  let ys1_val : bits('n) = y_read_ymask(num_elem, 0b0, ys1);
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+  var result : vector('n, bits('m)) = vector_init(zeros());
 
   // body elements
-  var vd_idx : nat = 0;
-  foreach (i from 0 to (num_elem - 1)) {
-    if i <= end_element then {
-      if vs1_val[i] == 0b1 then {
-        let 'p = vd_idx;
-        assert('p < 'n);
-        result['p] = vs2_val[i];
-        vd_idx = vd_idx + 1;
+  var yd_idx : nat = 0;
+  {
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys1_val_view = y_shape(ys1_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(result_view));
+      assert(i < length(ys1_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if p <= end_element then {
+        if ys1_val_view[i][j][k] == 0b1 then {
+          let (p as 'p) = yd_idx;
+          assert(sizeof('p) < sizeof('n));
+          result_view[sizeof('p) / (y_columns * y_depth)][(sizeof('p) / y_depth) % y_columns][
+            sizeof('p) % y_depth
+          ] =
+            ys2_val_view[i][j][k];
+          yd_idx = yd_idx + 1
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
+
   // tail elements
-  if vd_idx < num_elem then {
-    let tail_ag : agtype = get_vtype_vta();
-    let 'p = vd_idx;
-    foreach (i from 'p to (num_elem - 1)) {
-      result[i] = match tail_ag {
-        UNDISTURBED => vd_val[i],
-        AGNOSTIC    => vd_val[i] // TODO: configuration support
-      }
+  if yd_idx < num_elem then {
+    let tail_ag : y_agtype = y_get_ytype_yta();
+    let (p as 'p) = yd_idx;
+    {
+      var result_view = y_shape(result, y_columns, y_depth);
+      let yd_val_view = y_shape(yd_val, y_columns, y_depth);
+      foreach (p from sizeof('p) to (num_elem - 1)) {
+        let i = p / (y_columns * y_depth);
+        let j = (p / y_depth) % y_columns;
+        let k = p % y_depth;
+        assert(i < length(result_view));
+        assert(i < length(yd_val_view));
+        assert(j < y_columns & k < y_depth);
+
+        result_view[i][j][k] = match tail_ag {
+          Y_UNDISTURBED => yd_val_view[i][j][k],
+          Y_AGNOSTIC    => yd_val_view[i][j][k], // TODO: configuration support
+        }
+      };
+      result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
     }
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = MVVCOMPRESS(vs2, vs1, vd)
-  <-> "vcompress.vm" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1)
+mapping clause assembly = Y_MYYCOMPRESS(ys2, ys1, yd)
+ <-> "ycompress.ym" ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ y_yreg_name(ys1)
 
-// ****************************** OPMVX (VXTYPE) ********************************
-union clause instruction = MVXTYPE : (mvxfunct6, bits(1), vregidx, regidx, vregidx)
+// ****************************** OPMVX (YXTYPE) ********************************
+union clause instruction = Y_MYXTYPE : (y_myxfunct6, bits(1), yregidx, regidx, yregidx)
 
-mapping encdec_mvxfunct6 : mvxfunct6 <-> bits(6) = {
-  MVX_VAADDU        <-> 0b001000,
-  MVX_VAADD         <-> 0b001001,
-  MVX_VASUBU        <-> 0b001010,
-  MVX_VASUB         <-> 0b001011,
-  MVX_VSLIDE1UP     <-> 0b001110,
-  MVX_VSLIDE1DOWN   <-> 0b001111,
-  MVX_VMUL          <-> 0b100101,
-  MVX_VMULH         <-> 0b100111,
-  MVX_VMULHU        <-> 0b100100,
-  MVX_VMULHSU       <-> 0b100110,
-  MVX_VDIVU         <-> 0b100000,
-  MVX_VDIV          <-> 0b100001,
-  MVX_VREMU         <-> 0b100010,
-  MVX_VREM          <-> 0b100011
+mapping y_encdec_myxfunct6 : y_myxfunct6 <-> bits(6) = {
+ Y_MYX_YAADDU        <-> 0b001000,
+ Y_MYX_YAADD         <-> 0b001001,
+ Y_MYX_YASUBU        <-> 0b001010,
+ Y_MYX_YASUB         <-> 0b001011,
+ Y_MYX_YSLIDE1UP     <-> 0b001110,
+ Y_MYX_YSLIDE1DOWN   <-> 0b001111,
+ Y_MYX_YMUL          <-> 0b100101,
+ Y_MYX_YMULH         <-> 0b100111,
+ Y_MYX_YMULHU        <-> 0b100100,
+ Y_MYX_YMULHSU       <-> 0b100110,
+ Y_MYX_YDIVU         <-> 0b100000,
+ Y_MYX_YDIV          <-> 0b100001,
+ Y_MYX_YREMU         <-> 0b100010,
+ Y_MYX_YREM          <-> 0b100011
 }
 
-// vmulh.vx, vmulhu.vx and vmulhsu.vx are not included for EEW=64 in Zve64*.
-mapping clause encdec = MVXTYPE(funct6, vm, vs2, rs1, vd)
-  <-> encdec_mvxfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_reg(rs1) @ 0b110 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64 & valid_wide_mvxtype(funct6))
+// vmulh.yx, vmulhu.yx and vmulhsu.yx are not included for EEW=64 in Zve64*.
+mapping clause encdec = Y_MYXTYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_encdec_myxfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ encdec_reg(rs1) @ 0b110 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64 & y_valid_wide_myxtype(funct6))
 
-function clause execute MVXTYPE(funct6, vm, vs2, rs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_MYXTYPE(funct6, ym, ys2, rs1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
   // "The vslide1up instruction requires that the destination vector
   // register group does not overlap the source vector register
   // group. Otherwise, the instruction encoding is reserved."
-  let src_dst_overlap = funct6 == MVX_VSLIDE1UP & vs2 == vd;
-  if illegal_normal(vd, vm) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow)) |
-     src_dst_overlap
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let rs1_val : bits('m)             = get_scalar(rs1, SEW);
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  let src_dst_overlap = funct6 == Y_MYX_YSLIDE1UP & ys2 == yd;
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_normal(yd, ym)
+   | not(y_valid_reg_group(ys2, Y_LMUL_pow))
+   | not(y_valid_reg_group(yd, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW))
+   | src_dst_overlap then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let rs1_val : bits('m) = y_get_scalar(rs1, SEW);
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        MVX_VAADDU       => {
-                              let result_add = zero_extend('m + 1, vs2_val[i]) + zero_extend('m + 1, rs1_val);
-                              let rounding_incr = get_fixed_rounding_incr(result_add, 1);
-                              (result_add >> 1)['m - 1 .. 0] + zero_extend('m, rounding_incr)
-                            },
-        MVX_VAADD        => {
-                              let result_add = sign_extend('m + 1, vs2_val[i]) + sign_extend('m + 1, rs1_val);
-                              let rounding_incr = get_fixed_rounding_incr(result_add, 1);
-                              (result_add >> 1)['m - 1 .. 0] + zero_extend('m, rounding_incr)
-                            },
-        MVX_VASUBU       => {
-                              let result_sub = zero_extend('m + 1, vs2_val[i]) - zero_extend('m + 1, rs1_val);
-                              let rounding_incr = get_fixed_rounding_incr(result_sub, 1);
-                              (result_sub >> 1)['m - 1 .. 0] + zero_extend('m, rounding_incr)
-                            },
-        MVX_VASUB        => {
-                              let result_sub = sign_extend('m + 1, vs2_val[i]) - sign_extend('m + 1, rs1_val);
-                              let rounding_incr = get_fixed_rounding_incr(result_sub, 1);
-                              (result_sub >> 1)['m - 1 .. 0] + zero_extend('m, rounding_incr)
-                            },
-        MVX_VSLIDE1UP    => {
-                              if (vs2 == vd) then return Illegal_Instruction();
-                              if i == 0 then rs1_val else vs2_val[i - 1]
-                            },
-        MVX_VSLIDE1DOWN  => {
-                              let last_elem = get_end_element();
-                              assert(last_elem < num_elem);
-                              if i < last_elem then vs2_val[i + 1] else rs1_val
-                            },
-        MVX_VMUL         => mult_to_bits_half(SEW, Signed, Signed, vs2_val[i], rs1_val, Low),
-        MVX_VMULH        => mult_to_bits_half(SEW, Signed, Signed, vs2_val[i], rs1_val, High),
-        MVX_VMULHU       => mult_to_bits_half(SEW, Unsigned, Unsigned, vs2_val[i], rs1_val, High),
-        MVX_VMULHSU      => mult_to_bits_half(SEW, Signed, Unsigned, vs2_val[i], rs1_val, High),
-        MVX_VDIVU        => {
-                              let divisor = unsigned(rs1_val);
-                              let dividend = unsigned(vs2_val[i]);
-                              let q : int = if divisor == 0 then -1 else quot_round_zero(dividend, divisor);
-                              to_bits_unsafe(SEW, q)
-                            },
-        MVX_VDIV         => {
-                              let elem_max : int = 2 ^ (SEW - 1) - 1;
-                              let elem_min : int = 0 - 2 ^ (SEW - 1);
-                              let divisor = signed(rs1_val);
-                              let dividend = signed(vs2_val[i]);
-                              let q : int = if divisor == 0 then -1 else quot_round_zero(dividend, divisor);
-                              // check for signed overflow
-                              let q' : int = if q > elem_max then elem_min else q;
-                              to_bits_unsafe(SEW, q')
-                            },
-        MVX_VREMU        => {
-                              let divisor = unsigned(rs1_val);
-                              let dividend = unsigned(vs2_val[i]);
-                              let r : int = if divisor == 0 then dividend else rem_round_zero(dividend, divisor);
-                              // signed overflow case returns zero naturally as required due to -1 divisor
-                              to_bits_unsafe(SEW, r)
-                            },
-        MVX_VREM         => {
-                              let divisor = signed(rs1_val);
-                              let dividend = signed(vs2_val[i]);
-                              let r : int = if divisor == 0 then dividend else rem_round_zero(dividend, divisor);
-                              // signed overflow case returns zero naturally as required due to -1 divisor
-                              to_bits_unsafe(SEW, r)
-                            }
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_MYX_YAADDU      => {
+            let result_add = zero_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) +
+                zero_extend(sizeof('m) + 1, rs1_val);
+            let rounding_incr = y_get_fixed_rounding_incr(result_add, 1);
+            (result_add >> 1)[sizeof('m) - 1 .. 0] + zero_extend(sizeof('m), rounding_incr)
+          },
+          Y_MYX_YAADD       => {
+            let result_add = sign_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) +
+                sign_extend(sizeof('m) + 1, rs1_val);
+            let rounding_incr = y_get_fixed_rounding_incr(result_add, 1);
+            (result_add >> 1)[sizeof('m) - 1 .. 0] + zero_extend(sizeof('m), rounding_incr)
+          },
+          Y_MYX_YASUBU      => {
+            let result_sub = zero_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) -
+                zero_extend(sizeof('m) + 1, rs1_val);
+            let rounding_incr = y_get_fixed_rounding_incr(result_sub, 1);
+            (result_sub >> 1)[sizeof('m) - 1 .. 0] + zero_extend(sizeof('m), rounding_incr)
+          },
+          Y_MYX_YASUB       => {
+            let result_sub = sign_extend(sizeof('m) + 1, ys2_val_view[i][j][k]) -
+                sign_extend(sizeof('m) + 1, rs1_val);
+            let rounding_incr = y_get_fixed_rounding_incr(result_sub, 1);
+            (result_sub >> 1)[sizeof('m) - 1 .. 0] + zero_extend(sizeof('m), rounding_incr)
+          },
+          Y_MYX_YSLIDE1UP   => if p == 0 then {
+            rs1_val
+          } else {
+            ys2_val_view[(p - 1) / (y_columns * y_depth)][((p - 1) / y_depth) % y_columns][
+              (p - 1) % y_depth
+            ]
+          },
+          Y_MYX_YSLIDE1DOWN => {
+            let last_elem = y_get_end_element();
+            assert(last_elem < num_elem);
+            if p < last_elem then {
+              ys2_val_view[(p + 1) / (y_columns * y_depth)][((p + 1) / y_depth) % y_columns][
+                (p + 1) % y_depth
+              ]
+            } else {
+              rs1_val
+            }
+          },
+          Y_MYX_YMUL        => mult_to_bits_half(SEW, Signed, Signed, ys2_val_view[i][j][k], rs1_val, Low),
+          Y_MYX_YMULH       => mult_to_bits_half(SEW, Signed, Signed, ys2_val_view[i][j][k], rs1_val, High),
+          Y_MYX_YMULHU      => mult_to_bits_half(SEW, Unsigned, Unsigned, ys2_val_view[i][j][k], rs1_val, High),
+          Y_MYX_YMULHSU     => mult_to_bits_half(SEW, Signed, Unsigned, ys2_val_view[i][j][k], rs1_val, High),
+          Y_MYX_YDIVU       => {
+            let divisor = unsigned(rs1_val);
+            let dividend = unsigned(ys2_val_view[i][j][k]);
+            let q : int = if divisor == 0 then {
+                -1
+              } else {
+                quot_round_zero(dividend, divisor)
+              };
+            to_bits_unsafe(SEW, q)
+          },
+          Y_MYX_YDIV        => {
+            let elem_max : int = 2 ^ (SEW - 1) - 1;
+            let elem_min : int = 0 - 2 ^ (SEW - 1);
+            let divisor = signed(rs1_val);
+            let dividend = signed(ys2_val_view[i][j][k]);
+            let q : int = if divisor == 0 then {
+                -1
+              } else {
+                quot_round_zero(dividend, divisor)
+              };
+
+            // check for signed overflow
+            let q' : int = if q > elem_max then { elem_min } else { q };
+            to_bits_unsafe(SEW, q')
+          },
+          Y_MYX_YREMU       => {
+            let divisor = unsigned(rs1_val);
+            let dividend = unsigned(ys2_val_view[i][j][k]);
+            let r : int = if divisor == 0 then {
+                dividend
+              } else {
+                rem_round_zero(dividend, divisor)
+              };
+
+            // signed overflow case returns zero naturally as required due to -1 divisor
+            to_bits_unsafe(SEW, r)
+          },
+          Y_MYX_YREM        => {
+            let divisor = signed(rs1_val);
+            let dividend = signed(ys2_val_view[i][j][k]);
+            let r : int = if divisor == 0 then {
+                dividend
+              } else {
+                rem_round_zero(dividend, divisor)
+              };
+
+            // signed overflow case returns zero naturally as required due to -1 divisor
+            to_bits_unsafe(SEW, r)
+          },
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping mvxtype_mnemonic : mvxfunct6 <-> string = {
-  MVX_VAADDU        <-> "vaaddu.vx",
-  MVX_VAADD         <-> "vaadd.vx",
-  MVX_VASUBU        <-> "vasubu.vx",
-  MVX_VASUB         <-> "vasub.vx",
-  MVX_VSLIDE1UP     <-> "vslide1up.vx",
-  MVX_VSLIDE1DOWN   <-> "vslide1down.vx",
-  MVX_VMUL          <-> "vmul.vx",
-  MVX_VMULH         <-> "vmulh.vx",
-  MVX_VMULHU        <-> "vmulhu.vx",
-  MVX_VMULHSU       <-> "vmulhsu.vx",
-  MVX_VDIVU         <-> "vdivu.vx",
-  MVX_VDIV          <-> "vdiv.vx",
-  MVX_VREMU         <-> "vremu.vx",
-  MVX_VREM          <-> "vrem.vx"
+mapping y_myxtype_mnemonic : y_myxfunct6 <-> string = {
+ Y_MYX_YAADDU        <-> "yaaddu.yx",
+ Y_MYX_YAADD         <-> "yaadd.yx",
+ Y_MYX_YASUBU        <-> "yasubu.yx",
+ Y_MYX_YASUB         <-> "yasub.yx",
+ Y_MYX_YSLIDE1UP     <-> "yslide1up.yx",
+ Y_MYX_YSLIDE1DOWN   <-> "yslide1down.yx",
+ Y_MYX_YMUL          <-> "ymul.yx",
+ Y_MYX_YMULH         <-> "ymulh.yx",
+ Y_MYX_YMULHU        <-> "ymulhu.yx",
+ Y_MYX_YMULHSU       <-> "ymulhsu.yx",
+ Y_MYX_YDIVU         <-> "ydivu.yx",
+ Y_MYX_YDIV          <-> "ydiv.yx",
+ Y_MYX_YREMU         <-> "yremu.yx",
+ Y_MYX_YREM          <-> "yrem.yx"
 }
 
-mapping clause assembly = MVXTYPE(funct6, vm, vs2, rs1, vd)
-  <-> mvxtype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ reg_name(rs1) ^ maybe_vmask(vm)
+mapping clause assembly = Y_MYXTYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_myxtype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ reg_name(rs1) ^ y_maybe_ymask(ym)
 
-// ************************ OPMVX (VXtype Multiply-Add) *************************
-// Multiply-Add instructions switch the order of source operands in assembly (vs1/rs1 before vs2)
-union clause instruction = MVXMATYPE : (mvxmafunct6, bits(1), vregidx, regidx, vregidx)
+// ************************ OPMVX (yxtype Multiply-Add) *************************
+// Multiply-Add instructions switch the order of source operands in assembly (ys1/rs1 before ys2)
+union clause instruction = Y_MYXMATYPE : (y_myxmafunct6, bits(1), yregidx, regidx, yregidx)
 
-mapping encdec_mvxmafunct6 : mvxmafunct6 <-> bits(6) = {
-  MVX_VMACC         <-> 0b101101,
-  MVX_VNMSAC        <-> 0b101111,
-  MVX_VMADD         <-> 0b101001,
-  MVX_VNMSUB        <-> 0b101011
+mapping y_encdec_myxmafunct6 : y_myxmafunct6 <-> bits(6) = {
+ Y_MYX_YMACC         <-> 0b101101,
+ Y_MYX_YNMSAC        <-> 0b101111,
+ Y_MYX_YMADD         <-> 0b101001,
+ Y_MYX_YNMSUB        <-> 0b101011
 }
 
-mapping clause encdec = MVXMATYPE(funct6, vm, vs2, rs1, vd)
-  <-> encdec_mvxmafunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_reg(rs1) @ 0b110 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_MYXMATYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_encdec_myxmafunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ encdec_reg(rs1) @ 0b110 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute MVXMATYPE(funct6, vm, vs2, rs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_MYXMATYPE(funct6, ym, ys2, rs1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  if illegal_normal(vd, vm) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let rs1_val : bits('m)             = get_scalar(rs1, SEW);
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_normal(yd, ym)
+   | not(y_valid_reg_group(ys2, Y_LMUL_pow))
+   | not(y_valid_reg_group(yd, Y_LMUL_pow))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW)) then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let rs1_val : bits('m) = y_get_scalar(rs1, SEW);
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        MVX_VMACC  => mult_to_bits_half(SEW, Signed, Signed, rs1_val, vs2_val[i], Low) + vd_val[i],
-        MVX_VNMSAC => vd_val[i] - mult_to_bits_half(SEW, Signed, Signed, rs1_val, vs2_val[i], Low),
-        MVX_VMADD  => mult_to_bits_half(SEW, Signed, Signed, rs1_val, vd_val[i], Low) + vs2_val[i],
-        MVX_VNMSUB => vs2_val[i] - mult_to_bits_half(SEW, Signed, Signed, rs1_val, vd_val[i], Low)
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let yd_val_view = y_shape(yd_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(yd_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_MYX_YMACC  => mult_to_bits_half(SEW, Signed, Signed, rs1_val, ys2_val_view[i][j][k], Low) +
+            yd_val_view[i][j][k],
+          Y_MYX_YNMSAC => yd_val_view[i][j][k] -
+            mult_to_bits_half(SEW, Signed, Signed, rs1_val, ys2_val_view[i][j][k], Low),
+          Y_MYX_YMADD  => mult_to_bits_half(SEW, Signed, Signed, rs1_val, yd_val_view[i][j][k], Low) +
+            ys2_val_view[i][j][k],
+          Y_MYX_YNMSUB => ys2_val_view[i][j][k] -
+            mult_to_bits_half(SEW, Signed, Signed, rs1_val, yd_val_view[i][j][k], Low),
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping mvxmatype_mnemonic : mvxmafunct6 <-> string = {
-  MVX_VMACC         <-> "vmacc.vx",
-  MVX_VNMSAC        <-> "vnmsac.vx",
-  MVX_VMADD         <-> "vmadd.vx",
-  MVX_VNMSUB        <-> "vnmsub.vx"
+mapping y_myxmatype_mnemonic : y_myxmafunct6 <-> string = {
+ Y_MYX_YMACC         <-> "ymacc.yx",
+ Y_MYX_YNMSAC        <-> "ynmsac.yx",
+ Y_MYX_YMADD         <-> "ymadd.yx",
+ Y_MYX_YNMSUB        <-> "ynmsub.yx"
 }
 
-mapping clause assembly = MVXMATYPE(funct6, vm, vs2, rs1, vd)
-  <-> mvxmatype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ reg_name(rs1) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping clause assembly = Y_MYXMATYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_myxmatype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ reg_name(rs1) ^ sep() ^ y_yreg_name(ys2) ^ y_maybe_ymask(ym)
 
-// ************************** OPMVX (VXTYPE Widening) ***************************
-union clause instruction = WVXTYPE : (wvxfunct6, bits(1), vregidx, regidx, vregidx)
+// ************************** OPMVX (YXTYPE Widening) ***************************
+union clause instruction = Y_WIDE_YXTYPE : (y_wide_yxfunct6, bits(1), yregidx, regidx, yregidx)
 
-mapping encdec_wvxfunct6 : wvxfunct6 <-> bits(6) = {
-  WVX_VADD       <-> 0b110001,
-  WVX_VSUB       <-> 0b110011,
-  WVX_VADDU      <-> 0b110000,
-  WVX_VSUBU      <-> 0b110010,
-  WVX_VWMUL      <-> 0b111011,
-  WVX_VWMULU     <-> 0b111000,
-  WVX_VWMULSU    <-> 0b111010
+mapping y_encdec_wide_yxfunct6 : y_wide_yxfunct6 <-> bits(6) = {
+ Y_WIDE_YX_YADD       <-> 0b110001,
+ Y_WIDE_YX_YSUB       <-> 0b110011,
+ Y_WIDE_YX_YADDU      <-> 0b110000,
+ Y_WIDE_YX_YSUBU      <-> 0b110010,
+ Y_WIDE_YX_YWMUL      <-> 0b111011,
+ Y_WIDE_YX_YWMULU     <-> 0b111000,
+ Y_WIDE_YX_YWMULSU    <-> 0b111010
 }
 
-mapping clause encdec = WVXTYPE(funct6, vm, vs2, rs1, vd)
-  <-> encdec_wvxfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_reg(rs1) @ 0b110 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 16)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 32)
+mapping clause encdec = Y_WIDE_YXTYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_encdec_wide_yxfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ encdec_reg(rs1) @ 0b110 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 16)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 32)
 
-function clause execute WVXTYPE(funct6, vm, vs2, rs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_WIDE_YXTYPE(funct6, ym, ys2, rs1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  let SEW_widen      = SEW * 2;
-  let LMUL_pow_widen = LMUL_pow + 1;
+  let SEW_widen = SEW * 2;
+  let LMUL_pow_widen = Y_LMUL_pow + 1;
 
-  if  illegal_variable_width(vd, vm, SEW_widen, LMUL_pow_widen) |
-      not(valid_reg_overlap(vs2, vd, LMUL_pow, LMUL_pow_widen))
-  then return Illegal_Instruction();
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_variable_width(yd, ym, SEW_widen, LMUL_pow_widen)
+   | not(y_valid_reg_overlap(ys2, yd, Y_LMUL_pow, LMUL_pow_widen))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW)) then {
+    return Illegal_Instruction()
+  };
 
   assert(SEW_widen <= 64);
   assert(LMUL_pow_widen <= 3);
 
-  let 'n = num_elem;
-  let 'm = SEW;
-  let 'o = SEW_widen;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+  let (o as 'o) = SEW_widen;
 
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('o)) = read_vreg(num_elem, SEW_widen, LMUL_pow_widen, vd);
-  let rs1_val : bits('m)             = get_scalar(rs1, SEW);
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let yd_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_widen, LMUL_pow_widen, yd);
+  let rs1_val : bits('m) = y_get_scalar(rs1, SEW);
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
 
-  let (initial_result, mask) : (vector('n, bits('o)), bits('n)) = match init_masked_result(num_elem, SEW_widen, LMUL_pow_widen, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
+  let (initial_result, mask) : (vector('n, bits('o)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW_widen,
+    LMUL_pow_widen,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        WVX_VADD    => to_bits_unsafe(SEW_widen, signed(vs2_val[i]) + signed(rs1_val)),
-        WVX_VSUB    => to_bits_unsafe(SEW_widen, signed(vs2_val[i]) - signed(rs1_val)),
-        WVX_VADDU   => to_bits_unsafe(SEW_widen, unsigned(vs2_val[i]) + unsigned(rs1_val)),
-        WVX_VSUBU   => to_bits_unsafe(SEW_widen, unsigned(vs2_val[i]) - unsigned(rs1_val)),
-        WVX_VWMUL   => to_bits_unsafe(SEW_widen, signed(vs2_val[i]) * signed(rs1_val)),
-        WVX_VWMULU  => to_bits_unsafe(SEW_widen, unsigned(vs2_val[i]) * unsigned(rs1_val)),
-        WVX_VWMULSU => to_bits_unsafe(SEW_widen, signed(vs2_val[i]) * unsigned(rs1_val))
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_WIDE_YX_YADD    => to_bits_unsafe(SEW_widen, signed(ys2_val_view[i][j][k]) + signed(rs1_val)),
+          Y_WIDE_YX_YSUB    => to_bits_unsafe(SEW_widen, signed(ys2_val_view[i][j][k]) - signed(rs1_val)),
+          Y_WIDE_YX_YADDU   => to_bits_unsafe(SEW_widen, unsigned(ys2_val_view[i][j][k]) + unsigned(rs1_val)),
+          Y_WIDE_YX_YSUBU   => to_bits_unsafe(SEW_widen, unsigned(ys2_val_view[i][j][k]) - unsigned(rs1_val)),
+          Y_WIDE_YX_YWMUL   => to_bits_unsafe(SEW_widen, signed(ys2_val_view[i][j][k]) * signed(rs1_val)),
+          Y_WIDE_YX_YWMULU  => to_bits_unsafe(SEW_widen, unsigned(ys2_val_view[i][j][k]) * unsigned(rs1_val)),
+          Y_WIDE_YX_YWMULSU => to_bits_unsafe(SEW_widen, signed(ys2_val_view[i][j][k]) * unsigned(rs1_val)),
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW_widen, LMUL_pow_widen, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW_widen, LMUL_pow_widen, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping wvxtype_mnemonic : wvxfunct6 <-> string = {
-  WVX_VADD       <-> "vwadd.vx",
-  WVX_VSUB       <-> "vwsub.vx",
-  WVX_VADDU      <-> "vwaddu.vx",
-  WVX_VSUBU      <-> "vwsubu.vx",
-  WVX_VWMUL      <-> "vwmul.vx",
-  WVX_VWMULU     <-> "vwmulu.vx",
-  WVX_VWMULSU    <-> "vwmulsu.vx"
+mapping y_wide_yxtype_mnemonic : y_wide_yxfunct6 <-> string = {
+ Y_WIDE_YX_YADD       <-> "ywadd.yx",
+ Y_WIDE_YX_YSUB       <-> "ywsub.yx",
+ Y_WIDE_YX_YADDU      <-> "ywaddu.yx",
+ Y_WIDE_YX_YSUBU      <-> "ywsubu.yx",
+ Y_WIDE_YX_YWMUL      <-> "ywmul.yx",
+ Y_WIDE_YX_YWMULU     <-> "ywmulu.yx",
+ Y_WIDE_YX_YWMULSU    <-> "ywmulsu.yx"
 }
 
-mapping clause assembly = WVXTYPE(funct6, vm, vs2, rs1, vd)
-  <-> wvxtype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ reg_name(rs1) ^ maybe_vmask(vm)
+mapping clause assembly = Y_WIDE_YXTYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_wide_yxtype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ reg_name(rs1) ^ y_maybe_ymask(ym)
 
-// ************************** OPMVX (WXTYPE Widening) ***************************
-union clause instruction = WXTYPE : (wxfunct6, bits(1), vregidx, regidx, vregidx)
+// ************************** OPMVX (WIDE_XTYPE Widening) ***************************
+union clause instruction = Y_WIDE_XTYPE : (y_wide_xfunct6, bits(1), yregidx, regidx, yregidx)
 
-mapping encdec_wxfunct6 : wxfunct6 <-> bits(6) = {
-  WX_VADD       <-> 0b110101,
-  WX_VSUB       <-> 0b110111,
-  WX_VADDU      <-> 0b110100,
-  WX_VSUBU      <-> 0b110110
+mapping y_encdec_wide_xfunct6 : y_wide_xfunct6 <-> bits(6) = {
+ Y_WIDE_X_YADD       <-> 0b110101,
+ Y_WIDE_X_YSUB       <-> 0b110111,
+ Y_WIDE_X_YADDU      <-> 0b110100,
+ Y_WIDE_X_YSUBU      <-> 0b110110
 }
 
-mapping clause encdec = WXTYPE(funct6, vm, vs2, rs1, vd)
-  <-> encdec_wxfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_reg(rs1) @ 0b110 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 16)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 32)
+mapping clause encdec = Y_WIDE_XTYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_encdec_wide_xfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ encdec_reg(rs1) @ 0b110 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 16)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 32)
 
-function clause execute WXTYPE(funct6, vm, vs2, rs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_WIDE_XTYPE(funct6, ym, ys2, rs1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  let SEW_widen      = SEW * 2;
-  let LMUL_pow_widen = LMUL_pow + 1;
+  let SEW_widen = SEW * 2;
+  let LMUL_pow_widen = Y_LMUL_pow + 1;
 
-  if illegal_variable_width(vd, vm, SEW_widen, LMUL_pow_widen) |
-     not(valid_reg_group(vs2, LMUL_pow_widen)) |
-     not(valid_reg_group(vd, LMUL_pow_widen))
-  then return Illegal_Instruction();
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_variable_width(yd, ym, SEW_widen, LMUL_pow_widen)
+   | not(y_valid_reg_group(ys2, LMUL_pow_widen))
+   | not(y_valid_reg_group(yd, LMUL_pow_widen))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW_widen)) then {
+    return Illegal_Instruction()
+  };
 
   assert(SEW_widen <= 64);
   assert(LMUL_pow_widen <= 3);
 
-  let 'n = num_elem;
-  let 'm = SEW;
-  let 'o = SEW_widen;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+  let (o as 'o) = SEW_widen;
 
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('o)) = read_vreg(num_elem, SEW_widen, LMUL_pow_widen, vd);
-  let rs1_val : bits('m)             = get_scalar(rs1, SEW);
-  let vs2_val : vector('n, bits('o)) = read_vreg(num_elem, SEW_widen, LMUL_pow_widen, vs2);
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let yd_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_widen, LMUL_pow_widen, yd);
+  let rs1_val : bits('m) = y_get_scalar(rs1, SEW);
+  let ys2_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_widen, LMUL_pow_widen, ys2);
 
-  let (initial_result, mask) : (vector('n, bits('o)), bits('n)) = match init_masked_result(num_elem, SEW_widen, LMUL_pow_widen, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
+  let (initial_result, mask) : (vector('n, bits('o)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW_widen,
+    LMUL_pow_widen,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        WX_VADD  => to_bits_unsafe(SEW_widen, signed(vs2_val[i]) + signed(rs1_val)),
-        WX_VSUB  => to_bits_unsafe(SEW_widen, signed(vs2_val[i]) - signed(rs1_val)),
-        WX_VADDU => to_bits_unsafe(SEW_widen, unsigned(vs2_val[i]) + unsigned(rs1_val)),
-        WX_VSUBU => to_bits_unsafe(SEW_widen, unsigned(vs2_val[i]) - unsigned(rs1_val))
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_WIDE_X_YADD  => to_bits_unsafe(SEW_widen, signed(ys2_val_view[i][j][k]) + signed(rs1_val)),
+          Y_WIDE_X_YSUB  => to_bits_unsafe(SEW_widen, signed(ys2_val_view[i][j][k]) - signed(rs1_val)),
+          Y_WIDE_X_YADDU => to_bits_unsafe(SEW_widen, unsigned(ys2_val_view[i][j][k]) + unsigned(rs1_val)),
+          Y_WIDE_X_YSUBU => to_bits_unsafe(SEW_widen, unsigned(ys2_val_view[i][j][k]) - unsigned(rs1_val)),
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW_widen, LMUL_pow_widen, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW_widen, LMUL_pow_widen, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping wxtype_mnemonic : wxfunct6 <-> string = {
-  WX_VADD       <-> "vwadd.wx",
-  WX_VSUB       <-> "vwsub.wx",
-  WX_VADDU      <-> "vwaddu.wx",
-  WX_VSUBU      <-> "vwsubu.wx"
+mapping y_wide_xtype_mnemonic : y_wide_xfunct6 <-> string = {
+ Y_WIDE_X_YADD       <-> "ywadd.wide.yx",
+ Y_WIDE_X_YSUB       <-> "ywsub.wide.yx",
+ Y_WIDE_X_YADDU      <-> "ywaddu.wide.yx",
+ Y_WIDE_X_YSUBU      <-> "ywsubu.wide.yx"
 }
 
-mapping clause assembly = WXTYPE(funct6, vm, vs2, rs1, vd)
-  <-> wxtype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ reg_name(rs1) ^ maybe_vmask(vm)
+mapping clause assembly = Y_WIDE_XTYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_wide_xtype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ reg_name(rs1) ^ y_maybe_ymask(ym)
 
-// ******************* OPMVX (VXtype Widening Multiply-Add) *********************
-// Multiply-Add instructions switch the order of source operands in assembly (vs1/rs1 before vs2)
-union clause instruction =  WMVXTYPE : (wmvxfunct6, bits(1), vregidx, regidx, vregidx)
+// ******************* OPMVX (yxtype Widening Multiply-Add) *********************
+// Multiply-Add instructions switch the order of source operands in assembly (ys1/rs1 before ys2)
+union clause instruction =  Y_WIDE_MYXTYPE : (y_wide_myxfunct6, bits(1), yregidx, regidx, yregidx)
 
-mapping encdec_wmvxfunct6 : wmvxfunct6 <-> bits(6) = {
-  WMVX_VWMACCU    <-> 0b111100,
-  WMVX_VWMACC     <-> 0b111101,
-  WMVX_VWMACCUS   <-> 0b111110,
-  WMVX_VWMACCSU   <-> 0b111111
+mapping y_encdec_wide_myxfunct6 : y_wide_myxfunct6 <-> bits(6) = {
+ Y_WIDE_MYX_YWMACCU    <-> 0b111100,
+ Y_WIDE_MYX_YWMACC     <-> 0b111101,
+ Y_WIDE_MYX_YWMACCUS   <-> 0b111110,
+ Y_WIDE_MYX_YWMACCSU   <-> 0b111111
 }
 
-mapping clause encdec = WMVXTYPE(funct6, vm, vs2, rs1, vd)
-  <-> encdec_wmvxfunct6(funct6) @ vm @ encdec_vreg(vs2) @ encdec_reg(rs1) @ 0b110 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 16)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 32)
+mapping clause encdec = Y_WIDE_MYXTYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_encdec_wide_myxfunct6(funct6) @ ym @ y_encdec_yreg(ys2) @ encdec_reg(rs1) @ 0b110 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 16)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 32)
 
-function clause execute WMVXTYPE(funct6, vm, vs2, rs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_WIDE_MYXTYPE(funct6, ym, ys2, rs1, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  let SEW_widen      = SEW * 2;
-  let LMUL_pow_widen = LMUL_pow + 1;
+  let SEW_widen = SEW * 2;
+  let LMUL_pow_widen = Y_LMUL_pow + 1;
 
-  if  illegal_variable_width(vd, vm, SEW_widen, LMUL_pow_widen) |
-      not(valid_reg_overlap(vs2, vd, LMUL_pow, LMUL_pow_widen))
-  then return Illegal_Instruction();
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_variable_width(yd, ym, SEW_widen, LMUL_pow_widen)
+   | not(y_valid_reg_overlap(ys2, yd, Y_LMUL_pow, LMUL_pow_widen))
+   | // yd is also a source register
+    not(y_valid_src_overlap(ys2, SEW, Y_LMUL_pow, yd, SEW_widen, LMUL_pow_widen))
+   | not(y_valid_ym_src_overlap(ym, ys2, SEW)) then {
+    return Illegal_Instruction()
+  };
 
   assert(SEW_widen <= 64);
   assert(LMUL_pow_widen <= 3);
 
-  let 'n = num_elem;
-  let 'm = SEW;
-  let 'o = SEW_widen;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+  let (o as 'o) = SEW_widen;
 
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('o)) = read_vreg(num_elem, SEW_widen, LMUL_pow_widen, vd);
-  let rs1_val : bits('m)             = get_scalar(rs1, SEW);
-  let vs2_val : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vs2);
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let yd_val : vector('n, bits('o)) = y_read_yreg(num_elem, SEW_widen, LMUL_pow_widen, yd);
+  let rs1_val : bits('m) = y_get_scalar(rs1, SEW);
+  let ys2_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, ys2);
 
-  let (initial_result, mask) : (vector('n, bits('o)), bits('n)) = match init_masked_result(num_elem, SEW_widen, LMUL_pow_widen, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
+  let (initial_result, mask) : (vector('n, bits('o)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW_widen,
+    LMUL_pow_widen,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        WMVX_VWMACCU  => (to_bits_unsafe(SEW_widen, unsigned(rs1_val) * unsigned(vs2_val[i]) )) + vd_val[i],
-        WMVX_VWMACC   => (to_bits_unsafe(SEW_widen, signed(rs1_val) * signed(vs2_val[i]) )) + vd_val[i],
-        WMVX_VWMACCUS => (to_bits_unsafe(SEW_widen, unsigned(rs1_val) * signed(vs2_val[i]) ))+ vd_val[i],
-        WMVX_VWMACCSU => (to_bits_unsafe(SEW_widen, signed(rs1_val) * unsigned(vs2_val[i]) ))+ vd_val[i]
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let yd_val_view = y_shape(yd_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(yd_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_WIDE_MYX_YWMACCU  => to_bits_unsafe(SEW_widen, unsigned(rs1_val) * unsigned(ys2_val_view[i][j][k])) +
+            yd_val_view[i][j][k],
+          Y_WIDE_MYX_YWMACC   => to_bits_unsafe(SEW_widen, signed(rs1_val) * signed(ys2_val_view[i][j][k])) +
+            yd_val_view[i][j][k],
+          Y_WIDE_MYX_YWMACCUS => to_bits_unsafe(SEW_widen, unsigned(rs1_val) * signed(ys2_val_view[i][j][k])) +
+            yd_val_view[i][j][k],
+          Y_WIDE_MYX_YWMACCSU => to_bits_unsafe(SEW_widen, signed(rs1_val) * unsigned(ys2_val_view[i][j][k])) +
+            yd_val_view[i][j][k],
+        }
       }
-    }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW_widen, LMUL_pow_widen, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW_widen, LMUL_pow_widen, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping wmvxtype_mnemonic : wmvxfunct6 <-> string = {
-  WMVX_VWMACCU     <-> "vwmaccu.vx",
-  WMVX_VWMACC      <-> "vwmacc.vx",
-  WMVX_VWMACCUS    <-> "vwmaccus.vx",
-  WMVX_VWMACCSU    <-> "vwmaccsu.vx"
+mapping y_wide_myxtype_mnemonic : y_wide_myxfunct6 <-> string = {
+ Y_WIDE_MYX_YWMACCU     <-> "ywmaccu.yx",
+ Y_WIDE_MYX_YWMACC      <-> "ywmacc.yx",
+ Y_WIDE_MYX_YWMACCUS    <-> "ywmaccus.yx",
+ Y_WIDE_MYX_YWMACCSU    <-> "ywmaccsu.yx"
 }
 
-mapping clause assembly = WMVXTYPE(funct6, vm, vs2, rs1, vd)
-  <-> wmvxtype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ reg_name(rs1) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping clause assembly = Y_WIDE_MYXTYPE(funct6, ym, ys2, rs1, yd)
+ <-> y_wide_myxtype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ reg_name(rs1) ^ sep() ^ y_yreg_name(ys2) ^ y_maybe_ymask(ym)
 
-// ***************************** OPMVX (VRXUNARY0) ******************************
-union clause instruction = VMVSX : (regidx, vregidx)
+// ***************************** OPMVX (YRXUNARY0) ******************************
+union clause instruction = Y_YMVSX : (regidx, yregidx)
 
-mapping clause encdec = VMVSX(rs1, vd)
-  <-> 0b010000 @ 0b1 @ 0b00000 @ encdec_reg(rs1) @ 0b110 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_YMVSX(rs1, yd)
+ <-> 0b010000 @ 0b1 @ 0b00000 @ encdec_reg(rs1) @ 0b110 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute VMVSX(rs1, vd) = {
-  let SEW      = get_sew();
-  let num_elem = get_num_elem(0, SEW);
+function clause execute(Y_YMVSX(rs1, yd)) = {
+  let SEW = y_get_sew();
+  let num_elem = y_get_num_elem(0, SEW);
 
-  if illegal_vd_unmasked() then return Illegal_Instruction();
+  // See above comment in YMVXS for why LMUL is used here
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem_ystart = y_get_num_elem(Y_LMUL_pow, SEW);
+
+  if y_illegal_ystart(Y_YSTART_SCALAR_MOVE, num_elem_ystart, Y_LMUL_pow) | y_illegal_yd_unmasked() then {
+    return Illegal_Instruction()
+  };
 
   assert(num_elem > 0);
 
-  let 'n = num_elem;
-  let 'm = SEW;
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
 
-  let rs1_val : bits('m)             = get_scalar(rs1, 'm);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, 0, vd);
+  let rs1_val : bits('m) = y_get_scalar(rs1, sizeof('m));
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, 0, yd);
 
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, 0, vd_val, ones()) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    0,
+    yd_val,
+    ones(),
+  );
   var result = initial_result;
 
   // one body element
-  if mask[0] == 0b1 then result[0] = rs1_val;
-
-  // others treated as tail elements
-  let tail_ag : agtype = get_vtype_vta();
-  foreach (i from 1 to (num_elem - 1)) {
-    result[i] = match tail_ag {
-      UNDISTURBED => vd_val[i],
-      AGNOSTIC    => vd_val[i] // TODO: configuration support
-    }
+  if y_shape(mask, y_columns, y_depth)[0][0][0] == 0b1 then {
+    var origin_view = y_shape(result, y_columns, y_depth);
+    origin_view[0][0][0] = rs1_val;
+    result = y_unshape_vector(length(result), origin_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, 0, vd, result);
-  set_vstart(zeros());
+  // others treated as tail elements
+  let tail_ag : y_agtype = y_get_ytype_yta();
+  {
+    var result_view = y_shape(result, y_columns, y_depth);
+    let yd_val_view = y_shape(yd_val, y_columns, y_depth);
+    foreach (p from 1 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(result_view));
+      assert(i < length(yd_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      result_view[i][j][k] = match tail_ag {
+        Y_UNDISTURBED => yd_val_view[i][j][k],
+        Y_AGNOSTIC    => yd_val_view[i][j][k], // TODO: configuration support
+      }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
+  };
+
+  y_write_yreg(num_elem, SEW, 0, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VMVSX(rs1, vd)
-  <-> "vmv.s.x" ^ spc() ^ vreg_name(vd) ^ sep() ^ reg_name(rs1)
+mapping clause assembly = Y_YMVSX(rs1, yd)
+ <-> "ymv.s.x" ^ spc() ^ y_yreg_name(yd) ^ sep() ^ reg_name(rs1)

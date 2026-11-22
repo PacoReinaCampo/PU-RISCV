@@ -72,37 +72,70 @@ function clause execute AMO(op, aq, rl, rs2, rs1, width, rd) = {
   // This is checked during decoding.
   assert(width <= xlen_bytes * 2);
 
-  let access = Atomic(op, Data, Data);
+  let access = Atomic(op, aq, rl, Data, Data);
+  let access_info = default_access_info(access);
+  let eff_priv = access_info.eff_privilege;
 
   // Get the address, X(rs1) (no offset).
   // Some extensions perform additional checks on address validity.
-  let vaddr : virtaddr = match ext_data_get_addr(rs1, zeros(), access, width) {
+  let vaddr : virtaddr = match get_transformed_data_addr(rs1, zeros(), access, access_info, width) {
     Ext_DataAddr_Error(e)  => return Ext_DataAddr_Check_Failure(e),
     Ext_DataAddr_OK(vaddr) => vaddr,
   };
 
-  if not(is_aligned_addr(vaddr, width))
-  then return memory_exception(vaddr, E_SAMO_Addr_Align());
+  // AMO addresses are always available for triggers.  Trigger address
+  // matches have higher priority than Load/SAMO misaligned exceptions
+  // and data memory protection faults. An AMO is considered as both a
+  // load and a store for address purposes.
+  match match_memory_trigger_before(cur_privilege, TriggerAddress(TriggerAddress_AMO, bits_of(vaddr), width), access_is_gva(access_info)) {
+    Some(pti) => return PendingTrigger(pti),
+    None()    => (),
+  };
 
-  let (addr, pbmt) : (physaddr, page_based_mem_type) = match translateAddr(vaddr, access) {
-    Err(e, _) => return memory_exception(vaddr, e),
+  if not(is_aligned_addr(vaddr, width)) then {
+    // Check if the model is configured to raise an exception based on
+    // the misaligned virtual address.
+    match plat_misaligned_exception(access, false) {
+      Some(AccessFault)        => return memory_exception(E_SAMO_Access_Fault(), bits_of(vaddr), access_info),
+      Some(AlignmentException) => return memory_exception(E_SAMO_Addr_Align(), bits_of(vaddr), access_info),
+      // No exception yet, but we may still get one based on the
+      // physical address after address translation and checking PMAs.
+      None()                   => (),
+    };
+  };
+
+  let (addr, pbmt) : (physaddr, page_based_mem_type) = match translateAddr(vaddr, access, eff_priv) {
+    Err(e, _) => return trap(e),
     Ok(addr, pbmt, _) => (addr, pbmt),
   };
 
-  // AMOCAS.D for RV32 and AMOCAS.Q for RV64 operate on a pair of
-  // registers. When the first register of a register pair is
-  // x0, then both halves of the pair read/write as zero.
-  let rs2_val : bits('width * 8) = if width <= xlen_bytes then trunc(X(rs2)) else trunc(X_pair(rs2));
-
-  let loaded : bits('width * 8) = match mem_write_ea(addr, width, aq & rl, rl, true) {
-    Err(e) => return memory_exception(vaddr, e),
-    Ok(_)  => match mem_read(access, pbmt, addr, width, aq, aq & rl, true) {
-      Err(e)     => return memory_exception(vaddr, e),
+  let loaded : bits(8 * 'width) = match mem_write_ea(addr, width, eff_priv, access, pbmt, aq & rl, rl, true) {
+    Err(exc_addr, e) => {
+      // AMOs should not get split.
+      assert(exc_addr == addr);
+      let exc_vaddr = exception_vaddr(access_info, vaddr, addr, exc_addr);
+      return memory_exception(e, exc_vaddr, access_info)
+    },
+    Ok(_)  => match mem_read(access, pbmt, eff_priv, addr, width, aq, aq & rl, true) {
+      Err(exc_addr, e) => {
+        // AMOs should not get split.
+        assert(exc_addr == addr);
+        let exc_vaddr = exception_vaddr(access_info, vaddr, addr, exc_addr);
+        return memory_exception(e, exc_vaddr, access_info)
+      },
       Ok(loaded) => loaded,
     },
   };
 
-  let result : bits('width * 8) = match op {
+  // Sequence the read of `rs2` after the call to `mem_write_ea` with the effective address.
+  // See https://github.com/riscv/sail-riscv/issues/1761.
+
+  // AMOCAS.D for RV32 and AMOCAS.Q for RV64 operate on a pair of
+  // registers. When the first register of a register pair is
+  // x0, then both halves of the pair read/write as zero.
+  let rs2_val : bits(8 * 'width) = if width <= xlen_bytes then trunc(X(rs2)) else trunc(X_pair(rs2));
+
+  let stored : bits(8 * 'width) = match op {
     AMOSWAP => rs2_val,
     AMOADD  => rs2_val + loaded,
     AMOXOR  => rs2_val ^ loaded,
@@ -117,13 +150,13 @@ function clause execute AMO(op, aq, rl, rs2, rs1, width, rd) = {
   };
 
   // All operations except CAS where loaded != X(rd) write their value back.
-  if op == AMOCAS & loaded != (if width <= xlen_bytes then trunc(X(rd)) else trunc(X_pair(rd))) then {
+  let res = if op == AMOCAS & loaded != (if width <= xlen_bytes then trunc(X(rd)) else trunc(X_pair(rd))) then {
     // Compared, but didn't swap.
     if width <= xlen_bytes
     then X(rd) = sign_extend(loaded)
     else X_pair(rd) = sign_extend(loaded);
     RETIRE_SUCCESS
-  } else match mem_write_value(addr, width, sign_extend(result), access, pbmt, aq & rl, rl, true) {
+  } else match mem_write_value(addr, width, sign_extend(stored), eff_priv, access, pbmt, aq & rl, rl, true) {
     Ok(true)  => {
       if width <= xlen_bytes
       then X(rd) = sign_extend(loaded)
@@ -131,8 +164,24 @@ function clause execute AMO(op, aq, rl, rs2, rs1, width, rd) = {
       RETIRE_SUCCESS
     },
     Ok(false) => internal_error(__FILE__, __LINE__, "AMO got false from mem_write_value"),
-    Err(e)    => memory_exception(vaddr, e),
-  }
+    Err(exc_addr, e) => {
+      // AMOs should not get split.
+      assert(exc_addr == addr);
+      let exc_vaddr = exception_vaddr(access_info, vaddr, addr, exc_addr);
+      memory_exception(e, exc_vaddr, access_info)
+    }
+  };
+
+  // The spec leaves open whether the loaded value of an AMO is
+  // available to trigger on, and UNSPECIFIED whether the AMO store is
+  // matched by data store triggers.  This implementation implements data
+  // triggers for AMOs as `after` triggers to retain AMO atomicity.
+
+  if res == RETIRE_SUCCESS then {
+    match_memory_trigger_after(cur_privilege, TriggerAMOData(bits_of(vaddr), loaded, stored, width), access_is_gva(access_info));
+  };
+
+  res
 }
 
 mapping clause assembly = AMO(op, aq, rl, rs2, rs1, width, rd)

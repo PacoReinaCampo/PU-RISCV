@@ -1,4343 +1,573 @@
-**RVP - "RVP Standard Extension for Packed-SIMD"**
-
-PADD.BS:
-
-```
-let s1 = X(rs1);
-let s2_b0 = X(rs2)[7..0];
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes) - 1) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    d[(i*8+7)..(i*8)] = s1_b + s2_b0;
-}
-X(rd) = d;
-```
-
-PABD.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes) - 1) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    let s2_b = s2[(i*8+7)..(i*8)];
-    d[(i*8+7)..(i*8)] =
-        if (s1_b <_s s2_b) then s2_b - s1_b else s1_b - s2_b;
-}
-X(rd) = d;
-```
-
-PABDU.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes) - 1) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    let s2_b = s2[(i*8+7)..(i*8)];
-    d[(i*8+7)..(i*8)] =
-        if (s1_b <_u s2_b) then s2_b - s1_b else s1_b - s2_b;
-}
-X(rd) = d;
-```
-
-PREDSUM.BS:
-
-```
-let s1 = X(rs1);
-var sum : bits(xlen) = X(rs2);
-foreach (i from 0 to sizeof(xlen_bytes) - 1) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    sum = sum + sign_extend(sizeof(xlen), s1_b);
-}
-X(rd) = sum;
-```
-
-PREDSUMU.BS:
-
-```
-let s1 = X(rs1);
-var sum : bits(xlen) = X(rs2);
-foreach (i from 0 to sizeof(xlen_bytes) - 1) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    sum = sum + zero_extend(sizeof(xlen), s1_b);
-}
-X(rd) = sum;
-```
-
-PADD.HS:
-
-```
-let s1 = X(rs1);
-let s2_h0 = X(rs2)[15..0];
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] = s1_h + s2_h0;
-}
-X(rd) = d;
-```
-
-PSH1ADD.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] = (s1_h << 1) + s2_h;
-}
-X(rd) = d;
-```
-
-PSSH1SADD.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    let ssh1_s1_h : bits(16) =
-        if (s1_h <_s 0xC000) then { vxsat = 1; 0x8000 }
-            else if (s1_h >=_s 0x4000) then { vxsat = 1; 0x7FFF }
-                else s1_h << 1;
-    let xadd_ssh1 = to_bits(20, signed(ssh1_s1_h) + signed(s2_h));
-    d[(i*16+15)..(i*16)] =
-        if (xadd_ssh1 <_s 0xF8000) then { vxsat = 1; 0x8000 }
-            else if (xadd_ssh1 >_s 0x07FFF) then { vxsat = 1; 0x7FFF }
-                else xadd_ssh1[15..0];
-}
-X(rd) = d;
-```
-
-PABD.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        if (s1_h <_s s2_h) then s2_h - s1_h else s1_h - s2_h;
-}
-X(rd) = d;
-```
-
-PABDU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        if (s1_h <_u s2_h) then s2_h - s1_h else s1_h - s2_h;
-}
-X(rd) = d;
-```
-
-PREDSUM.HS:
-
-```
-let s1 = X(rs1);
-var sum : bits(xlen) = X(rs2);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    sum = sum + sign_extend(sizeof(xlen), s1_h);
-}
-X(rd) = sum;
-```
-
-PREDSUMU.HS:
-
-```
-let s1 = X(rs1);
-var sum : bits(xlen) = X(rs2);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    sum = sum + zero_extend(sizeof(xlen), s1_h);
-}
-X(rd) = sum;
-```
-
-RV32 SSH1SADD:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let ssh1_s1 : bits(32) =
-    if (s1 <_s 0xC0000000) then { vxsat = 1; 0x80000000 }
-        else if (s1 >=_s 0x40000000) then { vxsat = 1; 0x7FFFFFFF }
-            else s1 << 1;
-let xadd_ssh1 = to_bits(36, signed(ssh1_s1) + signed(s2));
-X(rd) =
-    if (xadd_ssh1 <_s 0xF80000000) then { vxsat = 1; 0x80000000 }
-        else if (xadd_ssh1 >_s 0x07FFFFFFF) then { vxsat = 1; 0x7FFFFFFF }
-            else xadd_ssh1[31..0];
-```
-
-RV64 PADD.WS:
-
-```
-let s1 = X(rs1);
-let s2_w0 = X(rs2)[31..0];
-var d : bits(64);
-d[31..0]  = s1[31..0]  + s2_w0;
-d[63..32] = s1[63..32] + s2_w0;
-X(rd) = d;
-```
-
-RV64 PSH1ADD.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64);
-d[31..0]  = (s1[31..0]  << 1) + s2[31..0];
-d[63..32] = (s1[63..32] << 1) + s2[63..32];
-X(rd) = d;
-```
-
-RV64 PSSH1SADD.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let s2_w = s2[(i*32+31)..(i*32)];
-    let ssh1_s1_w : bits(32) =
-        if (s1_w <_s 0xC0000000) then { vxsat = 1; 0x80000000 }
-            else if (s1_w >=_s 0x40000000) then { vxsat = 1; 0x7FFFFFFF }
-                else s1_w << 1;
-    let xadd_ssh1 = to_bits(36, signed(ssh1_s1_w) + signed(s2_w));
-    d[(i*32+31)..(i*32)] =
-        if (xadd_ssh1 <_s 0xF80000000) then { vxsat = 1; 0x80000000 }
-            else if (xadd_ssh1 >_s 0x07FFFFFFF)
-                then { vxsat = 1; 0x7FFFFFFF } else xadd_ssh1[31..0];
-}
-X(rd) = d;
-```
-
-RV64 PREDSUM.WS:
-
-```
-let s1 = X(rs1);
-X(rd) = X(rs2) + sign_extend(64, s1[31..0]) + sign_extend(64, s1[63..32]);
-```
-
-RV64 PREDSUMU.WS:
-
-```
-let s1 = X(rs1);
-X(rd) = X(rs2) + zero_extend(64, s1[31..0]) + zero_extend(64, s1[63..32]);
-```
-
-PSLL.BS:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[4..0];
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes) - 1) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    d[(i*8+7)..(i*8)] = (zero_extend(32, s1_b) << shamt)[7..0];
-}
-X(rd) = d;
-```
-
-PSRL.BS:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[4..0];
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes) - 1) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    d[(i*8+7)..(i*8)] = (zero_extend(32, s1_b) >> shamt)[7..0];
-}
-X(rd) = d;
-```
-
-PSRA.BS:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[4..0];
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes) - 1) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    d[(i*8+7)..(i*8)] = (sign_extend(40, s1_b) >> shamt)[7..0];
-}
-X(rd) = d;
-```
-
-PSLL.HS:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[4..0];
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] = (zero_extend(32, s1_h) << shamt)[15..0];
-}
-X(rd) = d;
-```
-
-PSRL.HS:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[4..0];
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] = (zero_extend(32, s1_h) >> shamt)[15..0];
-}
-X(rd) = d;
-```
-
-PSRA.HS:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[4..0];
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] = (sign_extend(48, s1_h) >> shamt)[15..0];
-}
-X(rd) = d;
-```
-
-PSSHA.HS:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[7..0];
-let sshamt = signed(shamt);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s1_xh = sign_extend(32, s1_h);
-    d[(i*16+15)..(i*16)] =
-        if (sshamt < 0) then {
-            if (sshamt <= -16) then s1_xh[31..16]
-                else (s1_xh >> (0x00 - shamt)[3..0])[15..0]
-        } else {
-            let shx : bits(32) =
-                if (sshamt >= 16) then s1_h @ 0x0000
-                    else s1_xh << shamt[3..0];
-            if (shx <_s 0xFFFF8000) then { vxsat = 1; 0x8000 }
-                else if (shx >_s 0x00007FFF) then { vxsat = 1; 0x7FFF }
-                    else shx[15..0]
-        };
-}
-X(rd) = d;
-```
-
-PSSHAR.HS:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[7..0];
-let sshamt = signed(shamt);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        if (sshamt < 0) then {
-            let s1_xh : bits(33) = sign_extend(32, s1_h) @ 0b0;
-            let shx : bits(17) =
-                if (sshamt <= -16) then s1_xh[32..16]
-                    else (s1_xh >> (0x00 - shamt)[3..0])[16..0];
-            (shx + 1)[16..1]
-        } else {
-            let shx : bits(32) =
-                if (sshamt >= 16) then s1_h @ 0x0000
-                    else sign_extend(32, s1_h) << shamt[3..0];
-            if (shx <_s 0xFFFF8000) then { vxsat = 1; 0x8000 }
-                else if (shx >_s 0x00007FFF) then { vxsat = 1; 0x7FFF }
-                    else shx[15..0]
-        };
-}
-X(rd) = d;
-```
-
-RV32 SSHA:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[7..0];
-let sshamt = signed(shamt);
-let xs1 = sign_extend(64, s1);
-X(rd) =
-    if (sshamt < 0) then {
-        if (sshamt <= -32) then xs1[63..32]
-            else (xs1 >> (0x00 - shamt)[4..0])[31..0]
-    } else {
-        let shx : bits(64) =
-            if (sshamt >= 32) then s1 @ 0x00000000 else xs1 << shamt[4..0];
-        if (shx <_s 0xFFFFFFFF80000000) then { vxsat = 1; 0x80000000 }
-            else if (shx >_s 0x000000007FFFFFFF)
-                then { vxsat = 1; 0x7FFFFFFF } else shx[31..0]
-    };
-```
-
-RV32 SSHAR:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[7..0];
-let sshamt = signed(shamt);
-X(rd) =
-    if (sshamt < 0) then {
-        let xs1 : bits(65) = sign_extend(64, s1) @ 0b0;
-        let shx : bits(33) =
-            if (sshamt <= -32) then xs1[64..32]
-                else (xs1 >> (0x00 - shamt)[4..0])[32..0]
-        (shx + 1)[32..1]
-    } else {
-        let shx : bits(64) =
-            if (sshamt >= 32) then s1 @ 0x00000000
-                else sign_extend(64, s1) << shamt[4..0];
-        if (shx <_s 0xFFFFFFFF80000000) then { vxsat = 1; 0x80000000 }
-            else if (shx >_s 0x000000007FFFFFFF)
-                then { vxsat = 1; 0x7FFFFFFF } else shx[31..0]
-    };
-```
-
-RV32 MSEQ:
-
-```
-X(rd) = if (X(rs1) == X(rs2)) then 0xFFFFFFFF else 0x00000000;
-```
-
-RV32 MSLT:
-
-```
-X(rd) = if (X(rs1) <_s X(rs2)) then 0xFFFFFFFF else 0x00000000;
-```
-
-RV32 MSLTU:
-
-```
-X(rd) = if (X(rs1) <_u X(rs2)) then 0xFFFFFFFF else 0x00000000;
-```
-
-RV64 PSEXT.W.B:
-
-```
-let s1 = X(rs1);
-X(rd) = sign_extend(32, s1[39..32]) @ sign_extend(32, s1[7..0]);
-```
-
-RV64 PSEXT.W.H:
-
-```
-let s1 = X(rs1);
-X(rd) = sign_extend(32, s1[47..32]) @ sign_extend(32, s1[15..0]);
-```
-
-RV64 PSSHA.WS:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[7..0];
-let sshamt = signed(shamt);
-var d : bits(64);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let s1_xw = sign_extend(64, s1_w);
-    d[(i*32+31)..(i*32)] =
-        if (sshamt < 0) then {
-            if (sshamt <= -32) then s1_xw[63..32]
-                else (s1_xw >> (0x00 - shamt)[4..0])[31..0]
-        } else {
-            let shx : bits(64) =
-                if (sshamt >= 32) then s1_w @ 0x00000000
-                    else s1_xw << shamt[4..0];
-            if (shx <_s 0xFFFFFFFF80000000) then { vxsat = 1; 0x80000000 }
-                else if (shx >_s 0x000000007FFFFFFF)
-                    then { vxsat = 1; 0x7FFFFFFF } else shx[31..0]
-        };
-}
-X(rd) = d;
-```
-
-RV64 PSSHAR.WS:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[7..0];
-let sshamt = signed(shamt);
-var d : bits(64);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        if (sshamt < 0) then {
-            let s1_xw : bits(65) = sign_extend(64, s1_w) @ 0b0;
-            let shx : bits(33) =
-                if (sshamt <= -32) then s1_xw[64..32]
-                    else (s1_xw >> (0x00 - shamt)[4..0])[32..0];
-            (shx + 1)[32..1]
-        } else {
-            let shx : bits(64) =
-                if (sshamt >= 32) then s1_w @ 0x00000000
-                    else sign_extend(64, s1_w) << shamt[4..0];
-            if (shx <_s 0xFFFFFFFF80000000) then { vxsat = 1; 0x80000000 }
-                else if (shx >_s 0x000000007FFFFFFF)
-                    then { vxsat = 1; 0x7FFFFFFF } else shx[31..0]
-        };
-}
-X(rd) = d;
-```
-
-RV64 PMSEQ.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = if (s1[31..0]  == s2[31..0] ) then 0xFFFFFFFF else 0x00000000;
-let d_w1 = if (s1[63..32] == s2[63..32]) then 0xFFFFFFFF else 0x00000000;
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMSLT.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = if (s1[31..0]  <_s s2[31..0] ) then 0xFFFFFFFF else 0x00000000;
-let d_w1 = if (s1[63..32] <_s s2[63..32]) then 0xFFFFFFFF else 0x00000000;
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMSLTU.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = if (s1[31..0]  <_u s2[31..0] ) then 0xFFFFFFFF else 0x00000000;
-let d_w1 = if (s1[63..32] <_u s2[63..32]) then 0xFFFFFFFF else 0x00000000;
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 SATI:
-
-```
-let s1 = X(rs1);
-let n = w_uimm[5..0];
-let minval : bits(64) = 0xFFFFFFFFFFFFFFFF << n;
-let maxval = ~minval;
-X(rd) =
-    if (s1 <_s minval) then { vxsat = 1; minval }
-        else if (s1 >_s maxval) then { vxsat = 1; maxval } else s1;
-```
-
-RV64 USATI:
-
-```
-let s1 = X(rs1);
-let n = w_uimm[5..0];
-let maxval : bits(64) = ~(0xFFFFFFFFFFFFFFFF << n);
-X(rd) =
-    if (s1 <_s 0x0000000000000000) then { vxsat = 1; 0x0000000000000000 }
-        else if (s1 >_s maxval) then { vxsat = 1; maxval } else s1;
-```
-
-RV64 SHA:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[7..0];
-let sshamt = signed(shamt);
-X(rd) =
-    if (sshamt < 0) then {
-        let xs1 = sign_extend(128, s1);
-        if (sshamt <= -64) then xs1[127..64]
-            else (xs1 >> (0x00 - shamt)[5..0])[63..0]
-    } else {
-        if (sshamt >= 64) then 0x0000000000000000 else s1 << shamt[5..0]
-    };
-```
-
-RV64 SHAR:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[7..0];
-let sshamt = signed(shamt);
-X(rd) =
-    if (sshamt < 0) then {
-        let xs1 : bits(129) = sign_extend(128, s1) @ 0b0;
-        let shx : bits(65) =
-            if (sshamt <= -64) then xs1[128..64]
-                else (xs1 >> (0x00 - shamt)[5..0])[64..0];
-        (shx + 1)[64..1]
-    } else {
-        if (sshamt >= 64) then 0x0000000000000000 else s1 << shamt[5..0]
-    };
-```
-
-PPAIRE.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] = s2_h[7..0] @ s1_h[7..0];
-}
-X(rd) = d;
-```
-
-PPAIREO.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] = s2_h[15..8] @ s1_h[7..0];
-}
-X(rd) = d;
-```
-
-PPAIROE.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] = s2_h[7..0] @ s1_h[15..8];
-}
-X(rd) = d;
-```
-
-PPAIRO.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] = s2_h[15..8] @ s1_h[15..8];
-}
-X(rd) = d;
-```
-
-RV64 REV16:
-
-```
-let s1 = X(rs1);
-X(rd) = s1[15..0] @ s1[31..16] @ s1[47..32] @ s1[63..48];
-```
-
-RV64 ZIP8P:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-    s2[31..24] @ s1[31..24] @ s2[23..16] @ s1[23..16]
-        @ s2[15..8] @ s1[15..8] @ s2[7..0] @ s1[7..0];
-```
-
-RV64 ZIP8HP:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-    s2[63..56] @ s1[63..56] @ s2[55..48] @ s1[55..48]
-        @ s2[47..40] @ s1[47..40] @ s2[39..32] @ s1[39..32];
-```
-
-RV64 UNZIP8P:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-    s2[55..48] @ s2[39..32] @ s2[23..16] @ s2[7..0]
-        @ s1[55..48] @ s1[39..32] @ s1[23..16] @ s1[7..0];
-```
-
-RV64 UNZIP8HP:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-    s2[63..56] @ s2[47..40] @ s2[31..24] @ s2[15..8]
-        @ s1[63..56] @ s1[47..40] @ s1[31..24] @ s1[15..8];
-```
-
-RV64 ZIP16P:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) = s2[31..16] @ s1[31..16] @ s2[15..0] @ s1[15..0];
-```
-
-RV64 ZIP16HP:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) = s2[63..48] @ s1[63..48] @ s2[47..32] @ s1[47..32];
-```
-
-RV64 UNZIP16P:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) = s2[47..32] @ s2[15..0] @ s1[47..32] @ s1[15..0];
-```
-
-RV64 UNZIP16HP:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) = s2[63..48] @ s2[31..16] @ s1[63..48] @ s1[31..16];
-```
-
-
-ABS:
-
-```
-let s1 = X(rs1);
-X(rd) = if (signed(s1) < 0) then 0 - s1 else s1;
-```
-
-CLS:
-
-```
-var v : bits(xlen) = X(rs1);
-let lo_bound = to_bits(sizeof(xlen), -(2^(sizeof(xlen) - 2)));
-let hi_bound = ~lo_bound;
-var c : int = 0;
-while (c < sizeof(xlen) - 1) & (v >=_s lo_bound) & (v <=_s hi_bound) do {
-    c = c + 1;
-    v = v << 1;
-}
-X(rd) = to_bits(sizeof(xlen), c);
-```
-
-SLX:
-
-```
-let shamt = X(rs2)[(log2(sizeof(xlen))-1)..0];
-X(rd) = ((X(rd) @ X(rs1)) << shamt)[(sizeof(xlen)*2-1)..sizeof(xlen)];
-```
-
-SRX:
-
-```
-let shamt = X(rs2)[(log2(sizeof(xlen))-1)..0];
-X(rd) = ((X(rs1) @ X(rd)) >> shamt)[(sizeof(xlen)-1)..0];
-```
-
-MVM:
-
-```
-let s2 = X(rs2);
-X(rd) = (~s2 & X(rd)) | (s2 & X(rs1));
-```
-
-MVMN:
-
-```
-let s2 = X(rs2);
-X(rd) = (~s2 & X(rs1)) | (s2 & X(rd));
-```
-
-MERGE:
-
-```
-let d = X(rd);
-X(rd) = (~d & X(rs1)) | (d & X(rs2));
-```
-
-RV64 ABSW:
-
-```
-let s1_w = X(rs1)[31..0];
-X(rd) =
-    sign_extend(
-        64, if (signed(s1_w) <_s 0) then 0x00000000 - s1_w else s1_w);
-```
-
-RV64 CLSW:
-
-```
-var w : bits(32) = X(rs1)[31..0];
-var c : int = 0;
-while (c < 31) & (w >=_s 0xC0000000) & (w <=_s 0x3FFFFFFF) do {
-    c = c + 1;
-    w = w << 1;
-}
-X(rd) = to_bits(sizeof(xlen), c);
-```
-
-RV32 PWADD.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64);
-foreach (i from 0 to 3) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    let s2_b = s2[(i*8+7)..(i*8)];
-    d[(i*16+15)..(i*16)] = to_bits(16, signed(s1_b) + signed(s2_b));
-};
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PWADDA.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-foreach (i from 0 to 3) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    let s2_b = s2[(i*8+7)..(i*8)];
-    let d_h = d[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] = d_h + to_bits(16, signed(s1_b) + signed(s2_b));
-};
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PWADDU.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64);
-foreach (i from 0 to 3) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    let s2_b = s2[(i*8+7)..(i*8)];
-    d[(i*16+15)..(i*16)] = to_bits(16, unsigned(s1_b) + unsigned(s2_b));
-};
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PWADDAU.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-foreach (i from 0 to 3) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    let s2_b = s2[(i*8+7)..(i*8)];
-    let d_h = d[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        d_h + to_bits(16, unsigned(s1_b) + unsigned(s2_b));
-};
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PWSUB.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64);
-foreach (i from 0 to 3) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    let s2_b = s2[(i*8+7)..(i*8)];
-    d[(i*16+15)..(i*16)] = to_bits(16, signed(s1_b) - signed(s2_b));
-};
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PWSUBA.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-foreach (i from 0 to 3) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    let s2_b = s2[(i*8+7)..(i*8)];
-    let d_h = d[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] = d_h + to_bits(16, signed(s1_b) - signed(s2_b));
-};
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PWSUBU.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64);
-foreach (i from 0 to 3) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    let s2_b = s2[(i*8+7)..(i*8)];
-    d[(i*16+15)..(i*16)] = to_bits(16, unsigned(s1_b) - unsigned(s2_b));
-};
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PWSUBAU.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-foreach (i from 0 to 3) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    let s2_b = s2[(i*8+7)..(i*8)];
-    let d_h = d[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        d_h + to_bits(16, unsigned(s1_b) - unsigned(s2_b));
-};
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PWSLLI.B:
-
-```
-let s1 = X(rs1);
-let shamt = w_uimm[3..0];
-var d : bits(64);
-foreach (i from 0 to 3) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    d[(i*16+15)..(i*16)] = zero_extend(16, s1_b) << shamt;
-};
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PWSLL.BS:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[4..0];
-var d : bits(64);
-foreach (i from 0 to 3) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    d[(i*16+15)..(i*16)] = (zero_extend(32, s1_b) << shamt)[15..0];
-};
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PWSLAI.B:
-
-```
-let s1 = X(rs1);
-let shamt = w_uimm[3..0];
-var d : bits(64);
-foreach (i from 0 to 3) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    d[(i*16+15)..(i*16)] = sign_extend(16, s1_b) << shamt;
-};
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PWSLA.BS:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[4..0];
-var d : bits(64);
-foreach (i from 0 to 3) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    d[(i*16+15)..(i*16)] = (sign_extend(32, s1_b) << shamt)[15..0];
-};
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PWADD.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = to_bits(32, signed(s1[15..0])  + signed(s2[15..0]) );
-let d_w1 = to_bits(32, signed(s1[31..16]) + signed(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 PWADDA.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d_w0 = X(rd_p*2);
-var d_w1 = if (rd_p == 0x0) then 0x00000000 else X(rd_p*2+1);
-d_w0 = d_w0 + to_bits(32, signed(s1[15..0])  + signed(s2[15..0]) );
-d_w1 = d_w1 + to_bits(32, signed(s1[31..16]) + signed(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 PWADDU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = to_bits(32, unsigned(s1[15..0])  + unsigned(s2[15..0]) );
-let d_w1 = to_bits(32, unsigned(s1[31..16]) + unsigned(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 PWADDAU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d_w0 = X(rd_p*2);
-var d_w1 = if (rd_p == 0x0) then 0x00000000 else X(rd_p*2+1);
-d_w0 = d_w0 + to_bits(32, unsigned(s1[15..0])  + unsigned(s2[15..0]) );
-d_w1 = d_w1 + to_bits(32, unsigned(s1[31..16]) + unsigned(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 PWSUB.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = to_bits(32, signed(s1[15..0])  - signed(s2[15..0]) );
-let d_w1 = to_bits(32, signed(s1[31..16]) - signed(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 PWSUBA.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d_w0 = X(rd_p*2);
-var d_w1 = if (rd_p == 0x0) then 0x00000000 else X(rd_p*2+1);
-d_w0 = d_w0 + to_bits(32, signed(s1[15..0])  - signed(s2[15..0]) );
-d_w1 = d_w1 + to_bits(32, signed(s1[31..16]) - signed(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 PWSUBU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = to_bits(32, unsigned(s1[15..0])  - unsigned(s2[15..0]) );
-let d_w1 = to_bits(32, unsigned(s1[31..16]) - unsigned(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 PWSUBAU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d_w0 = X(rd_p*2);
-var d_w1 = if (rd_p == 0x0) then 0x00000000 else X(rd_p*2+1);
-d_w0 = d_w0 + to_bits(32, unsigned(s1[15..0])  - unsigned(s2[15..0]) );
-d_w1 = d_w1 + to_bits(32, unsigned(s1[31..16]) - unsigned(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 PWSLLI.H:
-
-```
-let s1 = X(rs1);
-let shamt = w_uimm[4..0];
-let d_w0 = zero_extend(32, s1[15..0] ) << shamt;
-let d_w1 = zero_extend(32, s1[31..16]) << shamt;
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 PWSLL.HS:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[4..0];
-let d_w0 = zero_extend(32, s1[15..0] ) << shamt;
-let d_w1 = zero_extend(32, s1[31..16]) << shamt;
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 PWSLAI.H:
-
-```
-let s1 = X(rs1);
-let shamt = w_uimm[4..0];
-let d_w0 = sign_extend(32, s1[15..0] ) << shamt;
-let d_w1 = sign_extend(32, s1[31..16]) << shamt;
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 PWSLA.HS:
-
-```
-let s1 = X(rs1);
-let shamt = X(rs2)[4..0];
-let d_w0 = sign_extend(32, s1[15..0] ) << shamt;
-let d_w1 = sign_extend(32, s1[31..16]) << shamt;
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 WADD:
-
-```
-let d = to_bits(64, signed(X(rs1)) + signed(X(rs2)));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 WADDA:
-
-```
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-d = d + to_bits(64, signed(X(rs1)) + signed(X(rs2)));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 WADDU:
-
-```
-let d = to_bits(64, unsigned(X(rs1)) + unsigned(X(rs2)));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 WADDAU:
-
-```
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-d = d + to_bits(64, unsigned(X(rs1)) + unsigned(X(rs2)));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 WSUB:
-
-```
-let d = to_bits(64, signed(X(rs1)) - signed(X(rs2)));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 WSUBA:
-
-```
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-d = d + to_bits(64, signed(X(rs1)) - signed(X(rs2)));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 WSUBU:
-
-```
-let d = to_bits(64, unsigned(X(rs1)) - unsigned(X(rs2)));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 WSUBAU:
-
-```
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-d = d + to_bits(64, unsigned(X(rs1)) - unsigned(X(rs2)));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 WSLLI:
-
-```
-let shamt = w_uimm[5..0];
-let d = zero_extend(64, X(rs1)) << shamt;
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 WSLL:
-
-```
-let shamt = X(rs2)[5..0];
-let d = zero_extend(64, X(rs1)) << shamt;
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 WSLAI:
-
-```
-let shamt = w_uimm[5..0];
-let d = sign_extend(64, X(rs1)) << shamt;
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 WSLA:
-
-```
-let shamt = X(rs2)[5..0];
-let d = sign_extend(64, X(rs1)) << shamt;
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 WZIP8P:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = s2[15..8]  @ s1[15..8]  @ s2[7..0]   @ s1[7..0];
-    X(rd_p*2+1) = s2[31..24] @ s1[31..24] @ s2[23..16] @ s1[23..16];
-}
-```
-
-RV32 WZIP16P:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = s2[15..0]  @ s1[15..0];
-    X(rd_p*2+1) = s2[31..16] @ s1[31..16];
-}
-```
-
-RV32 PLI.DB, PLI.DH, PLUI.DH:
-
-```
-For these instructions, the function of
-
-    P<op>.D<s> rd,imm    // only even destination register number allowed
-
-is the same as two instructions:
-
-    P<op>.<s> rd,imm     // the even destination register
-    P<op>.<s> rd+,imm    // the odd destination register
-
-See the introduction for the precise meaning of "rd+".
-```
-
-RV32 PADD.DB, PSUB.DB, PSADD.DB, PSADDU.DB, PSSUB.DB, PSSUBU.DB, PAADD.DB, PAADDU.DB, PASUB.DB, PASUBU.DB, PABD.DB, PABDU.DB, PADD.DH, PSUB.DH, PSADD.DH, PSADDU.DH, PSSUB.DH, PSSUBU.DH, PAADD.DH, PAADDU.DH, PASUB.DH, PASUBU.DH, PSH1ADD.DH, PSSH1SADD.DH, PABD.DH, PABDU.DH:
-
-```
-For these instructions, the function of
-
-    P<op>.D<s> rd,rs1,rs2     // only even register numbers allowed
-
-is the same as two instructions:
-
-    P<op>.<s> rd,rs1,rs2      // the even registers
-    P<op>.<s> rd+,rs1+,rs2+   // the odd registers
-
-See the introduction for the precise meaning of "rd+", "rs1+", and
-"rs2+".
-```
-
-RV32 PAS.DHX, PSA.DHX, PSAS.DHX, PSSA.DHX, PAAS.DHX, PASA.DHX:
-
-```
-For these instructions, the function of
-
-    P<op>.DHX rd,rs1,rs2      // only even register numbers allowed
-
-is the same as two instructions:
-
-    P<op>.HX rd,rs1,rs2       // the even registers
-    P<op>.HX rd+,rs1+,rs2+    // the odd registers
-
-See the introduction for the precise meaning of "rd+", "rs1+", and
-"rs2+".
-```
-
-RV32 PSABS.DB, PSABS.DH:
-
-```
-For these instructions, the function of
-
-    PSABS.D<s> rd,rs1         // only even register numbers allowed
-
-is the same as two instructions:
-
-    PSABS.<s> rd,rs1          // the even registers
-    PSABS.<s> rd+,rs1+        // the odd registers
-
-See the introduction for the precise meaning of "rd+" and "rs1+".
-```
-
-RV32 PADD.DW, PSUB.DW, PSADD.DW, PSADDU.DW, PSSUB.DW, PSSUBU.DW, PAADD.DW, PAADDU.DW, PASUB.DW, PASUBU.DW, PSH1ADD.DW, PSSH1SADD.DW:
-
-```
-For these instructions, the function of
-
-    P<op>.DW rd,rs1,rs2       // only even register numbers allowed
-
-is the same as two instructions:
-
-    <op> rd,rs1,rs2           // the even registers
-    <op> rd+,rs1+,rs2+        // the odd registers
-
-See the introduction for the precise meaning of "rd+", "rs1+", and
-"rs2+".
-```
-
-RV32 PREDSUM.DBS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-X(rd) =
-    to_bits(
-        32,
-        signed(X(rs2)) + signed(s1[7..0]) + signed(s1[15..8])
-            + signed(s1[23..16]) + signed(s1[31..24])
-            + signed(s1[39..32]) + signed(s1[47..40])
-            + signed(s1[55..48]) + signed(s1[63..56])
-    );
-```
-
-RV32 PREDSUMU.DBS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-X(rd) =
-    to_bits(
-        32,
-        unsigned(X(rs2)) + unsigned(s1[7..0]) + unsigned(s1[15..8])
-            + unsigned(s1[23..16]) + unsigned(s1[31..24])
-            + unsigned(s1[39..32]) + unsigned(s1[47..40])
-            + unsigned(s1[55..48]) + unsigned(s1[63..56])
-    );
-```
-
-RV32 PREDSUM.DHS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-X(rd) =
-    to_bits(
-        32,
-        signed(X(rs2)) + signed(s1[15..0]) + signed(s1[31..16])
-            + signed(s1[47..32]) + signed(s1[63..48])
-    );
-```
-
-RV32 PREDSUMU.DHS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-X(rd) =
-    to_bits(
-        32,
-        unsigned(X(rs2)) + unsigned(s1[15..0]) + unsigned(s1[31..16])
-            + unsigned(s1[47..32]) + unsigned(s1[63..48])
-    );
-```
-
-RV32 PSLLI.DB, PSRLI.DB, PSRAI.DB, PSATI.DH, PUSATI.DH, PSLLI.DH, PSRLI.DH, PSRAI.DH, PSSLAI.DH, PSRARI.DH:
-
-```
-For these instructions, the function of
-
-    P<op>.D<s> rd,rs1,imm     // only even register numbers allowed
-
-is the same as two instructions:
-
-    P<op>.<s> rd,rs1,imm      // the even registers
-    P<op>.<s> rd+,rs1+,imm    // the odd registers
-
-See the introduction for the precise meaning of "rd+" and "rs1+".
-```
-
-RV32 PMIN.DB, PMINU.DB, PMAX.DB, PMAXU.DB, PMSEQ.DB, PMSLT.DB, PMSLTU.DB, PMIN.DH, PMINU.DH, PMAX.DH, PMAXU.DH, PMSEQ.DH, PMSLT.DH, PMSLTU.DH:
-
-```
-For these instructions, the function of
-
-    P<op>.D<s> rd,rs1,rs2     // only even register numbers allowed
-
-is the same as two instructions:
-
-    P<op>.<s> rd,rs1,rs2      // the even registers
-    P<op>.<s> rd+,rs1+,rs2+   // the odd registers
-
-See the introduction for the precise meaning of "rd+", "rs1+", and
-"rs2+".
-```
-
-RV32 PSEXT.DH.B:
-
-```
-The function of
-
-    PSEXT.DH.B rd,rs1         // only even register numbers allowed
-
-is the same as two instructions:
-
-    PSEXT.H.B rd,rs1          // the even registers
-    PSEXT.H.B rd+,rs1+        // the odd registers
-
-See the introduction for the precise meaning of "rd+" and "rs1+".
-```
-
-RV32 PSEXT.DW.B, PSEXT.DW.H:
-
-```
-For these instructions, the function of
-
-    PSEXT.DW.<s> rd,rs1       // only even register numbers allowed
-
-is the same as two instructions:
-
-    SEXT.<s> rd,rs1           // the even registers
-    SEXT.<s> rd+,rs1+         // the odd registers
-
-See the introduction for the precise meaning of "rd+" and "rs1+".
-```
-
-RV32 PSATI.DW, PUSATI.DW, PSLLI.DW, PSRLI.DW, PSRAI.DW, PSSLAI.DW, PSRARI.DW:
-
-```
-For these instructions, the function of
-
-    P<op>.DW rd,rs1,imm       // only even register numbers allowed
-
-is the same as two instructions:
-
-    <op> rd,rs1,imm           // the even registers
-    <op> rd+,rs1+,imm         // the odd registers
-
-See the introduction for the precise meaning of "rd+" and "rs1+".
-```
-
-RV32 PMIN.DW, PMINU.DW, PMAX.DW, PMAXU.DW, PMSEQ.DW, PMSLT.DW, PMSLTU.DW:
-
-```
-For these instructions, the function of
-
-    P<op>.DW rd,rs1,rs2       // only even register numbers allowed
-
-is the same as two instructions:
-
-    <op> rd,rs1,rs2           // the even registers
-    <op> rd+,rs1+,rs2+        // the odd registers
-
-See the introduction for the precise meaning of "rd+", "rs1+", and
-"rs2+".
-```
-
-RV32 PADD.DBS, PSLL.DBS, PSRL.DBS, PSRA.DBS, PADD.DHS, PSLL.DHS, PSRL.DHS, PSRA.DHS, PSSHA.DHS, PSSHAR.DHS:
-
-```
-For these instructions, the function of
-
-    P<op>.D<s>S rd,rs1,rs2    // only even register numbers allowed
-                              //  for rd and rs1
-
-is the same as two instructions:
-
-    P<op>.<s>S rd,rs1,rs2     // the even registers for rd and rs1
-    P<op>.<s>S rd+,rs1+,rs2   // the odd registers for rd and rs1
-
-when performed simultaneously, or in an order such that writes to
-destination registers rd and rd+ do not overwrite the scalar second
-operand rs2 between the two instructions.  (For example, if rs2 is an
-even-numbered register, the second instruction that writes odd register
-rd+ could be executed before the first instruction.)
-
-See the introduction for the precise meaning of "rd+" and "rs1+".
-```
-
-RV32 PADD.DWS, PSLL.DWS, PSRL.DWS, PSRA.DWS, PSSHA.DWS, PSSHAR.DWS:
-
-```
-For these instructions, the function of
-
-    P<op>.DWS rd,rs1,rs2      // only even register numbers allowed for
-                              //  rd and rs1
-
-is the same as two instructions:
-
-    <op> rd,rs1,rs2           // the even registers for rd and rs1
-    <op> rd+,rs1+,rs2         // the odd registers for rd and rs1
-
-when performed simultaneously, or in an order such that writes to
-destination registers rd and rd+ do not overwrite the scalar second
-operand rs2 between the two instructions.  (For example, if rs2 is an
-even-numbered register, the second instruction that writes odd register
-rd+ could be executed before the first instruction.)
-
-See the introduction for the precise meaning of "rd+" and "rs1+".
-```
-
-RV32 PPAIRE.DB, PPAIREO.DB, PPAIROE.DB, PPAIRO.DB, PPAIRE.DH, PPAIREO.DH, PPAIROE.DH, PPAIRO.DH:
-
-```
-For these instructions, the function of
-
-    P<op>.D<s> rd,rs1,rs2     // only even register numbers allowed
-
-is the same as two instructions:
-
-    P<op>.<s> rd,rs1,rs2      // the even registers
-    P<op>.<s> rd+,rs1+,rs2+   // the odd registers
-
-See the introduction for the precise meaning of "rd+", "rs1+", and
-"rs2+".
-
-(For RV32, pseudoinstruction PPAIRE.H is an alias for actual instruction
-PACK.)
-```
-
-RV32 PNSRLI.B:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[3..0];
-var d : bits(32);
-foreach (i from 0 to 3) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    d[(i*8+7)..(i*8)] = (s1_h >> shamt)[7..0];
-}
-X(rd) = d;
-```
-
-RV32 PNSRL.BS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[4..0];
-var d : bits(32);
-foreach (i from 0 to 3) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    d[(i*8+7)..(i*8)] = (zero_extend(32, s1_h) >> shamt)[7..0];
-}
-X(rd) = d;
-```
-
-RV32 PNSRAI.B:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[3..0];
-var d : bits(32);
-foreach (i from 0 to 3) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    d[(i*8+7)..(i*8)] = (sign_extend(24, s1_h) >> shamt)[7..0];
-}
-X(rd) = d;
-```
-
-RV32 PNSRA.BS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[4..0];
-var d : bits(32);
-foreach (i from 0 to 3) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    d[(i*8+7)..(i*8)] = (sign_extend(40, s1_h) >> shamt)[7..0];
-}
-X(rd) = d;
-```
-
-RV32 PNSRARI.B:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[3..0];
-var d : bits(32);
-foreach (i from 0 to 3) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let shx : bits(9) = ((sign_extend(24, s1_h) @ 0b0) >> shamt)[8..0];
-    d[(i*8+7)..(i*8)] = (shx + 1)[8..1];
-}
-X(rd) = d;
-```
-
-RV32 PNSRAR.BS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[4..0];
-var d : bits(32);
-foreach (i from 0 to 3) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let shx : bits(9) = ((sign_extend(40, s1_h) @ 0b0) >> shamt)[8..0];
-    d[(i*8+7)..(i*8)] = (shx + 1)[8..1];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIPI.B:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[3..0];
-var d : bits(32);
-foreach (i from 0 to 3) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let shx : bits(16) = (sign_extend(32, s1_h) >> shamt)[15..0];
-    d[(i*8+7)..(i*8)] =
-        if (shx <_s 0xFF80) then { vxsat = 1; 0x80 }
-            else if (shx >_s 0x007F) then { vxsat = 1; 0x7F }
-                else shx[7..0];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIP.BS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[4..0];
-var d : bits(32);
-foreach (i from 0 to 3) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let shx : bits(16) = (sign_extend(48, s1_h) >> shamt)[15..0];
-    d[(i*8+7)..(i*8)] =
-        if (shx <_s 0xFF80) then { vxsat = 1; 0x80 }
-            else if (shx >_s 0x007F) then { vxsat = 1; 0x7F }
-                else shx[7..0];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIPRI.B:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[3..0];
-var d : bits(32);
-foreach (i from 0 to 3) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let shx : bits(17) = ((sign_extend(32, s1_h) @ 0b0) >> shamt)[16..0];
-    let round_shx : bits(16) = (shx + 1)[16..1];
-    d[(i*8+7)..(i*8)] =
-        if (round_shx <_s 0xFF80) then { vxsat = 1; 0x80 }
-            else if (round_shx >_s 0x007F) then { vxsat = 1; 0x7F }
-                else round_shx[7..0];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIPR.BS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[4..0];
-var d : bits(32);
-foreach (i from 0 to 3) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let shx : bits(17) = ((sign_extend(48, s1_h) @ 0b0) >> shamt)[16..0];
-    let round_shx : bits(16) = (shx + 1)[16..1];
-    d[(i*8+7)..(i*8)] =
-        if (round_shx <_s 0xFF80) then { vxsat = 1; 0x80 }
-            else if (round_shx >_s 0x007F) then { vxsat = 1; 0x7F }
-                else round_shx[7..0];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIPIU.B:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[3..0];
-var d : bits(32);
-foreach (i from 0 to 3) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let shx = s1_h >> shamt;
-    d[(i*8+7)..(i*8)] =
-        if (shx >_u 0x00FF) then { vxsat = 1; 0xFF } else shx[7..0];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIPU.BS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[4..0];
-var d : bits(32);
-foreach (i from 0 to 3) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let shx = (zero_extend(32, s1_h) >> shamt)[15..0];
-    d[(i*8+7)..(i*8)] =
-        if (shx >_u 0x00FF) then { vxsat = 1; 0xFF } else shx[7..0];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIPRIU.B:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[3..0];
-var d : bits(32);
-foreach (i from 0 to 3) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let shx : bits(17) = (s1_h @ 0b0) >> shamt;
-    let round_shx : bits(16) = (shx + 1)[16..1];
-    d[(i*8+7)..(i*8)] =
-        if (round_shx >_u 0x00FF) then { vxsat = 1; 0xFF }
-            else round_shx[7..0];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIPRU.BS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[4..0];
-var d : bits(32);
-foreach (i from 0 to 3) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let shx : bits(17) = ((zero_extend(32, s1_h) @ 0b0) >> shamt)[16..0];
-    let round_shx : bits(16) = (shx + 1)[16..1];
-    d[(i*8+7)..(i*8)] =
-        if (round_shx >_u 0x00FF) then { vxsat = 1; 0xFF }
-            else round_shx[7..0];
-}
-X(rd) = d;
-```
-
-RV32 PNSRLI.H:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[4..0];
-var d : bits(32);
-d[15..0]  = (s1[31..0]  >> shamt)[15..0];
-d[31..16] = (s1[63..32] >> shamt)[15..0];
-X(rd) = d;
-```
-
-RV32 PNSRL.HS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[4..0];
-var d : bits(32);
-d[15..0]  = (s1[31..0]  >> shamt)[15..0];
-d[31..16] = (s1[63..32] >> shamt)[15..0];
-X(rd) = d;
-```
-
-RV32 PNSRAI.H:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[4..0];
-var d : bits(32);
-d[15..0]  = (sign_extend(48, s1[31..0]))  >> shamt)[15..0];
-d[31..16] = (sign_extend(48, s1[63..32])) >> shamt)[15..0];
-X(rd) = d;
-```
-
-RV32 PNSRA.HS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[4..0];
-var d : bits(32);
-d[15..0]  = (sign_extend(48, s1[31..0]))  >> shamt)[15..0];
-d[31..16] = (sign_extend(48, s1[63..32])) >> shamt)[15..0];
-X(rd) = d;
-```
-
-RV32 PNSRARI.H:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[4..0];
-var d : bits(32);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let shx : bits(17) = ((sign_extend(48, s1_w) @ 0b0) >> shamt)[16..0];
-    d[(i*16+15)..(i*16)] = (shx + 1)[17..1];
-}
-X(rd) = d;
-```
-
-RV32 PNSRAR.HS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[4..0];
-var d : bits(32);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let shx : bits(17) = ((sign_extend(48, s1_w) @ 0b0) >> shamt)[16..0];
-    d[(i*16+15)..(i*16)] = (shx + 1)[17..1];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIPI.H:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[4..0];
-var d : bits(32);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let shx : bits(32) = (sign_extend(64, s1_w) >> shamt)[31..0];
-    d[(i*16+15)..(i*16)] =
-        if (shx <_s 0xFFFF8000) then { vxsat = 1; 0x8000 }
-            else if (shx >_s 0x00007FFF) then { vxsat = 1; 0x7FFF }
-                else shx[15..0];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIP.HS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[4..0];
-var d : bits(32);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let shx : bits(32) = (sign_extend(64, s1_w) >> shamt)[31..0];
-    d[(i*16+15)..(i*16)] =
-        if (shx <_s 0xFFFF8000) then { vxsat = 1; 0x8000 }
-            else if (shx >_s 0x00007FFF) then { vxsat = 1; 0x7FFF }
-                else shx[15..0];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIPRI.H:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[4..0];
-var d : bits(32);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let shx : bits(33) = ((sign_extend(64, s1_w) @ 0b0) >> shamt)[32..0];
-    let round_shx : bits(32) = (shx + 1)[32..1];
-    d[(i*16+15)..(i*16)] =
-        if (round_shx <_s 0xFFFF8000) then { vxsat = 1; 0x8000 }
-            else if (round_shx >_s 0x00007FFF) then { vxsat = 1; 0x7FFF }
-                else round_shx[15..0];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIPR.HS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[4..0];
-var d : bits(32);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let shx : bits(33) = ((sign_extend(64, s1_w) @ 0b0) >> shamt)[32..0];
-    let round_shx : bits(32) = (shx + 1)[32..1];
-    d[(i*16+15)..(i*16)] =
-        if (round_shx <_s 0xFFFF8000) then { vxsat = 1; 0x8000 }
-            else if (round_shx >_s 0x00007FFF) then { vxsat = 1; 0x7FFF }
-                else round_shx[15..0];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIPIU.H:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[4..0];
-var d : bits(32);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let shx = s1_w >> shamt;
-    d[(i*16+15)..(i*16)] =
-        if (shx >_u 0x0000FFFF) then { vxsat = 1; 0xFFFF } else shx[15..0];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIPU.HS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[4..0];
-var d : bits(32);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let shx = s1_w >> shamt;
-    d[(i*16+15)..(i*16)] =
-        if (shx >_u 0x0000FFFF) then { vxsat = 1; 0xFFFF } else shx[15..0];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIPRIU.H:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[4..0];
-var d : bits(32);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let shx : bits(33) = (s1_w @ 0b0) >> shamt;
-    let round_shx : bits(32) = (shx + 1)[32..1];
-    d[(i*16+15)..(i*16)] =
-        if (round_shx >_u 0x0000FFFF) then { vxsat = 1; 0xFFFF }
-            else round_shx[15..0];
-}
-X(rd) = d;
-```
-
-RV32 PNCLIPRU.HS:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[4..0];
-var d : bits(32);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let shx : bits(33) = (s1_w @ 0b0) >> shamt;
-    let round_shx : bits(32) = (shx + 1)[32..1];
-    d[(i*16+15)..(i*16)] =
-        if (round_shx >_u 0x0000FFFF) then { vxsat = 1; 0xFFFF }
-            else round_shx[15..0];
-}
-X(rd) = d;
-```
-
-RV32 NSRLI:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[5..0];
-X(rd) = (s1 >> shamt)[31..0];
-```
-
-RV32 NSRL:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[5..0];
-X(rd) = (s1 >> shamt)[31..0];
-```
-
-RV32 NSRAI:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[5..0];
-X(rd) = (sign_extend(96, s1) >> shamt)[31..0];
-```
-
-RV32 NSRA:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[5..0];
-X(rd) = (sign_extend(96, s1) >> shamt)[31..0];
-```
-
-RV32 NSRARI:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[5..0];
-let shx : bits(33) = ((sign_extend(96, s1) @ 0b0) >> shamt)[32..0];
-X(rd) = (shx + 1)[32..1];
-```
-
-RV32 NSRAR:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[5..0];
-let shx : bits(33) = ((sign_extend(96, s1) @ 0b0) >> shamt)[32..0];
-X(rd) = (shx + 1)[32..1];
-```
-
-RV32 NCLIPI:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[5..0];
-let shx : bits(64) = (sign_extend(128, s1) >> shamt)[63..0];
-X(rd) =
-    if (shx <_s 0xFFFFFFFF80000000) then { vxsat = 1; 0x80000000 }
-        else if (shx >_s 0x000000007FFFFFFF) then { vxsat = 1; 0x7FFFFFFF }
-            else shx[31..0];
-```
-
-RV32 NCLIP:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[5..0];
-let shx : bits(64) = (sign_extend(128, s1) >> shamt)[63..0];
-X(rd) =
-    if (shx <_s 0xFFFFFFFF80000000) then { vxsat = 1; 0x80000000 }
-        else if (shx >_s 0x000000007FFFFFFF) then { vxsat = 1; 0x7FFFFFFF }
-            else shx[31..0];
-```
-
-RV32 NCLIPRI:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[5..0];
-let shx : bits(65) = ((sign_extend(128, s1) @ 0b0) >> shamt)[64..0];
-let round_shx : bits(64) = (shx + 1)[64..1];
-X(rd) =
-    if (round_shx <_s 0xFFFFFFFF80000000) then { vxsat = 1; 0x80000000 }
-        else if (round_shx >_s 0x000000007FFFFFFF)
-            then { vxsat = 1; 0x7FFFFFFF } else round_shx[31..0];
-```
-
-RV32 NCLIPR:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[5..0];
-let shx : bits(65) = ((sign_extend(128, s1) @ 0b0) >> shamt)[64..0];
-let round_shx : bits(64) = (shx + 1)[64..1];
-X(rd) =
-    if (round_shx <_s 0xFFFFFFFF80000000) then { vxsat = 1; 0x80000000 }
-        else if (round_shx >_s 0x000000007FFFFFFF)
-            then { vxsat = 1; 0x7FFFFFFF } else round_shx[31..0];
-```
-
-RV32 NCLIPIU:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[5..0];
-let shx = s1 >> shamt;
-X(rd) =
-    if (shx >_u 0x00000000FFFFFFFF) then { vxsat = 1; 0xFFFFFFFF }
-        else shx[31..0];
-```
-
-RV32 NCLIPU:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[5..0];
-let shx = s1 >> shamt;
-X(rd) =
-    if (shx >_u 0x00000000FFFFFFFF) then { vxsat = 1; 0xFFFFFFFF }
-        else shx[31..0];
-```
-
-RV32 NCLIPRIU:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = w_uimm[5..0];
-let shx : bits(65) = (s1 @ 0b0) >> shamt;
-let round_shx : bits(64) = (shx + 1)[64..1];
-X(rd) =
-    if (round_shx >_u 0x00000000FFFFFFFF) then { vxsat = 1; 0xFFFFFFFF }
-        else round_shx[31..0];
-```
-
-RV32 NCLIPRU:
-
-```
-let s1 : bits(64) =
-    if (rs1_p == 0x0) then zeros() else X(rs1_p*2+1) @ X(rs1_p*2);
-let shamt = X(rs2)[5..0];
-let shx : bits(65) = (s1 @ 0b0) >> shamt;
-let round_shx : bits(64) = (shx + 1)[64..1];
-X(rd) =
-    if (round_shx >_u 0x00000000FFFFFFFF) then { vxsat = 1; 0xFFFFFFFF }
-        else round_shx[31..0];
-```
-
-PMULH.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        to_bits(32, signed(s1_h) * signed(s2_h))[31..16];
-}
-X(rd) = d;
-```
-
-PMULHR.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        to_bits(32, signed(s1_h) * signed(s2_h) + 2^15)[31..16];
-}
-X(rd) = d;
-```
-
-PMULHSU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        to_bits(32, signed(s1_h) * unsigned(s2_h))[31..16];
-}
-X(rd) = d;
-```
-
-PMULHRSU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        to_bits(32, signed(s1_h) * unsigned(s2_h) + 2^15)[31..16];
-}
-X(rd) = d;
-```
-
-PMULHU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        to_bits(32, unsigned(s1_h) * unsigned(s2_h))[31..16];
-}
-X(rd) = d;
-```
-
-PMULHRU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        to_bits(32, unsigned(s1_h) * unsigned(s2_h) + 2^15)[31..16];
-}
-X(rd) = d;
-```
-
-PMULQR.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        if (s1_h == 0x8000) & (s2_h == 0x8000) then { vxsat = 1; 0x7FFF }
-            else to_bits(32, signed(s1_h) * signed(s2_h) + 2^14)[30..15];
-}
-X(rd) = d;
-```
-
-PMHACC.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    let d_h = d[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        d_h + to_bits(32, signed(s1_h) * signed(s2_h))[31..16];
-}
-X(rd) = d;
-```
-
-PMHRACC.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    let d_h = d[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        d_h + to_bits(32, signed(s1_h) * signed(s2_h) + 2^15)[31..16];
-}
-X(rd) = d;
-```
-
-PMHACCSU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    let d_h = d[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        d_h + to_bits(32, signed(s1_h) * unsigned(s2_h))[31..16];
-}
-X(rd) = d;
-```
-
-PMHRACCSU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    let d_h = d[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        d_h + to_bits(32, signed(s1_h) * unsigned(s2_h) + 2^15)[31..16];
-}
-X(rd) = d;
-```
-
-PMHACCU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    let d_h = d[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        d_h + to_bits(32, unsigned(s1_h) * unsigned(s2_h))[31..16];
-}
-X(rd) = d;
-```
-
-PMHRACCU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    let d_h = d[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        d_h + to_bits(32, unsigned(s1_h) * unsigned(s2_h) + 2^15)[31..16];
-}
-X(rd) = d;
-```
-
-RV32 MULHRSU:
-
-```
-X(rd) = to_bits(64, signed(X(rs1)) * unsigned(X(rs2)) + 2^31)[63..32];
-```
-
-RV32 MULHRU:
-
-```
-X(rd) = to_bits(64, unsigned(X(rs1)) * unsigned(X(rs2)) + 2^31)[63..32];
-```
-
-RV32 MHACC:
-
-```
-X(rd) = X(rd) + to_bits(64, signed(X(rs1)) * signed(X(rs2)))[63..32];
-```
-
-RV32 MHRACC:
-
-```
-X(rd) =
-    X(rd) + to_bits(64, signed(X(rs1)) * signed(X(rs2)) + 2^31)[63..32];
-```
-
-RV32 MHACCSU:
-
-```
-X(rd) = X(rd) + to_bits(64, signed(X(rs1)) * unsigned(X(rs2)))[63..32];
-```
-
-RV32 MHRACCSU:
-
-```
-X(rd) =
-    X(rd) + to_bits(64, signed(X(rs1)) * unsigned(X(rs2)) + 2^31)[63..32];
-```
-
-RV32 MHACCU:
-
-```
-X(rd) = X(rd) + to_bits(64, unsigned(X(rs1)) * unsigned(X(rs2)))[63..32];
-```
-
-RV32 MHRACCU:
-
-```
-X(rd) =
-    X(rd)
-        + to_bits(64, unsigned(X(rs1)) * unsigned(X(rs2)) + 2^31)[63..32];
-```
-
-RV64 PMULHSU.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let s2_w = s2[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        to_bits(64, signed(s1_w) * unsigned(s2_w))[63..32];
-}
-X(rd) = d;
-```
-
-RV64 PMULHRSU.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let s2_w = s2[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        to_bits(64, signed(s1_w) * unsigned(s2_w) + 2^31)[63..32];
-}
-X(rd) = d;
-```
-
-RV64 PMULHU.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let s2_w = s2[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        to_bits(64, unsigned(s1_w) * unsigned(s2_w))[63..32];
-}
-X(rd) = d;
-```
-
-RV64 PMULHRU.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let s2_w = s2[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        to_bits(64, unsigned(s1_w) * unsigned(s2_w) + 2^31)[63..32];
-}
-X(rd) = d;
-```
-
-RV64 PMHACC.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d = X(rd);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let s2_w = s2[(i*32+31)..(i*32)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(64, signed(s1_w) * signed(s2_w))[63..32];
-}
-X(rd) = d;
-```
-
-RV64 PMHRACC.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d = X(rd);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let s2_w = s2[(i*32+31)..(i*32)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(64, signed(s1_w) * signed(s2_w) + 2^31)[63..32];
-}
-X(rd) = d;
-```
-
-RV64 PMHACCSU.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d = X(rd);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let s2_w = s2[(i*32+31)..(i*32)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(64, signed(s1_w) * unsigned(s2_w))[63..32];
-}
-X(rd) = d;
-```
-
-RV64 PMHRACCSU.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d = X(rd);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let s2_w = s2[(i*32+31)..(i*32)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(64, signed(s1_w) * unsigned(s2_w) + 2^31)[63..32];
-}
-X(rd) = d;
-```
-
-RV64 PMHACCU.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d = X(rd);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let s2_w = s2[(i*32+31)..(i*32)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(64, unsigned(s1_w) * unsigned(s2_w))[63..32];
-}
-X(rd) = d;
-```
-
-RV64 PMHRACCU.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d = X(rd);
-foreach (i from 0 to 1) {
-    let s1_w = s1[(i*32+31)..(i*32)];
-    let s2_w = s2[(i*32+31)..(i*32)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(64, unsigned(s1_w) * unsigned(s2_w) + 2^31)[63..32];
-}
-X(rd) = d;
-```
-
-RV32 MQACC.H00:
-
-```
-let s1_h0 = X(rs1)[15..0];
-let s2_h0 = X(rs2)[15..0];
-X(rd) = X(rd) + to_bits(47, signed(s1_h0) * signed(s2_h0))[46..15];
-```
-
-RV32 MQACC.H01:
-
-```
-let s1_h0 = X(rs1)[15..0];
-let s2_h1 = X(rs2)[31..16];
-X(rd) = X(rd) + to_bits(47, signed(s1_h0) * signed(s2_h1))[46..15];
-```
-
-RV32 MQACC.H11:
-
-```
-let s1_h1 = X(rs1)[31..16];
-let s2_h1 = X(rs2)[31..16];
-X(rd) = X(rd) + to_bits(47, signed(s1_h1) * signed(s2_h1))[46..15];
-```
-
-RV32 MQRACC.H00:
-
-```
-let s1_h0 = X(rs1)[15..0];
-let s2_h0 = X(rs2)[15..0];
-X(rd) = X(rd) + to_bits(47, signed(s1_h0) * signed(s2_h0) + 2^14)[46..15];
-```
-
-RV32 MQRACC.H01:
-
-```
-let s1_h0 = X(rs1)[15..0];
-let s2_h1 = X(rs2)[31..16];
-X(rd) = X(rd) + to_bits(47, signed(s1_h0) * signed(s2_h1) + 2^14)[46..15];
-```
-
-RV32 MQRACC.H11:
-
-```
-let s1_h1 = X(rs1)[31..16];
-let s2_h1 = X(rs2)[31..16];
-X(rd) = X(rd) + to_bits(47, signed(s1_h1) * signed(s2_h1) + 2^14)[46..15];
-```
-
-RV64 PMQACC.W.H00:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d = X(rd);
-foreach (i from 0 to 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(47, signed(s1_h0) * signed(s2_h0))[46..15];
-}
-X(rd) = d;
-```
-
-RV64 PMQACC.W.H01:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d = X(rd);
-foreach (i from 0 to 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(47, signed(s1_h0) * signed(s2_h1))[46..15];
-}
-X(rd) = d;
-```
-
-RV64 PMQACC.W.H11:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d = X(rd);
-foreach (i from 0 to 1) {
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(47, signed(s1_h1) * signed(s2_h1))[46..15];
-}
-X(rd) = d;
-```
-
-RV64 PMQRACC.W.H00:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d = X(rd);
-foreach (i from 0 to 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(47, signed(s1_h0) * signed(s2_h0) + 2^14)[46..15];
-}
-X(rd) = d;
-```
-
-RV64 PMQRACC.W.H01:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d = X(rd);
-foreach (i from 0 to 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(47, signed(s1_h0) * signed(s2_h1) + 2^14)[46..15];
-}
-X(rd) = d;
-```
-
-RV64 PMQRACC.W.H11:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d = X(rd);
-foreach (i from 0 to 1) {
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(47, signed(s1_h1) * signed(s2_h1) + 2^14)[46..15];
-}
-X(rd) = d;
-```
-
-PMQ2ADD.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    d[(i*32+31)..(i*32)] =
-          to_bits(47, signed(s1_h0) * signed(s2_h0))[46..15]
-        + to_bits(47, signed(s1_h1) * signed(s2_h1))[46..15];
-}
-X(rd) = d;
-```
-
-PMQ2ADDA.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(47, signed(s1_h0) * signed(s2_h0))[46..15]
-            + to_bits(47, signed(s1_h1) * signed(s2_h1))[46..15];
-}
-X(rd) = d;
-```
-
-PMQR2ADD.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    d[(i*32+31)..(i*32)] =
-          to_bits(47, signed(s1_h0) * signed(s2_h0) + 2^14)[46..15]
-        + to_bits(47, signed(s1_h1) * signed(s2_h1) + 2^14)[46..15];
-}
-X(rd) = d;
-```
-
-PMQR2ADDA.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(47, signed(s1_h0) * signed(s2_h0) + 2^14)[46..15]
-            + to_bits(47, signed(s1_h1) * signed(s2_h1) + 2^14)[46..15];
-}
-X(rd) = d;
-```
-
-RV64 MQACC.W00:
-
-```
-let s1_w0 = X(rs1)[31..0];
-let s2_w0 = X(rs2)[31..0];
-X(rd) = X(rd) + to_bits(95, signed(s1_w0) * signed(s2_w0))[94..31];
-```
-
-RV64 MQACC.W01:
-
-```
-let s1_w0 = X(rs1)[31..0];
-let s2_w1 = X(rs2)[63..32];
-X(rd) = X(rd) + to_bits(95, signed(s1_w0) * signed(s2_w1))[94..31];
-```
-
-RV64 MQACC.W11:
-
-```
-let s1_w1 = X(rs1)[63..32];
-let s2_w1 = X(rs2)[63..32];
-X(rd) = X(rd) + to_bits(95, signed(s1_w1) * signed(s2_w1))[94..31];
-```
-
-RV64 MQRACC.W00:
-
-```
-let s1_w0 = X(rs1)[31..0];
-let s2_w0 = X(rs2)[31..0];
-X(rd) = X(rd) + to_bits(95, signed(s1_w0) * signed(s2_w0) + 2^30)[94..31];
-```
-
-RV64 MQRACC.W01:
-
-```
-let s1_w0 = X(rs1)[31..0];
-let s2_w1 = X(rs2)[63..32];
-X(rd) = X(rd) + to_bits(95, signed(s1_w0) * signed(s2_w1) + 2^30)[94..31];
-```
-
-RV64 MQRACC.W11:
-
-```
-let s1_w1 = X(rs1)[63..32];
-let s2_w1 = X(rs2)[63..32];
-X(rd) = X(rd) + to_bits(95, signed(s1_w1) * signed(s2_w1) + 2^30)[94..31];
-```
-
-RV64 PMQ2ADD.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-      to_bits(95, signed(s1[31..0])  * signed(s2[31..0]) )[94..31]
-    + to_bits(95, signed(s1[63..32]) * signed(s2[63..32]))[94..31];
-```
-
-RV64 PMQ2ADDA.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-    X(rd) + to_bits(95, signed(s1[31..0])  * signed(s2[31..0]) )[94..31]
-          + to_bits(95, signed(s1[63..32]) * signed(s2[63..32]))[94..31];
-```
-
-RV64 PMQR2ADD.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-      to_bits(95, signed(s1[31..0])  * signed(s2[31..0])  + 2^30)[94..31]
-    + to_bits(95, signed(s1[63..32]) * signed(s2[63..32]) + 2^30)[94..31];
-```
-
-RV64 PMQR2ADDA.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-    X(rd)
-        + to_bits(95, signed(s1[31..0])  * signed(s2[31..0])  + 2^30)[
-              94..31]
-        + to_bits(95, signed(s1[63..32]) * signed(s2[63..32]) + 2^30)[
-              94..31];
-```
-
-PMUL.H.B00:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_b0 = s1[(i*16+7)..(i*16)];
-    let s2_b0 = s2[(i*16+7)..(i*16)];
-    d[(i*16+15)..(i*16)] = to_bits(16, signed(s1_b0) * signed(s2_b0));
-}
-X(rd) = d;
-```
-
-PMUL.H.B01:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_b0 = s1[(i*16+7)..(i*16)];
-    let s2_b1 = s2[(i*16+15)..(i*16+8)];
-    d[(i*16+15)..(i*16)] = to_bits(16, signed(s1_b0) * signed(s2_b1));
-}
-X(rd) = d;
-```
-
-PMUL.H.B11:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_b1 = s1[(i*16+15)..(i*16+8)];
-    let s2_b1 = s2[(i*16+15)..(i*16+8)];
-    d[(i*16+15)..(i*16)] = to_bits(16, signed(s1_b1) * signed(s2_b1));
-}
-X(rd) = d;
-```
-
-PMULSU.H.B00:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_b0 = s1[(i*16+7)..(i*16)];
-    let s2_b0 = s2[(i*16+7)..(i*16)];
-    d[(i*16+15)..(i*16)] = to_bits(16, signed(s1_b0) * unsigned(s2_b0));
-}
-X(rd) = d;
-```
-
-PMULSU.H.B11:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_b1 = s1[(i*16+15)..(i*16+8)];
-    let s2_b1 = s2[(i*16+15)..(i*16+8)];
-    d[(i*16+15)..(i*16)] = to_bits(16, signed(s1_b1) * unsigned(s2_b1));
-}
-X(rd) = d;
-```
-
-PMULU.H.B00:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_b0 = s1[(i*16+7)..(i*16)];
-    let s2_b0 = s2[(i*16+7)..(i*16)];
-    d[(i*16+15)..(i*16)] = to_bits(16, unsigned(s1_b0) * unsigned(s2_b0));
-}
-X(rd) = d;
-```
-
-PMULU.H.B01:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_b0 = s1[(i*16+7)..(i*16)];
-    let s2_b1 = s2[(i*16+15)..(i*16+8)];
-    d[(i*16+15)..(i*16)] = to_bits(16, unsigned(s1_b0) * unsigned(s2_b1));
-}
-X(rd) = d;
-```
-
-PMULU.H.B11:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_b1 = s1[(i*16+15)..(i*16+8)];
-    let s2_b1 = s2[(i*16+15)..(i*16+8)];
-    d[(i*16+15)..(i*16)] = to_bits(16, unsigned(s1_b1) * unsigned(s2_b1));
-}
-X(rd) = d;
-```
-
-RV32 MULSU.H00:
-
-```
-let s1_h0 = X(rs1)[15..0];
-let s2_h0 = X(rs2)[15..0];
-X(rd) = to_bits(32, signed(s1_h0) * unsigned(s2_h0));
-```
-
-RV32 MULSU.H11:
-
-```
-let s1_h1 = X(rs1)[31..16];
-let s2_h1 = X(rs2)[31..16];
-X(rd) = to_bits(32, signed(s1_h1) * unsigned(s2_h1));
-```
-
-RV32 MULU.H00:
-
-```
-let s1_h0 = X(rs1)[15..0];
-let s2_h0 = X(rs2)[15..0];
-X(rd) = to_bits(32, unsigned(s1_h0) * unsigned(s2_h0));
-```
-
-RV32 MULU.H01:
-
-```
-let s1_h0 = X(rs1)[15..0];
-let s2_h1 = X(rs2)[31..16];
-X(rd) = to_bits(32, unsigned(s1_h0) * unsigned(s2_h1));
-```
-
-RV32 MULU.H11:
-
-```
-let s1_h1 = X(rs1)[31..16];
-let s2_h1 = X(rs2)[31..16];
-X(rd) = to_bits(32, unsigned(s1_h1) * unsigned(s2_h1));
-```
-
-RV32 MACC.H00:
-
-```
-let s1_h0 = X(rs1)[15..0];
-let s2_h0 = X(rs2)[15..0];
-X(rd) = X(rd) + to_bits(32, signed(s1_h0) * signed(s2_h0));
-```
-
-RV32 MACC.H01:
-
-```
-let s1_h0 = X(rs1)[15..0];
-let s2_h1 = X(rs2)[31..16];
-X(rd) = X(rd) + to_bits(32, signed(s1_h0) * signed(s2_h1));
-```
-
-RV32 MACC.H11:
-
-```
-let s1_h1 = X(rs1)[31..16];
-let s2_h1 = X(rs2)[31..16];
-X(rd) = X(rd) + to_bits(32, signed(s1_h1) * signed(s2_h1));
-```
-
-RV32 MACCSU.H00:
-
-```
-let s1_h0 = X(rs1)[15..0];
-let s2_h0 = X(rs2)[15..0];
-X(rd) = X(rd) + to_bits(32, signed(s1_h0) * unsigned(s2_h0));
-```
-
-RV32 MACCSU.H11:
-
-```
-let s1_h1 = X(rs1)[31..16];
-let s2_h1 = X(rs2)[31..16];
-X(rd) = X(rd) + to_bits(32, signed(s1_h1) * unsigned(s2_h1));
-```
-
-RV32 MACCU.H00:
-
-```
-let s1_h0 = X(rs1)[15..0];
-let s2_h0 = X(rs2)[15..0];
-X(rd) = X(rd) + to_bits(32, unsigned(s1_h0) * unsigned(s2_h0));
-```
-
-RV32 MACCU.H01:
-
-```
-let s1_h0 = X(rs1)[15..0];
-let s2_h1 = X(rs2)[31..16];
-X(rd) = X(rd) + to_bits(32, unsigned(s1_h0) * unsigned(s2_h1));
-```
-
-RV32 MACCU.H11:
-
-```
-let s1_h1 = X(rs1)[31..16];
-let s2_h1 = X(rs2)[31..16];
-X(rd) = X(rd) + to_bits(32, unsigned(s1_h1) * unsigned(s2_h1));
-```
-
-RV64 PMULSU.W.H00:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = to_bits(32, signed(s1[15..0])  * unsigned(s2[15..0]) );
-let d_w1 = to_bits(32, signed(s1[47..32]) * unsigned(s2[47..32]));
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMULSU.W.H11:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = to_bits(32, signed(s1[31..16]) * unsigned(s2[31..16]));
-let d_w1 = to_bits(32, signed(s1[63..48]) * unsigned(s2[63..48]));
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMULU.W.H00:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = to_bits(32, unsigned(s1[15..0])  * unsigned(s2[15..0]) );
-let d_w1 = to_bits(32, unsigned(s1[47..32]) * unsigned(s2[47..32]));
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMULU.W.H01:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = to_bits(32, unsigned(s1[15..0])  * unsigned(s2[31..16]));
-let d_w1 = to_bits(32, unsigned(s1[47..32]) * unsigned(s2[63..48]));
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMULU.W.H11:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = to_bits(32, unsigned(s1[31..16]) * unsigned(s2[31..16]));
-let d_w1 = to_bits(32, unsigned(s1[63..48]) * unsigned(s2[63..48]));
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMACC.W.H00:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let din = X(rd);
-let d_w0 =
-    din[31..0]  + to_bits(32, signed(s1[15..0])  * signed(s2[15..0]) );
-let d_w1 =
-    din[63..32] + to_bits(32, signed(s1[47..32]) * signed(s2[47..32]));
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMACC.W.H01:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let din = X(rd);
-let d_w0 =
-    din[31..0]  + to_bits(32, signed(s1[15..0])  * signed(s2[31..16]));
-let d_w1 =
-    din[63..32] + to_bits(32, signed(s1[47..32]) * signed(s2[63..48]));
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMACC.W.H11:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let din = X(rd);
-let d_w0 =
-    din[31..0]  + to_bits(32, signed(s1[31..16]) * signed(s2[31..16]));
-let d_w1 =
-    din[63..32] + to_bits(32, signed(s1[63..48]) * signed(s2[63..48]));
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMACCSU.W.H00:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let din = X(rd);
-let d_w0 =
-    din[31..0]  + to_bits(32, signed(s1[15..0])  * unsigned(s2[15..0]) );
-let d_w1 =
-    din[63..32] + to_bits(32, signed(s1[47..32]) * unsigned(s2[47..32]));
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMACCSU.W.H11:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let din = X(rd);
-let d_w0 =
-    din[31..0]  + to_bits(32, signed(s1[31..16]) * unsigned(s2[31..16]));
-let d_w1 =
-    din[63..32] + to_bits(32, signed(s1[63..48]) * unsigned(s2[63..48]));
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMACCU.W.H00:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let din = X(rd);
-let d_w0 =
-    din[31..0]  + to_bits(32, unsigned(s1[15..0])  * unsigned(s2[15..0]) );
-let d_w1 =
-    din[63..32] + to_bits(32, unsigned(s1[47..32]) * unsigned(s2[47..32]));
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMACCU.W.H01:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let din = X(rd);
-let d_w0 =
-    din[31..0]  + to_bits(32, unsigned(s1[15..0])  * unsigned(s2[31..16]));
-let d_w1 =
-    din[63..32] + to_bits(32, unsigned(s1[47..32]) * unsigned(s2[63..48]));
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMACCU.W.H11:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let din = X(rd);
-let d_w0 =
-    din[31..0]  + to_bits(32, unsigned(s1[31..16]) * unsigned(s2[31..16]));
-let d_w1 =
-    din[63..32] + to_bits(32, unsigned(s1[63..48]) * unsigned(s2[63..48]));
-X(rd) = d_w1 @ d_w0;
-```
-
-PM2ADD.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    d[(i*32+31)..(i*32)] =
-          to_bits(32, signed(s1_h0) * signed(s2_h0));
-        + to_bits(32, signed(s1_h1) * signed(s2_h1));
-}
-X(rd) = d;
-```
-
-PM2ADDA.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(32, signed(s1_h0) * signed(s2_h0))
-            + to_bits(32, signed(s1_h1) * signed(s2_h1));
-}
-X(rd) = d;
-```
-
-PM2ADDSU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    d[(i*32+31)..(i*32)] =
-          to_bits(32, signed(s1_h0) * unsigned(s2_h0))
-        + to_bits(32, signed(s1_h1) * unsigned(s2_h1));
-}
-X(rd) = d;
-```
-
-PM2ADDASU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(32, signed(s1_h0) * unsigned(s2_h0))
-            + to_bits(32, signed(s1_h1) * unsigned(s2_h1));
-}
-X(rd) = d;
-```
-
-PM2ADDU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    d[(i*32+31)..(i*32)] =
-          to_bits(32, unsigned(s1_h0) * unsigned(s2_h0))
-        + to_bits(32, unsigned(s1_h1) * unsigned(s2_h1));
-}
-X(rd) = d;
-```
-
-PM2ADDAU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(32, unsigned(s1_h0) * unsigned(s2_h0))
-            + to_bits(32, unsigned(s1_h1) * unsigned(s2_h1));
-}
-X(rd) = d;
-```
-
-PM2ADD.HX:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    d[(i*32+31)..(i*32)] =
-          to_bits(32, signed(s1_h0) * signed(s2_h1))
-        + to_bits(32, signed(s1_h1) * signed(s2_h0));
-}
-X(rd) = d;
-```
-
-PM2ADDA.HX:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(32, signed(s1_h0) * signed(s2_h1))
-            + to_bits(32, signed(s1_h1) * signed(s2_h0));
-}
-X(rd) = d;
-```
-
-PM2SUBA.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(32, signed(s1_h0) * signed(s2_h0))
-            - to_bits(32, signed(s1_h1) * signed(s2_h1));
-}
-X(rd) = d;
-```
-
-PM2SUBA.HX:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_h0 = s1[(i*32+15)..(i*32)];
-    let s1_h1 = s1[(i*32+31)..(i*32+16)];
-    let s2_h0 = s2[(i*32+15)..(i*32)];
-    let s2_h1 = s2[(i*32+31)..(i*32+16)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(32, signed(s1_h0) * signed(s2_h1))
-            - to_bits(32, signed(s1_h1) * signed(s2_h0));
-}
-X(rd) = d;
-```
-
-RV64 MULSU.W00:
-
-```
-let s1_w0 = X(rs1)[31..0];
-let s2_w0 = X(rs2)[31..0];
-X(rd) = to_bits(64, signed(s1_w0) * unsigned(s2_w0));
-```
-
-RV64 MULSU.W11:
-
-```
-let s1_w1 = X(rs1)[63..32];
-let s2_w1 = X(rs2)[63..32];
-X(rd) = to_bits(64, signed(s1_w1) * unsigned(s2_w1));
-```
-
-RV64 MULU.W00:
-
-```
-let s1_w0 = X(rs1)[31..0];
-let s2_w0 = X(rs2)[31..0];
-X(rd) = to_bits(64, unsigned(s1_w0) * unsigned(s2_w0));
-```
-
-RV64 MULU.W01:
-
-```
-let s1_w0 = X(rs1)[31..0];
-let s2_w1 = X(rs2)[63..32];
-X(rd) = to_bits(64, unsigned(s1_w0) * unsigned(s2_w1));
-```
-
-RV64 MULU.W11:
-
-```
-let s1_w1 = X(rs1)[63..32];
-let s2_w1 = X(rs2)[63..32];
-X(rd) = to_bits(64, unsigned(s1_w1) * unsigned(s2_w1));
-```
-
-RV64 MACC.W00:
-
-```
-let s1_w0 = X(rs1)[31..0];
-let s2_w0 = X(rs2)[31..0];
-X(rd) = X(rd) + to_bits(64, signed(s1_w0) * signed(s2_w0));
-```
-
-RV64 MACC.W01:
-
-```
-let s1_w0 = X(rs1)[31..0];
-let s2_w1 = X(rs2)[63..32];
-X(rd) = X(rd) + to_bits(64, signed(s1_w0) * signed(s2_w1));
-```
-
-RV64 MACC.W11:
-
-```
-let s1_w1 = X(rs1)[63..32];
-let s2_w1 = X(rs2)[63..32];
-X(rd) = X(rd) + to_bits(64, signed(s1_w1) * signed(s2_w1));
-```
-
-RV64 MACCSU.W00:
-
-```
-let s1_w0 = X(rs1)[31..0];
-let s2_w0 = X(rs2)[31..0];
-X(rd) = X(rd) + to_bits(64, signed(s1_w0) * unsigned(s2_w0));
-```
-
-RV64 MACCSU.W11:
-
-```
-let s1_w1 = X(rs1)[63..32];
-let s2_w1 = X(rs2)[63..32];
-X(rd) = X(rd) + to_bits(64, signed(s1_w1) * unsigned(s2_w1));
-```
-
-RV64 MACCU.W00:
-
-```
-let s1_w0 = X(rs1)[31..0];
-let s2_w0 = X(rs2)[31..0];
-X(rd) = X(rd) + to_bits(64, unsigned(s1_w0) * unsigned(s2_w0));
-```
-
-RV64 MACCU.W01:
-
-```
-let s1_w0 = X(rs1)[31..0];
-let s2_w1 = X(rs2)[63..32];
-X(rd) = X(rd) + to_bits(64, unsigned(s1_w0) * unsigned(s2_w1));
-```
-
-RV64 MACCU.W11:
-
-```
-let s1_w1 = X(rs1)[63..32];
-let s2_w1 = X(rs2)[63..32];
-X(rd) = X(rd) + to_bits(64, unsigned(s1_w1) * unsigned(s2_w1));
-```
-
-RV64 PM2ADD.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-      to_bits(64, signed(s1[31..0])  * signed(s2[31..0]) )
-    + to_bits(64, signed(s1[63..32]) * signed(s2[63..32]));
-```
-
-RV64 PM2ADDSU.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-      to_bits(64, signed(s1[31..0])  * unsigned(s2[31..0] ))
-    + to_bits(64, signed(s1[63..32]) * unsigned(s2[63..32]));
-```
-
-RV64 PM2ADDASU.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-    X(rd) + to_bits(64, signed(s1[31..0])  * unsigned(s2[31..0]) )
-          + to_bits(64, signed(s1[63..32]) * unsigned(s2[63..32]));
-```
-
-RV64 PM2ADDU.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-      to_bits(64, unsigned(s1[31..0])  * unsigned(s2[31..0]) )
-    + to_bits(64, unsigned(s1[63..32]) * unsigned(s2[63..32]));
-```
-
-RV64 PM2ADD.WX:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-      to_bits(64, signed(s1[31..0])  * signed(s2[63..32]))
-    + to_bits(64, signed(s1[63..32]) * signed(s2[31..0]) );
-```
-
-RV64 PM2ADDA.WX:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-    X(rd) + to_bits(64, signed(s1[31..0])  * signed(s2[63..32]))
-          + to_bits(64, signed(s1[63..32]) * signed(s2[31..0]) );
-```
-
-RV64 PM2SUBA.W:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-    X(rd) + to_bits(64, signed(s1[31..0])  * signed(s2[31..0]) )
-          - to_bits(64, signed(s1[63..32]) * signed(s2[63..32]));
-```
-
-RV64 PM2SUBA.WX:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-    X(rd) + to_bits(64, signed(s1[31..0])  * signed(s2[63..32]))
-          - to_bits(64, signed(s1[63..32]) * signed(s2[31..0]) );
-```
-
-PM4ADD.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_b0 = s1[(i*32+7)..(i*32)];
-    let s1_b1 = s1[(i*32+15)..(i*32+8)];
-    let s1_b2 = s1[(i*32+23)..(i*32+16)];
-    let s1_b3 = s1[(i*32+31)..(i*32+24)];
-    let s2_b0 = s2[(i*32+7)..(i*32)];
-    let s2_b1 = s2[(i*32+15)..(i*32+8)];
-    let s2_b2 = s2[(i*32+23)..(i*32+16)];
-    let s2_b3 = s2[(i*32+31)..(i*32+24)];
-    d[(i*32+31)..(i*32)] =
-          to_bits(32, signed(s1_b0) * signed(s2_b0))
-        + to_bits(32, signed(s1_b1) * signed(s2_b1))
-        + to_bits(32, signed(s1_b2) * signed(s2_b2))
-        + to_bits(32, signed(s1_b3) * signed(s2_b3));
-}
-X(rd) = d;
-```
-
-PM4ADDSU.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_b0 = s1[(i*32+7)..(i*32)];
-    let s1_b1 = s1[(i*32+15)..(i*32+8)];
-    let s1_b2 = s1[(i*32+23)..(i*32+16)];
-    let s1_b3 = s1[(i*32+31)..(i*32+24)];
-    let s2_b0 = s2[(i*32+7)..(i*32)];
-    let s2_b1 = s2[(i*32+15)..(i*32+8)];
-    let s2_b2 = s2[(i*32+23)..(i*32+16)];
-    let s2_b3 = s2[(i*32+31)..(i*32+24)];
-    d[(i*32+31)..(i*32)] =
-          to_bits(32, signed(s1_b0) * unsigned(s2_b0))
-        + to_bits(32, signed(s1_b1) * unsigned(s2_b1))
-        + to_bits(32, signed(s1_b2) * unsigned(s2_b2))
-        + to_bits(32, signed(s1_b3) * unsigned(s2_b3));
-}
-X(rd) = d;
-```
-
-PM4ADDU.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/4 - 1) {
-    let s1_b0 = s1[(i*32+7)..(i*32)];
-    let s1_b1 = s1[(i*32+15)..(i*32+8)];
-    let s1_b2 = s1[(i*32+23)..(i*32+16)];
-    let s1_b3 = s1[(i*32+31)..(i*32+24)];
-    let s2_b0 = s2[(i*32+7)..(i*32)];
-    let s2_b1 = s2[(i*32+15)..(i*32+8)];
-    let s2_b2 = s2[(i*32+23)..(i*32+16)];
-    let s2_b3 = s2[(i*32+31)..(i*32+24)];
-    d[(i*32+31)..(i*32)] =
-          to_bits(32, unsigned(s1_b0) * unsigned(s2_b0))
-        + to_bits(32, unsigned(s1_b1) * unsigned(s2_b1))
-        + to_bits(32, unsigned(s1_b2) * unsigned(s2_b2))
-        + to_bits(32, unsigned(s1_b3) * unsigned(s2_b3));
-}
-X(rd) = d;
-```
-
-RV64 PM4ADD.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-      to_bits(64, signed(s1[15..0])  * signed(s2[15..0]) )
-    + to_bits(64, signed(s1[31..16]) * signed(s2[31..16]))
-    + to_bits(64, signed(s1[47..32]) * signed(s2[47..32]))
-    + to_bits(64, signed(s1[63..48]) * signed(s2[63..48]));
-```
-
-RV64 PM4ADDSU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-      to_bits(64, signed(s1[15..0])  * unsigned(s2[15..0]) )
-    + to_bits(64, signed(s1[31..16]) * unsigned(s2[31..16]))
-    + to_bits(64, signed(s1[47..32]) * unsigned(s2[47..32]))
-    + to_bits(64, signed(s1[63..48]) * unsigned(s2[63..48]));
-```
-
-RV64 PM4ADDASU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-    X(rd) + to_bits(64, signed(s1[15..0])  * unsigned(s2[15..0]) )
-          + to_bits(64, signed(s1[31..16]) * unsigned(s2[31..16]))
-          + to_bits(64, signed(s1[47..32]) * unsigned(s2[47..32]))
-          + to_bits(64, signed(s1[63..48]) * unsigned(s2[63..48]));
-```
-
-RV64 PM4ADDU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-      to_bits(64, unsigned(s1[15..0])  * unsigned(s2[15..0]) )
-    + to_bits(64, unsigned(s1[31..16]) * unsigned(s2[31..16]))
-    + to_bits(64, unsigned(s1[47..32]) * unsigned(s2[47..32]))
-    + to_bits(64, unsigned(s1[63..48]) * unsigned(s2[63..48]));
-```
-
-RV64 PM4ADDAU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-X(rd) =
-    X(rd) + to_bits(64, unsigned(s1[15..0])  * unsigned(s2[15..0]) )
-          + to_bits(64, unsigned(s1[31..16]) * unsigned(s2[31..16]))
-          + to_bits(64, unsigned(s1[47..32]) * unsigned(s2[47..32]))
-          + to_bits(64, unsigned(s1[63..48]) * unsigned(s2[63..48]));
-```
-
-PMULH.H.B0:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_b0 = s2[(i*16+7)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        to_bits(24, signed(s1_h) * signed(s2_b0))[23..8];
-}
-X(rd) = d;
-```
-
-PMULH.H.B1:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_b1 = s2[(i*16+15)..(i*16+8)];
-    d[(i*16+15)..(i*16)] =
-        to_bits(24, signed(s1_h) * signed(s2_b1))[23..8];
-}
-X(rd) = d;
-```
-
-PMULHSU.H.B0:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_b0 = s2[(i*16+7)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        to_bits(24, signed(s1_h) * unsigned(s2_b0))[23..8];
-}
-X(rd) = d;
-```
-
-PMULHSU.H.B1:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_b1 = s2[(i*16+15)..(i*16+8)];
-    d[(i*16+15)..(i*16)] =
-        to_bits(24, signed(s1_h) * unsigned(s2_b1))[23..8];
-}
-X(rd) = d;
-```
-
-PMHACC.H.B0:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_b0 = s2[(i*16+7)..(i*16)];
-    let d_h = d[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        d_h + to_bits(24, signed(s1_h) * signed(s2_b0))[23..8];
-}
-X(rd) = d;
-```
-
-PMHACC.H.B1:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_b1 = s2[(i*16+15)..(i*16+8)];
-    let d_h = d[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        d_h + to_bits(24, signed(s1_h) * signed(s2_b1))[23..8];
-}
-X(rd) = d;
-```
-
-PMHACCSU.H.B0:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);;
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_b0 = s2[(i*16+7)..(i*16)];
-    let d_h = d[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        d_h + to_bits(24, signed(s1_h) * unsigned(s2_b0))[23..8];
-}
-X(rd) = d;
-```
-
-PMHACCSU.H.B1:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(xlen) = X(rd);;
-foreach (i from 0 to sizeof(xlen_bytes)/2 - 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_b1 = s2[(i*16+15)..(i*16+8)];
-    let d_h = d[(i*16+15)..(i*16)];
-    d[(i*16+15)..(i*16)] =
-        d_h + to_bits(24, signed(s1_h) * unsigned(s2_b1))[23..8];
-}
-X(rd) = d;
-```
-
-RV32 MULHSU.H0:
-
-```
-let s2_h0 = X(rs2)[15..0];
-X(rd) = to_bits(48, signed(X(rs1)) * unsigned(s2_h0))[47..16];
-```
-
-RV32 MULHSU.H1:
-
-```
-let s2_h1 = X(rs2)[31..16];
-X(rd) = to_bits(48, signed(X(rs1)) * unsigned(s2_h1))[47..16];
-```
-
-RV32 MHACC.H0:
-
-```
-let s2_h0 = X(rs2)[15..0];
-X(rd) = X(rd) + to_bits(48, signed(X(rs1)) * signed(s2_h0))[47..16];
-```
-
-RV32 MHACC.H1:
-
-```
-let s2_h1 = X(rs2)[31..16];
-X(rd) = X(rd) + to_bits(48, signed(X(rs1)) * signed(s2_h1))[47..16];
-```
-
-RV32 MHACCSU.H0:
-
-```
-let s2_h0 = X(rs2)[15..0];
-X(rd) = X(rd) + to_bits(48, signed(X(rs1)) * unsigned(s2_h0))[47..16];
-```
-
-RV32 MHACCSU.H1:
-
-```
-let s2_h1 = X(rs2)[31..16];
-X(rd) = X(rd) + to_bits(48, signed(X(rs1)) * unsigned(s2_h1))[47..16];
-```
-
-RV64 PMULHSU.W.H0:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = to_bits(48, signed(s1[31..0])  * unsigned(s2[15..0]) )[47..16];
-let d_w1 = to_bits(48, signed(s1[63..32]) * unsigned(s2[47..32]))[47..16];
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMULHSU.W.H1:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = to_bits(48, signed(s1[31..0])  * unsigned(s2[31..16]))[47..16];
-let d_w1 = to_bits(48, signed(s1[63..32]) * unsigned(s2[63..48]))[47..16];
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMHACC.W.H0:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let din = X(rd);
-let d_w0 =
-    din[31..0]
-        + to_bits(48, signed(s1[31..0])  * signed(s2[15..0]) )[47..16];
-let d_w1 =
-    din[63..32]
-        + to_bits(48, signed(s1[63..32]) * signed(s2[47..32]))[47..16];
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMHACC.W.H1:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let din = X(rd);
-let d_w0 =
-    din[31..0]
-        + to_bits(48, signed(s1[31..0])  * signed(s2[31..16]))[47..16];
-let d_w1 =
-    din[63..32]
-        + to_bits(48, signed(s1[63..32]) * signed(s2[63..48]))[47..16];
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMHACCSU.W.H0:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let din = X(rd);
-let d_w0 =
-    din[31..0]
-        + to_bits(48, signed(s1[31..0])  * unsigned(s2[15..0]) )[47..16];
-let d_w1 =
-    din[63..32]
-        + to_bits(48, signed(s1[63..32]) * unsigned(s2[47..32]))[47..16];
-X(rd) = d_w1 @ d_w0;
-```
-
-RV64 PMHACCSU.W.H1:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let din = X(rd);
-let d_w0 =
-    din[31..0]
-        + to_bits(48, signed(s1[31..0])  * unsigned(s2[31..16]))[47..16];
-let d_w1 =
-    din[63..32]
-        + to_bits(48, signed(s1[63..32]) * unsigned(s2[63..48]))[47..16];
-X(rd) = d_w1 @ d_w0;
-```
-
-RV32 PMQWACC.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-foreach (i from 0 to 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(47, signed(s1_h) * signed(s2_h))[46..15];
-}
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PMQRWACC.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-foreach (i from 0 to 1) {
-    let s1_h = s1[(i*16+15)..(i*16)];
-    let s2_h = s2[(i*16+15)..(i*16)];
-    let d_w = d[(i*32+31)..(i*32)];
-    d[(i*32+31)..(i*32)] =
-        d_w + to_bits(47, signed(s1_h) * signed(s2_h) + 2^14)[46..15];
-}
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 MQWACC:
-
-```
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-d = d + to_bits(95, signed(X(rs1)) * signed(X(rs2)))[94..31];
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 MQRWACC:
-
-```
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-d = d + to_bits(95, signed(X(rs1)) * signed(X(rs2)) + 2^30)[94..31];
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PWMULSU.B:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64);
-foreach (i from 0 to 3) {
-    let s1_b = s1[(i*8+7)..(i*8)];
-    let s2_b = s2[(i*8+7)..(i*8)];
-    d[(i*16+15)..(i*16)] = to_bits(16, signed(s1_b) * unsigned(s2_b));
-}
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PWMULSU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d_w0 = to_bits(32, signed(s1[15..0])  * unsigned(s2[15..0]) );
-let d_w1 = to_bits(32, signed(s1[31..16]) * unsigned(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 PWMACC.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d_w0 = X(rd_p*2);
-var d_w1 = if (rd_p == 0x0) then 0x00000000 else X(rd_p*2+1);
-d_w0 = d_w0 + to_bits(32, signed(s1[15..0])  * signed(s2[15..0]) );
-d_w1 = d_w1 + to_bits(32, signed(s1[31..16]) * signed(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 PWMACCSU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d_w0 = X(rd_p*2);
-var d_w1 = if (rd_p == 0x0) then 0x00000000 else X(rd_p*2+1);
-d_w0 = d_w0 + to_bits(32, signed(s1[15..0])  * unsigned(s2[15..0]) );
-d_w1 = d_w1 + to_bits(32, signed(s1[31..16]) * unsigned(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 PWMACCU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d_w0 = X(rd_p*2);
-var d_w1 = if (rd_p == 0x0) then 0x00000000 else X(rd_p*2+1);
-d_w0 = d_w0 + to_bits(32, unsigned(s1[15..0])  * unsigned(s2[15..0]) );
-d_w1 = d_w1 + to_bits(32, unsigned(s1[31..16]) * unsigned(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d_w0;
-    X(rd_p*2+1) = d_w1;
-}
-```
-
-RV32 WMULSU:
-
-```
-let d = to_bits(64, signed(X(rs1)) * unsigned(X(rs2)));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 WMACCSU:
-
-```
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-d = d + to_bits(64, signed(X(rs1)) * unsigned(X(rs2)));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PM2WADD.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d =
-      to_bits(64, signed(s1[15..0])  * signed(s2[15..0]) )
-    + to_bits(64, signed(s1[31..16]) * signed(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PM2WADDSU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d =
-      to_bits(64, signed(s1[15..0])  * unsigned(s2[15..0]) )
-    + to_bits(64, signed(s1[31..16]) * unsigned(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PM2WADDASU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-d = d + to_bits(64, signed(s1[15..0])  * unsigned(s2[15..0]) )
-      + to_bits(64, signed(s1[31..16]) * unsigned(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PM2WADDU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d =
-      to_bits(64, unsigned(s1[15..0])  * unsigned(s2[15..0]) )
-    + to_bits(64, unsigned(s1[31..16]) * unsigned(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PM2WADDAU.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-var d : bits(64) =
-    if (rd_p == 0x0) then zeros() else X(rd_p*2+1) @ X(rd_p*2);
-d = d + to_bits(64, unsigned(s1[15..0])  * unsigned(s2[15..0]) )
-      + to_bits(64, unsigned(s1[31..16]) * unsigned(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PM2WADD.HX:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d =
-      to_bits(64, signed(s1[15..0])  * signed(s2[31..16]))
-    + to_bits(64, signed(s1[31..16]) * signed(s2[15..0]) );
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PM2WSUB.H:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d =
-      to_bits(64, signed(s1[15..0])  * signed(s2[15..0]) )
-    - to_bits(64, signed(s1[31..16]) * signed(s2[31..16]));
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
-
-RV32 PM2WSUB.HX:
-
-```
-let s1 = X(rs1);
-let s2 = X(rs2);
-let d =
-      to_bits(64, signed(s1[15..0])  * signed(s2[31..16]))
-    - to_bits(64, signed(s1[31..16]) * signed(s2[15..0]) );
-if (rd_p != 0x0) then {
-    X(rd_p*2)   = d[31..0];
-    X(rd_p*2+1) = d[63..32];
-}
-```
+## INSTRUCTION PSEUDO-CODE (PL)
+
+| **Extension** | **Name**        | **Variable-Fields**  | **Pseudo-Code**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+|:--------------|:----------------|:---------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv_p`        | `abs`           | `rd, rs1`            | `s1 = rs1; rd = (as_signed(s1) < 0) ? (0 - s1) : s1;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv_p`        | `cls`           | `rd, rs1`            | `rd = count_leading_sign_bits(rs1, XLEN);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv_p`        | `clz`           | `rd, rs1`            | `rd = count_leading_zeros(rs1);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv_p`        | `max`           | `rd, rs1, rs2`       | `rd = sx(rs1) > sx(rs2) ? rs1 : rs2;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv_p`        | `maxu`          | `rd, rs1, rs2`       | `rd = ux(rs1) > ux(rs2) ? rs1 : rs2;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv_p`        | `merge`         | `rs2, rs1, rd`       | `d0 = rd; rd = (~d0 & rs1) \| (d0 & rs2);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv_p`        | `min`           | `rd, rs1, rs2`       | `rd = sx(rs1) < sx(rs2) ? rs1 : rs2;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv_p`        | `minu`          | `rd, rs1, rs2`       | `rd = ux(rs1) < ux(rs2) ? rs1 : rs2;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv_p`        | `mvm`           | `rs2, rs1, rd`       | `m = rs2; rd = (~m & rd) \| (m & rs1);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv_p`        | `mvmn`          | `rs2, rs1, rd`       | `m = rs2; rd = (~m & rs1) \| (m & rd);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv_p`        | `paadd_b`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); sum = a + b; set_bits(&d, (8*i+7), (8*i), to_bits(8, sum >> 1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv_p`        | `paadd_h`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); sum = a + b; set_bits(&d, (16*i+15), (16*i), to_bits(16, sum >> 1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv_p`        | `paaddu_b`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); sum = a + b; set_bits(&d, (8*i+7), (8*i), to_bits(8, sum >> 1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv_p`        | `paaddu_h`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); sum = a + b; set_bits(&d, (16*i+15), (16*i), to_bits(16, sum >> 1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv_p`        | `paas_hx`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a_hi = as_signed(bits(s1, (32*i+31), (32*i+16))); b_lo = as_signed(bits(s2, (32*i+15), (32*i))); sum = a_hi + b_lo; set_bits(&d, (32*i+31), (32*i+16), to_bits(16, sum >> 1)); a_lo = as_signed(bits(s1, (32*i+15), (32*i))); b_hi = as_signed(bits(s2, (32*i+31), (32*i+16))); diff = a_lo - b_hi; set_bits(&d, (32*i+15), (32*i), to_bits(16, diff >> 1)); } rd = d;`                                                                                                                                                                                                                                                                                         |
+| `rv_p`        | `pabd_b`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), (as_signed(a) < as_signed(b)) ? (b - a) : (a - b)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv_p`        | `pabd_h`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), (as_signed(a) < as_signed(b)) ? (b - a) : (a - b)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv_p`        | `pabdsumau_b`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; sum = as_unsigned(rd); for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); diff = (a >= b) ? (a - b) : (b - a); sum = sum + diff; } rd = to_bits(XLEN, sum);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv_p`        | `pabdsumu_b`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; sum = 0; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); diff = (a >= b) ? (a - b) : (b - a); sum = sum + diff; } rd = to_bits(XLEN, sum);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv_p`        | `pabdu_b`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), (as_unsigned(a) < as_unsigned(b)) ? (b - a) : (a - b)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv_p`        | `pabdu_h`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), (as_unsigned(a) < as_unsigned(b)) ? (b - a) : (a - b)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv_p`        | `pack`          | `rd, rs1, rs2`       | `s1 = rs1; s2 = rs2; d = concat_bits(bits(s2, XLEN/2-1, 0), bits(s1, XLEN/2-1, 0)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv_p`        | `padd_b`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), a + b); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv_p`        | `padd_bs`       | `rs2, rs1, rd`       | `s1 = rs1; s2_b0 = bits(rs2, 7, 0); for (i = 0; i <= (XLEN/8 - 1); ++i) { s1_b = bits(s1, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), s1_b + s2_b0); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv_p`        | `padd_h`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), a + b); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv_p`        | `padd_hs`       | `rs2, rs1, rd`       | `s1 = rs1; s2_h0 = bits(rs2, 15, 0); for (i = 0; i <= (XLEN/16 - 1); ++i) { h = bits(s1, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), h + s2_h0); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv_p`        | `pasa_hx`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a_hi = as_signed(bits(s1, (32*i+31), (32*i+16))); b_lo = as_signed(bits(s2, (32*i+15), (32*i))); diff = a_hi - b_lo; set_bits(&d, (32*i+31), (32*i+16), to_bits(16, diff >> 1)); a_lo = as_signed(bits(s1, (32*i+15), (32*i))); b_hi = as_signed(bits(s2, (32*i+31), (32*i+16))); sum = a_lo + b_hi; set_bits(&d, (32*i+15), (32*i), to_bits(16, sum >> 1)); } rd = d;`                                                                                                                                                                                                                                                                                         |
+| `rv_p`        | `pas_hx`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a_even = bits(s1, (32*i+15), (32*i)); b_odd = bits(s2, (32*i+31), (32*i+16)); set_bits(&d, (32*i+15), (32*i), a_even - b_odd); a_odd = bits(s1, (32*i+31), (32*i+16)); b_even = bits(s2, (32*i+15), (32*i)); set_bits(&d, (32*i+31), (32*i+16), a_odd + b_even); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv_p`        | `pasub_b`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); diff = a - b; set_bits(&d, (8*i+7), (8*i), to_bits(8, diff >> 1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv_p`        | `pasub_h`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); diff = a - b; set_bits(&d, (16*i+15), (16*i), to_bits(16, diff >> 1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv_p`        | `pasubu_b`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); diff = a - b; set_bits(&d, (8*i+7), (8*i), to_bits(8, diff >> 1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv_p`        | `pasubu_h`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); diff = a - b; set_bits(&d, (16*i+15), (16*i), to_bits(16, diff >> 1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv_p`        | `pli_b`         | `p_imm8, rd`         | `for (i = 0; i <= (XLEN/8 - 1); ++i) { set_bits(&d, (8*i+7), (8*i), bits(p_imm8, 7, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv_p`        | `pli_h`         | `p_imm10, rd`        | `imm_h = sign_extend(16, bits(p_imm10, 9, 0)); for (i = 0; i <= (XLEN/16 - 1); ++i) { set_bits(&d, (16*i+15), (16*i), imm_h); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv_p`        | `plui_h`        | `p_imm10, rd`        | `imm_h = zero_extend(16, bits(p_imm10, 9, 0)) << 6; for (i = 0; i <= (XLEN/16 - 1); ++i) { set_bits(&d, (16*i+15), (16*i), imm_h); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv_p`        | `pm2adda_h`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = sext_32(bits(s1, (32*i+15), (32*i))); a1 = sext_32(bits(s1, (32*i+31), (32*i+16))); b0 = sext_32(bits(s2, (32*i+15), (32*i))); b1 = sext_32(bits(s2, (32*i+31), (32*i+16))); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + to_bits(32, a0 * b0) + to_bits(32, a1 * b1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                 |
+| `rv_p`        | `pm2adda_hx`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = sext_32(bits(s1, (32*i+15), (32*i))); a1 = sext_32(bits(s1, (32*i+31), (32*i+16))); b0 = sext_32(bits(s2, (32*i+15), (32*i))); b1 = sext_32(bits(s2, (32*i+31), (32*i+16))); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + to_bits(32, a0 * b1) + to_bits(32, a1 * b0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                 |
+| `rv_p`        | `pm2addasu_h`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = sext_32(bits(s1, (32*i+15), (32*i))); a1 = sext_32(bits(s1, (32*i+31), (32*i+16))); b0 = zext_32(bits(s2, (32*i+15), (32*i))); b1 = zext_32(bits(s2, (32*i+31), (32*i+16))); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + to_bits(32, a0 * b0) + to_bits(32, a1 * b1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                 |
+| `rv_p`        | `pm2addau_h`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = zext_32(bits(s1, (32*i+15), (32*i))); a1 = zext_32(bits(s1, (32*i+31), (32*i+16))); b0 = zext_32(bits(s2, (32*i+15), (32*i))); b1 = zext_32(bits(s2, (32*i+31), (32*i+16))); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + to_bits(32, a0 * b0) + to_bits(32, a1 * b1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                 |
+| `rv_p`        | `pm2add_h`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = sext_32(bits(s1, (32*i+15), (32*i))); a1 = sext_32(bits(s1, (32*i+31), (32*i+16))); b0 = sext_32(bits(s2, (32*i+15), (32*i))); b1 = sext_32(bits(s2, (32*i+31), (32*i+16))); set_bits(&d, (32*i+31), (32*i), to_bits(32, a0 * b0) + to_bits(32, a1 * b1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv_p`        | `pm2add_hx`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = sext_32(bits(s1, (32*i+15), (32*i))); a1 = sext_32(bits(s1, (32*i+31), (32*i+16))); b0 = sext_32(bits(s2, (32*i+15), (32*i))); b1 = sext_32(bits(s2, (32*i+31), (32*i+16))); set_bits(&d, (32*i+31), (32*i), to_bits(32, a0 * b1) + to_bits(32, a1 * b0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv_p`        | `pm2addsu_h`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = sext_32(bits(s1, (32*i+15), (32*i))); a1 = sext_32(bits(s1, (32*i+31), (32*i+16))); b0 = zext_32(bits(s2, (32*i+15), (32*i))); b1 = zext_32(bits(s2, (32*i+31), (32*i+16))); set_bits(&d, (32*i+31), (32*i), to_bits(32, a0 * b0) + to_bits(32, a1 * b1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv_p`        | `pm2addu_h`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = zext_32(bits(s1, (32*i+15), (32*i))); a1 = zext_32(bits(s1, (32*i+31), (32*i+16))); b0 = zext_32(bits(s2, (32*i+15), (32*i))); b1 = zext_32(bits(s2, (32*i+31), (32*i+16))); set_bits(&d, (32*i+31), (32*i), to_bits(32, a0 * b0) + to_bits(32, a1 * b1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv_p`        | `pm2sadd_h`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { s1_h0 = bits(s1, (i*32+15), (i*32)); s1_h1 = bits(s1, (i*32+31), (i*32+16)); s2_h0 = bits(s2, (i*32+15), (i*32)); s2_h1 = bits(s2, (i*32+31), (i*32+16)); sum = as_signed(s1_h0) * as_signed(s2_h0) + as_signed(s1_h1) * as_signed(s2_h1); if (sum > 2147483647) { vxsat = 1; sum = 2147483647; } else if (sum < -2147483648) { vxsat = 1; sum = -2147483648; } set_bits(&d, (i*32+31), (i*32), sum); } rd = d;`                                                                                                                                                                                                                                                |
+| `rv_p`        | `pm2sadd_hx`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { s1_h0 = bits(s1, (i*32+15), (i*32)); s1_h1 = bits(s1, (i*32+31), (i*32+16)); s2_h0 = bits(s2, (i*32+15), (i*32)); s2_h1 = bits(s2, (i*32+31), (i*32+16)); sum = as_signed(s1_h0) * as_signed(s2_h1) + as_signed(s1_h1) * as_signed(s2_h0); if (sum > 2147483647) { vxsat = 1; sum = 2147483647; } else if (sum < -2147483648) { vxsat = 1; sum = -2147483648; } set_bits(&d, (i*32+31), (i*32), sum); } rd = d;`                                                                                                                                                                                                                                                |
+| `rv_p`        | `pm2suba_h`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = sext_32(bits(s1, (32*i+15), (32*i))); a1 = sext_32(bits(s1, (32*i+31), (32*i+16))); b0 = sext_32(bits(s2, (32*i+15), (32*i))); b1 = sext_32(bits(s2, (32*i+31), (32*i+16))); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + to_bits(32, a0 * b0) - to_bits(32, a1 * b1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                 |
+| `rv_p`        | `pm2suba_hx`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = sext_32(bits(s1, (32*i+15), (32*i))); a1 = sext_32(bits(s1, (32*i+31), (32*i+16))); b0 = sext_32(bits(s2, (32*i+15), (32*i))); b1 = sext_32(bits(s2, (32*i+31), (32*i+16))); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + to_bits(32, a0 * b1) - to_bits(32, a1 * b0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                 |
+| `rv_p`        | `pm2sub_h`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { s1_h0 = bits(s1, (i*32+15), (i*32)); s1_h1 = bits(s1, (i*32+31), (i*32+16)); s2_h0 = bits(s2, (i*32+15), (i*32)); s2_h1 = bits(s2, (i*32+31), (i*32+16)); set_bits(&d, (i*32+31), (i*32), sext32(as_signed(s1_h0) * as_signed(s2_h0))- sext32(as_signed(s1_h1) * as_signed(s2_h1))); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv_p`        | `pm2sub_hx`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { s1_h0 = bits(s1, (i*32+15), (i*32)); s1_h1 = bits(s1, (i*32+31), (i*32+16)); s2_h0 = bits(s2, (i*32+15), (i*32)); s2_h1 = bits(s2, (i*32+31), (i*32+16)); set_bits(&d, (i*32+31), (i*32), sext32(as_signed(s1_h0) * as_signed(s2_h1))- sext32(as_signed(s1_h1) * as_signed(s2_h0))); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv_p`        | `pm4adda_b`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/32 - 1); ++i) { s1_b0 = bits(s1, (i*32+7), (i*32)); s1_b1 = bits(s1, (i*32+15), (i*32+8)); s1_b2 = bits(s1, (i*32+23), (i*32+16)); s1_b3 = bits(s1, (i*32+31), (i*32+24)); s2_b0 = bits(s2, (i*32+7), (i*32)); s2_b1 = bits(s2, (i*32+15), (i*32+8)); s2_b2 = bits(s2, (i*32+23), (i*32+16)); s2_b3 = bits(s2, (i*32+31), (i*32+24)); d_w = bits(d, (i*32+31), (i*32)); set_bits(&d, (i*32+31), (i*32), d_w+ sext32(as_signed(s1_b0) * as_signed(s2_b0))+ sext32(as_signed(s1_b1) * as_signed(s2_b1))+ sext32(as_signed(s1_b2) * as_signed(s2_b2))+ sext32(as_signed(s1_b3) * as_signed(s2_b3))); } rd = d;`                                                            |
+| `rv_p`        | `pm4addasu_b`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/32 - 1); ++i) { s1_b0 = bits(s1, (i*32+7), (i*32)); s1_b1 = bits(s1, (i*32+15), (i*32+8)); s1_b2 = bits(s1, (i*32+23), (i*32+16)); s1_b3 = bits(s1, (i*32+31), (i*32+24)); s2_b0 = bits(s2, (i*32+7), (i*32)); s2_b1 = bits(s2, (i*32+15), (i*32+8)); s2_b2 = bits(s2, (i*32+23), (i*32+16)); s2_b3 = bits(s2, (i*32+31), (i*32+24)); d_w = bits(d, (i*32+31), (i*32)); set_bits(&d, (i*32+31), (i*32), d_w+ sext32(as_signed(s1_b0) * as_unsigned(s2_b0))+ sext32(as_signed(s1_b1) * as_unsigned(s2_b1))+ sext32(as_signed(s1_b2) * as_unsigned(s2_b2))+ sext32(as_signed(s1_b3) * as_unsigned(s2_b3))); } rd = d;`                                                    |
+| `rv_p`        | `pm4addau_b`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/32 - 1); ++i) { s1_b0 = bits(s1, (i*32+7), (i*32)); s1_b1 = bits(s1, (i*32+15), (i*32+8)); s1_b2 = bits(s1, (i*32+23), (i*32+16)); s1_b3 = bits(s1, (i*32+31), (i*32+24)); s2_b0 = bits(s2, (i*32+7), (i*32)); s2_b1 = bits(s2, (i*32+15), (i*32+8)); s2_b2 = bits(s2, (i*32+23), (i*32+16)); s2_b3 = bits(s2, (i*32+31), (i*32+24)); d_w = bits(d, (i*32+31), (i*32)); set_bits(&d, (i*32+31), (i*32), d_w+ zext32(as_unsigned(s1_b0) * as_unsigned(s2_b0))+ zext32(as_unsigned(s1_b1) * as_unsigned(s2_b1))+ zext32(as_unsigned(s1_b2) * as_unsigned(s2_b2))+ zext32(as_unsigned(s1_b3) * as_unsigned(s2_b3))); } rd = d;`                                            |
+| `rv_p`        | `pm4add_b`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = sext_32(bits(s1, (32*i+7), (32*i))); a1 = sext_32(bits(s1, (32*i+15), (32*i+8))); a2 = sext_32(bits(s1, (32*i+23), (32*i+16))); a3 = sext_32(bits(s1, (32*i+31), (32*i+24))); b0 = sext_32(bits(s2, (32*i+7), (32*i))); b1 = sext_32(bits(s2, (32*i+15), (32*i+8))); b2 = sext_32(bits(s2, (32*i+23), (32*i+16))); b3 = sext_32(bits(s2, (32*i+31), (32*i+24))); set_bits(&d, (32*i+31), (32*i), to_bits(32, a0*b0) + to_bits(32, a1*b1) + to_bits(32, a2*b2) + to_bits(32, a3*b3)); } rd = d;`                                                                                                                                                            |
+| `rv_p`        | `pm4addsu_b`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = sext_32(bits(s1, (32*i+7), (32*i))); a1 = sext_32(bits(s1, (32*i+15), (32*i+8))); a2 = sext_32(bits(s1, (32*i+23), (32*i+16))); a3 = sext_32(bits(s1, (32*i+31), (32*i+24))); b0 = zext_32(bits(s2, (32*i+7), (32*i))); b1 = zext_32(bits(s2, (32*i+15), (32*i+8))); b2 = zext_32(bits(s2, (32*i+23), (32*i+16))); b3 = zext_32(bits(s2, (32*i+31), (32*i+24))); set_bits(&d, (32*i+31), (32*i), to_bits(32, a0*b0) + to_bits(32, a1*b1) + to_bits(32, a2*b2) + to_bits(32, a3*b3)); } rd = d;`                                                                                                                                                            |
+| `rv_p`        | `pm4addu_b`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = zext_32(bits(s1, (32*i+7), (32*i))); a1 = zext_32(bits(s1, (32*i+15), (32*i+8))); a2 = zext_32(bits(s1, (32*i+23), (32*i+16))); a3 = zext_32(bits(s1, (32*i+31), (32*i+24))); b0 = zext_32(bits(s2, (32*i+7), (32*i))); b1 = zext_32(bits(s2, (32*i+15), (32*i+8))); b2 = zext_32(bits(s2, (32*i+23), (32*i+16))); b3 = zext_32(bits(s2, (32*i+31), (32*i+24))); set_bits(&d, (32*i+31), (32*i), to_bits(32, a0*b0) + to_bits(32, a1*b1) + to_bits(32, a2*b2) + to_bits(32, a3*b3)); } rd = d;`                                                                                                                                                            |
+| `rv_p`        | `pmax_b`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); set_bits(&d, (8*i+7), (8*i), (a > b) ? a : b); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv_p`        | `pmax_h`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); set_bits(&d, (16*i+15), (16*i), (a > b) ? a : b); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv_p`        | `pmaxu_b`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); set_bits(&d, (8*i+7), (8*i), (a > b) ? a : b); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv_p`        | `pmaxu_h`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); set_bits(&d, (16*i+15), (16*i), (a > b) ? a : b); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv_p`        | `pmhacc_h`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); acc = bits(d, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), acc + bits(to_bits(32, as_signed(a) * as_signed(b)), 31, 16)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv_p`        | `pmhacc_h_b0`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = sext_24(bits(s1, (16*i+15), (16*i))); b0 = sext_24(bits(s2, (16*i+7), (16*i))); p = a * b0; set_bits(&d, (16*i+15), (16*i), bits(d, (16*i+15), (16*i)) + bits(to_bits(24, p), 23, 8)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv_p`        | `pmhacc_h_b1`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = sext_24(bits(s1, (16*i+15), (16*i))); b1 = sext_24(bits(s2, (16*i+15), (16*i+8))); p = a * b1; set_bits(&d, (16*i+15), (16*i), bits(d, (16*i+15), (16*i)) + bits(to_bits(24, p), 23, 8)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv_p`        | `pmhaccsu_h`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); acc = bits(d, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), acc + bits(to_bits(32, as_signed(a) * as_unsigned(b)), 31, 16)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv_p`        | `pmhaccsu_h_b0` | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = sext_24(bits(s1, (16*i+15), (16*i))); b0 = zext_24(bits(s2, (16*i+7), (16*i))); p = a * b0; set_bits(&d, (16*i+15), (16*i), bits(d, (16*i+15), (16*i)) + bits(to_bits(24, p), 23, 8)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv_p`        | `pmhaccsu_h_b1` | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = sext_24(bits(s1, (16*i+15), (16*i))); b1 = zext_24(bits(s2, (16*i+15), (16*i+8))); p = a * b1; set_bits(&d, (16*i+15), (16*i), bits(d, (16*i+15), (16*i)) + bits(to_bits(24, p), 23, 8)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv_p`        | `pmhaccu_h`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); acc = bits(d, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), acc + bits(to_bits(32, as_unsigned(a) * as_unsigned(b)), 31, 16)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv_p`        | `pmhracc_h`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); acc = bits(d, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), acc + bits(to_bits(32, as_signed(a) * as_signed(b) + 0x8000), 31, 16)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv_p`        | `pmhraccsu_h`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); acc = bits(d, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), acc + bits(to_bits(32, as_signed(a) * as_unsigned(b) + 0x8000), 31, 16)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv_p`        | `pmhraccu_h`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); acc = bits(d, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), acc + bits(to_bits(32, as_unsigned(a) * as_unsigned(b) + 0x8000), 31, 16)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv_p`        | `pmin_b`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); set_bits(&d, (8*i+7), (8*i), (a < b) ? a : b); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv_p`        | `pmin_h`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); set_bits(&d, (16*i+15), (16*i), (a < b) ? a : b); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv_p`        | `pminu_b`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); set_bits(&d, (8*i+7), (8*i), (a < b) ? a : b); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv_p`        | `pminu_h`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); set_bits(&d, (16*i+15), (16*i), (a < b) ? a : b); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv_p`        | `pmq2adda_h`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = sext_47(bits(s1, (32*i+15), (32*i))); a1 = sext_47(bits(s1, (32*i+31), (32*i+16))); b0 = sext_47(bits(s2, (32*i+15), (32*i))); b1 = sext_47(bits(s2, (32*i+31), (32*i+16))); q0 = bits((a0 * b0), 46, 15); q1 = bits((a1 * b1), 46, 15); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + q0 + q1); } rd = d;`                                                                                                                                                                                                                                                                                                                         |
+| `rv_p`        | `pmq2add_h`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = sext_47(bits(s1, (32*i+15), (32*i))); a1 = sext_47(bits(s1, (32*i+31), (32*i+16))); b0 = sext_47(bits(s2, (32*i+15), (32*i))); b1 = sext_47(bits(s2, (32*i+31), (32*i+16))); q0 = bits((a0 * b0), 46, 15); q1 = bits((a1 * b1), 46, 15); set_bits(&d, (32*i+31), (32*i), q0 + q1); } rd = d;`                                                                                                                                                                                                                                                                                                                                                              |
+| `rv_p`        | `pmqr2adda_h`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = sext_47(bits(s1, (32*i+15), (32*i))); a1 = sext_47(bits(s1, (32*i+31), (32*i+16))); b0 = sext_47(bits(s2, (32*i+15), (32*i))); b1 = sext_47(bits(s2, (32*i+31), (32*i+16))); q0 = bits((a0 * b0 + 0x4000), 46, 15); q1 = bits((a1 * b1 + 0x4000), 46, 15); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + q0 + q1); } rd = d;`                                                                                                                                                                                                                                                                                                       |
+| `rv_p`        | `pmqr2add_h`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a0 = sext_47(bits(s1, (32*i+15), (32*i))); a1 = sext_47(bits(s1, (32*i+31), (32*i+16))); b0 = sext_47(bits(s2, (32*i+15), (32*i))); b1 = sext_47(bits(s2, (32*i+31), (32*i+16))); q0 = bits((a0 * b0 + 0x4000), 46, 15); q1 = bits((a1 * b1 + 0x4000), 46, 15); set_bits(&d, (32*i+31), (32*i), q0 + q1); } rd = d;`                                                                                                                                                                                                                                                                                                                                            |
+| `rv_p`        | `pmseq_b`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), (a == b) ? 0xFF : 0x00); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv_p`        | `pmseq_h`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), (a == b) ? 0xFFFF : 0x0000); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv_p`        | `pmslt_b`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); set_bits(&d, (8*i+7), (8*i), (a < b) ? 0xFF : 0x00); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv_p`        | `pmslt_h`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); set_bits(&d, (16*i+15), (16*i), (a < b) ? 0xFFFF : 0x0000); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv_p`        | `pmsltu_b`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); set_bits(&d, (8*i+7), (8*i), (a < b) ? 0xFF : 0x00); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv_p`        | `pmsltu_h`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); set_bits(&d, (16*i+15), (16*i), (a < b) ? 0xFFFF : 0x0000); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv_p`        | `pmul_h_b00`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = sext_16(bits(s1, (16*i+7), (16*i))); b = sext_16(bits(s2, (16*i+7), (16*i))); set_bits(&d, (16*i+15), (16*i), to_bits(16, a * b)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv_p`        | `pmul_h_b01`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = sext_16(bits(s1, (16*i+7), (16*i))); b = sext_16(bits(s2, (16*i+15), (16*i+8))); set_bits(&d, (16*i+15), (16*i), to_bits(16, a * b)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv_p`        | `pmul_h_b11`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = sext_16(bits(s1, (16*i+15), (16*i+8))); b = sext_16(bits(s2, (16*i+15), (16*i+8))); set_bits(&d, (16*i+15), (16*i), to_bits(16, a * b)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv_p`        | `pmulh_h`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), bits(to_bits(32, as_signed(a) * as_signed(b)), 31, 16)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv_p`        | `pmulh_h_b0`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = sext_24(bits(s1, (16*i+15), (16*i))); b0 = sext_24(bits(s2, (16*i+7), (16*i))); p = a * b0; set_bits(&d, (16*i+15), (16*i), bits(to_bits(24, p), 23, 8)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv_p`        | `pmulh_h_b1`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = sext_24(bits(s1, (16*i+15), (16*i))); b1 = sext_24(bits(s2, (16*i+15), (16*i+8))); p = a * b1; set_bits(&d, (16*i+15), (16*i), bits(to_bits(24, p), 23, 8)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv_p`        | `pmulhr_h`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), bits(to_bits(32, as_signed(a) * as_signed(b) + 0x8000), 31, 16)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv_p`        | `pmulhrsu_h`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), bits(to_bits(32, as_signed(a) * as_unsigned(b) + 0x8000), 31, 16)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv_p`        | `pmulhru_h`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), bits(to_bits(32, as_unsigned(a) * as_unsigned(b) + 0x8000), 31, 16)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv_p`        | `pmulhsu_h`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), bits(to_bits(32, as_signed(a) * as_unsigned(b)), 31, 16)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv_p`        | `pmulhsu_h_b0`  | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = sext_24(bits(s1, (16*i+15), (16*i))); b0 = zext_24(bits(s2, (16*i+7), (16*i))); p = a * b0; set_bits(&d, (16*i+15), (16*i), bits(to_bits(24, p), 23, 8)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv_p`        | `pmulhsu_h_b1`  | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = sext_24(bits(s1, (16*i+15), (16*i))); b1 = zext_24(bits(s2, (16*i+15), (16*i+8))); p = a * b1; set_bits(&d, (16*i+15), (16*i), bits(to_bits(24, p), 23, 8)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv_p`        | `pmulhu_h`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), bits((as_unsigned(a) * as_unsigned(b)), 31, 16)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv_p`        | `pmulq_h`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); if ((a == 0x8000) && (b == 0x8000)) { set_bits(&d, (16*i+15), (16*i), 0x7FFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits((as_signed(a) * as_signed(b)), 30, 15)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv_p`        | `pmulqr_h`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); if ((a == 0x8000) && (b == 0x8000)) { vxsat = 1; set_bits(&d, (16*i+15), (16*i), 0x7FFF); } else { set_bits(&d, (16*i+15), (16*i), bits(to_bits(32, as_signed(a) * as_signed(b) + 0x4000), 30, 15)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv_p`        | `pmulsu_h_b00`  | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = sext_16(bits(s1, (16*i+7), (16*i))); b = zext_16(bits(s2, (16*i+7), (16*i))); set_bits(&d, (16*i+15), (16*i), to_bits(16, a * b)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv_p`        | `pmulsu_h_b11`  | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = sext_16(bits(s1, (16*i+15), (16*i+8))); b = zext_16(bits(s2, (16*i+15), (16*i+8))); set_bits(&d, (16*i+15), (16*i), to_bits(16, a * b)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv_p`        | `pmulu_h_b00`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = zext_16(bits(s1, (16*i+7), (16*i))); b = zext_16(bits(s2, (16*i+7), (16*i))); set_bits(&d, (16*i+15), (16*i), to_bits(16, a * b)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv_p`        | `pmulu_h_b01`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = zext_16(bits(s1, (16*i+7), (16*i))); b = zext_16(bits(s2, (16*i+15), (16*i+8))); set_bits(&d, (16*i+15), (16*i), to_bits(16, a * b)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv_p`        | `pmulu_h_b11`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = zext_16(bits(s1, (16*i+15), (16*i+8))); b = zext_16(bits(s2, (16*i+15), (16*i+8))); set_bits(&d, (16*i+15), (16*i), to_bits(16, a * b)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv_p`        | `ppaire_b`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a_even = bits(s1, (16*i+7), (16*i)); b_even = bits(s2, (16*i+7), (16*i)); set_bits(&d, (16*i+7), (16*i), a_even); set_bits(&d, (16*i+15), (16*i+8), b_even); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv_p`        | `ppaireo_b`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a_even = bits(s1, (16*i+7), (16*i)); b_odd = bits(s2, (16*i+15), (16*i+8)); set_bits(&d, (16*i+7), (16*i), a_even); set_bits(&d, (16*i+15), (16*i+8), b_odd); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv_p`        | `ppaireo_h`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a_even = bits(s1, (32*i+15), (32*i)); b_odd = bits(s2, (32*i+31), (32*i+16)); set_bits(&d, (32*i+15), (32*i), a_even); set_bits(&d, (32*i+31), (32*i+16), b_odd); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv_p`        | `ppairo_b`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a_odd = bits(s1, (16*i+15), (16*i+8)); b_odd = bits(s2, (16*i+15), (16*i+8)); set_bits(&d, (16*i+7), (16*i), a_odd); set_bits(&d, (16*i+15), (16*i+8), b_odd); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv_p`        | `ppairoe_b`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a_odd = bits(s1, (16*i+15), (16*i+8)); b_even = bits(s2, (16*i+7), (16*i)); set_bits(&d, (16*i+7), (16*i), a_odd); set_bits(&d, (16*i+15), (16*i+8), b_even); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv_p`        | `ppairoe_h`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a_odd = bits(s1, (32*i+31), (32*i+16)); b_even = bits(s2, (32*i+15), (32*i)); set_bits(&d, (32*i+15), (32*i), a_odd); set_bits(&d, (32*i+31), (32*i+16), b_even); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv_p`        | `ppairo_h`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a_odd = bits(s1, (32*i+31), (32*i+16)); b_odd = bits(s2, (32*i+31), (32*i+16)); set_bits(&d, (32*i+15), (32*i), a_odd); set_bits(&d, (32*i+31), (32*i+16), b_odd); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv_p`        | `predsum_bs`    | `rs2, rs1, rd`       | `s1 = rs1; sum = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { b = bits(s1, (8*i+7), (8*i)); sum = sum + sign_extend(XLEN, b); } rd = sum;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv_p`        | `predsum_hs`    | `rs2, rs1, rd`       | `s1 = rs1; sum = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { h = bits(s1, (16*i+15), (16*i)); sum = sum + sign_extend(XLEN, h); } rd = sum;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv_p`        | `predsumu_bs`   | `rs2, rs1, rd`       | `s1 = rs1; sum = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { b = bits(s1, (8*i+7), (8*i)); sum = sum + zero_extend(XLEN, b); } rd = sum;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv_p`        | `predsumu_hs`   | `rs2, rs1, rd`       | `s1 = rs1; sum = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { h = bits(s1, (16*i+15), (16*i)); sum = sum + zero_extend(XLEN, h); } rd = sum;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv_p`        | `psabs_b`       | `rs1, rd`            | `s1 = rs1; for (i = 0; i <= (XLEN/8 - 1); ++i) { val = as_signed(bits(s1, (8*i+7), (8*i))); if (val == -128) { set_bits(&d, (8*i+7), (8*i), 0x7F); vxsat = 1; } else if (val < 0) { set_bits(&d, (8*i+7), (8*i), to_bits(8, -val)); } else { set_bits(&d, (8*i+7), (8*i), to_bits(8, val)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv_p`        | `psabs_h`       | `rs1, rd`            | `s1 = rs1; for (i = 0; i <= (XLEN/16 - 1); ++i) { val = as_signed(bits(s1, (16*i+15), (16*i))); if (val == -32768) { set_bits(&d, (16*i+15), (16*i), 0x7FFF); vxsat = 1; } else if (val < 0) { set_bits(&d, (16*i+15), (16*i), to_bits(16, -val)); } else { set_bits(&d, (16*i+15), (16*i), to_bits(16, val)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv_p`        | `psadd_b`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); result = a + b; if (result > 127) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), to_bits(8, 127)); } else if (result < -128) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), to_bits(8, -128)); } else { set_bits(&d, (8*i+7), (8*i), to_bits(8, result)); } } rd = d;`                                                                                                                                                                                                                                                                                                                   |
+| `rv_p`        | `psadd_h`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); result = a + b; if (result > 32767) { vxsat = 1; set_bits(&d, (16*i+15), (16*i), to_bits(16, 32767)); } else if (result < -32768) { vxsat = 1; set_bits(&d, (16*i+15), (16*i), to_bits(16, -32768)); } else { set_bits(&d, (16*i+15), (16*i), to_bits(16, result)); } } rd = d;`                                                                                                                                                                                                                                                                                        |
+| `rv_p`        | `psaddu_b`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); result = a + b; if (result > 255) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), to_bits(8, 255)); } else { set_bits(&d, (8*i+7), (8*i), to_bits(8, result)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv_p`        | `psaddu_h`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); result = a + b; if (result > 65535) { vxsat = 1; set_bits(&d, (16*i+15), (16*i), to_bits(16, 65535)); } else { set_bits(&d, (16*i+15), (16*i), to_bits(16, result)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv_p`        | `psa_hx`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a_even = bits(s1, (32*i+15), (32*i)); b_odd = bits(s2, (32*i+31), (32*i+16)); set_bits(&d, (32*i+15), (32*i), a_even + b_odd); a_odd = bits(s1, (32*i+31), (32*i+16)); b_even = bits(s2, (32*i+15), (32*i)); set_bits(&d, (32*i+31), (32*i+16), a_odd - b_even); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv_p`        | `psas_hx`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a_even = as_signed(bits(s1, (32*i+15), (32*i))); b_odd = as_signed(bits(s2, (32*i+31), (32*i+16))); res_even = a_even - b_odd; if (res_even > 0x8000 - 1) { res_even = 0x8000 - 1; vxsat = 1; } else if (res_even < -(0x8000)) { res_even = -(0x8000); vxsat = 1; } set_bits(&d, (32*i+15), (32*i), bits(res_even, 15, 0)); a_odd = as_signed(bits(s1, (32*i+31), (32*i+16))); b_even = as_signed(bits(s2, (32*i+15), (32*i))); res_odd = a_odd + b_even; if (res_odd > 0x8000 - 1) { res_odd = 0x8000 - 1; vxsat = 1; } else if (res_odd < -(0x8000)) { res_odd = -(0x8000); vxsat = 1; } set_bits(&d, (32*i+31), (32*i+16), bits(res_odd, 15, 0)); } rd = d;` |
+| `rv_p`        | `psati_h`       | `p_w_uimm4, rs1, rd` | `s1 = rs1; n = bits(p_w_uimm4, 3, 0); minval_h = sign_extend(16, 0xFFFF << n); maxval_h = ~minval_h; for (i = 0; i <= (XLEN/16 - 1); ++i) { e = as_signed(bits(s1, (16*i+15), (16*i))); if (e < as_signed(minval_h)) { set_bits(&d, (16*i+15), (16*i), minval_h); vxsat = 1; } else if (e > as_signed(maxval_h)) { set_bits(&d, (16*i+15), (16*i), maxval_h); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(s1, (16*i+15), (16*i))); } } rd = d;`                                                                                                                                                                                                                                                                |
+| `rv_p`        | `psext_h_b`     | `rs1, rd`            | `s1 = rs1; for (i = 0; i <= (XLEN/16 - 1); ++i) { b = bits(s1, (16*i+7), (16*i)); set_bits(&d, (16*i+15), (16*i), sign_extend(16, b)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv_p`        | `psh1add_h`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), (a << 1) + b); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv_p`        | `psll_bs`       | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 4, 0); for (i = 0; i <= (XLEN/8 - 1); ++i) { b = bits(s1, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), bits((zero_extend(32, b) << shamt), 7, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv_p`        | `psll_hs`       | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 4, 0); for (i = 0; i <= (XLEN/16 - 1); ++i) { h = bits(s1, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), bits((zero_extend(32, h) << shamt), 15, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv_p`        | `pslli_b`       | `p_w_uimm3, rs1, rd` | `s1 = rs1; shamt = bits(p_w_uimm3, 2, 0); for (i = 0; i <= (XLEN/8 - 1); ++i) { b = bits(s1, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), bits((zero_extend(32, b) << shamt), 7, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv_p`        | `pslli_h`       | `p_w_uimm4, rs1, rd` | `s1 = rs1; shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= (XLEN/16 - 1); ++i) { h = bits(s1, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), bits((zero_extend(32, h) << shamt), 15, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv_p`        | `psra_bs`       | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 4, 0); for (i = 0; i <= (XLEN/8 - 1); ++i) { b = bits(s1, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), shift_bits_right_arith(b, shamt)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv_p`        | `psra_hs`       | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 4, 0); for (i = 0; i <= (XLEN/16 - 1); ++i) { h = bits(s1, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), shift_bits_right_arith(h, shamt)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv_p`        | `psrai_b`       | `p_w_uimm3, rs1, rd` | `s1 = rs1; shamt = bits(p_w_uimm3, 2, 0); for (i = 0; i <= (XLEN/8 - 1); ++i) { b = bits(s1, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), shift_bits_right_arith(b, shamt)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv_p`        | `psrai_h`       | `p_w_uimm4, rs1, rd` | `s1 = rs1; shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= (XLEN/16 - 1); ++i) { h = bits(s1, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), shift_bits_right_arith(h, shamt)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv_p`        | `psrari_h`      | `p_w_uimm4, rs1, rd` | `s1 = rs1; shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= (XLEN/16 - 1); ++i) { h = bits(s1, (16*i+15), (16*i)); shx = shift_bits_right_arith(concat_bits(h, 0x0), shamt); set_bits(&d, (16*i+15), (16*i), bits((shx + 1), 16, 1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv_p`        | `psrl_bs`       | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 4, 0); for (i = 0; i <= (XLEN/8 - 1); ++i) { b = bits(s1, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), bits((zero_extend(32, b) >> shamt), 7, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv_p`        | `psrl_hs`       | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 4, 0); for (i = 0; i <= (XLEN/16 - 1); ++i) { h = bits(s1, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), bits((zero_extend(32, h) >> shamt), 15, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv_p`        | `psrli_b`       | `p_w_uimm3, rs1, rd` | `s1 = rs1; shamt = bits(p_w_uimm3, 2, 0); for (i = 0; i <= (XLEN/8 - 1); ++i) { b = bits(s1, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), bits((zero_extend(32, b) >> shamt), 7, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv_p`        | `psrli_h`       | `p_w_uimm4, rs1, rd` | `s1 = rs1; shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= (XLEN/16 - 1); ++i) { h = bits(s1, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), bits((zero_extend(32, h) >> shamt), 15, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv_p`        | `pssa_hx`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a_even = as_signed(bits(s1, (32*i+15), (32*i))); b_odd = as_signed(bits(s2, (32*i+31), (32*i+16))); res_even = a_even + b_odd; if (res_even > 0x8000 - 1) { res_even = 0x8000 - 1; vxsat = 1; } else if (res_even < -(0x8000)) { res_even = -(0x8000); vxsat = 1; } set_bits(&d, (32*i+15), (32*i), bits(res_even, 15, 0)); a_odd = as_signed(bits(s1, (32*i+31), (32*i+16))); b_even = as_signed(bits(s2, (32*i+15), (32*i))); res_odd = a_odd - b_even; if (res_odd > 0x8000 - 1) { res_odd = 0x8000 - 1; vxsat = 1; } else if (res_odd < -(0x8000)) { res_odd = -(0x8000); vxsat = 1; } set_bits(&d, (32*i+31), (32*i+16), bits(res_odd, 15, 0)); } rd = d;` |
+| `rv_p`        | `pssh1sadd_h`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i < XLEN / 16; ++i) { a = sign_extend(bits(s1, 16 * i + 15, 16 * i), 16, 32); b = sign_extend(bits(s2, 16 * i + 15, 16 * i), 16, 32); shifted = 2 * a; t = clamp(shifted, -32768, 32767); sum = t + b; result = clamp(sum, -32768, 32767); if (t != shifted \|\| result != sum) vxsat = 1; set_bits(&d, 16 * i + 15, 16 * i, result); } rd = d;`                                                                                                                                                                                                                                                                                                                                           |
+| `rv_p`        | `pssha_hs`      | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= (XLEN/16 - 1); ++i) { h = bits(s1, (16*i+15), (16*i)); xh = sign_extend(32, h); if (sshamt < 0) { if (sshamt <= -16) { r = bits(xh, 31, 16); } else { r = bits(shift_bits_right_arith(xh, bits((0 - shamt), 3, 0)), 15, 0); } } else { if (sshamt >= 16) { shx = (concat_bits(h, 0x0000)); } else { shx = xh << bits(shamt, 3, 0); } if (as_signed(shx) < as_signed(0xFFFF8000)) { vxsat = 1; r = 0x8000; } else if (as_signed(shx) > as_signed(0x00007FFF)) { vxsat = 1; r = 0x7FFF; } else { r = bits(shx, 15, 0); } } set_bits(&d, (16*i+15), (16*i), r); } rd = d;`                                                                     |
+| `rv_p`        | `psshar_hs`     | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= (XLEN/16 - 1); ++i) { h = bits(s1, (16*i+15), (16*i)); if (sshamt < 0) { x = concat_bits(sign_extend(32, h), 0x0); y = (sshamt <= -16) ? bits(x, 32, 16) : bits(shift_bits_right_arith(x, bits((0 - shamt), 3, 0)), 16, 0); r = bits((y + 1), 16, 1); } else { shx = (sshamt >= 16) ? (concat_bits(h, 0x0000)) : (sign_extend(32, h) << bits(shamt, 3, 0)); if (as_signed(shx) < as_signed(0xFFFF8000)) { vxsat = 1; r = 0x8000; } else if (as_signed(shx) > as_signed(0x00007FFF)) { vxsat = 1; r = 0x7FFF; } else { r = bits(shx, 15, 0); } } set_bits(&d, (16*i+15), (16*i), r); } rd = d;`                                              |
+| `rv_p`        | `psshl_hs`      | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= (XLEN/16 - 1); ++i) { h = bits(s1, (16*i+15), (16*i)); xh = zero_extend(32, h); if (sshamt < 0) { if (sshamt <= -16) { r = bits(xh, 31, 16); } else { r = bits((xh >> bits((0 - shamt), 3, 0)), 15, 0); } } else { if (sshamt >= 16) { shx = (concat_bits(h, 0x0000)); } else { shx = xh << bits(shamt, 3, 0); } if (as_unsigned(shx) > as_unsigned(0x0000FFFF)) { vxsat = 1; r = 0xFFFF; } else { r = bits(shx, 15, 0); } } set_bits(&d, (16*i+15), (16*i), r); } rd = d;`                                                                                                                                                                 |
+| `rv_p`        | `psshlr_hs`     | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= (XLEN/16 - 1); ++i) { h = bits(s1, (16*i+15), (16*i)); if (sshamt < 0) { x = concat_bits(zero_extend(32, h), 0x0); y = bits((x >> (-sshamt)), 16, 0); r = bits((y + 1), 16, 1); } else { shx = (sshamt >= 16) ? (concat_bits(h, 0x0000)) : (zero_extend(32, h) << bits(shamt, 3, 0)); if (as_unsigned(shx) > as_unsigned(0x0000FFFF)) { vxsat = 1; r = 0xFFFF; } else { r = bits(shx, 15, 0); } } set_bits(&d, (16*i+15), (16*i), r); } rd = d;`                                                                                                                                                                                            |
+| `rv_p`        | `psslai_h`      | `p_w_uimm4, rs1, rd` | `s1 = rs1; shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); result = a << shamt; if (result < -0x8000) { set_bits(&d, (16*i+15), (16*i), 0x8000); vxsat = 1; } else if (result > 0x8000 - 1) { set_bits(&d, (16*i+15), (16*i), 0x7FFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(result, 15, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                             |
+| `rv_p`        | `pssub_b`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); res = a - b; if (res > 0x80 - 1) { vxsat = 1; res = 0x80 - 1; } else if (res < -(0x80)) { vxsat = 1; res = -(0x80); } set_bits(&d, (8*i+7), (8*i), bits(res, 7, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv_p`        | `pssub_h`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); res = a - b; if (res > 0x8000 - 1) { vxsat = 1; res = 0x8000 - 1; } else if (res < -(0x8000)) { vxsat = 1; res = -(0x8000); } set_bits(&d, (16*i+15), (16*i), bits(res, 15, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv_p`        | `pssubu_b`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); res = a - b; if (res < 0) { vxsat = 1; res = 0; } set_bits(&d, (8*i+7), (8*i), bits(res, 7, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv_p`        | `pssubu_h`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); res = a - b; if (res < 0) { vxsat = 1; res = 0; } set_bits(&d, (16*i+15), (16*i), bits(res, 15, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv_p`        | `psub_b`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/8 - 1); ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), a - b); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv_p`        | `psub_h`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/16 - 1); ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), a - b); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv_p`        | `pusati_h`      | `p_w_uimm4, rs1, rd` | `s1 = rs1; n = bits(p_w_uimm4, 3, 0); maxval_h = ~(0xFFFF << n) & 0xFFFF; for (i = 0; i <= (XLEN/16 - 1); ++i) { e = as_signed(bits(s1, (16*i+15), (16*i))); if (e < 0) { set_bits(&d, (16*i+15), (16*i), 0x0000); vxsat = 1; } else if (e > as_signed(maxval_h)) { set_bits(&d, (16*i+15), (16*i), maxval_h); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(s1, (16*i+15), (16*i))); } } rd = d;`                                                                                                                                                                                                                                                                                                               |
+| `rv_p`        | `sext_b`        | `rd, rs1`            | `rd = EXTS(bits(rs1, 7, 0));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv_p`        | `sext_h`        | `rd, rs1`            | `rd = EXTS(bits(rs1, 15, 0));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv_p`        | `sh1add`        | `rd, rs1, rs2`       | `rd = rs2 + (rs1 << 1);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv_p`        | `slx`           | `rs2, rs1, rd`       | `shamt = bits(rs2, log2(XLEN)-1, 0); rd = bits(((concat_bits(rd, rs1)) << shamt), (2*XLEN-1), XLEN);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv_p`        | `srx`           | `rs2, rs1, rd`       | `shamt = bits(rs2, log2(XLEN)-1, 0); rd = bits(((concat_bits(rs1, rd)) >> shamt), (XLEN-1), 0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+
+:RVP - Specific Extension for Packed SIMD Instructions
+
+| **Extension** | **Name**       | **Variable-Fields**          | **Pseudo-Code**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+|:--------------|:---------------|:-----------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv32_p`      | `addd`         | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); s2 = (p_rs2_p == 0) ? 0 : (concat_bits(X[2*p_rs2_p+1], X[2*p_rs2_p])); d = s1 + s2; if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `mqrwacc`      | `rs2, rs1, p_rd_p`           | `acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); a = sext_95(rs1); b = sext_95(rs2); p = a * b + (1 << 30); term = bits(to_bits(95, p), 94, 31); acc = acc + term; if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `mqwacc`       | `rs2, rs1, p_rd_p`           | `acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); a = sext_95(rs1); b = sext_95(rs2); p = a * b; term = bits(to_bits(95, p), 94, 31); acc = acc + term; if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `nclip`        | `rs2, p_rs1_p, rd`           | `s1 = ((p_rs1_p == 0)) ? 0 : concat_bits(X[p_rs1_p * 2 + 1], X[p_rs1_p * 2]); shamt = bits(rs2, 5, 0); shx = shift_bits_right_arith(s1, shamt); if (as_signed(shx) < as_signed(0xFFFFFFFF80000000)) { rd = 0x80000000; vxsat = 1; } else if (as_signed(shx) > as_signed(0x000000007FFFFFFF)) { rd = 0x7FFFFFFF; vxsat = 1; } else { rd = bits(shx, 31, 0); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `nclipi`       | `p_w_uimm6, p_rs1_p, rd`     | `s1 = ((p_rs1_p == 0)) ? 0 : concat_bits(X[p_rs1_p * 2 + 1], X[p_rs1_p * 2]); shamt = bits(p_w_uimm6, 5, 0); shx = shift_bits_right_arith(s1, shamt); if (as_signed(shx) < as_signed(0xFFFFFFFF80000000)) { rd = 0x80000000; vxsat = 1; } else if (as_signed(shx) > as_signed(0x000000007FFFFFFF)) { rd = 0x7FFFFFFF; vxsat = 1; } else { rd = bits(shx, 31, 0); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `nclipiu`      | `p_w_uimm6, p_rs1_p, rd`     | `s1 = ((p_rs1_p == 0)) ? 0 : concat_bits(X[p_rs1_p * 2 + 1], X[p_rs1_p * 2]); shamt = bits(p_w_uimm6, 5, 0); shx = s1 >> shamt; if (as_unsigned(shx) > as_unsigned(0x00000000FFFFFFFF)) { rd = 0xFFFFFFFF; vxsat = 1; } else { rd = bits(shx, 31, 0); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `nclipr`       | `rs2, p_rs1_p, rd`           | `s1 = ((p_rs1_p == 0)) ? 0 : concat_bits(X[p_rs1_p * 2 + 1], X[p_rs1_p * 2]); shamt = bits(rs2, 5, 0); shx = shift_bits_right_arith(concat_bits(s1, 0x0), shamt); round_shx = bits((shx + 1), 64, 1); if (as_signed(round_shx) < as_signed(0xFFFFFFFF80000000)) { rd = 0x80000000; vxsat = 1; } else if (as_signed(round_shx) > as_signed(0x000000007FFFFFFF)) { rd = 0x7FFFFFFF; vxsat = 1; } else { rd = bits(round_shx, 31, 0); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv32_p`      | `nclipri`      | `p_w_uimm6, p_rs1_p, rd`     | `s1 = ((p_rs1_p == 0)) ? 0 : concat_bits(X[p_rs1_p * 2 + 1], X[p_rs1_p * 2]); shamt = bits(p_w_uimm6, 5, 0); shx = shift_bits_right_arith(concat_bits(s1, 0x0), shamt); round_shx = bits((shx + 1), 64, 1); if (as_signed(round_shx) < as_signed(0xFFFFFFFF80000000)) { rd = 0x80000000; vxsat = 1; } else if (as_signed(round_shx) > as_signed(0x000000007FFFFFFF)) { rd = 0x7FFFFFFF; vxsat = 1; } else { rd = bits(round_shx, 31, 0); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv32_p`      | `nclipriu`     | `p_w_uimm6, p_rs1_p, rd`     | `s1 = ((p_rs1_p == 0)) ? 0 : concat_bits(X[p_rs1_p * 2 + 1], X[p_rs1_p * 2]); shamt = bits(p_w_uimm6, 5, 0); shx = (concat_bits(s1, 0x0)) >> shamt; round_shx = bits((shx + 1), 64, 1); if (as_unsigned(round_shx) > as_unsigned(0x00000000FFFFFFFF)) { rd = 0xFFFFFFFF; vxsat = 1; } else { rd = bits(round_shx, 31, 0); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `nclipru`      | `rs2, p_rs1_p, rd`           | `s1 = ((p_rs1_p == 0)) ? 0 : concat_bits(X[p_rs1_p * 2 + 1], X[p_rs1_p * 2]); shamt = bits(rs2, 5, 0); shx = (concat_bits(s1, 0x0)) >> shamt; round_shx = bits((shx + 1), 64, 1); if (as_unsigned(round_shx) > as_unsigned(0x00000000FFFFFFFF)) { rd = 0xFFFFFFFF; vxsat = 1; } else { rd = bits(round_shx, 31, 0); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `nclipu`       | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(rs2, 5, 0); shx = s1 >> shamt; if (as_unsigned(shx) > as_unsigned(0x00000000FFFFFFFF)) { vxsat = 1; rd = 0xFFFFFFFF; } else { rd = bits(shx, 31, 0); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `nsra`         | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(rs2, 5, 0); rd = bits(shift_bits_right_arith(s1, shamt), 31, 0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `nsrai`        | `p_w_uimm6, p_rs1_p, rd`     | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(p_w_uimm6, 5, 0); rd = bits(shift_bits_right_arith(s1, shamt), 31, 0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `nsrar`        | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(rs2, 5, 0); shx = bits(shift_bits_right_arith(concat_bits(s1, 0x0), shamt), 32, 0); rd = bits((shx + 1), 32, 1);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `nsrari`       | `p_w_uimm6, p_rs1_p, rd`     | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(p_w_uimm6, 5, 0); shx = bits(shift_bits_right_arith(concat_bits(s1, 0x0), shamt), 32, 0); rd = bits((shx + 1), 32, 1);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `nsrl`         | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(rs2, 5, 0); rd = bits((s1 >> shamt), 31, 0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv32_p`      | `nsrli`        | `p_w_uimm6, p_rs1_p, rd`     | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(p_w_uimm6, 5, 0); rd = bits((s1 >> shamt), 31, 0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `paadd_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); sum = a + b; set_bits(&d, (8*i+7), (8*i), to_bits(8, sum >> 1)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv32_p`      | `paadd_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); sum = a + b; set_bits(&d, (16*i+15), (16*i), to_bits(16, sum >> 1)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv32_p`      | `paadd_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = as_signed(bits(s1, (32*i+31), (32*i))); b = as_signed(bits(s2, (32*i+31), (32*i))); sum = a + b; set_bits(&d, (32*i+31), (32*i), to_bits(32, sum >> 1)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv32_p`      | `paaddu_db`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); sum = a + b; set_bits(&d, (8*i+7), (8*i), to_bits(8, sum >> 1)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `paaddu_dh`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); sum = a + b; set_bits(&d, (16*i+15), (16*i), to_bits(16, sum >> 1)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `paaddu_dw`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = as_unsigned(bits(s1, (32*i+31), (32*i))); b = as_unsigned(bits(s2, (32*i+31), (32*i))); sum = a + b; set_bits(&d, (32*i+31), (32*i), to_bits(32, sum >> 1)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `paas_dhx`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a_even = as_signed(bits(s1, (32*i+15), (32*i))); b_odd = as_signed(bits(s2, (32*i+31), (32*i+16))); diff = a_even - b_odd; set_bits(&d, (32*i+15), (32*i), to_bits(16, diff >> 1)); a_odd = as_signed(bits(s1, (32*i+31), (32*i+16))); b_even = as_signed(bits(s2, (32*i+15), (32*i))); sum = a_odd + b_even; set_bits(&d, (32*i+31), (32*i+16), to_bits(16, sum >> 1)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                             |
+| `rv32_p`      | `pabd_db`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); set_bits(&d, (8*i+7), (8*i), (a >= b) ? (a - b) : (b - a)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `pabd_dh`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); set_bits(&d, (16*i+15), (16*i), (a >= b) ? (a - b) : (b - a)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `pabdu_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); set_bits(&d, (8*i+7), (8*i), (a >= b) ? (a - b) : (b - a)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `pabdu_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); set_bits(&d, (16*i+15), (16*i), (a >= b) ? (a - b) : (b - a)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `padd_db`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), a + b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `padd_dbs`     | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2_b0 = bits(rs2, 7, 0); for (i = 0; i <= 7; ++i) { a = bits(s1, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), a + s2_b0); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `padd_dh`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), a + b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `padd_dhs`     | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2_h0 = bits(rs2, 15, 0); for (i = 0; i <= 3; ++i) { a = bits(s1, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), a + s2_h0); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `padd_dw`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = bits(s1, (32*i+31), (32*i)); b = bits(s2, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), a + b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `padd_dws`     | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2_w0 = bits(rs2, 31, 0); for (i = 0; i <= 1; ++i) { a = bits(s1, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), a + s2_w0); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `pasa_dhx`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a_even = as_signed(bits(s1, (32*i+15), (32*i))); b_odd = as_signed(bits(s2, (32*i+31), (32*i+16))); sum = a_even + b_odd; set_bits(&d, (32*i+15), (32*i), to_bits(16, sum >> 1)); a_odd = as_signed(bits(s1, (32*i+31), (32*i+16))); b_even = as_signed(bits(s2, (32*i+15), (32*i))); diff = a_odd - b_even; set_bits(&d, (32*i+31), (32*i+16), to_bits(16, diff >> 1)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                             |
+| `rv32_p`      | `pas_dhx`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a_even = bits(s1, (32*i+15), (32*i)); b_odd = bits(s2, (32*i+31), (32*i+16)); set_bits(&d, (32*i+15), (32*i), a_even - b_odd); a_odd = bits(s1, (32*i+31), (32*i+16)); b_even = bits(s2, (32*i+15), (32*i)); set_bits(&d, (32*i+31), (32*i+16), a_odd + b_even); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `pasub_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); diff = a - b; set_bits(&d, (8*i+7), (8*i), to_bits(8, diff >> 1)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv32_p`      | `pasub_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); diff = a - b; set_bits(&d, (16*i+15), (16*i), to_bits(16, diff >> 1)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv32_p`      | `pasub_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = as_signed(bits(s1, (32*i+31), (32*i))); b = as_signed(bits(s2, (32*i+31), (32*i))); diff = a - b; set_bits(&d, (32*i+31), (32*i), to_bits(32, diff >> 1)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv32_p`      | `pasubu_db`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); diff = a - b; set_bits(&d, (8*i+7), (8*i), to_bits(8, diff >> 1)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv32_p`      | `pasubu_dh`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); diff = a - b; set_bits(&d, (16*i+15), (16*i), to_bits(16, diff >> 1)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv32_p`      | `pasubu_dw`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = as_unsigned(bits(s1, (32*i+31), (32*i))); b = as_unsigned(bits(s2, (32*i+31), (32*i))); diff = a - b; set_bits(&d, (32*i+31), (32*i), to_bits(32, diff >> 1)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv32_p`      | `pli_db`       | `p_imm8, p_rd_p`             | `for (i = 0; i <= 7; ++i) { set_bits(&d, (8*i+7), (8*i), bits(p_imm8, 7, 0)); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `pli_dh`       | `p_imm10, p_rd_p`            | `imm_h = sign_extend(16, bits(p_imm10, 9, 0)); for (i = 0; i <= 3; ++i) { set_bits(&d, (16*i+15), (16*i), imm_h); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `plui_dh`      | `p_imm10, p_rd_p`            | `imm_h = zero_extend(16, bits(p_imm10, 9, 0)) << 6; for (i = 0; i <= 3; ++i) { set_bits(&d, (16*i+15), (16*i), imm_h); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `pm2wadda_h`   | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); p0 = to_bits(64, sext_64(bits(s1, 15, 0)) * sext_64(bits(s2, 15, 0))); p1 = to_bits(64, sext_64(bits(s1, 31, 16)) * sext_64(bits(s2, 31, 16))); acc = acc + p0 + p1; if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `pm2wadda_hx`  | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); p0 = to_bits(64, sext_64(bits(s1, 15, 0)) * sext_64(bits(s2, 31, 16))); p1 = to_bits(64, sext_64(bits(s1, 31, 16)) * sext_64(bits(s2, 15, 0))); acc = acc + p0 + p1; if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `pm2waddasu_h` | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); p0 = to_bits(64, sext_64(bits(s1, 15, 0)) * zext_64(bits(s2, 15, 0))); p1 = to_bits(64, sext_64(bits(s1, 31, 16)) * zext_64(bits(s2, 31, 16))); acc = acc + p0 + p1; if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `pm2waddau_h`  | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); p0 = to_bits(64, zext_64(bits(s1, 15, 0)) * zext_64(bits(s2, 15, 0))); p1 = to_bits(64, zext_64(bits(s1, 31, 16)) * zext_64(bits(s2, 31, 16))); acc = acc + p0 + p1; if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `pm2wadd_h`    | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; p0 = to_bits(64, sext_64(bits(s1, 15, 0)) * sext_64(bits(s2, 15, 0))); p1 = to_bits(64, sext_64(bits(s1, 31, 16)) * sext_64(bits(s2, 31, 16))); d = p0 + p1; if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `pm2wadd_hx`   | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; p0 = to_bits(64, sext_64(bits(s1, 15, 0)) * sext_64(bits(s2, 31, 16))); p1 = to_bits(64, sext_64(bits(s1, 31, 16)) * sext_64(bits(s2, 15, 0))); d = p0 + p1; if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `pm2waddsu_h`  | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; p0 = to_bits(64, sext_64(bits(s1, 15, 0)) * zext_64(bits(s2, 15, 0))); p1 = to_bits(64, sext_64(bits(s1, 31, 16)) * zext_64(bits(s2, 31, 16))); d = p0 + p1; if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `pm2waddu_h`   | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; p0 = to_bits(64, zext_64(bits(s1, 15, 0)) * zext_64(bits(s2, 15, 0))); p1 = to_bits(64, zext_64(bits(s1, 31, 16)) * zext_64(bits(s2, 31, 16))); d = p0 + p1; if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `pm2wsuba_h`   | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); p0 = to_bits(64, sext_64(bits(s1, 15, 0)) * sext_64(bits(s2, 15, 0))); p1 = to_bits(64, sext_64(bits(s1, 31, 16)) * sext_64(bits(s2, 31, 16))); acc = acc + p0 - p1; if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `pm2wsuba_hx`  | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); p0 = to_bits(64, sext_64(bits(s1, 15, 0)) * sext_64(bits(s2, 31, 16))); p1 = to_bits(64, sext_64(bits(s1, 31, 16)) * sext_64(bits(s2, 15, 0))); acc = acc + p0 - p1; if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `pm2wsub_h`    | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; p0 = to_bits(64, sext_64(bits(s1, 15, 0)) * sext_64(bits(s2, 15, 0))); p1 = to_bits(64, sext_64(bits(s1, 31, 16)) * sext_64(bits(s2, 31, 16))); d = p0 - p1; if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `pm2wsub_hx`   | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; p0 = to_bits(64, sext_64(bits(s1, 15, 0)) * sext_64(bits(s2, 31, 16))); p1 = to_bits(64, sext_64(bits(s1, 31, 16)) * sext_64(bits(s2, 15, 0))); d = p0 - p1; if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `pmax_db`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); set_bits(&d, (8*i+7), (8*i), (a > b) ? a : b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `pmax_dh`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); set_bits(&d, (16*i+15), (16*i), (a > b) ? a : b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `pmax_dw`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = as_signed(bits(s1, (32*i+31), (32*i))); b = as_signed(bits(s2, (32*i+31), (32*i))); set_bits(&d, (32*i+31), (32*i), (a > b) ? a : b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `pmaxu_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); set_bits(&d, (8*i+7), (8*i), (a > b) ? a : b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv32_p`      | `pmaxu_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); set_bits(&d, (16*i+15), (16*i), (a > b) ? a : b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `pmaxu_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = as_unsigned(bits(s1, (32*i+31), (32*i))); b = as_unsigned(bits(s2, (32*i+31), (32*i))); set_bits(&d, (32*i+31), (32*i), (a > b) ? a : b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `pmin_db`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); set_bits(&d, (8*i+7), (8*i), (a < b) ? a : b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `pmin_dh`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); set_bits(&d, (16*i+15), (16*i), (a < b) ? a : b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `pmin_dw`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = as_signed(bits(s1, (32*i+31), (32*i))); b = as_signed(bits(s2, (32*i+31), (32*i))); set_bits(&d, (32*i+31), (32*i), (a < b) ? bits(s1, (32*i+31), (32*i)) : bits(s2, (32*i+31), (32*i))); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `pminu_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); set_bits(&d, (8*i+7), (8*i), (a < b) ? a : b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv32_p`      | `pminu_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); set_bits(&d, (16*i+15), (16*i), (a < b) ? a : b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `pminu_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = as_unsigned(bits(s1, (32*i+31), (32*i))); b = as_unsigned(bits(s2, (32*i+31), (32*i))); set_bits(&d, (32*i+31), (32*i), (a < b) ? a : b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `pmqrwacc_h`   | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); for (i = 0; i <= 1; ++i) { a = sext_47(bits(s1, (16*i+15), (16*i))); b = sext_47(bits(s2, (16*i+15), (16*i))); p = a * b + (1 << 14); hi = bits(to_bits(47, p), 46, 15); set_bits(&acc, (32*i+31), (32*i), bits(acc, (32*i+31), (32*i)) + hi); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `pmqwacc_h`    | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); for (i = 0; i <= 1; ++i) { a = sext_47(bits(s1, (16*i+15), (16*i))); b = sext_47(bits(s2, (16*i+15), (16*i))); p = a * b; hi = bits(to_bits(47, p), 46, 15); set_bits(&acc, (32*i+31), (32*i), bits(acc, (32*i+31), (32*i)) + hi); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `pmseq_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), (a == b) ? 0xFF : 0x00); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `pmseq_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), (a == b) ? 0xFFFF : 0x0000); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv32_p`      | `pmseq_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = bits(s1, (32*i+31), (32*i)); b = bits(s2, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), (a == b) ? 0xFFFFFFFF : 0x00000000); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `pmslt_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); set_bits(&d, (8*i+7), (8*i), (a < b) ? 0xFF : 0x00); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `pmslt_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); set_bits(&d, (16*i+15), (16*i), (a < b) ? 0xFFFF : 0x0000); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `pmslt_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = as_signed(bits(s1, (32*i+31), (32*i))); b = as_signed(bits(s2, (32*i+31), (32*i))); set_bits(&d, (32*i+31), (32*i), (a < b) ? 0xFFFFFFFF : 0x00000000); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `pmsltu_db`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); set_bits(&d, (8*i+7), (8*i), (a < b) ? 0xFF : 0x00); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `pmsltu_dh`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); set_bits(&d, (16*i+15), (16*i), (a < b) ? 0xFFFF : 0x0000); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `pmsltu_dw`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = as_unsigned(bits(s1, (32*i+31), (32*i))); b = as_unsigned(bits(s2, (32*i+31), (32*i))); set_bits(&d, (32*i+31), (32*i), (a < b) ? 0xFFFFFFFF : 0x00000000); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `pnclip_bs`    | `rs2, p_rs1_p, rd`           | `s1 = ((p_rs1_p == 0)) ? 0 : concat_bits(X[p_rs1_p * 2 + 1], X[p_rs1_p * 2]); shamt = bits(rs2, 4, 0); for (i = 0; i <= 3; ++i) { s1_h = bits(s1, (16*i+15), (16*i)); shx = shift_bits_right_arith(s1_h, shamt); if (as_signed(shx) < as_signed(0xFF80)) { set_bits(&d, (8*i+7), (8*i), 0x80); vxsat = 1; } else if (as_signed(shx) > as_signed(0x007F)) { set_bits(&d, (8*i+7), (8*i), 0x7F); vxsat = 1; } else { set_bits(&d, (8*i+7), (8*i), bits(shx, 7, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `pnclip_hs`    | `rs2, p_rs1_p, rd`           | `s1 = ((p_rs1_p == 0)) ? 0 : concat_bits(X[p_rs1_p * 2 + 1], X[p_rs1_p * 2]); shamt = bits(rs2, 4, 0); for (i = 0; i <= 1; ++i) { s1_w = bits(s1, (32*i+31), (32*i)); shx = shift_bits_right_arith(s1_w, shamt); if (as_signed(shx) < as_signed(0xFFFF8000)) { set_bits(&d, (16*i+15), (16*i), 0x8000); vxsat = 1; } else if (as_signed(shx) > as_signed(0x00007FFF)) { set_bits(&d, (16*i+15), (16*i), 0x7FFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(shx, 15, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `pnclipi_b`    | `p_w_uimm4, p_rs1_p, rd`     | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); shx = shift_bits_right_arith(h, shamt); if (as_signed(shx) < as_signed(0xFF80)) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), 0x80); } else if (as_signed(shx) > as_signed(0x007F)) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), 0x7F); } else { set_bits(&d, (8*i+7), (8*i), bits(shx, 7, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `pnclipi_h`    | `p_w_uimm5, p_rs1_p, rd`     | `s1 = ((p_rs1_p == 0)) ? 0 : concat_bits(X[p_rs1_p * 2 + 1], X[p_rs1_p * 2]); shamt = bits(p_w_uimm5, 4, 0); for (i = 0; i <= 1; ++i) { s1_w = bits(s1, (32*i+31), (32*i)); shx = shift_bits_right_arith(s1_w, shamt); if (as_signed(shx) < as_signed(0xFFFF8000)) { set_bits(&d, (16*i+15), (16*i), 0x8000); vxsat = 1; } else if (as_signed(shx) > as_signed(0x00007FFF)) { set_bits(&d, (16*i+15), (16*i), 0x7FFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(shx, 15, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `pnclipiu_b`   | `p_w_uimm4, p_rs1_p, rd`     | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); shx = zext_32(h) >> shamt; if (as_unsigned(shx) > as_unsigned(0x00FF)) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), 0xFF); } else { set_bits(&d, (8*i+7), (8*i), bits(shx, 7, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv32_p`      | `pnclipiu_h`   | `p_w_uimm5, p_rs1_p, rd`     | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(p_w_uimm5, 4, 0); for (i = 0; i <= 1; ++i) { w = bits(s1, (32*i+31), (32*i)); shx = zext_64(w) >> shamt; if (as_unsigned(shx) > as_unsigned(0x0000FFFF)) { vxsat = 1; set_bits(&d, (16*i+15), (16*i), 0xFFFF); } else { set_bits(&d, (16*i+15), (16*i), bits(shx, 15, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `pnclipr_bs`   | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(rs2, 4, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); shx = shift_bits_right_arith(concat_bits(h, 0x0), shamt); r = bits((shx + 1), 16, 1); if (as_signed(r) < as_signed(0xFF80)) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), 0x80); } else if (as_signed(r) > as_signed(0x007F)) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), 0x7F); } else { set_bits(&d, (8*i+7), (8*i), bits(r, 7, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `pnclipr_hs`   | `rs2, p_rs1_p, rd`           | `s1 = ((p_rs1_p == 0)) ? 0 : concat_bits(X[p_rs1_p * 2 + 1], X[p_rs1_p * 2]); shamt = bits(rs2, 4, 0); for (i = 0; i <= 1; ++i) { s1_w = bits(s1, (32*i+31), (32*i));  shx = shift_bits_right_arith(concat_bits(s1_w, 0x0), shamt); round_shx = bits((shx + 1), 32, 1); if (as_signed(round_shx) < as_signed(0xFFFF8000)) { set_bits(&d, (16*i+15), (16*i), 0x8000); vxsat = 1; } else if (as_signed(round_shx) > as_signed(0x00007FFF)) { set_bits(&d, (16*i+15), (16*i), 0x7FFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(round_shx, 15, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `pnclipri_b`   | `p_w_uimm4, p_rs1_p, rd`     | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); shx = shift_bits_right_arith(concat_bits(h, 0x0), shamt); r = bits((shx + 1), 16, 1); if (as_signed(r) < as_signed(0xFF80)) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), 0x80); } else if (as_signed(r) > as_signed(0x007F)) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), 0x7F); } else { set_bits(&d, (8*i+7), (8*i), bits(r, 7, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `pnclipri_h`   | `p_w_uimm5, p_rs1_p, rd`     | `s1 = ((p_rs1_p == 0)) ? 0 : concat_bits(X[p_rs1_p * 2 + 1], X[p_rs1_p * 2]); shamt = bits(p_w_uimm5, 4, 0); for (i = 0; i <= 1; ++i) { s1_w = bits(s1, (32*i+31), (32*i));  shx = shift_bits_right_arith(concat_bits(s1_w, 0x0), shamt); round_shx = bits((shx + 1), 32, 1); if (as_signed(round_shx) < as_signed(0xFFFF8000)) { set_bits(&d, (16*i+15), (16*i), 0x8000); vxsat = 1; } else if (as_signed(round_shx) > as_signed(0x00007FFF)) { set_bits(&d, (16*i+15), (16*i), 0x7FFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(round_shx, 15, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `pnclipriu_b`  | `p_w_uimm4, p_rs1_p, rd`     | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); shx = ((concat_bits(h, 0x0)) >> shamt); r = bits((shx + 1), 16, 1); if (as_unsigned(r) > as_unsigned(0x00FF)) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), 0xFF); } else { set_bits(&d, (8*i+7), (8*i), bits(r, 7, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `pnclipriu_h`  | `p_w_uimm5, p_rs1_p, rd`     | `s1 = ((p_rs1_p == 0)) ? 0 : concat_bits(X[p_rs1_p * 2 + 1], X[p_rs1_p * 2]); shamt = bits(p_w_uimm5, 4, 0); for (i = 0; i <= 1; ++i) { s1_w = bits(s1, (32*i+31), (32*i));  shx = (concat_bits(s1_w, 0x0)) >> shamt; round_shx = bits((shx + 1), 32, 1); if (as_unsigned(round_shx) > as_unsigned(0x0000FFFF)) { set_bits(&d, (16*i+15), (16*i), 0xFFFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(round_shx, 15, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `pnclipru_bs`  | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(rs2, 4, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); shx = bits(((concat_bits(zext_32(h), 0x0)) >> shamt), 16, 0); r = bits((shx + 1), 16, 1); if (as_unsigned(r) > as_unsigned(0x00FF)) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), 0xFF); } else { set_bits(&d, (8*i+7), (8*i), bits(r, 7, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `pnclipru_hs`  | `rs2, p_rs1_p, rd`           | `s1 = ((p_rs1_p == 0)) ? 0 : concat_bits(X[p_rs1_p * 2 + 1], X[p_rs1_p * 2]); shamt = bits(rs2, 4, 0); for (i = 0; i <= 1; ++i) { s1_w = bits(s1, (32*i+31), (32*i));  shx = (concat_bits(zero_extend(64, s1_w), 0x0)) >> shamt; round_shx = bits((shx + 1), 32, 1); if (as_unsigned(round_shx) > as_unsigned(0x0000FFFF)) { set_bits(&d, (16*i+15), (16*i), 0xFFFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(round_shx, 15, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv32_p`      | `pnclipu_bs`   | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(rs2, 4, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); shx = bits((zext_32(h) >> shamt), 15, 0); if (as_unsigned(shx) > as_unsigned(0x00FF)) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), 0xFF); } else { set_bits(&d, (8*i+7), (8*i), bits(shx, 7, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `pnclipu_hs`   | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(rs2, 4, 0); for (i = 0; i <= 1; ++i) { w = bits(s1, (32*i+31), (32*i)); shx = zext_64(w) >> shamt; if (as_unsigned(shx) > as_unsigned(0x0000FFFF)) { vxsat = 1; set_bits(&d, (16*i+15), (16*i), 0xFFFF); } else { set_bits(&d, (16*i+15), (16*i), bits(shx, 15, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `pnsra_bs`     | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(rs2, 4, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); set_bits(&d, (8*i+7), (8*i), bits(shift_bits_right_arith(h, shamt), 7, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `pnsra_hs`     | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(rs2, 4, 0); set_bits(&d, 15, 0, bits(shift_bits_right_arith(bits(s1, 31, 0), shamt), 15, 0)); set_bits(&d, 31, 16, bits(shift_bits_right_arith(bits(s1, 63, 32), shamt), 15, 0)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv32_p`      | `pnsrai_b`     | `p_w_uimm4, p_rs1_p, rd`     | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); set_bits(&d, (8*i+7), (8*i), bits(shift_bits_right_arith(h, shamt), 7, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv32_p`      | `pnsrai_h`     | `p_w_uimm5, p_rs1_p, rd`     | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(p_w_uimm5, 4, 0); set_bits(&d, 15, 0, bits(shift_bits_right_arith(bits(s1, 31, 0), shamt), 15, 0)); set_bits(&d, 31, 16, bits(shift_bits_right_arith(bits(s1, 63, 32), shamt), 15, 0)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv32_p`      | `pnsrar_bs`    | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(rs2, 4, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); shx = bits(shift_bits_right_arith(concat_bits(h, 0x0), shamt), 8, 0); set_bits(&d, (8*i+7), (8*i), bits((shx + 1), 8, 1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv32_p`      | `pnsrar_hs`    | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(rs2, 4, 0); for (i = 0; i <= 1; ++i) { w = bits(s1, (32*i+31), (32*i)); shx = bits(shift_bits_right_arith(concat_bits(w, 0x0), shamt), 16, 0); set_bits(&d, (16*i+15), (16*i), bits((shx + 1), 16, 1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `pnsrari_b`    | `p_w_uimm4, p_rs1_p, rd`     | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); shx = bits(shift_bits_right_arith(concat_bits(h, 0x0), shamt), 8, 0); set_bits(&d, (8*i+7), (8*i), bits((shx + 1), 8, 1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `pnsrari_h`    | `p_w_uimm5, p_rs1_p, rd`     | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(p_w_uimm5, 4, 0); for (i = 0; i <= 1; ++i) { w = bits(s1, (32*i+31), (32*i)); shx = bits(shift_bits_right_arith(concat_bits(w, 0x0), shamt), 16, 0); set_bits(&d, (16*i+15), (16*i), bits((shx + 1), 16, 1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `pnsrl_bs`     | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(rs2, 4, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); set_bits(&d, (8*i+7), (8*i), bits((zext_32(h) >> shamt), 7, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `pnsrl_hs`     | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(rs2, 4, 0); set_bits(&d, 15, 0, bits((bits(s1, 31, 0) >> shamt), 15, 0)); set_bits(&d, 31, 16, bits((bits(s1, 63, 32) >> shamt), 15, 0)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `pnsrli_b`     | `p_w_uimm4, p_rs1_p, rd`     | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); set_bits(&d, (8*i+7), (8*i), bits((zext_32(h) >> shamt), 7, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `pnsrli_h`     | `p_w_uimm5, p_rs1_p, rd`     | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); shamt = bits(p_w_uimm5, 4, 0); set_bits(&d, 15, 0, bits((bits(s1, 31, 0) >> shamt), 15, 0)); set_bits(&d, 31, 16, bits((bits(s1, 63, 32) >> shamt), 15, 0)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `ppaire_db`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a_even = bits(s1, (16*i+7), (16*i)); b_even = bits(s2, (16*i+7), (16*i)); set_bits(&d, (16*i+7), (16*i), a_even); set_bits(&d, (16*i+15), (16*i+8), b_even); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv32_p`      | `ppaire_dh`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a_even = bits(s1, (32*i+15), (32*i)); b_even = bits(s2, (32*i+15), (32*i)); set_bits(&d, (32*i+15), (32*i), a_even); set_bits(&d, (32*i+31), (32*i+16), b_even); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `ppaireo_db`   | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a_even = bits(s1, (16*i+7), (16*i)); b_odd = bits(s2, (16*i+15), (16*i+8)); set_bits(&d, (16*i+7), (16*i), a_even); set_bits(&d, (16*i+15), (16*i+8), b_odd); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `ppaireo_dh`   | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a_even = bits(s1, (32*i+15), (32*i)); b_odd = bits(s2, (32*i+31), (32*i+16)); set_bits(&d, (32*i+15), (32*i), a_even); set_bits(&d, (32*i+31), (32*i+16), b_odd); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `ppairo_db`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a_odd = bits(s1, (16*i+15), (16*i+8)); b_odd = bits(s2, (16*i+15), (16*i+8)); set_bits(&d, (16*i+7), (16*i), a_odd); set_bits(&d, (16*i+15), (16*i+8), b_odd); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv32_p`      | `ppairo_dh`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a_odd = bits(s1, (32*i+31), (32*i+16)); b_odd = bits(s2, (32*i+31), (32*i+16)); set_bits(&d, (32*i+15), (32*i), a_odd); set_bits(&d, (32*i+31), (32*i+16), b_odd); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv32_p`      | `ppairoe_db`   | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a_odd = bits(s1, (16*i+15), (16*i+8)); b_even = bits(s2, (16*i+7), (16*i)); set_bits(&d, (16*i+7), (16*i), a_odd); set_bits(&d, (16*i+15), (16*i+8), b_even); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `ppairoe_dh`   | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a_odd = bits(s1, (32*i+31), (32*i+16)); b_even = bits(s2, (32*i+15), (32*i)); set_bits(&d, (32*i+15), (32*i), a_odd); set_bits(&d, (32*i+31), (32*i+16), b_even); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `predsum_dbs`  | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); sum = as_signed(rs2); for (i = 0; i <= 7; ++i) { sum += as_signed(bits(s1, (8*i+7), (8*i))); } rd = to_bits(32, sum);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `predsum_dhs`  | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); sum = as_signed(rs2); for (i = 0; i <= 3; ++i) { sum += as_signed(bits(s1, (16*i+15), (16*i))); } rd = to_bits(32, sum);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv32_p`      | `predsumu_dbs` | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); sum = as_unsigned(rs2); for (i = 0; i <= 7; ++i) { sum += as_unsigned(bits(s1, (8*i+7), (8*i))); } rd = to_bits(32, sum);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv32_p`      | `predsumu_dhs` | `rs2, p_rs1_p, rd`           | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); sum = as_unsigned(rs2); for (i = 0; i <= 3; ++i) { sum += as_unsigned(bits(s1, (16*i+15), (16*i))); } rd = to_bits(32, sum);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv32_p`      | `psabs_db`     | `p_rs1_p, p_rd_p`            | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); for (i = 0; i <= 7; ++i) { val = as_signed(bits(s1, (8*i+7), (8*i))); if (val == -128) { set_bits(&d, (8*i+7), (8*i), 0x7F); vxsat = 1; } else if (val < 0) { set_bits(&d, (8*i+7), (8*i), to_bits(8, -val)); } else { set_bits(&d, (8*i+7), (8*i), to_bits(8, val)); } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `psabs_dh`     | `p_rs1_p, p_rd_p`            | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); for (i = 0; i <= 3; ++i) { val = as_signed(bits(s1, (16*i+15), (16*i))); if (val == -32768) { set_bits(&d, (16*i+15), (16*i), 0x7FFF); vxsat = 1; } else if (val < 0) { set_bits(&d, (16*i+15), (16*i), to_bits(16, -val)); } else { set_bits(&d, (16*i+15), (16*i), to_bits(16, val)); } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `psadd_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); result = a + b; if (result > 127) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), to_bits(8, 127)); } else if (result < -128) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), to_bits(8, -128)); } else { set_bits(&d, (8*i+7), (8*i), to_bits(8, result)); } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `psadd_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); result = a + b; if (result > 32767) { vxsat = 1; set_bits(&d, (16*i+15), (16*i), to_bits(16, 32767)); } else if (result < -32768) { vxsat = 1; set_bits(&d, (16*i+15), (16*i), to_bits(16, -32768)); } else { set_bits(&d, (16*i+15), (16*i), to_bits(16, result)); } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `psadd_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = as_signed(bits(s1, (32*i+31), (32*i))); b = as_signed(bits(s2, (32*i+31), (32*i))); result = a + b; if (result > 2147483647) { vxsat = 1; set_bits(&d, (32*i+31), (32*i), to_bits(32, 2147483647)); } else if (result < -2147483648) { vxsat = 1; set_bits(&d, (32*i+31), (32*i), to_bits(32, -2147483648)); } else { set_bits(&d, (32*i+31), (32*i), to_bits(32, result)); } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `psaddu_db`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); result = a + b; if (result > 255) { vxsat = 1; set_bits(&d, (8*i+7), (8*i), to_bits(8, 255)); } else { set_bits(&d, (8*i+7), (8*i), to_bits(8, result)); } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `psaddu_dh`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); res = a + b; if (res > 0x10000 - 1) { vxsat = 1; res = 0x10000 - 1; } set_bits(&d, (16*i+15), (16*i), bits(res, 15, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv32_p`      | `psaddu_dw`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = as_unsigned(bits(s1, (32*i+31), (32*i))); b = as_unsigned(bits(s2, (32*i+31), (32*i))); res = a + b; if (res > 0x100000000 - 1) { vxsat = 1; res = 0x100000000 - 1; } set_bits(&d, (32*i+31), (32*i), bits(res, 31, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv32_p`      | `psa_dhx`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a_even = bits(s1, (32*i+15), (32*i)); b_odd = bits(s2, (32*i+31), (32*i+16)); set_bits(&d, (32*i+15), (32*i), a_even + b_odd); a_odd = bits(s1, (32*i+31), (32*i+16)); b_even = bits(s2, (32*i+15), (32*i)); set_bits(&d, (32*i+31), (32*i+16), a_odd - b_even); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `psas_dhx`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a_even = as_signed(bits(s1, (32*i+15), (32*i))); b_odd = as_signed(bits(s2, (32*i+31), (32*i+16))); res_even = a_even - b_odd; if (res_even > 0x8000 - 1) { res_even = 0x8000 - 1; vxsat = 1; } else if (res_even < -(0x8000)) { res_even = -(0x8000); vxsat = 1; } set_bits(&d, (32*i+15), (32*i), bits(res_even, 15, 0)); a_odd = as_signed(bits(s1, (32*i+31), (32*i+16))); b_even = as_signed(bits(s2, (32*i+15), (32*i))); res_odd = a_odd + b_even; if (res_odd > 0x8000 - 1) { res_odd = 0x8000 - 1; vxsat = 1; } else if (res_odd < -(0x8000)) { res_odd = -(0x8000); vxsat = 1; } set_bits(&d, (32*i+31), (32*i+16), bits(res_odd, 15, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }` |
+| `rv32_p`      | `psati_dh`     | `p_w_uimm4, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); n = bits(p_w_uimm4, 3, 0); minval_h = sign_extend(16, 0xFFFF << n); maxval_h = ~minval_h; for (i = 0; i <= 3; ++i) { e = as_signed(bits(s1, (16*i+15), (16*i))); if (e < as_signed(minval_h)) { set_bits(&d, (16*i+15), (16*i), minval_h); vxsat = 1; } else if (e > as_signed(maxval_h)) { set_bits(&d, (16*i+15), (16*i), maxval_h); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(s1, (16*i+15), (16*i))); } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `psati_dw`     | `p_w_uimm5, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); n = bits(p_w_uimm5, 4, 0); minval = to_bits(32, -(1 << n)); maxval = (1 << n) - 1; for (i = 0; i <= 1; ++i) { e = as_signed(bits(s1, (32*i+31), (32*i))); if (as_signed(e) < as_signed(minval)) { set_bits(&d, (32*i+31), (32*i), minval); vxsat = 1; } else if (as_signed(e) > as_signed(maxval)) { set_bits(&d, (32*i+31), (32*i), maxval); vxsat = 1; } else { set_bits(&d, (32*i+31), (32*i), bits(s1, (32*i+31), (32*i))); } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `psext_dh_b`   | `p_rs1_p, p_rd_p`            | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); for (i = 0; i <= 3; ++i) { b = bits(s1, (16*i+7), (16*i)); set_bits(&d, (16*i+15), (16*i), sign_extend(16, b)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `psext_dw_b`   | `p_rs1_p, p_rd_p`            | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); for (i = 0; i <= 1; ++i) { set_bits(&d, (32*i+31), (32*i), sign_extend(32, bits(s1, (32*i+7), (32*i)))); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv32_p`      | `psext_dw_h`   | `p_rs1_p, p_rd_p`            | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); for (i = 0; i <= 1; ++i) { set_bits(&d, (32*i+31), (32*i), sign_extend(32, bits(s1, (32*i+15), (32*i)))); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `psh1add_dh`   | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), (a << 1) + b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `psh1add_dw`   | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = bits(s1, (32*i+31), (32*i)); b = bits(s2, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), (a << 1) + b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `psll_dbs`     | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 4, 0); for (i = 0; i <= 7; ++i) { b = bits(s1, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), bits((zero_extend(32, b) << shamt), 7, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `psll_dhs`     | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 4, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), bits((zero_extend(32, h) << shamt), 15, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `psll_dws`     | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 4, 0); for (i = 0; i <= 1; ++i) { set_bits(&d, (32*i+31), (32*i), bits((zero_extend(64, bits(s1, (32*i+31), (32*i))) << shamt), 31, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `pslli_db`     | `p_w_uimm3, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(p_w_uimm3, 2, 0); for (i = 0; i <= 7; ++i) { a = bits(s1, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), bits((a << shamt), 7, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `pslli_dh`     | `p_w_uimm4, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= 3; ++i) { a = bits(s1, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), bits((a << shamt), 15, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `pslli_dw`     | `p_w_uimm5, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(p_w_uimm5, 4, 0); for (i = 0; i <= 1; ++i) { a = bits(s1, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), bits((a << shamt), 31, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `psra_dbs`     | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 4, 0); for (i = 0; i <= 7; ++i) { a = bits(s1, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), shift_bits_right_arith(a, shamt)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `psra_dhs`     | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 4, 0); for (i = 0; i <= 3; ++i) { a = bits(s1, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), shift_bits_right_arith(a, shamt)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `psra_dws`     | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 4, 0); for (i = 0; i <= 1; ++i) { a = bits(s1, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), shift_bits_right_arith(a, shamt)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `psrai_db`     | `p_w_uimm3, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(p_w_uimm3, 2, 0); for (i = 0; i <= 7; ++i) { a = bits(s1, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), shift_bits_right_arith(a, shamt)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `psrai_dh`     | `p_w_uimm4, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= 3; ++i) { a = bits(s1, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), shift_bits_right_arith(a, shamt)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `psrai_dw`     | `p_w_uimm5, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(p_w_uimm5, 4, 0); for (i = 0; i <= 1; ++i) { a = bits(s1, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), shift_bits_right_arith(a, shamt)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `psrari_dh`    | `p_w_uimm4, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= 3; ++i) { a = bits(s1, (16*i+15), (16*i)); if (shamt == 0) { set_bits(&d, (16*i+15), (16*i), bits(a, 15, 0)); } else { round = a[shamt-1]; set_bits(&d, (16*i+15), (16*i), bits((shift_bits_right_arith(a, shamt) + round), 15, 0)); } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `psrari_dw`    | `p_w_uimm5, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(p_w_uimm5, 4, 0); for (i = 0; i <= 1; ++i) { w = bits(s1, (32*i+31), (32*i)); if (shamt == 0) { set_bits(&d, (32*i+31), (32*i), w); } else { round = w[shamt-1]; set_bits(&d, (32*i+31), (32*i), shift_bits_right_arith(w, shamt) + round); } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `psrl_dbs`     | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 4, 0); for (i = 0; i <= 7; ++i) { b = bits(s1, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), bits((zero_extend(32, b) >> shamt), 7, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `psrl_dhs`     | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 4, 0); for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), bits((zero_extend(32, h) >> shamt), 15, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `psrl_dws`     | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 4, 0); for (i = 0; i <= 1; ++i) { set_bits(&d, (32*i+31), (32*i), bits(s1, (32*i+31), (32*i)) >> shamt); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `psrli_db`     | `p_w_uimm3, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(p_w_uimm3, 2, 0); for (i = 0; i <= 7; ++i) { a = bits(s1, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), bits((a >> shamt), 7, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `psrli_dh`     | `p_w_uimm4, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= 3; ++i) { a = bits(s1, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), bits((a >> shamt), 15, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `psrli_dw`     | `p_w_uimm5, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(p_w_uimm5, 4, 0); for (i = 0; i <= 1; ++i) { a = bits(s1, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), bits((a >> shamt), 31, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `pssa_dhx`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a_even = as_signed(bits(s1, (32*i+15), (32*i))); b_odd = as_signed(bits(s2, (32*i+31), (32*i+16))); res_even = a_even + b_odd; if (res_even > 0x8000 - 1) { res_even = 0x8000 - 1; vxsat = 1; } else if (res_even < -(0x8000)) { res_even = -(0x8000); vxsat = 1; } set_bits(&d, (32*i+15), (32*i), bits(res_even, 15, 0)); a_odd = as_signed(bits(s1, (32*i+31), (32*i+16))); b_even = as_signed(bits(s2, (32*i+15), (32*i))); res_odd = a_odd - b_even; if (res_odd > 0x8000 - 1) { res_odd = 0x8000 - 1; vxsat = 1; } else if (res_odd < -(0x8000)) { res_odd = -(0x8000); vxsat = 1; } set_bits(&d, (32*i+31), (32*i+16), bits(res_odd, 15, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }` |
+| `rv32_p`      | `pssh1sadd_dh` | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = read_register_pair(p_rs1_p); s2 = read_register_pair(p_rs2_p); for (i = 0; i < 4; ++i) { a = sign_extend(bits(s1, 16 * i + 15, 16 * i), 16, 32); b = sign_extend(bits(s2, 16 * i + 15, 16 * i), 16, 32); shifted = 2 * a; t = clamp(shifted, -32768, 32767); sum = t + b; result = clamp(sum, -32768, 32767); if (t != shifted \|\| result != sum) vxsat = 1; set_bits(&d, 16 * i + 15, 16 * i, result); } if (p_rd_p != 0) write_register_pair(p_rd_p, d);`                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv32_p`      | `pssh1sadd_dw` | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = read_register_pair(p_rs1_p); s2 = read_register_pair(p_rs2_p); for (i = 0; i < 2; ++i) { a = sign_extend(bits(s1, 32 * i + 31, 32 * i), 32, 64); b = sign_extend(bits(s2, 32 * i + 31, 32 * i), 32, 64); shifted = 2 * a; t = clamp(shifted, -2147483648, 2147483647); sum = t + b; result = clamp(sum, -2147483648, 2147483647); if (t != shifted \|\| result != sum) vxsat = 1; set_bits(&d, 32 * i + 31, 32 * i, result); } if (p_rd_p != 0) write_register_pair(p_rd_p, d);`                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `pssha_dhs`    | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= 3; ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); if (sshamt < 0) { set_bits(&d, (16*i+15), (16*i), shift_bits_right_arith(to_bits(16, a), -sshamt)); } else { result = a << sshamt; if (result < -0x8000) { set_bits(&d, (16*i+15), (16*i), 0x8000); vxsat = 1; } else if (result > 0x8000 - 1) { set_bits(&d, (16*i+15), (16*i), 0x7FFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(result, 15, 0)); } } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                   |
+| `rv32_p`      | `pssha_dws`    | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= 1; ++i) { a = as_signed(bits(s1, (32*i+31), (32*i))); if (sshamt < 0) { set_bits(&d, (32*i+31), (32*i), shift_bits_right_arith(to_bits(32, a), -sshamt)); } else { result = a << sshamt; if (result < -0x80000000) { set_bits(&d, (32*i+31), (32*i), 0x80000000); vxsat = 1; } else if (result > 0x80000000 - 1) { set_bits(&d, (32*i+31), (32*i), 0x7FFFFFFF); vxsat = 1; } else { set_bits(&d, (32*i+31), (32*i), bits(result, 31, 0)); } } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                   |
+| `rv32_p`      | `psshar_dhs`   | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= 3; ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); if (sshamt < 0) { xa = concat_bits(to_bits(16, a), 0x0); shifted = shift_bits_right_arith(xa, -sshamt); set_bits(&d, (16*i+15), (16*i), bits((shifted + 1), 16, 1)); } else { result = a << sshamt; if (result < -0x8000) { set_bits(&d, (16*i+15), (16*i), 0x8000); vxsat = 1; } else if (result > 0x8000 - 1) { set_bits(&d, (16*i+15), (16*i), 0x7FFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(result, 15, 0)); } } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                  |
+| `rv32_p`      | `psshar_dws`   | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= 1; ++i) { a = as_signed(bits(s1, (32*i+31), (32*i))); if (sshamt < 0) { xa = concat_bits(to_bits(32, a), 0x0); shifted = shift_bits_right_arith(xa, -sshamt); set_bits(&d, (32*i+31), (32*i), bits((shifted + 1), 32, 1)); } else { result = a << sshamt; if (result < -0x80000000) { set_bits(&d, (32*i+31), (32*i), 0x80000000); vxsat = 1; } else if (result > 0x80000000 - 1) { set_bits(&d, (32*i+31), (32*i), 0x7FFFFFFF); vxsat = 1; } else { set_bits(&d, (32*i+31), (32*i), bits(result, 31, 0)); } } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                  |
+| `rv32_p`      | `psshl_dhs`    | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= 3; ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); if (sshamt < 0) { set_bits(&d, (16*i+15), (16*i), bits((a >> (-sshamt)), 15, 0)); } else { result = a << sshamt; if (result > 0x10000 - 1) { set_bits(&d, (16*i+15), (16*i), 0xFFFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(result, 15, 0)); } } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `psshl_dws`    | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= 1; ++i) { a = as_unsigned(bits(s1, (32*i+31), (32*i))); if (sshamt < 0) { set_bits(&d, (32*i+31), (32*i), bits((a >> (-sshamt)), 31, 0)); } else { result = a << sshamt; if (result > 0x100000000 - 1) { set_bits(&d, (32*i+31), (32*i), 0xFFFFFFFF); vxsat = 1; } else { set_bits(&d, (32*i+31), (32*i), bits(result, 31, 0)); } } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                             |
+| `rv32_p`      | `psshlr_dhs`   | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= 3; ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); if (sshamt < 0) { xa = a << 1; shifted = xa >> (-sshamt); set_bits(&d, (16*i+15), (16*i), bits(((shifted + 1) >> 1), 15, 0)); } else { result = a << sshamt; if (result > 0x10000 - 1) { set_bits(&d, (16*i+15), (16*i), 0xFFFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(result, 15, 0)); } } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                         |
+| `rv32_p`      | `psshlr_dws`   | `rs2, p_rs1_p, p_rd_p`       | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= 1; ++i) { a = as_unsigned(bits(s1, (32*i+31), (32*i))); if (sshamt < 0) { xa = a << 1; shifted = xa >> (-sshamt); set_bits(&d, (32*i+31), (32*i), bits(((shifted + 1) >> 1), 31, 0)); } else { result = a << sshamt; if (result > 0x100000000 - 1) { set_bits(&d, (32*i+31), (32*i), 0xFFFFFFFF); vxsat = 1; } else { set_bits(&d, (32*i+31), (32*i), bits(result, 31, 0)); } } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                 |
+| `rv32_p`      | `psslai_dh`    | `p_w_uimm4, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); imm = bits(p_w_uimm4, 3, 0); for (i = 0; i <= 3; ++i) { a = sign_extend(32, bits(s1, (16*i+15), (16*i))); shx = a << imm; if (shx < -0x8000) { set_bits(&d, (16*i+15), (16*i), 0x8000); vxsat = 1; } else if (shx > 0x8000 - 1) { set_bits(&d, (16*i+15), (16*i), 0x7FFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(shx, 15, 0)); } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `psslai_dw`    | `p_w_uimm5, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); imm = bits(p_w_uimm5, 4, 0); for (i = 0; i <= 1; ++i) { a = sign_extend(64, bits(s1, (32*i+31), (32*i))); shx = a << imm; if (shx < -0x80000000) { set_bits(&d, (32*i+31), (32*i), 0x80000000); vxsat = 1; } else if (shx > 0x80000000 - 1) { set_bits(&d, (32*i+31), (32*i), 0x7FFFFFFF); vxsat = 1; } else { set_bits(&d, (32*i+31), (32*i), bits(shx, 31, 0)); } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `pssub_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_signed(bits(s1, (8*i+7), (8*i))); b = as_signed(bits(s2, (8*i+7), (8*i))); res = a - b; if (res > 0x80 - 1) { vxsat = 1; res = 0x80 - 1; } else if (res < -(0x80)) { vxsat = 1; res = -(0x80); } set_bits(&d, (8*i+7), (8*i), bits(res, 7, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `pssub_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_signed(bits(s1, (16*i+15), (16*i))); b = as_signed(bits(s2, (16*i+15), (16*i))); res = a - b; if (res > 0x8000 - 1) { vxsat = 1; res = 0x8000 - 1; } else if (res < -(0x8000)) { vxsat = 1; res = -(0x8000); } set_bits(&d, (16*i+15), (16*i), bits(res, 15, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv32_p`      | `pssub_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = as_signed(bits(s1, (32*i+31), (32*i))); b = as_signed(bits(s2, (32*i+31), (32*i))); res = a - b; if (res > 0x80000000 - 1) { vxsat = 1; res = 0x80000000 - 1; } else if (res < -(0x80000000)) { vxsat = 1; res = -(0x80000000); } set_bits(&d, (32*i+31), (32*i), bits(res, 31, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                             |
+| `rv32_p`      | `pssubu_db`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = as_unsigned(bits(s1, (8*i+7), (8*i))); b = as_unsigned(bits(s2, (8*i+7), (8*i))); res = a - b; if (res < 0) { vxsat = 1; res = 0; } set_bits(&d, (8*i+7), (8*i), bits(res, 7, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `pssubu_dh`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = as_unsigned(bits(s1, (16*i+15), (16*i))); b = as_unsigned(bits(s2, (16*i+15), (16*i))); res = a - b; if (res < 0) { vxsat = 1; res = 0; } set_bits(&d, (16*i+15), (16*i), bits(res, 15, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `pssubu_dw`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = as_unsigned(bits(s1, (32*i+31), (32*i))); b = as_unsigned(bits(s2, (32*i+31), (32*i))); res = a - b; if (res < 0) { vxsat = 1; res = 0; } set_bits(&d, (32*i+31), (32*i), bits(res, 31, 0)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `psub_db`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 7; ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); set_bits(&d, (8*i+7), (8*i), a - b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `psub_dh`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 3; ++i) { a = bits(s1, (16*i+15), (16*i)); b = bits(s2, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), a - b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `psub_dw`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); s2 = (p_rs2_p == 0) ? 0 : concat_bits(X[p_rs2_p*2+1], X[p_rs2_p*2]); for (i = 0; i <= 1; ++i) { a = bits(s1, (32*i+31), (32*i)); b = bits(s2, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), a - b); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `pusati_dh`    | `p_w_uimm4, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); n = bits(p_w_uimm4, 3, 0); maxval = (1 << n) - 1; for (i = 0; i <= 3; ++i) { h = bits(s1, (16*i+15), (16*i)); if (as_signed(h) < as_signed(0)) { set_bits(&d, (16*i+15), (16*i), 0); vxsat = 1; } else if (as_signed(h) > as_signed(maxval)) { set_bits(&d, (16*i+15), (16*i), maxval); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), h); } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `pusati_dw`    | `p_w_uimm5, p_rs1_p, p_rd_p` | `s1 = (p_rs1_p == 0) ? 0 : concat_bits(X[p_rs1_p*2+1], X[p_rs1_p*2]); n = bits(p_w_uimm5, 4, 0); maxval = (1 << n) - 1; for (i = 0; i <= 1; ++i) { e = as_signed(bits(s1, (32*i+31), (32*i))); if (as_signed(e) < as_signed(0)) { set_bits(&d, (32*i+31), (32*i), 0); vxsat = 1; } else if (as_signed(e) > as_signed(maxval)) { set_bits(&d, (32*i+31), (32*i), maxval); vxsat = 1; } else { set_bits(&d, (32*i+31), (32*i), bits(s1, (32*i+31), (32*i))); } } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `pwadda_b`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; d = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); for (i = 0; i <= 3; ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); acc = bits(d, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), acc + to_bits(16, as_signed(a) + as_signed(b))); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `pwadda_h`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc0 = X[2*p_rd_p]; acc1 = (p_rd_p == 0) ? 0 : X[2*p_rd_p+1]; acc0 = acc0 + to_bits(32, as_signed(bits(s1, 15, 0)) + as_signed(bits(s2, 15, 0))); acc1 = acc1 + to_bits(32, as_signed(bits(s1, 31, 16)) + as_signed(bits(s2, 31, 16))); if (p_rd_p != 0) { X[2*p_rd_p] = acc0; X[2*p_rd_p+1] = acc1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `pwaddau_b`    | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; d = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); for (i = 0; i <= 3; ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); acc = bits(d, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), acc + to_bits(16, as_unsigned(a) + as_unsigned(b))); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `pwaddau_h`    | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc0 = X[2*p_rd_p]; acc1 = (p_rd_p == 0) ? 0 : X[2*p_rd_p+1]; acc0 = acc0 + to_bits(32, as_unsigned(bits(s1, 15, 0)) + as_unsigned(bits(s2, 15, 0))); acc1 = acc1 + to_bits(32, as_unsigned(bits(s1, 31, 16)) + as_unsigned(bits(s2, 31, 16))); if (p_rd_p != 0) { X[2*p_rd_p] = acc0; X[2*p_rd_p+1] = acc1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `pwadd_b`      | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; for (i = 0; i <= 3; ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); set_bits(&d, (16*i+15), (16*i), to_bits(16, as_signed(a) + as_signed(b))); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `pwadd_h`      | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; d0 = to_bits(32, as_signed(bits(s1, 15, 0)) + as_signed(bits(s2, 15, 0))); d1 = to_bits(32, as_signed(bits(s1, 31, 16)) + as_signed(bits(s2, 31, 16))); if (p_rd_p != 0) { X[2*p_rd_p] = d0; X[2*p_rd_p+1] = d1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `pwaddu_b`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; for (i = 0; i <= 3; ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); set_bits(&d, (16*i+15), (16*i), to_bits(16, as_unsigned(a) + as_unsigned(b))); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv32_p`      | `pwaddu_h`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; d0 = to_bits(32, as_unsigned(bits(s1, 15, 0)) + as_unsigned(bits(s2, 15, 0))); d1 = to_bits(32, as_unsigned(bits(s1, 31, 16)) + as_unsigned(bits(s2, 31, 16))); if (p_rd_p != 0) { X[2*p_rd_p] = d0; X[2*p_rd_p+1] = d1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `pwmacc_h`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc0 = X[2*p_rd_p]; acc1 = (p_rd_p == 0) ? 0 : X[2*p_rd_p+1]; acc0 = acc0 + to_bits(32, sext_32(bits(s1, 15, 0)) * sext_32(bits(s2, 15, 0))); acc1 = acc1 + to_bits(32, sext_32(bits(s1, 31, 16)) * sext_32(bits(s2, 31, 16))); if (p_rd_p != 0) { X[2*p_rd_p] = acc0; X[2*p_rd_p+1] = acc1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `pwmaccsu_h`   | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc0 = X[2*p_rd_p]; acc1 = (p_rd_p == 0) ? 0 : X[2*p_rd_p+1]; acc0 = acc0 + to_bits(32, sext_32(bits(s1, 15, 0)) * zext_32(bits(s2, 15, 0))); acc1 = acc1 + to_bits(32, sext_32(bits(s1, 31, 16)) * zext_32(bits(s2, 31, 16))); if (p_rd_p != 0) { X[2*p_rd_p] = acc0; X[2*p_rd_p+1] = acc1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `pwmaccu_h`    | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc0 = X[2*p_rd_p]; acc1 = (p_rd_p == 0) ? 0 : X[2*p_rd_p+1]; acc0 = acc0 + to_bits(32, zext_32(bits(s1, 15, 0)) * zext_32(bits(s2, 15, 0))); acc1 = acc1 + to_bits(32, zext_32(bits(s1, 31, 16)) * zext_32(bits(s2, 31, 16))); if (p_rd_p != 0) { X[2*p_rd_p] = acc0; X[2*p_rd_p+1] = acc1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `pwmul_b`      | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; for (i = 0; i <= 3; ++i) { s1_b = bits(s1, (i*8+7), (i*8)); s2_b = bits(s2, (i*8+7), (i*8)); set_bits(&d, (i*16+15), (i*16), as_signed(s1_b) * as_signed(s2_b)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `pwmul_h`      | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; d_w0 = as_signed(bits(s1, 15, 0)) * as_signed(bits(s2, 15, 0)); d_w1 = as_signed(bits(s1, 31, 16)) * as_signed(bits(s2, 31, 16)); if (p_rd_p != 0) { X[p_rd_p*2] = bits(d_w0, 31, 0); X[p_rd_p*2+1] = bits(d_w1, 31, 0); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `pwmulsu_b`    | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; for (i = 0; i <= 3; ++i) { a = sext_16(bits(s1, (8*i+7), (8*i))); b = zext_16(bits(s2, (8*i+7), (8*i))); set_bits(&d, (16*i+15), (16*i), to_bits(16, a * b)); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv32_p`      | `pwmulsu_h`    | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; d0 = to_bits(32, sext_32(bits(s1, 15, 0)) * zext_32(bits(s2, 15, 0))); d1 = to_bits(32, sext_32(bits(s1, 31, 16)) * zext_32(bits(s2, 31, 16))); if (p_rd_p != 0) { X[2*p_rd_p] = d0; X[2*p_rd_p+1] = d1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `pwmulu_b`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; for (i = 0; i <= 3; ++i) { s1_b = bits(s1, (i*8+7), (i*8)); s2_b = bits(s2, (i*8+7), (i*8)); set_bits(&d, (i*16+15), (i*16), as_unsigned(s1_b) * as_unsigned(s2_b)); } if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `pwmulu_h`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; d_w0 = as_unsigned(bits(s1, 15, 0)) * as_unsigned(bits(s2, 15, 0)); d_w1 = as_unsigned(bits(s1, 31, 16)) * as_unsigned(bits(s2, 31, 16)); if (p_rd_p != 0) { X[p_rd_p*2] = bits(d_w0, 31, 0); X[p_rd_p*2+1] = bits(d_w1, 31, 0); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `pwsla_bs`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; shamt = bits(rs2, 4, 0); for (i = 0; i <= 3; ++i) { a = bits(s1, (8*i+7), (8*i)); set_bits(&d, (16*i+15), (16*i), bits((sign_extend(32, a) << shamt), 15, 0)); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `pwsla_hs`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; shamt = bits(rs2, 4, 0); d0 = sign_extend(32, bits(s1, 15, 0)) << shamt; d1 = sign_extend(32, bits(s1, 31, 16)) << shamt; if (p_rd_p != 0) { X[2*p_rd_p] = d0; X[2*p_rd_p+1] = d1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `pwslai_b`     | `p_w_uimm4, rs1, p_rd_p`     | `s1 = rs1; shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= 3; ++i) { a = bits(s1, (8*i+7), (8*i)); set_bits(&d, (16*i+15), (16*i), sign_extend(16, a) << shamt); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `pwslai_h`     | `p_w_uimm5, rs1, p_rd_p`     | `s1 = rs1; shamt = bits(p_w_uimm5, 4, 0); d0 = sign_extend(32, bits(s1, 15, 0)) << shamt; d1 = sign_extend(32, bits(s1, 31, 16)) << shamt; if (p_rd_p != 0) { X[2*p_rd_p] = d0; X[2*p_rd_p+1] = d1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `pwsll_bs`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; shamt = bits(rs2, 4, 0); for (i = 0; i <= 3; ++i) { a = bits(s1, (8*i+7), (8*i)); set_bits(&d, (16*i+15), (16*i), bits((zero_extend(32, a) << shamt), 15, 0)); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `pwsll_hs`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; shamt = bits(rs2, 4, 0); d0 = zero_extend(32, bits(s1, 15, 0)) << shamt; d1 = zero_extend(32, bits(s1, 31, 16)) << shamt; if (p_rd_p != 0) { X[2*p_rd_p] = d0; X[2*p_rd_p+1] = d1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `pwslli_b`     | `p_w_uimm4, rs1, p_rd_p`     | `s1 = rs1; shamt = bits(p_w_uimm4, 3, 0); for (i = 0; i <= 3; ++i) { a = bits(s1, (8*i+7), (8*i)); set_bits(&d, (16*i+15), (16*i), zero_extend(16, a) << shamt); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `pwslli_h`     | `p_w_uimm5, rs1, p_rd_p`     | `s1 = rs1; shamt = bits(p_w_uimm5, 4, 0); d0 = zero_extend(32, bits(s1, 15, 0)) << shamt; d1 = zero_extend(32, bits(s1, 31, 16)) << shamt; if (p_rd_p != 0) { X[2*p_rd_p] = d0; X[2*p_rd_p+1] = d1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv32_p`      | `pwsuba_b`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; d = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); for (i = 0; i <= 3; ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); acc = bits(d, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), acc + to_bits(16, as_signed(a) - as_signed(b))); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `pwsuba_h`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc0 = X[2*p_rd_p]; acc1 = (p_rd_p == 0) ? 0 : X[2*p_rd_p+1]; acc0 = acc0 + to_bits(32, as_signed(bits(s1, 15, 0)) - as_signed(bits(s2, 15, 0))); acc1 = acc1 + to_bits(32, as_signed(bits(s1, 31, 16)) - as_signed(bits(s2, 31, 16))); if (p_rd_p != 0) { X[2*p_rd_p] = acc0; X[2*p_rd_p+1] = acc1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `pwsubau_b`    | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; d = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); for (i = 0; i <= 3; ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); acc = bits(d, (16*i+15), (16*i)); set_bits(&d, (16*i+15), (16*i), acc + to_bits(16, as_unsigned(a) - as_unsigned(b))); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `pwsubau_h`    | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; acc0 = X[2*p_rd_p]; acc1 = (p_rd_p == 0) ? 0 : X[2*p_rd_p+1]; acc0 = acc0 + to_bits(32, as_unsigned(bits(s1, 15, 0)) - as_unsigned(bits(s2, 15, 0))); acc1 = acc1 + to_bits(32, as_unsigned(bits(s1, 31, 16)) - as_unsigned(bits(s2, 31, 16))); if (p_rd_p != 0) { X[2*p_rd_p] = acc0; X[2*p_rd_p+1] = acc1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv32_p`      | `pwsub_b`      | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; for (i = 0; i <= 3; ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); set_bits(&d, (16*i+15), (16*i), to_bits(16, as_signed(a) - as_signed(b))); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv32_p`      | `pwsub_h`      | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; d0 = to_bits(32, as_signed(bits(s1, 15, 0)) - as_signed(bits(s2, 15, 0))); d1 = to_bits(32, as_signed(bits(s1, 31, 16)) - as_signed(bits(s2, 31, 16))); if (p_rd_p != 0) { X[2*p_rd_p] = d0; X[2*p_rd_p+1] = d1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `pwsubu_b`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; for (i = 0; i <= 3; ++i) { a = bits(s1, (8*i+7), (8*i)); b = bits(s2, (8*i+7), (8*i)); set_bits(&d, (16*i+15), (16*i), to_bits(16, as_unsigned(a) - as_unsigned(b))); } if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv32_p`      | `pwsubu_h`     | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; d0 = to_bits(32, as_unsigned(bits(s1, 15, 0)) - as_unsigned(bits(s2, 15, 0))); d1 = to_bits(32, as_unsigned(bits(s1, 31, 16)) - as_unsigned(bits(s2, 31, 16))); if (p_rd_p != 0) { X[2*p_rd_p] = d0; X[2*p_rd_p+1] = d1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `rev_rv32`     | `rd, rs1`                    | `a = rs1; for (i = 0; i <= (XLEN - 1); ++i) { d[i] = a[XLEN - 1 - i]; } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `subd`         | `p_rs2_p, p_rs1_p, p_rd_p`   | `s1 = (p_rs1_p == 0) ? 0 : (concat_bits(X[2*p_rs1_p+1], X[2*p_rs1_p])); s2 = (p_rs2_p == 0) ? 0 : (concat_bits(X[2*p_rs2_p+1], X[2*p_rs2_p])); d = s1 - s2; if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv32_p`      | `wadd`         | `rs2, rs1, p_rd_p`           | `d = to_bits(64, as_signed(rs1) + as_signed(rs2)); if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `wadda`        | `rs2, rs1, p_rd_p`           | `acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); acc = acc + to_bits(64, as_signed(rs1) + as_signed(rs2)); if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `waddau`       | `rs2, rs1, p_rd_p`           | `acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); acc = acc + to_bits(64, as_unsigned(rs1) + as_unsigned(rs2)); if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `waddu`        | `rs2, rs1, p_rd_p`           | `d = to_bits(64, as_unsigned(rs1) + as_unsigned(rs2)); if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv32_p`      | `wmacc`        | `rs2, rs1, p_rd_p`           | `d = ((p_rd_p == 0)) ? 0 : (concat_bits(X[p_rd_p*2+1], X[p_rd_p*2])); d = d + as_signed(rs1) * as_signed(rs2); if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `wmaccsu`      | `rs2, rs1, p_rd_p`           | `acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); prod = to_bits(64, sext_64(rs1) * zext_64(rs2)); acc = acc + prod; if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv32_p`      | `wmaccu`       | `rs2, rs1, p_rd_p`           | `d = ((p_rd_p == 0)) ? 0 : (concat_bits(X[p_rd_p*2+1], X[p_rd_p*2])); d = d + as_unsigned(rs1) * as_unsigned(rs2); if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `wmul`         | `rs2, rs1, p_rd_p`           | `d = as_signed(rs1) * as_signed(rs2); if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `wmulsu`       | `rs2, rs1, p_rd_p`           | `p = to_bits(64, sext_64(rs1) * zext_64(rs2)); if (p_rd_p != 0) { X[2*p_rd_p] = bits(p, 31, 0); X[2*p_rd_p+1] = bits(p, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv32_p`      | `wmulu`        | `rs2, rs1, p_rd_p`           | `d = as_unsigned(rs1) * as_unsigned(rs2); if (p_rd_p != 0) { X[p_rd_p*2] = bits(d, 31, 0); X[p_rd_p*2+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv32_p`      | `wsla`         | `rs2, rs1, p_rd_p`           | `shamt = bits(rs2, 5, 0); d = sign_extend(64, rs1) << shamt; if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv32_p`      | `wslai`        | `p_w_uimm6, rs1, p_rd_p`     | `shamt = bits(p_w_uimm6, 5, 0); d = sign_extend(64, rs1) << shamt; if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `wsll`         | `rs2, rs1, p_rd_p`           | `shamt = bits(rs2, 5, 0); d = zero_extend(64, rs1) << shamt; if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv32_p`      | `wslli`        | `p_w_uimm6, rs1, p_rd_p`     | `shamt = bits(p_w_uimm6, 5, 0); d = zero_extend(64, rs1) << shamt; if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `wsub`         | `rs2, rs1, p_rd_p`           | `d = to_bits(64, as_signed(rs1) - as_signed(rs2)); if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv32_p`      | `wsuba`        | `rs2, rs1, p_rd_p`           | `acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); acc = acc + to_bits(64, as_signed(rs1) - as_signed(rs2)); if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv32_p`      | `wsubau`       | `rs2, rs1, p_rd_p`           | `acc = (p_rd_p == 0) ? 0 : (concat_bits(X[2*p_rd_p+1], X[2*p_rd_p])); acc = acc + to_bits(64, as_unsigned(rs1) - as_unsigned(rs2)); if (p_rd_p != 0) { X[2*p_rd_p] = bits(acc, 31, 0); X[2*p_rd_p+1] = bits(acc, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv32_p`      | `wsubu`        | `rs2, rs1, p_rd_p`           | `d = to_bits(64, as_unsigned(rs1) - as_unsigned(rs2)); if (p_rd_p != 0) { X[2*p_rd_p] = bits(d, 31, 0); X[2*p_rd_p+1] = bits(d, 63, 32); }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv32_p`      | `wzip16p`      | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; lo = concat_bits(bits(s2, 15, 0), bits(s1, 15, 0)); hi = concat_bits(bits(s2, 31, 16), bits(s1, 31, 16)); if (p_rd_p != 0) { X[2*p_rd_p] = lo; X[2*p_rd_p+1] = hi; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv32_p`      | `wzip8p`       | `rs2, rs1, p_rd_p`           | `s1 = rs1; s2 = rs2; lo = concat_bits(bits(s2, 15, 8), bits(s1, 15, 8), bits(s2, 7, 0), bits(s1, 7, 0)); hi = concat_bits(bits(s2, 31, 24), bits(s1, 31, 24), bits(s2, 23, 16), bits(s1, 23, 16)); if (p_rd_p != 0) { X[2*p_rd_p] = lo; X[2*p_rd_p+1] = hi; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+
+:RV32P - Specific Extension for Packed SIMD Instructions (32 bit)
+
+| **Extension** | **Name**        | **Variable-Fields**  | **Pseudo-Code**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+|:--------------|:----------------|:---------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv64_p`      | `absw`          | `rd, rs1`            | `w = bits(rs1, 31, 0); rd = sign_extend(64, (as_signed(as_signed(w)) < as_signed(0)) ? (0 - w) : w);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv64_p`      | `clsw`          | `rd, rs1`            | `rd = count_leading_sign_bits(bits(rs1, 31, 0), 32);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv64_p`      | `clzw`          | `rd, rs1`            | `rd = count_leading_zeros(bits(rs1, 31, 0));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv64_p`      | `maccsu_w00`    | `rs2, rs1, rd`       | `a = sext_64(bits(rs1, 31, 0)); b = zext_64(bits(rs2, 31, 0)); rd = rd + to_bits(64, a * b);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv64_p`      | `maccsu_w11`    | `rs2, rs1, rd`       | `a = sext_64(bits(rs1, 63, 32)); b = zext_64(bits(rs2, 63, 32)); rd = rd + to_bits(64, a * b);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv64_p`      | `maccu_w00`     | `rs2, rs1, rd`       | `a = zext_64(bits(rs1, 31, 0)); b = zext_64(bits(rs2, 31, 0)); rd = rd + to_bits(64, a * b);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv64_p`      | `maccu_w01`     | `rs2, rs1, rd`       | `a = zext_64(bits(rs1, 31, 0)); b = zext_64(bits(rs2, 63, 32)); rd = rd + to_bits(64, a * b);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv64_p`      | `maccu_w11`     | `rs2, rs1, rd`       | `a = zext_64(bits(rs1, 63, 32)); b = zext_64(bits(rs2, 63, 32)); rd = rd + to_bits(64, a * b);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv64_p`      | `macc_w00`      | `rs2, rs1, rd`       | `a = sext_64(bits(rs1, 31, 0)); b = sext_64(bits(rs2, 31, 0)); rd = rd + to_bits(64, a * b);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv64_p`      | `macc_w01`      | `rs2, rs1, rd`       | `a = sext_64(bits(rs1, 31, 0)); b = sext_64(bits(rs2, 63, 32)); rd = rd + to_bits(64, a * b);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv64_p`      | `macc_w11`      | `rs2, rs1, rd`       | `a = sext_64(bits(rs1, 63, 32)); b = sext_64(bits(rs2, 63, 32)); rd = rd + to_bits(64, a * b);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv64_p`      | `mqacc_w00`     | `rs2, rs1, rd`       | `a = sext_95(bits(rs1, 31, 0)); b = sext_95(bits(rs2, 31, 0)); q = bits((a * b), 94, 31); rd = rd + q;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv64_p`      | `mqacc_w01`     | `rs2, rs1, rd`       | `a = sext_95(bits(rs1, 31, 0)); b = sext_95(bits(rs2, 63, 32)); q = bits((a * b), 94, 31); rd = rd + q;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv64_p`      | `mqacc_w11`     | `rs2, rs1, rd`       | `a = sext_95(bits(rs1, 63, 32)); b = sext_95(bits(rs2, 63, 32)); q = bits((a * b), 94, 31); rd = rd + q;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv64_p`      | `mqracc_w00`    | `rs2, rs1, rd`       | `a = sext_95(bits(rs1, 31, 0)); b = sext_95(bits(rs2, 31, 0)); q = bits((a * b + 0x40000000), 94, 31); rd = rd + q;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv64_p`      | `mqracc_w01`    | `rs2, rs1, rd`       | `a = sext_95(bits(rs1, 31, 0)); b = sext_95(bits(rs2, 63, 32)); q = bits((a * b + 0x40000000), 94, 31); rd = rd + q;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv64_p`      | `mqracc_w11`    | `rs2, rs1, rd`       | `a = sext_95(bits(rs1, 63, 32)); b = sext_95(bits(rs2, 63, 32)); q = bits((a * b + 0x40000000), 94, 31); rd = rd + q;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv64_p`      | `mulsu_w00`     | `rs2, rs1, rd`       | `a = sext_64(bits(rs1, 31, 0)); b = zext_64(bits(rs2, 31, 0)); rd = to_bits(64, a * b);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv64_p`      | `mulsu_w11`     | `rs2, rs1, rd`       | `a = sext_64(bits(rs1, 63, 32)); b = zext_64(bits(rs2, 63, 32)); rd = to_bits(64, a * b);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `mulu_w00`      | `rs2, rs1, rd`       | `a = zext_64(bits(rs1, 31, 0)); b = zext_64(bits(rs2, 31, 0)); rd = to_bits(64, a * b);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv64_p`      | `mulu_w01`      | `rs2, rs1, rd`       | `a = zext_64(bits(rs1, 31, 0)); b = zext_64(bits(rs2, 63, 32)); rd = to_bits(64, a * b);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv64_p`      | `mulu_w11`      | `rs2, rs1, rd`       | `a = zext_64(bits(rs1, 63, 32)); b = zext_64(bits(rs2, 63, 32)); rd = to_bits(64, a * b);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `mul_w00`       | `rs2, rs1, rd`       | `s1_w0 = bits(rs1, 31, 0); s2_w0 = bits(rs2, 31, 0); rd = as_signed(s1_w0) * as_signed(s2_w0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv64_p`      | `mul_w01`       | `rs2, rs1, rd`       | `s1_w0 = bits(rs1, 31, 0); s2_w1 = bits(rs2, 63, 32); rd = as_signed(s1_w0) * as_signed(s2_w1);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv64_p`      | `mul_w11`       | `rs2, rs1, rd`       | `s1_w1 = bits(rs1, 63, 32); s2_w1 = bits(rs2, 63, 32); rd = as_signed(s1_w1) * as_signed(s2_w1);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv64_p`      | `paaddu_w`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; a_lo = as_unsigned(bits(s1, 31, 0)); b_lo = as_unsigned(bits(s2, 31, 0)); sum_lo = a_lo + b_lo; set_bits(&d, 31, 0, to_bits(32, sum_lo >> 1)); a_hi = as_unsigned(bits(s1, 63, 32)); b_hi = as_unsigned(bits(s2, 63, 32)); sum_hi = a_hi + b_hi; set_bits(&d, 63, 32, to_bits(32, sum_hi >> 1)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv64_p`      | `paadd_w`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; a_lo = as_signed(bits(s1, 31, 0)); b_lo = as_signed(bits(s2, 31, 0)); sum_lo = a_lo + b_lo; set_bits(&d, 31, 0, to_bits(32, sum_lo >> 1)); a_hi = as_signed(bits(s1, 63, 32)); b_hi = as_signed(bits(s2, 63, 32)); sum_hi = a_hi + b_hi; set_bits(&d, 63, 32, to_bits(32, sum_hi >> 1)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv64_p`      | `paas_wx`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; a_hi = as_signed(bits(s1, 63, 32)); b_lo = as_signed(bits(s2, 31, 0)); sum = a_hi + b_lo; set_bits(&d, 63, 32, to_bits(32, sum >> 1)); a_lo = as_signed(bits(s1, 31, 0)); b_hi = as_signed(bits(s2, 63, 32)); diff = a_lo - b_hi; set_bits(&d, 31, 0, to_bits(32, diff >> 1)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv64_p`      | `padd_w`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; set_bits(&d, 31, 0, bits(s1, 31, 0) + bits(s2, 31, 0)); set_bits(&d, 63, 32, bits(s1, 63, 32) + bits(s2, 63, 32)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv64_p`      | `padd_ws`       | `rs2, rs1, rd`       | `s1 = rs1; s2_w0 = bits(rs2, 31, 0); set_bits(&d, 31, 0, bits(s1, 31, 0) + s2_w0); set_bits(&d, 63, 32, bits(s1, 63, 32) + s2_w0); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv64_p`      | `pasa_wx`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; a_hi = as_signed(bits(s1, 63, 32)); b_lo = as_signed(bits(s2, 31, 0)); diff = a_hi - b_lo; set_bits(&d, 63, 32, to_bits(32, diff >> 1)); a_lo = as_signed(bits(s1, 31, 0)); b_hi = as_signed(bits(s2, 63, 32)); sum = a_lo + b_hi; set_bits(&d, 31, 0, to_bits(32, sum >> 1)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv64_p`      | `pasubu_w`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; a_lo = as_unsigned(bits(s1, 31, 0)); b_lo = as_unsigned(bits(s2, 31, 0)); diff_lo = a_lo - b_lo; set_bits(&d, 31, 0, to_bits(32, diff_lo >> 1)); a_hi = as_unsigned(bits(s1, 63, 32)); b_hi = as_unsigned(bits(s2, 63, 32)); diff_hi = a_hi - b_hi; set_bits(&d, 63, 32, to_bits(32, diff_hi >> 1)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv64_p`      | `pasub_w`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; a_lo = as_signed(bits(s1, 31, 0)); b_lo = as_signed(bits(s2, 31, 0)); diff_lo = a_lo - b_lo; set_bits(&d, 31, 0, to_bits(32, diff_lo >> 1)); a_hi = as_signed(bits(s1, 63, 32)); b_hi = as_signed(bits(s2, 63, 32)); diff_hi = a_hi - b_hi; set_bits(&d, 63, 32, to_bits(32, diff_hi >> 1)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `pas_wx`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; a_even = bits(s1, 31, 0); b_odd = bits(s2, 63, 32); set_bits(&d, 31, 0, a_even - b_odd); a_odd = bits(s1, 63, 32); b_even = bits(s2, 31, 0); set_bits(&d, 63, 32, a_odd + b_even); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv64_p`      | `pli_w`         | `p_imm10, rd`        | `imm_w = sign_extend(32, bits(p_imm10, 9, 0)); for (i = 0; i <= (XLEN/32 - 1); ++i) { set_bits(&d, (32*i+31), (32*i), imm_w); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv64_p`      | `plui_w`        | `p_imm10, rd`        | `imm_w = zero_extend(32, bits(p_imm10, 9, 0)) << 22; for (i = 0; i <= (XLEN/32 - 1); ++i) { set_bits(&d, (32*i+31), (32*i), imm_w); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv64_p`      | `pm2addasu_w`   | `rs2, rs1, rd`       | `a0 = sext_64(bits(rs1, 31, 0)); b0 = zext_64(bits(rs2, 31, 0)); a1 = sext_64(bits(rs1, 63, 32)); b1 = zext_64(bits(rs2, 63, 32)); rd = rd + to_bits(64, a0 * b0) + to_bits(64, a1 * b1);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `pm2addau_w`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = rd+ zext64(as_unsigned(bits(s1, 31, 0)) * as_unsigned(bits(s2, 31, 0)))+ zext64(as_unsigned(bits(s1, 63, 32)) * as_unsigned(bits(s2, 63, 32)));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `pm2adda_w`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = rd+ sext64(as_signed(bits(s1, 31, 0)) * as_signed(bits(s2, 31, 0)))+ sext64(as_signed(bits(s1, 63, 32)) * as_signed(bits(s2, 63, 32)));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv64_p`      | `pm2adda_wx`    | `rs2, rs1, rd`       | `a0 = sext_64(bits(rs1, 31, 0)); a1 = sext_64(bits(rs1, 63, 32)); b0 = sext_64(bits(rs2, 31, 0)); b1 = sext_64(bits(rs2, 63, 32)); rd = rd + to_bits(64, a0 * b1) + to_bits(64, a1 * b0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `pm2addsu_w`    | `rs2, rs1, rd`       | `a0 = sext_64(bits(rs1, 31, 0)); b0 = zext_64(bits(rs2, 31, 0)); a1 = sext_64(bits(rs1, 63, 32)); b1 = zext_64(bits(rs2, 63, 32)); rd = to_bits(64, a0 * b0) + to_bits(64, a1 * b1);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv64_p`      | `pm2addu_w`     | `rs2, rs1, rd`       | `a0 = zext_64(bits(rs1, 31, 0)); b0 = zext_64(bits(rs2, 31, 0)); a1 = zext_64(bits(rs1, 63, 32)); b1 = zext_64(bits(rs2, 63, 32)); rd = to_bits(64, a0 * b0) + to_bits(64, a1 * b1);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv64_p`      | `pm2add_w`      | `rs2, rs1, rd`       | `a0 = sext_64(bits(rs1, 31, 0)); b0 = sext_64(bits(rs2, 31, 0)); a1 = sext_64(bits(rs1, 63, 32)); b1 = sext_64(bits(rs2, 63, 32)); rd = to_bits(64, a0 * b0) + to_bits(64, a1 * b1);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv64_p`      | `pm2add_wx`     | `rs2, rs1, rd`       | `a0 = sext_64(bits(rs1, 31, 0)); a1 = sext_64(bits(rs1, 63, 32)); b0 = sext_64(bits(rs2, 31, 0)); b1 = sext_64(bits(rs2, 63, 32)); rd = to_bits(64, a0 * b1) + to_bits(64, a1 * b0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv64_p`      | `pm2suba_w`     | `rs2, rs1, rd`       | `a0 = sext_64(bits(rs1, 31, 0)); b0 = sext_64(bits(rs2, 31, 0)); a1 = sext_64(bits(rs1, 63, 32)); b1 = sext_64(bits(rs2, 63, 32)); rd = rd + to_bits(64, a0 * b0) - to_bits(64, a1 * b1);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `pm2suba_wx`    | `rs2, rs1, rd`       | `a0 = sext_64(bits(rs1, 31, 0)); a1 = sext_64(bits(rs1, 63, 32)); b0 = sext_64(bits(rs2, 31, 0)); b1 = sext_64(bits(rs2, 63, 32)); rd = rd + to_bits(64, a0 * b1) - to_bits(64, a1 * b0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `pm2sub_w`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = sext64(as_signed(bits(s1, 31, 0)) * as_signed(bits(s2, 31, 0)))- sext64(as_signed(bits(s1, 63, 32)) * as_signed(bits(s2, 63, 32)));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv64_p`      | `pm2sub_wx`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = sext64(as_signed(bits(s1, 31, 0)) * as_signed(bits(s2, 63, 32)))- sext64(as_signed(bits(s1, 63, 32)) * as_signed(bits(s2, 31, 0)));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv64_p`      | `pm4adda_h`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = rd+ sext64(as_signed(bits(s1, 15, 0)) * as_signed(bits(s2, 15, 0)))+ sext64(as_signed(bits(s1, 31, 16)) * as_signed(bits(s2, 31, 16)))+ sext64(as_signed(bits(s1, 47, 32)) * as_signed(bits(s2, 47, 32)))+ sext64(as_signed(bits(s1, 63, 48)) * as_signed(bits(s2, 63, 48)));`                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv64_p`      | `pm4addasu_h`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = rd+ to_bits(64, sext_64(bits(s1, 15, 0)) * zext_64(bits(s2, 15, 0)))+ to_bits(64, sext_64(bits(s1, 31, 16)) * zext_64(bits(s2, 31, 16)))+ to_bits(64, sext_64(bits(s1, 47, 32)) * zext_64(bits(s2, 47, 32)))+ to_bits(64, sext_64(bits(s1, 63, 48)) * zext_64(bits(s2, 63, 48)));`                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv64_p`      | `pm4addau_h`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = rd+ to_bits(64, zext_64(bits(s1, 15, 0)) * zext_64(bits(s2, 15, 0)))+ to_bits(64, zext_64(bits(s1, 31, 16)) * zext_64(bits(s2, 31, 16)))+ to_bits(64, zext_64(bits(s1, 47, 32)) * zext_64(bits(s2, 47, 32)))+ to_bits(64, zext_64(bits(s1, 63, 48)) * zext_64(bits(s2, 63, 48)));`                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv64_p`      | `pm4add_h`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = to_bits(64, sext_64(bits(s1, 15, 0)) * sext_64(bits(s2, 15, 0)))+ to_bits(64, sext_64(bits(s1, 31, 16)) * sext_64(bits(s2, 31, 16)))+ to_bits(64, sext_64(bits(s1, 47, 32)) * sext_64(bits(s2, 47, 32)))+ to_bits(64, sext_64(bits(s1, 63, 48)) * sext_64(bits(s2, 63, 48)));`                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv64_p`      | `pm4addsu_h`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = to_bits(64, sext_64(bits(s1, 15, 0)) * zext_64(bits(s2, 15, 0)))+ to_bits(64, sext_64(bits(s1, 31, 16)) * zext_64(bits(s2, 31, 16)))+ to_bits(64, sext_64(bits(s1, 47, 32)) * zext_64(bits(s2, 47, 32)))+ to_bits(64, sext_64(bits(s1, 63, 48)) * zext_64(bits(s2, 63, 48)));`                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv64_p`      | `pm4addu_h`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = to_bits(64, zext_64(bits(s1, 15, 0)) * zext_64(bits(s2, 15, 0)))+ to_bits(64, zext_64(bits(s1, 31, 16)) * zext_64(bits(s2, 31, 16)))+ to_bits(64, zext_64(bits(s1, 47, 32)) * zext_64(bits(s2, 47, 32)))+ to_bits(64, zext_64(bits(s1, 63, 48)) * zext_64(bits(s2, 63, 48)));`                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv64_p`      | `pmaccsu_w_h00` | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; din = rd; d0 = bits(din, 31, 0) + to_bits(32, sext_32(bits(s1, 15, 0)) * zext_32(bits(s2, 15, 0))); d1 = bits(din, 63, 32) + to_bits(32, sext_32(bits(s1, 47, 32)) * zext_32(bits(s2, 47, 32))); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv64_p`      | `pmaccsu_w_h11` | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; din = rd; d0 = bits(din, 31, 0) + to_bits(32, sext_32(bits(s1, 31, 16)) * zext_32(bits(s2, 31, 16))); d1 = bits(din, 63, 32) + to_bits(32, sext_32(bits(s1, 63, 48)) * zext_32(bits(s2, 63, 48))); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv64_p`      | `pmaccu_w_h00`  | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; din = rd; d0 = bits(din, 31, 0) + to_bits(32, zext_32(bits(s1, 15, 0)) * zext_32(bits(s2, 15, 0))); d1 = bits(din, 63, 32) + to_bits(32, zext_32(bits(s1, 47, 32)) * zext_32(bits(s2, 47, 32))); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv64_p`      | `pmaccu_w_h01`  | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; din = rd; d0 = bits(din, 31, 0) + to_bits(32, zext_32(bits(s1, 15, 0)) * zext_32(bits(s2, 31, 16))); d1 = bits(din, 63, 32) + to_bits(32, zext_32(bits(s1, 47, 32)) * zext_32(bits(s2, 63, 48))); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv64_p`      | `pmaccu_w_h11`  | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; din = rd; d0 = bits(din, 31, 0) + to_bits(32, zext_32(bits(s1, 31, 16)) * zext_32(bits(s2, 31, 16))); d1 = bits(din, 63, 32) + to_bits(32, zext_32(bits(s1, 63, 48)) * zext_32(bits(s2, 63, 48))); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv64_p`      | `pmacc_w_h00`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; din = rd; d0 = bits(din, 31, 0) + to_bits(32, sext_32(bits(s1, 15, 0)) * sext_32(bits(s2, 15, 0))); d1 = bits(din, 63, 32) + to_bits(32, sext_32(bits(s1, 47, 32)) * sext_32(bits(s2, 47, 32))); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv64_p`      | `pmacc_w_h01`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; din = rd; d0 = bits(din, 31, 0) + to_bits(32, sext_32(bits(s1, 15, 0)) * sext_32(bits(s2, 31, 16))); d1 = bits(din, 63, 32) + to_bits(32, sext_32(bits(s1, 47, 32)) * sext_32(bits(s2, 63, 48))); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv64_p`      | `pmacc_w_h11`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; din = rd; d0 = bits(din, 31, 0) + to_bits(32, sext_32(bits(s1, 31, 16)) * sext_32(bits(s2, 31, 16))); d1 = bits(din, 63, 32) + to_bits(32, sext_32(bits(s1, 63, 48)) * sext_32(bits(s2, 63, 48))); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv64_p`      | `pmaxu_w`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; set_bits(&d, 31, 0, (as_unsigned(bits(s1, 31, 0)) > as_unsigned(bits(s2, 31, 0))) ? bits(s1, 31, 0) : bits(s2, 31, 0)); set_bits(&d, 63, 32, (as_unsigned(bits(s1, 63, 32)) > as_unsigned(bits(s2, 63, 32))) ? bits(s1, 63, 32) : bits(s2, 63, 32)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv64_p`      | `pmax_w`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; set_bits(&d, 31, 0, (as_signed(bits(s1, 31, 0)) > as_signed(bits(s2, 31, 0))) ? bits(s1, 31, 0) : bits(s2, 31, 0)); set_bits(&d, 63, 32, (as_signed(bits(s1, 63, 32)) > as_signed(bits(s2, 63, 32))) ? bits(s1, 63, 32) : bits(s2, 63, 32)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `pmhaccsu_w`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= 1; ++i) { a = sext_64(bits(s1, (32*i+31), (32*i))); b = zext_64(bits(s2, (32*i+31), (32*i))); hi = bits((a * b), 63, 32); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + hi); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv64_p`      | `pmhaccsu_w_h0` | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; din = rd; p0 = sext_48(bits(s1, 31, 0)) * zext_48(bits(s2, 15, 0)); p1 = sext_48(bits(s1, 63, 32)) * zext_48(bits(s2, 47, 32)); d0 = bits(din, 31, 0) + bits(to_bits(48, p0), 47, 16); d1 = bits(din, 63, 32) + bits(to_bits(48, p1), 47, 16); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv64_p`      | `pmhaccsu_w_h1` | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; din = rd; p0 = sext_48(bits(s1, 31, 0)) * zext_48(bits(s2, 31, 16)); p1 = sext_48(bits(s1, 63, 32)) * zext_48(bits(s2, 63, 48)); d0 = bits(din, 31, 0) + bits(to_bits(48, p0), 47, 16); d1 = bits(din, 63, 32) + bits(to_bits(48, p1), 47, 16); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv64_p`      | `pmhaccu_w`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= 1; ++i) { a = zext_64(bits(s1, (32*i+31), (32*i))); b = zext_64(bits(s2, (32*i+31), (32*i))); hi = bits((a * b), 63, 32); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + hi); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv64_p`      | `pmhacc_w`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= 1; ++i) { a = sext_64(bits(s1, (32*i+31), (32*i))); b = sext_64(bits(s2, (32*i+31), (32*i))); hi = bits((a * b), 63, 32); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + hi); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv64_p`      | `pmhacc_w_h0`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; din = rd; p0 = sext_48(bits(s1, 31, 0)) * sext_48(bits(s2, 15, 0)); p1 = sext_48(bits(s1, 63, 32)) * sext_48(bits(s2, 47, 32)); d0 = bits(din, 31, 0) + bits(to_bits(48, p0), 47, 16); d1 = bits(din, 63, 32) + bits(to_bits(48, p1), 47, 16); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv64_p`      | `pmhacc_w_h1`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; din = rd; p0 = sext_48(bits(s1, 31, 0)) * sext_48(bits(s2, 31, 16)); p1 = sext_48(bits(s1, 63, 32)) * sext_48(bits(s2, 63, 48)); d0 = bits(din, 31, 0) + bits(to_bits(48, p0), 47, 16); d1 = bits(din, 63, 32) + bits(to_bits(48, p1), 47, 16); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv64_p`      | `pmhraccsu_w`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= 1; ++i) { a = sext_64(bits(s1, (32*i+31), (32*i))); b = zext_64(bits(s2, (32*i+31), (32*i))); hi = bits((a * b + 0x80000000), 63, 32); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + hi); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv64_p`      | `pmhraccu_w`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= 1; ++i) { a = zext_64(bits(s1, (32*i+31), (32*i))); b = zext_64(bits(s2, (32*i+31), (32*i))); hi = bits((a * b + 0x80000000), 63, 32); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + hi); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv64_p`      | `pmhracc_w`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= 1; ++i) { a = sext_64(bits(s1, (32*i+31), (32*i))); b = sext_64(bits(s2, (32*i+31), (32*i))); hi = bits((a * b + 0x80000000), 63, 32); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + hi); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv64_p`      | `pminu_w`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; set_bits(&d, 31, 0, (as_unsigned(bits(s1, 31, 0)) < as_unsigned(bits(s2, 31, 0))) ? bits(s1, 31, 0) : bits(s2, 31, 0)); set_bits(&d, 63, 32, (as_unsigned(bits(s1, 63, 32)) < as_unsigned(bits(s2, 63, 32))) ? bits(s1, 63, 32) : bits(s2, 63, 32)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv64_p`      | `pmin_w`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; set_bits(&d, 31, 0, (as_signed(bits(s1, 31, 0)) < as_signed(bits(s2, 31, 0))) ? bits(s1, 31, 0) : bits(s2, 31, 0)); set_bits(&d, 63, 32, (as_signed(bits(s1, 63, 32)) < as_signed(bits(s2, 63, 32))) ? bits(s1, 63, 32) : bits(s2, 63, 32)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `pmq2adda_w`    | `rs2, rs1, rd`       | `a0 = sext_95(bits(rs1, 31, 0)); b0 = sext_95(bits(rs2, 31, 0)); a1 = sext_95(bits(rs1, 63, 32)); b1 = sext_95(bits(rs2, 63, 32)); q0 = bits((a0 * b0), 94, 31); q1 = bits((a1 * b1), 94, 31); rd = rd + q0 + q1;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv64_p`      | `pmq2add_w`     | `rs2, rs1, rd`       | `a0 = sext_95(bits(rs1, 31, 0)); b0 = sext_95(bits(rs2, 31, 0)); a1 = sext_95(bits(rs1, 63, 32)); b1 = sext_95(bits(rs2, 63, 32)); q0 = bits((a0 * b0), 94, 31); q1 = bits((a1 * b1), 94, 31); rd = q0 + q1;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv64_p`      | `pmqacc_w_h00`  | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= 1; ++i) { a = sext_47(bits(s1, (32*i+15), (32*i))); b = sext_47(bits(s2, (32*i+15), (32*i))); q = bits((a * b), 46, 15); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + q); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv64_p`      | `pmqacc_w_h01`  | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= 1; ++i) { a = sext_47(bits(s1, (32*i+15), (32*i))); b = sext_47(bits(s2, (32*i+31), (32*i+16))); q = bits((a * b), 46, 15); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + q); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv64_p`      | `pmqacc_w_h11`  | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= 1; ++i) { a = sext_47(bits(s1, (32*i+31), (32*i+16))); b = sext_47(bits(s2, (32*i+31), (32*i+16))); q = bits((a * b), 46, 15); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + q); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv64_p`      | `pmqr2adda_w`   | `rs2, rs1, rd`       | `a0 = sext_95(bits(rs1, 31, 0)); b0 = sext_95(bits(rs2, 31, 0)); a1 = sext_95(bits(rs1, 63, 32)); b1 = sext_95(bits(rs2, 63, 32)); q0 = bits((a0 * b0 + 0x40000000), 94, 31); q1 = bits((a1 * b1 + 0x40000000), 94, 31); rd = rd + q0 + q1;`                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv64_p`      | `pmqr2add_w`    | `rs2, rs1, rd`       | `a0 = sext_95(bits(rs1, 31, 0)); b0 = sext_95(bits(rs2, 31, 0)); a1 = sext_95(bits(rs1, 63, 32)); b1 = sext_95(bits(rs2, 63, 32)); q0 = bits((a0 * b0 + 0x40000000), 94, 31); q1 = bits((a1 * b1 + 0x40000000), 94, 31); rd = q0 + q1;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv64_p`      | `pmqracc_w_h00` | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= 1; ++i) { a = sext_47(bits(s1, (32*i+15), (32*i))); b = sext_47(bits(s2, (32*i+15), (32*i))); q = bits((a * b + 0x4000), 46, 15); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + q); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv64_p`      | `pmqracc_w_h01` | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= 1; ++i) { a = sext_47(bits(s1, (32*i+15), (32*i))); b = sext_47(bits(s2, (32*i+31), (32*i+16))); q = bits((a * b + 0x4000), 46, 15); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + q); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv64_p`      | `pmqracc_w_h11` | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d = rd; for (i = 0; i <= 1; ++i) { a = sext_47(bits(s1, (32*i+31), (32*i+16))); b = sext_47(bits(s2, (32*i+31), (32*i+16))); q = bits((a * b + 0x4000), 46, 15); set_bits(&d, (32*i+31), (32*i), bits(d, (32*i+31), (32*i)) + q); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv64_p`      | `pmseq_w`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d0 = (bits(s1, 31, 0) == bits(s2, 31, 0)) ? 0xFFFFFFFF : 0x00000000; d1 = (bits(s1, 63, 32) == bits(s2, 63, 32)) ? 0xFFFFFFFF : 0x00000000; rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv64_p`      | `pmsltu_w`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d0 = (as_unsigned(bits(s1, 31, 0)) < as_unsigned(bits(s2, 31, 0))) ? 0xFFFFFFFF : 0x00000000; d1 = (as_unsigned(bits(s1, 63, 32)) < as_unsigned(bits(s2, 63, 32))) ? 0xFFFFFFFF : 0x00000000; rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv64_p`      | `pmslt_w`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d0 = (as_signed(bits(s1, 31, 0)) < as_signed(bits(s2, 31, 0))) ? 0xFFFFFFFF : 0x00000000; d1 = (as_signed(bits(s1, 63, 32)) < as_signed(bits(s2, 63, 32))) ? 0xFFFFFFFF : 0x00000000; rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv64_p`      | `pmulhrsu_w`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= 1; ++i) { a = sext_64(bits(s1, (32*i+31), (32*i))); b = zext_64(bits(s2, (32*i+31), (32*i))); set_bits(&d, (32*i+31), (32*i), bits((a * b + 0x80000000), 63, 32)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv64_p`      | `pmulhru_w`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= 1; ++i) { a = zext_64(bits(s1, (32*i+31), (32*i))); b = zext_64(bits(s2, (32*i+31), (32*i))); set_bits(&d, (32*i+31), (32*i), bits((a * b + 0x80000000), 63, 32)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv64_p`      | `pmulhr_w`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= 1; ++i) { a = bits(s1, (32*i+31), (32*i)); b = bits(s2, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), bits((as_signed(a) * as_signed(b) + 0x80000000), 63, 32)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv64_p`      | `pmulhsu_w`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= 1; ++i) { a = sext_64(bits(s1, (32*i+31), (32*i))); b = zext_64(bits(s2, (32*i+31), (32*i))); set_bits(&d, (32*i+31), (32*i), bits((a * b), 63, 32)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv64_p`      | `pmulhsu_w_h0`  | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; p0 = sext_48(bits(s1, 31, 0)) * zext_48(bits(s2, 15, 0)); p1 = sext_48(bits(s1, 63, 32)) * zext_48(bits(s2, 47, 32)); d0 = bits(to_bits(48, p0), 47, 16); d1 = bits(to_bits(48, p1), 47, 16); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv64_p`      | `pmulhsu_w_h1`  | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; p0 = sext_48(bits(s1, 31, 0)) * zext_48(bits(s2, 31, 16)); p1 = sext_48(bits(s1, 63, 32)) * zext_48(bits(s2, 63, 48)); d0 = bits(to_bits(48, p0), 47, 16); d1 = bits(to_bits(48, p1), 47, 16); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv64_p`      | `pmulhu_w`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= 1; ++i) { a = zext_64(bits(s1, (32*i+31), (32*i))); b = zext_64(bits(s2, (32*i+31), (32*i))); set_bits(&d, (32*i+31), (32*i), bits((a * b), 63, 32)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv64_p`      | `pmulh_w`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= 1; ++i) { a = bits(s1, (32*i+31), (32*i)); b = bits(s2, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), bits((as_signed(a) * as_signed(b)), 63, 32)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `pmulh_w_h0`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d_w0 = bits((as_signed(bits(s1, 31, 0)) * as_signed(bits(s2, 15, 0)) ), 47, 16); d_w1 = bits((as_signed(bits(s1, 63, 32)) * as_signed(bits(s2, 47, 32))), 47, 16); rd = concat_bits(d_w1, d_w0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv64_p`      | `pmulh_w_h1`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d_w0 = bits((as_signed(bits(s1, 31, 0)) * as_signed(bits(s2, 31, 16))), 47, 16); d_w1 = bits((as_signed(bits(s1, 63, 32)) * as_signed(bits(s2, 63, 48))), 47, 16); rd = concat_bits(d_w1, d_w0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv64_p`      | `pmulqr_w`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= 1; ++i) { a = bits(s1, (32*i+31), (32*i)); b = bits(s2, (32*i+31), (32*i)); if ((a == 0x80000000) && (b == 0x80000000)) { set_bits(&d, (32*i+31), (32*i), 0x7FFFFFFF); vxsat = 1; } else { set_bits(&d, (32*i+31), (32*i), bits((as_signed(a) * as_signed(b) + 0x40000000), 62, 31)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv64_p`      | `pmulq_w`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= 1; ++i) { a = bits(s1, (32*i+31), (32*i)); b = bits(s2, (32*i+31), (32*i)); if ((a == 0x80000000) && (b == 0x80000000)) { set_bits(&d, (32*i+31), (32*i), 0x7FFFFFFF); vxsat = 1; } else { set_bits(&d, (32*i+31), (32*i), bits((as_signed(a) * as_signed(b)), 62, 31)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv64_p`      | `pmulsu_w_h00`  | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d0 = to_bits(32, sext_32(bits(s1, 15, 0)) * zext_32(bits(s2, 15, 0))); d1 = to_bits(32, sext_32(bits(s1, 47, 32)) * zext_32(bits(s2, 47, 32))); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv64_p`      | `pmulsu_w_h11`  | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d0 = to_bits(32, sext_32(bits(s1, 31, 16)) * zext_32(bits(s2, 31, 16))); d1 = to_bits(32, sext_32(bits(s1, 63, 48)) * zext_32(bits(s2, 63, 48))); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv64_p`      | `pmulu_w_h00`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d0 = to_bits(32, zext_32(bits(s1, 15, 0)) * zext_32(bits(s2, 15, 0))); d1 = to_bits(32, zext_32(bits(s1, 47, 32)) * zext_32(bits(s2, 47, 32))); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv64_p`      | `pmulu_w_h01`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d0 = to_bits(32, zext_32(bits(s1, 15, 0)) * zext_32(bits(s2, 31, 16))); d1 = to_bits(32, zext_32(bits(s1, 47, 32)) * zext_32(bits(s2, 63, 48))); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv64_p`      | `pmulu_w_h11`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d0 = to_bits(32, zext_32(bits(s1, 31, 16)) * zext_32(bits(s2, 31, 16))); d1 = to_bits(32, zext_32(bits(s1, 63, 48)) * zext_32(bits(s2, 63, 48))); rd = concat_bits(d1, d0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv64_p`      | `pmul_w_h00`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d_w0 = as_signed(bits(s1, 15, 0)) * as_signed(bits(s2, 15, 0)); d_w1 = as_signed(bits(s1, 47, 32)) * as_signed(bits(s2, 47, 32)); rd = concat_bits(d_w1, d_w0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv64_p`      | `pmul_w_h01`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d_w0 = as_signed(bits(s1, 15, 0)) * as_signed(bits(s2, 31, 16)); d_w1 = as_signed(bits(s1, 47, 32)) * as_signed(bits(s2, 63, 48)); rd = concat_bits(d_w1, d_w0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rv64_p`      | `pmul_w_h11`    | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; d_w0 = as_signed(bits(s1, 31, 16)) * as_signed(bits(s2, 31, 16)); d_w1 = as_signed(bits(s1, 63, 48)) * as_signed(bits(s2, 63, 48)); rd = concat_bits(d_w1, d_w0);`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv64_p`      | `pnclipp_b`     | `rs2, rs1, rd`       | `s = concat_bits(rs2, rs1); for (i = 0; i <= 7; ++i) { h = bits(s, (16*i+15), (16*i)); if (as_signed(h) < as_signed(0xFF80)) { set_bits(&d, (8*i+7), (8*i), 0x80); vxsat = 1; } else if (as_signed(h) > as_signed(0x007F)) { set_bits(&d, (8*i+7), (8*i), 0x7F); vxsat = 1; } else { set_bits(&d, (8*i+7), (8*i), bits(h, 7, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                             |
+| `rv64_p`      | `pnclipp_h`     | `rs2, rs1, rd`       | `s = concat_bits(rs2, rs1); for (i = 0; i <= 3; ++i) { w = bits(s, (32*i+31), (32*i)); if (as_signed(w) < as_signed(0xFFFF8000)) { set_bits(&d, (16*i+15), (16*i), 0x8000); vxsat = 1; } else if (as_signed(w) > as_signed(0x00007FFF)) { set_bits(&d, (16*i+15), (16*i), 0x7FFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(w, 15, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                       |
+| `rv64_p`      | `pnclipp_w`     | `rs2, rs1, rd`       | `s = concat_bits(rs2, rs1); for (i = 0; i <= 1; ++i) { dw = bits(s, (64*i+63), (64*i)); if (as_signed(dw) < as_signed(0xFFFFFFFF80000000)) { set_bits(&d, (32*i+31), (32*i), 0x80000000); vxsat = 1; } else if (as_signed(dw) > as_signed(0x000000007FFFFFFF)) { set_bits(&d, (32*i+31), (32*i), 0x7FFFFFFF); vxsat = 1; } else { set_bits(&d, (32*i+31), (32*i), bits(dw, 31, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                           |
+| `rv64_p`      | `pnclipup_b`    | `rs2, rs1, rd`       | `s = concat_bits(rs2, rs1); for (i = 0; i <= 7; ++i) { h = bits(s, (16*i+15), (16*i)); if (as_unsigned(h) > as_unsigned(0x00FF)) { set_bits(&d, (8*i+7), (8*i), 0xFF); vxsat = 1; } else { set_bits(&d, (8*i+7), (8*i), bits(h, 7, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv64_p`      | `pnclipup_h`    | `rs2, rs1, rd`       | `s = concat_bits(rs2, rs1); for (i = 0; i <= 3; ++i) { w = bits(s, (32*i+31), (32*i)); if (as_unsigned(w) > as_unsigned(0x0000FFFF)) { set_bits(&d, (16*i+15), (16*i), 0xFFFF); vxsat = 1; } else { set_bits(&d, (16*i+15), (16*i), bits(w, 15, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv64_p`      | `pnclipup_w`    | `rs2, rs1, rd`       | `s = concat_bits(rs2, rs1); for (i = 0; i <= 1; ++i) { dw = bits(s, (64*i+63), (64*i)); if (as_unsigned(dw) > as_unsigned(0x00000000FFFFFFFF)) { set_bits(&d, (32*i+31), (32*i), 0xFFFFFFFF); vxsat = 1; } else { set_bits(&d, (32*i+31), (32*i), bits(dw, 31, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv64_p`      | `ppaire_h`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= (XLEN/32 - 1); ++i) { a_even = bits(s1, (32*i+15), (32*i)); b_even = bits(s2, (32*i+15), (32*i)); set_bits(&d, (32*i+15), (32*i), a_even); set_bits(&d, (32*i+31), (32*i+16), b_even); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv64_p`      | `ppaireo_w`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; set_bits(&d, 31, 0, bits(s1, 31, 0)); set_bits(&d, 63, 32, bits(s2, 63, 32)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv64_p`      | `ppairoe_w`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; set_bits(&d, 31, 0, bits(s1, 63, 32)); set_bits(&d, 63, 32, bits(s2, 31, 0)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `rv64_p`      | `ppairo_w`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; set_bits(&d, 31, 0, bits(s1, 63, 32)); set_bits(&d, 63, 32, bits(s2, 63, 32)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `rv64_p`      | `predsumu_ws`   | `rs2, rs1, rd`       | `s1 = rs1; rd = rs2+ zero_extend(64, bits(s1, 31, 0))+ zero_extend(64, bits(s1, 63, 32));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `predsum_ws`    | `rs2, rs1, rd`       | `s1 = rs1; rd = rs2+ sign_extend(64, bits(s1, 31, 0))+ sign_extend(64, bits(s1, 63, 32));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `psaddu_w`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= 1; ++i) { a = as_unsigned(bits(s1, (32*i+31), (32*i))); b = as_unsigned(bits(s2, (32*i+31), (32*i))); result = a + b; if (result > 4294967295) { vxsat = 1; set_bits(&d, (32*i+31), (32*i), to_bits(32, 4294967295)); } else { set_bits(&d, (32*i+31), (32*i), to_bits(32, result)); } } rd = d;`                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv64_p`      | `psadd_w`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i <= 1; ++i) { a = as_signed(bits(s1, (32*i+31), (32*i))); b = as_signed(bits(s2, (32*i+31), (32*i))); result = a + b; if (result > 2147483647) { vxsat = 1; set_bits(&d, (32*i+31), (32*i), to_bits(32, 2147483647)); } else if (result < -2147483648) { vxsat = 1; set_bits(&d, (32*i+31), (32*i), to_bits(32, -2147483648)); } else { set_bits(&d, (32*i+31), (32*i), to_bits(32, result)); } } rd = d;`                                                                                                                                                                                                                                                               |
+| `rv64_p`      | `psas_wx`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; a_even = as_signed(bits(s1, 31, 0)); b_odd = as_signed(bits(s2, 63, 32)); res_even = a_even - b_odd; if (res_even > 0x80000000 - 1) { res_even = 0x80000000 - 1; vxsat = 1; } else if (res_even < -(0x80000000)) { res_even = -(0x80000000); vxsat = 1; } set_bits(&d, 31, 0, bits(res_even, 31, 0)); a_odd = as_signed(bits(s1, 63, 32)); b_even = as_signed(bits(s2, 31, 0)); res_odd = a_odd + b_even; if (res_odd > 0x80000000 - 1) { res_odd = 0x80000000 - 1; vxsat = 1; } else if (res_odd < -(0x80000000)) { res_odd = -(0x80000000); vxsat = 1; } set_bits(&d, 63, 32, bits(res_odd, 31, 0)); rd = d;`                                                                       |
+| `rv64_p`      | `psati_w`       | `p_w_uimm5, rs1, rd` | `s1 = rs1; n = bits(p_w_uimm5, 4, 0); minval_w = sign_extend(32, 0xFFFFFFFF << n); maxval_w = ~minval_w; for (i = 0; i <= (XLEN/32 - 1); ++i) { e = as_signed(bits(s1, (32*i+31), (32*i))); if (e < as_signed(minval_w)) { set_bits(&d, (32*i+31), (32*i), minval_w); vxsat = 1; } else if (e > as_signed(maxval_w)) { set_bits(&d, (32*i+31), (32*i), maxval_w); vxsat = 1; } else { set_bits(&d, (32*i+31), (32*i), bits(s1, (32*i+31), (32*i))); } } rd = d;`                                                                                                                                                                                                                                           |
+| `rv64_p`      | `psa_wx`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; a_even = bits(s1, 31, 0); b_odd = bits(s2, 63, 32); set_bits(&d, 31, 0, a_even + b_odd); a_odd = bits(s1, 63, 32); b_even = bits(s2, 31, 0); set_bits(&d, 63, 32, a_odd - b_even); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv64_p`      | `psext_w_b`     | `rs1, rd`            | `s1 = rs1; rd = concat_bits(sign_extend(32, bits(s1, 39, 32)), sign_extend(32, bits(s1, 7, 0)));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `rv64_p`      | `psext_w_h`     | `rs1, rd`            | `s1 = rs1; rd = concat_bits(sign_extend(32, bits(s1, 47, 32)), sign_extend(32, bits(s1, 15, 0)));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `rv64_p`      | `psh1add_w`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; set_bits(&d, 31, 0, (bits(s1, 31, 0) << 1) + bits(s2, 31, 0)); set_bits(&d, 63, 32, (bits(s1, 63, 32) << 1) + bits(s2, 63, 32)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv64_p`      | `pslli_w`       | `p_w_uimm5, rs1, rd` | `s1 = rs1; shamt = bits(p_w_uimm5, 4, 0); for (i = 0; i <= (XLEN/32 - 1); ++i) { w = bits(s1, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), bits((zero_extend(64, w) << shamt), 31, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv64_p`      | `psll_ws`       | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 4, 0); for (i = 0; i <= (XLEN/32 - 1); ++i) { w = bits(s1, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), bits((zero_extend(64, w) << shamt), 31, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv64_p`      | `psrai_w`       | `p_w_uimm5, rs1, rd` | `s1 = rs1; shamt = bits(p_w_uimm5, 4, 0); for (i = 0; i <= (XLEN/32 - 1); ++i) { w = bits(s1, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), shift_bits_right_arith(w, shamt)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv64_p`      | `psrari_w`      | `p_w_uimm5, rs1, rd` | `s1 = rs1; shamt = bits(p_w_uimm5, 4, 0); for (i = 0; i <= (XLEN/32 - 1); ++i) { w = bits(s1, (32*i+31), (32*i)); shx = shift_bits_right_arith(concat_bits(w, 0x0), shamt); set_bits(&d, (32*i+31), (32*i), bits((shx + 1), 32, 1)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv64_p`      | `psra_ws`       | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 4, 0); for (i = 0; i <= (XLEN/32 - 1); ++i) { w = bits(s1, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), shift_bits_right_arith(w, shamt)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv64_p`      | `psrli_w`       | `p_w_uimm5, rs1, rd` | `s1 = rs1; shamt = bits(p_w_uimm5, 4, 0); for (i = 0; i <= (XLEN/32 - 1); ++i) { w = bits(s1, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), bits((zero_extend(64, w) >> shamt), 31, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rv64_p`      | `psrl_ws`       | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 4, 0); for (i = 0; i <= (XLEN/32 - 1); ++i) { w = bits(s1, (32*i+31), (32*i)); set_bits(&d, (32*i+31), (32*i), bits((zero_extend(64, w) >> shamt), 31, 0)); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv64_p`      | `pssa_wx`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; a_even = as_signed(bits(s1, 31, 0)); b_odd = as_signed(bits(s2, 63, 32)); res_even = a_even + b_odd; if (res_even > 0x80000000 - 1) { res_even = 0x80000000 - 1; vxsat = 1; } else if (res_even < -(0x80000000)) { res_even = -(0x80000000); vxsat = 1; } set_bits(&d, 31, 0, bits(res_even, 31, 0)); a_odd = as_signed(bits(s1, 63, 32)); b_even = as_signed(bits(s2, 31, 0)); res_odd = a_odd - b_even; if (res_odd > 0x80000000 - 1) { res_odd = 0x80000000 - 1; vxsat = 1; } else if (res_odd < -(0x80000000)) { res_odd = -(0x80000000); vxsat = 1; } set_bits(&d, 63, 32, bits(res_odd, 31, 0)); rd = d;`                                                                       |
+| `rv64_p`      | `pssh1sadd_w`   | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; for (i = 0; i < XLEN / 32; ++i) { a = sign_extend(bits(s1, 32 * i + 31, 32 * i), 32, 64); b = sign_extend(bits(s2, 32 * i + 31, 32 * i), 32, 64); shifted = 2 * a; t = clamp(shifted, -2147483648, 2147483647); sum = t + b; result = clamp(sum, -2147483648, 2147483647); if (t != shifted \|\| result != sum) vxsat = 1; set_bits(&d, 32 * i + 31, 32 * i, result); } rd = d;`                                                                                                                                                                                                                                                                                                      |
+| `rv64_p`      | `psshar_ws`     | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= (XLEN/32 - 1); ++i) { w = bits(s1, (32*i+31), (32*i)); if (sshamt < 0) { x = concat_bits(sign_extend(64, w), 0x0); y = (sshamt <= -32) ? bits(x, 64, 32) : bits(shift_bits_right_arith(x, bits((0 - shamt), 4, 0)), 32, 0); r = bits((y + 1), 32, 1); } else { shx = (sshamt >= 32) ? (concat_bits(w, 0x00000000)) : (sign_extend(64, w) << bits(shamt, 4, 0)); if (as_signed(shx) < as_signed(0xFFFFFFFF80000000)) { vxsat = 1; r = 0x80000000; } else if (as_signed(shx) > as_signed(0x000000007FFFFFFF)) { vxsat = 1; r = 0x7FFFFFFF; } else { r = bits(shx, 31, 0); } } set_bits(&d, (32*i+31), (32*i), r); } rd = d;` |
+| `rv64_p`      | `pssha_ws`      | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= (XLEN/32 - 1); ++i) { w = bits(s1, (32*i+31), (32*i)); xw = sign_extend(64, w); if (sshamt < 0) { if (sshamt <= -32) { r = bits(xw, 63, 32); } else { r = bits(shift_bits_right_arith(xw, bits((0 - shamt), 4, 0)), 31, 0); } } else { if (sshamt >= 32) { shx = (concat_bits(w, 0x00000000)); } else { shx = xw << bits(shamt, 4, 0); } if (as_signed(shx) < as_signed(0xFFFFFFFF80000000)) { vxsat = 1; r = 0x80000000; } else if (as_signed(shx) > as_signed(0x000000007FFFFFFF)) { vxsat = 1; r = 0x7FFFFFFF; } else { r = bits(shx, 31, 0); } } set_bits(&d, (32*i+31), (32*i), r); } rd = d;`                        |
+| `rv64_p`      | `psshlr_ws`     | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= (XLEN/32 - 1); ++i) { w = bits(s1, (32*i+31), (32*i)); if (sshamt < 0) { x = concat_bits(zero_extend(64, w), 0x0); y = bits((x >> (-sshamt)), 32, 0); r = bits((y + 1), 32, 1); } else { shx = (sshamt >= 32) ? (concat_bits(w, 0x00000000)) : (zero_extend(64, w) << bits(shamt, 4, 0)); if (as_unsigned(shx) > as_unsigned(0xFFFFFFFF)) { vxsat = 1; r = 0xFFFFFFFF; } else { r = bits(shx, 31, 0); } } set_bits(&d, (32*i+31), (32*i), r); } rd = d;`                                                                                                                                                                   |
+| `rv64_p`      | `psshl_ws`      | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); for (i = 0; i <= (XLEN/32 - 1); ++i) { w = bits(s1, (32*i+31), (32*i)); xw = zero_extend(64, w); if (sshamt < 0) { if (sshamt <= -32) { r = bits(xw, 63, 32); } else { r = bits((xw >> bits((0 - shamt), 4, 0)), 31, 0); } } else { if (sshamt >= 32) { shx = (concat_bits(w, 0x00000000)); } else { shx = xw << bits(shamt, 4, 0); } if (as_unsigned(shx) > as_unsigned(0xFFFFFFFF)) { vxsat = 1; r = 0xFFFFFFFF; } else { r = bits(shx, 31, 0); } } set_bits(&d, (32*i+31), (32*i), r); } rd = d;`                                                                                                                                        |
+| `rv64_p`      | `psslai_w`      | `p_w_uimm5, rs1, rd` | `s1 = rs1; shamt = bits(p_w_uimm5, 4, 0); for (i = 0; i <= (XLEN/32 - 1); ++i) { a = as_signed(bits(s1, (32*i+31), (32*i))); result = a << shamt; if (result < -0x80000000) { set_bits(&d, (32*i+31), (32*i), 0x80000000); vxsat = 1; } else if (result > 0x80000000 - 1) { set_bits(&d, (32*i+31), (32*i), 0x7FFFFFFF); vxsat = 1; } else { set_bits(&d, (32*i+31), (32*i), bits(result, 31, 0)); } } rd = d;`                                                                                                                                                                                                                                                                                            |
+| `rv64_p`      | `pssubu_w`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; a_lo = as_unsigned(bits(s1, 31, 0)); b_lo = as_unsigned(bits(s2, 31, 0)); res_lo = a_lo - b_lo; if (res_lo < 0) { vxsat = 1; res_lo = 0; } set_bits(&d, 31, 0, bits(res_lo, 31, 0)); a_hi = as_unsigned(bits(s1, 63, 32)); b_hi = as_unsigned(bits(s2, 63, 32)); res_hi = a_hi - b_hi; if (res_hi < 0) { vxsat = 1; res_hi = 0; } set_bits(&d, 63, 32, bits(res_hi, 31, 0)); rd = d;`                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `pssub_w`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; a_lo = as_signed(bits(s1, 31, 0)); b_lo = as_signed(bits(s2, 31, 0)); res_lo = a_lo - b_lo; if (res_lo > 0x80000000 - 1) { vxsat = 1; res_lo = 0x80000000 - 1; } else if (res_lo < -(0x80000000)) { vxsat = 1; res_lo = -(0x80000000); } set_bits(&d, 31, 0, bits(res_lo, 31, 0)); a_hi = as_signed(bits(s1, 63, 32)); b_hi = as_signed(bits(s2, 63, 32)); res_hi = a_hi - b_hi; if (res_hi > 0x80000000 - 1) { vxsat = 1; res_hi = 0x80000000 - 1; } else if (res_hi < -(0x80000000)) { vxsat = 1; res_hi = -(0x80000000); } set_bits(&d, 63, 32, bits(res_hi, 31, 0)); rd = d;`                                                                                                     |
+| `rv64_p`      | `psub_w`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; set_bits(&d, 31, 0, bits(s1, 31, 0) - bits(s2, 31, 0)); set_bits(&d, 63, 32, bits(s1, 63, 32) - bits(s2, 63, 32)); rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv64_p`      | `pusati_w`      | `p_w_uimm5, rs1, rd` | `s1 = rs1; n = bits(p_w_uimm5, 4, 0); maxval_w = ~(0xFFFFFFFF << n) & 0xFFFFFFFF; for (i = 0; i <= (XLEN/32 - 1); ++i) { e = as_signed(bits(s1, (32*i+31), (32*i))); if (e < 0) { set_bits(&d, (32*i+31), (32*i), 0x00000000); vxsat = 1; } else if (e > as_signed(maxval_w)) { set_bits(&d, (32*i+31), (32*i), maxval_w); vxsat = 1; } else { set_bits(&d, (32*i+31), (32*i), bits(s1, (32*i+31), (32*i))); } } rd = d;`                                                                                                                                                                                                                                                                                  |
+| `rv64_p`      | `rev`           | `rd, rs1`            | `a = rs1; for (i = 0; i <= (XLEN - 1); ++i) { d[i] = a[XLEN - 1 - i]; } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `rv64_p`      | `rev16`         | `rd, rs1`            | `s1 = rs1; rd = concat_bits(bits(s1, 15, 0), bits(s1, 31, 16), bits(s1, 47, 32), bits(s1, 63, 48));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rv64_p`      | `sati`          | `p_w_uimm6, rs1, rd` | `s1 = rs1; n = bits(p_w_uimm6, 5, 0); minval = 0xFFFFFFFFFFFFFFFF << n; maxval = ~minval; if (as_signed(s1) < as_signed(minval)) { vxsat = 1; rd = minval; } else if (as_signed(s1) > as_signed(maxval)) { vxsat = 1; rd = maxval; } else { rd = s1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv64_p`      | `sha`           | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); if (sshamt < 0) { xs1 = sign_extend(128, s1); if (sshamt <= -64) { rd = bits(xs1, 127, 64); } else { rd = bits(shift_bits_right_arith(xs1, bits((0 - shamt), 5, 0)), 63, 0); } } else { if (sshamt >= 64) { rd = 0; } else { rd = s1 << bits(shamt, 5, 0); } }`                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv64_p`      | `shar`          | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); if (sshamt < 0) { xs1 = concat_bits(sign_extend(128, s1), 0x0); if (sshamt <= -64) { shx = bits(xs1, 128, 64); } else { shx = bits(shift_bits_right_arith(xs1, bits((0 - shamt), 5, 0)), 64, 0); } rd = bits((shx + 1), 64, 1); } else { if (sshamt >= 64) { rd = 0; } else { rd = s1 << bits(shamt, 5, 0); } }`                                                                                                                                                                                                                                                                                                                            |
+| `rv64_p`      | `shl`           | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); if (sshamt < 0) { xs1 = zero_extend(128, s1); if (sshamt <= -64) { rd = bits(xs1, 127, 64); } else { rd = bits((xs1 >> bits((0 - shamt), 5, 0)), 63, 0); } } else { if (sshamt >= 64) { rd = 0; } else { rd = s1 << bits(shamt, 5, 0); } }`                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `rv64_p`      | `shlr`          | `rs2, rs1, rd`       | `s1 = rs1; shamt = bits(rs2, 7, 0); sshamt = as_signed(shamt); if (sshamt < 0) { xs1 = concat_bits(zero_extend(128, s1), 0x0); shx = bits((xs1 >> (-sshamt)), 64, 0); rd = bits((shx + 1), 64, 1); } else { if (sshamt >= 64) { rd = 0; } else { rd = s1 << bits(shamt, 5, 0); } }`                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv64_p`      | `srari`         | `p_w_uimm6, rs1, rd` | `a = rs1; shamt = bits(p_w_uimm6, log2(XLEN)-1, 0); if (shamt == 0) { d = a; } else { shx = shift_bits_right_arith(concat_bits(a, 0x0), shamt); d = bits((shx + 1), XLEN, 1); } rd = d;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `rv64_p`      | `unzip16hp`     | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = concat_bits(bits(s2, 63, 48), bits(s2, 31, 16), bits(s1, 63, 48), bits(s1, 31, 16));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv64_p`      | `unzip16p`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = concat_bits(bits(s2, 47, 32), bits(s2, 15, 0), bits(s1, 47, 32), bits(s1, 15, 0));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv64_p`      | `unzip8hp`      | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = concat_bits(bits(s2, 63, 56), bits(s2, 47, 40), bits(s2, 31, 24), bits(s2, 15, 8), bits(s1, 63, 56), bits(s1, 47, 40), bits(s1, 31, 24), bits(s1, 15, 8));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rv64_p`      | `unzip8p`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = concat_bits(bits(s2, 55, 48), bits(s2, 39, 32), bits(s2, 23, 16), bits(s2, 7, 0), bits(s1, 55, 48), bits(s1, 39, 32), bits(s1, 23, 16), bits(s1, 7, 0));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `rv64_p`      | `usati`         | `p_w_uimm6, rs1, rd` | `s1 = rs1; n = bits(p_w_uimm6, 5, 0); maxval = ~(0xFFFFFFFFFFFFFFFF << n); if (as_signed(s1) < as_signed(0)) { vxsat = 1; rd = 0; } else if (as_signed(s1) > as_signed(maxval)) { vxsat = 1; rd = maxval; } else { rd = s1; }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rv64_p`      | `zip16hp`       | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = concat_bits(bits(s2, 63, 48), bits(s1, 63, 48), bits(s2, 47, 32), bits(s1, 47, 32));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `rv64_p`      | `zip16p`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = concat_bits(bits(s2, 31, 16), bits(s1, 31, 16), bits(s2, 15, 0), bits(s1, 15, 0));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `rv64_p`      | `zip8hp`        | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = concat_bits(bits(s2, 63, 56), bits(s1, 63, 56), bits(s2, 55, 48), bits(s1, 55, 48), bits(s2, 47, 40), bits(s1, 47, 40), bits(s2, 39, 32), bits(s1, 39, 32));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `rv64_p`      | `zip8p`         | `rs2, rs1, rd`       | `s1 = rs1; s2 = rs2; rd = concat_bits(bits(s2, 31, 24), bits(s1, 31, 24), bits(s2, 23, 16), bits(s1, 23, 16), bits(s2, 15, 8), bits(s1, 15, 8), bits(s2, 7, 0), bits(s1, 7, 0));`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+
+:RV64P - Specific Extension for Packed SIMD Instructions (64 bit)

@@ -136,9 +136,16 @@ function rV (Vregno(r) : vregno) -> vlenbits = {
 
 function dirty_v_context() -> unit = {
   assert(hartSupports(Ext_Zve32x));
-  mstatus[VS] = extStatus_to_bits(Dirty);
+  mstatus[VS] = extStatus_map(Dirty);
   mstatus[SD] = 0b1;
-  long_csr_write_callback("mstatus", "mstatush", mstatus.bits);
+  long_csr_write_callback("mstatus", "mstatush", read_mstatus().bits);
+  // When V=1 both vsstatus.VS and mstatus.VS are in effect, and modifying
+  // vector state must set both to Dirty.
+  if inVirtualPrivilege() then {
+    vsstatus[VS] = extStatus_map(Dirty);
+    vsstatus[SD] = 0b1;
+    csr_write_callback("vsstatus", vsstatus.bits[xlen - 1 .. 0]);
+  }
 }
 
 function wV (Vregno(r) : vregno, v : vlenbits) -> unit = {
@@ -228,8 +235,19 @@ function init_vregs() -> unit = {
 
 // vector csrs
 
-register vstart : xlenbits
-register vl     : xlenbits
+// Although `vstart` is XLEN-bit wide, it is defined to have only
+// enough writable bits to hold the largest element index (one less
+// than the maximum VLMAX).The maximum vector length is obtained with
+// the largest LMUL setting (8) and the smallest SEW setting (8), so
+// VLMAX_max = 8*VLEN/8 = VLEN. For example, for VLEN=256, vstart
+// would have 8 bits to represent indices from 0 through 255.
+register vstart : bits(vlen_exp)
+
+// The number of bits implemented in vl depends on the
+// implementation’s maximum vector length of the smallest supported
+// type. `vl` specifies a number of elements, which can be one greater
+// than the last index.
+register vl     : bits(vlen_exp + 1)
 
 let VLENB : xlenbits = to_bits(vlen / 8)
 
@@ -323,11 +341,11 @@ function clause is_CSR_exception_virtual(0xC20, _, _) = false // vl
 function clause is_CSR_exception_virtual(0xC21, _, _) = false // vtype
 function clause is_CSR_exception_virtual(0xC22, _, _) = false // vlenb
 
-function clause read_CSR(0x008) = vstart
+function clause read_CSR(0x008) = zero_extend(vstart)
 function clause read_CSR(0x009) = zero_extend(vcsr[vxsat])
 function clause read_CSR(0x00A) = zero_extend(vcsr[vxrm])
 function clause read_CSR(0x00F) = zero_extend(vcsr.bits)
-function clause read_CSR(0xC20) = vl
+function clause read_CSR(0xC20) = zero_extend(vl)
 function clause read_CSR(0xC21) = vtype.bits
 function clause read_CSR(0xC22) = VLENB
 
@@ -336,8 +354,8 @@ function clause read_CSR(0xC22) = VLENB
 
 function set_vstart(value : bits(16)) -> unit = {
   dirty_v_context();
-  vstart = zero_extend(value[(vlen_exp - 1) .. 0]);
-  csr_write_callback("vstart", vstart);
+  vstart = value[(vlen_exp - 1) .. 0];
+  csr_write_callback("vstart", zero_extend(vstart));
 }
 
 private function write_vcsr(vxrm_val : bits(2), vxsat_val : bits(1)) -> unit = {
@@ -346,7 +364,16 @@ private function write_vcsr(vxrm_val : bits(2), vxsat_val : bits(1)) -> unit = {
   dirty_v_context()
 }
 
-function clause write_CSR(0x008, value) = { set_vstart(value[15 .. 0]); Ok(vstart) }
+function write_vxsat(vxsat_val: bits(1)) -> unit = {
+  if vcsr[vxsat] != vxsat_val then {
+    vcsr[vxsat] = vxsat_val;
+    dirty_v_context();
+  };
+  csr_write_callback("vxsat", zero_extend(vcsr[vxsat]));
+  csr_write_callback("vcsr", zero_extend(vcsr.bits));
+}
+
+function clause write_CSR(0x008, value) = { set_vstart(value[15 .. 0]); Ok(zero_extend(vstart)) }
 function clause write_CSR(0x009, value) = { write_vcsr (vcsr[vxrm], value[0 .. 0]); Ok(zero_extend(vcsr[vxsat])) }
 function clause write_CSR(0x00A, value) = { write_vcsr (value[1 .. 0], vcsr[vxsat]); Ok(zero_extend(vcsr[vxrm])) }
 function clause write_CSR(0x00F, value) = { write_vcsr (value [2 .. 1], value [0 .. 0]); Ok(zero_extend(vcsr.bits)) }

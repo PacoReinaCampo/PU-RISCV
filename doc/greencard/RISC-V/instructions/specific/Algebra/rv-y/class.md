@@ -1,629 +1,722 @@
 ## INSTRUCTION CLASSES
 
-**Tensor Instructions Formats**
-
-  | **Category** | **Operands**       | **Operation**   |
-  |:-------------|:-------------------|:----------------|
-  | `OPIYY`      | `tensor-tensor`    | `Integer`       |
-  | `OPIYX`      | `tensor-scalar`    | `Integer`       |
-  | `OPIYI`      | `tensor-immediate` | `Integer`       |
-  | `OPFYY`      | `tensor-tensor`    | `Float`         |
-  | `OPFYF`      | `tensor-scalar`    | `Float`         |
-  | `OPMYY`      | `tensor-tensor`    | `Mask`          |
-  | `OPMYX`      | `tensor-scalar`    | `Mask`          |
-  | `OPCFG`      | `scalars-imms`     | `Configuration` |
-
-  : Tensor Instructions Formats
-
-**OPCFG (Configuration Setting)**
-
-  | **Name**   | **Opcode / Argument**                              | **Class**              |
-  |:-----------|:---------------------------------------------------|:-----------------------|
-  | `ysetiyli` | `31=1 30=1 zimm10   zimm5 14..12=0x7 rd 6..0=0x57` | `tensor,configuration` |
-  | `ysetyli`  | `31=0 zimm11          rs1 14..12=0x7 rd 6..0=0x57` | `tensor,configuration` |
-  | `ysetyl`   | `31=1 30..25=0x0 rs2  rs1 14..12=0x7 rd 6..0=0x57` | `tensor,configuration` |
-
-  : Configuration Setting
-
-**OPLS (Tensor Loads and Store)**
-
-* **Tensor Unit-Stride Instructions (including segment part)**
-
-  | **Name**  | **Opcode / Argument**                                            | **Class**           |
-  |:----------|:-----------------------------------------------------------------|:--------------------|
-  | `ylm.v`   | `31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0  yd 6..0=0x07` | `tensor,load,mask`  |
-  | `ysm.v`   | `31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0 ys3 6..0=0x27` | `tensor,store,mask` |
-  | `yle8.v`  | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x0  yd 6..0=0x07`      | `tensor,load`       |
-  | `yle16.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x5  yd 6..0=0x07`      | `tensor,load`       |
-  | `yle32.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x6  yd 6..0=0x07`      | `tensor,load`       |
-  | `yle64.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x7  yd 6..0=0x07`      | `tensor,load`       |
-  | `yse8.v`  | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x0 ys3 6..0=0x27`      | `tensor,store`      |
-  | `yse16.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x5 ys3 6..0=0x27`      | `tensor,store`      |
-  | `yse32.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x6 ys3 6..0=0x27`      | `tensor,store`      |
-  | `yse64.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x7 ys3 6..0=0x27`      | `tensor,store`      |
-
-  : Tensor Unit-Stride Instructions (including segment part)
-
-* **Tensor Indexed-Unordered Instructions (including segment part)**
-
-  | **Name**     | **Opcode / Argument**                                  | **Class**      |
-  |:-------------|:-------------------------------------------------------|:---------------|
-  | `yluxei8.v`  | `nf 28=0 27..26=1 vm ys2 rs1 14..12=0x0  yd 6..0=0x07` | `tensor,load`  |
-  | `yluxei16.v` | `nf 28=0 27..26=1 vm ys2 rs1 14..12=0x5  yd 6..0=0x07` | `tensor,load`  |
-  | `yluxei32.v` | `nf 28=0 27..26=1 vm ys2 rs1 14..12=0x6  yd 6..0=0x07` | `tensor,load`  |
-  | `yluxei64.v` | `nf 28=0 27..26=1 vm ys2 rs1 14..12=0x7  yd 6..0=0x07` | `tensor,load`  |
-  | `ysuxei8.v`  | `nf 28=0 27..26=1 vm ys2 rs1 14..12=0x0 ys3 6..0=0x27` | `tensor,store` |
-  | `ysuxei16.v` | `nf 28=0 27..26=1 vm ys2 rs1 14..12=0x5 ys3 6..0=0x27` | `tensor,store` |
-  | `ysuxei32.v` | `nf 28=0 27..26=1 vm ys2 rs1 14..12=0x6 ys3 6..0=0x27` | `tensor,store` |
-  | `ysuxei64.v` | `nf 28=0 27..26=1 vm ys2 rs1 14..12=0x7 ys3 6..0=0x27` | `tensor,store` |
-
-  : Tensor Indexed-Unordered Instructions (including segment part)
-
-* **Tensor Strided Instructions (including segment part)**
-
-  | **Name**   | **Opcode / Argument**                                  | **Class**      |
-  |:-----------|:-------------------------------------------------------|:---------------|
-  | `ylse8.v`  | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x0  yd 6..0=0x07` | `tensor,load`  |
-  | `ylse16.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x5  yd 6..0=0x07` | `tensor,load`  |
-  | `ylse32.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x6  yd 6..0=0x07` | `tensor,load`  |
-  | `ylse64.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x7  yd 6..0=0x07` | `tensor,load`  |
-  | `ysse8.v`  | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x0 ys3 6..0=0x27` | `tensor,store` |
-  | `ysse16.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x5 ys3 6..0=0x27` | `tensor,store` |
-  | `ysse32.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x6 ys3 6..0=0x27` | `tensor,store` |
-  | `ysse64.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x7 ys3 6..0=0x27` | `tensor,store` |
-
-  : Tensor Strided Instructions (including segment part)
-
-* **Tensor Indexed-Ordered Instructions (including segment part)**
-
-  | **Name**     | **Opcode / Argument**                                  | **Class**      |
-  |:-------------|:-------------------------------------------------------|:---------------|
-  | `yloxei8.v`  | `nf 28=0 27..26=3 vm ys2 rs1 14..12=0x0  yd 6..0=0x07` | `tensor,load`  |
-  | `yloxei16.v` | `nf 28=0 27..26=3 vm ys2 rs1 14..12=0x5  yd 6..0=0x07` | `tensor,load`  |
-  | `yloxei32.v` | `nf 28=0 27..26=3 vm ys2 rs1 14..12=0x6  yd 6..0=0x07` | `tensor,load`  |
-  | `yloxei64.v` | `nf 28=0 27..26=3 vm ys2 rs1 14..12=0x7  yd 6..0=0x07` | `tensor,load`  |
-  | `ysoxei8.v`  | `nf 28=0 27..26=3 vm ys2 rs1 14..12=0x0 ys3 6..0=0x27` | `tensor,store` |
-  | `ysoxei16.v` | `nf 28=0 27..26=3 vm ys2 rs1 14..12=0x5 ys3 6..0=0x27` | `tensor,store` |
-  | `ysoxei32.v` | `nf 28=0 27..26=3 vm ys2 rs1 14..12=0x6 ys3 6..0=0x27` | `tensor,store` |
-  | `ysoxei64.v` | `nf 28=0 27..26=3 vm ys2 rs1 14..12=0x7 ys3 6..0=0x27` | `tensor,store` |
-
-  : Tensor Indexed-Ordered Instructions (including segment part)
-
-* **Unit-stride Fault-Only-First Loads**
-
-  | **Name**    | **Opcode / Argument**                                          | **Class**                      |
-  |:------------|:---------------------------------------------------------------|:-------------------------------|
-  | `yle8ff.v`  | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x0  yd 6..0=0x07` | `tensor,load,fault-only-first` |
-  | `yle16ff.v` | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x5  yd 6..0=0x07` | `tensor,load,fault-only-first` |
-  | `yle32ff.v` | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x6  yd 6..0=0x07` | `tensor,load,fault-only-first` |
-  | `yle64ff.v` | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x7  yd 6..0=0x07` | `tensor,load,fault-only-first` |
-
-  : Unit-stride Fault-Only-First Loads
-
-* **Tensor Load/Store Whole Registers**
-
-  | **Name**    | **Opcode / Argument**                                                  | **Class**                     |
-  |:------------|:-----------------------------------------------------------------------|:------------------------------|
-  | `yl1re8.v`  | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl1re16.v` | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl1re32.v` | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl1re64.v` | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl2re8.v`  | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl2re16.v` | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl2re32.v` | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl2re64.v` | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl4re8.v`  | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl4re16.v` | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl4re32.v` | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl4re64.v` | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl8re8.v`  | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl8re16.v` | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl8re32.v` | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `yl8re64.v` | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 yd  6..0=0x07` | `tensor,load,whole-register`  |
-  | `ys1r.v`    | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 ys3 6..0=0x27` | `tensor,store,whole-register` |
-  | `ys2r.v`    | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 ys3 6..0=0x27` | `tensor,store,whole-register` |
-  | `ys4r.v`    | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 ys3 6..0=0x27` | `tensor,store,whole-register` |
-  | `ys8r.v`    | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 ys3 6..0=0x27` | `tensor,store,whole-register` |
-
-  : Tensor Load/Store Whole Registers
-
-**Tensor Float-Point Instructions**
-
-* **OPFYF**
-
-  | **Name**          | **Opcode / Argument**                                   | **Class**                       |
-  |:------------------|:--------------------------------------------------------|:--------------------------------|
-  | `yfadd.vf`        | `31..26=0x00 vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,alu,floating-point`     |
-  | `yfsub.vf`        | `31..26=0x02 vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,alu,floating-point`     |
-  | `yfmin.vf`        | `31..26=0x04 vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,alu,floating-point`     |
-  | `yfmax.vf`        | `31..26=0x06 vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,alu,floating-point`     |
-  | `yfsgnj.vf`       | `31..26=0x08 vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,logical,floating-point` |
-  | `yfsgnjn.vf`      | `31..26=0x09 vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,logical,floating-point` |
-  | `yfsgnjx.vf`      | `31..26=0x0a vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,logical,floating-point` |
-  | `yfslide1up.vf`   | `31..26=0x0e vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,permute,floating-point` |
-  | `yfslide1down.vf` | `31..26=0x0f vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,permute,floating-point` |
-  | `yfmv.s.f`        | `31..26=0x10 25=1 24..20=0 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,move,floating-point`    |
-
-  : OPFYF I
-
-  | **Name**      | **Opcode / Argument**                                   | **Class**                            |
-  |:--------------|:--------------------------------------------------------|:-------------------------------------|
-  | `yfmerge.vfm` | `31..26=0x17 25=0 ys2 rs1 14..12=0x5 yd 6..0=0x57`      | `tensor,merge,floating-point`        |
-  | `yfmv.v.f`    | `31..26=0x17 25=1 24..20=0 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,move,floating-point`         |
-  | `ymfeq.vf`    | `31..26=0x18 vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,compare,floating-point,mask` |
-  | `ymfle.vf`    | `31..26=0x19 vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,compare,floating-point,mask` |
-  | `ymflt.vf`    | `31..26=0x1b vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,compare,floating-point,mask` |
-  | `ymfne.vf`    | `31..26=0x1c vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,compare,floating-point,mask` |
-  | `ymfgt.vf`    | `31..26=0x1d vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,compare,floating-point,mask` |
-  | `ymfge.vf`    | `31..26=0x1f vm ys2 rs1 14..12=0x5 yd 6..0=0x57`        | `tensor,compare,floating-point,mask` |
-
-  : OPFYF II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                        |
-  |:-------------|:-------------------------------------------------|:---------------------------------|
-  | `yfdiv.vf`   | `31..26=0x20 vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,alu,floating-point`      |
-  | `yfrdiv.vf`  | `31..26=0x21 vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,alu,floating-point`      |
-  | `yfmul.vf`   | `31..26=0x24 vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,alu,floating-point`      |
-  | `yfrsub.vf`  | `31..26=0x27 vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,alu,floating-point`      |
-  | `yfmadd.vf`  | `31..26=0x28 vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfnmadd.vf` | `31..26=0x29 vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfmsub.vf`  | `31..26=0x2a vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfnmsub.vf` | `31..26=0x2b vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfmacc.vf`  | `31..26=0x2c vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfnmacc.vf` | `31..26=0x2d vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfmsac.vf`  | `31..26=0x2e vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfnmsac.vf` | `31..26=0x2f vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-
-  : OPFYF III
-
-  | **Name**      | **Opcode / Argument**                            | **Class**                        |
-  |:--------------|:-------------------------------------------------|:---------------------------------|
-  | `yfwadd.vf`   | `31..26=0x30 vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,alu,floating-point`      |
-  | `yfwsub.vf`   | `31..26=0x32 vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,alu,floating-point`      |
-  | `yfwadd.wf`   | `31..26=0x34 vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,alu,floating-point`      |
-  | `yfwsub.wf`   | `31..26=0x36 vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,alu,floating-point`      |
-  | `yfwmul.vf`   | `31..26=0x38 vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,alu,floating-point`      |
-  | `yfwmacc.vf`  | `31..26=0x3c vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfwnmacc.vf` | `31..26=0x3d vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfwmsac.vf`  | `31..26=0x3e vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfwnmsac.vf` | `31..26=0x3f vm ys2 rs1 14..12=0x5 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-
-  : OPFYF IV
-
-* **OPFYY**
-
-  | **Name**       | **Opcode / Argument**                                   | **Class**                         |
-  |:---------------|:--------------------------------------------------------|:----------------------------------|
-  | `yfadd.vv`     | `31..26=0x00 vm ys2 ys1 14..12=0x1 yd 6..0=0x57`        | `tensor,alu,floating-point`       |
-  | `yfredusum.ys` | `31..26=0x01 vm ys2 ys1 14..12=0x1 yd 6..0=0x57`        | `tensor,reduction,floating-point` |
-  | `yfsub.vv`     | `31..26=0x02 vm ys2 ys1 14..12=0x1 yd 6..0=0x57`        | `tensor,alu,floating-point`       |
-  | `yfredosum.ys` | `31..26=0x03 vm ys2 ys1 14..12=0x1 yd 6..0=0x57`        | `tensor,reduction,floating-point` |
-  | `yfmin.vv`     | `31..26=0x04 vm ys2 ys1 14..12=0x1 yd 6..0=0x57`        | `tensor,alu,floating-point`       |
-  | `yfredmin.ys`  | `31..26=0x05 vm ys2 ys1 14..12=0x1 yd 6..0=0x57`        | `tensor,reduction,floating-point` |
-  | `yfmax.vv`     | `31..26=0x06 vm ys2 ys1 14..12=0x1 yd 6..0=0x57`        | `tensor,alu,floating-point`       |
-  | `yfredmax.ys`  | `31..26=0x07 vm ys2 ys1 14..12=0x1 yd 6..0=0x57`        | `tensor,reduction,floating-point` |
-  | `yfsgnj.vv`    | `31..26=0x08 vm ys2 ys1 14..12=0x1 yd 6..0=0x57`        | `tensor,logical,floating-point`   |
-  | `yfsgnjn.vv`   | `31..26=0x09 vm ys2 ys1 14..12=0x1 yd 6..0=0x57`        | `tensor,logical,floating-point`   |
-  | `yfsgnjx.vv`   | `31..26=0x0a vm ys2 ys1 14..12=0x1 yd 6..0=0x57`        | `tensor,logical,floating-point`   |
-  | `yfmv.f.s`     | `31..26=0x10 25=1 ys2 19..15=0 14..12=0x1 rd 6..0=0x57` | `tensor,move,floating-point`      |
-
-  : OPFYY I
-
-  | **Name**   | **Opcode / Argument**                            | **Class**                            |
-  |:-----------|:-------------------------------------------------|:-------------------------------------|
-  | `ymfeq.vv` | `31..26=0x18 vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,compare,floating-point,mask` |
-  | `ymfle.vv` | `31..26=0x19 vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,compare,floating-point,mask` |
-  | `ymflt.vv` | `31..26=0x1b vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,compare,floating-point,mask` |
-  | `ymfne.vv` | `31..26=0x1c vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,compare,floating-point,mask` |
-
-  : OPFYY II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                        |
-  |:-------------|:-------------------------------------------------|:---------------------------------|
-  | `yfdiv.vv`   | `31..26=0x20 vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,alu,floating-point`      |
-  | `yfmul.vv`   | `31..26=0x24 vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,alu,floating-point`      |
-  | `yfmadd.vv`  | `31..26=0x28 vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfnmadd.vv` | `31..26=0x29 vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfmsub.vv`  | `31..26=0x2a vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfnmsub.vv` | `31..26=0x2b vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfmacc.vv`  | `31..26=0x2c vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfnmacc.vv` | `31..26=0x2d vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfmsac.vv`  | `31..26=0x2e vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-  | `yfnmsac.vv` | `31..26=0x2f vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,multiply,floating-point` |
-
-  : OPFYY III
-
-  | **Name**           | **Opcode / Argument**                                    | **Class**                       |
-  |:-------------------|:---------------------------------------------------------|:--------------------------------|
-  | `yfcvt.xu.f.v`     | `31..26=0x12 vm ys2 19..15=0x00 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfcvt.x.f.v`      | `31..26=0x12 vm ys2 19..15=0x01 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfcvt.f.xu.v`     | `31..26=0x12 vm ys2 19..15=0x02 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfcvt.f.x.v`      | `31..26=0x12 vm ys2 19..15=0x03 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfcvt.rtz.xu.f.v` | `31..26=0x12 vm ys2 19..15=0x06 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfcvt.rtz.x.f.v`  | `31..26=0x12 vm ys2 19..15=0x07 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-
-  : OPFYY IV
-
-  | **Name**            | **Opcode / Argument**                                    | **Class**                       |
-  |:--------------------|:---------------------------------------------------------|:--------------------------------|
-  | `yfwcvt.xu.f.v`     | `31..26=0x12 vm ys2 19..15=0x08 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfwcvt.x.f.v`      | `31..26=0x12 vm ys2 19..15=0x09 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfwcvt.f.xu.v`     | `31..26=0x12 vm ys2 19..15=0x0A 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfwcvt.f.x.v`      | `31..26=0x12 vm ys2 19..15=0x0B 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfwcvt.f.f.v`      | `31..26=0x12 vm ys2 19..15=0x0C 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfwcvt.rtz.xu.f.v` | `31..26=0x12 vm ys2 19..15=0x0E 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfwcvt.rtz.x.f.v`  | `31..26=0x12 vm ys2 19..15=0x0F 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-
-  : OPFYY V
-
-  | **Name**            | **Opcode / Argument**                                    | **Class**                       |
-  |:--------------------|:---------------------------------------------------------|:--------------------------------|
-  | `yfncvt.xu.f.w`     | `31..26=0x12 vm ys2 19..15=0x10 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfncvt.x.f.w`      | `31..26=0x12 vm ys2 19..15=0x11 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfncvt.f.xu.w`     | `31..26=0x12 vm ys2 19..15=0x12 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfncvt.f.x.w`      | `31..26=0x12 vm ys2 19..15=0x13 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfncvt.f.f.w`      | `31..26=0x12 vm ys2 19..15=0x14 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfncvt.rod.f.f.w`  | `31..26=0x12 vm ys2 19..15=0x15 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfncvt.rtz.xu.f.w` | `31..26=0x12 vm ys2 19..15=0x16 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-  | `yfncvt.rtz.x.f.w`  | `31..26=0x12 vm ys2 19..15=0x17 14..12=0x1 yd 6..0=0x57` | `tensor,convert,floating-point` |
-
-  : OPFYY VI
-
-  | **Name**     | **Opcode / Argument**                                    | **Class**                        |
-  |:-------------|:---------------------------------------------------------|:---------------------------------|
-  | `yfsqrt.v`   | `31..26=0x13 vm ys2 19..15=0x00 14..12=0x1 yd 6..0=0x57` | `tensor,alu,floating-point`      |
-  | `yfrsqrt7.v` | `31..26=0x13 vm ys2 19..15=0x04 14..12=0x1 yd 6..0=0x57` | `tensor,alu,floating-point`      |
-  | `yfrec7.v`   | `31..26=0x13 vm ys2 19..15=0x05 14..12=0x1 yd 6..0=0x57` | `tensor,alu,floating-point`      |
-  | `yfclass.v`  | `31..26=0x13 vm ys2 19..15=0x10 14..12=0x1 yd 6..0=0x57` | `tensor,classify,floating-point` |
-
-  : OPFYY VII
-
-  | **Name**        | **Opcode / Argument**                            | **Class**                         |
-  |:----------------|:-------------------------------------------------|:----------------------------------|
-  | `yfwadd.vv`     | `31..26=0x30 vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,alu,floating-point`       |
-  | `yfwredusum.ys` | `31..26=0x31 vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,reduction,floating-point` |
-  | `yfwsub.vv`     | `31..26=0x32 vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,alu,floating-point`       |
-  | `yfwredosum.ys` | `31..26=0x33 vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,reduction,floating-point` |
-  | `yfwadd.wv`     | `31..26=0x34 vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,alu,floating-point`       |
-  | `yfwsub.wv`     | `31..26=0x36 vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,alu,floating-point`       |
-  | `yfwmul.vv`     | `31..26=0x38 vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,alu,floating-point`       |
-  | `yfwmacc.vv`    | `31..26=0x3c vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,multiply,floating-point`  |
-  | `yfwnmacc.vv`   | `31..26=0x3d vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,multiply,floating-point`  |
-  | `yfwmsac.vv`    | `31..26=0x3e vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,multiply,floating-point`  |
-  | `yfwnmsac.vv`   | `31..26=0x3f vm ys2 ys1 14..12=0x1 yd 6..0=0x57` | `tensor,multiply,floating-point`  |
-
-  : OPFYY VIII
-
-**Tensor Integer Instructions**
-
-* **OPIYX**
-
-  | **Name**        | **Opcode / Argument**                            | **Class**            |
-  |:----------------|:-------------------------------------------------|:---------------------|
-  | `yadd.vx`       | `31..26=0x00 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `ysub.vx`       | `31..26=0x02 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yrsub.vx`      | `31..26=0x03 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yminu.vx`      | `31..26=0x04 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `ymin.vx`       | `31..26=0x05 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `ymaxu.vx`      | `31..26=0x06 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `ymax.vx`       | `31..26=0x07 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yand.vx`       | `31..26=0x09 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yor.vx`        | `31..26=0x0a vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yxor.vx`       | `31..26=0x0b vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yrgather.vx`   | `31..26=0x0c vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,permute`     |
-  | `yslideup.vx`   | `31..26=0x0e vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,permute`     |
-  | `yslidedown.vx` | `31..26=0x0f vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,permute`     |
-
-  : OPIYX I
-
-  | **Name**     | **Opcode / Argument**                                   | **Class**                     |
-  |:-------------|:--------------------------------------------------------|:------------------------------|
-  | `yadc.vxm`   | `31..26=0x10 25=0 ys2 rs1 14..12=0x4 yd 6..0=0x57`      | `tensor,alu,integer`          |
-  | `ymadc.vxm`  | `31..26=0x11 25=0 ys2 rs1 14..12=0x4 yd 6..0=0x57`      | `tensor,alu,integer,mask`     |
-  | `ymadc.vx`   | `31..26=0x11 25=1 ys2 rs1 14..12=0x4 yd 6..0=0x57`      | `tensor,alu,integer,mask`     |
-  | `ysbc.vxm`   | `31..26=0x12 25=0 ys2 rs1 14..12=0x4 yd 6..0=0x57`      | `tensor,alu,integer`          |
-  | `ymsbc.vxm`  | `31..26=0x13 25=0 ys2 rs1 14..12=0x4 yd 6..0=0x57`      | `tensor,alu,integer,mask`     |
-  | `ymsbc.vx`   | `31..26=0x13 25=1 ys2 rs1 14..12=0x4 yd 6..0=0x57`      | `tensor,alu,integer,mask`     |
-  | `ymerge.vxm` | `31..26=0x17 25=0 ys2 rs1 14..12=0x4 yd 6..0=0x57`      | `tensor,merge,integer`        |
-  | `ymv.v.x`    | `31..26=0x17 25=1 24..20=0 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,move,integer`         |
-  | `ymseq.vx`   | `31..26=0x18 vm ys2 rs1 14..12=0x4 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsne.vx`   | `31..26=0x19 vm ys2 rs1 14..12=0x4 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsltu.vx`  | `31..26=0x1a vm ys2 rs1 14..12=0x4 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymslt.vx`   | `31..26=0x1b vm ys2 rs1 14..12=0x4 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsleu.vx`  | `31..26=0x1c vm ys2 rs1 14..12=0x4 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsle.vx`   | `31..26=0x1d vm ys2 rs1 14..12=0x4 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsgtu.vx`  | `31..26=0x1e vm ys2 rs1 14..12=0x4 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsgt.vx`   | `31..26=0x1f vm ys2 rs1 14..12=0x4 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-
-  : OPIYX II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                |
-  |:-------------|:-------------------------------------------------|:-------------------------|
-  | `ysaddu.vx`  | `31..26=0x20 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `ysadd.vx`   | `31..26=0x21 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `yssubu.vx`  | `31..26=0x22 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `yssub.vx`   | `31..26=0x23 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `ysll.vx`    | `31..26=0x25 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer`     |
-  | `ysmul.vx`   | `31..26=0x27 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `ysrl.vx`    | `31..26=0x28 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer`     |
-  | `ysra.vx`    | `31..26=0x29 vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer`     |
-  | `yssrl.vx`   | `31..26=0x2a vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `yssra.vx`   | `31..26=0x2b vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `ynsrl.wx`   | `31..26=0x2c vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer`     |
-  | `ynsra.wx`   | `31..26=0x2d vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,integer`     |
-  | `ynclipu.wx` | `31..26=0x2e vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `ynclip.wx`  | `31..26=0x2f vm ys2 rs1 14..12=0x4 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-
-  : OPIYX III
-
-* **OPIYY**
-
-  | **Name**          | **Opcode / Argument**                            | **Class**            |
-  |:------------------|:-------------------------------------------------|:---------------------|
-  | `yadd.vv`         | `31..26=0x00 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `ysub.vv`         | `31..26=0x02 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yminu.vv`        | `31..26=0x04 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `ymin.vv`         | `31..26=0x05 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `ymaxu.vv`        | `31..26=0x06 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `ymax.vv`         | `31..26=0x07 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yand.vv`         | `31..26=0x09 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yor.vv`          | `31..26=0x0a vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yxor.vv`         | `31..26=0x0b vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yrgather.vv`     | `31..26=0x0c vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,permute`     |
-  | `yrgatherei16.vv` | `31..26=0x0e vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,permute`     |
-
-  : OPIYY I
-
-  | **Name**     | **Opcode / Argument**                                   | **Class**                     |
-  |:-------------|:--------------------------------------------------------|:------------------------------|
-  | `yadc.vvm`   | `31..26=0x10 25=0 ys2 ys1 14..12=0x0 yd 6..0=0x57`      | `tensor,alu,integer`          |
-  | `ymadc.vvm`  | `31..26=0x11 25=0 ys2 ys1 14..12=0x0 yd 6..0=0x57`      | `tensor,alu,integer,mask`     |
-  | `ymadc.vv`   | `31..26=0x11 25=1 ys2 ys1 14..12=0x0 yd 6..0=0x57`      | `tensor,alu,integer,mask`     |
-  | `ysbc.vvm`   | `31..26=0x12 25=0 ys2 ys1 14..12=0x0 yd 6..0=0x57`      | `tensor,alu,integer`          |
-  | `ymsbc.vvm`  | `31..26=0x13 25=0 ys2 ys1 14..12=0x0 yd 6..0=0x57`      | `tensor,alu,integer,mask`     |
-  | `ymsbc.vv`   | `31..26=0x13 25=1 ys2 ys1 14..12=0x0 yd 6..0=0x57`      | `tensor,alu,integer,mask`     |
-  | `ymerge.vvm` | `31..26=0x17 25=0 ys2 ys1 14..12=0x0 yd 6..0=0x57`      | `tensor,merge,integer`        |
-  | `ymv.v.v`    | `31..26=0x17 25=1 24..20=0 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,move,integer`         |
-  | `ymseq.vv`   | `31..26=0x18 vm ys2 ys1 14..12=0x0 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsne.vv`   | `31..26=0x19 vm ys2 ys1 14..12=0x0 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsltu.vv`  | `31..26=0x1a vm ys2 ys1 14..12=0x0 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymslt.vv`   | `31..26=0x1b vm ys2 ys1 14..12=0x0 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsleu.vv`  | `31..26=0x1c vm ys2 ys1 14..12=0x0 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsle.vv`   | `31..26=0x1d vm ys2 ys1 14..12=0x0 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-
-  : OPIYY II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                |
-  |:-------------|:-------------------------------------------------|:-------------------------|
-  | `ysaddu.vv`  | `31..26=0x20 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `ysadd.vv`   | `31..26=0x21 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `yssubu.vv`  | `31..26=0x22 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `yssub.vv`   | `31..26=0x23 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `ysll.vv`    | `31..26=0x25 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,integer`     |
-  | `ysmul.vv`   | `31..26=0x27 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `ysrl.vv`    | `31..26=0x28 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,integer`     |
-  | `ysra.vv`    | `31..26=0x29 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,integer`     |
-  | `yssrl.vv`   | `31..26=0x2a vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `yssra.vv`   | `31..26=0x2b vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `ynsrl.wv`   | `31..26=0x2c vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,integer`     |
-  | `ynsra.wv`   | `31..26=0x2d vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,integer`     |
-  | `ynclipu.wv` | `31..26=0x2e vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `ynclip.wv`  | `31..26=0x2f vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-
-  : OPIYY III
-
-  | **Name**       | **Opcode / Argument**                            | **Class**                  |
-  |:---------------|:-------------------------------------------------|:---------------------------|
-  | `ywredsumu.ys` | `31..26=0x30 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,reduction,integer` |
-  | `ywredsum.ys`  | `31..26=0x31 vm ys2 ys1 14..12=0x0 yd 6..0=0x57` | `tensor,reduction,integer` |
-
-  : OPIYY IV
-
-* **OPIYI**
-
-  | **Name**        | **Opcode / Argument**                              | **Class**            |
-  |:----------------|:---------------------------------------------------|:---------------------|
-  | `yadd.vi`       | `31..26=0x00 vm ys2 simm5 14..12=0x3 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yrsub.vi`      | `31..26=0x03 vm ys2 simm5 14..12=0x3 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yand.vi`       | `31..26=0x09 vm ys2 simm5 14..12=0x3 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yor.vi`        | `31..26=0x0a vm ys2 simm5 14..12=0x3 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yxor.vi`       | `31..26=0x0b vm ys2 simm5 14..12=0x3 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yrgather.vi`   | `31..26=0x0c vm ys2 simm5 14..12=0x3 yd 6..0=0x57` | `tensor,permute`     |
-  | `yslideup.vi`   | `31..26=0x0e vm ys2 simm5 14..12=0x3 yd 6..0=0x57` | `tensor,permute`     |
-  | `yslidedown.vi` | `31..26=0x0f vm ys2 simm5 14..12=0x3 yd 6..0=0x57` | `tensor,permute`     |
-
-  : OPIYI I
-
-  | **Name**     | **Opcode / Argument**                                     | **Class**                     |
-  |:-------------|:----------------------------------------------------------|:------------------------------|
-  | `yadc.vim`   | `31..26=0x10 25=0 ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,alu,integer`          |
-  | `ymadc.vim`  | `31..26=0x11 25=0 ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,alu,integer,mask`     |
-  | `ymadc.vi`   | `31..26=0x11 25=1 ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,alu,integer,mask`     |
-  | `ymerge.vim` | `31..26=0x17 25=0 ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,merge,integer`        |
-  | `ymv.v.i`    | `31..26=0x17 25=1 24..20=0 simm5 14..12=0x3 yd 6..0=0x57` | `tensor,move,integer`         |
-  | `ymseq.vi`   | `31..26=0x18 vm ys2 simm5 14..12=0x3 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsne.vi`   | `31..26=0x19 vm ys2 simm5 14..12=0x3 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsleu.vi`  | `31..26=0x1c vm ys2 simm5 14..12=0x3 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsle.vi`   | `31..26=0x1d vm ys2 simm5 14..12=0x3 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsgtu.vi`  | `31..26=0x1e vm ys2 simm5 14..12=0x3 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-  | `ymsgt.vi`   | `31..26=0x1f vm ys2 simm5 14..12=0x3 yd 6..0=0x57`        | `tensor,compare,integer,mask` |
-
-  : OPIYI II
-
-  | **Name**     | **Opcode / Argument**                                   | **Class**                    |
-  |:-------------|:--------------------------------------------------------|:-----------------------------|
-  | `ysaddu.vi`  | `31..26=0x20 vm ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,alu,fixed-point`     |
-  | `ysadd.vi`   | `31..26=0x21 vm ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,alu,fixed-point`     |
-  | `ysll.vi`    | `31..26=0x25 vm ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,alu,integer`         |
-  | `ymv1r.v`    | `31..26=0x27 25=1 ys2 19..15=0 14..12=0x3 yd 6..0=0x57` | `tensor,move,whole-register` |
-  | `ymv2r.v`    | `31..26=0x27 25=1 ys2 19..15=1 14..12=0x3 yd 6..0=0x57` | `tensor,move,whole-register` |
-  | `ymv4r.v`    | `31..26=0x27 25=1 ys2 19..15=3 14..12=0x3 yd 6..0=0x57` | `tensor,move,whole-register` |
-  | `ymv8r.v`    | `31..26=0x27 25=1 ys2 19..15=7 14..12=0x3 yd 6..0=0x57` | `tensor,move,whole-register` |
-  | `ysrl.vi`    | `31..26=0x28 vm ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,alu,integer`         |
-  | `ysra.vi`    | `31..26=0x29 vm ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,alu,integer`         |
-  | `yssrl.vi`   | `31..26=0x2a vm ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,alu,fixed-point`     |
-  | `yssra.vi`   | `31..26=0x2b vm ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,alu,fixed-point`     |
-  | `ynsrl.wi`   | `31..26=0x2c vm ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,alu,integer`         |
-  | `ynsra.wi`   | `31..26=0x2d vm ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,alu,integer`         |
-  | `ynclipu.wi` | `31..26=0x2e vm ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,alu,fixed-point`     |
-  | `ynclip.wi`  | `31..26=0x2f vm ys2 simm5 14..12=0x3 yd 6..0=0x57`      | `tensor,alu,fixed-point`     |
-
-  : OPIYI III
-
-* **OPI (Tensor Integer Extension Instructions)**
-
-  | **Name**    | **Opcode / Argument**                                 | **Class**            |
-  |:------------|:------------------------------------------------------|:---------------------|
-  | `yzext.vf8` | `31..26=0x12 vm ys2 19..15=2 14..12=0x2 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `ysext.vf8` | `31..26=0x12 vm ys2 19..15=3 14..12=0x2 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yzext.vf4` | `31..26=0x12 vm ys2 19..15=4 14..12=0x2 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `ysext.vf4` | `31..26=0x12 vm ys2 19..15=5 14..12=0x2 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `yzext.vf2` | `31..26=0x12 vm ys2 19..15=6 14..12=0x2 yd 6..0=0x57` | `tensor,alu,integer` |
-  | `ysext.vf2` | `31..26=0x12 vm ys2 19..15=7 14..12=0x2 yd 6..0=0x57` | `tensor,alu,integer` |
-
-  : Tensor Integer Extension Instructions I
-
-  | **Name**       | **Opcode / Argument**                              | **Class**                 |
-  |:---------------|:---------------------------------------------------|:--------------------------|
-  | `ycompress.vm` | `31..26=0x17 25=1 ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,permute,compress` |
-  | `ymandn.mm`    | `31..26=0x18 25=1 ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,logical,mask`     |
-  | `ymand.mm`     | `31..26=0x19 25=1 ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,logical,mask`     |
-  | `ymor.mm`      | `31..26=0x1a 25=1 ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,logical,mask`     |
-  | `ymxor.mm`     | `31..26=0x1b 25=1 ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,logical,mask`     |
-  | `ymorn.mm`     | `31..26=0x1c 25=1 ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,logical,mask`     |
-  | `ymnand.mm`    | `31..26=0x1d 25=1 ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,logical,mask`     |
-  | `ymnor.mm`     | `31..26=0x1e 25=1 ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,logical,mask`     |
-  | `ymxnor.mm`    | `31..26=0x1f 25=1 ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,logical,mask`     |
-
-  : Tensor Integer Extension Instructions II
-
-  | **Name**   | **Opcode / Argument**                                         | **Class**            |
-  |:-----------|:--------------------------------------------------------------|:---------------------|
-  | `ymsbf.m`  | `31..26=0x14 vm ys2 19..15=0x01 14..12=0x2 yd 6..0=0x57`      | `tensor,mask,prefix` |
-  | `ymsof.m`  | `31..26=0x14 vm ys2 19..15=0x02 14..12=0x2 yd 6..0=0x57`      | `tensor,mask,prefix` |
-  | `ymsif.m`  | `31..26=0x14 vm ys2 19..15=0x03 14..12=0x2 yd 6..0=0x57`      | `tensor,mask,prefix` |
-  | `yiota.m`  | `31..26=0x14 vm ys2 19..15=0x10 14..12=0x2 yd 6..0=0x57`      | `tensor,mask,prefix` |
-  | `yid.v`    | `31..26=0x14 vm 24..20=0 19..15=0x11 14..12=0x2 yd 6..0=0x57` | `tensor,index`       |
-  | `ycpop.m`  | `31..26=0x10 vm ys2 19..15=0x10 14..12=0x2 rd 6..0=0x57`      | `tensor,mask,count`  |
-  | `yfirst.m` | `31..26=0x10 vm ys2 19..15=0x11 14..12=0x2 rd 6..0=0x57`      | `tensor,mask,search` |
-
-  : Tensor Integer Extension Instructions III
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                 |
-  |:-------------|:-------------------------------------------------|:--------------------------|
-  | `ydivu.vv`   | `31..26=0x20 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,divide,integer`   |
-  | `ydiv.vv`    | `31..26=0x21 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,divide,integer`   |
-  | `yremu.vv`   | `31..26=0x22 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,divide,integer`   |
-  | `yrem.vv`    | `31..26=0x23 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,divide,integer`   |
-  | `ymulhu.vv`  | `31..26=0x24 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ymul.vv`    | `31..26=0x25 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ymulhsu.vv` | `31..26=0x26 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ymulh.vv`   | `31..26=0x27 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ymadd.vv`   | `31..26=0x29 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ynmsub.vv`  | `31..26=0x2b vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ymacc.vv`   | `31..26=0x2d vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ynmsac.vv`  | `31..26=0x2f vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,multiply,integer` |
-
-  : Tensor Integer Extension Instructions IV
-
-  | **Name**      | **Opcode / Argument**                            | **Class**                 |
-  |:--------------|:-------------------------------------------------|:--------------------------|
-  | `ywaddu.vv`   | `31..26=0x30 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywadd.vv`    | `31..26=0x31 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywsubu.vv`   | `31..26=0x32 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywsub.vv`    | `31..26=0x33 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywaddu.wv`   | `31..26=0x34 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywadd.wv`    | `31..26=0x35 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywsubu.wv`   | `31..26=0x36 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywsub.wv`    | `31..26=0x37 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywmulu.vv`   | `31..26=0x38 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ywmulsu.vv`  | `31..26=0x3a vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ywmul.vv`    | `31..26=0x3b vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ywmaccu.vv`  | `31..26=0x3c vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ywmacc.vv`   | `31..26=0x3d vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ywmaccsu.vv` | `31..26=0x3f vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,multiply,integer` |
-
-  : Tensor Integer Extension Instructions V
-
-**Tensor Mask Instructions**
-
-* **OPMYY**
-
-  | **Name**      | **Opcode / Argument**                            | **Class**                  |
-  |:--------------|:-------------------------------------------------|:---------------------------|
-  | `yredsum.ys`  | `31..26=0x00 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,reduction,integer` |
-  | `yredand.ys`  | `31..26=0x01 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,reduction,integer` |
-  | `yredor.ys`   | `31..26=0x02 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,reduction,integer` |
-  | `yredxor.ys`  | `31..26=0x03 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,reduction,integer` |
-  | `yredminu.ys` | `31..26=0x04 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,reduction,integer` |
-  | `yredmin.ys`  | `31..26=0x05 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,reduction,integer` |
-  | `yredmaxu.ys` | `31..26=0x06 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,reduction,integer` |
-  | `yredmax.ys`  | `31..26=0x07 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,reduction,integer` |
-  | `yaaddu.vv`   | `31..26=0x08 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,alu,fixed-point`   |
-  | `yaadd.vv`    | `31..26=0x09 vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,alu,fixed-point`   |
-  | `yasubu.vv`   | `31..26=0x0a vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,alu,fixed-point`   |
-  | `yasub.vv`    | `31..26=0x0b vm ys2 ys1 14..12=0x2 yd 6..0=0x57` | `tensor,alu,fixed-point`   |
-
-  : OPMYY I
-
-  | **Name**  | **Opcode / Argument**                                   | **Class**             |
-  |:----------|:--------------------------------------------------------|:----------------------|
-  | `ymv.x.s` | `31..26=0x10 25=1 ys2 19..15=0 14..12=0x2 rd 6..0=0x57` | `tensor,move,integer` |
-
-  : OPMYY II
-
-* **OPMYX**
-
-  | **Name**    | **Opcode / Argument**                            | **Class**                |
-  |:------------|:-------------------------------------------------|:-------------------------|
-  | `yaaddu.vx` | `31..26=0x08 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `yaadd.vx`  | `31..26=0x09 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `yasubu.vx` | `31..26=0x0a vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-  | `yasub.vx`  | `31..26=0x0b vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,alu,fixed-point` |
-
-  : OPMYX I
-
-  | **Name**         | **Opcode / Argument**                                   | **Class**             |
-  |:-----------------|:--------------------------------------------------------|:----------------------|
-  | `ymv.s.x`        | `31..26=0x10 25=1 24..20=0 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,move,integer` |
-  | `yslide1up.vx`   | `31..26=0x0e vm ys2 rs1 14..12=0x6 yd 6..0=0x57`        | `tensor,permute`      |
-  | `yslide1down.vx` | `31..26=0x0f vm ys2 rs1 14..12=0x6 yd 6..0=0x57`        | `tensor,permute`      |
-
-  : OPMYX II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                 |
-  |:-------------|:-------------------------------------------------|:--------------------------|
-  | `ydivu.vx`   | `31..26=0x20 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,divide,integer`   |
-  | `ydiv.vx`    | `31..26=0x21 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,divide,integer`   |
-  | `yremu.vx`   | `31..26=0x22 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,divide,integer`   |
-  | `yrem.vx`    | `31..26=0x23 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,divide,integer`   |
-  | `ymulhu.vx`  | `31..26=0x24 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ymul.vx`    | `31..26=0x25 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ymulhsu.vx` | `31..26=0x26 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ymulh.vx`   | `31..26=0x27 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ymadd.vx`   | `31..26=0x29 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ynmsub.vx`  | `31..26=0x2b vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ymacc.vx`   | `31..26=0x2d vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ynmsac.vx`  | `31..26=0x2f vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-
-  : OPMYX III
-
-  | **Name**      | **Opcode / Argument**                            | **Class**                 |
-  |:--------------|:-------------------------------------------------|:--------------------------|
-  | `ywaddu.vx`   | `31..26=0x30 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywadd.vx`    | `31..26=0x31 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywsubu.vx`   | `31..26=0x32 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywsub.vx`    | `31..26=0x33 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywaddu.wx`   | `31..26=0x34 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywadd.wx`    | `31..26=0x35 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywsubu.wx`   | `31..26=0x36 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywsub.wx`    | `31..26=0x37 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,alu,integer`      |
-  | `ywmulu.vx`   | `31..26=0x38 vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ywmulsu.vx`  | `31..26=0x3a vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ywmul.vx`    | `31..26=0x3b vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ywmaccu.vx`  | `31..26=0x3c vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ywmacc.vx`   | `31..26=0x3d vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ywmaccus.vx` | `31..26=0x3e vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-  | `ywmaccsu.vx` | `31..26=0x3f vm ys2 rs1 14..12=0x6 yd 6..0=0x57` | `tensor,multiply,integer` |
-
-  : OPMYX IV
+| **Extension** | **Name**               | **Variable-Fields**  | **Class**                                 |
+|:--------------|:-----------------------|:---------------------|:------------------------------------------|
+| `rv_y`        | `yaaddu_yy`            | `ym, ys2, ys1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yaaddu_yx`            | `ym, ys2, rs1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yaadd_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yaadd_yx`             | `ym, ys2, rs1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yadc_yim`             | `ys2, simm5, yd`     | `tensor, alu, integer`                    |
+| `rv_y`        | `yadc_yym`             | `ys2, ys1, yd`       | `tensor, alu, integer`                    |
+| `rv_y`        | `yadc_yxm`             | `ys2, rs1, yd`       | `tensor, alu, integer`                    |
+| `rv_y`        | `yadd_yi`              | `ym, ys2, simm5, yd` | `tensor, alu, integer`                    |
+| `rv_y`        | `yadd_yy`              | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `yadd_yx`              | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `yand_yi`              | `ym, ys2, simm5, yd` | `tensor, alu, integer`                    |
+| `rv_y`        | `yand_yy`              | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `yand_yx`              | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `yasubu_yy`            | `ym, ys2, ys1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yasubu_yx`            | `ym, ys2, rs1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yasub_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yasub_yx`             | `ym, ys2, rs1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ycompress_ym`         | `ys2, ys1, yd`       | `tensor, permute, compress`               |
+| `rv_y`        | `ycpop_m`              | `ym, ys2, rd`        | `tensor, mask, count`                     |
+| `rv_y`        | `ydivu_yy`             | `ym, ys2, ys1, yd`   | `tensor, divide, integer`                 |
+| `rv_y`        | `ydivu_yx`             | `ym, ys2, rs1, yd`   | `tensor, divide, integer`                 |
+| `rv_y`        | `ydiv_yy`              | `ym, ys2, ys1, yd`   | `tensor, divide, integer`                 |
+| `rv_y`        | `ydiv_yx`              | `ym, ys2, rs1, yd`   | `tensor, divide, integer`                 |
+| `rv_y`        | `yfadd_yf`             | `ym, ys2, rs1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfadd_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfclass_y`            | `ym, ys2, yd`        | `tensor, classify, floating-point`        |
+| `rv_y`        | `yfcvt_f_xu_y`         | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfcvt_f_x_y`          | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfcvt_rtz_x_f_y`      | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfcvt_rtz_xu_f_y`     | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfcvt_x_f_y`          | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfcvt_xu_f_y`         | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfdiv_yf`             | `ym, ys2, rs1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfdiv_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfirst_m`             | `ym, ys2, rd`        | `tensor, mask, search`                    |
+| `rv_y`        | `yfmacc_yf`            | `ym, ys2, rs1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfmacc_yy`            | `ym, ys2, ys1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfmadd_yf`            | `ym, ys2, rs1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfmadd_yy`            | `ym, ys2, ys1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfmax_yf`             | `ym, ys2, rs1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfmax_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfmerge_yfm`          | `ys2, rs1, yd`       | `tensor, merge, floating-point`           |
+| `rv_y`        | `yfmin_yf`             | `ym, ys2, rs1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfmin_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfmsac_yf`            | `ym, ys2, rs1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfmsac_yy`            | `ym, ys2, ys1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfmsub_yf`            | `ym, ys2, rs1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfmsub_yy`            | `ym, ys2, ys1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfmul_yf`             | `ym, ys2, rs1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfmul_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfmv_f_s`             | `ys2, rd`            | `tensor, move, floating-point`            |
+| `rv_y`        | `yfmv_s_f`             | `rs1, yd`            | `tensor, move, floating-point`            |
+| `rv_y`        | `yfmv_y_f`             | `rs1, yd`            | `tensor, move, floating-point`            |
+| `rv_y`        | `yfncvt_f_f_wide`      | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfncvt_f_xu_wide`     | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfncvt_f_x_wide`      | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfncvt_rod_f_f_wide`  | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfncvt_rtz_x_f_wide`  | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfncvt_rtz_xu_f_wide` | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfncvt_x_f_wide`      | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfncvt_xu_f_wide`     | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfnmacc_yf`           | `ym, ys2, rs1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfnmacc_yy`           | `ym, ys2, ys1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfnmadd_yf`           | `ym, ys2, rs1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfnmadd_yy`           | `ym, ys2, ys1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfnmsac_yf`           | `ym, ys2, rs1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfnmsac_yy`           | `ym, ys2, ys1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfnmsub_yf`           | `ym, ys2, rs1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfnmsub_yy`           | `ym, ys2, ys1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfrdiv_yf`            | `ym, ys2, rs1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfrec7_y`             | `ym, ys2, yd`        | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfredmax_ys`          | `ym, ys2, ys1, yd`   | `tensor, reduction, floating-point`       |
+| `rv_y`        | `yfredmin_ys`          | `ym, ys2, ys1, yd`   | `tensor, reduction, floating-point`       |
+| `rv_y`        | `yfredosum_ys`         | `ym, ys2, ys1, yd`   | `tensor, reduction, floating-point`       |
+| `rv_y`        | `yfredusum_ys`         | `ym, ys2, ys1, yd`   | `tensor, reduction, floating-point`       |
+| `rv_y`        | `yfrsqrt7_y`           | `ym, ys2, yd`        | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfrsub_yf`            | `ym, ys2, rs1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfsgnjn_yf`           | `ym, ys2, rs1, yd`   | `tensor, logical, floating-point`         |
+| `rv_y`        | `yfsgnjn_yy`           | `ym, ys2, ys1, yd`   | `tensor, logical, floating-point`         |
+| `rv_y`        | `yfsgnj_yf`            | `ym, ys2, rs1, yd`   | `tensor, logical, floating-point`         |
+| `rv_y`        | `yfsgnj_yy`            | `ym, ys2, ys1, yd`   | `tensor, logical, floating-point`         |
+| `rv_y`        | `yfsgnjx_yf`           | `ym, ys2, rs1, yd`   | `tensor, logical, floating-point`         |
+| `rv_y`        | `yfsgnjx_yy`           | `ym, ys2, ys1, yd`   | `tensor, logical, floating-point`         |
+| `rv_y`        | `yfslide1down_yf`      | `ym, ys2, rs1, yd`   | `tensor, permute, floating-point`         |
+| `rv_y`        | `yfslide1up_yf`        | `ym, ys2, rs1, yd`   | `tensor, permute, floating-point`         |
+| `rv_y`        | `yfsqrt_y`             | `ym, ys2, yd`        | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfsub_yf`             | `ym, ys2, rs1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfsub_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfwadd_yf`            | `ym, ys2, rs1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfwadd_yy`            | `ym, ys2, ys1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfwadd_wide_yf`       | `ym, ys2, rs1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfwadd_wide_yy`       | `ym, ys2, ys1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfwcvt_f_f_y`         | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfwcvt_f_xu_y`        | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfwcvt_f_x_y`         | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfwcvt_rtz_x_f_y`     | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfwcvt_rtz_xu_f_y`    | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfwcvt_x_f_y`         | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfwcvt_xu_f_y`        | `ym, ys2, yd`        | `tensor, convert, floating-point`         |
+| `rv_y`        | `yfwmacc_yf`           | `ym, ys2, rs1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfwmacc_yy`           | `ym, ys2, ys1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfwmsac_yf`           | `ym, ys2, rs1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfwmsac_yy`           | `ym, ys2, ys1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfwmul_yf`            | `ym, ys2, rs1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfwmul_yy`            | `ym, ys2, ys1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfwnmacc_yf`          | `ym, ys2, rs1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfwnmacc_yy`          | `ym, ys2, ys1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfwnmsac_yf`          | `ym, ys2, rs1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfwnmsac_yy`          | `ym, ys2, ys1, yd`   | `tensor, multiply, floating-point`        |
+| `rv_y`        | `yfwredosum_ys`        | `ym, ys2, ys1, yd`   | `tensor, reduction, floating-point`       |
+| `rv_y`        | `yfwredusum_ys`        | `ym, ys2, ys1, yd`   | `tensor, reduction, floating-point`       |
+| `rv_y`        | `yfwsub_yf`            | `ym, ys2, rs1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfwsub_yy`            | `ym, ys2, ys1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfwsub_wide_yf`       | `ym, ys2, rs1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yfwsub_wide_yy`       | `ym, ys2, ys1, yd`   | `tensor, alu, floating-point`             |
+| `rv_y`        | `yid_y`                | `ym, yd`             | `tensor, index`                           |
+| `rv_y`        | `yiota_m`              | `ym, ys2, yd`        | `tensor, mask, prefix`                    |
+| `rv_y`        | `yl1re16_y`            | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl1re32_y`            | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl1re64_y`            | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl1re8_y`             | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl2re16_y`            | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl2re32_y`            | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl2re64_y`            | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl2re8_y`             | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl4re16_y`            | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl4re32_y`            | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl4re64_y`            | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl4re8_y`             | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl8re16_y`            | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl8re32_y`            | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl8re64_y`            | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yl8re8_y`             | `rs1, yd`            | `tensor, load, whole-register`            |
+| `rv_y`        | `yle16ff_y`            | `ym, rs1, yd`        | `tensor, load, fault-only-first`          |
+| `rv_y`        | `yle16_y`              | `ym, rs1, yd`        | `tensor, load`                            |
+| `rv_y`        | `yle32ff_y`            | `ym, rs1, yd`        | `tensor, load, fault-only-first`          |
+| `rv_y`        | `yle32_y`              | `ym, rs1, yd`        | `tensor, load`                            |
+| `rv_y`        | `yle64ff_y`            | `ym, rs1, yd`        | `tensor, load, fault-only-first`          |
+| `rv_y`        | `yle64_y`              | `ym, rs1, yd`        | `tensor, load`                            |
+| `rv_y`        | `yle8ff_y`             | `ym, rs1, yd`        | `tensor, load, fault-only-first`          |
+| `rv_y`        | `yle8_y`               | `ym, rs1, yd`        | `tensor, load`                            |
+| `rv_y`        | `ylm_y`                | `rs1, yd`            | `tensor, load, mask`                      |
+| `rv_y`        | `yloxei16_y`           | `ym, ys2, rs1, yd`   | `tensor, load`                            |
+| `rv_y`        | `yloxei32_y`           | `ym, ys2, rs1, yd`   | `tensor, load`                            |
+| `rv_y`        | `yloxei64_y`           | `ym, ys2, rs1, yd`   | `tensor, load`                            |
+| `rv_y`        | `yloxei8_y`            | `ym, ys2, rs1, yd`   | `tensor, load`                            |
+| `rv_y`        | `yloxseg2ei16_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg2ei32_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg2ei64_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg2ei8_y`        | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg3ei16_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg3ei32_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg3ei64_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg3ei8_y`        | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg4ei16_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg4ei32_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg4ei64_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg4ei8_y`        | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg5ei16_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg5ei32_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg5ei64_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg5ei8_y`        | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg6ei16_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg6ei32_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg6ei64_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg6ei8_y`        | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg7ei16_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg7ei32_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg7ei64_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg7ei8_y`        | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg8ei16_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg8ei32_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg8ei64_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yloxseg8ei8_y`        | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylse16_y`             | `ym, rs2, rs1, yd`   | `tensor, load`                            |
+| `rv_y`        | `ylse32_y`             | `ym, rs2, rs1, yd`   | `tensor, load`                            |
+| `rv_y`        | `ylse64_y`             | `ym, rs2, rs1, yd`   | `tensor, load`                            |
+| `rv_y`        | `ylse8_y`              | `ym, rs2, rs1, yd`   | `tensor, load`                            |
+| `rv_y`        | `ylseg2e16ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg2e16_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg2e32ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg2e32_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg2e64ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg2e64_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg2e8ff_y`         | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg2e8_y`           | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg3e16ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg3e16_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg3e32ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg3e32_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg3e64ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg3e64_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg3e8ff_y`         | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg3e8_y`           | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg4e16ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg4e16_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg4e32ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg4e32_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg4e64ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg4e64_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg4e8ff_y`         | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg4e8_y`           | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg5e16ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg5e16_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg5e32ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg5e32_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg5e64ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg5e64_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg5e8ff_y`         | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg5e8_y`           | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg6e16ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg6e16_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg6e32ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg6e32_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg6e64ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg6e64_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg6e8ff_y`         | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg6e8_y`           | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg7e16ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg7e16_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg7e32ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg7e32_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg7e64ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg7e64_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg7e8ff_y`         | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg7e8_y`           | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg8e16ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg8e16_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg8e32ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg8e32_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg8e64ff_y`        | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg8e64_y`          | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylseg8e8ff_y`         | `ym, rs1, yd`        | `tensor, load, fault-only-first, segment` |
+| `rv_y`        | `ylseg8e8_y`           | `ym, rs1, yd`        | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg2e16_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg2e32_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg2e64_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg2e8_y`          | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg3e16_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg3e32_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg3e64_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg3e8_y`          | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg4e16_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg4e32_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg4e64_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg4e8_y`          | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg5e16_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg5e32_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg5e64_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg5e8_y`          | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg6e16_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg6e32_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg6e64_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg6e8_y`          | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg7e16_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg7e32_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg7e64_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg7e8_y`          | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg8e16_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg8e32_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg8e64_y`         | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ylsseg8e8_y`          | `ym, rs2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxei16_y`           | `ym, ys2, rs1, yd`   | `tensor, load`                            |
+| `rv_y`        | `yluxei32_y`           | `ym, ys2, rs1, yd`   | `tensor, load`                            |
+| `rv_y`        | `yluxei64_y`           | `ym, ys2, rs1, yd`   | `tensor, load`                            |
+| `rv_y`        | `yluxei8_y`            | `ym, ys2, rs1, yd`   | `tensor, load`                            |
+| `rv_y`        | `yluxseg2ei16_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg2ei32_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg2ei64_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg2ei8_y`        | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg3ei16_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg3ei32_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg3ei64_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg3ei8_y`        | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg4ei16_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg4ei32_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg4ei64_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg4ei8_y`        | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg5ei16_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg5ei32_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg5ei64_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg5ei8_y`        | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg6ei16_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg6ei32_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg6ei64_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg6ei8_y`        | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg7ei16_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg7ei32_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg7ei64_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg7ei8_y`        | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg8ei16_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg8ei32_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg8ei64_y`       | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `yluxseg8ei8_y`        | `ym, ys2, rs1, yd`   | `tensor, load, segment`                   |
+| `rv_y`        | `ymacc_yy`             | `ym, ys2, ys1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ymacc_yx`             | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ymadc_yi`             | `ys2, simm5, yd`     | `tensor, alu, integer, mask`              |
+| `rv_y`        | `ymadc_yim`            | `ys2, simm5, yd`     | `tensor, alu, integer, mask`              |
+| `rv_y`        | `ymadc_yy`             | `ys2, ys1, yd`       | `tensor, alu, integer, mask`              |
+| `rv_y`        | `ymadc_yym`            | `ys2, ys1, yd`       | `tensor, alu, integer, mask`              |
+| `rv_y`        | `ymadc_yx`             | `ys2, rs1, yd`       | `tensor, alu, integer, mask`              |
+| `rv_y`        | `ymadc_yxm`            | `ys2, rs1, yd`       | `tensor, alu, integer, mask`              |
+| `rv_y`        | `ymadd_yy`             | `ym, ys2, ys1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ymadd_yx`             | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ymand_mm`             | `ys2, ys1, yd`       | `tensor, logical, mask`                   |
+| `rv_y`        | `ymandn_mm`            | `ys2, ys1, yd`       | `tensor, logical, mask`                   |
+| `rv_y`        | `ymaxu_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ymaxu_yx`             | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ymax_yy`              | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ymax_yx`              | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ymerge_yim`           | `ys2, simm5, yd`     | `tensor, merge, integer`                  |
+| `rv_y`        | `ymerge_yym`           | `ys2, ys1, yd`       | `tensor, merge, integer`                  |
+| `rv_y`        | `ymerge_yxm`           | `ys2, rs1, yd`       | `tensor, merge, integer`                  |
+| `rv_y`        | `ymfeq_yf`             | `ym, ys2, rs1, yd`   | `tensor, compare, floating-point, mask`   |
+| `rv_y`        | `ymfeq_yy`             | `ym, ys2, ys1, yd`   | `tensor, compare, floating-point, mask`   |
+| `rv_y`        | `ymfge_yf`             | `ym, ys2, rs1, yd`   | `tensor, compare, floating-point, mask`   |
+| `rv_y`        | `ymfgt_yf`             | `ym, ys2, rs1, yd`   | `tensor, compare, floating-point, mask`   |
+| `rv_y`        | `ymfle_yf`             | `ym, ys2, rs1, yd`   | `tensor, compare, floating-point, mask`   |
+| `rv_y`        | `ymfle_yy`             | `ym, ys2, ys1, yd`   | `tensor, compare, floating-point, mask`   |
+| `rv_y`        | `ymflt_yf`             | `ym, ys2, rs1, yd`   | `tensor, compare, floating-point, mask`   |
+| `rv_y`        | `ymflt_yy`             | `ym, ys2, ys1, yd`   | `tensor, compare, floating-point, mask`   |
+| `rv_y`        | `ymfne_yf`             | `ym, ys2, rs1, yd`   | `tensor, compare, floating-point, mask`   |
+| `rv_y`        | `ymfne_yy`             | `ym, ys2, ys1, yd`   | `tensor, compare, floating-point, mask`   |
+| `rv_y`        | `yminu_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `yminu_yx`             | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ymin_yy`              | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ymin_yx`              | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ymnand_mm`            | `ys2, ys1, yd`       | `tensor, logical, mask`                   |
+| `rv_y`        | `ymnor_mm`             | `ys2, ys1, yd`       | `tensor, logical, mask`                   |
+| `rv_y`        | `ymor_mm`              | `ys2, ys1, yd`       | `tensor, logical, mask`                   |
+| `rv_y`        | `ymorn_mm`             | `ys2, ys1, yd`       | `tensor, logical, mask`                   |
+| `rv_y`        | `ymsbc_yy`             | `ys2, ys1, yd`       | `tensor, alu, integer, mask`              |
+| `rv_y`        | `ymsbc_yym`            | `ys2, ys1, yd`       | `tensor, alu, integer, mask`              |
+| `rv_y`        | `ymsbc_yx`             | `ys2, rs1, yd`       | `tensor, alu, integer, mask`              |
+| `rv_y`        | `ymsbc_yxm`            | `ys2, rs1, yd`       | `tensor, alu, integer, mask`              |
+| `rv_y`        | `ymsbf_m`              | `ym, ys2, yd`        | `tensor, mask, prefix`                    |
+| `rv_y`        | `ymseq_yi`             | `ym, ys2, simm5, yd` | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymseq_yy`             | `ym, ys2, ys1, yd`   | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymseq_yx`             | `ym, ys2, rs1, yd`   | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsgtu_yi`            | `ym, ys2, simm5, yd` | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsgtu_yx`            | `ym, ys2, rs1, yd`   | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsgt_yi`             | `ym, ys2, simm5, yd` | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsgt_yx`             | `ym, ys2, rs1, yd`   | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsif_m`              | `ym, ys2, yd`        | `tensor, mask, prefix`                    |
+| `rv_y`        | `ymsleu_yi`            | `ym, ys2, simm5, yd` | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsleu_yy`            | `ym, ys2, ys1, yd`   | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsleu_yx`            | `ym, ys2, rs1, yd`   | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsle_yi`             | `ym, ys2, simm5, yd` | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsle_yy`             | `ym, ys2, ys1, yd`   | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsle_yx`             | `ym, ys2, rs1, yd`   | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsltu_yy`            | `ym, ys2, ys1, yd`   | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsltu_yx`            | `ym, ys2, rs1, yd`   | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymslt_yy`             | `ym, ys2, ys1, yd`   | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymslt_yx`             | `ym, ys2, rs1, yd`   | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsne_yi`             | `ym, ys2, simm5, yd` | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsne_yy`             | `ym, ys2, ys1, yd`   | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsne_yx`             | `ym, ys2, rs1, yd`   | `tensor, compare, integer, mask`          |
+| `rv_y`        | `ymsof_m`              | `ym, ys2, yd`        | `tensor, mask, prefix`                    |
+| `rv_y`        | `ymulhsu_yy`           | `ym, ys2, ys1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ymulhsu_yx`           | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ymulhu_yy`            | `ym, ys2, ys1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ymulhu_yx`            | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ymulh_yy`             | `ym, ys2, ys1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ymulh_yx`             | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ymul_yy`              | `ym, ys2, ys1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ymul_yx`              | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ymv1r_y`              | `ys2, yd`            | `tensor, move, whole-register`            |
+| `rv_y`        | `ymv2r_y`              | `ys2, yd`            | `tensor, move, whole-register`            |
+| `rv_y`        | `ymv4r_y`              | `ys2, yd`            | `tensor, move, whole-register`            |
+| `rv_y`        | `ymv8r_y`              | `ys2, yd`            | `tensor, move, whole-register`            |
+| `rv_y`        | `ymv_s_x`              | `rs1, yd`            | `tensor, move, integer`                   |
+| `rv_y`        | `ymv_y_i`              | `simm5, yd`          | `tensor, move, integer`                   |
+| `rv_y`        | `ymv_y_y`              | `ys1, yd`            | `tensor, move, integer`                   |
+| `rv_y`        | `ymv_y_x`              | `rs1, yd`            | `tensor, move, integer`                   |
+| `rv_y`        | `ymv_x_s`              | `ys2, rd`            | `tensor, move, integer`                   |
+| `rv_y`        | `ymxnor_mm`            | `ys2, ys1, yd`       | `tensor, logical, mask`                   |
+| `rv_y`        | `ymxor_mm`             | `ys2, ys1, yd`       | `tensor, logical, mask`                   |
+| `rv_y`        | `ynclipu_wide_yi`      | `ym, ys2, zimm5, yd` | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ynclipu_wide_yy`      | `ym, ys2, ys1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ynclipu_wide_yx`      | `ym, ys2, rs1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ynclip_wide_yi`       | `ym, ys2, zimm5, yd` | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ynclip_wide_yy`       | `ym, ys2, ys1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ynclip_wide_yx`       | `ym, ys2, rs1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ynmsac_yy`            | `ym, ys2, ys1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ynmsac_yx`            | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ynmsub_yy`            | `ym, ys2, ys1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ynmsub_yx`            | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ynsra_wide_yi`        | `ym, ys2, zimm5, yd` | `tensor, alu, integer`                    |
+| `rv_y`        | `ynsra_wide_yy`        | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ynsra_wide_yx`        | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ynsrl_wide_yi`        | `ym, ys2, zimm5, yd` | `tensor, alu, integer`                    |
+| `rv_y`        | `ynsrl_wide_yy`        | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ynsrl_wide_yx`        | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `yor_yi`               | `ym, ys2, simm5, yd` | `tensor, alu, integer`                    |
+| `rv_y`        | `yor_yy`               | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `yor_yx`               | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `yredand_ys`           | `ym, ys2, ys1, yd`   | `tensor, reduction, integer`              |
+| `rv_y`        | `yredmaxu_ys`          | `ym, ys2, ys1, yd`   | `tensor, reduction, integer`              |
+| `rv_y`        | `yredmax_ys`           | `ym, ys2, ys1, yd`   | `tensor, reduction, integer`              |
+| `rv_y`        | `yredminu_ys`          | `ym, ys2, ys1, yd`   | `tensor, reduction, integer`              |
+| `rv_y`        | `yredmin_ys`           | `ym, ys2, ys1, yd`   | `tensor, reduction, integer`              |
+| `rv_y`        | `yredor_ys`            | `ym, ys2, ys1, yd`   | `tensor, reduction, integer`              |
+| `rv_y`        | `yredsum_ys`           | `ym, ys2, ys1, yd`   | `tensor, reduction, integer`              |
+| `rv_y`        | `yredxor_ys`           | `ym, ys2, ys1, yd`   | `tensor, reduction, integer`              |
+| `rv_y`        | `yremu_yy`             | `ym, ys2, ys1, yd`   | `tensor, divide, integer`                 |
+| `rv_y`        | `yremu_yx`             | `ym, ys2, rs1, yd`   | `tensor, divide, integer`                 |
+| `rv_y`        | `yrem_yy`              | `ym, ys2, ys1, yd`   | `tensor, divide, integer`                 |
+| `rv_y`        | `yrem_yx`              | `ym, ys2, rs1, yd`   | `tensor, divide, integer`                 |
+| `rv_y`        | `yrgatherei16_yy`      | `ym, ys2, ys1, yd`   | `tensor, permute`                         |
+| `rv_y`        | `yrgather_yi`          | `ym, ys2, zimm5, yd` | `tensor, permute`                         |
+| `rv_y`        | `yrgather_yy`          | `ym, ys2, ys1, yd`   | `tensor, permute`                         |
+| `rv_y`        | `yrgather_yx`          | `ym, ys2, rs1, yd`   | `tensor, permute`                         |
+| `rv_y`        | `yrsub_yi`             | `ym, ys2, simm5, yd` | `tensor, alu, integer`                    |
+| `rv_y`        | `yrsub_yx`             | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ys1r_y`               | `rs1, ys3`           | `tensor, store, whole-register`           |
+| `rv_y`        | `ys2r_y`               | `rs1, ys3`           | `tensor, store, whole-register`           |
+| `rv_y`        | `ys4r_y`               | `rs1, ys3`           | `tensor, store, whole-register`           |
+| `rv_y`        | `ys8r_y`               | `rs1, ys3`           | `tensor, store, whole-register`           |
+| `rv_y`        | `ysaddu_yi`            | `ym, ys2, simm5, yd` | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ysaddu_yy`            | `ym, ys2, ys1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ysaddu_yx`            | `ym, ys2, rs1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ysadd_yi`             | `ym, ys2, simm5, yd` | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ysadd_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ysadd_yx`             | `ym, ys2, rs1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ysbc_yym`             | `ys2, ys1, yd`       | `tensor, alu, integer`                    |
+| `rv_y`        | `ysbc_yxm`             | `ys2, rs1, yd`       | `tensor, alu, integer`                    |
+| `rv_y`        | `yse16_y`              | `ym, rs1, ys3`       | `tensor, store`                           |
+| `rv_y`        | `yse32_y`              | `ym, rs1, ys3`       | `tensor, store`                           |
+| `rv_y`        | `yse64_y`              | `ym, rs1, ys3`       | `tensor, store`                           |
+| `rv_y`        | `yse8_y`               | `ym, rs1, ys3`       | `tensor, store`                           |
+| `rv_y`        | `ysetiyli`             | `zimm10, zimm5, rd`  | `tensor, configuration`                   |
+| `rv_y`        | `ysetyl`               | `rs2, rs1, rd`       | `tensor, configuration`                   |
+| `rv_y`        | `ysetyli`              | `zimm11, rs1, rd`    | `tensor, configuration`                   |
+| `rv_y`        | `ysext_yf2`            | `ym, ys2, yd`        | `tensor, alu, integer`                    |
+| `rv_y`        | `ysext_yf4`            | `ym, ys2, yd`        | `tensor, alu, integer`                    |
+| `rv_y`        | `ysext_yf8`            | `ym, ys2, yd`        | `tensor, alu, integer`                    |
+| `rv_y`        | `yslide1down_yx`       | `ym, ys2, rs1, yd`   | `tensor, permute`                         |
+| `rv_y`        | `yslide1up_yx`         | `ym, ys2, rs1, yd`   | `tensor, permute`                         |
+| `rv_y`        | `yslidedown_yi`        | `ym, ys2, zimm5, yd` | `tensor, permute`                         |
+| `rv_y`        | `yslidedown_yx`        | `ym, ys2, rs1, yd`   | `tensor, permute`                         |
+| `rv_y`        | `yslideup_yi`          | `ym, ys2, zimm5, yd` | `tensor, permute`                         |
+| `rv_y`        | `yslideup_yx`          | `ym, ys2, rs1, yd`   | `tensor, permute`                         |
+| `rv_y`        | `ysll_yi`              | `ym, ys2, zimm5, yd` | `tensor, alu, integer`                    |
+| `rv_y`        | `ysll_yy`              | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ysll_yx`              | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ysmul_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ysmul_yx`             | `ym, ys2, rs1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ysm_y`                | `rs1, ys3`           | `tensor, store, mask`                     |
+| `rv_y`        | `ysoxei16_y`           | `ym, ys2, rs1, ys3`  | `tensor, store`                           |
+| `rv_y`        | `ysoxei32_y`           | `ym, ys2, rs1, ys3`  | `tensor, store`                           |
+| `rv_y`        | `ysoxei64_y`           | `ym, ys2, rs1, ys3`  | `tensor, store`                           |
+| `rv_y`        | `ysoxei8_y`            | `ym, ys2, rs1, ys3`  | `tensor, store`                           |
+| `rv_y`        | `ysoxseg2ei16_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg2ei32_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg2ei64_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg2ei8_y`        | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg3ei16_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg3ei32_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg3ei64_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg3ei8_y`        | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg4ei16_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg4ei32_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg4ei64_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg4ei8_y`        | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg5ei16_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg5ei32_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg5ei64_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg5ei8_y`        | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg6ei16_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg6ei32_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg6ei64_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg6ei8_y`        | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg7ei16_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg7ei32_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg7ei64_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg7ei8_y`        | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg8ei16_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg8ei32_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg8ei64_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysoxseg8ei8_y`        | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysra_yi`              | `ym, ys2, zimm5, yd` | `tensor, alu, integer`                    |
+| `rv_y`        | `ysra_yy`              | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ysra_yx`              | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ysrl_yi`              | `ym, ys2, zimm5, yd` | `tensor, alu, integer`                    |
+| `rv_y`        | `ysrl_yy`              | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ysrl_yx`              | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ysse16_y`             | `ym, rs2, rs1, ys3`  | `tensor, store`                           |
+| `rv_y`        | `ysse32_y`             | `ym, rs2, rs1, ys3`  | `tensor, store`                           |
+| `rv_y`        | `ysse64_y`             | `ym, rs2, rs1, ys3`  | `tensor, store`                           |
+| `rv_y`        | `ysse8_y`              | `ym, rs2, rs1, ys3`  | `tensor, store`                           |
+| `rv_y`        | `ysseg2e16_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg2e32_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg2e64_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg2e8_y`           | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg3e16_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg3e32_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg3e64_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg3e8_y`           | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg4e16_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg4e32_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg4e64_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg4e8_y`           | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg5e16_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg5e32_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg5e64_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg5e8_y`           | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg6e16_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg6e32_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg6e64_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg6e8_y`           | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg7e16_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg7e32_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg7e64_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg7e8_y`           | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg8e16_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg8e32_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg8e64_y`          | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `ysseg8e8_y`           | `ym, rs1, ys3`       | `tensor, store, segment`                  |
+| `rv_y`        | `yssra_yi`             | `ym, ys2, zimm5, yd` | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yssra_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yssra_yx`             | `ym, ys2, rs1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yssrl_yi`             | `ym, ys2, zimm5, yd` | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yssrl_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yssrl_yx`             | `ym, ys2, rs1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yssseg2e16_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg2e32_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg2e64_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg2e8_y`          | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg3e16_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg3e32_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg3e64_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg3e8_y`          | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg4e16_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg4e32_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg4e64_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg4e8_y`          | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg5e16_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg5e32_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg5e64_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg5e8_y`          | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg6e16_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg6e32_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg6e64_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg6e8_y`          | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg7e16_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg7e32_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg7e64_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg7e8_y`          | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg8e16_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg8e32_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg8e64_y`         | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssseg8e8_y`          | `ym, rs2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `yssubu_yy`            | `ym, ys2, ys1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yssubu_yx`            | `ym, ys2, rs1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yssub_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `yssub_yx`             | `ym, ys2, rs1, yd`   | `tensor, alu, fixed-point`                |
+| `rv_y`        | `ysub_yy`              | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ysub_yx`              | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ysuxei16_y`           | `ym, ys2, rs1, ys3`  | `tensor, store`                           |
+| `rv_y`        | `ysuxei32_y`           | `ym, ys2, rs1, ys3`  | `tensor, store`                           |
+| `rv_y`        | `ysuxei64_y`           | `ym, ys2, rs1, ys3`  | `tensor, store`                           |
+| `rv_y`        | `ysuxei8_y`            | `ym, ys2, rs1, ys3`  | `tensor, store`                           |
+| `rv_y`        | `ysuxseg2ei16_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg2ei32_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg2ei64_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg2ei8_y`        | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg3ei16_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg3ei32_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg3ei64_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg3ei8_y`        | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg4ei16_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg4ei32_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg4ei64_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg4ei8_y`        | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg5ei16_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg5ei32_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg5ei64_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg5ei8_y`        | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg6ei16_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg6ei32_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg6ei64_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg6ei8_y`        | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg7ei16_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg7ei32_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg7ei64_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg7ei8_y`        | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg8ei16_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg8ei32_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg8ei64_y`       | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ysuxseg8ei8_y`        | `ym, ys2, rs1, ys3`  | `tensor, store, segment`                  |
+| `rv_y`        | `ywaddu_yy`            | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywaddu_yx`            | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywaddu_wide_yy`       | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywaddu_wide_yx`       | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywadd_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywadd_yx`             | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywadd_wide_yy`        | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywadd_wide_yx`        | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywmaccsu_yy`          | `ym, ys2, ys1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ywmaccsu_yx`          | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ywmaccus_yx`          | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ywmaccu_yy`           | `ym, ys2, ys1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ywmaccu_yx`           | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ywmacc_yy`            | `ym, ys2, ys1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ywmacc_yx`            | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ywmulsu_yy`           | `ym, ys2, ys1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ywmulsu_yx`           | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ywmulu_yy`            | `ym, ys2, ys1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ywmulu_yx`            | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ywmul_yy`             | `ym, ys2, ys1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ywmul_yx`             | `ym, ys2, rs1, yd`   | `tensor, multiply, integer`               |
+| `rv_y`        | `ywredsumu_ys`         | `ym, ys2, ys1, yd`   | `tensor, reduction, integer`              |
+| `rv_y`        | `ywredsum_ys`          | `ym, ys2, ys1, yd`   | `tensor, reduction, integer`              |
+| `rv_y`        | `ywsubu_yy`            | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywsubu_yx`            | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywsubu_wide_yy`       | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywsubu_wide_yx`       | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywsub_yy`             | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywsub_yx`             | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywsub_wide_yy`        | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `ywsub_wide_yx`        | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `yxor_yi`              | `ym, ys2, simm5, yd` | `tensor, alu, integer`                    |
+| `rv_y`        | `yxor_yy`              | `ym, ys2, ys1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `yxor_yx`              | `ym, ys2, rs1, yd`   | `tensor, alu, integer`                    |
+| `rv_y`        | `yzext_yf2`            | `ym, ys2, yd`        | `tensor, alu, integer`                    |
+| `rv_y`        | `yzext_yf4`            | `ym, ys2, yd`        | `tensor, alu, integer`                    |
+| `rv_y`        | `yzext_yf8`            | `ym, ys2, yd`        | `tensor, alu, integer`                    |
+
+:RVY - Specific Extension for Tensor Operations
+
+| **Extension**      | **Name**                  | **Variable-Fields**             | **Class**                                         |
+|:-------------------|:--------------------------|:--------------------------------|:--------------------------------------------------|
+| `rv_zyabd`         | `yabdu_yy`                | `ym, ys2, ys1, yd`              | `tensor, alu, integer`                            |
+| `rv_zyabd`         | `yabdu_yx`                | `ym, ys2, rs1, yd`              | `tensor, alu, integer`                            |
+| `rv_zyabd`         | `yabd_yy`                 | `ym, ys2, ys1, yd`              | `tensor, alu, integer`                            |
+| `rv_zyabd`         | `yabd_yx`                 | `ym, ys2, rs1, yd`              | `tensor, alu, integer`                            |
+| `rv_zyabd`         | `ywabdau_yy`              | `ym, ys2, ys1, yd`              | `tensor, alu, integer`                            |
+| `rv_zyabd`         | `ywabdau_yx`              | `ym, ys2, rs1, yd`              | `tensor, alu, integer`                            |
+| `rv_zyabd`         | `ywabda_yy`               | `ym, ys2, ys1, yd`              | `tensor, alu, integer`                            |
+| `rv_zyabd`         | `ywabda_yx`               | `ym, ys2, rs1, yd`              | `tensor, alu, integer`                            |
+| `rv_zybb`          | `yandn_yy`                | `ym, ys2, ys1, yd`              | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `yandn_yx`                | `ym, ys2, rs1, yd`              | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `ybrev8_y`                | `ym, ys2, yd`                   | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `ybrev_y`                 | `ym, ys2, yd`                   | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `yclz_y`                  | `ym, ys2, yd`                   | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `ycpop_y`                 | `ym, ys2, yd`                   | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `yctz_y`                  | `ym, ys2, yd`                   | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `yrev8_y`                 | `ym, ys2, yd`                   | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `yrol_yy`                 | `ym, ys2, ys1, yd`              | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `yrol_yx`                 | `ym, ys2, rs1, yd`              | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `yror_yi`                 | `zimm6hi, ym, ys2, zimm6lo, yd` | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `yror_yy`                 | `ym, ys2, ys1, yd`              | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `yror_yx`                 | `ym, ys2, rs1, yd`              | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `ywsll_yi`                | `ym, ys2, zimm5, yd`            | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `ywsll_yy`                | `ym, ys2, ys1, yd`              | `tensor, alu, bit-manipulation`                   |
+| `rv_zybb`          | `ywsll_yx`                | `ym, ys2, rs1, yd`              | `tensor, alu, bit-manipulation`                   |
+| `rv_zybc`          | `yclmulh_yy`              | `ym, ys2, ys1, yd`              | `tensor, alu, bit-manipulation`                   |
+| `rv_zybc`          | `yclmulh_yx`              | `ym, ys2, rs1, yd`              | `tensor, alu, bit-manipulation`                   |
+| `rv_zybc`          | `yclmul_yy`               | `ym, ys2, ys1, yd`              | `tensor, alu, bit-manipulation`                   |
+| `rv_zybc`          | `yclmul_yx`               | `ym, ys2, rs1, yd`              | `tensor, alu, bit-manipulation`                   |
+| `rv_zydot4a`       | `ydot4asu_yy`             | `ym, ys2, ys1, yd`              | `tensor, alu, integer, dot-product`               |
+| `rv_zydot4a`       | `ydot4asu_yx`             | `ym, ys2, rs1, yd`              | `tensor, alu, integer, dot-product`               |
+| `rv_zydot4a`       | `ydot4aus_yx`             | `ym, ys2, rs1, yd`              | `tensor, alu, integer, dot-product`               |
+| `rv_zydot4a`       | `ydot4au_yy`              | `ym, ys2, ys1, yd`              | `tensor, alu, integer, dot-product`               |
+| `rv_zydot4a`       | `ydot4au_yx`              | `ym, ys2, rs1, yd`              | `tensor, alu, integer, dot-product`               |
+| `rv_zydot4a`       | `ydot4a_yy`               | `ym, ys2, ys1, yd`              | `tensor, alu, integer, dot-product`               |
+| `rv_zydot4a`       | `ydot4a_yx`               | `ym, ys2, rs1, yd`              | `tensor, alu, integer, dot-product`               |
+| `rv_zyfbdota32f`   | `yfbdota_yy`              | `ym, ys2x8, ci, ys1, yd`        | `tensor, alu, floating-point, dot-product`        |
+| `rv_zyfbfmin`      | `yfncvtbf16_f_f_wide`     | `ym, ys2, yd`                   | `tensor, alu, floating-point, conversion`         |
+| `rv_zyfbfmin`      | `yfwcvtbf16_f_f_y`        | `ym, ys2, yd`                   | `tensor, alu, floating-point, conversion`         |
+| `rv_zyfbfwma`      | `yfwmaccbf16_yf`          | `ym, ys2, rs1, yd`              | `tensor, alu, floating-point, fused-multiply-add` |
+| `rv_zyfbfwma`      | `yfwmaccbf16_yy`          | `ym, ys2, ys1, yd`              | `tensor, alu, floating-point, fused-multiply-add` |
+| `rv_zyfofp4min`    | `yfext_yf2`               | `ym, ys2, yd`                   | `tensor, alu, floating-point, conversion`         |
+| `rv_zyfofp8min`    | `yfncvtbf16_sat_f_f_wide` | `ym, ys2, yd`                   | `tensor, alu, floating-point, conversion`         |
+| `rv_zyfofp8min`    | `yfncvt_f_f_q`            | `ym, ys2, yd`                   | `tensor, alu, floating-point, conversion`         |
+| `rv_zyfofp8min`    | `yfncvt_sat_f_f_q`        | `ym, ys2, yd`                   | `tensor, alu, floating-point, conversion`         |
+| `rv_zyfqwbdota8f`  | `yfqwbdota_alt_yy`        | `ym, ys2x8, ci, ys1, yd`        | `tensor, alu, floating-point, dot-product`        |
+| `rv_zyfqwbdota8f`  | `yfqwbdota_yy`            | `ym, ys2x8, ci, ys1, yd`        | `tensor, alu, floating-point, dot-product`        |
+| `rv_zyfqwdota8f`   | `yfqwdota_alt_yy`         | `ym, ys2, ys1, yd`              | `tensor, alu, floating-point, dot-product`        |
+| `rv_zyfqwdota8f`   | `yfqwdota_yy`             | `ym, ys2, ys1, yd`              | `tensor, alu, floating-point, dot-product`        |
+| `rv_zyfwbdota16bf` | `yfwbdota_yy`             | `ym, ys2x8, ci, ys1, yd`        | `tensor, alu, floating-point, dot-product`        |
+| `rv_zyfwdota16bf`  | `yfwdota_yy`              | `ym, ys2, ys1, yd`              | `tensor, alu, floating-point, dot-product`        |
+| `rv_zyqwbdota8i`   | `yqwbdotas_yy`            | `ym, ys2x8, ci, ys1, yd`        | `tensor, alu, integer, dot-product`               |
+| `rv_zyqwbdota8i`   | `yqwbdotau_yy`            | `ym, ys2x8, ci, ys1, yd`        | `tensor, alu, integer, dot-product`               |
+| `rv_zyqwdota8i`    | `yqwdotas_yy`             | `ym, ys2, ys1, yd`              | `tensor, alu, integer, dot-product`               |
+| `rv_zyqwdota8i`    | `yqwdotau_yy`             | `ym, ys2, ys1, yd`              | `tensor, alu, integer, dot-product`               |
+| `rv_zyt16e`        | `ytle16`                  | `rs2, rs1`                      | `tensor, tile, load`                              |
+| `rv_zyt16e`        | `ytse16`                  | `rs2, rs1`                      | `tensor, tile, store`                             |
+| `rv_zyt64e`        | `ytle64`                  | `rs2, rs1`                      | `tensor, tile, load`                              |
+| `rv_zyt64e`        | `ytse64`                  | `rs2, rs1`                      | `tensor, tile, store`                             |
+| `rv_zyt8e`         | `ytle8`                   | `rs2, rs1`                      | `tensor, tile, load`                              |
+| `rv_zyt8e`         | `ytse8`                   | `rs2, rs1`                      | `tensor, tile, store`                             |
+| `rv_zytbase`       | `ymsetmtype`              | `rs2, rs1, rd`                  | `tensor, tile, configuration`                     |
+| `rv_zytbase`       | `ymsetmtypei`             | `altfmt, ysew, mtwiden, rd`     | `tensor, tile, configuration`                     |
+| `rv_zytbase`       | `ymsettk`                 | `rs1, rd`                       | `tensor, tile, configuration`                     |
+| `rv_zytbase`       | `ymsettm`                 | `rs1, rd`                       | `tensor, tile, configuration`                     |
+| `rv_zytbase`       | `ymsettn`                 | `rs1, rd`                       | `tensor, tile, configuration`                     |
+| `rv_zytbase`       | `ytdiscard`               | `none`                          | `tensor, tile, context`                           |
+| `rv_zytbase`       | `ytle32`                  | `rs2, rs1`                      | `tensor, tile, load`                              |
+| `rv_zytbase`       | `ytmv_t_y`                | `ys2, rs1`                      | `tensor, tile, move`                              |
+| `rv_zytbase`       | `ytmv_y_t`                | `rs1, yd`                       | `tensor, tile, move`                              |
+| `rv_zytbase`       | `ytse32`                  | `rs2, rs1`                      | `tensor, tile, store`                             |
+| `rv_zytbase`       | `ytzero`                  | `zyt_mtd16`                     | `tensor, tile, context`                           |
+| `rv_zytbf16fmm`    | `ytfmm_alt_tyy`           | `ys2, ys1, zyt_mtd8`            | `tensor, tile, multiply-accumulate`               |
+| `rv_zytdmm`        | `ytfmm_tyy`               | `ys2, ys1, zyt_mtd8`            | `tensor, tile, multiply-accumulate`               |
+| `rv_zytfmm`        | `ytfmm_tyy`               | `ys2, ys1, zyt_mtd8`            | `tensor, tile, multiply-accumulate`               |
+| `rv_zytfp16fmm`    | `ytfmm_tyy`               | `ys2, ys1, zyt_mtd8`            | `tensor, tile, multiply-accumulate`               |
+| `rv_zyti8i32mm`    | `ytmms_tyy`               | `ys2, ys1, zyt_mtd8`            | `tensor, tile, multiply-accumulate`               |
+| `rv_zyti8i32mm`    | `ytmmu_tyy`               | `ys2, ys1, zyt_mtd8`            | `tensor, tile, multiply-accumulate`               |
+| `rv_zytofp8fmm`    | `ytfmm_alt_tyy`           | `ys2, ys1, zyt_mtd8`            | `tensor, tile, multiply-accumulate`               |
+| `rv_zytofp8fmm`    | `ytfmm_tyy`               | `ys2, ys1, zyt_mtd8`            | `tensor, tile, multiply-accumulate`               |
+| `rv_zyzip`         | `ypaire_yy`               | `ym, ys2, ys1, yd`              | `tensor, permutation`                             |
+| `rv_zyzip`         | `ypairo_yy`               | `ym, ys2, ys1, yd`              | `tensor, permutation`                             |
+| `rv_zyzip`         | `yunzipe_y`               | `ym, ys2, yd`                   | `tensor, permutation`                             |
+| `rv_zyzip`         | `yunzipo_y`               | `ym, ys2, yd`                   | `tensor, permutation`                             |
+| `rv_zyzip`         | `yzip_yy`                 | `ym, ys2, ys1, yd`              | `tensor, permutation`                             |
+
+:RVZY - Specific Extension for Tensor Operations

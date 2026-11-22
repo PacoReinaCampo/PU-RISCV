@@ -1,7 +1,9 @@
-# Pseudo-Intructions
+## PSEUDO-INSTRUCTIONS
 
-```
-$pseudo_op rv_q::fsgnj.q  fmv.q  rd rs1 rs2=rs1 31..27=0x04 14..12=0 26..25=3 6..2=0x14 1..0=3
-$pseudo_op rv_q::fsgnjx.q fabs.q rd rs1 rs2=rs1 31..27=0x04 14..12=2 26..25=3 6..2=0x14 1..0=3
-$pseudo_op rv_q::fsgnjn.q fneg.q rd rs1 rs2=rs1 31..27=0x04 14..12=1 26..25=3 6..2=0x14 1..0=3
-```
+| **Extension** | **Name**   | **Variable-Fields** | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:-----------|:--------------------|:-----------------------|:-----------------------------------|
+| `rv_q`        | `fsgnj_q`  | `rd, rs1`           | `fmv_q`                | `0010011----------000-----1010011` |
+| `rv_q`        | `fsgnjx_q` | `rd, rs1`           | `fabs_q`               | `0010011----------010-----1010011` |
+| `rv_q`        | `fsgnjn_q` | `rd, rs1`           | `fneg_q`               | `0010011----------001-----1010011` |
+
+:RVQ - RVQ Specific Extension for Quadruple-Precision Floating-Point Instructions

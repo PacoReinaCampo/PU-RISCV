@@ -1,238 +1,97 @@
 ## INSTRUCTION CLASSES
 
-| **Instruction** | **Class**       |
-|:----------------|:----------------|
-| `lui`           | `alu`           |
-| `auipc`         | `alu`           |
-| `jal`           | `jump`          |
-| `jalr`          | `jump,indirect` |
-| `beq`           | `branch`        |
-| `bne`           | `branch`        |
-| `blt`           | `branch`        |
-| `bge`           | `branch`        |
-| `bltu`          | `branch`        |
-| `bgeu`          | `branch`        |
-| `lb`            | `load`          |
-| `lh`            | `load`          |
-| `lw`            | `load`          |
-| `lbu`           | `load`          |
-| `lhu`           | `load`          |
-| `lwu`           | `load`          |
-| `sb`            | `store`         |
-| `sh`            | `store`         |
-| `sw`            | `store`         |
-| `addi`          | `alu`           |
-| `slti`          | `alu`           |
-| `sltiu`         | `alu`           |
-| `xori`          | `alu`           |
-| `ori`           | `alu`           |
-| `andi`          | `alu`           |
-| `slli`          | `alu`           |
-| `srli`          | `alu`           |
-| `srai`          | `alu`           |
-| `add`           | `alu`           |
-| `sub`           | `alu`           |
-| `sll`           | `alu`           |
-| `slt`           | `alu`           |
-| `sltu`          | `alu`           |
-| `xor`           | `alu`           |
-| `srl`           | `alu`           |
-| `sra`           | `alu`           |
-| `or`            | `alu`           |
-| `and`           | `alu`           |
-| `fence`         | `fence`         |
-| `fence.i`       | `fence`         |
+| **Extension** | **Name**     | **Variable-Fields**                  | **Class**    |
+|:--------------|:-------------|:-------------------------------------|:-------------|
+| `rv_c`        | `c_add`      | `rd_rs1_n0, c_rs2_n0`                | `compressed` |
+| `rv_c`        | `c_addi`     | `rd_rs1_n0, c_nzimm6lo, c_nzimm6hi`  | `compressed` |
+| `rv_c`        | `c_addi16sp` | `c_nzimm10hi, c_nzimm10lo`           | `compressed` |
+| `rv_c`        | `c_addi4spn` | `rd_p, c_nzuimm10`                   | `compressed` |
+| `rv_c`        | `c_and`      | `rd_rs1_p, rs2_p`                    | `compressed` |
+| `rv_c`        | `c_andi`     | `rd_rs1_p, c_imm6hi, c_imm6lo`       | `compressed` |
+| `rv_c`        | `c_beqz`     | `rs1_p, c_bimm9lo, c_bimm9hi`        | `compressed` |
+| `rv_c`        | `c_bnez`     | `rs1_p, c_bimm9lo, c_bimm9hi`        | `compressed` |
+| `rv_c`        | `c_ebreak`   | `none`                               | `compressed` |
+| `rv_c`        | `c_j`        | `c_imm12`                            | `compressed` |
+| `rv_c`        | `c_jalr`     | `c_rs1_n0`                           | `compressed` |
+| `rv_c`        | `c_jr`       | `rs1_n0`                             | `compressed` |
+| `rv_c`        | `c_li`       | `rd_n0, c_imm6lo, c_imm6hi`          | `compressed` |
+| `rv_c`        | `c_lui`      | `rd_n2, c_nzimm18hi, c_nzimm18lo`    | `compressed` |
+| `rv_c`        | `c_lw`       | `rd_p, rs1_p, c_uimm7lo, c_uimm7hi`  | `compressed` |
+| `rv_c`        | `c_lwsp`     | `rd_n0, c_uimm8sphi, c_uimm8splo`    | `compressed` |
+| `rv_c`        | `c_mv`       | `rd_n0, c_rs2_n0`                    | `compressed` |
+| `rv_c`        | `c_nop`      | `c_nzimm6hi, c_nzimm6lo`             | `compressed` |
+| `rv_c`        | `c_or`       | `rd_rs1_p, rs2_p`                    | `compressed` |
+| `rv_c`        | `c_sub`      | `rd_rs1_p, rs2_p`                    | `compressed` |
+| `rv_c`        | `c_sw`       | `rs1_p, rs2_p, c_uimm7lo, c_uimm7hi` | `compressed` |
+| `rv_c`        | `c_swsp`     | `c_rs2, c_uimm8sp_s`                 | `compressed` |
+| `rv_c`        | `c_xor`      | `rd_rs1_p, rs2_p`                    | `compressed` |
+| `rv_c_d`      | `c_fld`      | `rd_p, rs1_p, c_uimm8lo, c_uimm8hi`  | `compressed` |
+| `rv_c_d`      | `c_fldsp`    | `rd, c_uimm9sphi, c_uimm9splo`       | `compressed` |
+| `rv_c_d`      | `c_fsd`      | `rs1_p, rs2_p, c_uimm8lo, c_uimm8hi` | `compressed` |
+| `rv_c_d`      | `c_fsdsp`    | `c_rs2, c_uimm9sp_s`                 | `compressed` |
 
-:RV32I - "RV32I Base Integer Instruction Set"
+:RVC - Standard Extension for Compressed Instructions
 
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `ld`            | `load`    |
-| `sd`            | `store`   |
-| `addiw`         | `alu`     |
-| `slliw`         | `alu`     |
-| `srliw`         | `alu`     |
-| `sraiw`         | `alu`     |
-| `addw`          | `alu`     |
-| `subw`          | `alu`     |
-| `sllw`          | `alu`     |
-| `srlw`          | `alu`     |
-| `sraw`          | `alu`     |
+| **Extension** | **Name**  | **Variable-Fields**                  | **Class**    |
+|:--------------|:----------|:-------------------------------------|:-------------|
+| `rv32_c`      | `c_jal`   | `c_imm12`                            | `compressed` |
+| `rv32_c_f`    | `c_flw`   | `rd_p, rs1_p, c_uimm7lo, c_uimm7hi`  | `compressed` |
+| `rv32_c_f`    | `c_flwsp` | `rd, c_uimm8sphi, c_uimm8splo`       | `compressed` |
+| `rv32_c_f`    | `c_fsw`   | `rs1_p, rs2_p, c_uimm7lo, c_uimm7hi` | `compressed` |
+| `rv32_c_f`    | `c_fswsp` | `c_rs2, c_uimm8sp_s`                 | `compressed` |
 
-:RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
+:RV32C - Standard Extension for Compressed Instructions (32 bit)
 
-| **Instruction** | **Class**      |
-|:----------------|:---------------|
-| `mul`           | `alu,multiply` |
-| `mulh`          | `alu,multiply` |
-| `mulhsu`        | `alu,multiply` |
-| `mulhu`         | `alu,multiply` |
-| `div`           | `alu,divide`   |
-| `divu`          | `alu,divide`   |
-| `rem`           | `alu,divide`   |
-| `remu`          | `alu,divide`   |
+| **Extension** | **Name**  | **Variable-Fields**                   | **Class**    |
+|:--------------|:----------|:--------------------------------------|:-------------|
+| `rv64_c`      | `c_addiw` | `rd_rs1_n0, c_imm6lo, c_imm6hi`       | `compressed` |
+| `rv64_c`      | `c_addw`  | `rd_rs1_p, rs2_p`                     | `compressed` |
+| `rv64_c`      | `c_ld`    | `rd_p, rs1_p, c_uimm8lo, c_uimm8hi`   | `compressed` |
+| `rv64_c`      | `c_ldsp`  | `rd_n0, c_uimm9sphi, c_uimm9splo`     | `compressed` |
+| `rv64_c`      | `c_sd`    | `rs1_p, rs2_p, c_uimm8hi, c_uimm8lo`  | `compressed` |
+| `rv64_c`      | `c_sdsp`  | `c_rs2, c_uimm9sp_s`                  | `compressed` |
+| `rv64_c`      | `c_slli`  | `rd_rs1_n0, c_nzuimm6hi, c_nzuimm6lo` | `compressed` |
+| `rv64_c`      | `c_srai`  | `rd_rs1_p, c_nzuimm6lo, c_nzuimm6hi`  | `compressed` |
+| `rv64_c`      | `c_srli`  | `rd_rs1_p, c_nzuimm6lo, c_nzuimm6hi`  | `compressed` |
+| `rv64_c`      | `c_subw`  | `rd_rs1_p, rs2_p`                     | `compressed` |
 
-:RV32M - "RV32M Standard Extension for Integer Multiply and Divide"
+:RV64C - Standard Extension for Compressed Instructions (64 bit)
 
-| **Instruction** | **Class**      |
-|:----------------|:---------------|
-| `mulw`          | `alu,multiply` |
-| `divw`          | `alu,multiply` |
-| `divuw`         | `alu,multiply` |
-| `remw`          | `alu,divide`   |
-| `remuw`         | `alu,divide`   |
+| **Extension** | **Name** | **Variable-Fields**   | **Class**    |
+|:--------------|:---------|:----------------------|:-------------|
+| `rv128_c`     | `c_lq`   | `crdq, crs1q, cimmq`  | `compressed` |
+| `rv128_c`     | `c_lqsp` | `crd, cimmlqsp`       | `compressed` |
+| `rv128_c`     | `c_sq`   | `crs1q, crs2q, cimmq` | `compressed` |
+| `rv128_c`     | `c_sqsp` | `crs2, cimmsqsp`      | `compressed` |
 
-:RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
+:RV128C - Standard Extension for Compressed Instructions (128 bit)
 
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `lr.w`          | `atomic`  |
-| `sc.w`          | `atomic`  |
-| `amoswap.w`     | `atomic`  |
-| `amoadd.w`      | `atomic`  |
-| `amoxor.w`      | `atomic`  |
-| `amoor.w`       | `atomic`  |
-| `amoand.w`      | `atomic`  |
-| `amomin.w`      | `atomic`  |
-| `amomax.w`      | `atomic`  |
-| `amominu.w`     | `atomic`  |
-| `amomaxu.w`     | `atomic`  |
+| **Extension** | **Name**     | **Variable-Fields**     | **Class**        |
+|:--------------|:-------------|:------------------------|:-----------------|
+| `rv_zcb`      | `c_lbu`      | `rd_p, rs1_p, c_uimm2`  | `load`           |
+| `rv_zcb`      | `c_lh`       | `rd_p, rs1_p, c_uimm1`  | `load`           |
+| `rv_zcb`      | `c_lhu`      | `rd_p, rs1_p, c_uimm1`  | `load`           |
+| `rv_zcb`      | `c_mul`      | `rd_rs1_p, rs2_p`       | `alu, multiply`  |
+| `rv_zcb`      | `c_not`      | `rd_rs1_p`              | `alu`            |
+| `rv_zcb`      | `c_sb`       | `rs2_p, rs1_p, c_uimm2` | `store`          |
+| `rv_zcb`      | `c_sext_b`   | `rd_rs1_p`              | `alu`            |
+| `rv_zcb`      | `c_sext_h`   | `rd_rs1_p`              | `alu`            |
+| `rv_zcb`      | `c_sh`       | `rs2_p, rs1_p, c_uimm1` | `store`          |
+| `rv_zcb`      | `c_zext_b`   | `rd_rs1_p`              | `alu`            |
+| `rv_zcb`      | `c_zext_h`   | `rd_rs1_p`              | `alu`            |
+| `rv_zcmop`    | `c_mop_N`    | `c_mop_t`               | `alu`            |
+| `rv_zcmp`     | `cm_mva01s`  | `c_sreg1, c_sreg2`      | `alu`            |
+| `rv_zcmp`     | `cm_mvsa01`  | `c_sreg1, c_sreg2`      | `alu`            |
+| `rv_zcmp`     | `cm_pop`     | `c_rlist, c_spimm`      | `load`           |
+| `rv_zcmp`     | `cm_popret`  | `c_rlist, c_spimm`      | `load, jump`     |
+| `rv_zcmp`     | `cm_popretz` | `c_rlist, c_spimm`      | `load, jump`     |
+| `rv_zcmp`     | `cm_push`    | `c_rlist, c_spimm`      | `store`          |
+| `rv_zcmt`     | `cm_jalt`    | `c_index`               | `jump, indirect` |
 
-:RV32A - "RV32A Standard Extension for Atomic Instructions"
+:RVZC - Standard Extension for Compressed Instructions
 
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `lr.d`          | `atomic`  |
-| `sc.d`          | `atomic`  |
-| `amoswap.d`     | `atomic`  |
-| `amoadd.d`      | `atomic`  |
-| `amoxor.d`      | `atomic`  |
-| `amoor.d`       | `atomic`  |
-| `amoand.d`      | `atomic`  |
-| `amomin.d`      | `atomic`  |
-| `amomax.d`      | `atomic`  |
-| `amominu.d`     | `atomic`  |
-| `amomaxu.d`     | `atomic`  |
+| **Extension** | **Name**   | **Variable-Fields** | **Class** |
+|:--------------|:-----------|:--------------------|:----------|
+| `rv64_zcb`    | `c_zext_w` | `rd_rs1_p`          | `alu`     |
 
-:RV64A - "RV64A Standard Extension for Atomic Instructions (+ RV32A)"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `ecall`         | `system`  |
-| `ebreak`        | `system`  |
-| `uret`          | `system`  |
-| `sret`          | `system`  |
-| `hret`          | `system`  |
-| `mret`          | `system`  |
-| `dret`          | `system`  |
-| `sfence.vm`     | `system`  |
-| `wfi`           | `system`  |
-| `rdcycle`       | `csr`     |
-| `rdtime`        | `csr`     |
-| `rdinstret`     | `csr`     |
-| `rdcycleh`      | `csr`     |
-| `rdtimeh`       | `csr`     |
-| `rdinstreth`    | `csr`     |
-| `csrrw`         | `csr`     |
-| `csrrs`         | `csr`     |
-| `csrrc`         | `csr`     |
-| `csrrwi`        | `csr`     |
-| `csrrsi`        | `csr`     |
-| `csrrci`        | `csr`     |
-
-:RV32S - "RV32S Standard Extension for Supervisor-level Instructions"
-
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `flw`           | `fpu,load`  |
-| `fsw`           | `fpu,store` |
-| `fmadd.s`       | `fpu,fma`   |
-| `fmsub.s`       | `fpu,fma`   |
-| `fnmadd.s`      | `fpu,fma`   |
-| `fnmsub.s`      | `fpu,fma`   |
-| `fadd.s`        | `fpu`       |
-| `fsub.s`        | `fpu`       |
-| `fmul.s`        | `fpu`       |
-| `fdiv.s`        | `fpu,fdiv`  |
-| `fsgnj.s`       | `fpu`       |
-| `fsgnjn.s`      | `fpu`       |
-| `fsgnjx.s`      | `fpu`       |
-| `fmin.s`        | `fpu`       |
-| `fmax.s`        | `fpu`       |
-| `fsqrt.s`       | `fpu,fsqrt` |
-| `fle.s`         | `fpu`       |
-| `flt.s`         | `fpu`       |
-| `feq.s`         | `fpu`       |
-| `fcvt.w.s`      | `fpu,fcvt`  |
-| `fcvt.wu.s`     | `fpu,fcvt`  |
-| `fcvt.s.w`      | `fpu,fcvt`  |
-| `fcvt.s.wu`     | `fpu,fcvt`  |
-| `fmv.x.s`       | `fpu,fmove` |
-| `fclass.s`      | `fpu`       |
-| `fmv.s.x`       | `fpu,fmove` |
-
-:RV32F - "RV32F Standard Extension for Single-Precision Floating-Point"
-
-| **Instruction** | **Class**  |
-|:----------------|:-----------|
-| `fcvt.l.s`      | `fpu,fcvt` |
-| `fcvt.lu.s`     | `fpu,fcvt` |
-| `fcvt.s.l`      | `fpu,fcvt` |
-| `fcvt.s.lu`     | `fpu,fcvt` |
-
-:RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
-
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `fld`           | `fpu,load`  |
-| `fsd`           | `fpu,store` |
-| `fmadd.d`       | `fpu,fma`   |
-| `fmsub.d`       | `fpu,fma`   |
-| `fnmadd.d`      | `fpu,fma`   |
-| `fnmsub.d`      | `fpu,fma`   |
-| `fadd.d`        | `fpu`       |
-| `fsub.d`        | `fpu`       |
-| `fmul.d`        | `fpu`       |
-| `fdiv.d`        | `fpu,fdiv`  |
-| `fsgnj.d`       | `fpu`       |
-| `fsgnjn.d`      | `fpu`       |
-| `fsgnjx.d`      | `fpu`       |
-| `fmin.d`        | `fpu`       |
-| `fmax.d`        | `fpu`       |
-| `fcvt.s.d`      | `fpu,fcvt`  |
-| `fcvt.d.s`      | `fpu,fcvt`  |
-| `fsqrt.d`       | `fpu,fsqrt` |
-| `fle.d`         | `fpu`       |
-| `flt.d`         | `fpu`       |
-| `feq.d`         | `fpu`       |
-| `fcvt.w.d`      | `fpu,fcvt`  |
-| `fcvt.wu.d`     | `fpu,fcvt`  |
-| `fcvt.d.w`      | `fpu,fcvt`  |
-| `fcvt.d.wu`     | `fpu,fcvt`  |
-| `fclass.d`      | `fpu`       |
-
-:RV32D - "RV32D Standard Extension for Double-Precision Floating-Point"
-
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `fcvt.l.d`      | `fpu,fcvt`  |
-| `fcvt.lu.d`     | `fpu,fcvt`  |
-| `fmv.x.d`       | `fpu,fmove` |
-| `fcvt.d.l`      | `fpu,fcvt`  |
-| `fcvt.d.lu`     | `fpu,fcvt`  |
-| `fmv.d.x`       | `fpu,fmove` |
-
-:RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32D)"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `frcsr`         | `csr`     |
-| `frrm`          | `csr`     |
-| `frflags`       | `csr`     |
-| `fscsr`         | `csr`     |
-| `fsrm`          | `csr`     |
-| `fsflags`       | `csr`     |
-| `fsrmi`         | `csr`     |
-| `fsflagsi`      | `csr`     |
-
-:RV32FD - "RV32F and RV32D Common Floating-Point Instructions"
+:RV64ZC - Standard Extension for Compressed Instructions (64 bit)

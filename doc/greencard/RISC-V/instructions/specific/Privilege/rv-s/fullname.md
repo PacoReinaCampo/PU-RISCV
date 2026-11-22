@@ -1,27 +1,18 @@
 ## INSTRUCTION FULL-NAMES
 
-| **Instruction** | **Instruction Full-Name**                                           |
-|:----------------|:--------------------------------------------------------------------|
-| `ecall`         | `Environment Call`                                                  |
-| `ebreak`        | `Environment Break to Debugger`                                     |
-| `uret`          | `User Return`                                                       |
-| `sret`          | `System Return`                                                     |
-| `hret`          | `Hypervisor Return`                                                 |
-| `mret`          | `Machine-Mode Return`                                               |
-| `dret`          | `Debug-Mode Return`                                                 |
-| `sfence.vm`     | `Supervisor Memory Management Fence`                                |
-| `wfi`           | `Wait For Interrupt`                                                |
-| `rdcycle`       | `Read Cycle Counter Status Register`                                |
-| `rdtime`        | `Read Timer Status register`                                        |
-| `rdinstret`     | `Read Instructions Retired Status Register`                         |
-| `rdcycleh`      | `Read Cycle Counter Status Register (upper 32-bits on RV32)`        |
-| `rdtimeh`       | `Read Timer Status register (upper 32-bits on RV32)`                |
-| `rdinstreth`    | `Read Instructions Retired Status Register (upper 32-bits on RV32)` |
-| `csrrw`         | `CSR Atomic Read Write`                                             |
-| `csrrs`         | `CSR Atomic Set Bit`                                                |
-| `csrrc`         | `CSR Atomic Clear Bit`                                              |
-| `csrrwi`        | `CSR Atomic Read Write Immediate`                                   |
-| `csrrsi`        | `CSR Atomic Set Bit Immediate`                                      |
-| `csrrci`        | `CSR Atomic Clear Bit Immediate`                                    |
+| **Extension**  | **Name**          | **Variable-Fields** | **Full-Name**                                                |
+|:---------------|:------------------|:--------------------|:-------------------------------------------------------------|
+| `rv_sdext`     | `dret`            | `none`              | `Debug-Mode Return`                                          |
+| `rv_smrnmi`    | `mnret`           | `none`              | `Machine-Mode Resumable Non-Maskable Interrupt Return`       |
+| `rv_ssctr`     | `sctrclr`         | `none`              | `Supervisor Control Transfer Record Clear`                   |
+| `rv_s`         | `sfence_vma`      | `rs1, rs2`          | `Supervisor Memory Management Fence`                         |
+| `rv_s`         | `sret`            | `none`              | `System Return`                                              |
+| `rv_svinval_h` | `hinval_gvma`     | `rs1, rs2`          | `Hypervisor Guest-Physical Address Translation Invalidation` |
+| `rv_svinval_h` | `hinval_vvma`     | `rs1, rs2`          | `Hypervisor Guest-Virtual Address Translation Invalidation`  |
+| `rv_svinval`   | `sfence_inval_ir` | `none`              | `Fence Invalidation Before Implicit Reads`                   |
+| `rv_svinval`   | `sfence_w_inval`  | `none`              | `Fence Writes Before Invalidation`                           |
+| `rv_svinval`   | `sinval_vma`      | `rs1, rs2`          | `Supervisor Address Translation Invalidation`                |
+| `rv_system`    | `mret`            | `none`              | `Machine-Mode Return`                                        |
+| `rv_system`    | `wfi`             | `none`              | `Wait For Interrupt`                                         |
 
-:RV32S - "RV32S Standard Extension for Supervisor-level Instructions"
+:RVS - Specific Extension for Supervisor-level Instructions

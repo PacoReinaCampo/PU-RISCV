@@ -1,238 +1,149 @@
 ## INSTRUCTION PSEUDO-CODE (PL)
 
-| **Instruction** | **Instruction Pseudo-Code**                                                             |
-|:----------------|:----------------------------------------------------------------------------------------|
-| `lui`           | `rd = imm`                                                                              |
-| `auipc`         | `rd = pc + imm`                                                                         |
-| `jal`           | `rd = pc + length(inst); pc_offset = imm`                                               |
-| `jalr`          | `ux new_offset = (rs1 + imm - pc) & ~1; rd = pc + length(inst); pc_offset = new_offset` |
-| `beq`           | `if (sx(rs1) == sx(rs2)) pc_offset = imm`                                               |
-| `bne`           | `if (sx(rs1) != sx(rs2)) pc_offset = imm`                                               |
-| `blt`           | `if (sx(rs1) < sx(rs2)) pc_offset = imm`                                                |
-| `bge`           | `if (sx(rs1) >= sx(rs2)) pc_offset = imm`                                               |
-| `bltu`          | `if (ux(rs1) < ux(rs2)) pc_offset = imm`                                                |
-| `bgeu`          | `if (ux(rs1) >= ux(rs2)) pc_offset = imm`                                               |
-| `lb`            | `s8 t; mmu.load<s8>(rs1 + imm, t); rd = t; rd = sx(*(s8*)ptr(rs1 + imm))`               |
-| `lh`            | `s16 t; mmu.load<s16>(rs1 + imm, t); rd = t; rd = sx(*(s16*)ptr(rs1 + imm))`            |
-| `lw`            | `s32 t; mmu.load<s32>(rs1 + imm, t); rd = t; rd = sx(*(s32*)ptr(rs1 + imm))`            |
-| `lbu`           | `u8 t; mmu.load<u8>(rs1 + imm, t); rd = t; rd = ux(*(u8*)ptr(rs1 + imm))`               |
-| `lhu`           | `u16 t; mmu.load<u16>(rs1 + imm, t); rd = t; rd = ux(*(u16*)ptr(rs1 + imm))`            |
-| `lwu`           | `u32 t; mmu.load<u32>(rs1 + imm, t); rd = t; rd = ux(*(u32*)ptr(rs1 + imm))`            |
-| `sb`            | `mmu.store<s8>(rs1 + imm, s8(rs2)); *((u8*)ptr(rs1 + imm)) = rs2`                       |
-| `sh`            | `mmu.store<s16>(rs1 + imm, s16(rs2)); *((u16*)ptr(rs1 + imm)) = rs2`                    |
-| `sw`            | `mmu.store<s32>(rs1 + imm, s32(rs2)); *((u32*)ptr(rs1 + imm)) = rs2`                    |
-| `addi`          | `rd = sx(rs1) + sx(imm)`                                                                |
-| `slti`          | `rd = sx(rs1) < sx(imm)`                                                                |
-| `sltiu`         | `rd = ux(rs1) < ux(imm)`                                                                |
-| `xori`          | `rd = ux(rs1) ^ ux(imm)`                                                                |
-| `ori`           | `rd = ux(rs1) \| ux(imm)`                                                               |
-| `andi`          | `rd = ux(rs1) & ux(imm)`                                                                |
-| `slli`          | `rd = ux(rs1) << imm`                                                                   |
-| `srli`          | `rd = ux(rs1) >> imm`                                                                   |
-| `srai`          | `rd = sx(rs1) >> imm`                                                                   |
-| `add`           | `rd = sx(rs1) + sx(rs2)`                                                                |
-| `sub`           | `rd = sx(rs1) - sx(rs2)`                                                                |
-| `sll`           | `rd = ux(rs1) << (rs2 & 0b1111111); 7-bit mask for RV128I`                              |
-| `slt`           | `rd = sx(rs1) < sx(rs2)`                                                                |
-| `sltu`          | `rd = ux(rs1) < ux(rs2)`                                                                |
-| `xor`           | `rd = ux(rs1) ^ ux(rs2)`                                                                |
-| `srl`           | `rd = ux(rs1) >> (rs2 & 0b1111111); 7-bit mask for RV128I`                              |
-| `sra`           | `rd = sx(rs1) >> (rs2 & 0b1111111); 7-bit mask for RV128I`                              |
-| `or`            | `rd = ux(rs1) \| ux(rs2)`                                                               |
-| `and`           | `rd = ux(rs1) & ux(rs2)`                                                                |
-| `fence`         |                                                                                         |
-| `fence.i`       |                                                                                         |
+| **Extension** | **Name**     | **Variable-Fields** | **Pseudo-Code**                                                                                                                                                                                                                                                                                                                                             |
+|:--------------|:-------------|:--------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv_zk`       | `andn`       | `rd, rs1, rs2`      | `rd = rs1 & ~rs2;`                                                                                                                                                                                                                                                                                                                                          |
+| `rv_zk`       | `clmul`      | `rd, rs1, rs2`      | `result = 0; for (i = 0; i < XLEN; ++i) { if (rs2[i]) result = result ^ (rs1 << i); } rd = result;`                                                                                                                                                                                                                                                         |
+| `rv_zk`       | `clmulh`     | `rd, rs1, rs2`      | `result = 0; for (i = 1; i < XLEN; ++i) { if (rs2[i]) result = result ^ (rs1 >> (XLEN - i)); } rd = result;`                                                                                                                                                                                                                                                |
+| `rv_zkn`      | `andn`       | `rd, rs1, rs2`      | `rd = rs1 & ~rs2;`                                                                                                                                                                                                                                                                                                                                          |
+| `rv_zkn`      | `clmul`      | `rd, rs1, rs2`      | `result = 0; for (i = 0; i < XLEN; ++i) { if (rs2[i]) result = result ^ (rs1 << i); } rd = result;`                                                                                                                                                                                                                                                         |
+| `rv_zkn`      | `clmulh`     | `rd, rs1, rs2`      | `result = 0; for (i = 1; i < XLEN; ++i) { if (rs2[i]) result = result ^ (rs1 >> (XLEN - i)); } rd = result;`                                                                                                                                                                                                                                                |
+| `rv_zknh`     | `sha256sig0` | `rd, rs1`           | `u32_t inb = bits(rs1, 31, 0); u32_t result = ror32(inb, 7) ^ ror32(inb, 18) ^ (inb >> 3); rd = sx(s32(result));`                                                                                                                                                                                                                                           |
+| `rv_zknh`     | `sha256sig1` | `rd, rs1`           | `u32_t inb = bits(rs1, 31, 0); u32_t result = ror32(inb, 17) ^ ror32(inb, 19) ^ (inb >> 10); rd = sx(s32(result));`                                                                                                                                                                                                                                         |
+| `rv_zknh`     | `sha256sum0` | `rd, rs1`           | `u32_t inb = bits(rs1, 31, 0); u32_t result = ror32(inb, 2) ^ ror32(inb, 13) ^ ror32(inb, 22); rd = sx(s32(result));`                                                                                                                                                                                                                                       |
+| `rv_zknh`     | `sha256sum1` | `rd, rs1`           | `u32_t inb = bits(rs1, 31, 0); u32_t result = ror32(inb, 6) ^ ror32(inb, 11) ^ ror32(inb, 25); rd = sx(s32(result));`                                                                                                                                                                                                                                       |
+| `rv_zkn`      | `orn`        | `rd, rs1, rs2`      | `rd = rs1 \| ~rs2;`                                                                                                                                                                                                                                                                                                                                         |
+| `rv_zkn`      | `pack`       | `rd, rs1, rs2`      | `lo_half = bits(rs1, XLEN/2-1, 0); hi_half = bits(rs2, XLEN/2-1, 0); rd = EXTZ(concat_bits(hi_half, lo_half));`                                                                                                                                                                                                                                             |
+| `rv_zkn`      | `packh`      | `rd, rs1, rs2`      | `lo_half = bits(rs1, 7, 0); hi_half = bits(rs2, 7, 0); rd = EXTZ(concat_bits(hi_half, lo_half));`                                                                                                                                                                                                                                                           |
+| `rv_zkn`      | `rol`        | `rd, rs1, rs2`      | `rd = rotate_left(rs1, rs2 & (XLEN - 1), XLEN);`                                                                                                                                                                                                                                                                                                            |
+| `rv_zkn`      | `ror`        | `rd, rs1, rs2`      | `rd = rotate_right(rs1, rs2 & (XLEN - 1), XLEN);`                                                                                                                                                                                                                                                                                                           |
+| `rv_zkn`      | `sha256sig0` | `rd, rs1`           | `u32_t inb = bits(rs1, 31, 0); u32_t result = ror32(inb, 7) ^ ror32(inb, 18) ^ (inb >> 3); rd = sx(s32(result));`                                                                                                                                                                                                                                           |
+| `rv_zkn`      | `sha256sig1` | `rd, rs1`           | `u32_t inb = bits(rs1, 31, 0); u32_t result = ror32(inb, 17) ^ ror32(inb, 19) ^ (inb >> 10); rd = sx(s32(result));`                                                                                                                                                                                                                                         |
+| `rv_zkn`      | `sha256sum0` | `rd, rs1`           | `u32_t inb = bits(rs1, 31, 0); u32_t result = ror32(inb, 2) ^ ror32(inb, 13) ^ ror32(inb, 22); rd = sx(s32(result));`                                                                                                                                                                                                                                       |
+| `rv_zkn`      | `sha256sum1` | `rd, rs1`           | `u32_t inb = bits(rs1, 31, 0); u32_t result = ror32(inb, 6) ^ ror32(inb, 11) ^ ror32(inb, 25); rd = sx(s32(result));`                                                                                                                                                                                                                                       |
+| `rv_zkn`      | `xnor`       | `rd, rs1, rs2`      | `rd = ~(rs1 ^ rs2);`                                                                                                                                                                                                                                                                                                                                        |
+| `rv_zkn`      | `xperm4`     | `rd, rs1, rs2`      | `for (i = 0; i < XLEN; i += 4) { index = bits(rs2, i + 3, i); set_bits(&result, i + 3, i, index < XLEN / 4 ? bits(rs1, 4*index + 3, 4*index) : 0); } rd = result;`                                                                                                                                                                                          |
+| `rv_zkn`      | `xperm8`     | `rd, rs1, rs2`      | `for (i = 0; i < XLEN; i += 8) { index = bits(rs2, i + 7, i); set_bits(&result, i + 7, i, index < XLEN / 8 ? bits(rs1, 8*index + 7, 8*index) : 0); } rd = result;`                                                                                                                                                                                          |
+| `rv_zk`       | `orn`        | `rd, rs1, rs2`      | `rd = rs1 \| ~rs2;`                                                                                                                                                                                                                                                                                                                                         |
+| `rv_zk`       | `pack`       | `rd, rs1, rs2`      | `lo_half = bits(rs1, XLEN/2-1, 0); hi_half = bits(rs2, XLEN/2-1, 0); rd = EXTZ(concat_bits(hi_half, lo_half));`                                                                                                                                                                                                                                             |
+| `rv_zk`       | `packh`      | `rd, rs1, rs2`      | `lo_half = bits(rs1, 7, 0); hi_half = bits(rs2, 7, 0); rd = EXTZ(concat_bits(hi_half, lo_half));`                                                                                                                                                                                                                                                           |
+| `rv_zk`       | `rol`        | `rd, rs1, rs2`      | `rd = rotate_left(rs1, rs2 & (XLEN - 1), XLEN);`                                                                                                                                                                                                                                                                                                            |
+| `rv_zk`       | `ror`        | `rd, rs1, rs2`      | `rd = rotate_right(rs1, rs2 & (XLEN - 1), XLEN);`                                                                                                                                                                                                                                                                                                           |
+| `rv_zks`      | `andn`       | `rd, rs1, rs2`      | `rd = rs1 & ~rs2;`                                                                                                                                                                                                                                                                                                                                          |
+| `rv_zks`      | `clmul`      | `rd, rs1, rs2`      | `result = 0; for (i = 0; i < XLEN; ++i) { if (rs2[i]) result = result ^ (rs1 << i); } rd = result;`                                                                                                                                                                                                                                                         |
+| `rv_zks`      | `clmulh`     | `rd, rs1, rs2`      | `result = 0; for (i = 1; i < XLEN; ++i) { if (rs2[i]) result = result ^ (rs1 >> (XLEN - i)); } rd = result;`                                                                                                                                                                                                                                                |
+| `rv_zksed`    | `sm4ed`      | `rd, rs1, rs2, bs`  | `u8_t shamt = 8 * bs; u8_t sb_in = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u32_t x = concat_bits(0x000000, sm4_sbox(sb_in)); u32_t y = x ^ (x << 8) ^ ( x << 2) ^ (x << 18) ^ ((x & 0x0000003F) << 26) ^ ((x & 0x000000C0) << 10); u32_t z = rol32(y, as_unsigned(shamt)); u32_t result = z ^ bits(rs1, 31, 0); rd = sx(s32(result));`                     |
+| `rv_zksed`    | `sm4ks`      | `rd, rs1, rs2, bs`  | `u8_t shamt = (8 * bs); u8_t sb_in = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u32_t x = concat_bits(0x000000, sm4_sbox(sb_in)); u32_t y = x ^ ((x & 0x00000007) << 29) ^ ((x & 0x000000FE) << 7) ^ ((x & 0x00000001) << 23) ^ ((x & 0x000000F8) << 13); u32_t z = rol32(y, as_unsigned(shamt)); u32_t result = z ^ bits(rs1, 31, 0); rd = sx(s32(result));` |
+| `rv_zk`       | `sha256sig0` | `rd, rs1`           | `u32_t inb = bits(rs1, 31, 0); u32_t result = ror32(inb, 7) ^ ror32(inb, 18) ^ (inb >> 3); rd = sx(s32(result));`                                                                                                                                                                                                                                           |
+| `rv_zk`       | `sha256sig1` | `rd, rs1`           | `u32_t inb = bits(rs1, 31, 0); u32_t result = ror32(inb, 17) ^ ror32(inb, 19) ^ (inb >> 10); rd = sx(s32(result));`                                                                                                                                                                                                                                         |
+| `rv_zk`       | `sha256sum0` | `rd, rs1`           | `u32_t inb = bits(rs1, 31, 0); u32_t result = ror32(inb, 2) ^ ror32(inb, 13) ^ ror32(inb, 22); rd = sx(s32(result));`                                                                                                                                                                                                                                       |
+| `rv_zk`       | `sha256sum1` | `rd, rs1`           | `u32_t inb = bits(rs1, 31, 0); u32_t result = ror32(inb, 6) ^ ror32(inb, 11) ^ ror32(inb, 25); rd = sx(s32(result));`                                                                                                                                                                                                                                       |
+| `rv_zksh`     | `sm3p0`      | `rd, rs1`           | `u32_t r1 = bits(rs1, 31, 0); u32_t result = r1 ^ rol32(r1, 9) ^ rol32(r1, 17); rd = sx(s32(result));`                                                                                                                                                                                                                                                      |
+| `rv_zksh`     | `sm3p1`      | `rd, rs1`           | `u32_t r1 = bits(rs1, 31, 0); u32_t result = r1 ^ rol32(r1, 15) ^ rol32(r1, 23); rd = sx(s32(result));`                                                                                                                                                                                                                                                     |
+| `rv_zks`      | `orn`        | `rd, rs1, rs2`      | `rd = rs1 \| ~rs2;`                                                                                                                                                                                                                                                                                                                                         |
+| `rv_zks`      | `pack`       | `rd, rs1, rs2`      | `lo_half = bits(rs1, XLEN/2-1, 0); hi_half = bits(rs2, XLEN/2-1, 0); rd = EXTZ(concat_bits(hi_half, lo_half));`                                                                                                                                                                                                                                             |
+| `rv_zks`      | `packh`      | `rd, rs1, rs2`      | `lo_half = bits(rs1, 7, 0); hi_half = bits(rs2, 7, 0); rd = EXTZ(concat_bits(hi_half, lo_half));`                                                                                                                                                                                                                                                           |
+| `rv_zks`      | `rol`        | `rd, rs1, rs2`      | `rd = rotate_left(rs1, rs2 & (XLEN - 1), XLEN);`                                                                                                                                                                                                                                                                                                            |
+| `rv_zks`      | `ror`        | `rd, rs1, rs2`      | `rd = rotate_right(rs1, rs2 & (XLEN - 1), XLEN);`                                                                                                                                                                                                                                                                                                           |
+| `rv_zks`      | `sm3p0`      | `rd, rs1`           | `u32_t r1 = bits(rs1, 31, 0); u32_t result = r1 ^ rol32(r1, 9) ^ rol32(r1, 17); rd = sx(s32(result));`                                                                                                                                                                                                                                                      |
+| `rv_zks`      | `sm3p1`      | `rd, rs1`           | `u32_t r1 = bits(rs1, 31, 0); u32_t result = r1 ^ rol32(r1, 15) ^ rol32(r1, 23); rd = sx(s32(result));`                                                                                                                                                                                                                                                     |
+| `rv_zks`      | `sm4ed`      | `rd, rs1, rs2, bs`  | `u8_t shamt = 8 * bs; u8_t sb_in = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u32_t x = concat_bits(0x000000, sm4_sbox(sb_in)); u32_t y = x ^ (x << 8) ^ ( x << 2) ^ (x << 18) ^ ((x & 0x0000003F) << 26) ^ ((x & 0x000000C0) << 10); u32_t z = rol32(y, as_unsigned(shamt)); u32_t result = z ^ bits(rs1, 31, 0); rd = sx(s32(result));`                     |
+| `rv_zks`      | `sm4ks`      | `rd, rs1, rs2, bs`  | `u8_t shamt = (8 * bs); u8_t sb_in = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u32_t x = concat_bits(0x000000, sm4_sbox(sb_in)); u32_t y = x ^ ((x & 0x00000007) << 29) ^ ((x & 0x000000FE) << 7) ^ ((x & 0x00000001) << 23) ^ ((x & 0x000000F8) << 13); u32_t z = rol32(y, as_unsigned(shamt)); u32_t result = z ^ bits(rs1, 31, 0); rd = sx(s32(result));` |
+| `rv_zks`      | `xnor`       | `rd, rs1, rs2`      | `rd = ~(rs1 ^ rs2);`                                                                                                                                                                                                                                                                                                                                        |
+| `rv_zks`      | `xperm4`     | `rd, rs1, rs2`      | `for (i = 0; i < XLEN; i += 4) { index = bits(rs2, i + 3, i); set_bits(&result, i + 3, i, index < XLEN / 4 ? bits(rs1, 4*index + 3, 4*index) : 0); } rd = result;`                                                                                                                                                                                          |
+| `rv_zks`      | `xperm8`     | `rd, rs1, rs2`      | `for (i = 0; i < XLEN; i += 8) { index = bits(rs2, i + 7, i); set_bits(&result, i + 7, i, index < XLEN / 8 ? bits(rs1, 8*index + 7, 8*index) : 0); } rd = result;`                                                                                                                                                                                          |
+| `rv_zk`       | `xnor`       | `rd, rs1, rs2`      | `rd = ~(rs1 ^ rs2);`                                                                                                                                                                                                                                                                                                                                        |
+| `rv_zk`       | `xperm4`     | `rd, rs1, rs2`      | `for (i = 0; i < XLEN; i += 4) { index = bits(rs2, i + 3, i); set_bits(&result, i + 3, i, index < XLEN / 4 ? bits(rs1, 4*index + 3, 4*index) : 0); } rd = result;`                                                                                                                                                                                          |
+| `rv_zk`       | `xperm8`     | `rd, rs1, rs2`      | `for (i = 0; i < XLEN; i += 8) { index = bits(rs2, i + 7, i); set_bits(&result, i + 7, i, index < XLEN / 8 ? bits(rs1, 8*index + 7, 8*index) : 0); } rd = result;`                                                                                                                                                                                          |
 
-:RV32I - "RV32I Base Integer Instruction Set"
+:RVZXK - Specific Extension for Scalar Cryptography Instructions
 
-| **Instruction** | **Instruction Pseudo-Code**                                                  |
-|:----------------|:-----------------------------------------------------------------------------|
-| `ld`            | `s64 t; mmu.load<s64>(rs1 + imm, t); rd = t; rd = sx(*(s64*)ptr(rs1 + imm))` |
-| `sd`            | `mmu.store<s64>(rs1 + imm, s64(rs2)); *(u64*)ptr(rs1 + imm) = rs2`           |
-| `addiw`         | `rd = s32(s32(rs1) + imm); clang requires -fwrapv`                           |
-| `slliw`         | `rd = s32(u32(rs1) << imm)`                                                  |
-| `srliw`         | `rd = s32(u32(rs1) >> imm)`                                                  |
-| `sraiw`         | `rd = s32(rs1) >> imm`                                                       |
-| `addw`          | `rd = s32(s32(rs1) + s32(rs2)); clang requires -fwrapv`                      |
-| `subw`          | `rd = s32(s32(rs1) - s32(rs2)); clang requires -fwrapv`                      |
-| `sllw`          | `rd = s32(u32(rs1) << (rs2 & 0b11111))`                                      |
-| `srlw`          | `rd = s32(u32(rs1) >> (rs2 & 0b11111))`                                      |
-| `sraw`          | `rd = s32(s32(rs1) >> (rs2 & 0b11111))`                                      |
+| **Extension** | **Name**      | **Variable-Fields** | **Pseudo-Code**                                                                                                                                                                                                                           |
+|:--------------|:--------------|:--------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv32_zk`     | `aes32dsi`    | `rd, rs1, rs2, bs`  | `u8_t shamt = 8 * bs; u8_t si = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u32_t so = concat_bits(0x000000, aes_sbox_inv(si)); u32_t result = bits(rs1, 31, 0) ^ rol32(so, as_unsigned(shamt)); rd = sx(s32(result));`                      |
+| `rv32_zk`     | `aes32dsmi`   | `rd, rs1, rs2, bs`  | `u8_t shamt = 8 * bs; u8_t si = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u8_t so = aes_sbox_inv(si); u32_t mixed = aes_mixcolumn_byte_inv(so); u32_t result = bits(rs1, 31, 0) ^ rol32(mixed, as_unsigned(shamt)); rd = sx(s32(result));` |
+| `rv32_zk`     | `aes32esi`    | `rd, rs1, rs2, bs`  | `u8_t shamt = 8 * bs; u8_t si = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u32_t so = concat_bits(0x000000, aes_sbox_fwd(si)); u32_t result = bits(rs1, 31, 0) ^ rol32(so, as_unsigned(shamt)); rd = sx(s32(result));`                      |
+| `rv32_zk`     | `aes32esmi`   | `rd, rs1, rs2, bs`  | `u8_t shamt = 8 * bs; u8_t si = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u8_t so = aes_sbox_fwd(si); u32_t mixed = aes_mixcolumn_byte_fwd(so); u32_t result = bits(rs1, 31, 0) ^ rol32(mixed, as_unsigned(shamt)); rd = sx(s32(result));` |
+| `rv32_zkn`    | `aes32dsi`    | `rd, rs1, rs2, bs`  | `u8_t shamt = 8 * bs; u8_t si = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u32_t so = concat_bits(0x000000, aes_sbox_inv(si)); u32_t result = bits(rs1, 31, 0) ^ rol32(so, as_unsigned(shamt)); rd = sx(s32(result));`                      |
+| `rv32_zkn`    | `aes32dsmi`   | `rd, rs1, rs2, bs`  | `u8_t shamt = 8 * bs; u8_t si = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u8_t so = aes_sbox_inv(si); u32_t mixed = aes_mixcolumn_byte_inv(so); u32_t result = bits(rs1, 31, 0) ^ rol32(mixed, as_unsigned(shamt)); rd = sx(s32(result));` |
+| `rv32_zkn`    | `aes32esi`    | `rd, rs1, rs2, bs`  | `u8_t shamt = 8 * bs; u8_t si = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u32_t so = concat_bits(0x000000, aes_sbox_fwd(si)); u32_t result = bits(rs1, 31, 0) ^ rol32(so, as_unsigned(shamt)); rd = sx(s32(result));`                      |
+| `rv32_zkn`    | `aes32esmi`   | `rd, rs1, rs2, bs`  | `u8_t shamt = 8 * bs; u8_t si = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u8_t so = aes_sbox_fwd(si); u32_t mixed = aes_mixcolumn_byte_fwd(so); u32_t result = bits(rs1, 31, 0) ^ rol32(mixed, as_unsigned(shamt)); rd = sx(s32(result));` |
+| `rv32_zknd`   | `aes32dsi`    | `rd, rs1, rs2, bs`  | `u8_t shamt = 8 * bs; u8_t si = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u32_t so = concat_bits(0x000000, aes_sbox_inv(si)); u32_t result = bits(rs1, 31, 0) ^ rol32(so, as_unsigned(shamt)); rd = sx(s32(result));`                      |
+| `rv32_zknd`   | `aes32dsmi`   | `rd, rs1, rs2, bs`  | `u8_t shamt = 8 * bs; u8_t si = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u8_t so = aes_sbox_inv(si); u32_t mixed = aes_mixcolumn_byte_inv(so); u32_t result = bits(rs1, 31, 0) ^ rol32(mixed, as_unsigned(shamt)); rd = sx(s32(result));` |
+| `rv32_zkne`   | `aes32esi`    | `rd, rs1, rs2, bs`  | `u8_t shamt = 8 * bs; u8_t si = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u32_t so = concat_bits(0x000000, aes_sbox_fwd(si)); u32_t result = bits(rs1, 31, 0) ^ rol32(so, as_unsigned(shamt)); rd = sx(s32(result));`                      |
+| `rv32_zkne`   | `aes32esmi`   | `rd, rs1, rs2, bs`  | `u8_t shamt = 8 * bs; u8_t si = bits((bits(rs2, 31, 0) >> shamt), 7, 0); u8_t so = aes_sbox_fwd(si); u32_t mixed = aes_mixcolumn_byte_fwd(so); u32_t result = bits(rs1, 31, 0) ^ rol32(mixed, as_unsigned(shamt)); rd = sx(s32(result));` |
+| `rv32_zknh`   | `sha512sig0h` | `rd, rs1, rs2`      | `rd = sx((rs1 >> 1) ^ (rs1 >> 7) ^ (rs1 >> 8) ^ (rs2 << 31) ^ (rs2 << 24) );`                                                                                                                                                             |
+| `rv32_zknh`   | `sha512sig0l` | `rd, rs1, rs2`      | `rd = sx((rs1 >> 1) ^ (rs1 >> 7) ^ (rs1 >> 8) ^ (rs2 << 31) ^ (rs2 << 25) ^ (rs2 << 24) );`                                                                                                                                               |
+| `rv32_zknh`   | `sha512sig1h` | `rd, rs1, rs2`      | `rd = sx((rs1 << 3) ^ (rs1 >> 6) ^ (rs1 >> 19) ^ (rs2 >> 29) ^ (rs2 << 13) );`                                                                                                                                                            |
+| `rv32_zknh`   | `sha512sig1l` | `rd, rs1, rs2`      | `rd = sx((rs1 << 3) ^ (rs1 >> 6) ^ (rs1 >> 19) ^ (rs2 >> 29) ^ (rs2 << 26) ^ (rs2 << 13) );`                                                                                                                                              |
+| `rv32_zknh`   | `sha512sum0r` | `rd, rs1, rs2`      | `rd = sx((rs1 << 25) ^ (rs1 << 30) ^ (rs1 >> 28) ^ (rs2 >> 7) ^ (rs2 >> 2) ^ (rs2 << 4) );`                                                                                                                                               |
+| `rv32_zknh`   | `sha512sum1r` | `rd, rs1, rs2`      | `rd = sx((rs1 << 23) ^ (rs1 >> 14) ^ (rs1 >> 18) ^ (rs2 >> 9) ^ (rs2 << 18) ^ (rs2 << 14) );`                                                                                                                                             |
+| `rv32_zkn`    | `sha512sig0h` | `rd, rs1, rs2`      | `rd = sx((rs1 >> 1) ^ (rs1 >> 7) ^ (rs1 >> 8) ^ (rs2 << 31) ^ (rs2 << 24) );`                                                                                                                                                             |
+| `rv32_zkn`    | `sha512sig0l` | `rd, rs1, rs2`      | `rd = sx((rs1 >> 1) ^ (rs1 >> 7) ^ (rs1 >> 8) ^ (rs2 << 31) ^ (rs2 << 25) ^ (rs2 << 24) );`                                                                                                                                               |
+| `rv32_zkn`    | `sha512sig1h` | `rd, rs1, rs2`      | `rd = sx((rs1 << 3) ^ (rs1 >> 6) ^ (rs1 >> 19) ^ (rs2 >> 29) ^ (rs2 << 13) );`                                                                                                                                                            |
+| `rv32_zkn`    | `sha512sig1l` | `rd, rs1, rs2`      | `rd = sx((rs1 << 3) ^ (rs1 >> 6) ^ (rs1 >> 19) ^ (rs2 >> 29) ^ (rs2 << 26) ^ (rs2 << 13) );`                                                                                                                                              |
+| `rv32_zkn`    | `sha512sum0r` | `rd, rs1, rs2`      | `rd = sx((rs1 << 25) ^ (rs1 << 30) ^ (rs1 >> 28) ^ (rs2 >> 7) ^ (rs2 >> 2) ^ (rs2 << 4) );`                                                                                                                                               |
+| `rv32_zkn`    | `sha512sum1r` | `rd, rs1, rs2`      | `rd = sx((rs1 << 23) ^ (rs1 >> 14) ^ (rs1 >> 18) ^ (rs2 >> 9) ^ (rs2 << 18) ^ (rs2 << 14) );`                                                                                                                                             |
+| `rv32_zk`     | `sha512sig0h` | `rd, rs1, rs2`      | `rd = sx((rs1 >> 1) ^ (rs1 >> 7) ^ (rs1 >> 8) ^ (rs2 << 31) ^ (rs2 << 24) );`                                                                                                                                                             |
+| `rv32_zk`     | `sha512sig0l` | `rd, rs1, rs2`      | `rd = sx((rs1 >> 1) ^ (rs1 >> 7) ^ (rs1 >> 8) ^ (rs2 << 31) ^ (rs2 << 25) ^ (rs2 << 24) );`                                                                                                                                               |
+| `rv32_zk`     | `sha512sig1h` | `rd, rs1, rs2`      | `rd = sx((rs1 << 3) ^ (rs1 >> 6) ^ (rs1 >> 19) ^ (rs2 >> 29) ^ (rs2 << 13) );`                                                                                                                                                            |
+| `rv32_zk`     | `sha512sig1l` | `rd, rs1, rs2`      | `rd = sx((rs1 << 3) ^ (rs1 >> 6) ^ (rs1 >> 19) ^ (rs2 >> 29) ^ (rs2 << 26) ^ (rs2 << 13) );`                                                                                                                                              |
+| `rv32_zk`     | `sha512sum0r` | `rd, rs1, rs2`      | `rd = sx((rs1 << 25) ^ (rs1 << 30) ^ (rs1 >> 28) ^ (rs2 >> 7) ^ (rs2 >> 2) ^ (rs2 << 4) );`                                                                                                                                               |
+| `rv32_zk`     | `sha512sum1r` | `rd, rs1, rs2`      | `rd = sx((rs1 << 23) ^ (rs1 >> 14) ^ (rs1 >> 18) ^ (rs2 >> 9) ^ (rs2 << 18) ^ (rs2 << 14) );`                                                                                                                                             |
 
-:RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
+:RV32ZXK - Specific Extension for Scalar Cryptography Instructions (32 bit)
 
-| **Instruction** | **Instruction Pseudo-Code**                                                                          |
-|:----------------|:-----------------------------------------------------------------------------------------------------|
-| `mul`           | `rd = sx(rs1) * sx(rs2)`                                                                             |
-| `mulh`          | `rd = riscv::mulh(sx(rs1), sx(rs2))`                                                                 |
-| `mulhsu`        | `rd = riscv::mulhsu(sx(rs1), ux(rs2))`                                                               |
-| `mulhu`         | `rd = riscv::mulhu(ux(rs1), ux(rs2))`                                                                |
-| `div`           | `rd = sx(rs1) == sx(INT_MIN) && sx(rs2) == -1 ? sx(INT_MIN) : sx(rs2) == 0 ? -1 : sx(rs1) / sx(rs2)` |
-| `divu`          | `rd = sx(rs2) == 0 ? -1 : sx(ux(rs1) / ux(rs2))`                                                     |
-| `rem`           | `rd = sx(rs1) == sx(INT_MIN) && sx(rs2) == -1 ? 0 : sx(rs2) == 0 ? sx(rs1) : sx(rs1) % sx(rs2)`      |
-| `remu`          | `rd = sx(rs2) == 0 ? sx(rs1) : sx(ux(rs1) % ux(rs2))`                                                |
+| **Extension** | **Name**     | **Variable-Fields** | **Pseudo-Code**                                                                                                                                                                                                                                                          |
+|:--------------|:-------------|:--------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv64_zk`     | `aes64ds`    | `rd, rs1, rs2`      | `u64_t sr = aes_rv64_shiftrows_inv(bits(rs2, 63, 0), bits(rs1, 63, 0)); u64_t wd = bits(sr, 63, 0); rd = aes_apply_inv_sbox_to_each_byte(wd);`                                                                                                                           |
+| `rv64_zk`     | `aes64dsm`   | `rd, rs1, rs2`      | `u64_t sr = aes_rv64_shiftrows_inv(bits(rs2, 63, 0), bits(rs1, 63, 0)); u64_t wd = bits(sr, 63, 0); u64_t sb = aes_apply_inv_sbox_to_each_byte(wd); rd = concat_bits(aes_mixcolumn_inv(bits(sb, 63, 32)), aes_mixcolumn_inv(bits(sb, 31, 0)));`                          |
+| `rv64_zk`     | `aes64es`    | `rd, rs1, rs2`      | `u64_t sr = aes_rv64_shiftrows_fwd(bits(rs2, 63, 0), bits(rs1, 63, 0)); u64_t wd = bits(sr, 63, 0); rd = aes_apply_fwd_sbox_to_each_byte(wd);`                                                                                                                           |
+| `rv64_zk`     | `aes64esm`   | `rd, rs1, rs2`      | `u64_t sr = aes_rv64_shiftrows_fwd(bits(rs2, 63, 0), bits(rs1, 63, 0)); u64_t wd = bits(sr, 63, 0); u64_t sb = aes_apply_fwd_sbox_to_each_byte(wd); rd = concat_bits(aes_mixcolumn_fwd(bits(sb, 63, 32)), aes_mixcolumn_fwd(bits(sb, 31, 0)));`                          |
+| `rv64_zk`     | `aes64im`    | `rd, rs1`           | `u32_t w0 = aes_mixcolumn_inv(bits(rs1, 31, 0)); u32_t w1 = aes_mixcolumn_inv(bits(rs1, 63, 32)); rd = concat_bits(w1, w0);`                                                                                                                                             |
+| `rv64_zk`     | `aes64ks1i`  | `rd, rs1, rnum`     | `if (rnum > 10) { trap(CAUSE_ILLEGAL_INSTRUCTION); } else { u32_t word = bits(rs1, 63, 32); u32_t rotated = rnum == 10 ? word : ror32(word, 8); u32_t result = aes_subword_fwd(rotated) ^ (rnum == 10 ? 0 : aes_decode_rcon(rnum)); rd = concat_bits(result, result); }` |
+| `rv64_zk`     | `aes64ks2`   | `rd, rs1, rs2`      | `u32_t w0 = bits(rs1, 63, 32) ^ bits(rs2, 31, 0); u32_t w1 = bits(rs1, 63, 32) ^ bits(rs2, 31, 0) ^ bits(rs2, 63, 32); rd = concat_bits(w1, w0);`                                                                                                                        |
+| `rv64_zkn`    | `aes64ds`    | `rd, rs1, rs2`      | `u64_t sr = aes_rv64_shiftrows_inv(bits(rs2, 63, 0), bits(rs1, 63, 0)); u64_t wd = bits(sr, 63, 0); rd = aes_apply_inv_sbox_to_each_byte(wd);`                                                                                                                           |
+| `rv64_zkn`    | `aes64dsm`   | `rd, rs1, rs2`      | `u64_t sr = aes_rv64_shiftrows_inv(bits(rs2, 63, 0), bits(rs1, 63, 0)); u64_t wd = bits(sr, 63, 0); u64_t sb = aes_apply_inv_sbox_to_each_byte(wd); rd = concat_bits(aes_mixcolumn_inv(bits(sb, 63, 32)), aes_mixcolumn_inv(bits(sb, 31, 0)));`                          |
+| `rv64_zkn`    | `aes64es`    | `rd, rs1, rs2`      | `u64_t sr = aes_rv64_shiftrows_fwd(bits(rs2, 63, 0), bits(rs1, 63, 0)); u64_t wd = bits(sr, 63, 0); rd = aes_apply_fwd_sbox_to_each_byte(wd);`                                                                                                                           |
+| `rv64_zkn`    | `aes64esm`   | `rd, rs1, rs2`      | `u64_t sr = aes_rv64_shiftrows_fwd(bits(rs2, 63, 0), bits(rs1, 63, 0)); u64_t wd = bits(sr, 63, 0); u64_t sb = aes_apply_fwd_sbox_to_each_byte(wd); rd = concat_bits(aes_mixcolumn_fwd(bits(sb, 63, 32)), aes_mixcolumn_fwd(bits(sb, 31, 0)));`                          |
+| `rv64_zkn`    | `aes64im`    | `rd, rs1`           | `u32_t w0 = aes_mixcolumn_inv(bits(rs1, 31, 0)); u32_t w1 = aes_mixcolumn_inv(bits(rs1, 63, 32)); rd = concat_bits(w1, w0);`                                                                                                                                             |
+| `rv64_zkn`    | `aes64ks1i`  | `rd, rs1, rnum`     | `if (rnum > 10) { trap(CAUSE_ILLEGAL_INSTRUCTION); } else { u32_t word = bits(rs1, 63, 32); u32_t rotated = rnum == 10 ? word : ror32(word, 8); u32_t result = aes_subword_fwd(rotated) ^ (rnum == 10 ? 0 : aes_decode_rcon(rnum)); rd = concat_bits(result, result); }` |
+| `rv64_zkn`    | `aes64ks2`   | `rd, rs1, rs2`      | `u32_t w0 = bits(rs1, 63, 32) ^ bits(rs2, 31, 0); u32_t w1 = bits(rs1, 63, 32) ^ bits(rs2, 31, 0) ^ bits(rs2, 63, 32); rd = concat_bits(w1, w0);`                                                                                                                        |
+| `rv64_zknd`   | `aes64ds`    | `rd, rs1, rs2`      | `u64_t sr = aes_rv64_shiftrows_inv(bits(rs2, 63, 0), bits(rs1, 63, 0)); u64_t wd = bits(sr, 63, 0); rd = aes_apply_inv_sbox_to_each_byte(wd);`                                                                                                                           |
+| `rv64_zknd`   | `aes64dsm`   | `rd, rs1, rs2`      | `u64_t sr = aes_rv64_shiftrows_inv(bits(rs2, 63, 0), bits(rs1, 63, 0)); u64_t wd = bits(sr, 63, 0); u64_t sb = aes_apply_inv_sbox_to_each_byte(wd); rd = concat_bits(aes_mixcolumn_inv(bits(sb, 63, 32)), aes_mixcolumn_inv(bits(sb, 31, 0)));`                          |
+| `rv64_zknd`   | `aes64im`    | `rd, rs1`           | `u32_t w0 = aes_mixcolumn_inv(bits(rs1, 31, 0)); u32_t w1 = aes_mixcolumn_inv(bits(rs1, 63, 32)); rd = concat_bits(w1, w0);`                                                                                                                                             |
+| `rv64_zknd`   | `aes64ks1i`  | `rd, rs1, rnum`     | `if (rnum > 10) { trap(CAUSE_ILLEGAL_INSTRUCTION); } else { u32_t word = bits(rs1, 63, 32); u32_t rotated = rnum == 10 ? word : ror32(word, 8); u32_t result = aes_subword_fwd(rotated) ^ (rnum == 10 ? 0 : aes_decode_rcon(rnum)); rd = concat_bits(result, result); }` |
+| `rv64_zknd`   | `aes64ks2`   | `rd, rs1, rs2`      | `u32_t w0 = bits(rs1, 63, 32) ^ bits(rs2, 31, 0); u32_t w1 = bits(rs1, 63, 32) ^ bits(rs2, 31, 0) ^ bits(rs2, 63, 32); rd = concat_bits(w1, w0);`                                                                                                                        |
+| `rv64_zkne`   | `aes64es`    | `rd, rs1, rs2`      | `u64_t sr = aes_rv64_shiftrows_fwd(bits(rs2, 63, 0), bits(rs1, 63, 0)); u64_t wd = bits(sr, 63, 0); rd = aes_apply_fwd_sbox_to_each_byte(wd);`                                                                                                                           |
+| `rv64_zkne`   | `aes64esm`   | `rd, rs1, rs2`      | `u64_t sr = aes_rv64_shiftrows_fwd(bits(rs2, 63, 0), bits(rs1, 63, 0)); u64_t wd = bits(sr, 63, 0); u64_t sb = aes_apply_fwd_sbox_to_each_byte(wd); rd = concat_bits(aes_mixcolumn_fwd(bits(sb, 63, 32)), aes_mixcolumn_fwd(bits(sb, 31, 0)));`                          |
+| `rv64_zkne`   | `aes64ks1i`  | `rd, rs1, rnum`     | `if (rnum > 10) { trap(CAUSE_ILLEGAL_INSTRUCTION); } else { u32_t word = bits(rs1, 63, 32); u32_t rotated = rnum == 10 ? word : ror32(word, 8); u32_t result = aes_subword_fwd(rotated) ^ (rnum == 10 ? 0 : aes_decode_rcon(rnum)); rd = concat_bits(result, result); }` |
+| `rv64_zkne`   | `aes64ks2`   | `rd, rs1, rs2`      | `u32_t w0 = bits(rs1, 63, 32) ^ bits(rs2, 31, 0); u32_t w1 = bits(rs1, 63, 32) ^ bits(rs2, 31, 0) ^ bits(rs2, 63, 32); rd = concat_bits(w1, w0);`                                                                                                                        |
+| `rv64_zknh`   | `sha512sig0` | `rd, rs1`           | `rd = ror64(rs1, 1) ^ ror64(rs1, 8) ^ (rs1 >> 7);`                                                                                                                                                                                                                       |
+| `rv64_zknh`   | `sha512sig1` | `rd, rs1`           | `rd = ror64(rs1, 19) ^ ror64(rs1, 61) ^ (rs1 >> 6);`                                                                                                                                                                                                                     |
+| `rv64_zknh`   | `sha512sum0` | `rd, rs1`           | `rd = ror64(rs1, 28) ^ ror64(rs1, 34) ^ ror64(rs1,39);`                                                                                                                                                                                                                  |
+| `rv64_zknh`   | `sha512sum1` | `rd, rs1`           | `rd = ror64(rs1, 14) ^ ror64(rs1, 18) ^ ror64(rs1,41);`                                                                                                                                                                                                                  |
+| `rv64_zkn`    | `packw`      | `rd, rs1, rs2`      | `lo_half = bits(rs1, 15, 0); hi_half = bits(rs2, 15, 0); rd = EXTS(concat_bits(hi_half, lo_half));`                                                                                                                                                                      |
+| `rv64_zkn`    | `rolw`       | `rd, rs1, rs2`      | `rd = sx(s32(rotate_left(bits(rs1, 31, 0), rs2 & (32 - 1), 32)));`                                                                                                                                                                                                       |
+| `rv64_zkn`    | `rori`       | `rd, rs1, shamtd`   | `rd = rotate_right(rs1, shamtd & (XLEN - 1), XLEN);`                                                                                                                                                                                                                     |
+| `rv64_zkn`    | `roriw`      | `rd, rs1, shamtw`   | `rd = sx(s32(rotate_right(bits(rs1, 31, 0), shamtw & (32 - 1), 32)));`                                                                                                                                                                                                   |
+| `rv64_zkn`    | `rorw`       | `rd, rs1, rs2`      | `rd = sx(s32(rotate_right(bits(rs1, 31, 0), rs2 & (32 - 1), 32)));`                                                                                                                                                                                                      |
+| `rv64_zkn`    | `sha512sig0` | `rd, rs1`           | `rd = ror64(rs1, 1) ^ ror64(rs1, 8) ^ (rs1 >> 7);`                                                                                                                                                                                                                       |
+| `rv64_zkn`    | `sha512sig1` | `rd, rs1`           | `rd = ror64(rs1, 19) ^ ror64(rs1, 61) ^ (rs1 >> 6);`                                                                                                                                                                                                                     |
+| `rv64_zkn`    | `sha512sum0` | `rd, rs1`           | `rd = ror64(rs1, 28) ^ ror64(rs1, 34) ^ ror64(rs1,39);`                                                                                                                                                                                                                  |
+| `rv64_zkn`    | `sha512sum1` | `rd, rs1`           | `rd = ror64(rs1, 14) ^ ror64(rs1, 18) ^ ror64(rs1,41);`                                                                                                                                                                                                                  |
+| `rv64_zk`     | `packw`      | `rd, rs1, rs2`      | `lo_half = bits(rs1, 15, 0); hi_half = bits(rs2, 15, 0); rd = EXTS(concat_bits(hi_half, lo_half));`                                                                                                                                                                      |
+| `rv64_zk`     | `rolw`       | `rd, rs1, rs2`      | `rd = sx(s32(rotate_left(bits(rs1, 31, 0), rs2 & (32 - 1), 32)));`                                                                                                                                                                                                       |
+| `rv64_zk`     | `rori`       | `rd, rs1, shamtd`   | `rd = rotate_right(rs1, shamtd & (XLEN - 1), XLEN);`                                                                                                                                                                                                                     |
+| `rv64_zk`     | `roriw`      | `rd, rs1, shamtw`   | `rd = sx(s32(rotate_right(bits(rs1, 31, 0), shamtw & (32 - 1), 32)));`                                                                                                                                                                                                   |
+| `rv64_zk`     | `rorw`       | `rd, rs1, rs2`      | `rd = sx(s32(rotate_right(bits(rs1, 31, 0), rs2 & (32 - 1), 32)));`                                                                                                                                                                                                      |
+| `rv64_zk`     | `sha512sig0` | `rd, rs1`           | `rd = ror64(rs1, 1) ^ ror64(rs1, 8) ^ (rs1 >> 7);`                                                                                                                                                                                                                       |
+| `rv64_zk`     | `sha512sig1` | `rd, rs1`           | `rd = ror64(rs1, 19) ^ ror64(rs1, 61) ^ (rs1 >> 6);`                                                                                                                                                                                                                     |
+| `rv64_zk`     | `sha512sum0` | `rd, rs1`           | `rd = ror64(rs1, 28) ^ ror64(rs1, 34) ^ ror64(rs1,39);`                                                                                                                                                                                                                  |
+| `rv64_zk`     | `sha512sum1` | `rd, rs1`           | `rd = ror64(rs1, 14) ^ ror64(rs1, 18) ^ ror64(rs1,41);`                                                                                                                                                                                                                  |
+| `rv64_zks`    | `packw`      | `rd, rs1, rs2`      | `lo_half = bits(rs1, 15, 0); hi_half = bits(rs2, 15, 0); rd = EXTS(concat_bits(hi_half, lo_half));`                                                                                                                                                                      |
+| `rv64_zks`    | `rolw`       | `rd, rs1, rs2`      | `rd = sx(s32(rotate_left(bits(rs1, 31, 0), rs2 & (32 - 1), 32)));`                                                                                                                                                                                                       |
+| `rv64_zks`    | `rori`       | `rd, rs1, shamtd`   | `rd = rotate_right(rs1, shamtd & (XLEN - 1), XLEN);`                                                                                                                                                                                                                     |
+| `rv64_zks`    | `roriw`      | `rd, rs1, shamtw`   | `rd = sx(s32(rotate_right(bits(rs1, 31, 0), shamtw & (32 - 1), 32)));`                                                                                                                                                                                                   |
+| `rv64_zks`    | `rorw`       | `rd, rs1, rs2`      | `rd = sx(s32(rotate_right(bits(rs1, 31, 0), rs2 & (32 - 1), 32)));`                                                                                                                                                                                                      |
 
-:RV32M - "RV32M Standard Extension for Integer Multiply and Divide"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                                                 |
-|:----------------|:------------------------------------------------------------------------------------------------------------|
-| `mulw`          | `rd = s32(u32(rs1) * u32(rs2))`                                                                             |
-| `divw`          | `rd = s32(rs1) == s32(INT_MIN) && s32(rs2) == -1 ? s32(INT_MIN) : s32(rs2) == 0 ? -1 : s32(rs1) / s32(rs2)` |
-| `divuw`         | `rd = s32(rs2) == 0 ? -1 : s32(u32(rs1) / u32(rs2))`                                                        |
-| `remw`          | `rd = s32(rs1) == s32(INT_MIN) && s32(rs2) == -1 ? 0 : s32(rs2) == 0 ? s32(rs1) : s32(rs1) % s32(rs2)`      |
-| `remuw`         | `rd = s32(rs2) == 0 ? s32(rs1) : s32(u32(rs1) % u32(rs2))`                                                  |
-
-:RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                        |
-|:----------------|:-----------------------------------------------------------------------------------|
-| `lr.w`          | `lr = rs1; s32 t; mmu.load<s32>(rs1, t); rd = t`                                   |
-| `sc.w`          | `ux res = 0; if (lr != rs1) res = 1; else mmu.store<s32>(rs1, s32(rs2)); rd = res` |
-| `amoswap.w`     | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoswap, rs1, t1, t2); rd = t1`               |
-| `amoadd.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoadd, rs1, t1, t2); rd = t1`                |
-| `amoxor.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoxor, rs1, t1, t2); rd = t1`                |
-| `amoor.w`       | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoor, rs1, t1, t2); rd = t1`                 |
-| `amoand.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amoand, rs1, t1, t2); rd = t1`                |
-| `amomin.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amomin, rs1, t1, t2); rd = t1`                |
-| `amomax.w`      | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amomax, rs1, t1, t2); rd = t1`                |
-| `amominu.w`     | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amominu, rs1, t1, t2); rd = t1`               |
-| `amomaxu.w`     | `s32 t1, t2 = s32(rs2); mmu.amo<s32>(amomaxu, rs1, t1, t2); rd = t1`               |
-
-:RV32A - "RV32A Standard Extension for Atomic Instructions"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                        |
-|:----------------|:-----------------------------------------------------------------------------------|
-| `lr.d`          | `lr = rs1; s64 t; mmu.load<s64>(rs1, t); rd = t`                                   |
-| `sc.d`          | `ux res = 0; if (lr != rs1) res = 1; else mmu.store<s64>(rs1, s64(rs2)); rd = res` |
-| `amoswap.d`     | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoswap, rs1, t1, t2); rd = t1`               |
-| `amoadd.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoadd, rs1, t1, t2); rd = t1`                |
-| `amoxor.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoxor, rs1, t1, t2); rd = t1`                |
-| `amoor.d`       | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoor, rs1, t1, t2); rd = t1`                 |
-| `amoand.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amoand, rs1, t1, t2); rd = t1`                |
-| `amomin.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amomin, rs1, t1, t2); rd = t1`                |
-| `amomax.d`      | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amomax, rs1, t1, t2); rd = t1`                |
-| `amominu.d`     | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amominu, rs1, t1, t2); rd = t1`               |
-| `amomaxu.d`     | `s64 t1, t2 = s64(rs2); mmu.amo<s64>(amomaxu, rs1, t1, t2); rd = t1`               |
-
-:RV64A - "RV64A Standard Extension for Atomic Instructions (+ RV32A)"
-
-| **Instruction** | **Instruction Pseudo-Code** |
-|:----------------|:----------------------------|
-| `ecall`         |                             |
-| `ebreak`        |                             |
-| `uret`          |                             |
-| `sret`          |                             |
-| `hret`          |                             |
-| `mret`          |                             |
-| `dret`          |                             |
-| `sfence.vm`     |                             |
-| `wfi`           |                             |
-| `rdcycle`       |                             |
-| `rdtime`        |                             |
-| `rdinstret`     |                             |
-| `rdcycleh`      |                             |
-| `rdtimeh`       |                             |
-| `rdinstreth`    |                             |
-| `csrrw`         |                             |
-| `csrrs`         |                             |
-| `csrrc`         |                             |
-| `csrrwi`        |                             |
-| `csrrsi`        |                             |
-| `csrrci`        |                             |
-
-:RV32S - "RV32S Standard Extension for Supervisor-level Instructions"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                          |
-|:----------------|:-------------------------------------------------------------------------------------|
-| `flw`           | `u32 t; mmu.load<u32>(rs1 + imm, t); u32(frd) = t; f32(frd) = *(f32*)ptr(rs1 + imm)` |
-| `fsw`           | `mmu.store<f32>(rs1 + imm, f32(frs2)); *(f32*)ptr(rs1 + imm) = f32(frs2)`            |
-| `fmadd.s`       | `fenv_setrm(rm); f32(frd) = f32(frs1) * f32(frs2) + f32(frs3); -mfma`                |
-| `fmsub.s`       | `fenv_setrm(rm); f32(frd) = f32(frs1) * f32(frs2) - f32(frs3)`                       |
-| `fnmadd.s`      | `fenv_setrm(rm); f32(frd) = f32(frs1) * -f32(frs2) - f32(frs3)`                      |
-| `fnmsub.s`      | `fenv_setrm(rm); f32(frd) = f32(frs1) * -f32(frs2) + f32(frs3)`                      |
-| `fadd.s`        | `fenv_setrm(rm); f32(frd) = f32(frs1) + f32(frs2)`                                   |
-| `fsub.s`        | `fenv_setrm(rm); f32(frd) = f32(frs1) - f32(frs2)`                                   |
-| `fmul.s`        | `fenv_setrm(rm); f32(frd) = f32(frs1) * f32(frs2)`                                   |
-| `fdiv.s`        | `fenv_setrm(rm); f32(frd) = f32(frs1) / f32(frs2)`                                   |
-| `fsgnj.s`       | `u32(frd) = (u32(frs1) & u32(~(1U<<31))) \| (u32(frs2) & u32(1U<<31))`               |
-| `fsgnjn.s`      | `u32(frd) = (u32(frs1) & u32(~(1U<<31))) \| (~u32(frs2) & u32(1U<<31))`              |
-| `fsgnjx.s`      | `u32(frd) = u32(frs1) ^ (u32(frs2) & u32(1U<<31))`                                   |
-| `fmin.s`        | `f32(frd) = (f32(frs1) < f32(frs2)) \|\| isnan(f32(frs2)) ? f32(frs1) : f32(frs2)`   |
-| `fmax.s`        | `f32(frd) = (f32(frs1) > f32(frs2)) \|\| isnan(f32(frs2)) ? f32(frs1) : f32(frs2)`   |
-| `fsqrt.s`       | `fenv_setrm(rm); f32(frd) = riscv::f32_sqrt(f32(frs1))`                              |
-| `fle.s`         | `rd = f32(frs1) <= f32(frs2)`                                                        |
-| `flt.s`         | `rd = f32(frs1) < f32(frs2)`                                                         |
-| `feq.s`         | `rd = f32(frs1) == f32(frs2)`                                                        |
-| `fcvt.w.s`      | `fenv_setrm(rm); rd = riscv::fcvt_w(fcsr, f32(frs1)); s32(f32(frs1))`                |
-| `fcvt.wu.s`     | `fenv_setrm(rm); rd = riscv::fcvt_wu(fcsr, f32(frs1)); s32(u32(f32(frs1)))`          |
-| `fcvt.s.w`      | `fenv_setrm(rm); f32(frd) = f32(s32(rs1))`                                           |
-| `fcvt.s.wu`     | `fenv_setrm(rm); f32(frd) = f32(u32(rs1))`                                           |
-| `fmv.x.s`       | `rd = isnan(f32(frs1)) ? s32(u32(f32(NAN))) : s32(frs1); s32(frs1)`                  |
-| `fclass.s`      | `rd = f32_classify(f32(frs1))`                                                       |
-| `fmv.s.x`       | `u32(frd) = u32(rs1)`                                                                |
-
-:RV32F - "RV32F Standard Extension for Single-Precision Floating-Point"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                 |
-|:----------------|:----------------------------------------------------------------------------|
-| `fcvt.l.s`      | `fenv_setrm(rm); rd = riscv::fcvt_l(fcsr, f32(frs1)); s64(f32(frs1))`       |
-| `fcvt.lu.s`     | `fenv_setrm(rm); rd = riscv::fcvt_lu(fcsr, f32(frs1)); s64(u32(f32(frs1)))` |
-| `fcvt.s.l`      | `fenv_setrm(rm); f32(frd) = f32(s64(rs1))`                                  |
-| `fcvt.s.lu`     | `fenv_setrm(rm); f32(frd) = f32(u64(rs1))`                                  |
-
-:RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                          |
-|:----------------|:-------------------------------------------------------------------------------------|
-| `fld`           | `u64 t; mmu.load<u64>(rs1 + imm, t); u64(frd) = t; f64(frd) = *(f64*)ptr(rs1 + imm)` |
-| `fsd`           | `mmu.store<f64>(rs1 + imm, f64(frs2)); *(f64*)ptr(rs1 + imm) = f64(frs2)`            |
-| `fmadd.d`       | `fenv_setrm(rm); f64(frd) = f64(frs1) * f64(frs2) + f64(frs3)`                       |
-| `fmsub.d`       | `fenv_setrm(rm); f64(frd) = f64(frs1) * f64(frs2) - f64(frs3)`                       |
-| `fnmadd.d`      | `fenv_setrm(rm); f64(frd) = f64(frs1) * -f64(frs2) - f64(frs3)`                      |
-| `fnmsub.d`      | `fenv_setrm(rm); f64(frd) = f64(frs1) * -f64(frs2) + f64(frs3)`                      |
-| `fadd.d`        | `fenv_setrm(rm); f64(frd) = f64(frs1) + f64(frs2)`                                   |
-| `fsub.d`        | `fenv_setrm(rm); f64(frd) = f64(frs1) - f64(frs2)`                                   |
-| `fmul.d`        | `fenv_setrm(rm); f64(frd) = f64(frs1) * f64(frs2)`                                   |
-| `fdiv.d`        | `fenv_setrm(rm); f64(frd) = f64(frs1) / f64(frs2)`                                   |
-| `fsgnj.d`       | `u64(frd) = (u64(frs1) & u64(~(1ULL<<63))) \| (u64(frs2) & u64(1ULL<<63))`           |
-| `fsgnjn.d`      | `u64(frd) = (u64(frs1) & u64(~(1ULL<<63))) \| (~u64(frs2) & u64(1ULL<<63))`          |
-| `fsgnjx.d`      | `u64(frd) = u64(frs1) ^ (u64(frs2) & u64(1ULL<<63))`                                 |
-| `fmin.d`        | `f64(frd) = (f64(frs1) < f64(frs2)) \|\| isnan(f64(frs2)) ? f64(frs1) : f64(frs2)`   |
-| `fmax.d`        | `f64(frd) = (f64(frs1) > f64(frs2)) \|\| isnan(f64(frs2)) ? f64(frs1) : f64(frs2)`   |
-| `fcvt.s.d`      | `fenv_setrm(rm); f32(frd) = f32(f64(frs1))`                                          |
-| `fcvt.d.s`      | `fenv_setrm(rm); f64(frd) = f64(f32(frs1))`                                          |
-| `fsqrt.d`       | `fenv_setrm(rm); f64(frd) = riscv::f64_sqrt(f64(frs1))`                              |
-| `fle.d`         | `rd = f64(frs1) <= f64(frs2)`                                                        |
-| `flt.d`         | `rd = f64(frs1) < f64(frs2)`                                                         |
-| `feq.d`         | `rd = f64(frs1) == f64(frs2)`                                                        |
-| `fcvt.w.d`      | `fenv_setrm(rm); rd = riscv::fcvt_w(fcsr, f64(frs1)); s32(f64(frs1))`                |
-| `fcvt.wu.d`     | `fenv_setrm(rm); rd = riscv::fcvt_wu(fcsr, f64(frs1)); s32(u32(f64(frs1)))`          |
-| `fcvt.d.w`      | `fenv_setrm(rm); f64(frd) = f64(s32(rs1))`                                           |
-| `fcvt.d.wu`     | `fenv_setrm(rm); f64(frd) = f64(u32(rs1))`                                           |
-| `fclass.d`      | `rd = f64_classify(f64(frs1))`                                                       |
-
-:RV32D - "RV32D Standard Extension for Double-Precision Floating-Point"
-
-| **Instruction** | **Instruction Pseudo-Code**                                                 |
-|:----------------|:----------------------------------------------------------------------------|
-| `fcvt.l.d`      | `fenv_setrm(rm); rd = riscv::fcvt_l(fcsr, f64(frs1)); s64(f64(frs1))`       |
-| `fcvt.lu.d`     | `fenv_setrm(rm); rd = riscv::fcvt_lu(fcsr, f64(frs1)); s64(u64(f64(frs1)))` |
-| `fmv.x.d`       | `rd = isnan(f64(frs1)) ? s64(u64(f64(NAN))) : s64(frs1); s64(frs1)`         |
-| `fcvt.d.l`      | `fenv_setrm(rm); f64(frd) = f64(s64(rs1))`                                  |
-| `fcvt.d.lu`     | `fenv_setrm(rm); f64(frd) = f64(u64(rs1))`                                  |
-| `fmv.d.x`       | `u64(frd) = u64(rs1)`                                                       |
-
-:RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32F)"
-
-| **Instruction** | **Instruction Pseudo-Code** |
-|:----------------|:----------------------------|
-| `frcsr`         |                             |
-| `frrm`          |                             |
-| `frflags`       |                             |
-| `fscsr`         |                             |
-| `fsrm`          |                             |
-| `fsflags`       |                             |
-| `fsrmi`         |                             |
-| `fsflagsi`      |                             |
-
-:RV32FD - "RV32F and RV32D Common Floating-Point Instructions"
+:RV64ZXK - Specific Extension for Scalar Cryptography Instructions (64 bit)

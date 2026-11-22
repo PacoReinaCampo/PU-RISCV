@@ -7,6 +7,6 @@
 | `fullname`       | `Instruction Full-Names`        |
 | `pseudocode-hdl` | `Instruction Pseudo-Code (HDL)` |
 | `pseudocode-pl`  | `Instruction Pseudo-Code (PL)`  |
-| `opcode`         | `Opcode Encoding Information`   |
+| `opcode`         | `Instruction Opcode`            |
 
 :Instruction Directory

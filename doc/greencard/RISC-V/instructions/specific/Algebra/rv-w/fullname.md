@@ -1,629 +1,722 @@
 ## INSTRUCTION FULL-NAMES
 
-**Matrix Instructions Formats**
-
-  | **Category** | **Operands**       | **Operation**   |
-  |:-------------|:-------------------|:----------------|
-  | `OPIWW`      | `matrix-matrix`    | `Integer`       |
-  | `OPIWX`      | `matrix-scalar`    | `Integer`       |
-  | `OPIWI`      | `matrix-immediate` | `Integer`       |
-  | `OPFWW`      | `matrix-matrix`    | `Float`         |
-  | `OPFWF`      | `matrix-scalar`    | `Float`         |
-  | `OPMWW`      | `matrix-matrix`    | `Mask`          |
-  | `OPMWX`      | `matrix-scalar`    | `Mask`          |
-  | `OPCFG`      | `scalars-imms`     | `Configuration` |
-
-  : Matrix Instructions Formats
-
-**OPCFG (Configuration Setting)**
-
-  | **Name**   | **Opcode / Argument**                              | **Full-Name**                                                    |
-  |:-----------|:---------------------------------------------------|:-----------------------------------------------------------------|
-  | `wsetiwli` | `31=1 30=1 zimm10   zimm5 14..12=0x7 rd 6..0=0x57` | `Set Matrix Length and Immediate Matrix Type with Immediate AVL` |
-  | `wsetwli`  | `31=0 zimm11          rs1 14..12=0x7 rd 6..0=0x57` | `Set Matrix Length and Immediate Matrix Type`                    |
-  | `wsetwl`   | `31=1 30..25=0x0 rs2  rs1 14..12=0x7 rd 6..0=0x57` | `Set Matrix Length and Register Matrix Type`                     |
-
-  : Configuration Setting
-
-**OPLS (Matrix Loads and Store)**
-
-* **Matrix Unit-Stride Instructions (including segment part)**
-
-  | **Name**  | **Opcode / Argument**                                            | **Full-Name**                                   |
-  |:----------|:-----------------------------------------------------------------|:------------------------------------------------|
-  | `wlm.v`   | `31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0  wd 6..0=0x07` | `Matrix Mask Load`                              |
-  | `wsm.v`   | `31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0 ws3 6..0=0x27` | `Matrix Mask Store`                             |
-  | `wle8.v`  | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x0  wd 6..0=0x07`      | `Matrix Unit-Stride Load with 8-Bit Elements`   |
-  | `wle16.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x5  wd 6..0=0x07`      | `Matrix Unit-Stride Load with 16-Bit Elements`  |
-  | `wle32.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x6  wd 6..0=0x07`      | `Matrix Unit-Stride Load with 32-Bit Elements`  |
-  | `wle64.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x7  wd 6..0=0x07`      | `Matrix Unit-Stride Load with 64-Bit Elements`  |
-  | `wse8.v`  | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x0 ws3 6..0=0x27`      | `Matrix Unit-Stride Store with 8-Bit Elements`  |
-  | `wse16.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x5 ws3 6..0=0x27`      | `Matrix Unit-Stride Store with 16-Bit Elements` |
-  | `wse32.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x6 ws3 6..0=0x27`      | `Matrix Unit-Stride Store with 32-Bit Elements` |
-  | `wse64.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x7 ws3 6..0=0x27`      | `Matrix Unit-Stride Store with 64-Bit Elements` |
-
-  : Matrix Unit-Stride Instructions (including segment part)
-
-* **Matrix Indexed-Unordered Instructions (including segment part)**
-
-  | **Name**     | **Opcode / Argument**                                  | **Full-Name**                                        |
-  |:-------------|:-------------------------------------------------------|:-----------------------------------------------------|
-  | `wluxei8.v`  | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x0  wd 6..0=0x07` | `Matrix Indexed-Unordered Load with 8-Bit Indices`   |
-  | `wluxei16.v` | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x5  wd 6..0=0x07` | `Matrix Indexed-Unordered Load with 16-Bit Indices`  |
-  | `wluxei32.v` | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x6  wd 6..0=0x07` | `Matrix Indexed-Unordered Load with 32-Bit Indices`  |
-  | `wluxei64.v` | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x7  wd 6..0=0x07` | `Matrix Indexed-Unordered Load with 64-Bit Indices`  |
-  | `wsuxei8.v`  | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x0 ws3 6..0=0x27` | `Matrix Indexed-Unordered Store with 8-Bit Indices`  |
-  | `wsuxei16.v` | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x5 ws3 6..0=0x27` | `Matrix Indexed-Unordered Store with 16-Bit Indices` |
-  | `wsuxei32.v` | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x6 ws3 6..0=0x27` | `Matrix Indexed-Unordered Store with 32-Bit Indices` |
-  | `wsuxei64.v` | `nf 28=0 27..26=1 vm ws2 rs1 14..12=0x7 ws3 6..0=0x27` | `Matrix Indexed-Unordered Store with 64-Bit Indices` |
-
-  : Matrix Indexed-Unordered Instructions (including segment part)
-
-* **Matrix Strided Instructions (including segment part)**
-
-  | **Name**   | **Opcode / Argument**                                  | **Full-Name**                               |
-  |:-----------|:-------------------------------------------------------|:--------------------------------------------|
-  | `wlse8.v`  | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x0  wd 6..0=0x07` | `Matrix Strided Load with 8-Bit Elements`   |
-  | `wlse16.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x5  wd 6..0=0x07` | `Matrix Strided Load with 16-Bit Elements`  |
-  | `wlse32.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x6  wd 6..0=0x07` | `Matrix Strided Load with 32-Bit Elements`  |
-  | `wlse64.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x7  wd 6..0=0x07` | `Matrix Strided Load with 64-Bit Elements`  |
-  | `wsse8.v`  | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x0 ws3 6..0=0x27` | `Matrix Strided Store with 8-Bit Elements`  |
-  | `wsse16.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x5 ws3 6..0=0x27` | `Matrix Strided Store with 16-Bit Elements` |
-  | `wsse32.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x6 ws3 6..0=0x27` | `Matrix Strided Store with 32-Bit Elements` |
-  | `wsse64.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x7 ws3 6..0=0x27` | `Matrix Strided Store with 64-Bit Elements` |
-
-  : Matrix Strided Instructions (including segment part)
-
-* **Matrix Indexed-Ordered Instructions (including segment part)**
-
-  | **Name**     | **Opcode / Argument**                                  | **Full-Name**                                      |
-  |:-------------|:-------------------------------------------------------|:---------------------------------------------------|
-  | `wloxei8.v`  | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x0  wd 6..0=0x07` | `Matrix Indexed-Ordered Load with 8-Bit Indices`   |
-  | `wloxei16.v` | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x5  wd 6..0=0x07` | `Matrix Indexed-Ordered Load with 16-Bit Indices`  |
-  | `wloxei32.v` | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x6  wd 6..0=0x07` | `Matrix Indexed-Ordered Load with 32-Bit Indices`  |
-  | `wloxei64.v` | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x7  wd 6..0=0x07` | `Matrix Indexed-Ordered Load with 64-Bit Indices`  |
-  | `wsoxei8.v`  | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x0 ws3 6..0=0x27` | `Matrix Indexed-Ordered Store with 8-Bit Indices`  |
-  | `wsoxei16.v` | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x5 ws3 6..0=0x27` | `Matrix Indexed-Ordered Store with 16-Bit Indices` |
-  | `wsoxei32.v` | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x6 ws3 6..0=0x27` | `Matrix Indexed-Ordered Store with 32-Bit Indices` |
-  | `wsoxei64.v` | `nf 28=0 27..26=3 vm ws2 rs1 14..12=0x7 ws3 6..0=0x27` | `Matrix Indexed-Ordered Store with 64-Bit Indices` |
-
-  : Matrix Indexed-Ordered Instructions (including segment part)
-
-* **Unit-stride Fault-Only-First Loads**
-
-  | **Name**    | **Opcode / Argument**                                          | **Full-Name**                                                   |
-  |:------------|:---------------------------------------------------------------|:----------------------------------------------------------------|
-  | `wle8ff.v`  | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x0  wd 6..0=0x07` | `Matrix Unit-Stride Fault-Only-First Load with 8-Bit Elements`  |
-  | `wle16ff.v` | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x5  wd 6..0=0x07` | `Matrix Unit-Stride Fault-Only-First Load with 16-Bit Elements` |
-  | `wle32ff.v` | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x6  wd 6..0=0x07` | `Matrix Unit-Stride Fault-Only-First Load with 32-Bit Elements` |
-  | `wle64ff.v` | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x7  wd 6..0=0x07` | `Matrix Unit-Stride Fault-Only-First Load with 64-Bit Elements` |
-
-  : Unit-stride Fault-Only-First Loads
-
-* **Matrix Load/Store Whole Registers**
-
-  | **Name**    | **Opcode / Argument**                                                  | **Full-Name**                                                     |
-  |:------------|:-----------------------------------------------------------------------|:------------------------------------------------------------------|
-  | `wl1re8.v`  | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 wd  6..0=0x07` | `Matrix Load 1 Whole Register with 8-Bit Encoded Element Width`   |
-  | `wl1re16.v` | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 wd  6..0=0x07` | `Matrix Load 1 Whole Register with 16-Bit Encoded Element Width`  |
-  | `wl1re32.v` | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 wd  6..0=0x07` | `Matrix Load 1 Whole Register with 32-Bit Encoded Element Width`  |
-  | `wl1re64.v` | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 wd  6..0=0x07` | `Matrix Load 1 Whole Register with 64-Bit Encoded Element Width`  |
-  | `wl2re8.v`  | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 wd  6..0=0x07` | `Matrix Load 2 Whole Registers with 8-Bit Encoded Element Width`  |
-  | `wl2re16.v` | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 wd  6..0=0x07` | `Matrix Load 2 Whole Registers with 16-Bit Encoded Element Width` |
-  | `wl2re32.v` | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 wd  6..0=0x07` | `Matrix Load 2 Whole Registers with 32-Bit Encoded Element Width` |
-  | `wl2re64.v` | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 wd  6..0=0x07` | `Matrix Load 2 Whole Registers with 64-Bit Encoded Element Width` |
-  | `wl4re8.v`  | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 wd  6..0=0x07` | `Matrix Load 4 Whole Registers with 8-Bit Encoded Element Width`  |
-  | `wl4re16.v` | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 wd  6..0=0x07` | `Matrix Load 4 Whole Registers with 16-Bit Encoded Element Width` |
-  | `wl4re32.v` | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 wd  6..0=0x07` | `Matrix Load 4 Whole Registers with 32-Bit Encoded Element Width` |
-  | `wl4re64.v` | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 wd  6..0=0x07` | `Matrix Load 4 Whole Registers with 64-Bit Encoded Element Width` |
-  | `wl8re8.v`  | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 wd  6..0=0x07` | `Matrix Load 8 Whole Registers with 8-Bit Encoded Element Width`  |
-  | `wl8re16.v` | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 wd  6..0=0x07` | `Matrix Load 8 Whole Registers with 16-Bit Encoded Element Width` |
-  | `wl8re32.v` | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 wd  6..0=0x07` | `Matrix Load 8 Whole Registers with 32-Bit Encoded Element Width` |
-  | `wl8re64.v` | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 wd  6..0=0x07` | `Matrix Load 8 Whole Registers with 64-Bit Encoded Element Width` |
-  | `ws1r.v`    | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 ws3 6..0=0x27` | `Matrix Store 1 Whole Register`                                   |
-  | `ws2r.v`    | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 ws3 6..0=0x27` | `Matrix Store 2 Whole Registers`                                  |
-  | `ws4r.v`    | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 ws3 6..0=0x27` | `Matrix Store 4 Whole Registers`                                  |
-  | `ws8r.v`    | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 ws3 6..0=0x27` | `Matrix Store 8 Whole Registers`                                  |
-
-  : Matrix Load/Store Whole Registers
-
-**Matrix Float-Point Instructions**
-
-* **OPFWF**
-
-  | **Name**          | **Opcode / Argument**                                   | **Full-Name**                                                  |
-  |:------------------|:--------------------------------------------------------|:---------------------------------------------------------------|
-  | `wfadd.vf`        | `31..26=0x00 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point Add (Matrix-Scalar)`                    |
-  | `wfsub.vf`        | `31..26=0x02 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point Subtract (Matrix-Scalar)`               |
-  | `wfmin.vf`        | `31..26=0x04 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point Minimum (Matrix-Scalar)`                |
-  | `wfmax.vf`        | `31..26=0x06 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point Maximum (Matrix-Scalar)`                |
-  | `wfsgnj.vf`       | `31..26=0x08 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point Sign Injection (Matrix-Scalar)`         |
-  | `wfsgnjn.vf`      | `31..26=0x09 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point Negated Sign Injection (Matrix-Scalar)` |
-  | `wfsgnjx.vf`      | `31..26=0x0a vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point XOR Sign Injection (Matrix-Scalar)`     |
-  | `wfslide1up.vf`   | `31..26=0x0e vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point Slide One Up (Matrix-Scalar)`           |
-  | `wfslide1down.vf` | `31..26=0x0f vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point Slide One Down (Matrix-Scalar)`         |
-  | `wfmv.s.f`        | `31..26=0x10 25=1 24..20=0 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Move Floating-Point Scalar to Matrix Element`          |
-
-  : OPFWF I
-
-  | **Name**      | **Opcode / Argument**                                   | **Full-Name**                                                         |
-  |:--------------|:--------------------------------------------------------|:----------------------------------------------------------------------|
-  | `wfmerge.vfm` | `31..26=0x17 25=0 ws2 rs1 14..12=0x5 wd 6..0=0x57`      | `Matrix Floating-Point Merge (Matrix-Scalar)`                         |
-  | `wfmv.v.f`    | `31..26=0x17 25=1 24..20=0 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Broadcast Floating-Point Scalar`                              |
-  | `wmfeq.vf`    | `31..26=0x18 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point Compare Equal (Matrix-Scalar)`                 |
-  | `wmfle.vf`    | `31..26=0x19 vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point Compare Less Than or Equal (Matrix-Scalar)`    |
-  | `wmflt.vf`    | `31..26=0x1b vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point Compare Less Than (Matrix-Scalar)`             |
-  | `wmfne.vf`    | `31..26=0x1c vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point Compare Not Equal (Matrix-Scalar)`             |
-  | `wmfgt.vf`    | `31..26=0x1d vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point Compare Greater Than (Matrix-Scalar)`          |
-  | `wmfge.vf`    | `31..26=0x1f vm ws2 rs1 14..12=0x5 wd 6..0=0x57`        | `Matrix Floating-Point Compare Greater Than or Equal (Matrix-Scalar)` |
-
-  : OPFWF II
-
-  | **Name**     | **Opcode / Argument**                            | **Full-Name**                                                                                    |
-  |:-------------|:-------------------------------------------------|:-------------------------------------------------------------------------------------------------|
-  | `wfdiv.vf`   | `31..26=0x20 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Floating-Point Divide (Matrix-Scalar)`                                                   |
-  | `wfrdiv.vf`  | `31..26=0x21 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Floating-Point Reverse Divide (Matrix-Scalar)`                                           |
-  | `wfmul.vf`   | `31..26=0x24 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Floating-Point Multiply (Matrix-Scalar)`                                                 |
-  | `wfrsub.vf`  | `31..26=0x27 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Floating-Point Reverse Subtract (Matrix-Scalar)`                                         |
-  | `wfmadd.vf`  | `31..26=0x28 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Floating-Point Fused Multiply-Add, Overwrite Multiplicand (Matrix-Scalar)`               |
-  | `wfnmadd.vf` | `31..26=0x29 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Floating-Point Fused Negative Multiply-Add, Overwrite Multiplicand (Matrix-Scalar)`      |
-  | `wfmsub.vf`  | `31..26=0x2a vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Floating-Point Fused Multiply-Subtract, Overwrite Multiplicand (Matrix-Scalar)`          |
-  | `wfnmsub.vf` | `31..26=0x2b vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Floating-Point Fused Negative Multiply-Subtract, Overwrite Multiplicand (Matrix-Scalar)` |
-  | `wfmacc.vf`  | `31..26=0x2c vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Floating-Point Fused Multiply-Accumulate (Matrix-Scalar)`                                |
-  | `wfnmacc.vf` | `31..26=0x2d vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Floating-Point Fused Negative Multiply-Accumulate (Matrix-Scalar)`                       |
-  | `wfmsac.vf`  | `31..26=0x2e vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Floating-Point Fused Multiply-Subtract Accumulator (Matrix-Scalar)`                      |
-  | `wfnmsac.vf` | `31..26=0x2f vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Floating-Point Fused Negative Multiply-Subtract Accumulator (Matrix-Scalar)`             |
-
-  : OPFWF III
-
-  | **Name**      | **Opcode / Argument**                            | **Full-Name**                                                                                 |
-  |:--------------|:-------------------------------------------------|:----------------------------------------------------------------------------------------------|
-  | `wfwadd.vf`   | `31..26=0x30 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Widening Floating-Point Add (Matrix-Scalar)`                                          |
-  | `wfwsub.vf`   | `31..26=0x32 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Widening Floating-Point Subtract (Matrix-Scalar)`                                     |
-  | `wfwadd.wf`   | `31..26=0x34 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Widening Floating-Point Add (Wide Matrix-Scalar)`                                     |
-  | `wfwsub.wf`   | `31..26=0x36 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Widening Floating-Point Subtract (Wide Matrix-Scalar)`                                |
-  | `wfwmul.vf`   | `31..26=0x38 vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Widening Floating-Point Multiply (Matrix-Scalar)`                                     |
-  | `wfwmacc.vf`  | `31..26=0x3c vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Widening Floating-Point Fused Multiply-Accumulate (Matrix-Scalar)`                    |
-  | `wfwnmacc.vf` | `31..26=0x3d vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Widening Floating-Point Fused Negative Multiply-Accumulate (Matrix-Scalar)`           |
-  | `wfwmsac.vf`  | `31..26=0x3e vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Widening Floating-Point Fused Multiply-Subtract Accumulator (Matrix-Scalar)`          |
-  | `wfwnmsac.vf` | `31..26=0x3f vm ws2 rs1 14..12=0x5 wd 6..0=0x57` | `Matrix Widening Floating-Point Fused Negative Multiply-Subtract Accumulator (Matrix-Scalar)` |
-
-  : OPFWF IV
-
-* **OPFWW**
-
-  | **Name**       | **Opcode / Argument**                                   | **Full-Name**                                                  |
-  |:---------------|:--------------------------------------------------------|:---------------------------------------------------------------|
-  | `wfadd.vv`     | `31..26=0x00 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `Matrix Floating-Point Add (Matrix-Matrix)`                    |
-  | `wfredusum.ws` | `31..26=0x01 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `Matrix Floating-Point Unordered Sum Reduction`                |
-  | `wfsub.vv`     | `31..26=0x02 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `Matrix Floating-Point Subtract (Matrix-Matrix)`               |
-  | `wfredosum.ws` | `31..26=0x03 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `Matrix Floating-Point Ordered Sum Reduction`                  |
-  | `wfmin.vv`     | `31..26=0x04 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `Matrix Floating-Point Minimum (Matrix-Matrix)`                |
-  | `wfredmin.ws`  | `31..26=0x05 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `Matrix Floating-Point Minimum Reduction`                      |
-  | `wfmax.vv`     | `31..26=0x06 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `Matrix Floating-Point Maximum (Matrix-Matrix)`                |
-  | `wfredmax.ws`  | `31..26=0x07 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `Matrix Floating-Point Maximum Reduction`                      |
-  | `wfsgnj.vv`    | `31..26=0x08 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `Matrix Floating-Point Sign Injection (Matrix-Matrix)`         |
-  | `wfsgnjn.vv`   | `31..26=0x09 vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `Matrix Floating-Point Negated Sign Injection (Matrix-Matrix)` |
-  | `wfsgnjx.vv`   | `31..26=0x0a vm ws2 ws1 14..12=0x1 wd 6..0=0x57`        | `Matrix Floating-Point XOR Sign Injection (Matrix-Matrix)`     |
-  | `wfmv.f.s`     | `31..26=0x10 25=1 ws2 19..15=0 14..12=0x1 rd 6..0=0x57` | `Matrix Move Matrix Element to Floating-Point Scalar`          |
-
-  : OPFWW I
-
-  | **Name**   | **Opcode / Argument**                            | **Full-Name**                                                      |
-  |:-----------|:-------------------------------------------------|:-------------------------------------------------------------------|
-  | `wmfeq.vv` | `31..26=0x18 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Compare Equal (Matrix-Matrix)`              |
-  | `wmfle.vv` | `31..26=0x19 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Compare Less Than or Equal (Matrix-Matrix)` |
-  | `wmflt.vv` | `31..26=0x1b vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Compare Less Than (Matrix-Matrix)`          |
-  | `wmfne.vv` | `31..26=0x1c vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Compare Not Equal (Matrix-Matrix)`          |
-
-  : OPFWW II
-
-  | **Name**     | **Opcode / Argument**                            | **Full-Name**                                                                                    |
-  |:-------------|:-------------------------------------------------|:-------------------------------------------------------------------------------------------------|
-  | `wfdiv.vv`   | `31..26=0x20 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Divide (Matrix-Matrix)`                                                   |
-  | `wfmul.vv`   | `31..26=0x24 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Multiply (Matrix-Matrix)`                                                 |
-  | `wfmadd.vv`  | `31..26=0x28 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Fused Multiply-Add, Overwrite Multiplicand (Matrix-Matrix)`               |
-  | `wfnmadd.vv` | `31..26=0x29 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Fused Negative Multiply-Add, Overwrite Multiplicand (Matrix-Matrix)`      |
-  | `wfmsub.vv`  | `31..26=0x2a vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Fused Multiply-Subtract, Overwrite Multiplicand (Matrix-Matrix)`          |
-  | `wfnmsub.vv` | `31..26=0x2b vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Fused Negative Multiply-Subtract, Overwrite Multiplicand (Matrix-Matrix)` |
-  | `wfmacc.vv`  | `31..26=0x2c vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Fused Multiply-Accumulate (Matrix-Matrix)`                                |
-  | `wfnmacc.vv` | `31..26=0x2d vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Fused Negative Multiply-Accumulate (Matrix-Matrix)`                       |
-  | `wfmsac.vv`  | `31..26=0x2e vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Fused Multiply-Subtract Accumulator (Matrix-Matrix)`                      |
-  | `wfnmsac.vv` | `31..26=0x2f vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Fused Negative Multiply-Subtract Accumulator (Matrix-Matrix)`             |
-
-  : OPFWW III
-
-  | **Name**           | **Opcode / Argument**                                    | **Full-Name**                                                              |
-  |:-------------------|:---------------------------------------------------------|:---------------------------------------------------------------------------|
-  | `wfcvt.xu.f.v`     | `31..26=0x12 vm ws2 19..15=0x00 14..12=0x1 wd 6..0=0x57` | `Matrix Convert Floating-Point to Unsigned Integer`                        |
-  | `wfcvt.x.f.v`      | `31..26=0x12 vm ws2 19..15=0x01 14..12=0x1 wd 6..0=0x57` | `Matrix Convert Floating-Point to Signed Integer`                          |
-  | `wfcvt.f.xu.v`     | `31..26=0x12 vm ws2 19..15=0x02 14..12=0x1 wd 6..0=0x57` | `Matrix Convert Unsigned Integer to Floating-Point`                        |
-  | `wfcvt.f.x.v`      | `31..26=0x12 vm ws2 19..15=0x03 14..12=0x1 wd 6..0=0x57` | `Matrix Convert Signed Integer to Floating-Point`                          |
-  | `wfcvt.rtz.xu.f.v` | `31..26=0x12 vm ws2 19..15=0x06 14..12=0x1 wd 6..0=0x57` | `Matrix Convert Floating-Point to Unsigned Integer with Round Toward Zero` |
-  | `wfcvt.rtz.x.f.v`  | `31..26=0x12 vm ws2 19..15=0x07 14..12=0x1 wd 6..0=0x57` | `Matrix Convert Floating-Point to Signed Integer with Round Toward Zero`   |
-
-  : OPFWW IV
-
-  | **Name**            | **Opcode / Argument**                                    | **Full-Name**                                                                       |
-  |:--------------------|:---------------------------------------------------------|:------------------------------------------------------------------------------------|
-  | `wfwcvt.xu.f.v`     | `31..26=0x12 vm ws2 19..15=0x08 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Convert Floating-Point to Unsigned Integer`                        |
-  | `wfwcvt.x.f.v`      | `31..26=0x12 vm ws2 19..15=0x09 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Convert Floating-Point to Signed Integer`                          |
-  | `wfwcvt.f.xu.v`     | `31..26=0x12 vm ws2 19..15=0x0A 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Convert Unsigned Integer to Floating-Point`                        |
-  | `wfwcvt.f.x.v`      | `31..26=0x12 vm ws2 19..15=0x0B 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Convert Signed Integer to Floating-Point`                          |
-  | `wfwcvt.f.f.v`      | `31..26=0x12 vm ws2 19..15=0x0C 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Convert Floating-Point to Floating-Point`                          |
-  | `wfwcvt.rtz.xu.f.v` | `31..26=0x12 vm ws2 19..15=0x0E 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Convert Floating-Point to Unsigned Integer with Round Toward Zero` |
-  | `wfwcvt.rtz.x.f.v`  | `31..26=0x12 vm ws2 19..15=0x0F 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Convert Floating-Point to Signed Integer with Round Toward Zero`   |
-
-  : OPFWW V
-
-  | **Name**            | **Opcode / Argument**                                    | **Full-Name**                                                                        |
-  |:--------------------|:---------------------------------------------------------|:-------------------------------------------------------------------------------------|
-  | `wfncvt.xu.f.w`     | `31..26=0x12 vm ws2 19..15=0x10 14..12=0x1 wd 6..0=0x57` | `Matrix Narrowing Convert Floating-Point to Unsigned Integer`                        |
-  | `wfncvt.x.f.w`      | `31..26=0x12 vm ws2 19..15=0x11 14..12=0x1 wd 6..0=0x57` | `Matrix Narrowing Convert Floating-Point to Signed Integer`                          |
-  | `wfncvt.f.xu.w`     | `31..26=0x12 vm ws2 19..15=0x12 14..12=0x1 wd 6..0=0x57` | `Matrix Narrowing Convert Unsigned Integer to Floating-Point`                        |
-  | `wfncvt.f.x.w`      | `31..26=0x12 vm ws2 19..15=0x13 14..12=0x1 wd 6..0=0x57` | `Matrix Narrowing Convert Signed Integer to Floating-Point`                          |
-  | `wfncvt.f.f.w`      | `31..26=0x12 vm ws2 19..15=0x14 14..12=0x1 wd 6..0=0x57` | `Matrix Narrowing Convert Floating-Point to Floating-Point`                          |
-  | `wfncvt.rod.f.f.w`  | `31..26=0x12 vm ws2 19..15=0x15 14..12=0x1 wd 6..0=0x57` | `Matrix Narrowing Convert Floating-Point to Floating-Point with Round to Odd`        |
-  | `wfncvt.rtz.xu.f.w` | `31..26=0x12 vm ws2 19..15=0x16 14..12=0x1 wd 6..0=0x57` | `Matrix Narrowing Convert Floating-Point to Unsigned Integer with Round Toward Zero` |
-  | `wfncvt.rtz.x.f.w`  | `31..26=0x12 vm ws2 19..15=0x17 14..12=0x1 wd 6..0=0x57` | `Matrix Narrowing Convert Floating-Point to Signed Integer with Round Toward Zero`   |
-
-  : OPFWW VI
-
-  | **Name**     | **Opcode / Argument**                                    | **Full-Name**                                                     |
-  |:-------------|:---------------------------------------------------------|:------------------------------------------------------------------|
-  | `wfsqrt.v`   | `31..26=0x13 vm ws2 19..15=0x00 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Square Root`                               |
-  | `wfrsqrt7.v` | `31..26=0x13 vm ws2 19..15=0x04 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Reciprocal Square-Root Estimate to 7 Bits` |
-  | `wfrec7.v`   | `31..26=0x13 vm ws2 19..15=0x05 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Reciprocal Estimate to 7 Bits`             |
-  | `wfclass.v`  | `31..26=0x13 vm ws2 19..15=0x10 14..12=0x1 wd 6..0=0x57` | `Matrix Floating-Point Classify`                                  |
-
-  : OPFWW VII
-
-  | **Name**        | **Opcode / Argument**                            | **Full-Name**                                                                                 |
-  |:----------------|:-------------------------------------------------|:----------------------------------------------------------------------------------------------|
-  | `wfwadd.vv`     | `31..26=0x30 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Floating-Point Add (Matrix-Matrix)`                                          |
-  | `wfwredusum.ws` | `31..26=0x31 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Floating-Point Unordered Sum Reduction`                                      |
-  | `wfwsub.vv`     | `31..26=0x32 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Floating-Point Subtract (Matrix-Matrix)`                                     |
-  | `wfwredosum.ws` | `31..26=0x33 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Floating-Point Ordered Sum Reduction`                                        |
-  | `wfwadd.wv`     | `31..26=0x34 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Floating-Point Add (Wide Matrix-Matrix)`                                     |
-  | `wfwsub.wv`     | `31..26=0x36 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Floating-Point Subtract (Wide Matrix-Matrix)`                                |
-  | `wfwmul.vv`     | `31..26=0x38 vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Floating-Point Multiply (Matrix-Matrix)`                                     |
-  | `wfwmacc.vv`    | `31..26=0x3c vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Floating-Point Fused Multiply-Accumulate (Matrix-Matrix)`                    |
-  | `wfwnmacc.vv`   | `31..26=0x3d vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Floating-Point Fused Negative Multiply-Accumulate (Matrix-Matrix)`           |
-  | `wfwmsac.vv`    | `31..26=0x3e vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Floating-Point Fused Multiply-Subtract Accumulator (Matrix-Matrix)`          |
-  | `wfwnmsac.vv`   | `31..26=0x3f vm ws2 ws1 14..12=0x1 wd 6..0=0x57` | `Matrix Widening Floating-Point Fused Negative Multiply-Subtract Accumulator (Matrix-Matrix)` |
-
-  : OPFWW VIII
-
-**Matrix Integer Instructions**
-
-* **OPIWX**
-
-  | **Name**        | **Opcode / Argument**                            | **Full-Name**                                     |
-  |:----------------|:-------------------------------------------------|:--------------------------------------------------|
-  | `wadd.vx`       | `31..26=0x00 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Integer Add (Matrix-Scalar)`              |
-  | `wsub.vx`       | `31..26=0x02 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Integer Subtract (Matrix-Scalar)`         |
-  | `wrsub.vx`      | `31..26=0x03 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Integer Reverse Subtract (Matrix-Scalar)` |
-  | `wminu.vx`      | `31..26=0x04 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Integer Min Unsigned (Matrix-Scalar)`     |
-  | `wmin.vx`       | `31..26=0x05 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Integer Min Signed (Matrix-Scalar)`       |
-  | `wmaxu.vx`      | `31..26=0x06 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Integer Max Unsigned (Matrix-Scalar)`     |
-  | `wmax.vx`       | `31..26=0x07 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Integer Max Signed (Matrix-Scalar)`       |
-  | `wand.vx`       | `31..26=0x09 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Bitwise AND (Matrix-Scalar)`              |
-  | `wor.vx`        | `31..26=0x0a vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Bitwise OR (Matrix-Scalar)`               |
-  | `wxor.vx`       | `31..26=0x0b vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Bitwise XOR (Matrix-Scalar)`              |
-  | `wrgather.vx`   | `31..26=0x0c vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Register Gather (Matrix-Scalar)`          |
-  | `wslideup.vx`   | `31..26=0x0e vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Slide Up (Matrix-Scalar)`                 |
-  | `wslidedown.vx` | `31..26=0x0f vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Slide Down (Matrix-Scalar)`               |
-
-  : OPIWX I
-
-  | **Name**     | **Opcode / Argument**                                   | **Full-Name**                                                                |
-  |:-------------|:--------------------------------------------------------|:-----------------------------------------------------------------------------|
-  | `wadc.vxm`   | `31..26=0x10 25=0 ws2 rs1 14..12=0x4 wd 6..0=0x57`      | `Matrix Integer Add with Carry (Matrix-Scalar with Mask Carry Input)`        |
-  | `wmadc.vxm`  | `31..26=0x11 25=0 ws2 rs1 14..12=0x4 wd 6..0=0x57`      | `Matrix Integer Add Carry-Out (Matrix-Scalar with Mask Carry Input)`         |
-  | `wmadc.vx`   | `31..26=0x11 25=1 ws2 rs1 14..12=0x4 wd 6..0=0x57`      | `Matrix Integer Add Carry-Out (Matrix-Scalar)`                               |
-  | `wsbc.vxm`   | `31..26=0x12 25=0 ws2 rs1 14..12=0x4 wd 6..0=0x57`      | `Matrix Integer Subtract with Borrow (Matrix-Scalar with Mask Borrow Input)` |
-  | `wmsbc.vxm`  | `31..26=0x13 25=0 ws2 rs1 14..12=0x4 wd 6..0=0x57`      | `Matrix Integer Subtract Borrow-Out (Matrix-Scalar with Mask Borrow Input)`  |
-  | `wmsbc.vx`   | `31..26=0x13 25=1 ws2 rs1 14..12=0x4 wd 6..0=0x57`      | `Matrix Integer Subtract Borrow-Out (Matrix-Scalar)`                         |
-  | `wmerge.vxm` | `31..26=0x17 25=0 ws2 rs1 14..12=0x4 wd 6..0=0x57`      | `Matrix Integer Merge (Matrix-Scalar)`                                       |
-  | `wmv.v.x`    | `31..26=0x17 25=1 24..20=0 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Broadcast Integer Scalar`                                            |
-  | `wmseq.vx`   | `31..26=0x18 vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `Matrix Integer Compare Equal (Matrix-Scalar)`                               |
-  | `wmsne.vx`   | `31..26=0x19 vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `Matrix Integer Compare Not Equal (Matrix-Scalar)`                           |
-  | `wmsltu.vx`  | `31..26=0x1a vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `Matrix Integer Compare Less Than Unsigned (Matrix-Scalar)`                  |
-  | `wmslt.vx`   | `31..26=0x1b vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `Matrix Integer Compare Less Than Signed (Matrix-Scalar)`                    |
-  | `wmsleu.vx`  | `31..26=0x1c vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `Matrix Integer Compare Less Than or Equal Unsigned (Matrix-Scalar)`         |
-  | `wmsle.vx`   | `31..26=0x1d vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `Matrix Integer Compare Less Than or Equal Signed (Matrix-Scalar)`           |
-  | `wmsgtu.vx`  | `31..26=0x1e vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `Matrix Integer Compare Greater Than Unsigned (Matrix-Scalar)`               |
-  | `wmsgt.vx`   | `31..26=0x1f vm ws2 rs1 14..12=0x4 wd 6..0=0x57`        | `Matrix Integer Compare Greater Than Signed (Matrix-Scalar)`                 |
-
-  : OPIWX II
-
-  | **Name**     | **Opcode / Argument**                            | **Full-Name**                                                                    |
-  |:-------------|:-------------------------------------------------|:---------------------------------------------------------------------------------|
-  | `wsaddu.vx`  | `31..26=0x20 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Integer Saturating Add Unsigned (Matrix-Scalar)`                         |
-  | `wsadd.vx`   | `31..26=0x21 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Integer Saturating Add Signed (Matrix-Scalar)`                           |
-  | `wssubu.vx`  | `31..26=0x22 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Integer Saturating Subtract Unsigned (Matrix-Scalar)`                    |
-  | `wssub.vx`   | `31..26=0x23 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Integer Saturating Subtract Signed (Matrix-Scalar)`                      |
-  | `wsll.vx`    | `31..26=0x25 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Shift Left Logical (Matrix-Scalar)`                                      |
-  | `wsmul.vx`   | `31..26=0x27 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Signed Fractional Multiply with Rounding and Saturation (Matrix-Scalar)` |
-  | `wsrl.vx`    | `31..26=0x28 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Shift Right Logical (Matrix-Scalar)`                                     |
-  | `wsra.vx`    | `31..26=0x29 vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Shift Right Arithmetic (Matrix-Scalar)`                                  |
-  | `wssrl.vx`   | `31..26=0x2a vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Scaling Shift Right Unsigned (Matrix-Scalar)`                            |
-  | `wssra.vx`   | `31..26=0x2b vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Scaling Shift Right Signed (Matrix-Scalar)`                              |
-  | `wnsrl.wx`   | `31..26=0x2c vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Narrowing Shift Right Logical (Wide Matrix-Scalar)`                      |
-  | `wnsra.wx`   | `31..26=0x2d vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Narrowing Shift Right Arithmetic (Wide Matrix-Scalar)`                   |
-  | `wnclipu.wx` | `31..26=0x2e vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Narrowing Clip Unsigned (Wide Matrix-Scalar)`                            |
-  | `wnclip.wx`  | `31..26=0x2f vm ws2 rs1 14..12=0x4 wd 6..0=0x57` | `Matrix Narrowing Clip Signed (Wide Matrix-Scalar)`                              |
-
-  : OPIWX III
-
-* **OPIWW**
-
-  | **Name**          | **Opcode / Argument**                            | **Full-Name**                                                        |
-  |:------------------|:-------------------------------------------------|:---------------------------------------------------------------------|
-  | `wadd.vv`         | `31..26=0x00 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Integer Add (Matrix-Matrix)`                                 |
-  | `wsub.vv`         | `31..26=0x02 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Integer Subtract (Matrix-Matrix)`                            |
-  | `wminu.vv`        | `31..26=0x04 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Integer Min Unsigned (Matrix-Matrix)`                        |
-  | `wmin.vv`         | `31..26=0x05 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Integer Min Signed (Matrix-Matrix)`                          |
-  | `wmaxu.vv`        | `31..26=0x06 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Integer Max Unsigned (Matrix-Matrix)`                        |
-  | `wmax.vv`         | `31..26=0x07 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Integer Max Signed (Matrix-Matrix)`                          |
-  | `wand.vv`         | `31..26=0x09 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Bitwise AND (Matrix-Matrix)`                                 |
-  | `wor.vv`          | `31..26=0x0a vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Bitwise OR (Matrix-Matrix)`                                  |
-  | `wxor.vv`         | `31..26=0x0b vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Bitwise XOR (Matrix-Matrix)`                                 |
-  | `wrgather.vv`     | `31..26=0x0c vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Register Gather (Matrix-Matrix)`                             |
-  | `wrgatherei16.vv` | `31..26=0x0e vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Register Gather with 16-Bit Element Indices (Matrix-Matrix)` |
-
-  : OPIWW I
-
-  | **Name**     | **Opcode / Argument**                                   | **Full-Name**                                                                |
-  |:-------------|:--------------------------------------------------------|:-----------------------------------------------------------------------------|
-  | `wadc.vvm`   | `31..26=0x10 25=0 ws2 ws1 14..12=0x0 wd 6..0=0x57`      | `Matrix Integer Add with Carry (Matrix-Matrix with Mask Carry Input)`        |
-  | `wmadc.vvm`  | `31..26=0x11 25=0 ws2 ws1 14..12=0x0 wd 6..0=0x57`      | `Matrix Integer Add Carry-Out (Matrix-Matrix with Mask Carry Input)`         |
-  | `wmadc.vv`   | `31..26=0x11 25=1 ws2 ws1 14..12=0x0 wd 6..0=0x57`      | `Matrix Integer Add Carry-Out (Matrix-Matrix)`                               |
-  | `wsbc.vvm`   | `31..26=0x12 25=0 ws2 ws1 14..12=0x0 wd 6..0=0x57`      | `Matrix Integer Subtract with Borrow (Matrix-Matrix with Mask Borrow Input)` |
-  | `wmsbc.vvm`  | `31..26=0x13 25=0 ws2 ws1 14..12=0x0 wd 6..0=0x57`      | `Matrix Integer Subtract Borrow-Out (Matrix-Matrix with Mask Borrow Input)`  |
-  | `wmsbc.vv`   | `31..26=0x13 25=1 ws2 ws1 14..12=0x0 wd 6..0=0x57`      | `Matrix Integer Subtract Borrow-Out (Matrix-Matrix)`                         |
-  | `wmerge.vvm` | `31..26=0x17 25=0 ws2 ws1 14..12=0x0 wd 6..0=0x57`      | `Matrix Integer Merge (Matrix-Matrix)`                                       |
-  | `wmv.v.v`    | `31..26=0x17 25=1 24..20=0 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Move Matrix Elements`                                                |
-  | `wmseq.vv`   | `31..26=0x18 vm ws2 ws1 14..12=0x0 wd 6..0=0x57`        | `Matrix Integer Compare Equal (Matrix-Matrix)`                               |
-  | `wmsne.vv`   | `31..26=0x19 vm ws2 ws1 14..12=0x0 wd 6..0=0x57`        | `Matrix Integer Compare Not Equal (Matrix-Matrix)`                           |
-  | `wmsltu.vv`  | `31..26=0x1a vm ws2 ws1 14..12=0x0 wd 6..0=0x57`        | `Matrix Integer Compare Less Than Unsigned (Matrix-Matrix)`                  |
-  | `wmslt.vv`   | `31..26=0x1b vm ws2 ws1 14..12=0x0 wd 6..0=0x57`        | `Matrix Integer Compare Less Than Signed (Matrix-Matrix)`                    |
-  | `wmsleu.vv`  | `31..26=0x1c vm ws2 ws1 14..12=0x0 wd 6..0=0x57`        | `Matrix Integer Compare Less Than or Equal Unsigned (Matrix-Matrix)`         |
-  | `wmsle.vv`   | `31..26=0x1d vm ws2 ws1 14..12=0x0 wd 6..0=0x57`        | `Matrix Integer Compare Less Than or Equal Signed (Matrix-Matrix)`           |
-
-  : OPIWW II
-
-  | **Name**     | **Opcode / Argument**                            | **Full-Name**                                                                    |
-  |:-------------|:-------------------------------------------------|:---------------------------------------------------------------------------------|
-  | `wsaddu.vv`  | `31..26=0x20 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Integer Saturating Add Unsigned (Matrix-Matrix)`                         |
-  | `wsadd.vv`   | `31..26=0x21 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Integer Saturating Add Signed (Matrix-Matrix)`                           |
-  | `wssubu.vv`  | `31..26=0x22 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Integer Saturating Subtract Unsigned (Matrix-Matrix)`                    |
-  | `wssub.vv`   | `31..26=0x23 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Integer Saturating Subtract Signed (Matrix-Matrix)`                      |
-  | `wsll.vv`    | `31..26=0x25 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Shift Left Logical (Matrix-Matrix)`                                      |
-  | `wsmul.vv`   | `31..26=0x27 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Signed Fractional Multiply with Rounding and Saturation (Matrix-Matrix)` |
-  | `wsrl.vv`    | `31..26=0x28 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Shift Right Logical (Matrix-Matrix)`                                     |
-  | `wsra.vv`    | `31..26=0x29 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Shift Right Arithmetic (Matrix-Matrix)`                                  |
-  | `wssrl.vv`   | `31..26=0x2a vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Scaling Shift Right Unsigned (Matrix-Matrix)`                            |
-  | `wssra.vv`   | `31..26=0x2b vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Scaling Shift Right Signed (Matrix-Matrix)`                              |
-  | `wnsrl.wv`   | `31..26=0x2c vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Narrowing Shift Right Logical (Wide Matrix-Matrix)`                      |
-  | `wnsra.wv`   | `31..26=0x2d vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Narrowing Shift Right Arithmetic (Wide Matrix-Matrix)`                   |
-  | `wnclipu.wv` | `31..26=0x2e vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Narrowing Clip Unsigned (Wide Matrix-Matrix)`                            |
-  | `wnclip.wv`  | `31..26=0x2f vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Narrowing Clip Signed (Wide Matrix-Matrix)`                              |
-
-  : OPIWW III
-
-  | **Name**       | **Opcode / Argument**                            | **Full-Name**                                    |
-  |:---------------|:-------------------------------------------------|:-------------------------------------------------|
-  | `wwredsumu.ws` | `31..26=0x30 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Widening Integer Sum Unsigned Reduction` |
-  | `wwredsum.ws`  | `31..26=0x31 vm ws2 ws1 14..12=0x0 wd 6..0=0x57` | `Matrix Widening Integer Sum Reduction`          |
-
-  : OPIWW IV
-
-* **OPIWI**
-
-  | **Name**        | **Opcode / Argument**                              | **Full-Name**                                        |
-  |:----------------|:---------------------------------------------------|:-----------------------------------------------------|
-  | `wadd.vi`       | `31..26=0x00 vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `Matrix Integer Add (Matrix-Immediate)`              |
-  | `wrsub.vi`      | `31..26=0x03 vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `Matrix Integer Reverse Subtract (Matrix-Immediate)` |
-  | `wand.vi`       | `31..26=0x09 vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `Matrix Bitwise AND (Matrix-Immediate)`              |
-  | `wor.vi`        | `31..26=0x0a vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `Matrix Bitwise OR (Matrix-Immediate)`               |
-  | `wxor.vi`       | `31..26=0x0b vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `Matrix Bitwise XOR (Matrix-Immediate)`              |
-  | `wrgather.vi`   | `31..26=0x0c vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `Matrix Register Gather (Matrix-Immediate)`          |
-  | `wslideup.vi`   | `31..26=0x0e vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `Matrix Slide Up (Matrix-Immediate)`                 |
-  | `wslidedown.vi` | `31..26=0x0f vm ws2 simm5 14..12=0x3 wd 6..0=0x57` | `Matrix Slide Down (Matrix-Immediate)`               |
-
-  : OPIWI I
-
-  | **Name**     | **Opcode / Argument**                                     | **Full-Name**                                                            |
-  |:-------------|:----------------------------------------------------------|:-------------------------------------------------------------------------|
-  | `wadc.vim`   | `31..26=0x10 25=0 ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Integer Add with Carry (Matrix-Immediate with Mask Carry Input)` |
-  | `wmadc.vim`  | `31..26=0x11 25=0 ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Integer Add Carry-Out (Matrix-Immediate with Mask Carry Input)`  |
-  | `wmadc.vi`   | `31..26=0x11 25=1 ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Integer Add Carry-Out (Matrix-Immediate)`                        |
-  | `wmerge.vim` | `31..26=0x17 25=0 ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Integer Merge (Matrix-Immediate)`                                |
-  | `wmv.v.i`    | `31..26=0x17 25=1 24..20=0 simm5 14..12=0x3 wd 6..0=0x57` | `Matrix Broadcast Signed Immediate`                                      |
-  | `wmseq.vi`   | `31..26=0x18 vm ws2 simm5 14..12=0x3 wd 6..0=0x57`        | `Matrix Integer Compare Equal (Matrix-Immediate)`                        |
-  | `wmsne.vi`   | `31..26=0x19 vm ws2 simm5 14..12=0x3 wd 6..0=0x57`        | `Matrix Integer Compare Not Equal (Matrix-Immediate)`                    |
-  | `wmsleu.vi`  | `31..26=0x1c vm ws2 simm5 14..12=0x3 wd 6..0=0x57`        | `Matrix Integer Compare Less Than or Equal Unsigned (Matrix-Immediate)`  |
-  | `wmsle.vi`   | `31..26=0x1d vm ws2 simm5 14..12=0x3 wd 6..0=0x57`        | `Matrix Integer Compare Less Than or Equal Signed (Matrix-Immediate)`    |
-  | `wmsgtu.vi`  | `31..26=0x1e vm ws2 simm5 14..12=0x3 wd 6..0=0x57`        | `Matrix Integer Compare Greater Than Unsigned (Matrix-Immediate)`        |
-  | `wmsgt.vi`   | `31..26=0x1f vm ws2 simm5 14..12=0x3 wd 6..0=0x57`        | `Matrix Integer Compare Greater Than Signed (Matrix-Immediate)`          |
-
-  : OPIWI II
-
-  | **Name**     | **Opcode / Argument**                                   | **Full-Name**                                                     |
-  |:-------------|:--------------------------------------------------------|:------------------------------------------------------------------|
-  | `wsaddu.vi`  | `31..26=0x20 vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Integer Saturating Add Unsigned (Matrix-Immediate)`       |
-  | `wsadd.vi`   | `31..26=0x21 vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Integer Saturating Add Signed (Matrix-Immediate)`         |
-  | `wsll.vi`    | `31..26=0x25 vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Shift Left Logical (Matrix-Immediate)`                    |
-  | `wmv1r.v`    | `31..26=0x27 25=1 ws2 19..15=0 14..12=0x3 wd 6..0=0x57` | `Matrix Move 1 Whole Register`                                    |
-  | `wmv2r.v`    | `31..26=0x27 25=1 ws2 19..15=1 14..12=0x3 wd 6..0=0x57` | `Matrix Move 2 Whole Registers`                                   |
-  | `wmv4r.v`    | `31..26=0x27 25=1 ws2 19..15=3 14..12=0x3 wd 6..0=0x57` | `Matrix Move 4 Whole Registers`                                   |
-  | `wmv8r.v`    | `31..26=0x27 25=1 ws2 19..15=7 14..12=0x3 wd 6..0=0x57` | `Matrix Move 8 Whole Registers`                                   |
-  | `wsrl.vi`    | `31..26=0x28 vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Shift Right Logical (Matrix-Immediate)`                   |
-  | `wsra.vi`    | `31..26=0x29 vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Shift Right Arithmetic (Matrix-Immediate)`                |
-  | `wssrl.vi`   | `31..26=0x2a vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Scaling Shift Right Unsigned (Matrix-Immediate)`          |
-  | `wssra.vi`   | `31..26=0x2b vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Scaling Shift Right Signed (Matrix-Immediate)`            |
-  | `wnsrl.wi`   | `31..26=0x2c vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Narrowing Shift Right Logical (Wide Matrix-Immediate)`    |
-  | `wnsra.wi`   | `31..26=0x2d vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Narrowing Shift Right Arithmetic (Wide Matrix-Immediate)` |
-  | `wnclipu.wi` | `31..26=0x2e vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Narrowing Clip Unsigned (Wide Matrix-Immediate)`          |
-  | `wnclip.wi`  | `31..26=0x2f vm ws2 simm5 14..12=0x3 wd 6..0=0x57`      | `Matrix Narrowing Clip Signed (Wide Matrix-Immediate)`            |
-
-  : OPIWI III
-
-* **OPI (Matrix Integer Extension Instructions)**
-
-  | **Name**    | **Opcode / Argument**                                 | **Full-Name**                    |
-  |:------------|:------------------------------------------------------|:---------------------------------|
-  | `wzext.vf8` | `31..26=0x12 vm ws2 19..15=2 14..12=0x2 wd 6..0=0x57` | `Matrix Zero-Extend by Factor 8` |
-  | `wsext.vf8` | `31..26=0x12 vm ws2 19..15=3 14..12=0x2 wd 6..0=0x57` | `Matrix Sign-Extend by Factor 8` |
-  | `wzext.vf4` | `31..26=0x12 vm ws2 19..15=4 14..12=0x2 wd 6..0=0x57` | `Matrix Zero-Extend by Factor 4` |
-  | `wsext.vf4` | `31..26=0x12 vm ws2 19..15=5 14..12=0x2 wd 6..0=0x57` | `Matrix Sign-Extend by Factor 4` |
-  | `wzext.vf2` | `31..26=0x12 vm ws2 19..15=6 14..12=0x2 wd 6..0=0x57` | `Matrix Zero-Extend by Factor 2` |
-  | `wsext.vf2` | `31..26=0x12 vm ws2 19..15=7 14..12=0x2 wd 6..0=0x57` | `Matrix Sign-Extend by Factor 2` |
-
-  : Matrix Integer Extension Instructions I
-
-  | **Name**       | **Opcode / Argument**                              | **Full-Name**         |
-  |:---------------|:---------------------------------------------------|:----------------------|
-  | `wcompress.vm` | `31..26=0x17 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Compress`     |
-  | `wmandn.mm`    | `31..26=0x18 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Mask AND-NOT` |
-  | `wmand.mm`     | `31..26=0x19 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Mask AND`     |
-  | `wmor.mm`      | `31..26=0x1a 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Mask OR`      |
-  | `wmxor.mm`     | `31..26=0x1b 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Mask XOR`     |
-  | `wmorn.mm`     | `31..26=0x1c 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Mask OR-NOT`  |
-  | `wmnand.mm`    | `31..26=0x1d 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Mask NAND`    |
-  | `wmnor.mm`     | `31..26=0x1e 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Mask NOR`     |
-  | `wmxnor.mm`    | `31..26=0x1f 25=1 ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Mask XNOR`    |
-
-  : Matrix Integer Extension Instructions II
-
-  | **Name**   | **Opcode / Argument**                                         | **Full-Name**                     |
-  |:-----------|:--------------------------------------------------------------|:----------------------------------|
-  | `wmsbf.m`  | `31..26=0x14 vm ws2 19..15=0x01 14..12=0x2 wd 6..0=0x57`      | `Matrix Mask Set Before First`    |
-  | `wmsof.m`  | `31..26=0x14 vm ws2 19..15=0x02 14..12=0x2 wd 6..0=0x57`      | `Matrix Mask Set Only First`      |
-  | `wmsif.m`  | `31..26=0x14 vm ws2 19..15=0x03 14..12=0x2 wd 6..0=0x57`      | `Matrix Mask Set Including First` |
-  | `wiota.m`  | `31..26=0x14 vm ws2 19..15=0x10 14..12=0x2 wd 6..0=0x57`      | `Matrix Mask Iota`                |
-  | `wid.v`    | `31..26=0x14 vm 24..20=0 19..15=0x11 14..12=0x2 wd 6..0=0x57` | `Matrix Element Index`            |
-  | `wcpop.m`  | `31..26=0x10 vm ws2 19..15=0x10 14..12=0x2 rd 6..0=0x57`      | `Matrix Mask Population Count`    |
-  | `wfirst.m` | `31..26=0x10 vm ws2 19..15=0x11 14..12=0x2 rd 6..0=0x57`      | `Matrix Mask Find First Set`      |
-
-  : Matrix Integer Extension Instructions III
-
-  | **Name**     | **Opcode / Argument**                            | **Full-Name**                                                                       |
-  |:-------------|:-------------------------------------------------|:------------------------------------------------------------------------------------|
-  | `wdivu.vv`   | `31..26=0x20 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Divide Unsigned (Matrix-Matrix)`                                    |
-  | `wdiv.vv`    | `31..26=0x21 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Divide Signed (Matrix-Matrix)`                                      |
-  | `wremu.vv`   | `31..26=0x22 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Remainder Unsigned (Matrix-Matrix)`                                 |
-  | `wrem.vv`    | `31..26=0x23 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Remainder Signed (Matrix-Matrix)`                                   |
-  | `wmulhu.vv`  | `31..26=0x24 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Multiply High Unsigned (Matrix-Matrix)`                             |
-  | `wmul.vv`    | `31..26=0x25 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Multiply Signed (Matrix-Matrix)`                                    |
-  | `wmulhsu.vv` | `31..26=0x26 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Multiply High Signed-Unsigned (Matrix-Matrix)`                      |
-  | `wmulh.vv`   | `31..26=0x27 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Multiply High Signed (Matrix-Matrix)`                               |
-  | `wmadd.vv`   | `31..26=0x29 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Multiply-Add, Overwrite Multiplicand (Matrix-Matrix)`               |
-  | `wnmsub.vv`  | `31..26=0x2b vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Negative Multiply-Subtract, Overwrite Multiplicand (Matrix-Matrix)` |
-  | `wmacc.vv`   | `31..26=0x2d vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Multiply-Accumulate (Matrix-Matrix)`                                |
-  | `wnmsac.vv`  | `31..26=0x2f vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Negative Multiply-Subtract from Accumulator (Matrix-Matrix)`        |
-
-  : Matrix Integer Extension Instructions IV
-
-  | **Name**      | **Opcode / Argument**                            | **Full-Name**                                                                 |
-  |:--------------|:-------------------------------------------------|:------------------------------------------------------------------------------|
-  | `wwaddu.vv`   | `31..26=0x30 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Widening Integer Add Unsigned (Matrix-Matrix)`                        |
-  | `wwadd.vv`    | `31..26=0x31 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Widening Integer Add Signed (Matrix-Matrix)`                          |
-  | `wwsubu.vv`   | `31..26=0x32 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Widening Integer Subtract Unsigned (Matrix-Matrix)`                   |
-  | `wwsub.vv`    | `31..26=0x33 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Widening Integer Subtract Signed (Matrix-Matrix)`                     |
-  | `wwaddu.wv`   | `31..26=0x34 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Widening Integer Add Unsigned (Wide Matrix-Matrix)`                   |
-  | `wwadd.wv`    | `31..26=0x35 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Widening Integer Add Signed (Wide Matrix-Matrix)`                     |
-  | `wwsubu.wv`   | `31..26=0x36 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Widening Integer Subtract Unsigned (Wide Matrix-Matrix)`              |
-  | `wwsub.wv`    | `31..26=0x37 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Widening Integer Subtract Signed (Wide Matrix-Matrix)`                |
-  | `wwmulu.vv`   | `31..26=0x38 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Widening Integer Multiply Unsigned (Matrix-Matrix)`                   |
-  | `wwmulsu.vv`  | `31..26=0x3a vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Widening Integer Multiply Signed-Unsigned (Matrix-Matrix)`            |
-  | `wwmul.vv`    | `31..26=0x3b vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Widening Integer Multiply Signed (Matrix-Matrix)`                     |
-  | `wwmaccu.vv`  | `31..26=0x3c vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Widening Unsigned Integer Multiply-Accumulate (Matrix-Matrix)`        |
-  | `wwmacc.vv`   | `31..26=0x3d vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Widening Signed Integer Multiply-Accumulate (Matrix-Matrix)`          |
-  | `wwmaccsu.vv` | `31..26=0x3f vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Widening Signed-Unsigned Integer Multiply-Accumulate (Matrix-Matrix)` |
-
-  : Matrix Integer Extension Instructions V
-
-**Matrix Mask Instructions**
-
-* **OPMWW**
-
-  | **Name**      | **Opcode / Argument**                            | **Full-Name**                                        |
-  |:--------------|:-------------------------------------------------|:-----------------------------------------------------|
-  | `wredsum.ws`  | `31..26=0x00 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Sum Reduction`                       |
-  | `wredand.ws`  | `31..26=0x01 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer AND Reduction`                       |
-  | `wredor.ws`   | `31..26=0x02 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer OR Reduction`                        |
-  | `wredxor.ws`  | `31..26=0x03 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer XOR Reduction`                       |
-  | `wredminu.ws` | `31..26=0x04 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Minimum Unsigned Reduction`          |
-  | `wredmin.ws`  | `31..26=0x05 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Minimum Signed Reduction`            |
-  | `wredmaxu.ws` | `31..26=0x06 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Maximum Unsigned Reduction`          |
-  | `wredmax.ws`  | `31..26=0x07 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Integer Maximum Signed Reduction`            |
-  | `waaddu.vv`   | `31..26=0x08 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Averaging Add Unsigned (Matrix-Matrix)`      |
-  | `waadd.vv`    | `31..26=0x09 vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Averaging Add Signed (Matrix-Matrix)`        |
-  | `wasubu.vv`   | `31..26=0x0a vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Averaging Subtract Unsigned (Matrix-Matrix)` |
-  | `wasub.vv`    | `31..26=0x0b vm ws2 ws1 14..12=0x2 wd 6..0=0x57` | `Matrix Averaging Subtract Signed (Matrix-Matrix)`   |
-
-  : OPMWW I
-
-  | **Name**  | **Opcode / Argument**                                   | **Full-Name**                                  |
-  |:----------|:--------------------------------------------------------|:-----------------------------------------------|
-  | `wmv.x.s` | `31..26=0x10 25=1 ws2 19..15=0 14..12=0x2 rd 6..0=0x57` | `Matrix Move Matrix Element to Integer Scalar` |
-
-  : OPMWW II
-
-* **OPMWX**
-
-  | **Name**    | **Opcode / Argument**                            | **Full-Name**                                        |
-  |:------------|:-------------------------------------------------|:-----------------------------------------------------|
-  | `waaddu.vx` | `31..26=0x08 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Averaging Add Unsigned (Matrix-Scalar)`      |
-  | `waadd.vx`  | `31..26=0x09 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Averaging Add Signed (Matrix-Scalar)`        |
-  | `wasubu.vx` | `31..26=0x0a vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Averaging Subtract Unsigned (Matrix-Scalar)` |
-  | `wasub.vx`  | `31..26=0x0b vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Averaging Subtract Signed (Matrix-Scalar)`   |
-
-  : OPMWX I
-
-  | **Name**         | **Opcode / Argument**                                   | **Full-Name**                                  |
-  |:-----------------|:--------------------------------------------------------|:-----------------------------------------------|
-  | `wmv.s.x`        | `31..26=0x10 25=1 24..20=0 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Move Integer Scalar to Matrix Element` |
-  | `wslide1up.vx`   | `31..26=0x0e vm ws2 rs1 14..12=0x6 wd 6..0=0x57`        | `Matrix Slide One Up (Matrix-Scalar)`          |
-  | `wslide1down.vx` | `31..26=0x0f vm ws2 rs1 14..12=0x6 wd 6..0=0x57`        | `Matrix Slide One Down (Matrix-Scalar)`        |
-
-  : OPMWX II
-
-  | **Name**     | **Opcode / Argument**                            | **Full-Name**                                                                       |
-  |:-------------|:-------------------------------------------------|:------------------------------------------------------------------------------------|
-  | `wdivu.vx`   | `31..26=0x20 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Integer Divide Unsigned (Matrix-Scalar)`                                    |
-  | `wdiv.vx`    | `31..26=0x21 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Integer Divide Signed (Matrix-Scalar)`                                      |
-  | `wremu.vx`   | `31..26=0x22 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Integer Remainder Unsigned (Matrix-Scalar)`                                 |
-  | `wrem.vx`    | `31..26=0x23 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Integer Remainder Signed (Matrix-Scalar)`                                   |
-  | `wmulhu.vx`  | `31..26=0x24 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Integer Multiply High Unsigned (Matrix-Scalar)`                             |
-  | `wmul.vx`    | `31..26=0x25 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Integer Multiply Signed (Matrix-Scalar)`                                    |
-  | `wmulhsu.vx` | `31..26=0x26 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Integer Multiply High Signed-Unsigned (Matrix-Scalar)`                      |
-  | `wmulh.vx`   | `31..26=0x27 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Integer Multiply High Signed (Matrix-Scalar)`                               |
-  | `wmadd.vx`   | `31..26=0x29 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Integer Multiply-Add, Overwrite Multiplicand (Matrix-Scalar)`               |
-  | `wnmsub.vx`  | `31..26=0x2b vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Integer Negative Multiply-Subtract, Overwrite Multiplicand (Matrix-Scalar)` |
-  | `wmacc.vx`   | `31..26=0x2d vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Integer Multiply-Accumulate (Matrix-Scalar)`                                |
-  | `wnmsac.vx`  | `31..26=0x2f vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Integer Negative Multiply-Subtract from Accumulator (Matrix-Scalar)`        |
-
-  : OPMWX III
-
-  | **Name**      | **Opcode / Argument**                            | **Full-Name**                                                                 |
-  |:--------------|:-------------------------------------------------|:------------------------------------------------------------------------------|
-  | `wwaddu.vx`   | `31..26=0x30 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Integer Add Unsigned (Matrix-Scalar)`                        |
-  | `wwadd.vx`    | `31..26=0x31 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Integer Add Signed (Matrix-Scalar)`                          |
-  | `wwsubu.vx`   | `31..26=0x32 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Integer Subtract Unsigned (Matrix-Scalar)`                   |
-  | `wwsub.vx`    | `31..26=0x33 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Integer Subtract Signed (Matrix-Scalar)`                     |
-  | `wwaddu.wx`   | `31..26=0x34 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Integer Add Unsigned (Wide Matrix-Scalar)`                   |
-  | `wwadd.wx`    | `31..26=0x35 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Integer Add Signed (Wide Matrix-Scalar)`                     |
-  | `wwsubu.wx`   | `31..26=0x36 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Integer Subtract Unsigned (Wide Matrix-Scalar)`              |
-  | `wwsub.wx`    | `31..26=0x37 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Integer Subtract Signed (Wide Matrix-Scalar)`                |
-  | `wwmulu.vx`   | `31..26=0x38 vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Integer Multiply Unsigned (Matrix-Scalar)`                   |
-  | `wwmulsu.vx`  | `31..26=0x3a vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Integer Multiply Signed-Unsigned (Matrix-Scalar)`            |
-  | `wwmul.vx`    | `31..26=0x3b vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Integer Multiply Signed (Matrix-Scalar)`                     |
-  | `wwmaccu.vx`  | `31..26=0x3c vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Unsigned Integer Multiply-Accumulate (Matrix-Scalar)`        |
-  | `wwmacc.vx`   | `31..26=0x3d vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Signed Integer Multiply-Accumulate (Matrix-Scalar)`          |
-  | `wwmaccus.vx` | `31..26=0x3e vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Unsigned-Signed Integer Multiply-Accumulate (Matrix-Scalar)` |
-  | `wwmaccsu.vx` | `31..26=0x3f vm ws2 rs1 14..12=0x6 wd 6..0=0x57` | `Matrix Widening Signed-Unsigned Integer Multiply-Accumulate (Matrix-Scalar)` |
-
-  : OPMWX IV
+| **Extension** | **Name**               | **Variable-Fields**  | **Full-Name**                                                                                    |
+|:--------------|:-----------------------|:---------------------|:-------------------------------------------------------------------------------------------------|
+| `rv_w`        | `waaddu_ww`            | `wm, ws2, ws1, wd`   | `Matrix Averaging Add Unsigned (Matrix-Matrix)`                                                  |
+| `rv_w`        | `waaddu_wx`            | `wm, ws2, rs1, wd`   | `Matrix Averaging Add Unsigned (Matrix-Scalar)`                                                  |
+| `rv_w`        | `waadd_ww`             | `wm, ws2, ws1, wd`   | `Matrix Averaging Add Signed (Matrix-Matrix)`                                                    |
+| `rv_w`        | `waadd_wx`             | `wm, ws2, rs1, wd`   | `Matrix Averaging Add Signed (Matrix-Scalar)`                                                    |
+| `rv_w`        | `wadc_wim`             | `ws2, simm5, wd`     | `Matrix Integer Add with Carry (Matrix-Immediate with Mask Carry Input)`                         |
+| `rv_w`        | `wadc_wwm`             | `ws2, ws1, wd`       | `Matrix Integer Add with Carry (Matrix-Matrix with Mask Carry Input)`                            |
+| `rv_w`        | `wadc_wxm`             | `ws2, rs1, wd`       | `Matrix Integer Add with Carry (Matrix-Scalar with Mask Carry Input)`                            |
+| `rv_w`        | `wadd_wi`              | `wm, ws2, simm5, wd` | `Matrix Integer Add (Matrix-Immediate)`                                                          |
+| `rv_w`        | `wadd_ww`              | `wm, ws2, ws1, wd`   | `Matrix Integer Add (Matrix-Matrix)`                                                             |
+| `rv_w`        | `wadd_wx`              | `wm, ws2, rs1, wd`   | `Matrix Integer Add (Matrix-Scalar)`                                                             |
+| `rv_w`        | `wand_wi`              | `wm, ws2, simm5, wd` | `Matrix Bitwise AND (Matrix-Immediate)`                                                          |
+| `rv_w`        | `wand_ww`              | `wm, ws2, ws1, wd`   | `Matrix Bitwise AND (Matrix-Matrix)`                                                             |
+| `rv_w`        | `wand_wx`              | `wm, ws2, rs1, wd`   | `Matrix Bitwise AND (Matrix-Scalar)`                                                             |
+| `rv_w`        | `wasubu_ww`            | `wm, ws2, ws1, wd`   | `Matrix Averaging Subtract Unsigned (Matrix-Matrix)`                                             |
+| `rv_w`        | `wasubu_wx`            | `wm, ws2, rs1, wd`   | `Matrix Averaging Subtract Unsigned (Matrix-Scalar)`                                             |
+| `rv_w`        | `wasub_ww`             | `wm, ws2, ws1, wd`   | `Matrix Averaging Subtract Signed (Matrix-Matrix)`                                               |
+| `rv_w`        | `wasub_wx`             | `wm, ws2, rs1, wd`   | `Matrix Averaging Subtract Signed (Matrix-Scalar)`                                               |
+| `rv_w`        | `wcompress_wm`         | `ws2, ws1, wd`       | `Matrix Compress`                                                                                |
+| `rv_w`        | `wcpop_m`              | `wm, ws2, rd`        | `Matrix Mask Population Count`                                                                   |
+| `rv_w`        | `wdivu_ww`             | `wm, ws2, ws1, wd`   | `Matrix Integer Divide Unsigned (Matrix-Matrix)`                                                 |
+| `rv_w`        | `wdivu_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Divide Unsigned (Matrix-Scalar)`                                                 |
+| `rv_w`        | `wdiv_ww`              | `wm, ws2, ws1, wd`   | `Matrix Integer Divide Signed (Matrix-Matrix)`                                                   |
+| `rv_w`        | `wdiv_wx`              | `wm, ws2, rs1, wd`   | `Matrix Integer Divide Signed (Matrix-Scalar)`                                                   |
+| `rv_w`        | `wfadd_wf`             | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Add (Matrix-Scalar)`                                                      |
+| `rv_w`        | `wfadd_ww`             | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Add (Matrix-Matrix)`                                                      |
+| `rv_w`        | `wfclass_w`            | `wm, ws2, wd`        | `Matrix Floating-Point Classify`                                                                 |
+| `rv_w`        | `wfcvt_f_xu_w`         | `wm, ws2, wd`        | `Matrix Convert Unsigned Integer to Floating-Point`                                              |
+| `rv_w`        | `wfcvt_f_x_w`          | `wm, ws2, wd`        | `Matrix Convert Signed Integer to Floating-Point`                                                |
+| `rv_w`        | `wfcvt_rtz_x_f_w`      | `wm, ws2, wd`        | `Matrix Convert Floating-Point to Signed Integer with Round Toward Zero`                         |
+| `rv_w`        | `wfcvt_rtz_xu_f_w`     | `wm, ws2, wd`        | `Matrix Convert Floating-Point to Unsigned Integer with Round Toward Zero`                       |
+| `rv_w`        | `wfcvt_x_f_w`          | `wm, ws2, wd`        | `Matrix Convert Floating-Point to Signed Integer`                                                |
+| `rv_w`        | `wfcvt_xu_f_w`         | `wm, ws2, wd`        | `Matrix Convert Floating-Point to Unsigned Integer`                                              |
+| `rv_w`        | `wfdiv_wf`             | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Divide (Matrix-Scalar)`                                                   |
+| `rv_w`        | `wfdiv_ww`             | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Divide (Matrix-Matrix)`                                                   |
+| `rv_w`        | `wfirst_m`             | `wm, ws2, rd`        | `Matrix Mask Find First Set`                                                                     |
+| `rv_w`        | `wfmacc_wf`            | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Fused Multiply-Accumulate (Matrix-Scalar)`                                |
+| `rv_w`        | `wfmacc_ww`            | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Fused Multiply-Accumulate (Matrix-Matrix)`                                |
+| `rv_w`        | `wfmadd_wf`            | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Fused Multiply-Add, Overwrite Multiplicand (Matrix-Scalar)`               |
+| `rv_w`        | `wfmadd_ww`            | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Fused Multiply-Add, Overwrite Multiplicand (Matrix-Matrix)`               |
+| `rv_w`        | `wfmax_wf`             | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Maximum (Matrix-Scalar)`                                                  |
+| `rv_w`        | `wfmax_ww`             | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Maximum (Matrix-Matrix)`                                                  |
+| `rv_w`        | `wfmerge_wfm`          | `ws2, rs1, wd`       | `Matrix Floating-Point Merge (Matrix-Scalar)`                                                    |
+| `rv_w`        | `wfmin_wf`             | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Minimum (Matrix-Scalar)`                                                  |
+| `rv_w`        | `wfmin_ww`             | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Minimum (Matrix-Matrix)`                                                  |
+| `rv_w`        | `wfmsac_wf`            | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Fused Multiply-Subtract Accumulator (Matrix-Scalar)`                      |
+| `rv_w`        | `wfmsac_ww`            | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Fused Multiply-Subtract Accumulator (Matrix-Matrix)`                      |
+| `rv_w`        | `wfmsub_wf`            | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Fused Multiply-Subtract, Overwrite Multiplicand (Matrix-Scalar)`          |
+| `rv_w`        | `wfmsub_ww`            | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Fused Multiply-Subtract, Overwrite Multiplicand (Matrix-Matrix)`          |
+| `rv_w`        | `wfmul_wf`             | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Multiply (Matrix-Scalar)`                                                 |
+| `rv_w`        | `wfmul_ww`             | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Multiply (Matrix-Matrix)`                                                 |
+| `rv_w`        | `wfmv_f_s`             | `ws2, rd`            | `Matrix Move Matrix Element to Floating-Point Scalar`                                            |
+| `rv_w`        | `wfmv_s_f`             | `rs1, wd`            | `Matrix Move Floating-Point Scalar to Matrix Element`                                            |
+| `rv_w`        | `wfmv_w_f`             | `rs1, wd`            | `Matrix Broadcast Floating-Point Scalar`                                                         |
+| `rv_w`        | `wfncvt_f_f_wide`      | `wm, ws2, wd`        | `Matrix Narrowing Convert Floating-Point to Floating-Point`                                      |
+| `rv_w`        | `wfncvt_f_xu_wide`     | `wm, ws2, wd`        | `Matrix Narrowing Convert Unsigned Integer to Floating-Point`                                    |
+| `rv_w`        | `wfncvt_f_x_wide`      | `wm, ws2, wd`        | `Matrix Narrowing Convert Signed Integer to Floating-Point`                                      |
+| `rv_w`        | `wfncvt_rod_f_f_wide`  | `wm, ws2, wd`        | `Matrix Narrowing Convert Floating-Point to Floating-Point with Round to Odd`                    |
+| `rv_w`        | `wfncvt_rtz_x_f_wide`  | `wm, ws2, wd`        | `Matrix Narrowing Convert Floating-Point to Signed Integer with Round Toward Zero`               |
+| `rv_w`        | `wfncvt_rtz_xu_f_wide` | `wm, ws2, wd`        | `Matrix Narrowing Convert Floating-Point to Unsigned Integer with Round Toward Zero`             |
+| `rv_w`        | `wfncvt_x_f_wide`      | `wm, ws2, wd`        | `Matrix Narrowing Convert Floating-Point to Signed Integer`                                      |
+| `rv_w`        | `wfncvt_xu_f_wide`     | `wm, ws2, wd`        | `Matrix Narrowing Convert Floating-Point to Unsigned Integer`                                    |
+| `rv_w`        | `wfnmacc_wf`           | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Fused Negative Multiply-Accumulate (Matrix-Scalar)`                       |
+| `rv_w`        | `wfnmacc_ww`           | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Fused Negative Multiply-Accumulate (Matrix-Matrix)`                       |
+| `rv_w`        | `wfnmadd_wf`           | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Fused Negative Multiply-Add, Overwrite Multiplicand (Matrix-Scalar)`      |
+| `rv_w`        | `wfnmadd_ww`           | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Fused Negative Multiply-Add, Overwrite Multiplicand (Matrix-Matrix)`      |
+| `rv_w`        | `wfnmsac_wf`           | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Fused Negative Multiply-Subtract Accumulator (Matrix-Scalar)`             |
+| `rv_w`        | `wfnmsac_ww`           | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Fused Negative Multiply-Subtract Accumulator (Matrix-Matrix)`             |
+| `rv_w`        | `wfnmsub_wf`           | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Fused Negative Multiply-Subtract, Overwrite Multiplicand (Matrix-Scalar)` |
+| `rv_w`        | `wfnmsub_ww`           | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Fused Negative Multiply-Subtract, Overwrite Multiplicand (Matrix-Matrix)` |
+| `rv_w`        | `wfrdiv_wf`            | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Reverse Divide (Matrix-Scalar)`                                           |
+| `rv_w`        | `wfrec7_w`             | `wm, ws2, wd`        | `Matrix Floating-Point Reciprocal Estimate to 7 Bits`                                            |
+| `rv_w`        | `wfredmax_ws`          | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Maximum Reduction`                                                        |
+| `rv_w`        | `wfredmin_ws`          | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Minimum Reduction`                                                        |
+| `rv_w`        | `wfredosum_ws`         | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Ordered Sum Reduction`                                                    |
+| `rv_w`        | `wfredusum_ws`         | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Unordered Sum Reduction`                                                  |
+| `rv_w`        | `wfrsqrt7_w`           | `wm, ws2, wd`        | `Matrix Floating-Point Reciprocal Square-Root Estimate to 7 Bits`                                |
+| `rv_w`        | `wfrsub_wf`            | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Reverse Subtract (Matrix-Scalar)`                                         |
+| `rv_w`        | `wfsgnjn_wf`           | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Negated Sign Injection (Matrix-Scalar)`                                   |
+| `rv_w`        | `wfsgnjn_ww`           | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Negated Sign Injection (Matrix-Matrix)`                                   |
+| `rv_w`        | `wfsgnj_wf`            | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Sign Injection (Matrix-Scalar)`                                           |
+| `rv_w`        | `wfsgnj_ww`            | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Sign Injection (Matrix-Matrix)`                                           |
+| `rv_w`        | `wfsgnjx_wf`           | `wm, ws2, rs1, wd`   | `Matrix Floating-Point XOR Sign Injection (Matrix-Scalar)`                                       |
+| `rv_w`        | `wfsgnjx_ww`           | `wm, ws2, ws1, wd`   | `Matrix Floating-Point XOR Sign Injection (Matrix-Matrix)`                                       |
+| `rv_w`        | `wfslide1down_wf`      | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Slide One Down (Matrix-Scalar)`                                           |
+| `rv_w`        | `wfslide1up_wf`        | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Slide One Up (Matrix-Scalar)`                                             |
+| `rv_w`        | `wfsqrt_w`             | `wm, ws2, wd`        | `Matrix Floating-Point Square Root`                                                              |
+| `rv_w`        | `wfsub_wf`             | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Subtract (Matrix-Scalar)`                                                 |
+| `rv_w`        | `wfsub_ww`             | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Subtract (Matrix-Matrix)`                                                 |
+| `rv_w`        | `wfwadd_wf`            | `wm, ws2, rs1, wd`   | `Matrix Widening Floating-Point Add (Matrix-Scalar)`                                             |
+| `rv_w`        | `wfwadd_ww`            | `wm, ws2, ws1, wd`   | `Matrix Widening Floating-Point Add (Matrix-Matrix)`                                             |
+| `rv_w`        | `wfwadd_wide_wf`       | `wm, ws2, rs1, wd`   | `Matrix Widening Floating-Point Add (Wide Matrix-Scalar)`                                        |
+| `rv_w`        | `wfwadd_wide_ww`       | `wm, ws2, ws1, wd`   | `Matrix Widening Floating-Point Add (Wide Matrix-Matrix)`                                        |
+| `rv_w`        | `wfwcvt_f_f_w`         | `wm, ws2, wd`        | `Matrix Widening Convert Floating-Point to Floating-Point`                                       |
+| `rv_w`        | `wfwcvt_f_xu_w`        | `wm, ws2, wd`        | `Matrix Widening Convert Unsigned Integer to Floating-Point`                                     |
+| `rv_w`        | `wfwcvt_f_x_w`         | `wm, ws2, wd`        | `Matrix Widening Convert Signed Integer to Floating-Point`                                       |
+| `rv_w`        | `wfwcvt_rtz_x_f_w`     | `wm, ws2, wd`        | `Matrix Widening Convert Floating-Point to Signed Integer with Round Toward Zero`                |
+| `rv_w`        | `wfwcvt_rtz_xu_f_w`    | `wm, ws2, wd`        | `Matrix Widening Convert Floating-Point to Unsigned Integer with Round Toward Zero`              |
+| `rv_w`        | `wfwcvt_x_f_w`         | `wm, ws2, wd`        | `Matrix Widening Convert Floating-Point to Signed Integer`                                       |
+| `rv_w`        | `wfwcvt_xu_f_w`        | `wm, ws2, wd`        | `Matrix Widening Convert Floating-Point to Unsigned Integer`                                     |
+| `rv_w`        | `wfwmacc_wf`           | `wm, ws2, rs1, wd`   | `Matrix Widening Floating-Point Fused Multiply-Accumulate (Matrix-Scalar)`                       |
+| `rv_w`        | `wfwmacc_ww`           | `wm, ws2, ws1, wd`   | `Matrix Widening Floating-Point Fused Multiply-Accumulate (Matrix-Matrix)`                       |
+| `rv_w`        | `wfwmsac_wf`           | `wm, ws2, rs1, wd`   | `Matrix Widening Floating-Point Fused Multiply-Subtract Accumulator (Matrix-Scalar)`             |
+| `rv_w`        | `wfwmsac_ww`           | `wm, ws2, ws1, wd`   | `Matrix Widening Floating-Point Fused Multiply-Subtract Accumulator (Matrix-Matrix)`             |
+| `rv_w`        | `wfwmul_wf`            | `wm, ws2, rs1, wd`   | `Matrix Widening Floating-Point Multiply (Matrix-Scalar)`                                        |
+| `rv_w`        | `wfwmul_ww`            | `wm, ws2, ws1, wd`   | `Matrix Widening Floating-Point Multiply (Matrix-Matrix)`                                        |
+| `rv_w`        | `wfwnmacc_wf`          | `wm, ws2, rs1, wd`   | `Matrix Widening Floating-Point Fused Negative Multiply-Accumulate (Matrix-Scalar)`              |
+| `rv_w`        | `wfwnmacc_ww`          | `wm, ws2, ws1, wd`   | `Matrix Widening Floating-Point Fused Negative Multiply-Accumulate (Matrix-Matrix)`              |
+| `rv_w`        | `wfwnmsac_wf`          | `wm, ws2, rs1, wd`   | `Matrix Widening Floating-Point Fused Negative Multiply-Subtract Accumulator (Matrix-Scalar)`    |
+| `rv_w`        | `wfwnmsac_ww`          | `wm, ws2, ws1, wd`   | `Matrix Widening Floating-Point Fused Negative Multiply-Subtract Accumulator (Matrix-Matrix)`    |
+| `rv_w`        | `wfwredosum_ws`        | `wm, ws2, ws1, wd`   | `Matrix Widening Floating-Point Ordered Sum Reduction`                                           |
+| `rv_w`        | `wfwredusum_ws`        | `wm, ws2, ws1, wd`   | `Matrix Widening Floating-Point Unordered Sum Reduction`                                         |
+| `rv_w`        | `wfwsub_wf`            | `wm, ws2, rs1, wd`   | `Matrix Widening Floating-Point Subtract (Matrix-Scalar)`                                        |
+| `rv_w`        | `wfwsub_ww`            | `wm, ws2, ws1, wd`   | `Matrix Widening Floating-Point Subtract (Matrix-Matrix)`                                        |
+| `rv_w`        | `wfwsub_wide_wf`       | `wm, ws2, rs1, wd`   | `Matrix Widening Floating-Point Subtract (Wide Matrix-Scalar)`                                   |
+| `rv_w`        | `wfwsub_wide_ww`       | `wm, ws2, ws1, wd`   | `Matrix Widening Floating-Point Subtract (Wide Matrix-Matrix)`                                   |
+| `rv_w`        | `wid_w`                | `wm, wd`             | `Matrix Element Index`                                                                           |
+| `rv_w`        | `wiota_m`              | `wm, ws2, wd`        | `Matrix Mask Iota`                                                                               |
+| `rv_w`        | `wl1re16_w`            | `rs1, wd`            | `Matrix Load 1 Whole Register with 16-Bit Encoded Element Width`                                 |
+| `rv_w`        | `wl1re32_w`            | `rs1, wd`            | `Matrix Load 1 Whole Register with 32-Bit Encoded Element Width`                                 |
+| `rv_w`        | `wl1re64_w`            | `rs1, wd`            | `Matrix Load 1 Whole Register with 64-Bit Encoded Element Width`                                 |
+| `rv_w`        | `wl1re8_w`             | `rs1, wd`            | `Matrix Load 1 Whole Register with 8-Bit Encoded Element Width`                                  |
+| `rv_w`        | `wl2re16_w`            | `rs1, wd`            | `Matrix Load 2 Whole Registers with 16-Bit Encoded Element Width`                                |
+| `rv_w`        | `wl2re32_w`            | `rs1, wd`            | `Matrix Load 2 Whole Registers with 32-Bit Encoded Element Width`                                |
+| `rv_w`        | `wl2re64_w`            | `rs1, wd`            | `Matrix Load 2 Whole Registers with 64-Bit Encoded Element Width`                                |
+| `rv_w`        | `wl2re8_w`             | `rs1, wd`            | `Matrix Load 2 Whole Registers with 8-Bit Encoded Element Width`                                 |
+| `rv_w`        | `wl4re16_w`            | `rs1, wd`            | `Matrix Load 4 Whole Registers with 16-Bit Encoded Element Width`                                |
+| `rv_w`        | `wl4re32_w`            | `rs1, wd`            | `Matrix Load 4 Whole Registers with 32-Bit Encoded Element Width`                                |
+| `rv_w`        | `wl4re64_w`            | `rs1, wd`            | `Matrix Load 4 Whole Registers with 64-Bit Encoded Element Width`                                |
+| `rv_w`        | `wl4re8_w`             | `rs1, wd`            | `Matrix Load 4 Whole Registers with 8-Bit Encoded Element Width`                                 |
+| `rv_w`        | `wl8re16_w`            | `rs1, wd`            | `Matrix Load 8 Whole Registers with 16-Bit Encoded Element Width`                                |
+| `rv_w`        | `wl8re32_w`            | `rs1, wd`            | `Matrix Load 8 Whole Registers with 32-Bit Encoded Element Width`                                |
+| `rv_w`        | `wl8re64_w`            | `rs1, wd`            | `Matrix Load 8 Whole Registers with 64-Bit Encoded Element Width`                                |
+| `rv_w`        | `wl8re8_w`             | `rs1, wd`            | `Matrix Load 8 Whole Registers with 8-Bit Encoded Element Width`                                 |
+| `rv_w`        | `wle16ff_w`            | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Load with 16-Bit Elements`                                  |
+| `rv_w`        | `wle16_w`              | `wm, rs1, wd`        | `Matrix Unit-Stride Load with 16-Bit Elements`                                                   |
+| `rv_w`        | `wle32ff_w`            | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Load with 32-Bit Elements`                                  |
+| `rv_w`        | `wle32_w`              | `wm, rs1, wd`        | `Matrix Unit-Stride Load with 32-Bit Elements`                                                   |
+| `rv_w`        | `wle64ff_w`            | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Load with 64-Bit Elements`                                  |
+| `rv_w`        | `wle64_w`              | `wm, rs1, wd`        | `Matrix Unit-Stride Load with 64-Bit Elements`                                                   |
+| `rv_w`        | `wle8ff_w`             | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Load with 8-Bit Elements`                                   |
+| `rv_w`        | `wle8_w`               | `wm, rs1, wd`        | `Matrix Unit-Stride Load with 8-Bit Elements`                                                    |
+| `rv_w`        | `wlm_w`                | `rs1, wd`            | `Matrix Mask Load`                                                                               |
+| `rv_w`        | `wloxei16_w`           | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Load with 16-Bit Indices`                                                |
+| `rv_w`        | `wloxei32_w`           | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Load with 32-Bit Indices`                                                |
+| `rv_w`        | `wloxei64_w`           | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Load with 64-Bit Indices`                                                |
+| `rv_w`        | `wloxei8_w`            | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Load with 8-Bit Indices`                                                 |
+| `rv_w`        | `wloxseg2ei16_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 2 Fields with 16-Bit Indices`                            |
+| `rv_w`        | `wloxseg2ei32_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 2 Fields with 32-Bit Indices`                            |
+| `rv_w`        | `wloxseg2ei64_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 2 Fields with 64-Bit Indices`                            |
+| `rv_w`        | `wloxseg2ei8_w`        | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 2 Fields with 8-Bit Indices`                             |
+| `rv_w`        | `wloxseg3ei16_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 3 Fields with 16-Bit Indices`                            |
+| `rv_w`        | `wloxseg3ei32_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 3 Fields with 32-Bit Indices`                            |
+| `rv_w`        | `wloxseg3ei64_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 3 Fields with 64-Bit Indices`                            |
+| `rv_w`        | `wloxseg3ei8_w`        | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 3 Fields with 8-Bit Indices`                             |
+| `rv_w`        | `wloxseg4ei16_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 4 Fields with 16-Bit Indices`                            |
+| `rv_w`        | `wloxseg4ei32_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 4 Fields with 32-Bit Indices`                            |
+| `rv_w`        | `wloxseg4ei64_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 4 Fields with 64-Bit Indices`                            |
+| `rv_w`        | `wloxseg4ei8_w`        | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 4 Fields with 8-Bit Indices`                             |
+| `rv_w`        | `wloxseg5ei16_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 5 Fields with 16-Bit Indices`                            |
+| `rv_w`        | `wloxseg5ei32_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 5 Fields with 32-Bit Indices`                            |
+| `rv_w`        | `wloxseg5ei64_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 5 Fields with 64-Bit Indices`                            |
+| `rv_w`        | `wloxseg5ei8_w`        | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 5 Fields with 8-Bit Indices`                             |
+| `rv_w`        | `wloxseg6ei16_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 6 Fields with 16-Bit Indices`                            |
+| `rv_w`        | `wloxseg6ei32_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 6 Fields with 32-Bit Indices`                            |
+| `rv_w`        | `wloxseg6ei64_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 6 Fields with 64-Bit Indices`                            |
+| `rv_w`        | `wloxseg6ei8_w`        | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 6 Fields with 8-Bit Indices`                             |
+| `rv_w`        | `wloxseg7ei16_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 7 Fields with 16-Bit Indices`                            |
+| `rv_w`        | `wloxseg7ei32_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 7 Fields with 32-Bit Indices`                            |
+| `rv_w`        | `wloxseg7ei64_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 7 Fields with 64-Bit Indices`                            |
+| `rv_w`        | `wloxseg7ei8_w`        | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 7 Fields with 8-Bit Indices`                             |
+| `rv_w`        | `wloxseg8ei16_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 8 Fields with 16-Bit Indices`                            |
+| `rv_w`        | `wloxseg8ei32_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 8 Fields with 32-Bit Indices`                            |
+| `rv_w`        | `wloxseg8ei64_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 8 Fields with 64-Bit Indices`                            |
+| `rv_w`        | `wloxseg8ei8_w`        | `wm, ws2, rs1, wd`   | `Matrix Indexed-Ordered Segment Load of 8 Fields with 8-Bit Indices`                             |
+| `rv_w`        | `wlse16_w`             | `wm, rs2, rs1, wd`   | `Matrix Strided Load with 16-Bit Elements`                                                       |
+| `rv_w`        | `wlse32_w`             | `wm, rs2, rs1, wd`   | `Matrix Strided Load with 32-Bit Elements`                                                       |
+| `rv_w`        | `wlse64_w`             | `wm, rs2, rs1, wd`   | `Matrix Strided Load with 64-Bit Elements`                                                       |
+| `rv_w`        | `wlse8_w`              | `wm, rs2, rs1, wd`   | `Matrix Strided Load with 8-Bit Elements`                                                        |
+| `rv_w`        | `wlseg2e16ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 2 Fields with 16-Bit Elements`              |
+| `rv_w`        | `wlseg2e16_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 2 Fields with 16-Bit Elements`                               |
+| `rv_w`        | `wlseg2e32ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 2 Fields with 32-Bit Elements`              |
+| `rv_w`        | `wlseg2e32_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 2 Fields with 32-Bit Elements`                               |
+| `rv_w`        | `wlseg2e64ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 2 Fields with 64-Bit Elements`              |
+| `rv_w`        | `wlseg2e64_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 2 Fields with 64-Bit Elements`                               |
+| `rv_w`        | `wlseg2e8ff_w`         | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 2 Fields with 8-Bit Elements`               |
+| `rv_w`        | `wlseg2e8_w`           | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 2 Fields with 8-Bit Elements`                                |
+| `rv_w`        | `wlseg3e16ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 3 Fields with 16-Bit Elements`              |
+| `rv_w`        | `wlseg3e16_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 3 Fields with 16-Bit Elements`                               |
+| `rv_w`        | `wlseg3e32ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 3 Fields with 32-Bit Elements`              |
+| `rv_w`        | `wlseg3e32_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 3 Fields with 32-Bit Elements`                               |
+| `rv_w`        | `wlseg3e64ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 3 Fields with 64-Bit Elements`              |
+| `rv_w`        | `wlseg3e64_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 3 Fields with 64-Bit Elements`                               |
+| `rv_w`        | `wlseg3e8ff_w`         | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 3 Fields with 8-Bit Elements`               |
+| `rv_w`        | `wlseg3e8_w`           | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 3 Fields with 8-Bit Elements`                                |
+| `rv_w`        | `wlseg4e16ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 4 Fields with 16-Bit Elements`              |
+| `rv_w`        | `wlseg4e16_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 4 Fields with 16-Bit Elements`                               |
+| `rv_w`        | `wlseg4e32ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 4 Fields with 32-Bit Elements`              |
+| `rv_w`        | `wlseg4e32_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 4 Fields with 32-Bit Elements`                               |
+| `rv_w`        | `wlseg4e64ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 4 Fields with 64-Bit Elements`              |
+| `rv_w`        | `wlseg4e64_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 4 Fields with 64-Bit Elements`                               |
+| `rv_w`        | `wlseg4e8ff_w`         | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 4 Fields with 8-Bit Elements`               |
+| `rv_w`        | `wlseg4e8_w`           | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 4 Fields with 8-Bit Elements`                                |
+| `rv_w`        | `wlseg5e16ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 5 Fields with 16-Bit Elements`              |
+| `rv_w`        | `wlseg5e16_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 5 Fields with 16-Bit Elements`                               |
+| `rv_w`        | `wlseg5e32ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 5 Fields with 32-Bit Elements`              |
+| `rv_w`        | `wlseg5e32_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 5 Fields with 32-Bit Elements`                               |
+| `rv_w`        | `wlseg5e64ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 5 Fields with 64-Bit Elements`              |
+| `rv_w`        | `wlseg5e64_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 5 Fields with 64-Bit Elements`                               |
+| `rv_w`        | `wlseg5e8ff_w`         | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 5 Fields with 8-Bit Elements`               |
+| `rv_w`        | `wlseg5e8_w`           | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 5 Fields with 8-Bit Elements`                                |
+| `rv_w`        | `wlseg6e16ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 6 Fields with 16-Bit Elements`              |
+| `rv_w`        | `wlseg6e16_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 6 Fields with 16-Bit Elements`                               |
+| `rv_w`        | `wlseg6e32ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 6 Fields with 32-Bit Elements`              |
+| `rv_w`        | `wlseg6e32_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 6 Fields with 32-Bit Elements`                               |
+| `rv_w`        | `wlseg6e64ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 6 Fields with 64-Bit Elements`              |
+| `rv_w`        | `wlseg6e64_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 6 Fields with 64-Bit Elements`                               |
+| `rv_w`        | `wlseg6e8ff_w`         | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 6 Fields with 8-Bit Elements`               |
+| `rv_w`        | `wlseg6e8_w`           | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 6 Fields with 8-Bit Elements`                                |
+| `rv_w`        | `wlseg7e16ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 7 Fields with 16-Bit Elements`              |
+| `rv_w`        | `wlseg7e16_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 7 Fields with 16-Bit Elements`                               |
+| `rv_w`        | `wlseg7e32ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 7 Fields with 32-Bit Elements`              |
+| `rv_w`        | `wlseg7e32_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 7 Fields with 32-Bit Elements`                               |
+| `rv_w`        | `wlseg7e64ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 7 Fields with 64-Bit Elements`              |
+| `rv_w`        | `wlseg7e64_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 7 Fields with 64-Bit Elements`                               |
+| `rv_w`        | `wlseg7e8ff_w`         | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 7 Fields with 8-Bit Elements`               |
+| `rv_w`        | `wlseg7e8_w`           | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 7 Fields with 8-Bit Elements`                                |
+| `rv_w`        | `wlseg8e16ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 8 Fields with 16-Bit Elements`              |
+| `rv_w`        | `wlseg8e16_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 8 Fields with 16-Bit Elements`                               |
+| `rv_w`        | `wlseg8e32ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 8 Fields with 32-Bit Elements`              |
+| `rv_w`        | `wlseg8e32_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 8 Fields with 32-Bit Elements`                               |
+| `rv_w`        | `wlseg8e64ff_w`        | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 8 Fields with 64-Bit Elements`              |
+| `rv_w`        | `wlseg8e64_w`          | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 8 Fields with 64-Bit Elements`                               |
+| `rv_w`        | `wlseg8e8ff_w`         | `wm, rs1, wd`        | `Matrix Unit-Stride Fault-Only-First Segment Load of 8 Fields with 8-Bit Elements`               |
+| `rv_w`        | `wlseg8e8_w`           | `wm, rs1, wd`        | `Matrix Unit-Stride Segment Load of 8 Fields with 8-Bit Elements`                                |
+| `rv_w`        | `wlsseg2e16_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 2 Fields with 16-Bit Elements`                                   |
+| `rv_w`        | `wlsseg2e32_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 2 Fields with 32-Bit Elements`                                   |
+| `rv_w`        | `wlsseg2e64_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 2 Fields with 64-Bit Elements`                                   |
+| `rv_w`        | `wlsseg2e8_w`          | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 2 Fields with 8-Bit Elements`                                    |
+| `rv_w`        | `wlsseg3e16_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 3 Fields with 16-Bit Elements`                                   |
+| `rv_w`        | `wlsseg3e32_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 3 Fields with 32-Bit Elements`                                   |
+| `rv_w`        | `wlsseg3e64_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 3 Fields with 64-Bit Elements`                                   |
+| `rv_w`        | `wlsseg3e8_w`          | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 3 Fields with 8-Bit Elements`                                    |
+| `rv_w`        | `wlsseg4e16_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 4 Fields with 16-Bit Elements`                                   |
+| `rv_w`        | `wlsseg4e32_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 4 Fields with 32-Bit Elements`                                   |
+| `rv_w`        | `wlsseg4e64_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 4 Fields with 64-Bit Elements`                                   |
+| `rv_w`        | `wlsseg4e8_w`          | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 4 Fields with 8-Bit Elements`                                    |
+| `rv_w`        | `wlsseg5e16_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 5 Fields with 16-Bit Elements`                                   |
+| `rv_w`        | `wlsseg5e32_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 5 Fields with 32-Bit Elements`                                   |
+| `rv_w`        | `wlsseg5e64_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 5 Fields with 64-Bit Elements`                                   |
+| `rv_w`        | `wlsseg5e8_w`          | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 5 Fields with 8-Bit Elements`                                    |
+| `rv_w`        | `wlsseg6e16_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 6 Fields with 16-Bit Elements`                                   |
+| `rv_w`        | `wlsseg6e32_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 6 Fields with 32-Bit Elements`                                   |
+| `rv_w`        | `wlsseg6e64_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 6 Fields with 64-Bit Elements`                                   |
+| `rv_w`        | `wlsseg6e8_w`          | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 6 Fields with 8-Bit Elements`                                    |
+| `rv_w`        | `wlsseg7e16_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 7 Fields with 16-Bit Elements`                                   |
+| `rv_w`        | `wlsseg7e32_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 7 Fields with 32-Bit Elements`                                   |
+| `rv_w`        | `wlsseg7e64_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 7 Fields with 64-Bit Elements`                                   |
+| `rv_w`        | `wlsseg7e8_w`          | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 7 Fields with 8-Bit Elements`                                    |
+| `rv_w`        | `wlsseg8e16_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 8 Fields with 16-Bit Elements`                                   |
+| `rv_w`        | `wlsseg8e32_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 8 Fields with 32-Bit Elements`                                   |
+| `rv_w`        | `wlsseg8e64_w`         | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 8 Fields with 64-Bit Elements`                                   |
+| `rv_w`        | `wlsseg8e8_w`          | `wm, rs2, rs1, wd`   | `Matrix Strided Segment Load of 8 Fields with 8-Bit Elements`                                    |
+| `rv_w`        | `wluxei16_w`           | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Load with 16-Bit Indices`                                              |
+| `rv_w`        | `wluxei32_w`           | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Load with 32-Bit Indices`                                              |
+| `rv_w`        | `wluxei64_w`           | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Load with 64-Bit Indices`                                              |
+| `rv_w`        | `wluxei8_w`            | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Load with 8-Bit Indices`                                               |
+| `rv_w`        | `wluxseg2ei16_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 2 Fields with 16-Bit Indices`                          |
+| `rv_w`        | `wluxseg2ei32_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 2 Fields with 32-Bit Indices`                          |
+| `rv_w`        | `wluxseg2ei64_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 2 Fields with 64-Bit Indices`                          |
+| `rv_w`        | `wluxseg2ei8_w`        | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 2 Fields with 8-Bit Indices`                           |
+| `rv_w`        | `wluxseg3ei16_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 3 Fields with 16-Bit Indices`                          |
+| `rv_w`        | `wluxseg3ei32_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 3 Fields with 32-Bit Indices`                          |
+| `rv_w`        | `wluxseg3ei64_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 3 Fields with 64-Bit Indices`                          |
+| `rv_w`        | `wluxseg3ei8_w`        | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 3 Fields with 8-Bit Indices`                           |
+| `rv_w`        | `wluxseg4ei16_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 4 Fields with 16-Bit Indices`                          |
+| `rv_w`        | `wluxseg4ei32_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 4 Fields with 32-Bit Indices`                          |
+| `rv_w`        | `wluxseg4ei64_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 4 Fields with 64-Bit Indices`                          |
+| `rv_w`        | `wluxseg4ei8_w`        | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 4 Fields with 8-Bit Indices`                           |
+| `rv_w`        | `wluxseg5ei16_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 5 Fields with 16-Bit Indices`                          |
+| `rv_w`        | `wluxseg5ei32_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 5 Fields with 32-Bit Indices`                          |
+| `rv_w`        | `wluxseg5ei64_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 5 Fields with 64-Bit Indices`                          |
+| `rv_w`        | `wluxseg5ei8_w`        | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 5 Fields with 8-Bit Indices`                           |
+| `rv_w`        | `wluxseg6ei16_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 6 Fields with 16-Bit Indices`                          |
+| `rv_w`        | `wluxseg6ei32_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 6 Fields with 32-Bit Indices`                          |
+| `rv_w`        | `wluxseg6ei64_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 6 Fields with 64-Bit Indices`                          |
+| `rv_w`        | `wluxseg6ei8_w`        | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 6 Fields with 8-Bit Indices`                           |
+| `rv_w`        | `wluxseg7ei16_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 7 Fields with 16-Bit Indices`                          |
+| `rv_w`        | `wluxseg7ei32_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 7 Fields with 32-Bit Indices`                          |
+| `rv_w`        | `wluxseg7ei64_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 7 Fields with 64-Bit Indices`                          |
+| `rv_w`        | `wluxseg7ei8_w`        | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 7 Fields with 8-Bit Indices`                           |
+| `rv_w`        | `wluxseg8ei16_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 8 Fields with 16-Bit Indices`                          |
+| `rv_w`        | `wluxseg8ei32_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 8 Fields with 32-Bit Indices`                          |
+| `rv_w`        | `wluxseg8ei64_w`       | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 8 Fields with 64-Bit Indices`                          |
+| `rv_w`        | `wluxseg8ei8_w`        | `wm, ws2, rs1, wd`   | `Matrix Indexed-Unordered Segment Load of 8 Fields with 8-Bit Indices`                           |
+| `rv_w`        | `wmacc_ww`             | `wm, ws2, ws1, wd`   | `Matrix Integer Multiply-Accumulate (Matrix-Matrix)`                                             |
+| `rv_w`        | `wmacc_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Multiply-Accumulate (Matrix-Scalar)`                                             |
+| `rv_w`        | `wmadc_wi`             | `ws2, simm5, wd`     | `Matrix Integer Add Carry-Out (Matrix-Immediate)`                                                |
+| `rv_w`        | `wmadc_wim`            | `ws2, simm5, wd`     | `Matrix Integer Add Carry-Out (Matrix-Immediate with Mask Carry Input)`                          |
+| `rv_w`        | `wmadc_ww`             | `ws2, ws1, wd`       | `Matrix Integer Add Carry-Out (Matrix-Matrix)`                                                   |
+| `rv_w`        | `wmadc_wwm`            | `ws2, ws1, wd`       | `Matrix Integer Add Carry-Out (Matrix-Matrix with Mask Carry Input)`                             |
+| `rv_w`        | `wmadc_wx`             | `ws2, rs1, wd`       | `Matrix Integer Add Carry-Out (Matrix-Scalar)`                                                   |
+| `rv_w`        | `wmadc_wxm`            | `ws2, rs1, wd`       | `Matrix Integer Add Carry-Out (Matrix-Scalar with Mask Carry Input)`                             |
+| `rv_w`        | `wmadd_ww`             | `wm, ws2, ws1, wd`   | `Matrix Integer Multiply-Add, Overwrite Multiplicand (Matrix-Matrix)`                            |
+| `rv_w`        | `wmadd_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Multiply-Add, Overwrite Multiplicand (Matrix-Scalar)`                            |
+| `rv_w`        | `wmand_mm`             | `ws2, ws1, wd`       | `Matrix Mask AND`                                                                                |
+| `rv_w`        | `wmandn_mm`            | `ws2, ws1, wd`       | `Matrix Mask AND-NOT`                                                                            |
+| `rv_w`        | `wmaxu_ww`             | `wm, ws2, ws1, wd`   | `Matrix Integer Max Unsigned (Matrix-Matrix)`                                                    |
+| `rv_w`        | `wmaxu_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Max Unsigned (Matrix-Scalar)`                                                    |
+| `rv_w`        | `wmax_ww`              | `wm, ws2, ws1, wd`   | `Matrix Integer Max Signed (Matrix-Matrix)`                                                      |
+| `rv_w`        | `wmax_wx`              | `wm, ws2, rs1, wd`   | `Matrix Integer Max Signed (Matrix-Scalar)`                                                      |
+| `rv_w`        | `wmerge_wim`           | `ws2, simm5, wd`     | `Matrix Integer Merge (Matrix-Immediate)`                                                        |
+| `rv_w`        | `wmerge_wwm`           | `ws2, ws1, wd`       | `Matrix Integer Merge (Matrix-Matrix)`                                                           |
+| `rv_w`        | `wmerge_wxm`           | `ws2, rs1, wd`       | `Matrix Integer Merge (Matrix-Scalar)`                                                           |
+| `rv_w`        | `wmfeq_wf`             | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Compare Equal (Matrix-Scalar)`                                            |
+| `rv_w`        | `wmfeq_ww`             | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Compare Equal (Matrix-Matrix)`                                            |
+| `rv_w`        | `wmfge_wf`             | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Compare Greater Than or Equal (Matrix-Scalar)`                            |
+| `rv_w`        | `wmfgt_wf`             | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Compare Greater Than (Matrix-Scalar)`                                     |
+| `rv_w`        | `wmfle_wf`             | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Compare Less Than or Equal (Matrix-Scalar)`                               |
+| `rv_w`        | `wmfle_ww`             | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Compare Less Than or Equal (Matrix-Matrix)`                               |
+| `rv_w`        | `wmflt_wf`             | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Compare Less Than (Matrix-Scalar)`                                        |
+| `rv_w`        | `wmflt_ww`             | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Compare Less Than (Matrix-Matrix)`                                        |
+| `rv_w`        | `wmfne_wf`             | `wm, ws2, rs1, wd`   | `Matrix Floating-Point Compare Not Equal (Matrix-Scalar)`                                        |
+| `rv_w`        | `wmfne_ww`             | `wm, ws2, ws1, wd`   | `Matrix Floating-Point Compare Not Equal (Matrix-Matrix)`                                        |
+| `rv_w`        | `wminu_ww`             | `wm, ws2, ws1, wd`   | `Matrix Integer Min Unsigned (Matrix-Matrix)`                                                    |
+| `rv_w`        | `wminu_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Min Unsigned (Matrix-Scalar)`                                                    |
+| `rv_w`        | `wmin_ww`              | `wm, ws2, ws1, wd`   | `Matrix Integer Min Signed (Matrix-Matrix)`                                                      |
+| `rv_w`        | `wmin_wx`              | `wm, ws2, rs1, wd`   | `Matrix Integer Min Signed (Matrix-Scalar)`                                                      |
+| `rv_w`        | `wmnand_mm`            | `ws2, ws1, wd`       | `Matrix Mask NAND`                                                                               |
+| `rv_w`        | `wmnor_mm`             | `ws2, ws1, wd`       | `Matrix Mask NOR`                                                                                |
+| `rv_w`        | `wmor_mm`              | `ws2, ws1, wd`       | `Matrix Mask OR`                                                                                 |
+| `rv_w`        | `wmorn_mm`             | `ws2, ws1, wd`       | `Matrix Mask OR-NOT`                                                                             |
+| `rv_w`        | `wmsbc_ww`             | `ws2, ws1, wd`       | `Matrix Integer Subtract Borrow-Out (Matrix-Matrix)`                                             |
+| `rv_w`        | `wmsbc_wwm`            | `ws2, ws1, wd`       | `Matrix Integer Subtract Borrow-Out (Matrix-Matrix with Mask Borrow Input)`                      |
+| `rv_w`        | `wmsbc_wx`             | `ws2, rs1, wd`       | `Matrix Integer Subtract Borrow-Out (Matrix-Scalar)`                                             |
+| `rv_w`        | `wmsbc_wxm`            | `ws2, rs1, wd`       | `Matrix Integer Subtract Borrow-Out (Matrix-Scalar with Mask Borrow Input)`                      |
+| `rv_w`        | `wmsbf_m`              | `wm, ws2, wd`        | `Matrix Mask Set Before First`                                                                   |
+| `rv_w`        | `wmseq_wi`             | `wm, ws2, simm5, wd` | `Matrix Integer Compare Equal (Matrix-Immediate)`                                                |
+| `rv_w`        | `wmseq_ww`             | `wm, ws2, ws1, wd`   | `Matrix Integer Compare Equal (Matrix-Matrix)`                                                   |
+| `rv_w`        | `wmseq_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Compare Equal (Matrix-Scalar)`                                                   |
+| `rv_w`        | `wmsgtu_wi`            | `wm, ws2, simm5, wd` | `Matrix Integer Compare Greater Than Unsigned (Matrix-Immediate)`                                |
+| `rv_w`        | `wmsgtu_wx`            | `wm, ws2, rs1, wd`   | `Matrix Integer Compare Greater Than Unsigned (Matrix-Scalar)`                                   |
+| `rv_w`        | `wmsgt_wi`             | `wm, ws2, simm5, wd` | `Matrix Integer Compare Greater Than Signed (Matrix-Immediate)`                                  |
+| `rv_w`        | `wmsgt_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Compare Greater Than Signed (Matrix-Scalar)`                                     |
+| `rv_w`        | `wmsif_m`              | `wm, ws2, wd`        | `Matrix Mask Set Including First`                                                                |
+| `rv_w`        | `wmsleu_wi`            | `wm, ws2, simm5, wd` | `Matrix Integer Compare Less Than or Equal Unsigned (Matrix-Immediate)`                          |
+| `rv_w`        | `wmsleu_ww`            | `wm, ws2, ws1, wd`   | `Matrix Integer Compare Less Than or Equal Unsigned (Matrix-Matrix)`                             |
+| `rv_w`        | `wmsleu_wx`            | `wm, ws2, rs1, wd`   | `Matrix Integer Compare Less Than or Equal Unsigned (Matrix-Scalar)`                             |
+| `rv_w`        | `wmsle_wi`             | `wm, ws2, simm5, wd` | `Matrix Integer Compare Less Than or Equal Signed (Matrix-Immediate)`                            |
+| `rv_w`        | `wmsle_ww`             | `wm, ws2, ws1, wd`   | `Matrix Integer Compare Less Than or Equal Signed (Matrix-Matrix)`                               |
+| `rv_w`        | `wmsle_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Compare Less Than or Equal Signed (Matrix-Scalar)`                               |
+| `rv_w`        | `wmsltu_ww`            | `wm, ws2, ws1, wd`   | `Matrix Integer Compare Less Than Unsigned (Matrix-Matrix)`                                      |
+| `rv_w`        | `wmsltu_wx`            | `wm, ws2, rs1, wd`   | `Matrix Integer Compare Less Than Unsigned (Matrix-Scalar)`                                      |
+| `rv_w`        | `wmslt_ww`             | `wm, ws2, ws1, wd`   | `Matrix Integer Compare Less Than Signed (Matrix-Matrix)`                                        |
+| `rv_w`        | `wmslt_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Compare Less Than Signed (Matrix-Scalar)`                                        |
+| `rv_w`        | `wmsne_wi`             | `wm, ws2, simm5, wd` | `Matrix Integer Compare Not Equal (Matrix-Immediate)`                                            |
+| `rv_w`        | `wmsne_ww`             | `wm, ws2, ws1, wd`   | `Matrix Integer Compare Not Equal (Matrix-Matrix)`                                               |
+| `rv_w`        | `wmsne_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Compare Not Equal (Matrix-Scalar)`                                               |
+| `rv_w`        | `wmsof_m`              | `wm, ws2, wd`        | `Matrix Mask Set Only First`                                                                     |
+| `rv_w`        | `wmulhsu_ww`           | `wm, ws2, ws1, wd`   | `Matrix Integer Multiply High Signed-Unsigned (Matrix-Matrix)`                                   |
+| `rv_w`        | `wmulhsu_wx`           | `wm, ws2, rs1, wd`   | `Matrix Integer Multiply High Signed-Unsigned (Matrix-Scalar)`                                   |
+| `rv_w`        | `wmulhu_ww`            | `wm, ws2, ws1, wd`   | `Matrix Integer Multiply High Unsigned (Matrix-Matrix)`                                          |
+| `rv_w`        | `wmulhu_wx`            | `wm, ws2, rs1, wd`   | `Matrix Integer Multiply High Unsigned (Matrix-Scalar)`                                          |
+| `rv_w`        | `wmulh_ww`             | `wm, ws2, ws1, wd`   | `Matrix Integer Multiply High Signed (Matrix-Matrix)`                                            |
+| `rv_w`        | `wmulh_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Multiply High Signed (Matrix-Scalar)`                                            |
+| `rv_w`        | `wmul_ww`              | `wm, ws2, ws1, wd`   | `Matrix Integer Multiply Signed (Matrix-Matrix)`                                                 |
+| `rv_w`        | `wmul_wx`              | `wm, ws2, rs1, wd`   | `Matrix Integer Multiply Signed (Matrix-Scalar)`                                                 |
+| `rv_w`        | `wmv1r_w`              | `ws2, wd`            | `Matrix Move 1 Whole Register`                                                                   |
+| `rv_w`        | `wmv2r_w`              | `ws2, wd`            | `Matrix Move 2 Whole Registers`                                                                  |
+| `rv_w`        | `wmv4r_w`              | `ws2, wd`            | `Matrix Move 4 Whole Registers`                                                                  |
+| `rv_w`        | `wmv8r_w`              | `ws2, wd`            | `Matrix Move 8 Whole Registers`                                                                  |
+| `rv_w`        | `wmv_s_x`              | `rs1, wd`            | `Matrix Move Integer Scalar to Matrix Element`                                                   |
+| `rv_w`        | `wmv_w_i`              | `simm5, wd`          | `Matrix Broadcast Signed Immediate`                                                              |
+| `rv_w`        | `wmv_w_w`              | `ws1, wd`            | `Matrix Move Matrix Elements`                                                                    |
+| `rv_w`        | `wmv_w_x`              | `rs1, wd`            | `Matrix Broadcast Integer Scalar`                                                                |
+| `rv_w`        | `wmv_x_s`              | `ws2, rd`            | `Matrix Move Matrix Element to Integer Scalar`                                                   |
+| `rv_w`        | `wmxnor_mm`            | `ws2, ws1, wd`       | `Matrix Mask XNOR`                                                                               |
+| `rv_w`        | `wmxor_mm`             | `ws2, ws1, wd`       | `Matrix Mask XOR`                                                                                |
+| `rv_w`        | `wnclipu_wide_wi`      | `wm, ws2, zimm5, wd` | `Matrix Narrowing Clip Unsigned (Wide Matrix-Immediate)`                                         |
+| `rv_w`        | `wnclipu_wide_ww`      | `wm, ws2, ws1, wd`   | `Matrix Narrowing Clip Unsigned (Wide Matrix-Matrix)`                                            |
+| `rv_w`        | `wnclipu_wide_wx`      | `wm, ws2, rs1, wd`   | `Matrix Narrowing Clip Unsigned (Wide Matrix-Scalar)`                                            |
+| `rv_w`        | `wnclip_wide_wi`       | `wm, ws2, zimm5, wd` | `Matrix Narrowing Clip Signed (Wide Matrix-Immediate)`                                           |
+| `rv_w`        | `wnclip_wide_ww`       | `wm, ws2, ws1, wd`   | `Matrix Narrowing Clip Signed (Wide Matrix-Matrix)`                                              |
+| `rv_w`        | `wnclip_wide_wx`       | `wm, ws2, rs1, wd`   | `Matrix Narrowing Clip Signed (Wide Matrix-Scalar)`                                              |
+| `rv_w`        | `wnmsac_ww`            | `wm, ws2, ws1, wd`   | `Matrix Integer Negative Multiply-Subtract from Accumulator (Matrix-Matrix)`                     |
+| `rv_w`        | `wnmsac_wx`            | `wm, ws2, rs1, wd`   | `Matrix Integer Negative Multiply-Subtract from Accumulator (Matrix-Scalar)`                     |
+| `rv_w`        | `wnmsub_ww`            | `wm, ws2, ws1, wd`   | `Matrix Integer Negative Multiply-Subtract, Overwrite Multiplicand (Matrix-Matrix)`              |
+| `rv_w`        | `wnmsub_wx`            | `wm, ws2, rs1, wd`   | `Matrix Integer Negative Multiply-Subtract, Overwrite Multiplicand (Matrix-Scalar)`              |
+| `rv_w`        | `wnsra_wide_wi`        | `wm, ws2, zimm5, wd` | `Matrix Narrowing Shift Right Arithmetic (Wide Matrix-Immediate)`                                |
+| `rv_w`        | `wnsra_wide_ww`        | `wm, ws2, ws1, wd`   | `Matrix Narrowing Shift Right Arithmetic (Wide Matrix-Matrix)`                                   |
+| `rv_w`        | `wnsra_wide_wx`        | `wm, ws2, rs1, wd`   | `Matrix Narrowing Shift Right Arithmetic (Wide Matrix-Scalar)`                                   |
+| `rv_w`        | `wnsrl_wide_wi`        | `wm, ws2, zimm5, wd` | `Matrix Narrowing Shift Right Logical (Wide Matrix-Immediate)`                                   |
+| `rv_w`        | `wnsrl_wide_ww`        | `wm, ws2, ws1, wd`   | `Matrix Narrowing Shift Right Logical (Wide Matrix-Matrix)`                                      |
+| `rv_w`        | `wnsrl_wide_wx`        | `wm, ws2, rs1, wd`   | `Matrix Narrowing Shift Right Logical (Wide Matrix-Scalar)`                                      |
+| `rv_w`        | `wor_wi`               | `wm, ws2, simm5, wd` | `Matrix Bitwise OR (Matrix-Immediate)`                                                           |
+| `rv_w`        | `wor_ww`               | `wm, ws2, ws1, wd`   | `Matrix Bitwise OR (Matrix-Matrix)`                                                              |
+| `rv_w`        | `wor_wx`               | `wm, ws2, rs1, wd`   | `Matrix Bitwise OR (Matrix-Scalar)`                                                              |
+| `rv_w`        | `wredand_ws`           | `wm, ws2, ws1, wd`   | `Matrix Integer AND Reduction`                                                                   |
+| `rv_w`        | `wredmaxu_ws`          | `wm, ws2, ws1, wd`   | `Matrix Integer Maximum Unsigned Reduction`                                                      |
+| `rv_w`        | `wredmax_ws`           | `wm, ws2, ws1, wd`   | `Matrix Integer Maximum Signed Reduction`                                                        |
+| `rv_w`        | `wredminu_ws`          | `wm, ws2, ws1, wd`   | `Matrix Integer Minimum Unsigned Reduction`                                                      |
+| `rv_w`        | `wredmin_ws`           | `wm, ws2, ws1, wd`   | `Matrix Integer Minimum Signed Reduction`                                                        |
+| `rv_w`        | `wredor_ws`            | `wm, ws2, ws1, wd`   | `Matrix Integer OR Reduction`                                                                    |
+| `rv_w`        | `wredsum_ws`           | `wm, ws2, ws1, wd`   | `Matrix Integer Sum Reduction`                                                                   |
+| `rv_w`        | `wredxor_ws`           | `wm, ws2, ws1, wd`   | `Matrix Integer XOR Reduction`                                                                   |
+| `rv_w`        | `wremu_ww`             | `wm, ws2, ws1, wd`   | `Matrix Integer Remainder Unsigned (Matrix-Matrix)`                                              |
+| `rv_w`        | `wremu_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Remainder Unsigned (Matrix-Scalar)`                                              |
+| `rv_w`        | `wrem_ww`              | `wm, ws2, ws1, wd`   | `Matrix Integer Remainder Signed (Matrix-Matrix)`                                                |
+| `rv_w`        | `wrem_wx`              | `wm, ws2, rs1, wd`   | `Matrix Integer Remainder Signed (Matrix-Scalar)`                                                |
+| `rv_w`        | `wrgatherei16_ww`      | `wm, ws2, ws1, wd`   | `Matrix Register Gather with 16-Bit Element Indices (Matrix-Matrix)`                             |
+| `rv_w`        | `wrgather_wi`          | `wm, ws2, zimm5, wd` | `Matrix Register Gather (Matrix-Immediate)`                                                      |
+| `rv_w`        | `wrgather_ww`          | `wm, ws2, ws1, wd`   | `Matrix Register Gather (Matrix-Matrix)`                                                         |
+| `rv_w`        | `wrgather_wx`          | `wm, ws2, rs1, wd`   | `Matrix Register Gather (Matrix-Scalar)`                                                         |
+| `rv_w`        | `wrsub_wi`             | `wm, ws2, simm5, wd` | `Matrix Integer Reverse Subtract (Matrix-Immediate)`                                             |
+| `rv_w`        | `wrsub_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Reverse Subtract (Matrix-Scalar)`                                                |
+| `rv_w`        | `ws1r_w`               | `rs1, ws3`           | `Matrix Store 1 Whole Register`                                                                  |
+| `rv_w`        | `ws2r_w`               | `rs1, ws3`           | `Matrix Store 2 Whole Registers`                                                                 |
+| `rv_w`        | `ws4r_w`               | `rs1, ws3`           | `Matrix Store 4 Whole Registers`                                                                 |
+| `rv_w`        | `ws8r_w`               | `rs1, ws3`           | `Matrix Store 8 Whole Registers`                                                                 |
+| `rv_w`        | `wsaddu_wi`            | `wm, ws2, simm5, wd` | `Matrix Integer Saturating Add Unsigned (Matrix-Immediate)`                                      |
+| `rv_w`        | `wsaddu_ww`            | `wm, ws2, ws1, wd`   | `Matrix Integer Saturating Add Unsigned (Matrix-Matrix)`                                         |
+| `rv_w`        | `wsaddu_wx`            | `wm, ws2, rs1, wd`   | `Matrix Integer Saturating Add Unsigned (Matrix-Scalar)`                                         |
+| `rv_w`        | `wsadd_wi`             | `wm, ws2, simm5, wd` | `Matrix Integer Saturating Add Signed (Matrix-Immediate)`                                        |
+| `rv_w`        | `wsadd_ww`             | `wm, ws2, ws1, wd`   | `Matrix Integer Saturating Add Signed (Matrix-Matrix)`                                           |
+| `rv_w`        | `wsadd_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Saturating Add Signed (Matrix-Scalar)`                                           |
+| `rv_w`        | `wsbc_wwm`             | `ws2, ws1, wd`       | `Matrix Integer Subtract with Borrow (Matrix-Matrix with Mask Borrow Input)`                     |
+| `rv_w`        | `wsbc_wxm`             | `ws2, rs1, wd`       | `Matrix Integer Subtract with Borrow (Matrix-Scalar with Mask Borrow Input)`                     |
+| `rv_w`        | `wse16_w`              | `wm, rs1, ws3`       | `Matrix Unit-Stride Store with 16-Bit Elements`                                                  |
+| `rv_w`        | `wse32_w`              | `wm, rs1, ws3`       | `Matrix Unit-Stride Store with 32-Bit Elements`                                                  |
+| `rv_w`        | `wse64_w`              | `wm, rs1, ws3`       | `Matrix Unit-Stride Store with 64-Bit Elements`                                                  |
+| `rv_w`        | `wse8_w`               | `wm, rs1, ws3`       | `Matrix Unit-Stride Store with 8-Bit Elements`                                                   |
+| `rv_w`        | `wsetiwli`             | `zimm10, zimm5, rd`  | `Set Matrix Length and Immediate Matrix Type with Immediate AVL`                                 |
+| `rv_w`        | `wsetwl`               | `rs2, rs1, rd`       | `Set Matrix Length and Register Matrix Type`                                                     |
+| `rv_w`        | `wsetwli`              | `zimm11, rs1, rd`    | `Set Matrix Length and Immediate Matrix Type`                                                    |
+| `rv_w`        | `wsext_wf2`            | `wm, ws2, wd`        | `Matrix Sign-Extend by Factor 2`                                                                 |
+| `rv_w`        | `wsext_wf4`            | `wm, ws2, wd`        | `Matrix Sign-Extend by Factor 4`                                                                 |
+| `rv_w`        | `wsext_wf8`            | `wm, ws2, wd`        | `Matrix Sign-Extend by Factor 8`                                                                 |
+| `rv_w`        | `wslide1down_wx`       | `wm, ws2, rs1, wd`   | `Matrix Slide One Down (Matrix-Scalar)`                                                          |
+| `rv_w`        | `wslide1up_wx`         | `wm, ws2, rs1, wd`   | `Matrix Slide One Up (Matrix-Scalar)`                                                            |
+| `rv_w`        | `wslidedown_wi`        | `wm, ws2, zimm5, wd` | `Matrix Slide Down (Matrix-Immediate)`                                                           |
+| `rv_w`        | `wslidedown_wx`        | `wm, ws2, rs1, wd`   | `Matrix Slide Down (Matrix-Scalar)`                                                              |
+| `rv_w`        | `wslideup_wi`          | `wm, ws2, zimm5, wd` | `Matrix Slide Up (Matrix-Immediate)`                                                             |
+| `rv_w`        | `wslideup_wx`          | `wm, ws2, rs1, wd`   | `Matrix Slide Up (Matrix-Scalar)`                                                                |
+| `rv_w`        | `wsll_wi`              | `wm, ws2, zimm5, wd` | `Matrix Shift Left Logical (Matrix-Immediate)`                                                   |
+| `rv_w`        | `wsll_ww`              | `wm, ws2, ws1, wd`   | `Matrix Shift Left Logical (Matrix-Matrix)`                                                      |
+| `rv_w`        | `wsll_wx`              | `wm, ws2, rs1, wd`   | `Matrix Shift Left Logical (Matrix-Scalar)`                                                      |
+| `rv_w`        | `wsmul_ww`             | `wm, ws2, ws1, wd`   | `Matrix Signed Fractional Multiply with Rounding and Saturation (Matrix-Matrix)`                 |
+| `rv_w`        | `wsmul_wx`             | `wm, ws2, rs1, wd`   | `Matrix Signed Fractional Multiply with Rounding and Saturation (Matrix-Scalar)`                 |
+| `rv_w`        | `wsm_w`                | `rs1, ws3`           | `Matrix Mask Store`                                                                              |
+| `rv_w`        | `wsoxei16_w`           | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Store with 16-Bit Indices`                                               |
+| `rv_w`        | `wsoxei32_w`           | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Store with 32-Bit Indices`                                               |
+| `rv_w`        | `wsoxei64_w`           | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Store with 64-Bit Indices`                                               |
+| `rv_w`        | `wsoxei8_w`            | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Store with 8-Bit Indices`                                                |
+| `rv_w`        | `wsoxseg2ei16_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 2 Fields with 16-Bit Indices`                           |
+| `rv_w`        | `wsoxseg2ei32_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 2 Fields with 32-Bit Indices`                           |
+| `rv_w`        | `wsoxseg2ei64_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 2 Fields with 64-Bit Indices`                           |
+| `rv_w`        | `wsoxseg2ei8_w`        | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 2 Fields with 8-Bit Indices`                            |
+| `rv_w`        | `wsoxseg3ei16_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 3 Fields with 16-Bit Indices`                           |
+| `rv_w`        | `wsoxseg3ei32_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 3 Fields with 32-Bit Indices`                           |
+| `rv_w`        | `wsoxseg3ei64_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 3 Fields with 64-Bit Indices`                           |
+| `rv_w`        | `wsoxseg3ei8_w`        | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 3 Fields with 8-Bit Indices`                            |
+| `rv_w`        | `wsoxseg4ei16_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 4 Fields with 16-Bit Indices`                           |
+| `rv_w`        | `wsoxseg4ei32_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 4 Fields with 32-Bit Indices`                           |
+| `rv_w`        | `wsoxseg4ei64_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 4 Fields with 64-Bit Indices`                           |
+| `rv_w`        | `wsoxseg4ei8_w`        | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 4 Fields with 8-Bit Indices`                            |
+| `rv_w`        | `wsoxseg5ei16_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 5 Fields with 16-Bit Indices`                           |
+| `rv_w`        | `wsoxseg5ei32_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 5 Fields with 32-Bit Indices`                           |
+| `rv_w`        | `wsoxseg5ei64_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 5 Fields with 64-Bit Indices`                           |
+| `rv_w`        | `wsoxseg5ei8_w`        | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 5 Fields with 8-Bit Indices`                            |
+| `rv_w`        | `wsoxseg6ei16_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 6 Fields with 16-Bit Indices`                           |
+| `rv_w`        | `wsoxseg6ei32_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 6 Fields with 32-Bit Indices`                           |
+| `rv_w`        | `wsoxseg6ei64_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 6 Fields with 64-Bit Indices`                           |
+| `rv_w`        | `wsoxseg6ei8_w`        | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 6 Fields with 8-Bit Indices`                            |
+| `rv_w`        | `wsoxseg7ei16_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 7 Fields with 16-Bit Indices`                           |
+| `rv_w`        | `wsoxseg7ei32_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 7 Fields with 32-Bit Indices`                           |
+| `rv_w`        | `wsoxseg7ei64_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 7 Fields with 64-Bit Indices`                           |
+| `rv_w`        | `wsoxseg7ei8_w`        | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 7 Fields with 8-Bit Indices`                            |
+| `rv_w`        | `wsoxseg8ei16_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 8 Fields with 16-Bit Indices`                           |
+| `rv_w`        | `wsoxseg8ei32_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 8 Fields with 32-Bit Indices`                           |
+| `rv_w`        | `wsoxseg8ei64_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 8 Fields with 64-Bit Indices`                           |
+| `rv_w`        | `wsoxseg8ei8_w`        | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Ordered Segment Store of 8 Fields with 8-Bit Indices`                            |
+| `rv_w`        | `wsra_wi`              | `wm, ws2, zimm5, wd` | `Matrix Shift Right Arithmetic (Matrix-Immediate)`                                               |
+| `rv_w`        | `wsra_ww`              | `wm, ws2, ws1, wd`   | `Matrix Shift Right Arithmetic (Matrix-Matrix)`                                                  |
+| `rv_w`        | `wsra_wx`              | `wm, ws2, rs1, wd`   | `Matrix Shift Right Arithmetic (Matrix-Scalar)`                                                  |
+| `rv_w`        | `wsrl_wi`              | `wm, ws2, zimm5, wd` | `Matrix Shift Right Logical (Matrix-Immediate)`                                                  |
+| `rv_w`        | `wsrl_ww`              | `wm, ws2, ws1, wd`   | `Matrix Shift Right Logical (Matrix-Matrix)`                                                     |
+| `rv_w`        | `wsrl_wx`              | `wm, ws2, rs1, wd`   | `Matrix Shift Right Logical (Matrix-Scalar)`                                                     |
+| `rv_w`        | `wsse16_w`             | `wm, rs2, rs1, ws3`  | `Matrix Strided Store with 16-Bit Elements`                                                      |
+| `rv_w`        | `wsse32_w`             | `wm, rs2, rs1, ws3`  | `Matrix Strided Store with 32-Bit Elements`                                                      |
+| `rv_w`        | `wsse64_w`             | `wm, rs2, rs1, ws3`  | `Matrix Strided Store with 64-Bit Elements`                                                      |
+| `rv_w`        | `wsse8_w`              | `wm, rs2, rs1, ws3`  | `Matrix Strided Store with 8-Bit Elements`                                                       |
+| `rv_w`        | `wsseg2e16_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 2 Fields with 16-Bit Elements`                              |
+| `rv_w`        | `wsseg2e32_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 2 Fields with 32-Bit Elements`                              |
+| `rv_w`        | `wsseg2e64_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 2 Fields with 64-Bit Elements`                              |
+| `rv_w`        | `wsseg2e8_w`           | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 2 Fields with 8-Bit Elements`                               |
+| `rv_w`        | `wsseg3e16_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 3 Fields with 16-Bit Elements`                              |
+| `rv_w`        | `wsseg3e32_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 3 Fields with 32-Bit Elements`                              |
+| `rv_w`        | `wsseg3e64_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 3 Fields with 64-Bit Elements`                              |
+| `rv_w`        | `wsseg3e8_w`           | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 3 Fields with 8-Bit Elements`                               |
+| `rv_w`        | `wsseg4e16_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 4 Fields with 16-Bit Elements`                              |
+| `rv_w`        | `wsseg4e32_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 4 Fields with 32-Bit Elements`                              |
+| `rv_w`        | `wsseg4e64_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 4 Fields with 64-Bit Elements`                              |
+| `rv_w`        | `wsseg4e8_w`           | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 4 Fields with 8-Bit Elements`                               |
+| `rv_w`        | `wsseg5e16_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 5 Fields with 16-Bit Elements`                              |
+| `rv_w`        | `wsseg5e32_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 5 Fields with 32-Bit Elements`                              |
+| `rv_w`        | `wsseg5e64_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 5 Fields with 64-Bit Elements`                              |
+| `rv_w`        | `wsseg5e8_w`           | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 5 Fields with 8-Bit Elements`                               |
+| `rv_w`        | `wsseg6e16_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 6 Fields with 16-Bit Elements`                              |
+| `rv_w`        | `wsseg6e32_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 6 Fields with 32-Bit Elements`                              |
+| `rv_w`        | `wsseg6e64_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 6 Fields with 64-Bit Elements`                              |
+| `rv_w`        | `wsseg6e8_w`           | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 6 Fields with 8-Bit Elements`                               |
+| `rv_w`        | `wsseg7e16_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 7 Fields with 16-Bit Elements`                              |
+| `rv_w`        | `wsseg7e32_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 7 Fields with 32-Bit Elements`                              |
+| `rv_w`        | `wsseg7e64_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 7 Fields with 64-Bit Elements`                              |
+| `rv_w`        | `wsseg7e8_w`           | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 7 Fields with 8-Bit Elements`                               |
+| `rv_w`        | `wsseg8e16_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 8 Fields with 16-Bit Elements`                              |
+| `rv_w`        | `wsseg8e32_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 8 Fields with 32-Bit Elements`                              |
+| `rv_w`        | `wsseg8e64_w`          | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 8 Fields with 64-Bit Elements`                              |
+| `rv_w`        | `wsseg8e8_w`           | `wm, rs1, ws3`       | `Matrix Unit-Stride Segment Store of 8 Fields with 8-Bit Elements`                               |
+| `rv_w`        | `wssra_wi`             | `wm, ws2, zimm5, wd` | `Matrix Scaling Shift Right Signed (Matrix-Immediate)`                                           |
+| `rv_w`        | `wssra_ww`             | `wm, ws2, ws1, wd`   | `Matrix Scaling Shift Right Signed (Matrix-Matrix)`                                              |
+| `rv_w`        | `wssra_wx`             | `wm, ws2, rs1, wd`   | `Matrix Scaling Shift Right Signed (Matrix-Scalar)`                                              |
+| `rv_w`        | `wssrl_wi`             | `wm, ws2, zimm5, wd` | `Matrix Scaling Shift Right Unsigned (Matrix-Immediate)`                                         |
+| `rv_w`        | `wssrl_ww`             | `wm, ws2, ws1, wd`   | `Matrix Scaling Shift Right Unsigned (Matrix-Matrix)`                                            |
+| `rv_w`        | `wssrl_wx`             | `wm, ws2, rs1, wd`   | `Matrix Scaling Shift Right Unsigned (Matrix-Scalar)`                                            |
+| `rv_w`        | `wssseg2e16_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 2 Fields with 16-Bit Elements`                                  |
+| `rv_w`        | `wssseg2e32_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 2 Fields with 32-Bit Elements`                                  |
+| `rv_w`        | `wssseg2e64_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 2 Fields with 64-Bit Elements`                                  |
+| `rv_w`        | `wssseg2e8_w`          | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 2 Fields with 8-Bit Elements`                                   |
+| `rv_w`        | `wssseg3e16_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 3 Fields with 16-Bit Elements`                                  |
+| `rv_w`        | `wssseg3e32_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 3 Fields with 32-Bit Elements`                                  |
+| `rv_w`        | `wssseg3e64_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 3 Fields with 64-Bit Elements`                                  |
+| `rv_w`        | `wssseg3e8_w`          | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 3 Fields with 8-Bit Elements`                                   |
+| `rv_w`        | `wssseg4e16_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 4 Fields with 16-Bit Elements`                                  |
+| `rv_w`        | `wssseg4e32_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 4 Fields with 32-Bit Elements`                                  |
+| `rv_w`        | `wssseg4e64_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 4 Fields with 64-Bit Elements`                                  |
+| `rv_w`        | `wssseg4e8_w`          | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 4 Fields with 8-Bit Elements`                                   |
+| `rv_w`        | `wssseg5e16_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 5 Fields with 16-Bit Elements`                                  |
+| `rv_w`        | `wssseg5e32_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 5 Fields with 32-Bit Elements`                                  |
+| `rv_w`        | `wssseg5e64_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 5 Fields with 64-Bit Elements`                                  |
+| `rv_w`        | `wssseg5e8_w`          | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 5 Fields with 8-Bit Elements`                                   |
+| `rv_w`        | `wssseg6e16_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 6 Fields with 16-Bit Elements`                                  |
+| `rv_w`        | `wssseg6e32_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 6 Fields with 32-Bit Elements`                                  |
+| `rv_w`        | `wssseg6e64_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 6 Fields with 64-Bit Elements`                                  |
+| `rv_w`        | `wssseg6e8_w`          | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 6 Fields with 8-Bit Elements`                                   |
+| `rv_w`        | `wssseg7e16_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 7 Fields with 16-Bit Elements`                                  |
+| `rv_w`        | `wssseg7e32_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 7 Fields with 32-Bit Elements`                                  |
+| `rv_w`        | `wssseg7e64_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 7 Fields with 64-Bit Elements`                                  |
+| `rv_w`        | `wssseg7e8_w`          | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 7 Fields with 8-Bit Elements`                                   |
+| `rv_w`        | `wssseg8e16_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 8 Fields with 16-Bit Elements`                                  |
+| `rv_w`        | `wssseg8e32_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 8 Fields with 32-Bit Elements`                                  |
+| `rv_w`        | `wssseg8e64_w`         | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 8 Fields with 64-Bit Elements`                                  |
+| `rv_w`        | `wssseg8e8_w`          | `wm, rs2, rs1, ws3`  | `Matrix Strided Segment Store of 8 Fields with 8-Bit Elements`                                   |
+| `rv_w`        | `wssubu_ww`            | `wm, ws2, ws1, wd`   | `Matrix Integer Saturating Subtract Unsigned (Matrix-Matrix)`                                    |
+| `rv_w`        | `wssubu_wx`            | `wm, ws2, rs1, wd`   | `Matrix Integer Saturating Subtract Unsigned (Matrix-Scalar)`                                    |
+| `rv_w`        | `wssub_ww`             | `wm, ws2, ws1, wd`   | `Matrix Integer Saturating Subtract Signed (Matrix-Matrix)`                                      |
+| `rv_w`        | `wssub_wx`             | `wm, ws2, rs1, wd`   | `Matrix Integer Saturating Subtract Signed (Matrix-Scalar)`                                      |
+| `rv_w`        | `wsub_ww`              | `wm, ws2, ws1, wd`   | `Matrix Integer Subtract (Matrix-Matrix)`                                                        |
+| `rv_w`        | `wsub_wx`              | `wm, ws2, rs1, wd`   | `Matrix Integer Subtract (Matrix-Scalar)`                                                        |
+| `rv_w`        | `wsuxei16_w`           | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Store with 16-Bit Indices`                                             |
+| `rv_w`        | `wsuxei32_w`           | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Store with 32-Bit Indices`                                             |
+| `rv_w`        | `wsuxei64_w`           | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Store with 64-Bit Indices`                                             |
+| `rv_w`        | `wsuxei8_w`            | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Store with 8-Bit Indices`                                              |
+| `rv_w`        | `wsuxseg2ei16_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 2 Fields with 16-Bit Indices`                         |
+| `rv_w`        | `wsuxseg2ei32_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 2 Fields with 32-Bit Indices`                         |
+| `rv_w`        | `wsuxseg2ei64_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 2 Fields with 64-Bit Indices`                         |
+| `rv_w`        | `wsuxseg2ei8_w`        | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 2 Fields with 8-Bit Indices`                          |
+| `rv_w`        | `wsuxseg3ei16_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 3 Fields with 16-Bit Indices`                         |
+| `rv_w`        | `wsuxseg3ei32_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 3 Fields with 32-Bit Indices`                         |
+| `rv_w`        | `wsuxseg3ei64_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 3 Fields with 64-Bit Indices`                         |
+| `rv_w`        | `wsuxseg3ei8_w`        | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 3 Fields with 8-Bit Indices`                          |
+| `rv_w`        | `wsuxseg4ei16_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 4 Fields with 16-Bit Indices`                         |
+| `rv_w`        | `wsuxseg4ei32_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 4 Fields with 32-Bit Indices`                         |
+| `rv_w`        | `wsuxseg4ei64_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 4 Fields with 64-Bit Indices`                         |
+| `rv_w`        | `wsuxseg4ei8_w`        | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 4 Fields with 8-Bit Indices`                          |
+| `rv_w`        | `wsuxseg5ei16_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 5 Fields with 16-Bit Indices`                         |
+| `rv_w`        | `wsuxseg5ei32_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 5 Fields with 32-Bit Indices`                         |
+| `rv_w`        | `wsuxseg5ei64_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 5 Fields with 64-Bit Indices`                         |
+| `rv_w`        | `wsuxseg5ei8_w`        | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 5 Fields with 8-Bit Indices`                          |
+| `rv_w`        | `wsuxseg6ei16_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 6 Fields with 16-Bit Indices`                         |
+| `rv_w`        | `wsuxseg6ei32_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 6 Fields with 32-Bit Indices`                         |
+| `rv_w`        | `wsuxseg6ei64_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 6 Fields with 64-Bit Indices`                         |
+| `rv_w`        | `wsuxseg6ei8_w`        | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 6 Fields with 8-Bit Indices`                          |
+| `rv_w`        | `wsuxseg7ei16_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 7 Fields with 16-Bit Indices`                         |
+| `rv_w`        | `wsuxseg7ei32_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 7 Fields with 32-Bit Indices`                         |
+| `rv_w`        | `wsuxseg7ei64_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 7 Fields with 64-Bit Indices`                         |
+| `rv_w`        | `wsuxseg7ei8_w`        | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 7 Fields with 8-Bit Indices`                          |
+| `rv_w`        | `wsuxseg8ei16_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 8 Fields with 16-Bit Indices`                         |
+| `rv_w`        | `wsuxseg8ei32_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 8 Fields with 32-Bit Indices`                         |
+| `rv_w`        | `wsuxseg8ei64_w`       | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 8 Fields with 64-Bit Indices`                         |
+| `rv_w`        | `wsuxseg8ei8_w`        | `wm, ws2, rs1, ws3`  | `Matrix Indexed-Unordered Segment Store of 8 Fields with 8-Bit Indices`                          |
+| `rv_w`        | `wwaddu_ww`            | `wm, ws2, ws1, wd`   | `Matrix Widening Integer Add Unsigned (Matrix-Matrix)`                                           |
+| `rv_w`        | `wwaddu_wx`            | `wm, ws2, rs1, wd`   | `Matrix Widening Integer Add Unsigned (Matrix-Scalar)`                                           |
+| `rv_w`        | `wwaddu_wide_ww`       | `wm, ws2, ws1, wd`   | `Matrix Widening Integer Add Unsigned (Wide Matrix-Matrix)`                                      |
+| `rv_w`        | `wwaddu_wide_wx`       | `wm, ws2, rs1, wd`   | `Matrix Widening Integer Add Unsigned (Wide Matrix-Scalar)`                                      |
+| `rv_w`        | `wwadd_ww`             | `wm, ws2, ws1, wd`   | `Matrix Widening Integer Add Signed (Matrix-Matrix)`                                             |
+| `rv_w`        | `wwadd_wx`             | `wm, ws2, rs1, wd`   | `Matrix Widening Integer Add Signed (Matrix-Scalar)`                                             |
+| `rv_w`        | `wwadd_wide_ww`        | `wm, ws2, ws1, wd`   | `Matrix Widening Integer Add Signed (Wide Matrix-Matrix)`                                        |
+| `rv_w`        | `wwadd_wide_wx`        | `wm, ws2, rs1, wd`   | `Matrix Widening Integer Add Signed (Wide Matrix-Scalar)`                                        |
+| `rv_w`        | `wwmaccsu_ww`          | `wm, ws2, ws1, wd`   | `Matrix Widening Signed-Unsigned Integer Multiply-Accumulate (Matrix-Matrix)`                    |
+| `rv_w`        | `wwmaccsu_wx`          | `wm, ws2, rs1, wd`   | `Matrix Widening Signed-Unsigned Integer Multiply-Accumulate (Matrix-Scalar)`                    |
+| `rv_w`        | `wwmaccus_wx`          | `wm, ws2, rs1, wd`   | `Matrix Widening Unsigned-Signed Integer Multiply-Accumulate (Matrix-Scalar)`                    |
+| `rv_w`        | `wwmaccu_ww`           | `wm, ws2, ws1, wd`   | `Matrix Widening Unsigned Integer Multiply-Accumulate (Matrix-Matrix)`                           |
+| `rv_w`        | `wwmaccu_wx`           | `wm, ws2, rs1, wd`   | `Matrix Widening Unsigned Integer Multiply-Accumulate (Matrix-Scalar)`                           |
+| `rv_w`        | `wwmacc_ww`            | `wm, ws2, ws1, wd`   | `Matrix Widening Signed Integer Multiply-Accumulate (Matrix-Matrix)`                             |
+| `rv_w`        | `wwmacc_wx`            | `wm, ws2, rs1, wd`   | `Matrix Widening Signed Integer Multiply-Accumulate (Matrix-Scalar)`                             |
+| `rv_w`        | `wwmulsu_ww`           | `wm, ws2, ws1, wd`   | `Matrix Widening Integer Multiply Signed-Unsigned (Matrix-Matrix)`                               |
+| `rv_w`        | `wwmulsu_wx`           | `wm, ws2, rs1, wd`   | `Matrix Widening Integer Multiply Signed-Unsigned (Matrix-Scalar)`                               |
+| `rv_w`        | `wwmulu_ww`            | `wm, ws2, ws1, wd`   | `Matrix Widening Integer Multiply Unsigned (Matrix-Matrix)`                                      |
+| `rv_w`        | `wwmulu_wx`            | `wm, ws2, rs1, wd`   | `Matrix Widening Integer Multiply Unsigned (Matrix-Scalar)`                                      |
+| `rv_w`        | `wwmul_ww`             | `wm, ws2, ws1, wd`   | `Matrix Widening Integer Multiply Signed (Matrix-Matrix)`                                        |
+| `rv_w`        | `wwmul_wx`             | `wm, ws2, rs1, wd`   | `Matrix Widening Integer Multiply Signed (Matrix-Scalar)`                                        |
+| `rv_w`        | `wwredsumu_ws`         | `wm, ws2, ws1, wd`   | `Matrix Widening Integer Sum Unsigned Reduction`                                                 |
+| `rv_w`        | `wwredsum_ws`          | `wm, ws2, ws1, wd`   | `Matrix Widening Integer Sum Reduction`                                                          |
+| `rv_w`        | `wwsubu_ww`            | `wm, ws2, ws1, wd`   | `Matrix Widening Integer Subtract Unsigned (Matrix-Matrix)`                                      |
+| `rv_w`        | `wwsubu_wx`            | `wm, ws2, rs1, wd`   | `Matrix Widening Integer Subtract Unsigned (Matrix-Scalar)`                                      |
+| `rv_w`        | `wwsubu_wide_ww`       | `wm, ws2, ws1, wd`   | `Matrix Widening Integer Subtract Unsigned (Wide Matrix-Matrix)`                                 |
+| `rv_w`        | `wwsubu_wide_wx`       | `wm, ws2, rs1, wd`   | `Matrix Widening Integer Subtract Unsigned (Wide Matrix-Scalar)`                                 |
+| `rv_w`        | `wwsub_ww`             | `wm, ws2, ws1, wd`   | `Matrix Widening Integer Subtract Signed (Matrix-Matrix)`                                        |
+| `rv_w`        | `wwsub_wx`             | `wm, ws2, rs1, wd`   | `Matrix Widening Integer Subtract Signed (Matrix-Scalar)`                                        |
+| `rv_w`        | `wwsub_wide_ww`        | `wm, ws2, ws1, wd`   | `Matrix Widening Integer Subtract Signed (Wide Matrix-Matrix)`                                   |
+| `rv_w`        | `wwsub_wide_wx`        | `wm, ws2, rs1, wd`   | `Matrix Widening Integer Subtract Signed (Wide Matrix-Scalar)`                                   |
+| `rv_w`        | `wxor_wi`              | `wm, ws2, simm5, wd` | `Matrix Bitwise XOR (Matrix-Immediate)`                                                          |
+| `rv_w`        | `wxor_ww`              | `wm, ws2, ws1, wd`   | `Matrix Bitwise XOR (Matrix-Matrix)`                                                             |
+| `rv_w`        | `wxor_wx`              | `wm, ws2, rs1, wd`   | `Matrix Bitwise XOR (Matrix-Scalar)`                                                             |
+| `rv_w`        | `wzext_wf2`            | `wm, ws2, wd`        | `Matrix Zero-Extend by Factor 2`                                                                 |
+| `rv_w`        | `wzext_wf4`            | `wm, ws2, wd`        | `Matrix Zero-Extend by Factor 4`                                                                 |
+| `rv_w`        | `wzext_wf8`            | `wm, ws2, wd`        | `Matrix Zero-Extend by Factor 8`                                                                 |
+
+:RVW - Specific Extension for Matrix Operations
+
+| **Extension**      | **Name**                  | **Variable-Fields**             | **Full-Name**                                                                      |
+|:-------------------|:--------------------------|:--------------------------------|:-----------------------------------------------------------------------------------|
+| `rv_zwabd`         | `wabdu_ww`                | `wm, ws2, ws1, wd`              | `Matrix Unsigned Absolute Difference (Matrix-Matrix)`                              |
+| `rv_zwabd`         | `wabdu_wx`                | `wm, ws2, rs1, wd`              | `Matrix Unsigned Absolute Difference (Matrix-Scalar)`                              |
+| `rv_zwabd`         | `wabd_ww`                 | `wm, ws2, ws1, wd`              | `Matrix Signed Absolute Difference (Matrix-Matrix)`                                |
+| `rv_zwabd`         | `wabd_wx`                 | `wm, ws2, rs1, wd`              | `Matrix Signed Absolute Difference (Matrix-Scalar)`                                |
+| `rv_zwabd`         | `wwabdau_ww`              | `wm, ws2, ws1, wd`              | `Matrix Widening Unsigned Absolute Difference Accumulate (Matrix-Matrix)`          |
+| `rv_zwabd`         | `wwabdau_wx`              | `wm, ws2, rs1, wd`              | `Matrix Widening Unsigned Absolute Difference Accumulate (Matrix-Scalar)`          |
+| `rv_zwabd`         | `wwabda_ww`               | `wm, ws2, ws1, wd`              | `Matrix Widening Signed Absolute Difference Accumulate (Matrix-Matrix)`            |
+| `rv_zwabd`         | `wwabda_wx`               | `wm, ws2, rs1, wd`              | `Matrix Widening Signed Absolute Difference Accumulate (Matrix-Scalar)`            |
+| `rv_zwbb`          | `wandn_ww`                | `wm, ws2, ws1, wd`              | `Matrix And-Not (Matrix-Matrix)`                                                   |
+| `rv_zwbb`          | `wandn_wx`                | `wm, ws2, rs1, wd`              | `Matrix And-Not (Matrix-Scalar)`                                                   |
+| `rv_zwbb`          | `wbrev8_w`                | `wm, ws2, wd`                   | `Matrix Reverse Bits in Bytes (Matrix)`                                            |
+| `rv_zwbb`          | `wbrev_w`                 | `wm, ws2, wd`                   | `Matrix Reverse Bits in Elements (Matrix)`                                         |
+| `rv_zwbb`          | `wclz_w`                  | `wm, ws2, wd`                   | `Matrix Count Leading Zeros (Matrix)`                                              |
+| `rv_zwbb`          | `wcpop_w`                 | `wm, ws2, wd`                   | `Matrix Population Count (Matrix)`                                                 |
+| `rv_zwbb`          | `wctz_w`                  | `wm, ws2, wd`                   | `Matrix Count Trailing Zeros (Matrix)`                                             |
+| `rv_zwbb`          | `wrev8_w`                 | `wm, ws2, wd`                   | `Matrix Reverse Bytes (Matrix)`                                                    |
+| `rv_zwbb`          | `wrol_ww`                 | `wm, ws2, ws1, wd`              | `Matrix Rotate Left (Matrix-Matrix)`                                               |
+| `rv_zwbb`          | `wrol_wx`                 | `wm, ws2, rs1, wd`              | `Matrix Rotate Left (Matrix-Scalar)`                                               |
+| `rv_zwbb`          | `wror_wi`                 | `zimm6hi, wm, ws2, zimm6lo, wd` | `Matrix Rotate Right (Matrix-Immediate)`                                           |
+| `rv_zwbb`          | `wror_ww`                 | `wm, ws2, ws1, wd`              | `Matrix Rotate Right (Matrix-Matrix)`                                              |
+| `rv_zwbb`          | `wror_wx`                 | `wm, ws2, rs1, wd`              | `Matrix Rotate Right (Matrix-Scalar)`                                              |
+| `rv_zwbb`          | `wwsll_wi`                | `wm, ws2, zimm5, wd`            | `Matrix Widening Shift Left Logical (Matrix-Immediate)`                            |
+| `rv_zwbb`          | `wwsll_ww`                | `wm, ws2, ws1, wd`              | `Matrix Widening Shift Left Logical (Matrix-Matrix)`                               |
+| `rv_zwbb`          | `wwsll_wx`                | `wm, ws2, rs1, wd`              | `Matrix Widening Shift Left Logical (Matrix-Scalar)`                               |
+| `rv_zwbc`          | `wclmulh_ww`              | `wm, ws2, ws1, wd`              | `Matrix Carry-Less Multiply High (Matrix-Matrix)`                                  |
+| `rv_zwbc`          | `wclmulh_wx`              | `wm, ws2, rs1, wd`              | `Matrix Carry-Less Multiply High (Matrix-Scalar)`                                  |
+| `rv_zwbc`          | `wclmul_ww`               | `wm, ws2, ws1, wd`              | `Matrix Carry-Less Multiply Low (Matrix-Matrix)`                                   |
+| `rv_zwbc`          | `wclmul_wx`               | `wm, ws2, rs1, wd`              | `Matrix Carry-Less Multiply Low (Matrix-Scalar)`                                   |
+| `rv_zwdot4a`       | `wdot4asu_ww`             | `wm, ws2, ws1, wd`              | `Matrix Packed 8-Bit Dot Product Accumulate (Signed × Unsigned) (Matrix-Matrix)`   |
+| `rv_zwdot4a`       | `wdot4asu_wx`             | `wm, ws2, rs1, wd`              | `Matrix Packed 8-Bit Dot Product Accumulate (Signed × Unsigned) (Matrix-Scalar)`   |
+| `rv_zwdot4a`       | `wdot4aus_wx`             | `wm, ws2, rs1, wd`              | `Matrix Packed 8-Bit Dot Product Accumulate (Unsigned × Signed) (Matrix-Scalar)`   |
+| `rv_zwdot4a`       | `wdot4au_ww`              | `wm, ws2, ws1, wd`              | `Matrix Packed 8-Bit Dot Product Accumulate (Unsigned × Unsigned) (Matrix-Matrix)` |
+| `rv_zwdot4a`       | `wdot4au_wx`              | `wm, ws2, rs1, wd`              | `Matrix Packed 8-Bit Dot Product Accumulate (Unsigned × Unsigned) (Matrix-Scalar)` |
+| `rv_zwdot4a`       | `wdot4a_ww`               | `wm, ws2, ws1, wd`              | `Matrix Packed 8-Bit Dot Product Accumulate (Signed × Signed) (Matrix-Matrix)`     |
+| `rv_zwdot4a`       | `wdot4a_wx`               | `wm, ws2, rs1, wd`              | `Matrix Packed 8-Bit Dot Product Accumulate (Signed × Signed) (Matrix-Scalar)`     |
+| `rv_zwfbdota32f`   | `wfbdota_ww`              | `wm, ws2x8, ci, ws1, wd`        | `Matrix Batched FP32 Dot Product Accumulate`                                       |
+| `rv_zwfbfmin`      | `wfncvtbf16_f_f_wide`     | `wm, ws2, wd`                   | `Matrix FP32 to BF16 Conversion`                                                   |
+| `rv_zwfbfmin`      | `wfwcvtbf16_f_f_w`        | `wm, ws2, wd`                   | `Matrix BF16 to FP32 Conversion`                                                   |
+| `rv_zwfbfwma`      | `wfwmaccbf16_wf`          | `wm, ws2, rs1, wd`              | `Matrix BF16 Widening Fused Multiply-Accumulate (Matrix-Scalar)`                   |
+| `rv_zwfbfwma`      | `wfwmaccbf16_ww`          | `wm, ws2, ws1, wd`              | `Matrix BF16 Widening Fused Multiply-Accumulate (Matrix-Matrix)`                   |
+| `rv_zwfofp4min`    | `wfext_wf2`               | `wm, ws2, wd`                   | `Matrix E2M1 to E4M3 Conversion`                                                   |
+| `rv_zwfofp8min`    | `wfncvtbf16_sat_f_f_wide` | `wm, ws2, wd`                   | `Matrix BF16 to OFP8 Saturating Conversion`                                        |
+| `rv_zwfofp8min`    | `wfncvt_f_f_q`            | `wm, ws2, wd`                   | `Matrix FP32 to OFP8 Conversion`                                                   |
+| `rv_zwfofp8min`    | `wfncvt_sat_f_f_q`        | `wm, ws2, wd`                   | `Matrix FP32 to OFP8 Saturating Conversion`                                        |
+| `rv_zwfqwbdota8f`  | `wfqwbdota_alt_ww`        | `wm, ws2x8, ci, ws1, wd`        | `Matrix Batched OFP8 Dot Product Accumulate (E5M2 Source 2)`                       |
+| `rv_zwfqwbdota8f`  | `wfqwbdota_ww`            | `wm, ws2x8, ci, ws1, wd`        | `Matrix Batched OFP8 Dot Product Accumulate (E4M3 Source 2)`                       |
+| `rv_zwfqwdota8f`   | `wfqwdota_alt_ww`         | `wm, ws2, ws1, wd`              | `Matrix Long OFP8 Dot Product Accumulate (E5M2 Source 2)`                          |
+| `rv_zwfqwdota8f`   | `wfqwdota_ww`             | `wm, ws2, ws1, wd`              | `Matrix Long OFP8 Dot Product Accumulate (E4M3 Source 2)`                          |
+| `rv_zwfwbdota16bf` | `wfwbdota_ww`             | `wm, ws2x8, ci, ws1, wd`        | `Matrix Batched BF16 Dot Product Accumulate`                                       |
+| `rv_zwfwdota16bf`  | `wfwdota_ww`              | `wm, ws2, ws1, wd`              | `Matrix Long BF16 Dot Product Accumulate`                                          |
+| `rv_zwqwbdota8i`   | `wqwbdotas_ww`            | `wm, ws2x8, ci, ws1, wd`        | `Matrix Batched 8-Bit Integer Dot Product Accumulate (Signed Source 2)`            |
+| `rv_zwqwbdota8i`   | `wqwbdotau_ww`            | `wm, ws2x8, ci, ws1, wd`        | `Matrix Batched 8-Bit Integer Dot Product Accumulate (Unsigned Source 2)`          |
+| `rv_zwqwdota8i`    | `wqwdotas_ww`             | `wm, ws2, ws1, wd`              | `Matrix Long 8-Bit Integer Dot Product Accumulate (Signed Source 2)`               |
+| `rv_zwqwdota8i`    | `wqwdotau_ww`             | `wm, ws2, ws1, wd`              | `Matrix Long 8-Bit Integer Dot Product Accumulate (Unsigned Source 2)`             |
+| `rv_zwt16e`        | `wtle16`                  | `rs2, rs1`                      | `Load 16-Bit Matrix Tile Elements`                                                 |
+| `rv_zwt16e`        | `wtse16`                  | `rs2, rs1`                      | `Store 16-Bit Matrix Tile Elements`                                                |
+| `rv_zwt64e`        | `wtle64`                  | `rs2, rs1`                      | `Load 64-Bit Matrix Tile Elements`                                                 |
+| `rv_zwt64e`        | `wtse64`                  | `rs2, rs1`                      | `Store 64-Bit Matrix Tile Elements`                                                |
+| `rv_zwt8e`         | `wtle8`                   | `rs2, rs1`                      | `Load 8-Bit Matrix Tile Elements`                                                  |
+| `rv_zwt8e`         | `wtse8`                   | `rs2, rs1`                      | `Store 8-Bit Matrix Tile Elements`                                                 |
+| `rv_zwtbase`       | `wmsetmtype`              | `rs2, rs1, rd`                  | `Set Matrix Tile and Matrix Register Types`                                        |
+| `rv_zwtbase`       | `wmsetmtypei`             | `altfmt, wsew, mtwiden, rd`     | `Set Matrix Tile and Matrix Register Types from Immediates`                        |
+| `rv_zwtbase`       | `wmsettk`                 | `rs1, rd`                       | `Set Matrix Reduction Width`                                                       |
+| `rv_zwtbase`       | `wmsettm`                 | `rs1, rd`                       | `Set Matrix Row Count`                                                             |
+| `rv_zwtbase`       | `wmsettn`                 | `rs1, rd`                       | `Set Matrix Column Count`                                                          |
+| `rv_zwtbase`       | `wtdiscard`               | `none`                          | `Discard Matrix Tile Context`                                                      |
+| `rv_zwtbase`       | `wtle32`                  | `rs2, rs1`                      | `Load 32-Bit Matrix Tile Elements`                                                 |
+| `rv_zwtbase`       | `wtmv_t_w`                | `ws2, rs1`                      | `Move Matrix to Matrix Tile Subset`                                                |
+| `rv_zwtbase`       | `wtmv_w_t`                | `rs1, wd`                       | `Move Matrix Tile Subset to Matrix`                                                |
+| `rv_zwtbase`       | `wtse32`                  | `rs2, rs1`                      | `Store 32-Bit Matrix Tile Elements`                                                |
+| `rv_zwtbase`       | `wtzero`                  | `zwt_mtd16`                     | `Zero Matrix Tile Region`                                                          |
+| `rv_zwtbf16fmm`    | `wtfmm_alt_tww`           | `ws2, ws1, zwt_mtd8`            | `BF16 Matrix Tile Multiply-Accumulate (Alternate)`                                 |
+| `rv_zwtdmm`        | `wtfmm_tww`               | `ws2, ws1, zwt_mtd8`            | `FP64 Matrix Tile Multiply-Accumulate`                                             |
+| `rv_zwtfmm`        | `wtfmm_tww`               | `ws2, ws1, zwt_mtd8`            | `FP32 Matrix Tile Multiply-Accumulate`                                             |
+| `rv_zwtfp16fmm`    | `wtfmm_tww`               | `ws2, ws1, zwt_mtd8`            | `FP16 Matrix Tile Multiply-Accumulate`                                             |
+| `rv_zwti8i32mm`    | `wtmms_tww`               | `ws2, ws1, zwt_mtd8`            | `Signed 8-Bit Matrix Tile Multiply-Accumulate`                                     |
+| `rv_zwti8i32mm`    | `wtmmu_tww`               | `ws2, ws1, zwt_mtd8`            | `Unsigned 8-Bit Matrix Tile Multiply-Accumulate`                                   |
+| `rv_zwtofp8fmm`    | `wtfmm_alt_tww`           | `ws2, ws1, zwt_mtd8`            | `OFP8 Matrix Tile Multiply-Accumulate (Alternate)`                                 |
+| `rv_zwtofp8fmm`    | `wtfmm_tww`               | `ws2, ws1, zwt_mtd8`            | `OFP8 Matrix Tile Multiply-Accumulate`                                             |
+| `rv_zwzip`         | `wpaire_ww`               | `wm, ws2, ws1, wd`              | `Matrix Interleave Even Elements (Matrix-Matrix)`                                  |
+| `rv_zwzip`         | `wpairo_ww`               | `wm, ws2, ws1, wd`              | `Matrix Interleave Odd Elements (Matrix-Matrix)`                                   |
+| `rv_zwzip`         | `wunzipe_w`               | `wm, ws2, wd`                   | `Matrix Extract Even Elements (Matrix)`                                            |
+| `rv_zwzip`         | `wunzipo_w`               | `wm, ws2, wd`                   | `Matrix Extract Odd Elements (Matrix)`                                             |
+| `rv_zwzip`         | `wzip_ww`                 | `wm, ws2, ws1, wd`              | `Matrix Interleave Elements (Matrix-Matrix)`                                       |
+
+:RVZW - Specific Extension for Matrix Operations

@@ -1,179 +1,67 @@
-# Zwkg - Vector GCM/GMAC
+## INSTRUCTION OPCODES
 
-# Vector Multiply over GHASH Galois-Field
+| **Extension** | **Name**     | **Variable-Fields**             | **Encoding**                       | **Match**    | **Mask**     |
+|:--------------|:-------------|:--------------------------------|:-----------------------------------|:-------------|:-------------|
+| `rv_zwkg`     | `wghsh_ww`   | `ws2, ws1, wd`                  | `1011001----------010-----1011111` | `0xb200205f` | `0xfe00707f` |
+| `rv_zwkg`     | `wgmul_ww`   | `ws2, wd`                       | `1010001-----10001010-----1011111` | `0xa208a05f` | `0xfe0ff07f` |
+| `rv_zwkned`   | `waesdf_ws`  | `ws2, wd`                       | `1010011-----00001010-----1011111` | `0xa600a05f` | `0xfe0ff07f` |
+| `rv_zwkned`   | `waesdf_ww`  | `ws2, wd`                       | `1010001-----00001010-----1011111` | `0xa200a05f` | `0xfe0ff07f` |
+| `rv_zwkned`   | `waesdm_ws`  | `ws2, wd`                       | `1010011-----00000010-----1011111` | `0xa600205f` | `0xfe0ff07f` |
+| `rv_zwkned`   | `waesdm_ww`  | `ws2, wd`                       | `1010001-----00000010-----1011111` | `0xa200205f` | `0xfe0ff07f` |
+| `rv_zwkned`   | `waesef_ws`  | `ws2, wd`                       | `1010011-----00011010-----1011111` | `0xa601a05f` | `0xfe0ff07f` |
+| `rv_zwkned`   | `waesef_ww`  | `ws2, wd`                       | `1010001-----00011010-----1011111` | `0xa201a05f` | `0xfe0ff07f` |
+| `rv_zwkned`   | `waesem_ws`  | `ws2, wd`                       | `1010011-----00010010-----1011111` | `0xa601205f` | `0xfe0ff07f` |
+| `rv_zwkned`   | `waesem_ww`  | `ws2, wd`                       | `1010001-----00010010-----1011111` | `0xa201205f` | `0xfe0ff07f` |
+| `rv_zwkned`   | `waeskf1_wi` | `ws2, zimm5, wd`                | `1000101----------010-----1011111` | `0x8a00205f` | `0xfe00707f` |
+| `rv_zwkned`   | `waeskf2_wi` | `ws2, zimm5, wd`                | `1010101----------010-----1011111` | `0xaa00205f` | `0xfe00707f` |
+| `rv_zwkned`   | `waesz_ws`   | `ws2, wd`                       | `1010011-----00111010-----1011111` | `0xa603a05f` | `0xfe0ff07f` |
+| `rv_zwknha`   | `wsha2ch_ww` | `ws2, ws1, wd`                  | `1011101----------010-----1011111` | `0xba00205f` | `0xfe00707f` |
+| `rv_zwknha`   | `wsha2cl_ww` | `ws2, ws1, wd`                  | `1011111----------010-----1011111` | `0xbe00205f` | `0xfe00707f` |
+| `rv_zwknha`   | `wsha2ms_ww` | `ws2, ws1, wd`                  | `1011011----------010-----1011111` | `0xb600205f` | `0xfe00707f` |
+| `rv_zwknhb`   | `wsha2ch_ww` | `ws2, ws1, wd`                  | `1011101----------010-----1011111` | `0xba00205f` | `0xfe00707f` |
+| `rv_zwknhb`   | `wsha2cl_ww` | `ws2, ws1, wd`                  | `1011111----------010-----1011111` | `0xbe00205f` | `0xfe00707f` |
+| `rv_zwknhb`   | `wsha2ms_ww` | `ws2, ws1, wd`                  | `1011011----------010-----1011111` | `0xb600205f` | `0xfe00707f` |
+| `rv_zwkn`     | `waesdf_ws`  | `ws2, wd`                       | `1010011-----00001010-----1011111` | `0xa600a05f` | `0xfe0ff07f` |
+| `rv_zwkn`     | `waesdf_ww`  | `ws2, wd`                       | `1010001-----00001010-----1011111` | `0xa200a05f` | `0xfe0ff07f` |
+| `rv_zwkn`     | `waesdm_ws`  | `ws2, wd`                       | `1010011-----00000010-----1011111` | `0xa600205f` | `0xfe0ff07f` |
+| `rv_zwkn`     | `waesdm_ww`  | `ws2, wd`                       | `1010001-----00000010-----1011111` | `0xa200205f` | `0xfe0ff07f` |
+| `rv_zwkn`     | `waesef_ws`  | `ws2, wd`                       | `1010011-----00011010-----1011111` | `0xa601a05f` | `0xfe0ff07f` |
+| `rv_zwkn`     | `waesef_ww`  | `ws2, wd`                       | `1010001-----00011010-----1011111` | `0xa201a05f` | `0xfe0ff07f` |
+| `rv_zwkn`     | `waesem_ws`  | `ws2, wd`                       | `1010011-----00010010-----1011111` | `0xa601205f` | `0xfe0ff07f` |
+| `rv_zwkn`     | `waesem_ww`  | `ws2, wd`                       | `1010001-----00010010-----1011111` | `0xa201205f` | `0xfe0ff07f` |
+| `rv_zwkn`     | `waeskf1_wi` | `ws2, zimm5, wd`                | `1000101----------010-----1011111` | `0x8a00205f` | `0xfe00707f` |
+| `rv_zwkn`     | `waeskf2_wi` | `ws2, zimm5, wd`                | `1010101----------010-----1011111` | `0xaa00205f` | `0xfe00707f` |
+| `rv_zwkn`     | `waesz_ws`   | `ws2, wd`                       | `1010011-----00111010-----1011111` | `0xa603a05f` | `0xfe0ff07f` |
+| `rv_zwkn`     | `wandn_ww`   | `wm, ws2, ws1, wd`              | `000001-----------000-----0001011` | `0x0400000b` | `0xfc00707f` |
+| `rv_zwkn`     | `wandn_wx`   | `wm, ws2, rs1, wd`              | `000001-----------100-----0001011` | `0x0400400b` | `0xfc00707f` |
+| `rv_zwkn`     | `wbrev8_w`   | `wm, ws2, wd`                   | `010010------01000010-----0001011` | `0x4804200b` | `0xfc0ff07f` |
+| `rv_zwkn`     | `wrev8_w`    | `wm, ws2, wd`                   | `010010------01001010-----0001011` | `0x4804a00b` | `0xfc0ff07f` |
+| `rv_zwkn`     | `wrol_ww`    | `wm, ws2, ws1, wd`              | `010101-----------000-----0001011` | `0x5400000b` | `0xfc00707f` |
+| `rv_zwkn`     | `wrol_wx`    | `wm, ws2, rs1, wd`              | `010101-----------100-----0001011` | `0x5400400b` | `0xfc00707f` |
+| `rv_zwkn`     | `wror_wi`    | `zimm6hi, wm, ws2, zimm6lo, wd` | `01010------------011-----0001011` | `0x5000300b` | `0xf800707f` |
+| `rv_zwkn`     | `wror_ww`    | `wm, ws2, ws1, wd`              | `010100-----------000-----0001011` | `0x5000000b` | `0xfc00707f` |
+| `rv_zwkn`     | `wror_wx`    | `wm, ws2, rs1, wd`              | `010100-----------100-----0001011` | `0x5000400b` | `0xfc00707f` |
+| `rv_zwkn`     | `wsha2ch_ww` | `ws2, ws1, wd`                  | `1011101----------010-----1011111` | `0xba00205f` | `0xfe00707f` |
+| `rv_zwkn`     | `wsha2cl_ww` | `ws2, ws1, wd`                  | `1011111----------010-----1011111` | `0xbe00205f` | `0xfe00707f` |
+| `rv_zwkn`     | `wsha2ms_ww` | `ws2, ws1, wd`                  | `1011011----------010-----1011111` | `0xb600205f` | `0xfe00707f` |
+| `rv_zwksed`   | `wsm4k_wi`   | `ws2, zimm5, wd`                | `1000011----------010-----1011111` | `0x8600205f` | `0xfe00707f` |
+| `rv_zwksed`   | `wsm4r_ws`   | `ws2, wd`                       | `1010011-----10000010-----1011111` | `0xa608205f` | `0xfe0ff07f` |
+| `rv_zwksed`   | `wsm4r_ww`   | `ws2, wd`                       | `1010001-----10000010-----1011111` | `0xa208205f` | `0xfe0ff07f` |
+| `rv_zwksh`    | `wsm3c_wi`   | `ws2, zimm5, wd`                | `1010111----------010-----1011111` | `0xae00205f` | `0xfe00707f` |
+| `rv_zwksh`    | `wsm3me_ww`  | `ws2, ws1, wd`                  | `1000001----------010-----1011111` | `0x8200205f` | `0xfe00707f` |
+| `rv_zwks`     | `wandn_ww`   | `wm, ws2, ws1, wd`              | `000001-----------000-----0001011` | `0x0400000b` | `0xfc00707f` |
+| `rv_zwks`     | `wandn_wx`   | `wm, ws2, rs1, wd`              | `000001-----------100-----0001011` | `0x0400400b` | `0xfc00707f` |
+| `rv_zwks`     | `wbrev8_w`   | `wm, ws2, wd`                   | `010010------01000010-----0001011` | `0x4804200b` | `0xfc0ff07f` |
+| `rv_zwks`     | `wrev8_w`    | `wm, ws2, wd`                   | `010010------01001010-----0001011` | `0x4804a00b` | `0xfc0ff07f` |
+| `rv_zwks`     | `wrol_ww`    | `wm, ws2, ws1, wd`              | `010101-----------000-----0001011` | `0x5400000b` | `0xfc00707f` |
+| `rv_zwks`     | `wrol_wx`    | `wm, ws2, rs1, wd`              | `010101-----------100-----0001011` | `0x5400400b` | `0xfc00707f` |
+| `rv_zwks`     | `wror_wi`    | `zimm6hi, wm, ws2, zimm6lo, wd` | `01010------------011-----0001011` | `0x5000300b` | `0xf800707f` |
+| `rv_zwks`     | `wror_ww`    | `wm, ws2, ws1, wd`              | `010100-----------000-----0001011` | `0x5000000b` | `0xfc00707f` |
+| `rv_zwks`     | `wror_wx`    | `wm, ws2, rs1, wd`              | `010100-----------100-----0001011` | `0x5000400b` | `0xfc00707f` |
+| `rv_zwks`     | `wsm3c_wi`   | `ws2, zimm5, wd`                | `1010111----------010-----1011111` | `0xae00205f` | `0xfe00707f` |
+| `rv_zwks`     | `wsm3me_ww`  | `ws2, ws1, wd`                  | `1000001----------010-----1011111` | `0x8200205f` | `0xfe00707f` |
+| `rv_zwks`     | `wsm4k_wi`   | `ws2, zimm5, wd`                | `1000011----------010-----1011111` | `0x8600205f` | `0xfe00707f` |
+| `rv_zwks`     | `wsm4r_ws`   | `ws2, wd`                       | `1010011-----10000010-----1011111` | `0xa608205f` | `0xfe0ff07f` |
+| `rv_zwks`     | `wsm4r_ww`   | `ws2, wd`                       | `1010001-----10000010-----1011111` | `0xa208205f` | `0xfe0ff07f` |
 
-```
-vgmul.vv 31..26=0x28 25=1 vs2 19..15=0x11 14..12=0x2 vd 6..0=0x77
-```
-
-# Vector Add-Multiply over GHASH Galois-Field
-
-```
-vghsh.vv 31..26=0x2C 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x77
-```
-
-# Zwkn, Vector Crypto Extension, NIST Algorithm Suite
-
-# Import Zwkb (proper subset of Zwbb extension)
-
-```
-$import rv_zwbb::vandn.vv
-$import rv_zwbb::vandn.vx
-$import rv_zwbb::vbrev8.v
-$import rv_zwbb::vrev8.v
-$import rv_zwbb::vrol.vv
-$import rv_zwbb::vrol.vx
-$import rv_zwbb::vror.vv
-$import rv_zwbb::vror.vx
-$import rv_zwbb::vror.vi
-```
-
-# Import Zwkned
-
-```
-$import rv_zwkned::vaesef.vs
-$import rv_zwkned::vaesef.vv
-$import rv_zwkned::vaesem.vs
-$import rv_zwkned::vaesem.vv
-$import rv_zwkned::vaesdf.vs
-$import rv_zwkned::vaesdf.vv
-$import rv_zwkned::vaesdm.vs
-$import rv_zwkned::vaesdm.vv
-$import rv_zwkned::vaeskf1.vi
-$import rv_zwkned::vaeskf2.vi
-$import rv_zwkned::vaesz.vs
-```
-
-# Import Zwknh
-
-
-`Zwkn` implies `Zwknhb`. We import the instructions from `rv_zwknha`, because we cannot import already imported instructions, `rv_zwknhb` imports them from `rv_zwknha`, and the instructions are identical.
-
-```
-$import rv_zwknha::vsha2ms.vv
-$import rv_zwknha::vsha2ch.vv
-$import rv_zwknha::vsha2cl.vv
-```
-
-# Zwk, Vector Crypto Extension, ShangMi Algorithm Suite
-
-# Import Zwkb (proper subset of the Zwbb extension)
-
-```
-$import rv_zwbb::vandn.vv
-$import rv_zwbb::vandn.vx
-$import rv_zwbb::vbrev8.v
-$import rv_zwbb::vrev8.v
-$import rv_zwbb::vrol.vv
-$import rv_zwbb::vrol.vx
-$import rv_zwbb::vror.vv
-$import rv_zwbb::vror.vx
-$import rv_zwbb::vror.vi
-```
-
-# Import Zwksed
-
-```
-$import rv_zwksed::vsm4k.vi
-$import rv_zwksed::vsm4r.vv
-$import rv_zwksed::vsm4r.vs
-```
-
-# Import Zwksh
-
-```
-$import rv_zwksh::vsm3c.vi
-$import rv_zwksh::vsm3me.vv
-```
-
-# Zwksh - Vector Crypto SM3 (Hash)
-
-# SM3 Message Compression
-
-```
-vsm3c.vi     31..26=0x2B 25=1 vs2 zimm5 14..12=0x2 vd 6..0=0x77
-```
-
-# SM3 Message Expansion
-
-```
-vsm3me.vv    31..26=0x20 25=1 vs2 vs1   14..12=0x2 vd 6..0=0x77
-```
-
-# Zwkned - Vector Crypto AES Encryption & Decryption (Singe Round)
-
-# AES Single Round Decryption
-
-```
-vaesdf.vv    31..26=0x28 25=1 vs2 19..15=0x1 14..12=0x2 vd 6..0=0x77
-vaesdf.vs    31..26=0x29 25=1 vs2 19..15=0x1 14..12=0x2 vd 6..0=0x77
-vaesdm.vv    31..26=0x28 25=1 vs2 19..15=0x0 14..12=0x2 vd 6..0=0x77
-vaesdm.vs    31..26=0x29 25=1 vs2 19..15=0x0 14..12=0x2 vd 6..0=0x77
-```
-
-# AES Single Round Encryption
-
-```
-vaesef.vv    31..26=0x28 25=1 vs2 19..15=0x3 14..12=0x2 vd 6..0=0x77
-vaesef.vs    31..26=0x29 25=1 vs2 19..15=0x3 14..12=0x2 vd 6..0=0x77
-vaesem.vv    31..26=0x28 25=1 vs2 19..15=0x2 14..12=0x2 vd 6..0=0x77
-vaesem.vs    31..26=0x29 25=1 vs2 19..15=0x2 14..12=0x2 vd 6..0=0x77
-```
-
-# AES Scalar Round Zero Encryption/Decryption
-
-```
-vaesz.vs     31..26=0x29 25=1 vs2 19..15=0x7 14..12=0x2 vd 6..0=0x77
-```
-
-# AES-128 Forward Key Schedule
-
-```
-vaeskf1.vi   31..26=0x22 25=1 vs2 zimm5      14..12=0x2 vd 6..0=0x77
-```
-# AES-256 Forward Key Schedule
-
-```
-vaeskf2.vi   31..26=0x2A 25=1 vs2 zimm5      14..12=0x2 vd 6..0=0x77
-```
-
-# Zwknha - Vector Crypto SHA-256 Secure Hash
-
-The following three instructions are defined in both Zwknha and Zwknhb:
-
-- in Zwknha, they support SHA-256 (SEW=32) only,
-- in Zwknhb, they support both SHA-256 (SEW=32) and SHA-512 (SEW=64).
-
-```
-vsha2ms.vv    31..26=0x2D 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x77
-vsha2ch.vv    31..26=0x2E 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x77
-vsha2cl.vv    31..26=0x2F 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x77
-```
-
-# Zwknhb - Vector Crypto SHA-256 and SHA-512 Secure Hash
-
-The following three instructions are defined in both Zwknha and Zwknhb:
-
-- in Zwknha, they support SHA-256 (SEW=32) only,
-- in Zwknhb, they support both SHA-256 (SEW=32) and SHA-512 (SEW=64).
-
-```
-$import rv_zwknha::vsha2ms.vv
-$import rv_zwknha::vsha2ch.vv
-$import rv_zwknha::vsha2cl.vv
-```
-
-# Zwksed - Vector Crypto SM4 (Block Cipher)
-
-# SM4 Key Expansion
-
-```
-vsm4k.vi     31..26=0x21 25=1 vs2 zimm5       14..12=0x2 vd 6..0=0x77
-```
-
-# SM4 Encryption/Decryption Rounds
-
-```
-vsm4r.vv     31..26=0x28 25=1 vs2 19..15=0x10 14..12=0x2 vd 6..0=0x77
-vsm4r.vs     31..26=0x29 25=1 vs2 19..15=0x10 14..12=0x2 vd 6..0=0x77
-```
+:RVZWK - Specific Extension for Matrix Cryptography Instructions

@@ -6,258 +6,258 @@
 // SPDX-License-Identifier: BSD-2-Clause
 // =======================================================================================
 
-function clause currentlyEnabled(Ext_Zvkned) = hartSupports(Ext_Zvkned) & currentlyEnabled(Ext_Zve32x)
+function xw_crypto_kned_enabled() -> bool = (config extensions.Xw.crypto.kned : bool) & xw_enabled()
 
-union clause instruction = VAESDF : (zvk_vaesdf_funct6, vregidx, vregidx)
+union clause instruction = XWK_WAESDF : (zwk_waesdf_funct6, wregidx, wregidx)
 
-mapping encdec_vaesdf : zvk_vaesdf_funct6 <-> bits(6) = {
-  ZVK_VAESDF_VV <-> 0b101000,
-  ZVK_VAESDF_VS <-> 0b101001,
+mapping wk_encdec_vaesdf : zwk_waesdf_funct6 <-> bits(6) = {
+  XWK_ZWK_WAESDF_WW <-> 0b101000,
+  XWK_ZWK_WAESDF_WS <-> 0b101001,
 }
 
-$[wavedrom "VAESDF.OP _ _ _ OPMVV _ OP-VE"]
-mapping clause encdec = VAESDF(funct6, vs2, vd)
-  <-> encdec_vaesdf(funct6) @ 0b1 @ encdec_vreg(vs2) @ 0b00001 @ 0b010 @ encdec_vreg(vd) @ 0b1110111
-  when currentlyEnabled(Ext_Zvkned) & get_sew() == 32 & zvk_check_encdec(128, 4) & (funct6 == ZVK_VAESDF_VV |
-  zvk_valid_reg_overlap(vs2, vd, get_lmul_pow()))
+$[wavedrom "WAESDF.OP _ _ _ OPMWW _ CUSTOM-2"]
+mapping clause encdec = XWK_WAESDF(funct6, ws2, wd)
+  <-> wk_encdec_vaesdf(funct6) @ 0b1 @ encdec_wreg(ws2) @ 0b00001 @ 0b010 @ encdec_wreg(wd) @ 0b1011011
+  when valid_wtype() & xw_crypto_kned_enabled() & w_get_sew() == 32 & zwk_check_encdec(128, 4) & (funct6 == XWK_ZWK_WAESDF_WW |
+  zwk_valid_reg_overlap(ws2, wd, w_get_lmul_pow()))
 
-function clause execute VAESDF(funct6, vs2, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute XWK_WAESDF(funct6, ws2, wd) = {
+  let SEW      = w_get_sew();
+  let LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(LMUL_pow, SEW);
 
-  if not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
+  if not(w_valid_reg_group(ws2, LMUL_pow)) |
+     not(w_valid_reg_group(wd, LMUL_pow))
   then return Illegal_Instruction();
 
   assert(SEW == 32);
 
-  let vs2_val = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  = read_vreg(num_elem, SEW, LMUL_pow, vd);
+  let ws2_val = read_wreg(num_elem, SEW, LMUL_pow, ws2);
+  let wd_val  = read_wreg(num_elem, SEW, LMUL_pow, wd);
 
-  let eg_len   = (unsigned(vl) / 4);
-  let eg_start = (unsigned(vstart) / 4);
+  let group_count = (unsigned(wl) / 4);
+  let first_group = (unsigned(wstart) / 4);
 
-  foreach (i from eg_start to (eg_len - 1)) {
-    assert(i * 4 + 3 < num_elem);
+  foreach (group_index from first_group to (group_count - 1)) {
+    assert(group_index * 4 + 3 < num_elem);
 
-    let state = get_velem_quad(vd_val, i);
+    let state = get_welem_quad(wd_val, group_index);
     let rkey : bits(128) = match funct6 {
-      ZVK_VAESDF_VV => get_velem_quad(vs2_val, i),
-      ZVK_VAESDF_VS => get_velem_quad(vs2_val, 0),
+      XWK_ZWK_WAESDF_WW => get_welem_quad(ws2_val, group_index),
+      XWK_ZWK_WAESDF_WS => get_welem_quad(ws2_val, 0),
     };
     let sr  = aes_shift_rows_inv(state);
     let sb  = aes_subbytes_inv(sr);
     let ark = sb ^ rkey;
 
-    write_velem_quad(vd, SEW, ark, i);
+    write_welem_quad(wd, SEW, ark, group_index);
   };
 
-  set_vstart(zeros());
+  set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping vaesdf_mnemonic : zvk_vaesdf_funct6 <-> string = {
-  ZVK_VAESDF_VV <-> "vaesdf.vv",
-  ZVK_VAESDF_VS <-> "vaesdf.vs",
+mapping wk_aesdf_mnemonic : zwk_waesdf_funct6 <-> string = {
+  XWK_ZWK_WAESDF_WW <-> "waesdf.ww",
+  XWK_ZWK_WAESDF_WS <-> "waesdf.ws",
 }
 
-mapping clause assembly = VAESDF(funct6, vs2, vd)
-  <-> vaesdf_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2)
+mapping clause assembly = XWK_WAESDF(funct6, ws2, wd)
+  <-> wk_aesdf_mnemonic(funct6) ^ spc() ^ wreg_name(wd) ^ sep() ^ wreg_name(ws2)
 
-union clause instruction = VAESDM : (zvk_vaesdm_funct6, vregidx, vregidx)
+union clause instruction = XWK_WAESDM : (zwk_waesdm_funct6, wregidx, wregidx)
 
-mapping encdec_vaesdm : zvk_vaesdm_funct6 <-> bits(6) = {
-  ZVK_VAESDM_VV <-> 0b101000,
-  ZVK_VAESDM_VS <-> 0b101001,
+mapping wk_encdec_vaesdm : zwk_waesdm_funct6 <-> bits(6) = {
+  XWK_ZWK_WAESDM_WW <-> 0b101000,
+  XWK_ZWK_WAESDM_WS <-> 0b101001,
 }
 
-$[wavedrom "VAESDM.OP _ _ _ OPMVV _ OP-VE"]
-mapping clause encdec = VAESDM(funct6, vs2, vd)
-  <-> encdec_vaesdm(funct6) @ 0b1 @ encdec_vreg(vs2) @ 0b00000 @ 0b010 @ encdec_vreg(vd) @ 0b1110111
-  when currentlyEnabled(Ext_Zvkned) & get_sew() == 32 & zvk_check_encdec(128, 4) & (funct6 == ZVK_VAESDM_VV |
-  zvk_valid_reg_overlap(vs2, vd, get_lmul_pow()))
+$[wavedrom "WAESDM.OP _ _ _ OPMWW _ CUSTOM-2"]
+mapping clause encdec = XWK_WAESDM(funct6, ws2, wd)
+  <-> wk_encdec_vaesdm(funct6) @ 0b1 @ encdec_wreg(ws2) @ 0b00000 @ 0b010 @ encdec_wreg(wd) @ 0b1011011
+  when valid_wtype() & xw_crypto_kned_enabled() & w_get_sew() == 32 & zwk_check_encdec(128, 4) & (funct6 == XWK_ZWK_WAESDM_WW |
+  zwk_valid_reg_overlap(ws2, wd, w_get_lmul_pow()))
 
-function clause execute VAESDM(funct6, vs2, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute XWK_WAESDM(funct6, ws2, wd) = {
+  let SEW      = w_get_sew();
+  let LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(LMUL_pow, SEW);
 
-  if not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
+  if not(w_valid_reg_group(ws2, LMUL_pow)) |
+     not(w_valid_reg_group(wd, LMUL_pow))
   then return Illegal_Instruction();
 
   assert(SEW == 32);
 
-  let vs2_val = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  = read_vreg(num_elem, SEW, LMUL_pow, vd);
+  let ws2_val = read_wreg(num_elem, SEW, LMUL_pow, ws2);
+  let wd_val  = read_wreg(num_elem, SEW, LMUL_pow, wd);
 
-  let eg_len   = (unsigned(vl) / 4);
-  let eg_start = (unsigned(vstart) / 4);
+  let group_count = (unsigned(wl) / 4);
+  let first_group = (unsigned(wstart) / 4);
 
-  foreach (i from eg_start to (eg_len - 1)) {
-    assert(i * 4 + 3 < num_elem);
+  foreach (group_index from first_group to (group_count - 1)) {
+    assert(group_index * 4 + 3 < num_elem);
 
-    let state = get_velem_quad(vd_val, i);
+    let state = get_welem_quad(wd_val, group_index);
     let rkey : bits(128) = match funct6 {
-      ZVK_VAESDM_VV => get_velem_quad(vs2_val, i),
-      ZVK_VAESDM_VS => get_velem_quad(vs2_val, 0),
+      XWK_ZWK_WAESDM_WW => get_welem_quad(ws2_val, group_index),
+      XWK_ZWK_WAESDM_WS => get_welem_quad(ws2_val, 0),
     };
     let sr    = aes_shift_rows_inv(state);
     let sb    = aes_subbytes_inv(sr);
     let ark   = sb ^ rkey;
     let mix   = aes_mixcolumns_inv(ark);
 
-    write_velem_quad(vd, SEW, mix, i);
+    write_welem_quad(wd, SEW, mix, group_index);
   };
 
-  set_vstart(zeros());
+  set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping vaesdm_mnemonic : zvk_vaesdm_funct6 <-> string = {
-  ZVK_VAESDM_VV <-> "vaesdm.vv",
-  ZVK_VAESDM_VS <-> "vaesdm.vs",
+mapping wk_aesdm_mnemonic : zwk_waesdm_funct6 <-> string = {
+  XWK_ZWK_WAESDM_WW <-> "waesdm.ww",
+  XWK_ZWK_WAESDM_WS <-> "waesdm.ws",
 }
 
-mapping clause assembly = VAESDM(funct6, vs2, vd)
-  <-> vaesdm_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2)
+mapping clause assembly = XWK_WAESDM(funct6, ws2, wd)
+  <-> wk_aesdm_mnemonic(funct6) ^ spc() ^ wreg_name(wd) ^ sep() ^ wreg_name(ws2)
 
-union clause instruction = VAESEF : (zvk_vaesef_funct6, vregidx, vregidx)
+union clause instruction = XWK_WAESEF : (zwk_waesef_funct6, wregidx, wregidx)
 
-mapping encdec_vaesef : zvk_vaesef_funct6 <-> bits(6) = {
-  ZVK_VAESEF_VV <-> 0b101000,
-  ZVK_VAESEF_VS <-> 0b101001,
+mapping wk_encdec_vaesef : zwk_waesef_funct6 <-> bits(6) = {
+  XWK_ZWK_WAESEF_WW <-> 0b101000,
+  XWK_ZWK_WAESEF_WS <-> 0b101001,
 }
 
-$[wavedrom "VAESEF.OP _ _ _ OPMVV _ OP-VE"]
-mapping clause encdec = VAESEF(funct6, vs2, vd)
-  <-> encdec_vaesef(funct6) @ 0b1 @ encdec_vreg(vs2) @ 0b00011 @ 0b010 @ encdec_vreg(vd) @ 0b1110111
-  when currentlyEnabled(Ext_Zvkned) & get_sew() == 32 & zvk_check_encdec(128, 4) & (funct6 == ZVK_VAESEF_VV |
-  zvk_valid_reg_overlap(vs2, vd, get_lmul_pow()))
+$[wavedrom "WAESEF.OP _ _ _ OPMWW _ CUSTOM-2"]
+mapping clause encdec = XWK_WAESEF(funct6, ws2, wd)
+  <-> wk_encdec_vaesef(funct6) @ 0b1 @ encdec_wreg(ws2) @ 0b00011 @ 0b010 @ encdec_wreg(wd) @ 0b1011011
+  when valid_wtype() & xw_crypto_kned_enabled() & w_get_sew() == 32 & zwk_check_encdec(128, 4) & (funct6 == XWK_ZWK_WAESEF_WW |
+  zwk_valid_reg_overlap(ws2, wd, w_get_lmul_pow()))
 
-function clause execute VAESEF(funct6, vs2, vd) = {
-  let SEW = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute XWK_WAESEF(funct6, ws2, wd) = {
+  let SEW = w_get_sew();
+  let LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(LMUL_pow, SEW);
 
-  if not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
+  if not(w_valid_reg_group(ws2, LMUL_pow)) |
+     not(w_valid_reg_group(wd, LMUL_pow))
   then return Illegal_Instruction();
 
   assert(SEW == 32);
 
-  let vs2_val = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  = read_vreg(num_elem, SEW, LMUL_pow, vd);
+  let ws2_val = read_wreg(num_elem, SEW, LMUL_pow, ws2);
+  let wd_val  = read_wreg(num_elem, SEW, LMUL_pow, wd);
 
-  let eg_len   = (unsigned(vl) / 4);
-  let eg_start = (unsigned(vstart) / 4);
+  let group_count = (unsigned(wl) / 4);
+  let first_group = (unsigned(wstart) / 4);
 
-  foreach (i from eg_start to (eg_len - 1)) {
-    assert(i * 4 + 3 < num_elem);
+  foreach (group_index from first_group to (group_count - 1)) {
+    assert(group_index * 4 + 3 < num_elem);
 
-    let state = get_velem_quad(vd_val, i);
+    let state = get_welem_quad(wd_val, group_index);
     let rkey : bits(128) = match funct6 {
-      ZVK_VAESEF_VV => get_velem_quad(vs2_val, i),
-      ZVK_VAESEF_VS => get_velem_quad(vs2_val, 0),
+      XWK_ZWK_WAESEF_WW => get_welem_quad(ws2_val, group_index),
+      XWK_ZWK_WAESEF_WS => get_welem_quad(ws2_val, 0),
     };
     let sb    = aes_subbytes_fwd(state);
     let sr    = aes_shift_rows_fwd(sb);
     let ark   = sr ^ rkey;
 
-    write_velem_quad(vd, SEW, ark, i);
+    write_welem_quad(wd, SEW, ark, group_index);
   };
 
-  set_vstart(zeros());
+  set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping vaesef_mnemonic : zvk_vaesef_funct6 <-> string = {
-  ZVK_VAESEF_VV <-> "vaesef.vv",
-  ZVK_VAESEF_VS <-> "vaesef.vs",
+mapping wk_aesef_mnemonic : zwk_waesef_funct6 <-> string = {
+  XWK_ZWK_WAESEF_WW <-> "waesef.ww",
+  XWK_ZWK_WAESEF_WS <-> "waesef.ws",
 }
 
-mapping clause assembly = VAESEF(funct6, vs2, vd)
-  <-> vaesef_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2)
+mapping clause assembly = XWK_WAESEF(funct6, ws2, wd)
+  <-> wk_aesef_mnemonic(funct6) ^ spc() ^ wreg_name(wd) ^ sep() ^ wreg_name(ws2)
 
-union clause instruction = VAESEM : (zvk_vaesem_funct6, vregidx, vregidx)
+union clause instruction = XWK_WAESEM : (zwk_waesem_funct6, wregidx, wregidx)
 
-mapping encdec_vaesem : zvk_vaesem_funct6 <-> bits(6) = {
-  ZVK_VAESEM_VV <-> 0b101000,
-  ZVK_VAESEM_VS <-> 0b101001,
+mapping wk_encdec_vaesem : zwk_waesem_funct6 <-> bits(6) = {
+  XWK_ZWK_WAESEM_WW <-> 0b101000,
+  XWK_ZWK_WAESEM_WS <-> 0b101001,
 }
 
-$[wavedrom "VAESEM.OP _ _ _ OPMVV _ OP-VE"]
-mapping clause encdec = VAESEM(funct6, vs2, vd)
-  <-> encdec_vaesem(funct6) @ 0b1 @ encdec_vreg(vs2) @ 0b00010 @ 0b010 @ encdec_vreg(vd) @ 0b1110111
-  when currentlyEnabled(Ext_Zvkned) & get_sew() == 32 & zvk_check_encdec(128, 4) & (funct6 == ZVK_VAESEM_VV |
-  zvk_valid_reg_overlap(vs2, vd, get_lmul_pow()))
+$[wavedrom "WAESEM.OP _ _ _ OPMWW _ CUSTOM-2"]
+mapping clause encdec = XWK_WAESEM(funct6, ws2, wd)
+  <-> wk_encdec_vaesem(funct6) @ 0b1 @ encdec_wreg(ws2) @ 0b00010 @ 0b010 @ encdec_wreg(wd) @ 0b1011011
+  when valid_wtype() & xw_crypto_kned_enabled() & w_get_sew() == 32 & zwk_check_encdec(128, 4) & (funct6 == XWK_ZWK_WAESEM_WW |
+  zwk_valid_reg_overlap(ws2, wd, w_get_lmul_pow()))
 
-function clause execute VAESEM(funct6, vs2, vd) = {
-  let SEW = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute XWK_WAESEM(funct6, ws2, wd) = {
+  let SEW = w_get_sew();
+  let LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(LMUL_pow, SEW);
 
-  if not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
+  if not(w_valid_reg_group(ws2, LMUL_pow)) |
+     not(w_valid_reg_group(wd, LMUL_pow))
   then return Illegal_Instruction();
 
   assert(SEW == 32);
 
-  let vs2_val = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  = read_vreg(num_elem, SEW, LMUL_pow, vd);
+  let ws2_val = read_wreg(num_elem, SEW, LMUL_pow, ws2);
+  let wd_val  = read_wreg(num_elem, SEW, LMUL_pow, wd);
 
-  let eg_len   = (unsigned(vl) / 4);
-  let eg_start = (unsigned(vstart) / 4);
+  let group_count = (unsigned(wl) / 4);
+  let first_group = (unsigned(wstart) / 4);
 
-  foreach (i from eg_start to (eg_len - 1)) {
-    assert(i * 4 + 3 < num_elem);
+  foreach (group_index from first_group to (group_count - 1)) {
+    assert(group_index * 4 + 3 < num_elem);
 
-    let state = get_velem_quad(vd_val, i);
+    let state = get_welem_quad(wd_val, group_index);
     let rkey : bits(128) = match funct6 {
-      ZVK_VAESEM_VV => get_velem_quad(vs2_val, i),
-      ZVK_VAESEM_VS => get_velem_quad(vs2_val, 0),
+      XWK_ZWK_WAESEM_WW => get_welem_quad(ws2_val, group_index),
+      XWK_ZWK_WAESEM_WS => get_welem_quad(ws2_val, 0),
     };
     let sb    = aes_subbytes_fwd(state);
     let sr    = aes_shift_rows_fwd(sb);
     let mix   = aes_mixcolumns_fwd(sr);
     let ark   = mix ^ rkey;
 
-    write_velem_quad(vd, SEW, ark, i);
+    write_welem_quad(wd, SEW, ark, group_index);
   };
 
-  set_vstart(zeros());
+  set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping vaesem_mnemonic : zvk_vaesem_funct6 <-> string = {
-  ZVK_VAESEM_VV <-> "vaesem.vv",
-  ZVK_VAESEM_VS <-> "vaesem.vs",
+mapping wk_aesem_mnemonic : zwk_waesem_funct6 <-> string = {
+  XWK_ZWK_WAESEM_WW <-> "waesem.ww",
+  XWK_ZWK_WAESEM_WS <-> "waesem.ws",
 }
 
-mapping clause assembly = VAESEM(funct6, vs2, vd)
-  <-> vaesem_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2)
+mapping clause assembly = XWK_WAESEM(funct6, ws2, wd)
+  <-> wk_aesem_mnemonic(funct6) ^ spc() ^ wreg_name(wd) ^ sep() ^ wreg_name(ws2)
 
-union clause instruction = VAESKF1_VI : (vregidx, bits(5), vregidx)
+union clause instruction = XWK_WAESKF1_WI : (wregidx, bits(5), wregidx)
 
-$[wavedrom "_ _ _ OPMVV _ OP-VE"]
-mapping clause encdec = VAESKF1_VI(vs2, rnd, vd)
-  <-> 0b1000101 @ encdec_vreg(vs2) @ rnd @ 0b010 @ encdec_vreg(vd) @ 0b1110111
-  when currentlyEnabled(Ext_Zvkned) & get_sew() == 32 & zvk_check_encdec(128, 4)
+$[wavedrom "_ _ _ OPMWW _ CUSTOM-2"]
+mapping clause encdec = XWK_WAESKF1_WI(ws2, rnd, wd)
+  <-> 0b1000101 @ encdec_wreg(ws2) @ rnd @ 0b010 @ encdec_wreg(wd) @ 0b1011011
+  when valid_wtype() & xw_crypto_kned_enabled() & w_get_sew() == 32 & zwk_check_encdec(128, 4)
 
-function clause execute VAESKF1_VI(vs2, rnd, vd) = {
-  let SEW = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute XWK_WAESKF1_WI(ws2, rnd, wd) = {
+  let SEW = w_get_sew();
+  let LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(LMUL_pow, SEW);
 
-  if not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
+  if not(w_valid_reg_group(ws2, LMUL_pow)) |
+     not(w_valid_reg_group(wd, LMUL_pow))
   then return Illegal_Instruction();
 
   assert(SEW == 32);
 
-  let vs2_val = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  = read_vreg(num_elem, SEW, LMUL_pow, vd);
+  let ws2_val = read_wreg(num_elem, SEW, LMUL_pow, ws2);
+  let wd_val  = read_wreg(num_elem, SEW, LMUL_pow, wd);
 
   var rnd_val : bits(5) = rnd;
 
@@ -268,13 +268,13 @@ function clause execute VAESKF1_VI(vs2, rnd, vd) = {
 
   var w : vector(4, bits(32)) = vector_init(zeros());
 
-  let eg_len   = (unsigned(vl) / 4);
-  let eg_start = (unsigned(vstart) / 4);
+  let group_count = (unsigned(wl) / 4);
+  let first_group = (unsigned(wstart) / 4);
 
-  foreach (i from eg_start to (eg_len - 1)) {
-    assert(i * 4 + 3 < num_elem);
+  foreach (group_index from first_group to (group_count - 1)) {
+    assert(group_index * 4 + 3 < num_elem);
 
-    let current_round_key = get_velem_quad_vec(vs2_val, i);
+    let current_round_key = get_welem_quad_vec(ws2_val, group_index);
 
     w[0] = aes_subword_fwd(current_round_key[3] >>> 8) ^
            aes_decode_rcon(r) ^ current_round_key[0];
@@ -282,36 +282,36 @@ function clause execute VAESKF1_VI(vs2, rnd, vd) = {
     w[2] = w[1] ^ current_round_key[2];
     w[3] = w[2] ^ current_round_key[3];
 
-    write_velem_quad_vec(vd, SEW, w, i);
+    write_welem_quad_vec(wd, SEW, w, group_index);
   };
 
-  set_vstart(zeros());
+  set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VAESKF1_VI(vs2, rnd, vd)
-  <-> "vaeskf1.vi" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ hex_bits_5(rnd)
+mapping clause assembly = XWK_WAESKF1_WI(ws2, rnd, wd)
+  <-> "waeskf1.wi" ^ spc() ^ wreg_name(wd) ^ sep() ^ wreg_name(ws2) ^ sep() ^ hex_bits_5(rnd)
 
-union clause instruction = VAESKF2_VI : (vregidx, bits(5), vregidx)
+union clause instruction = XWK_WAESKF2_WI : (wregidx, bits(5), wregidx)
 
-$[wavedrom "_ _ _ _ OPMVV _ OP-VE"]
-mapping clause encdec = VAESKF2_VI(vs2, rnd, vd)
-  <-> 0b101010 @ 0b1 @ encdec_vreg(vs2) @ rnd @ 0b010 @ encdec_vreg(vd) @ 0b1110111
-  when currentlyEnabled(Ext_Zvkned) & get_sew() == 32 & zvk_check_encdec(128, 4)
+$[wavedrom "_ _ _ _ OPMWW _ CUSTOM-2"]
+mapping clause encdec = XWK_WAESKF2_WI(ws2, rnd, wd)
+  <-> 0b101010 @ 0b1 @ encdec_wreg(ws2) @ rnd @ 0b010 @ encdec_wreg(wd) @ 0b1011011
+  when valid_wtype() & xw_crypto_kned_enabled() & w_get_sew() == 32 & zwk_check_encdec(128, 4)
 
-function clause execute VAESKF2_VI(vs2, rnd, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute XWK_WAESKF2_WI(ws2, rnd, wd) = {
+  let SEW      = w_get_sew();
+  let LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(LMUL_pow, SEW);
 
-  if not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
+  if not(w_valid_reg_group(ws2, LMUL_pow)) |
+     not(w_valid_reg_group(wd, LMUL_pow))
   then return Illegal_Instruction();
 
   assert(SEW == 32);
 
-  let vs2_val = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  = read_vreg(num_elem, SEW, LMUL_pow, vd);
+  let ws2_val = read_wreg(num_elem, SEW, LMUL_pow, ws2);
+  let wd_val  = read_wreg(num_elem, SEW, LMUL_pow, wd);
 
   var rnd_val : bits(4) = rnd[3..0];
 
@@ -320,14 +320,14 @@ function clause execute VAESKF2_VI(vs2, rnd, vd) = {
 
   var w : vector(4, bits(32)) = vector_init(zeros());
 
-  let eg_len   = (unsigned(vl) / 4);
-  let eg_start = (unsigned(vstart) / 4);
+  let group_count = (unsigned(wl) / 4);
+  let first_group = (unsigned(wstart) / 4);
 
-  foreach (i from eg_start to (eg_len - 1)) {
-    assert(i * 4 + 3 < num_elem);
+  foreach (group_index from first_group to (group_count - 1)) {
+    assert(group_index * 4 + 3 < num_elem);
 
-    let current_round_key = get_velem_quad_vec(vs2_val, i);
-    let round_key_b       = get_velem_quad_vec(vd_val, i);
+    let current_round_key = get_welem_quad_vec(ws2_val, group_index);
+    let round_key_b       = get_welem_quad_vec(wd_val, group_index);
 
     w[0] = if (rnd_val[0] == 0b1)
            then aes_subword_fwd(current_round_key[3]) ^ round_key_b[0]
@@ -337,53 +337,53 @@ function clause execute VAESKF2_VI(vs2, rnd, vd) = {
     w[2] = w[1] ^ round_key_b[2];
     w[3] = w[2] ^ round_key_b[3];
 
-    write_velem_quad_vec(vd, SEW, w, i)
+    write_welem_quad_vec(wd, SEW, w, group_index)
   };
 
-  set_vstart(zeros());
+  set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VAESKF2_VI(vs2, rnd, vd)
-  <-> "vaeskf2.vi" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ hex_bits_5(rnd)
+mapping clause assembly = XWK_WAESKF2_WI(ws2, rnd, wd)
+  <-> "waeskf2.wi" ^ spc() ^ wreg_name(wd) ^ sep() ^ wreg_name(ws2) ^ sep() ^ hex_bits_5(rnd)
 
-union clause instruction = VAESZ_VS : (vregidx, vregidx)
+union clause instruction = XWK_WAESZ_WS : (wregidx, wregidx)
 
-$[wavedrom "_ _ _ _ OPMVV _ OP-VE"]
-mapping clause encdec = VAESZ_VS(vs2, vd)
-  <-> 0b101001 @ 0b1 @ encdec_vreg(vs2) @ 0b00111 @ 0b010 @ encdec_vreg(vd) @ 0b1110111
-  when currentlyEnabled(Ext_Zvkned) & get_sew() == 32 & zvk_check_encdec(128, 4) & zvk_valid_reg_overlap(vs2, vd, get_lmul_pow())
+$[wavedrom "_ _ _ _ OPMWW _ CUSTOM-2"]
+mapping clause encdec = XWK_WAESZ_WS(ws2, wd)
+  <-> 0b101001 @ 0b1 @ encdec_wreg(ws2) @ 0b00111 @ 0b010 @ encdec_wreg(wd) @ 0b1011011
+  when valid_wtype() & xw_crypto_kned_enabled() & w_get_sew() == 32 & zwk_check_encdec(128, 4) & zwk_valid_reg_overlap(ws2, wd, w_get_lmul_pow())
 
-function clause execute VAESZ_VS(vs2, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute XWK_WAESZ_WS(ws2, wd) = {
+  let SEW      = w_get_sew();
+  let LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(LMUL_pow, SEW);
 
-  if not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
+  if not(w_valid_reg_group(ws2, LMUL_pow)) |
+     not(w_valid_reg_group(wd, LMUL_pow))
   then return Illegal_Instruction();
 
   assert(SEW == 32);
 
-  let vs2_val = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  = read_vreg(num_elem, SEW, LMUL_pow, vd);
+  let ws2_val = read_wreg(num_elem, SEW, LMUL_pow, ws2);
+  let wd_val  = read_wreg(num_elem, SEW, LMUL_pow, wd);
 
-  let eg_len   = (unsigned(vl) / 4);
-  let eg_start = (unsigned(vstart) / 4);
+  let group_count = (unsigned(wl) / 4);
+  let first_group = (unsigned(wstart) / 4);
 
-  foreach (i from eg_start to (eg_len - 1)) {
-    assert(i * 4 + 3 < num_elem);
+  foreach (group_index from first_group to (group_count - 1)) {
+    assert(group_index * 4 + 3 < num_elem);
 
-    let state = get_velem_quad(vd_val, i);
-    let rkey  = get_velem_quad(vs2_val, 0);
+    let state = get_welem_quad(wd_val, group_index);
+    let rkey  = get_welem_quad(ws2_val, 0);
     let ark   = state ^ rkey;
 
-    write_velem_quad(vd, SEW, ark, i)
+    write_welem_quad(wd, SEW, ark, group_index)
   };
 
-  set_vstart(zeros());
+  set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VAESZ_VS(vs2, vd)
-  <-> "vaesz.vs" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2)
+mapping clause assembly = XWK_WAESZ_WS(ws2, wd)
+  <-> "waesz.ws" ^ spc() ^ wreg_name(wd) ^ sep() ^ wreg_name(ws2)

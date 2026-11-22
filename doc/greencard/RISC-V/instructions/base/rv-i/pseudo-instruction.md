@@ -1,62 +1,52 @@
 ## PSEUDO-INSTRUCTIONS
 
-| **Pseudo**   | **Opcode**              | **Format**       | **Constraint**                   |
-|:-------------|:------------------------|:-----------------|:---------------------------------|
-| `nop`        | `addi`                  | `none`           | `rd_eq_x0 rs1_eq_x0 imm_eq_zero` |
-| `#lla,la`    | `{lui,slli,addi,addiw}` | `rd,symbol`      | `-`                              |
-| `#la`        | `auipc,{ld,lw}`         | `rd,symbol`      | `-`                              |
-| `#lla,la`    | `auipc,addi`            | `rd,symbol`      | `-`                              |
-| `#la.tls.gd` | `auipc,addi`            | `rd,symbol`      | `-`                              |
-| `#la.tls.ie` | `auipc,{ld,lw}`         | `rd,symbol`      | `-`                              |
-| `#li`        | `{lui,slli,addi,addiw}` | `rd,rs1`         | `-`                              |
-| `mv`         | `addi`                  | `rd,rs1`         | `imm_eq_zero`                    |
-| `not`        | `xori`                  | `rd,rs1`         | `imm_eq_n1`                      |
-| `neg`        | `sub`                   | `rd,rs2`         | `rs1_eq_x0`                      |
-| `negw`       | `subw`                  | `rd,rs2`         | `rs1_eq_x0`                      |
-| `sext.w`     | `addiw`                 | `rd,rs1`         | `imm_eq_zero`                    |
-| `seqz`       | `sltiu`                 | `rd,rs1`         | `imm_eq_p1`                      |
-| `snez`       | `sltu`                  | `rd,rs2`         | `rs1_eq_x0`                      |
-| `sltz`       | `slt`                   | `rd,rs1`         | `rs2_eq_x0`                      |
-| `sgtz`       | `slt`                   | `rd,rs2`         | `rs1_eq_x0`                      |
-| `fmv.s`      | `fsgnj.s`               | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fabs.s`     | `fsgnjx.s`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fneg.s`     | `fsgnjn.s`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fmv.d`      | `fsgnj.d`               | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fabs.d`     | `fsgnjx.d`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fneg.d`     | `fsgnjn.d`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fmv.q`      | `fsgnj.q`               | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fabs.q`     | `fsgnjx.q`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fneg.q`     | `fsgnjn.q`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `beqz`       | `beq`                   | `rs1,offset`     | `rs2_eq_x0`                      |
-| `bnez`       | `bne`                   | `rs1,offset`     | `rs2_eq_x0`                      |
-| `blez`       | `bge`                   | `rs2,offset`     | `rs1_eq_x0`                      |
-| `bgez`       | `bge`                   | `rs1,offset`     | `rs2_eq_x0`                      |
-| `bltz`       | `blt`                   | `rs1,offset`     | `rs2_eq_x0`                      |
-| `bgtz`       | `blt`                   | `rs2,offset`     | `rs1_eq_x0`                      |
-| `ble`        | `bge`                   | `rs2,rs1,offset` | `-`                              |
-| `bleu`       | `bgeu`                  | `rs2,rs1,offset` | `-`                              |
-| `bgt`        | `blt`                   | `rs2,rs1,offset` | `-`                              |
-| `bgtu`       | `bltu`                  | `rs2,rs1,offset` | `-`                              |
-| `j`          | `jal`                   | `offset`         | `rd_eq_x0`                       |
-| `jal`        | `jal`                   | `offset`         | `rd_eq_ra`                       |
-| `ret`        | `jalr`                  | `none`           | `rd_eq_x0 rs1_eq_ra`             |
-| `jr`         | `jalr`                  | `rs1`            | `rd_eq_x0 imm_eq_zero`           |
-| `jalr`       | `jalr`                  | `rs1`            | `rd_eq_ra imm_eq_zero`           |
-| `#call`      | `{auipc,jalr}`          | `offset`         | `-`                              |
-| `#tail`      | `{auipc,jalr}`          | `offset`         | `-`                              |
-| `rdcycle`    | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc00`         |
-| `rdtime`     | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc01`         |
-| `rdinstret`  | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc02`         |
-| `rdcycleh`   | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc80`         |
-| `rdtimeh`    | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc81`         |
-| `rdinstreth` | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc82`         |
-| `frcsr`      | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0x003`         |
-| `frrm`       | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0x002`         |
-| `frflags`    | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0x001`         |
-| `fscsr`      | `csrrw`                 | `rd,rs1`         | `csr_eq_0x003`                   |
-| `fsrm`       | `csrrw`                 | `rd,rs1`         | `csr_eq_0x002`                   |
-| `fsflags`    | `csrrw`                 | `rd,rs1`         | `csr_eq_0x001`                   |
-| `fsrmi`      | `csrrwi`                | `rd,zimm`        | `csr_eq_0x002`                   |
-| `fsflagsi`   | `csrrwi`                | `rd,zimm`        | `csr_eq_0x001`                   |
+| **Extension** | **Name** | **Variable-Fields**            | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:---------|:-------------------------------|:-----------------------|:-----------------------------------|
+| `rv_i`        | `fence`  | `rs1, rd`                      | `fence_tso`            | `100000110011-----000-----0001111` |
+| `rv_i`        | `fence`  | `none`                         | `pause`                | `00000001000000000000000000001111` |
+| `rv_i`        | `ecall`  | `none`                         | `scall`                | `00000000000000000000000001110011` |
+| `rv_i`        | `ebreak` | `none`                         | `sbreak`               | `00000000000100000000000001110011` |
+| `rv_i`        | `addi`   | `rd, rs1`                      | `mv`                   | `000000000000-----000-----0010011` |
+| `rv_i`        | `sub`    | `rd, rs2`                      | `neg`                  | `0100000-----00000000-----0110011` |
+| `rv_i`        | `addi`   | `none`                         | `nop`                  | `00000000000000000000000000010011` |
+| `rv_i`        | `andi`   | `rd, rs1`                      | `zext_b`               | `000011111111-----111-----0010011` |
+| `rv_i`        | `jalr`   | `none`                         | `ret`                  | `00000000000000001000000001100111` |
+| `rv_i`        | `bgeu`   | `bimm12hi, rs2, rs1, bimm12lo` | `bleu`                 | `-----------------111-----1100011` |
+| `rv_i`        | `bltu`   | `bimm12hi, rs2, rs1, bimm12lo` | `bgtu`                 | `-----------------110-----1100011` |
+| `rv_i`        | `bge`    | `bimm12hi, rs2, rs1, bimm12lo` | `ble`                  | `-----------------101-----1100011` |
+| `rv_i`        | `bge`    | `bimm12hi, rs1, bimm12lo`      | `bgez`                 | `-------00000-----101-----1100011` |
+| `rv_i`        | `bge`    | `bimm12hi, rs2, bimm12lo`      | `blez`                 | `------------00000101-----1100011` |
+| `rv_i`        | `blt`    | `bimm12hi, rs2, rs1, bimm12lo` | `bgt`                  | `-----------------100-----1100011` |
+| `rv_i`        | `blt`    | `bimm12hi, rs2, bimm12lo`      | `bgtz`                 | `------------00000100-----1100011` |
+| `rv_i`        | `blt`    | `bimm12hi, rs1, bimm12lo`      | `bltz`                 | `-------00000-----100-----1100011` |
+| `rv_i`        | `bne`    | `bimm12hi, rs1, bimm12lo`      | `bnez`                 | `-------00000-----001-----1100011` |
+| `rv_i`        | `beq`    | `bimm12hi, rs1, bimm12lo`      | `beqz`                 | `-------00000-----000-----1100011` |
+| `rv_i`        | `sltiu`  | `rd, rs1`                      | `seqz`                 | `000000000001-----011-----0010011` |
+| `rv_i`        | `sltu`   | `rd, rs2`                      | `snez`                 | `0000000-----00000011-----0110011` |
+| `rv_i`        | `slt`    | `rd, rs1`                      | `sltz`                 | `000000000000-----010-----0110011` |
+| `rv_i`        | `slt`    | `rd, rs2`                      | `sgtz`                 | `0000000-----00000010-----0110011` |
+| `rv_i`        | `jalr`   | `rs1`                          | `jalr`                 | `000000000000-----000000011100111` |
+| `rv_i`        | `jalr`   | `rs1`                          | `jr`                   | `000000000000-----000000001100111` |
+| `rv_i`        | `jal`    | `jimm20`                       | `jal`                  | `--------------------000011101111` |
+| `rv_i`        | `jal`    | `jimm20`                       | `j`                    | `--------------------000001101111` |
 
-:Pseudo-Instructions
+:RVI - RVI Base Integer Instruction Set
+
+| **Extension** | **Name** | **Variable-Fields** | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:---------|:--------------------|:-----------------------|:-----------------------------------|
+| `rv64_i`      | `slli`   | `rd, rs1, shamtw`   | `slli`                 | `0000000----------001-----0010011` |
+| `rv64_i`      | `srli`   | `rd, rs1, shamtw`   | `srli`                 | `0000000----------101-----0010011` |
+| `rv64_i`      | `srai`   | `rd, rs1, shamtw`   | `srai`                 | `0100000----------101-----0010011` |
+| `rv64_i`      | `slli`   | `rd, rs1, shamtw`   | `slli_rv32`            | `0000000----------001-----0010011` |
+| `rv64_i`      | `srli`   | `rd, rs1, shamtw`   | `srli_rv32`            | `0000000----------101-----0010011` |
+| `rv64_i`      | `srai`   | `rd, rs1, shamtw`   | `srai_rv32`            | `0100000----------101-----0010011` |
+| `rv64_i`      | `addiw`  | `rd, rs1`           | `sext_w`               | `000000000000-----000-----0011011` |
+
+:RV64I - RV64I Base Integer Instruction Set (+ RV32I)
+
+| **Extension** | **Name** | **Variable-Fields** | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:---------|:--------------------|:-----------------------|:-----------------------------------|
+| `rv_zilx`     | `lxsb`   | `rd, rs1, rs2`      | `lxb`                  | `1101000----------000-----0101111` |
+| `rv_zilx`     | `lxsbu`  | `rd, rs1, rs2`      | `lxbu`                 | `1101000----------100-----0101111` |
+
+:RVZI - RVZI Base Integer Instruction Set

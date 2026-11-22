@@ -1,238 +1,149 @@
 ## INSTRUCTION CLASSES
 
-| **Instruction** | **Class**       |
-|:----------------|:----------------|
-| `lui`           | `alu`           |
-| `auipc`         | `alu`           |
-| `jal`           | `jump`          |
-| `jalr`          | `jump,indirect` |
-| `beq`           | `branch`        |
-| `bne`           | `branch`        |
-| `blt`           | `branch`        |
-| `bge`           | `branch`        |
-| `bltu`          | `branch`        |
-| `bgeu`          | `branch`        |
-| `lb`            | `load`          |
-| `lh`            | `load`          |
-| `lw`            | `load`          |
-| `lbu`           | `load`          |
-| `lhu`           | `load`          |
-| `lwu`           | `load`          |
-| `sb`            | `store`         |
-| `sh`            | `store`         |
-| `sw`            | `store`         |
-| `addi`          | `alu`           |
-| `slti`          | `alu`           |
-| `sltiu`         | `alu`           |
-| `xori`          | `alu`           |
-| `ori`           | `alu`           |
-| `andi`          | `alu`           |
-| `slli`          | `alu`           |
-| `srli`          | `alu`           |
-| `srai`          | `alu`           |
-| `add`           | `alu`           |
-| `sub`           | `alu`           |
-| `sll`           | `alu`           |
-| `slt`           | `alu`           |
-| `sltu`          | `alu`           |
-| `xor`           | `alu`           |
-| `srl`           | `alu`           |
-| `sra`           | `alu`           |
-| `or`            | `alu`           |
-| `and`           | `alu`           |
-| `fence`         | `fence`         |
-| `fence.i`       | `fence`         |
+| **Extension** | **Name**     | **Variable-Fields** | **Class**      |
+|:--------------|:-------------|:--------------------|:---------------|
+| `rv_zk`       | `andn`       | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zk`       | `clmul`      | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zk`       | `clmulh`     | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zkn`      | `andn`       | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zkn`      | `clmul`      | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zkn`      | `clmulh`     | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zknh`     | `sha256sig0` | `rd, rs1`           | `cryptography` |
+| `rv_zknh`     | `sha256sig1` | `rd, rs1`           | `cryptography` |
+| `rv_zknh`     | `sha256sum0` | `rd, rs1`           | `cryptography` |
+| `rv_zknh`     | `sha256sum1` | `rd, rs1`           | `cryptography` |
+| `rv_zkn`      | `orn`        | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zkn`      | `pack`       | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zkn`      | `packh`      | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zkn`      | `rol`        | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zkn`      | `ror`        | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zkn`      | `sha256sig0` | `rd, rs1`           | `cryptography` |
+| `rv_zkn`      | `sha256sig1` | `rd, rs1`           | `cryptography` |
+| `rv_zkn`      | `sha256sum0` | `rd, rs1`           | `cryptography` |
+| `rv_zkn`      | `sha256sum1` | `rd, rs1`           | `cryptography` |
+| `rv_zkn`      | `xnor`       | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zkn`      | `xperm4`     | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zkn`      | `xperm8`     | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zk`       | `orn`        | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zk`       | `pack`       | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zk`       | `packh`      | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zk`       | `rol`        | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zk`       | `ror`        | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zks`      | `andn`       | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zks`      | `clmul`      | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zks`      | `clmulh`     | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zksed`    | `sm4ed`      | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv_zksed`    | `sm4ks`      | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv_zk`       | `sha256sig0` | `rd, rs1`           | `cryptography` |
+| `rv_zk`       | `sha256sig1` | `rd, rs1`           | `cryptography` |
+| `rv_zk`       | `sha256sum0` | `rd, rs1`           | `cryptography` |
+| `rv_zk`       | `sha256sum1` | `rd, rs1`           | `cryptography` |
+| `rv_zksh`     | `sm3p0`      | `rd, rs1`           | `cryptography` |
+| `rv_zksh`     | `sm3p1`      | `rd, rs1`           | `cryptography` |
+| `rv_zks`      | `orn`        | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zks`      | `pack`       | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zks`      | `packh`      | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zks`      | `rol`        | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zks`      | `ror`        | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zks`      | `sm3p0`      | `rd, rs1`           | `cryptography` |
+| `rv_zks`      | `sm3p1`      | `rd, rs1`           | `cryptography` |
+| `rv_zks`      | `sm4ed`      | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv_zks`      | `sm4ks`      | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv_zks`      | `xnor`       | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zks`      | `xperm4`     | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zks`      | `xperm8`     | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zk`       | `xnor`       | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zk`       | `xperm4`     | `rd, rs1, rs2`      | `cryptography` |
+| `rv_zk`       | `xperm8`     | `rd, rs1, rs2`      | `cryptography` |
 
-:RV32I - "RV32I Base Integer Instruction Set"
+:RVZXK - Specific Extension for Scalar Cryptography Instructions
 
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `ld`            | `load`    |
-| `sd`            | `store`   |
-| `addiw`         | `alu`     |
-| `slliw`         | `alu`     |
-| `srliw`         | `alu`     |
-| `sraiw`         | `alu`     |
-| `addw`          | `alu`     |
-| `subw`          | `alu`     |
-| `sllw`          | `alu`     |
-| `srlw`          | `alu`     |
-| `sraw`          | `alu`     |
+| **Extension** | **Name**      | **Variable-Fields** | **Class**      |
+|:--------------|:--------------|:--------------------|:---------------|
+| `rv32_zk`     | `aes32dsi`    | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv32_zk`     | `aes32dsmi`   | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv32_zk`     | `aes32esi`    | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv32_zk`     | `aes32esmi`   | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv32_zkn`    | `aes32dsi`    | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv32_zkn`    | `aes32dsmi`   | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv32_zkn`    | `aes32esi`    | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv32_zkn`    | `aes32esmi`   | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv32_zknd`   | `aes32dsi`    | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv32_zknd`   | `aes32dsmi`   | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv32_zkne`   | `aes32esi`    | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv32_zkne`   | `aes32esmi`   | `rd, rs1, rs2, bs`  | `cryptography` |
+| `rv32_zknh`   | `sha512sig0h` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zknh`   | `sha512sig0l` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zknh`   | `sha512sig1h` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zknh`   | `sha512sig1l` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zknh`   | `sha512sum0r` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zknh`   | `sha512sum1r` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zkn`    | `sha512sig0h` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zkn`    | `sha512sig0l` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zkn`    | `sha512sig1h` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zkn`    | `sha512sig1l` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zkn`    | `sha512sum0r` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zkn`    | `sha512sum1r` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zk`     | `sha512sig0h` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zk`     | `sha512sig0l` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zk`     | `sha512sig1h` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zk`     | `sha512sig1l` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zk`     | `sha512sum0r` | `rd, rs1, rs2`      | `cryptography` |
+| `rv32_zk`     | `sha512sum1r` | `rd, rs1, rs2`      | `cryptography` |
 
-:RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
+:RV32ZXK - Specific Extension for Scalar Cryptography Instructions (32 bit)
 
-| **Instruction** | **Class**      |
-|:----------------|:---------------|
-| `mul`           | `alu,multiply` |
-| `mulh`          | `alu,multiply` |
-| `mulhsu`        | `alu,multiply` |
-| `mulhu`         | `alu,multiply` |
-| `div`           | `alu,divide`   |
-| `divu`          | `alu,divide`   |
-| `rem`           | `alu,divide`   |
-| `remu`          | `alu,divide`   |
+| **Extension** | **Name**     | **Variable-Fields** | **Class**      |
+|:--------------|:-------------|:--------------------|:---------------|
+| `rv64_zk`     | `aes64ds`    | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zk`     | `aes64dsm`   | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zk`     | `aes64es`    | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zk`     | `aes64esm`   | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zk`     | `aes64im`    | `rd, rs1`           | `cryptography` |
+| `rv64_zk`     | `aes64ks1i`  | `rd, rs1, rnum`     | `cryptography` |
+| `rv64_zk`     | `aes64ks2`   | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zkn`    | `aes64ds`    | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zkn`    | `aes64dsm`   | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zkn`    | `aes64es`    | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zkn`    | `aes64esm`   | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zkn`    | `aes64im`    | `rd, rs1`           | `cryptography` |
+| `rv64_zkn`    | `aes64ks1i`  | `rd, rs1, rnum`     | `cryptography` |
+| `rv64_zkn`    | `aes64ks2`   | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zknd`   | `aes64ds`    | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zknd`   | `aes64dsm`   | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zknd`   | `aes64im`    | `rd, rs1`           | `cryptography` |
+| `rv64_zknd`   | `aes64ks1i`  | `rd, rs1, rnum`     | `cryptography` |
+| `rv64_zknd`   | `aes64ks2`   | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zkne`   | `aes64es`    | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zkne`   | `aes64esm`   | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zkne`   | `aes64ks1i`  | `rd, rs1, rnum`     | `cryptography` |
+| `rv64_zkne`   | `aes64ks2`   | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zknh`   | `sha512sig0` | `rd, rs1`           | `cryptography` |
+| `rv64_zknh`   | `sha512sig1` | `rd, rs1`           | `cryptography` |
+| `rv64_zknh`   | `sha512sum0` | `rd, rs1`           | `cryptography` |
+| `rv64_zknh`   | `sha512sum1` | `rd, rs1`           | `cryptography` |
+| `rv64_zkn`    | `packw`      | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zkn`    | `rolw`       | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zkn`    | `rori`       | `rd, rs1, shamtd`   | `cryptography` |
+| `rv64_zkn`    | `roriw`      | `rd, rs1, shamtw`   | `cryptography` |
+| `rv64_zkn`    | `rorw`       | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zkn`    | `sha512sig0` | `rd, rs1`           | `cryptography` |
+| `rv64_zkn`    | `sha512sig1` | `rd, rs1`           | `cryptography` |
+| `rv64_zkn`    | `sha512sum0` | `rd, rs1`           | `cryptography` |
+| `rv64_zkn`    | `sha512sum1` | `rd, rs1`           | `cryptography` |
+| `rv64_zk`     | `packw`      | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zk`     | `rolw`       | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zk`     | `rori`       | `rd, rs1, shamtd`   | `cryptography` |
+| `rv64_zk`     | `roriw`      | `rd, rs1, shamtw`   | `cryptography` |
+| `rv64_zk`     | `rorw`       | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zk`     | `sha512sig0` | `rd, rs1`           | `cryptography` |
+| `rv64_zk`     | `sha512sig1` | `rd, rs1`           | `cryptography` |
+| `rv64_zk`     | `sha512sum0` | `rd, rs1`           | `cryptography` |
+| `rv64_zk`     | `sha512sum1` | `rd, rs1`           | `cryptography` |
+| `rv64_zks`    | `packw`      | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zks`    | `rolw`       | `rd, rs1, rs2`      | `cryptography` |
+| `rv64_zks`    | `rori`       | `rd, rs1, shamtd`   | `cryptography` |
+| `rv64_zks`    | `roriw`      | `rd, rs1, shamtw`   | `cryptography` |
+| `rv64_zks`    | `rorw`       | `rd, rs1, rs2`      | `cryptography` |
 
-:RV32M - "RV32M Standard Extension for Integer Multiply and Divide"
-
-| **Instruction** | **Class**      |
-|:----------------|:---------------|
-| `mulw`          | `alu,multiply` |
-| `divw`          | `alu,multiply` |
-| `divuw`         | `alu,multiply` |
-| `remw`          | `alu,divide`   |
-| `remuw`         | `alu,divide`   |
-
-:RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `lr.w`          | `atomic`  |
-| `sc.w`          | `atomic`  |
-| `amoswap.w`     | `atomic`  |
-| `amoadd.w`      | `atomic`  |
-| `amoxor.w`      | `atomic`  |
-| `amoor.w`       | `atomic`  |
-| `amoand.w`      | `atomic`  |
-| `amomin.w`      | `atomic`  |
-| `amomax.w`      | `atomic`  |
-| `amominu.w`     | `atomic`  |
-| `amomaxu.w`     | `atomic`  |
-
-:RV32A - "RV32A Standard Extension for Atomic Instructions"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `lr.d`          | `atomic`  |
-| `sc.d`          | `atomic`  |
-| `amoswap.d`     | `atomic`  |
-| `amoadd.d`      | `atomic`  |
-| `amoxor.d`      | `atomic`  |
-| `amoor.d`       | `atomic`  |
-| `amoand.d`      | `atomic`  |
-| `amomin.d`      | `atomic`  |
-| `amomax.d`      | `atomic`  |
-| `amominu.d`     | `atomic`  |
-| `amomaxu.d`     | `atomic`  |
-
-:RV64A - "RV64A Standard Extension for Atomic Instructions (+ RV32A)"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `ecall`         | `system`  |
-| `ebreak`        | `system`  |
-| `uret`          | `system`  |
-| `sret`          | `system`  |
-| `hret`          | `system`  |
-| `mret`          | `system`  |
-| `dret`          | `system`  |
-| `sfence.vm`     | `system`  |
-| `wfi`           | `system`  |
-| `rdcycle`       | `csr`     |
-| `rdtime`        | `csr`     |
-| `rdinstret`     | `csr`     |
-| `rdcycleh`      | `csr`     |
-| `rdtimeh`       | `csr`     |
-| `rdinstreth`    | `csr`     |
-| `csrrw`         | `csr`     |
-| `csrrs`         | `csr`     |
-| `csrrc`         | `csr`     |
-| `csrrwi`        | `csr`     |
-| `csrrsi`        | `csr`     |
-| `csrrci`        | `csr`     |
-
-:RV32S - "RV32S Standard Extension for Supervisor-level Instructions"
-
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `flw`           | `fpu,load`  |
-| `fsw`           | `fpu,store` |
-| `fmadd.s`       | `fpu,fma`   |
-| `fmsub.s`       | `fpu,fma`   |
-| `fnmadd.s`      | `fpu,fma`   |
-| `fnmsub.s`      | `fpu,fma`   |
-| `fadd.s`        | `fpu`       |
-| `fsub.s`        | `fpu`       |
-| `fmul.s`        | `fpu`       |
-| `fdiv.s`        | `fpu,fdiv`  |
-| `fsgnj.s`       | `fpu`       |
-| `fsgnjn.s`      | `fpu`       |
-| `fsgnjx.s`      | `fpu`       |
-| `fmin.s`        | `fpu`       |
-| `fmax.s`        | `fpu`       |
-| `fsqrt.s`       | `fpu,fsqrt` |
-| `fle.s`         | `fpu`       |
-| `flt.s`         | `fpu`       |
-| `feq.s`         | `fpu`       |
-| `fcvt.w.s`      | `fpu,fcvt`  |
-| `fcvt.wu.s`     | `fpu,fcvt`  |
-| `fcvt.s.w`      | `fpu,fcvt`  |
-| `fcvt.s.wu`     | `fpu,fcvt`  |
-| `fmv.x.s`       | `fpu,fmove` |
-| `fclass.s`      | `fpu`       |
-| `fmv.s.x`       | `fpu,fmove` |
-
-:RV32F - "RV32F Standard Extension for Single-Precision Floating-Point"
-
-| **Instruction** | **Class**  |
-|:----------------|:-----------|
-| `fcvt.l.s`      | `fpu,fcvt` |
-| `fcvt.lu.s`     | `fpu,fcvt` |
-| `fcvt.s.l`      | `fpu,fcvt` |
-| `fcvt.s.lu`     | `fpu,fcvt` |
-
-:RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
-
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `fld`           | `fpu,load`  |
-| `fsd`           | `fpu,store` |
-| `fmadd.d`       | `fpu,fma`   |
-| `fmsub.d`       | `fpu,fma`   |
-| `fnmadd.d`      | `fpu,fma`   |
-| `fnmsub.d`      | `fpu,fma`   |
-| `fadd.d`        | `fpu`       |
-| `fsub.d`        | `fpu`       |
-| `fmul.d`        | `fpu`       |
-| `fdiv.d`        | `fpu,fdiv`  |
-| `fsgnj.d`       | `fpu`       |
-| `fsgnjn.d`      | `fpu`       |
-| `fsgnjx.d`      | `fpu`       |
-| `fmin.d`        | `fpu`       |
-| `fmax.d`        | `fpu`       |
-| `fcvt.s.d`      | `fpu,fcvt`  |
-| `fcvt.d.s`      | `fpu,fcvt`  |
-| `fsqrt.d`       | `fpu,fsqrt` |
-| `fle.d`         | `fpu`       |
-| `flt.d`         | `fpu`       |
-| `feq.d`         | `fpu`       |
-| `fcvt.w.d`      | `fpu,fcvt`  |
-| `fcvt.wu.d`     | `fpu,fcvt`  |
-| `fcvt.d.w`      | `fpu,fcvt`  |
-| `fcvt.d.wu`     | `fpu,fcvt`  |
-| `fclass.d`      | `fpu`       |
-
-:RV32D - "RV32D Standard Extension for Double-Precision Floating-Point"
-
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `fcvt.l.d`      | `fpu,fcvt`  |
-| `fcvt.lu.d`     | `fpu,fcvt`  |
-| `fmv.x.d`       | `fpu,fmove` |
-| `fcvt.d.l`      | `fpu,fcvt`  |
-| `fcvt.d.lu`     | `fpu,fcvt`  |
-| `fmv.d.x`       | `fpu,fmove` |
-
-:RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32D)"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `frcsr`         | `csr`     |
-| `frrm`          | `csr`     |
-| `frflags`       | `csr`     |
-| `fscsr`         | `csr`     |
-| `fsrm`          | `csr`     |
-| `fsflags`       | `csr`     |
-| `fsrmi`         | `csr`     |
-| `fsflagsi`      | `csr`     |
-
-:RV32FD - "RV32F and RV32D Common Floating-Point Instructions"
+:RV64ZXK - Specific Extension for Scalar Cryptography Instructions (64 bit)

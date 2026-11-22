@@ -1,56 +1,45 @@
-# Specialized Fences
+## PSEUDO-INSTRUCTIONS
 
-```
-$pseudo_op rv_e::fence fence.tso 31..28=8 27..24=3 23..20=3 rs1 14..12=0 rd 6..2=0x03 1..0=3
-$pseudo_op rv_e::fence pause     31..28=0 27..24=1 23..20=0 19..15=0      14..12=0 11..7=0      6..2=0x03 1..0=3
-ecall    31..20=0x000 19..7=0 6..2=0x1C 1..0=3
-ebreak   31..20=0x001 19..7=0 6..2=0x1C 1..0=3
-```
+| **Extension** | **Name** | **Variable-Fields**            | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:---------|:-------------------------------|:-----------------------|:-----------------------------------|
+| `rv_e`        | `fence`  | `rs1, rd`                      | `fence_tso`            | `100000110011-----000-----0001111` |
+| `rv_e`        | `fence`  | `none`                         | `pause`                | `00000001000000000000000000001111` |
+| `rv_e`        | `ecall`  | `none`                         | `scall`                | `00000000000000000000000001110011` |
+| `rv_e`        | `ebreak` | `none`                         | `sbreak`               | `00000000000100000000000001110011` |
+| `rv_e`        | `addi`   | `rd, rs1`                      | `mv`                   | `000000000000-----000-----0010011` |
+| `rv_e`        | `sub`    | `rd, rs2`                      | `neg`                  | `0100000-----00000000-----0110011` |
+| `rv_e`        | `addi`   | `none`                         | `nop`                  | `00000000000000000000000000010011` |
+| `rv_e`        | `andi`   | `rd, rs1`                      | `zext_b`               | `000011111111-----111-----0010011` |
+| `rv_e`        | `jalr`   | `none`                         | `ret`                  | `00000000000000001000000001100111` |
+| `rv_e`        | `bgeu`   | `bimm12hi, rs2, rs1, bimm12lo` | `bleu`                 | `-----------------111-----1100011` |
+| `rv_e`        | `bltu`   | `bimm12hi, rs2, rs1, bimm12lo` | `bgtu`                 | `-----------------110-----1100011` |
+| `rv_e`        | `bge`    | `bimm12hi, rs2, rs1, bimm12lo` | `ble`                  | `-----------------101-----1100011` |
+| `rv_e`        | `bge`    | `bimm12hi, rs1, bimm12lo`      | `bgez`                 | `-------00000-----101-----1100011` |
+| `rv_e`        | `bge`    | `bimm12hi, rs2, bimm12lo`      | `blez`                 | `------------00000101-----1100011` |
+| `rv_e`        | `blt`    | `bimm12hi, rs2, rs1, bimm12lo` | `bgt`                  | `-----------------100-----1100011` |
+| `rv_e`        | `blt`    | `bimm12hi, rs2, bimm12lo`      | `bgtz`                 | `------------00000100-----1100011` |
+| `rv_e`        | `blt`    | `bimm12hi, rs1, bimm12lo`      | `bltz`                 | `-------00000-----100-----1100011` |
+| `rv_e`        | `bne`    | `bimm12hi, rs1, bimm12lo`      | `bnez`                 | `-------00000-----001-----1100011` |
+| `rv_e`        | `beq`    | `bimm12hi, rs1, bimm12lo`      | `beqz`                 | `-------00000-----000-----1100011` |
+| `rv_e`        | `sltiu`  | `rd, rs1`                      | `seqz`                 | `000000000001-----011-----0010011` |
+| `rv_e`        | `sltu`   | `rd, rs2`                      | `snez`                 | `0000000-----00000011-----0110011` |
+| `rv_e`        | `slt`    | `rd, rs1`                      | `sltz`                 | `000000000000-----010-----0110011` |
+| `rv_e`        | `slt`    | `rd, rs2`                      | `sgtz`                 | `0000000-----00000010-----0110011` |
+| `rv_e`        | `jalr`   | `rs1`                          | `jalr`                 | `000000000000-----000000011100111` |
+| `rv_e`        | `jalr`   | `rs1`                          | `jr`                   | `000000000000-----000000001100111` |
+| `rv_e`        | `jal`    | `jimm20`                       | `jal`                  | `--------------------000011101111` |
+| `rv_e`        | `jal`    | `jimm20`                       | `j`                    | `--------------------000001101111` |
 
-# Old Names for ecall/ebreak
+:RVE - RVE Base Embedded Instruction Set
 
-```
-$pseudo_op rv_e::ecall scall     11..7=0 19..15=0 31..20=0x000 14..12=0 6..2=0x1C 1..0=3
-$pseudo_op rv_e::ebreak sbreak    11..7=0 19..15=0 31..20=0x001 14..12=0 6..2=0x1C 1..0=3
-```
+| **Extension** | **Name** | **Variable-Fields** | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:---------|:--------------------|:-----------------------|:-----------------------------------|
+| `rv64_e`      | `slli`   | `rd, rs1, shamtw`   | `slli`                 | `0000000----------001-----0010011` |
+| `rv64_e`      | `srli`   | `rd, rs1, shamtw`   | `srli`                 | `0000000----------101-----0010011` |
+| `rv64_e`      | `srai`   | `rd, rs1, shamtw`   | `srai`                 | `0100000----------101-----0010011` |
+| `rv64_e`      | `slli`   | `rd, rs1, shamtw`   | `slli_rv32`            | `0000000----------001-----0010011` |
+| `rv64_e`      | `srli`   | `rd, rs1, shamtw`   | `srli_rv32`            | `0000000----------101-----0010011` |
+| `rv64_e`      | `srai`   | `rd, rs1, shamtw`   | `srai_rv32`            | `0100000----------101-----0010011` |
+| `rv64_e`      | `addiw`  | `rd, rs1`           | `sext_w`               | `000000000000-----000-----0011011` |
 
-# Pseudo-Instructions from ASM Manual
-
-```
-$pseudo_op rv_e::addi   mv rd rs1 31..20=0 14..12=0 6..2=0x04 1..0=3
-$pseudo_op rv_e::sub    neg rd rs1 31..25=32 24..20=0x0 14..12=0 6..2=0x0C 1..0=3
-$pseudo_op rv_e::addi   nop 31..20=0 19..15=0 14..12=0 11..7=0 6..2=0x04 1..0=3
-$pseudo_op rv_e::andi   zext.b rd rs1 31..20=0xff 14..12=7 6..2=0x04 1..0=3
-
-$pseudo_op rv_e::jalr ret 31..20=0 19..15=0x01 14..12=0 11..7=0 6..2=0x19 1..0=3
-
-$pseudo_op rv_e::bgeu   bleu bimm12hi rs2 rs1 bimm12lo 14..12=7 6..2=0x18 1..0=3
-$pseudo_op rv_e::bltu   bgtu bimm12hi rs2 rs1 bimm12lo 14..12=6 6..2=0x18 1..0=3
-$pseudo_op rv_e::bge    ble  bimm12hi rs2 rs1 bimm12lo 14..12=5 6..2=0x18 1..0=3
-$pseudo_op rv_e::bge    bgez bimm12hi rs1     bimm12lo 24..20=0x0 14..12=5 6..2=0x18 1..0=3
-$pseudo_op rv_e::bge    blez bimm12hi rs2     bimm12lo 19..15=0x0 14..12=5 6..2=0x18 1..0=3
-$pseudo_op rv_e::blt    bgt  bimm12hi rs2 rs1 bimm12lo 14..12=4 6..2=0x18 1..0=3
-$pseudo_op rv_e::blt    bgtz bimm12hi rs2     bimm12lo 19..15=0x0 14..12=4 6..2=0x18 1..0=3
-$pseudo_op rv_e::blt    bltz bimm12hi rs1     bimm12lo 24..20=0x0 14..12=4 6..2=0x18 1..0=3
-$pseudo_op rv_e::bne    bnez bimm12hi rs1     bimm12lo 24..20=0x0 14..12=1 6..2=0x18 1..0=3
-$pseudo_op rv_e::beq    beqz bimm12hi rs1     bimm12lo 24..20=0x0 14..12=0 6..2=0x18 1..0=3
-
-$pseudo_op rv_e::sltiu  seqz rd rs1 31..20=1 14..12=3 6..2=0x04 1..0=3
-$pseudo_op rv_e::sltu   snez rd rs2 31..25=0 19..15=0x0 14..12=3 6..2=0x0C 1..0=3
-$pseudo_op rv_e::slt    sltz rd rs1 31..25=0 24..20=0x0 14..12=2 6..2=0x0C 1..0=3
-$pseudo_op rv_e::slt    sgtz rd rs2 31..25=0 19..15=0x0 14..12=2 6..2=0x0C 1..0=3
-
-$pseudo_op rv_e::jalr   jalr rs1    31..20=0 14..12=0 11..7=0x01 6..2=0x19 1..0=3
-$pseudo_op rv_e::jalr   jr   rs1    31..20=0 14..12=0 11..7=0x0  6..2=0x19 1..0=3
-$pseudo_op rv_e::jal    jal  jimm20                   11..7=0x01 6..2=0x1b 1..0=3
-$pseudo_op rv_e::jal    j    jimm20                   11..7=0x0  6..2=0x1b 1..0=3
-
-$pseudo_op rv64_e::slli slli rd rs1 shamtw 31..25=0  14..12=1 6..2=0x04 1..0=3
-$pseudo_op rv64_e::srli srli rd rs1 shamtw 31..25=0  14..12=5 6..2=0x04 1..0=3
-$pseudo_op rv64_e::srai srai rd rs1 shamtw 31..25=32 14..12=5 6..2=0x04 1..0=3
-$pseudo_op rv64_e::slli slli_rv32 rd rs1 shamtw 31..25=0  14..12=1 6..2=0x04 1..0=3
-$pseudo_op rv64_e::srli srli_rv32 rd rs1 shamtw 31..25=0  14..12=5 6..2=0x04 1..0=3
-$pseudo_op rv64_e::srai srai_rv32 rd rs1 shamtw 31..25=32 14..12=5 6..2=0x04 1..0=3
-
-$pseudo_op rv64_e::addiw sext.w rd rs1 31..20=0 14..12=0 6..2=0x06 1..0=3
-```
+:RV64E - RV64E Base Embedded Instruction Set (+ RV32E)

@@ -46,11 +46,40 @@ function stateen_allows_CSR_access(csr : csreg, priv : Privilege, _access_type :
     // sstateen3
     (0x10F, priv) => check_stateen_bit(priv, STATEEN_SE, 3),
 
+    // siselect, sireg*, vsiselect, vsireg*
+    (0x150, priv) => check_stateen_bit(priv, STATEEN_CSRIND, 0),
+    (0x151, priv) => check_stateen_bit(priv, STATEEN_CSRIND, 0),
+    (0x152, priv) => check_stateen_bit(priv, STATEEN_CSRIND, 0),
+    (0x153, priv) => check_stateen_bit(priv, STATEEN_CSRIND, 0),
+    (0x155, priv) => check_stateen_bit(priv, STATEEN_CSRIND, 0),
+    (0x156, priv) => check_stateen_bit(priv, STATEEN_CSRIND, 0),
+    (0x157, priv) => check_stateen_bit(priv, STATEEN_CSRIND, 0),
+    (0x250, priv) => check_stateen_bit(priv, STATEEN_CSRIND, 0),
+    (0x251, priv) => check_stateen_bit(priv, STATEEN_CSRIND, 0),
+    (0x252, priv) => check_stateen_bit(priv, STATEEN_CSRIND, 0),
+    (0x253, priv) => check_stateen_bit(priv, STATEEN_CSRIND, 0),
+    (0x255, priv) => check_stateen_bit(priv, STATEEN_CSRIND, 0),
+    (0x256, priv) => check_stateen_bit(priv, STATEEN_CSRIND, 0),
+    (0x257, priv) => check_stateen_bit(priv, STATEEN_CSRIND, 0),
+
     // senvcfg
     (0x10A, priv) => check_stateen_bit(priv, STATEEN_ENVCFG, 0),
 
+    // henvcfg
+    (0x60A, priv) => check_stateen_bit(priv, STATEEN_ENVCFG, 0),
+    // henvcfgh
+    (0x61A, priv) => check_stateen_bit(priv, STATEEN_ENVCFG, 0),
+
     // srmcfg
     (0x181, priv) => check_stateen_bit(priv, STATEEN_SRMCFG, 0),
+
+    // hedelegh
+    (0x612, priv) => check_stateen_bit(priv, STATEEN_P1P13, 0),
+
+    // scontext
+    (0x5a8, priv) => check_stateen_bit(priv, STATEEN_CONTEXT, 0),
+    // hcontext
+    (0x6a8, priv) => check_stateen_bit(priv, STATEEN_CONTEXT, 0),
 
     // fflags
     (0x001, priv) => if hartSupports(Ext_Zfinx) then check_stateen_bit(priv, STATEEN_FCSR, 0) else true,

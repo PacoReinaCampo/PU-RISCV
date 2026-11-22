@@ -1,317 +1,149 @@
 ## INSTRUCTION DESCRIPTIONS
 
-| **Instruction Name** | **Instruction Description**                                                                                              |
-|:---------------------|:-------------------------------------------------------------------------------------------------------------------------|
-| `lui`                | `Set and sign extend the 20-bit immediate (shited 12 bits left) and zero the bottom 12 bits into rd`                     |
-| `auipc`              | `Place the PC plus the 20-bit signed immediate (shited 12 bits left) into rd (used before JALR)`                         |
-| `jal`                | `Jump to the PC plus 20-bit signed immediate while saving PC+4 into rd`                                                  |
-| `jalr`               | `Jump to rs1 plus the 12-bit signed immediate while saving PC+4 into rd`                                                 |
-| `beq`                | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 == rs2`                                       |
-| `bne`                | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 != rs2`                                       |
-| `blt`                | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 < rs2 (signed)`                               |
-| `bge`                | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 >= rs2 (signed)`                              |
-| `bltu`               | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 < rs2 (unsigned)`                             |
-| `bgeu`               | `Branch to PC relative 12-bit signed immediate (shifted 1 bit left) if rs1 >= rs2 (unsigned)`                            |
-| `lb`                 | `Load 8-bit value from addr in rs1 plus the 12-bit signed immediate and place sign-extended result into rd`              |
-| `lh`                 | `Load 16-bit value from addr in rs1 plus the 12-bit signed immediate and place sign-extended result into rd`             |
-| `lw`                 | `Load 32-bit value from addr in rs1 plus the 12-bit signed immediate and place sign-extended result into rd`             |
-| `lbu`                | `Load 8-bit value from addr in rs1 plus the 12-bit signed immediate and place zero-extended result into rd`              |
-| `lhu`                | `Load 32-bit value from addr in rs1 plus the 12-bit signed immediate and place zero-extended result into rd`             |
-| `lwu`                | `Load 32-bit value from addr in rs1 plus the 12-bit signed immediate and place zero-extended result into rd`             |
-| `sb`                 | `Store 8-bit value from the low bits of rs2 to addr in rs1 plus the 12-bit signed immediate`                             |
-| `sh`                 | `Store 16-bit value from the low bits of rs2 to addr in rs1 plus the 12-bit signed immediate`                            |
-| `sw`                 | `Store 32-bit value from the low bits of rs2 to addr in rs1 plus the 12-bit signed immediate`                            |
-| `addi`               | `Add sign-extended 12-bit immediate to register rs1 and place the result in rd`                                          |
-| `slti`               | `Set rd to 1 if rs1 is less than the sign-extended 12-bit immediate, otherwise set rd to 0 (signed)`                     |
-| `sltiu`              | `Set rd to 1 if rs1 is less than the sign-extended 12-bit immediate, otherwise set rd to 0 (unsigned)`                   |
-| `xori`               | `Set rd to the bitwise xor of rs1 with the sign-extended 12-bit immediate`                                               |
-| `ori`                | `Set rd to the bitwise or of rs1 with the sign-extended 12-bit immediate`                                                |
-| `andi`               | `Set rd to the bitwise and of rs1 with the sign-extended 12-bit immediate`                                               |
-| `slli`               | `Shift rs1 left by the 5 or 6 (RV32/64) bit (RV64) immediate and place the result into rd`                               |
-| `srli`               | `Shift rs1 right by the 5 or 6 (RV32/64) bit immediate and place the result into rd`                                     |
-| `srai`               | `Shift rs1 right by the 5 or 6 (RV32/64) bit immediate and place the result into rd while retaining the sign`            |
-| `add`                | `Add rs2 to rs1 and place the result into rd`                                                                            |
-| `sub`                | `Subtract rs2 from rs1 and place the result into rd`                                                                     |
-| `sll`                | `Shift rs1 left by the by the lower 5 or 6 (RV32/64) bits in rs2 and place the result into rd`                           |
-| `slt`                | `Set rd to 1 if rs1 is less than rs2, otherwise set rd to 0 (signed)`                                                    |
-| `sltu`               | `Set rd to 1 if rs1 is less than rs2, otherwise set rd to 0 (unsigned)`                                                  |
-| `xor`                | `Set rd to the bitwise xor of rs1 and rs2`                                                                               |
-| `srl`                | `Shift rs1 right by the by the lower 5 or 6 (RV32/64) bits in rs2 and place the result into rd`                          |
-| `sra`                | `Shift rs1 right by the by the lower 5 or 6 (RV32/64) bits in rs2 and place the result into rd while retaining the sign` |
-| `or`                 | `Set rd to the bitwise or of rs1 and rs2`                                                                                |
-| `and`                | `Set rd to the bitwise and of rs1 and rs2`                                                                               |
-| `fence`              | `Order device I/O and memory accesses viewed by other threads and devices`                                               |
-| `fence.i`            | `Synchronize the instruction and data streams`                                                                           |
+| **Extension** | **Name**     | **Variable-Fields** | **Description**                                                                                                                                                          |
+|:--------------|:-------------|:--------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv_zk`       | `andn`       | `rd, rs1, rs2`      | `Performs the bitwise logical AND operation between rs1 and the bitwise inversion of rs2. Write the result to rd`                                                        |
+| `rv_zk`       | `clmul`      | `rd, rs1, rs2`      | `CLMUL produces the lower half of the 2·XLEN carry-less product. Read the source value from rs1. Use rs2 as the second source operand. Write the result to rd`           |
+| `rv_zk`       | `clmulh`     | `rd, rs1, rs2`      | `CLMULH produces the upper half of the 2·XLEN carry-less product. Read the source value from rs1. Use rs2 as the second source operand. Write the result to rd`          |
+| `rv_zkn`      | `andn`       | `rd, rs1, rs2`      | `Performs the bitwise logical AND operation between rs1 and the bitwise inversion of rs2. Write the result to rd`                                                        |
+| `rv_zkn`      | `clmul`      | `rd, rs1, rs2`      | `CLMUL produces the lower half of the 2·XLEN carry-less product. Read the source value from rs1. Use rs2 as the second source operand. Write the result to rd`           |
+| `rv_zkn`      | `clmulh`     | `rd, rs1, rs2`      | `CLMULH produces the upper half of the 2·XLEN carry-less product. Read the source value from rs1. Use rs2 as the second source operand. Write the result to rd`          |
+| `rv_zknh`     | `sha256sig0` | `rd, rs1`           | `Apply the SHA-256 small sigma 0 transformation to the low 256 bits of rs1 and write the sign-extended result to rd`                                                     |
+| `rv_zknh`     | `sha256sig1` | `rd, rs1`           | `Apply the SHA-256 small sigma 1 transformation to the low 256 bits of rs1 and write the sign-extended result to rd`                                                     |
+| `rv_zknh`     | `sha256sum0` | `rd, rs1`           | `Apply the SHA-256 big sigma 0 transformation to the low 256 bits of rs1 and write the sign-extended result to rd`                                                       |
+| `rv_zknh`     | `sha256sum1` | `rd, rs1`           | `Apply the SHA-256 big sigma 1 transformation to the low 256 bits of rs1 and write the sign-extended result to rd`                                                       |
+| `rv_zkn`      | `orn`        | `rd, rs1, rs2`      | `Performs the bitwise logical OR operation between rs1 and the bitwise inversion of rs2. Write the result to rd`                                                         |
+| `rv_zkn`      | `pack`       | `rd, rs1, rs2`      | `The pack instruction packs the XLEN/2-bit lower halves of rs1 and rs2 into rd, with rs1 in the lower half and rs2 in the upper half`                                    |
+| `rv_zkn`      | `packh`      | `rd, rs1, rs2`      | `The packh instruction packs the least-significant bytes of rs1 and rs2 into the 16 least-significant bits of rd, zero extending the rest of rd`                         |
+| `rv_zkn`      | `rol`        | `rd, rs1, rs2`      | `Performs a rotate left of rs1 by the amount in least-significant log2(XLEN) bits of rs2. Write the result to rd`                                                        |
+| `rv_zkn`      | `ror`        | `rd, rs1, rs2`      | `Performs a rotate right of rs1 by the amount in least-significant log2(XLEN) bits of rs2. Write the result to rd`                                                       |
+| `rv_zkn`      | `sha256sig0` | `rd, rs1`           | `Apply the SHA-256 small sigma 0 transformation to the low 256 bits of rs1 and write the sign-extended result to rd`                                                     |
+| `rv_zkn`      | `sha256sig1` | `rd, rs1`           | `Apply the SHA-256 small sigma 1 transformation to the low 256 bits of rs1 and write the sign-extended result to rd`                                                     |
+| `rv_zkn`      | `sha256sum0` | `rd, rs1`           | `Apply the SHA-256 big sigma 0 transformation to the low 256 bits of rs1 and write the sign-extended result to rd`                                                       |
+| `rv_zkn`      | `sha256sum1` | `rd, rs1`           | `Apply the SHA-256 big sigma 1 transformation to the low 256 bits of rs1 and write the sign-extended result to rd`                                                       |
+| `rv_zkn`      | `xnor`       | `rd, rs1, rs2`      | `Performs the bit-wise exclusive-NOR operation on rs1 and rs2. Write the result to rd`                                                                                   |
+| `rv_zkn`      | `xperm4`     | `rd, rs1, rs2`      | `For each 4-bit index in rs2, select the corresponding 4-bit element from rs1 and place it in rd. Use zero for out-of-range indices`                                     |
+| `rv_zkn`      | `xperm8`     | `rd, rs1, rs2`      | `For each 8-bit index in rs2, select the corresponding 8-bit element from rs1 and place it in rd. Use zero for out-of-range indices`                                     |
+| `rv_zk`       | `orn`        | `rd, rs1, rs2`      | `Performs the bitwise logical OR operation between rs1 and the bitwise inversion of rs2. Write the result to rd`                                                         |
+| `rv_zk`       | `pack`       | `rd, rs1, rs2`      | `The pack instruction packs the XLEN/2-bit lower halves of rs1 and rs2 into rd, with rs1 in the lower half and rs2 in the upper half`                                    |
+| `rv_zk`       | `packh`      | `rd, rs1, rs2`      | `The packh instruction packs the least-significant bytes of rs1 and rs2 into the 16 least-significant bits of rd, zero extending the rest of rd`                         |
+| `rv_zk`       | `rol`        | `rd, rs1, rs2`      | `Performs a rotate left of rs1 by the amount in least-significant log2(XLEN) bits of rs2. Write the result to rd`                                                        |
+| `rv_zk`       | `ror`        | `rd, rs1, rs2`      | `Performs a rotate right of rs1 by the amount in least-significant log2(XLEN) bits of rs2. Write the result to rd`                                                       |
+| `rv_zks`      | `andn`       | `rd, rs1, rs2`      | `Performs the bitwise logical AND operation between rs1 and the bitwise inversion of rs2. Write the result to rd`                                                        |
+| `rv_zks`      | `clmul`      | `rd, rs1, rs2`      | `CLMUL produces the lower half of the 2·XLEN carry-less product. Read the source value from rs1. Use rs2 as the second source operand. Write the result to rd`           |
+| `rv_zks`      | `clmulh`     | `rd, rs1, rs2`      | `CLMULH produces the upper half of the 2·XLEN carry-less product. Read the source value from rs1. Use rs2 as the second source operand. Write the result to rd`          |
+| `rv_zksed`    | `sm4ed`      | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the SM4 S-box and round linear transform, rotate by 8 times bs, XOR with the low word of rs1, and sign-extend the result into rd`        |
+| `rv_zksed`    | `sm4ks`      | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the SM4 S-box and key schedule linear transform, rotate by 8 times bs, XOR with the low word of rs1, and sign-extend the result into rd` |
+| `rv_zk`       | `sha256sig0` | `rd, rs1`           | `Apply the SHA-256 small sigma 0 transformation to the low 256 bits of rs1 and write the sign-extended result to rd`                                                     |
+| `rv_zk`       | `sha256sig1` | `rd, rs1`           | `Apply the SHA-256 small sigma 1 transformation to the low 256 bits of rs1 and write the sign-extended result to rd`                                                     |
+| `rv_zk`       | `sha256sum0` | `rd, rs1`           | `Apply the SHA-256 big sigma 0 transformation to the low 256 bits of rs1 and write the sign-extended result to rd`                                                       |
+| `rv_zk`       | `sha256sum1` | `rd, rs1`           | `Apply the SHA-256 big sigma 1 transformation to the low 256 bits of rs1 and write the sign-extended result to rd`                                                       |
+| `rv_zksh`     | `sm3p0`      | `rd, rs1`           | `Apply the SM3 P0 permutation to the low 32 bits of rs1 and sign-extend the result into rd`                                                                              |
+| `rv_zksh`     | `sm3p1`      | `rd, rs1`           | `Apply the SM3 P1 permutation to the low 32 bits of rs1 and sign-extend the result into rd`                                                                              |
+| `rv_zks`      | `orn`        | `rd, rs1, rs2`      | `Performs the bitwise logical OR operation between rs1 and the bitwise inversion of rs2. Write the result to rd`                                                         |
+| `rv_zks`      | `pack`       | `rd, rs1, rs2`      | `The pack instruction packs the XLEN/2-bit lower halves of rs1 and rs2 into rd, with rs1 in the lower half and rs2 in the upper half`                                    |
+| `rv_zks`      | `packh`      | `rd, rs1, rs2`      | `The packh instruction packs the least-significant bytes of rs1 and rs2 into the 16 least-significant bits of rd, zero extending the rest of rd`                         |
+| `rv_zks`      | `rol`        | `rd, rs1, rs2`      | `Performs a rotate left of rs1 by the amount in least-significant log2(XLEN) bits of rs2. Write the result to rd`                                                        |
+| `rv_zks`      | `ror`        | `rd, rs1, rs2`      | `Performs a rotate right of rs1 by the amount in least-significant log2(XLEN) bits of rs2. Write the result to rd`                                                       |
+| `rv_zks`      | `sm3p0`      | `rd, rs1`           | `Apply the SM3 P0 permutation to the low 32 bits of rs1 and sign-extend the result into rd`                                                                              |
+| `rv_zks`      | `sm3p1`      | `rd, rs1`           | `Apply the SM3 P1 permutation to the low 32 bits of rs1 and sign-extend the result into rd`                                                                              |
+| `rv_zks`      | `sm4ed`      | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the SM4 S-box and round linear transform, rotate by 8 times bs, XOR with the low word of rs1, and sign-extend the result into rd`        |
+| `rv_zks`      | `sm4ks`      | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the SM4 S-box and key schedule linear transform, rotate by 8 times bs, XOR with the low word of rs1, and sign-extend the result into rd` |
+| `rv_zks`      | `xnor`       | `rd, rs1, rs2`      | `Performs the bit-wise exclusive-NOR operation on rs1 and rs2. Write the result to rd`                                                                                   |
+| `rv_zks`      | `xperm4`     | `rd, rs1, rs2`      | `For each 4-bit index in rs2, select the corresponding 4-bit element from rs1 and place it in rd. Use zero for out-of-range indices`                                     |
+| `rv_zks`      | `xperm8`     | `rd, rs1, rs2`      | `For each 8-bit index in rs2, select the corresponding 8-bit element from rs1 and place it in rd. Use zero for out-of-range indices`                                     |
+| `rv_zk`       | `xnor`       | `rd, rs1, rs2`      | `Performs the bit-wise exclusive-NOR operation on rs1 and rs2. Write the result to rd`                                                                                   |
+| `rv_zk`       | `xperm4`     | `rd, rs1, rs2`      | `For each 4-bit index in rs2, select the corresponding 4-bit element from rs1 and place it in rd. Use zero for out-of-range indices`                                     |
+| `rv_zk`       | `xperm8`     | `rd, rs1, rs2`      | `For each 8-bit index in rs2, select the corresponding 8-bit element from rs1 and place it in rd. Use zero for out-of-range indices`                                     |
 
-:RV32I - "RV32I Base Integer Instruction Set"
+:RVZXK - Specific Extension for Scalar Cryptography Instructions
 
-| **Instruction Name** | **Instruction Description**                                                                                                      |
-|:---------------------|:---------------------------------------------------------------------------------------------------------------------------------|
-| `ld`                 | `Load 64-bit value from addr in rs1 plus 12-bit signed immediate and place sign-extended result into rd`                         |
-| `sd`                 | `Store 64-bit value from the low bits of rs2 to addr in rs1 plus the 12-bit signed immediate`                                    |
-| `addiw`              | `Add sign-extended 12-bit immediate to register rs1 and place 32-bit sign extended result in rs2 zeroing upper bits`             |
-| `slliw`              | `Shift 32-bit value in rs1 left by the 5 bit immediate and place the result into rd while zeroing upper bits`                    |
-| `srliw`              | `Shift 32-bit value in rs1 right by the 5 bit immediate and place the result into rd while zeroing upper bits`                   |
-| `sraiw`              | `Shift 32-bit value in rs1 right by the 5 bit immediate and place the result into rd and retaining the sign`                     |
-| `addw`               | `Add 32-bit value in rs2 to rs1 and place the 32-bit result into rd`                                                             |
-| `subw`               | `Subtract 32-bit value in rs2 from rs1 and place the 32-bit result into rd`                                                      |
-| `sllw`               | `Shift 32-bit value in rs1 left by the by the lower 5 bits in rs2 and place the 32-bit result into rd`                           |
-| `srlw`               | `Shift 32-bit value in rs1 right by the by the lower 5 bits in rs2 and place the 32-bit result into rd`                          |
-| `sraw`               | `Shift 32-bit value in rs1 right by the by the lower 5 bits in rs2 and place the 32-bit result into rd while retaining the sign` |
+| **Extension** | **Name**      | **Variable-Fields** | **Description**                                                                                                                              |
+|:--------------|:--------------|:--------------------|:---------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv32_zk`     | `aes32dsi`    | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the inverse S-box, rotate the result left by 8 times bs, and XOR it with rs1 into rd`                        |
+| `rv32_zk`     | `aes32dsmi`   | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the inverse S-box and inverse MixColumns, rotate the result left by 8 times bs, and XOR it with rs1 into rd` |
+| `rv32_zk`     | `aes32esi`    | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the forward S-box, rotate the result left by 8 times bs, and XOR it with rs1 into rd`                        |
+| `rv32_zk`     | `aes32esmi`   | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the forward S-box and forward MixColumns, rotate the result left by 8 times bs, and XOR it with rs1 into rd` |
+| `rv32_zkn`    | `aes32dsi`    | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the inverse S-box, rotate the result left by 8 times bs, and XOR it with rs1 into rd`                        |
+| `rv32_zkn`    | `aes32dsmi`   | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the inverse S-box and inverse MixColumns, rotate the result left by 8 times bs, and XOR it with rs1 into rd` |
+| `rv32_zkn`    | `aes32esi`    | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the forward S-box, rotate the result left by 8 times bs, and XOR it with rs1 into rd`                        |
+| `rv32_zkn`    | `aes32esmi`   | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the forward S-box and forward MixColumns, rotate the result left by 8 times bs, and XOR it with rs1 into rd` |
+| `rv32_zknd`   | `aes32dsi`    | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the inverse S-box, rotate the result left by 8 times bs, and XOR it with rs1 into rd`                        |
+| `rv32_zknd`   | `aes32dsmi`   | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the inverse S-box and inverse MixColumns, rotate the result left by 8 times bs, and XOR it with rs1 into rd` |
+| `rv32_zkne`   | `aes32esi`    | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the forward S-box, rotate the result left by 8 times bs, and XOR it with rs1 into rd`                        |
+| `rv32_zkne`   | `aes32esmi`   | `rd, rs1, rs2, bs`  | `Select byte bs from rs2, apply the forward S-box and forward MixColumns, rotate the result left by 8 times bs, and XOR it with rs1 into rd` |
+| `rv32_zknh`   | `sha512sig0h` | `rd, rs1, rs2`      | `Compute the high 32-bit half of the SHA-512 small sigma 0 result using rs1 and rs2, and write it to rd`                                     |
+| `rv32_zknh`   | `sha512sig0l` | `rd, rs1, rs2`      | `Compute the low 32-bit half of the SHA-512 small sigma 0 result using rs1 and rs2, and write it to rd`                                      |
+| `rv32_zknh`   | `sha512sig1h` | `rd, rs1, rs2`      | `Compute the high 32-bit half of the SHA-512 small sigma 1 result using rs1 and rs2, and write it to rd`                                     |
+| `rv32_zknh`   | `sha512sig1l` | `rd, rs1, rs2`      | `Compute the low 32-bit half of the SHA-512 small sigma 1 result using rs1 and rs2, and write it to rd`                                      |
+| `rv32_zknh`   | `sha512sum0r` | `rd, rs1, rs2`      | `Compute one 32-bit half of SHA-512 big sigma 0 using rs1 and rs2, and write the result to rd`                                               |
+| `rv32_zknh`   | `sha512sum1r` | `rd, rs1, rs2`      | `Compute one 32-bit half of SHA-512 big sigma 1 using rs1 and rs2, and write the result to rd`                                               |
+| `rv32_zkn`    | `sha512sig0h` | `rd, rs1, rs2`      | `Compute the high 32-bit half of the SHA-512 small sigma 0 result using rs1 and rs2, and write it to rd`                                     |
+| `rv32_zkn`    | `sha512sig0l` | `rd, rs1, rs2`      | `Compute the low 32-bit half of the SHA-512 small sigma 0 result using rs1 and rs2, and write it to rd`                                      |
+| `rv32_zkn`    | `sha512sig1h` | `rd, rs1, rs2`      | `Compute the high 32-bit half of the SHA-512 small sigma 1 result using rs1 and rs2, and write it to rd`                                     |
+| `rv32_zkn`    | `sha512sig1l` | `rd, rs1, rs2`      | `Compute the low 32-bit half of the SHA-512 small sigma 1 result using rs1 and rs2, and write it to rd`                                      |
+| `rv32_zkn`    | `sha512sum0r` | `rd, rs1, rs2`      | `Compute one 32-bit half of SHA-512 big sigma 0 using rs1 and rs2, and write the result to rd`                                               |
+| `rv32_zkn`    | `sha512sum1r` | `rd, rs1, rs2`      | `Compute one 32-bit half of SHA-512 big sigma 1 using rs1 and rs2, and write the result to rd`                                               |
+| `rv32_zk`     | `sha512sig0h` | `rd, rs1, rs2`      | `Compute the high 32-bit half of the SHA-512 small sigma 0 result using rs1 and rs2, and write it to rd`                                     |
+| `rv32_zk`     | `sha512sig0l` | `rd, rs1, rs2`      | `Compute the low 32-bit half of the SHA-512 small sigma 0 result using rs1 and rs2, and write it to rd`                                      |
+| `rv32_zk`     | `sha512sig1h` | `rd, rs1, rs2`      | `Compute the high 32-bit half of the SHA-512 small sigma 1 result using rs1 and rs2, and write it to rd`                                     |
+| `rv32_zk`     | `sha512sig1l` | `rd, rs1, rs2`      | `Compute the low 32-bit half of the SHA-512 small sigma 1 result using rs1 and rs2, and write it to rd`                                      |
+| `rv32_zk`     | `sha512sum0r` | `rd, rs1, rs2`      | `Compute one 32-bit half of SHA-512 big sigma 0 using rs1 and rs2, and write the result to rd`                                               |
+| `rv32_zk`     | `sha512sum1r` | `rd, rs1, rs2`      | `Compute one 32-bit half of SHA-512 big sigma 1 using rs1 and rs2, and write the result to rd`                                               |
 
-:RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
+:RV32ZXK - Specific Extension for Scalar Cryptography Instructions (32 bit)
 
-| **Instruction Name** | **Instruction Description**                                                         |
-|:---------------------|:------------------------------------------------------------------------------------|
-| `mul`                | `Multiply rs1 by rs2 and place the result in rd`                                    |
-| `mulh`               | `Multiply signed rs1 by signed rs2 and place the high bits of the result in rd`     |
-| `mulhsu`             | `Multiply signed rs1 by unsigned rs2 and place the high bits of the result in rd`   |
-| `mulhu`              | `Multiply unsigned rs1 by unsigned rs2 and place the high bits of the result in rd` |
-| `div`                | `Divide rs1 (dividend) by rs2 (divisor) and place the quotient in rd (signed)`      |
-| `divu`               | `Divide rs1 (dividend) by rs2 (divisor) and place the quotient in rd (unsigned)`    |
-| `rem`                | `Divide rs1 (dividend) by rs2 (divisor) and place the remainder in rd (signed)`     |
-| `remu`               | `Divide rs1 (dividend) by rs2 (divisor) and place the remainder in rd (unsigned)`   |
+| **Extension** | **Name**     | **Variable-Fields** | **Description**                                                                                                                                                                                                                         |
+|:--------------|:-------------|:--------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv64_zk`     | `aes64ds`    | `rd, rs1, rs2`      | `Apply inverse ShiftRows and SubBytes to the AES state supplied by rs1 and rs2 and write the resulting 64-bit half to rd`                                                                                                               |
+| `rv64_zk`     | `aes64dsm`   | `rd, rs1, rs2`      | `Apply inverse ShiftRows and SubBytes, followed by inverse MixColumns to the AES state supplied by rs1 and rs2 and write the resulting 64-bit half to rd`                                                                               |
+| `rv64_zk`     | `aes64es`    | `rd, rs1, rs2`      | `Apply forward ShiftRows and SubBytes to the AES state supplied by rs1 and rs2 and write the resulting 64-bit half to rd`                                                                                                               |
+| `rv64_zk`     | `aes64esm`   | `rd, rs1, rs2`      | `Apply forward ShiftRows and SubBytes, followed by forward MixColumns to the AES state supplied by rs1 and rs2 and write the resulting 64-bit half to rd`                                                                               |
+| `rv64_zk`     | `aes64im`    | `rd, rs1`           | `Apply inverse MixColumns to each 32-bit word of rs1 and write both results to rd`                                                                                                                                                      |
+| `rv64_zk`     | `aes64ks1i`  | `rd, rs1, rnum`     | `Use rnum to select the AES key schedule rotation and round constant, transform the upper word of rs1, and duplicate the result into both words of rd. Values of rnum above 10 are reserved`                                            |
+| `rv64_zk`     | `aes64ks2`   | `rd, rs1, rs2`      | `Combine the high word of rs1 with the two words of rs2 by XOR and write the next two AES key schedule words to rd`                                                                                                                     |
+| `rv64_zkn`    | `aes64ds`    | `rd, rs1, rs2`      | `Apply inverse ShiftRows and SubBytes to the AES state supplied by rs1 and rs2 and write the resulting 64-bit half to rd`                                                                                                               |
+| `rv64_zkn`    | `aes64dsm`   | `rd, rs1, rs2`      | `Apply inverse ShiftRows and SubBytes, followed by inverse MixColumns to the AES state supplied by rs1 and rs2 and write the resulting 64-bit half to rd`                                                                               |
+| `rv64_zkn`    | `aes64es`    | `rd, rs1, rs2`      | `Apply forward ShiftRows and SubBytes to the AES state supplied by rs1 and rs2 and write the resulting 64-bit half to rd`                                                                                                               |
+| `rv64_zkn`    | `aes64esm`   | `rd, rs1, rs2`      | `Apply forward ShiftRows and SubBytes, followed by forward MixColumns to the AES state supplied by rs1 and rs2 and write the resulting 64-bit half to rd`                                                                               |
+| `rv64_zkn`    | `aes64im`    | `rd, rs1`           | `Apply inverse MixColumns to each 32-bit word of rs1 and write both results to rd`                                                                                                                                                      |
+| `rv64_zkn`    | `aes64ks1i`  | `rd, rs1, rnum`     | `Use rnum to select the AES key schedule rotation and round constant, transform the upper word of rs1, and duplicate the result into both words of rd. Values of rnum above 10 are reserved`                                            |
+| `rv64_zkn`    | `aes64ks2`   | `rd, rs1, rs2`      | `Combine the high word of rs1 with the two words of rs2 by XOR and write the next two AES key schedule words to rd`                                                                                                                     |
+| `rv64_zknd`   | `aes64ds`    | `rd, rs1, rs2`      | `Apply inverse ShiftRows and SubBytes to the AES state supplied by rs1 and rs2 and write the resulting 64-bit half to rd`                                                                                                               |
+| `rv64_zknd`   | `aes64dsm`   | `rd, rs1, rs2`      | `Apply inverse ShiftRows and SubBytes, followed by inverse MixColumns to the AES state supplied by rs1 and rs2 and write the resulting 64-bit half to rd`                                                                               |
+| `rv64_zknd`   | `aes64im`    | `rd, rs1`           | `Apply inverse MixColumns to each 32-bit word of rs1 and write both results to rd`                                                                                                                                                      |
+| `rv64_zknd`   | `aes64ks1i`  | `rd, rs1, rnum`     | `Use rnum to select the AES key schedule rotation and round constant, transform the upper word of rs1, and duplicate the result into both words of rd. Values of rnum above 10 are reserved`                                            |
+| `rv64_zknd`   | `aes64ks2`   | `rd, rs1, rs2`      | `Combine the high word of rs1 with the two words of rs2 by XOR and write the next two AES key schedule words to rd`                                                                                                                     |
+| `rv64_zkne`   | `aes64es`    | `rd, rs1, rs2`      | `Apply forward ShiftRows and SubBytes to the AES state supplied by rs1 and rs2 and write the resulting 64-bit half to rd`                                                                                                               |
+| `rv64_zkne`   | `aes64esm`   | `rd, rs1, rs2`      | `Apply forward ShiftRows and SubBytes, followed by forward MixColumns to the AES state supplied by rs1 and rs2 and write the resulting 64-bit half to rd`                                                                               |
+| `rv64_zkne`   | `aes64ks1i`  | `rd, rs1, rnum`     | `Use rnum to select the AES key schedule rotation and round constant, transform the upper word of rs1, and duplicate the result into both words of rd. Values of rnum above 10 are reserved`                                            |
+| `rv64_zkne`   | `aes64ks2`   | `rd, rs1, rs2`      | `Combine the high word of rs1 with the two words of rs2 by XOR and write the next two AES key schedule words to rd`                                                                                                                     |
+| `rv64_zknh`   | `sha512sig0` | `rd, rs1`           | `Apply the SHA-512 small sigma 0 transformation to the low 512 bits of rs1 and write the result to rd`                                                                                                                                  |
+| `rv64_zknh`   | `sha512sig1` | `rd, rs1`           | `Apply the SHA-512 small sigma 1 transformation to the low 512 bits of rs1 and write the result to rd`                                                                                                                                  |
+| `rv64_zknh`   | `sha512sum0` | `rd, rs1`           | `Apply the SHA-512 big sigma 0 transformation to the low 512 bits of rs1 and write the result to rd`                                                                                                                                    |
+| `rv64_zknh`   | `sha512sum1` | `rd, rs1`           | `Apply the SHA-512 big sigma 1 transformation to the low 512 bits of rs1 and write the result to rd`                                                                                                                                    |
+| `rv64_zkn`    | `packw`      | `rd, rs1, rs2`      | `Packs the low 16 bits of rs1 and rs2 into the 32 least-significant bits of rd, sign extending the 32-bit result to the rest of rd. This instruction only exists on RV64 based systems`                                                 |
+| `rv64_zkn`    | `rolw`       | `rd, rs1, rs2`      | `Performs a rotate left on the least-significant word of rs1 by the amount in least-significant 5 bits of rs2. The resulting word value is sign-extended by copying bit 31 to all of the more-significant bits. Write the result to rd` |
+| `rv64_zkn`    | `rori`       | `rd, rs1, shamtd`   | `Performs a rotate right of rs1 by the amount in the least-significant log2(XLEN) bits of shamtd. For RV32, the encodings corresponding to shamtd[5]=1 are reserved. Write the result to rd`                                            |
+| `rv64_zkn`    | `roriw`      | `rd, rs1, shamtw`   | `Rotate the low 32 bits of rs1 right by shamtw and sign-extend the result into rd`                                                                                                                                                      |
+| `rv64_zkn`    | `rorw`       | `rd, rs1, rs2`      | `Performs a rotate right on the least-significant word of rs1 by the amount in least-significant 5 bits of rs2. The resultant word is sign-extended by copying bit 31 to all of the more-significant bits. Write the result to rd`      |
+| `rv64_zkn`    | `sha512sig0` | `rd, rs1`           | `Apply the SHA-512 small sigma 0 transformation to the low 512 bits of rs1 and write the result to rd`                                                                                                                                  |
+| `rv64_zkn`    | `sha512sig1` | `rd, rs1`           | `Apply the SHA-512 small sigma 1 transformation to the low 512 bits of rs1 and write the result to rd`                                                                                                                                  |
+| `rv64_zkn`    | `sha512sum0` | `rd, rs1`           | `Apply the SHA-512 big sigma 0 transformation to the low 512 bits of rs1 and write the result to rd`                                                                                                                                    |
+| `rv64_zkn`    | `sha512sum1` | `rd, rs1`           | `Apply the SHA-512 big sigma 1 transformation to the low 512 bits of rs1 and write the result to rd`                                                                                                                                    |
+| `rv64_zk`     | `packw`      | `rd, rs1, rs2`      | `Packs the low 16 bits of rs1 and rs2 into the 32 least-significant bits of rd, sign extending the 32-bit result to the rest of rd. This instruction only exists on RV64 based systems`                                                 |
+| `rv64_zk`     | `rolw`       | `rd, rs1, rs2`      | `Performs a rotate left on the least-significant word of rs1 by the amount in least-significant 5 bits of rs2. The resulting word value is sign-extended by copying bit 31 to all of the more-significant bits. Write the result to rd` |
+| `rv64_zk`     | `rori`       | `rd, rs1, shamtd`   | `Performs a rotate right of rs1 by the amount in the least-significant log2(XLEN) bits of shamtd. For RV32, the encodings corresponding to shamtd[5]=1 are reserved. Write the result to rd`                                            |
+| `rv64_zk`     | `roriw`      | `rd, rs1, shamtw`   | `Rotate the low 32 bits of rs1 right by shamtw and sign-extend the result into rd`                                                                                                                                                      |
+| `rv64_zk`     | `rorw`       | `rd, rs1, rs2`      | `Performs a rotate right on the least-significant word of rs1 by the amount in least-significant 5 bits of rs2. The resultant word is sign-extended by copying bit 31 to all of the more-significant bits. Write the result to rd`      |
+| `rv64_zk`     | `sha512sig0` | `rd, rs1`           | `Apply the SHA-512 small sigma 0 transformation to the low 512 bits of rs1 and write the result to rd`                                                                                                                                  |
+| `rv64_zk`     | `sha512sig1` | `rd, rs1`           | `Apply the SHA-512 small sigma 1 transformation to the low 512 bits of rs1 and write the result to rd`                                                                                                                                  |
+| `rv64_zk`     | `sha512sum0` | `rd, rs1`           | `Apply the SHA-512 big sigma 0 transformation to the low 512 bits of rs1 and write the result to rd`                                                                                                                                    |
+| `rv64_zk`     | `sha512sum1` | `rd, rs1`           | `Apply the SHA-512 big sigma 1 transformation to the low 512 bits of rs1 and write the result to rd`                                                                                                                                    |
+| `rv64_zks`    | `packw`      | `rd, rs1, rs2`      | `Packs the low 16 bits of rs1 and rs2 into the 32 least-significant bits of rd, sign extending the 32-bit result to the rest of rd. This instruction only exists on RV64 based systems`                                                 |
+| `rv64_zks`    | `rolw`       | `rd, rs1, rs2`      | `Performs a rotate left on the least-significant word of rs1 by the amount in least-significant 5 bits of rs2. The resulting word value is sign-extended by copying bit 31 to all of the more-significant bits. Write the result to rd` |
+| `rv64_zks`    | `rori`       | `rd, rs1, shamtd`   | `Performs a rotate right of rs1 by the amount in the least-significant log2(XLEN) bits of shamtd. For RV32, the encodings corresponding to shamtd[5]=1 are reserved. Write the result to rd`                                            |
+| `rv64_zks`    | `roriw`      | `rd, rs1, shamtw`   | `Rotate the low 32 bits of rs1 right by shamtw and sign-extend the result into rd`                                                                                                                                                      |
+| `rv64_zks`    | `rorw`       | `rd, rs1, rs2`      | `Performs a rotate right on the least-significant word of rs1 by the amount in least-significant 5 bits of rs2. The resultant word is sign-extended by copying bit 31 to all of the more-significant bits. Write the result to rd`      |
 
-:RV32M - "RV32M Standard Extension for Integer Multiply and Divide"
-
-| **Instruction Name** | **Instruction Description**                                                                                         |
-|:---------------------|:--------------------------------------------------------------------------------------------------------------------|
-| `mulw`               | `Multiply with lower 32-bits of rs1 by the lower 32-bits of rs2 and place the result in rd`                         |
-| `divw`               | `Divide lower 32-bits of rs1 (dividend) by lower 32-bits of rs2 (divisor) and place the quotient in rd (signed)`    |
-| `divuw`              | `Divide lower 32-bits of rs1 (dividend) by lower 32-bits of rs2 (divisor) and place the quotient in rd (unsigned)`  |
-| `remw`               | `Divide lower 32-bits of rs1 (dividend) by lower 32-bits of rs2 (divisor) and place the remainder in rd (signed)`   |
-| `remuw`              | `Divide lower 32-bits of rs1 (dividend) by lower 32-bits of rs2 (divisor) and place the remainder in rd (unsigned)` |
-
-:RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
-
-| **Instruction Name** | **Instruction Description**                                                                                            |
-|:---------------------|:-----------------------------------------------------------------------------------------------------------------------|
-| `lr.w`               | `Load word from address in rs1, place the sign-extended result in rd and register a reservation on the memory word`    |
-| `sc.w`               | `Write word in rs1 to the address in rs2 if a valid reservation exists, write 0 on success or 1 on failure to rd`      |
-| `amoswap.w`          | `Load word from address in rs1 into rd, swap rd and rs2, write the result to the address in rs1`                       |
-| `amoadd.w`           | `Load word from address in rs1 into rd, add rd and rs2, write the result to the address in rs1`                        |
-| `amoxor.w`           | `Load word from address in rs1 into rd, xor rd and rs2, write the result to the address in rs1`                        |
-| `amoor.w`            | `Load word from address in rs1 into rd, or rd and rs2, write the result to the address in rs1`                         |
-| `amoand.w`           | `Load word from address in rs1 into rd, and rd and rs2, write the result to the address in rs1`                        |
-| `amomin.w`           | `Load word from address in rs1 into rd, find minimum of rd and rs2, write the result to the address in rs1 (signed)`   |
-| `amomax.w`           | `Load word from address in rs1 into rd, find maximum of rd and rs2, write the result to the address in rs1 (signed)`   |
-| `amominu.w`          | `Load word from address in rs1 into rd, find minimum of rd and rs2, write the result to the address in rs1 (unsigned)` |
-| `amomaxu.w`          | `Load word from address in rs1 into rd, find maximum of rd and rs2, write the result to the address in rs1 (unsigned)` |
-
-:RV32A - "RV32A Standard Extension for Atomic Instructions"
-
-| **Instruction Name** | **Instruction Description**                                                                                                   |
-|:---------------------|:------------------------------------------------------------------------------------------------------------------------------|
-| `lr.d`               | `Load double word from address in rs1, place the sign-extended result in rd and register a reservation on the memory word`    |
-| `sc.d`               | `Write double word in rs1 to the address in rs2 if a valid reservation exists, write 0 on success or 1 on failure to rd`      |
-| `amoswap.d`          | `Load double word from address in rs1 into rd, swap rd and rs2, write the result to the address in rs1`                       |
-| `amoadd.d`           | `Load double word from address in rs1 into rd, add rd and rs2, write the result to the address in rs1`                        |
-| `amoxor.d`           | `Load double word from address in rs1 into rd, xor rd and rs2, write the result to the address in rs1`                        |
-| `amoor.d`            | `Load double word from address in rs1 into rd, or rd and rs2, write the result to the address in rs1`                         |
-| `amoand.d`           | `Load double word from address in rs1 into rd, and rd and rs2, write the result to the address in rs1`                        |
-| `amomin.d`           | `Load double word from address in rs1 into rd, find minimum of rd and rs2, write the result to the address in rs1 (signed)`   |
-| `amomax.d`           | `Load double word from address in rs1 into rd, find maximum of rd and rs2, write the result to the address in rs1 (signed)`   |
-| `amominu.d`          | `Load double word from address in rs1 into rd, find minimum of rd and rs2, write the result to the address in rs1 (unsigned)` |
-| `amomaxu.d`          | `Load double word from address in rs1 into rd, find maximum of rd and rs2, write the result to the address in rs1 (unsigned)` |
-
-:RV64A - "RV64A Standard Extension for Atomic Instructions (+ RV32A)"
-
-| **Instruction Name** | **Instruction Description**                                                                                           |
-|:---------------------|:----------------------------------------------------------------------------------------------------------------------|
-| `scall`              | `System call is used to make a request to a higher privilege level`                                                   |
-| `sbreak`             | `Break to Debugger causes control to be transferred back to the debugging environment via a breakpoint exception`     |
-| `sret`               | `System Return returns to the supervisor mode privilege level after handling a trap`                                  |
-| `sfence.vm`          | `Supervisor memory-management fence synchronizes updates to in-memory memory-management data structures`              |
-| `wfi`                | `Wait for Interrupt indicates the hart can be stalled until an interrupt needs servicing`                             |
-| `rdcycle`            | `Read cycle counter status register`                                                                                  |
-| `rdtime`             | `Read timer status register`                                                                                          |
-| `rdinstret`          | `Read instructions retired status register`                                                                           |
-| `rdcycleh`           | `Read cycle counter status register (upper 32-bits on RV32)`                                                          |
-| `rdtimeh`            | `Read timer status register (upper 32-bits on RV32)`                                                                  |
-| `rdinstreth`         | `Read instructions retired status register (upper 32-bits on RV32)`                                                   |
-| `csrrw`              | `CSR Atomic Read Write writes the value in rs1 to the CSR, and writes previous value to rd`                           |
-| `csrrs`              | `CSR Atomic Set Bit reads the CSR, sets CSR bits set in rs1, and writes previous value to rd`                         |
-| `csrrc`              | `CSR Atomic Clear Bit reads the CSR, clears CSR bits set in rs1, and writes previous value to rd`                     |
-| `csrrwi`             | `CSR Atomic Read Write Immediate writes the immediate value to the CSR, and writes previous value to rd`              |
-| `csrrsi`             | `CSR Atomic Set Bit Immediate reads the CSR, sets CSR bits set in the immediate, and writes previous value to rd`     |
-| `csrrci`             | `CSR Atomic Clear Bit Immediate reads the CSR, clears CSR bits set in the immediate, and writes previous value to rd` |
-
-:RV32S - "RV32S Standard Extension for Supervisor-level Instructions"
-
-| **Instruction Name** | **Instruction Description**                                                                                                 |
-|:---------------------|:----------------------------------------------------------------------------------------------------------------------------|
-| `flw`                | `Loads a single-precision foating-point value from memory into foating-point register frd`                                  |
-| `fsw`                | `Stores a single-precision foating-point value from foating-point register frs2 to memory`                                  |
-| `fmadd.s`            | `Multiply the single-precision values in frs1 and frs2, then add rs3 and write the result to frd`                           |
-| `fmsub.s`            | `Multiply the single-precision values in frs1 and frs2, then subtract rs3 and write the result to frd`                      |
-| `fnmsub.s`           | `Multiply the single-precision value in frs1 with the negated value in frs2, then add rs3 and write the result to frd`      |
-| `fnmadd.s`           | `Multiply the single-precision value in frs1 with the negated value in frs2, then subtract rs3 and write the result to frd` |
-| `fadd.s`             | `Add the single-precision values in frs1 and frs2, then write the result to frd`                                            |
-| `fsub.s`             | `Subtract the single-precision values in frs1 from frs2, then write the result to frd`                                      |
-| `fmul.s`             | `Multiply the single-precision values in frs1 and frs2, then write the result to frd`                                       |
-| `fdiv.s`             | `Divide the single-precision value in frs1 into frs2, then write the result to frd`                                         |
-| `fsgnj.s`            | `Take the single-precision value from frs1 and inject the sign bit from frs2, then write the result to frd`                 |
-| `fsgnjn.s`           | `Take the single-precision value from frs1 and inject the negated sign bit from frs2, then write the result to frd`         |
-| `fsgnjx.s`           | `Take the single-precision value from frs1 and inject the xor of the sign bits frs1 and frs2, then write the result to frd` |
-| `fmin.s`             | `Take the smaller single-precision value from frs1 and frs2, then write the result to frd`                                  |
-| `fmax.s`             | `Take the larger single-precision value from frs1 and frs2, then write the result to frd`                                   |
-| `fsqrt.s`            | `Calculate the square root of the single-precision value in frs1, then write the result to frd`                             |
-| `fle.s`              | `Set rd to 1 if the single-precision value in frs1 is less than or equal to frs2, otherwise set rd to 0`                    |
-| `flt.s`              | `Set rd to 1 if the single-precision value in frs1 is less than frs2, otherwise set rd to 0`                                |
-| `feq.s`              | `Set rd to 1 if the single-precision value in frs1 is equal to frs2, otherwise set rd to 0`                                 |
-| `fcvt.w.s`           | `Convert the single-precision value in frs1 to a 32-bit signed integer, then write the result to rd`                        |
-| `fcvt.wu.s`          | `Convert the single-precision value in frs1 to a 32-bit unsigned integer, then write the result to rd`                      |
-| `fcvt.s.w`           | `Convert the 32-bit signed integer in rs1 to a single-precision value, then write the result to frd`                        |
-| `fcvt.s.wu`          | `Convert the 32-bit unsigned integer in rs1 to a single-precision value, then write the result to frd`                      |
-| `fclass.s`           | `Set rd to a 10-bit mask indicating the class of the single-precision value in frs1`                                        |
-
-:RV32F - "RV32F Standard Extension for Single-Precision Floating-Point"
-
-| **Instruction Name** | **Instruction Description**                                                                            |
-|:---------------------|:-------------------------------------------------------------------------------------------------------|
-| `fcvt.l.s`           | `Convert the single-precision value in frs1 to a 64-bit signed integer, then write the result to rd`   |
-| `fcvt.lu.s`          | `Convert the single-precision value in frs1 to a 64-bit unsigned integer, then write the result to rd` |
-| `fmv.x.s`            | `Write the sign extended single-precision value in frs1 into the integer register rd`                  |
-| `fcvt.s.l`           | `Convert the 64-bit signed integer in rs1 to a single-precision value, then write the result to frd`   |
-| `fcvt.s.lu`          | `Convert the 64-bit unsigned integer in rs1 to a single-precision value, then write the result to frd` |
-| `fmv.s.x`            | `Write the lower 32-bits of the integer register rs1 into the single-precision register frd`           |
-
-:RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
-
-| **Instruction Name** | **Instruction Description**                                                                                                 |
-|:---------------------|:----------------------------------------------------------------------------------------------------------------------------|
-| `fld`                | `Loads a double-precision foating-point value from memory into foating-point register frd`                                  |
-| `fsd`                | `Stores a double-precision foating-point value from foating-point register frs2 to memory`                                  |
-| `fmadd.d`            | `Multiply the double-precision values in frs1 and frs2, then add rs3 and write the result to frd`                           |
-| `fmsub.d`            | `Multiply the double-precision values in frs1 and frs2, then subtract rs3 and write the result to frd`                      |
-| `fnmsub.d`           | `Multiply the double-precision value in frs1 with the negated value in frs2, then add rs3 and write the result to frd`      |
-| `fnmadd.d`           | `Multiply the double-precision value in frs1 with the negated value in frs2, then subtract rs3 and write the result to frd` |
-| `fadd.d`             | `Add the double-precision values in frs1 and frs2, then write the result to frd`                                            |
-| `fsub.d`             | `Subtract the double-precision values in frs1 from frs2, then write the result to frd`                                      |
-| `fmul.d`             | `Multiply the double-precision values in frs1 and frs2, then write the result to frd`                                       |
-| `fdiv.d`             | `Divide the double-precision value in frs1 into frs2, then write the result to frd`                                         |
-| `fsgnj.d`            | `Take the double-precision value from frs1 and inject the sign bit from frs2, then write the result to frd`                 |
-| `fsgnjn.d`           | `Take the double-precision value from frs1 and inject the negated sign bit from frs2, then write the result to frd`         |
-| `fsgnjx.d`           | `Take the double-precision value from frs1 and inject the xor of the sign bits frs1 and frs2, then write the result to frd` |
-| `fmin.s`             | `Take the smaller double-precision value from frs1 and frs2, then write the result to frd`                                  |
-| `fmax.s`             | `Take the larger double-precision value from frs1 and frs2, then write the result to frd`                                   |
-| `fcvt.s.d`           | `Convert the double-precision value in frs1 to single-precision, then write the result to frd`                              |
-| `fcvt.d.s`           | `Convert the single-precision value in frs1 to double-precision, then write the result to frd`                              |
-| `fsqrt.d`            | `Calculate the square root of the double-precision value in frs1, then write the result to frd`                             |
-| `fle.d`              | `Set rd to 1 if frs1 is less than or equal to frs2, otherwise set rd to 0`                                                  |
-| `flt.d`              | `Set rd to 1 if frs1 is less than frs2, otherwise set rd to 0`                                                              |
-| `feq.d`              | `Set rd to 1 if frs1 is equal to frs2, otherwise set rd to 0`                                                               |
-| `fcvt.w.d`           | `Convert the double-precision value in frs1 to a 32-bit signed integer, then write the result to rd`                        |
-| `fcvt.wu.d`          | `Convert the double-precision value in frs1 to a 32-bit unsigned integer, then write the result to rd`                      |
-| `fcvt.d.w`           | `Convert the 64-bit signed integer in rs1 to a double-precision value, then write the result to frd`                        |
-| `fcvt.d.wu`          | `Convert the 64-bit unsigned integer in rs1 to a double-precision value, then write the result to frd`                      |
-| `fmv.x.d`            | `Write the sign extended double-precision value in frs1 into integer register rd`                                           |
-| `fclass.d`           | `Set rd to a 10-bit mask indicating the class of the double-precision value in frs1`                                        |
-| `fmv.d.x`            | `Write the 64-bit integer register rs1 into the double-precision register frd`                                              |
-
-:RV32D - "RV32D Standard Extension for Double-Precision Floating-Point"
-
-| **Instruction Name** | **Instruction Description**                                                                            |
-|:---------------------|:-------------------------------------------------------------------------------------------------------|
-| `fcvt.l.d`           | `Convert the double-precision value in frs1 to a 64-bit signed integer, then write the result to rd`   |
-| `fcvt.lu.d`          | `Convert the double-precision value in frs1 to a 64-bit unsigned integer, then write the result to rd` |
-| `fcvt.d.l`           | `Convert the 64-bit signed integer in rs1 to a double-precision value, then write the result to frd`   |
-| `fcvt.d.lu`          | `Convert the 64-bit unsigned integer in rs1 to a double-precision value, then write the result to frd` |
-
-:RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32D)"
-
-| **Instruction Name** | **Instruction Description**                                                               |
-|:---------------------|:------------------------------------------------------------------------------------------|
-| `frcsr`              | `Read FP Control and Status Register`                                                     |
-| `frrm`               | `Read FP Rounding Mode (Bits 7:5 of fcsr Control and Status Register)`                    |
-| `frflags`            | `Read FP Accrued Exception Flags (Bits 4:0 of fcsr Control and Status Register)`          |
-| `fscsr`              | `Read FP Control and Status Register`                                                     |
-| `fsrm`               | `Set FP Rounding Mode (Bits 7:5 of fcsr Control and Status Register)`                     |
-| `fsflags`            | `Set FP Accrued Exception Flags (Bits 4:0 of fcsr Control and Status Register)`           |
-| `fsrmi`              | `Set FP Rounding Mode Immediate (Bits 7:5 of fcsr Control and Status Register)`           |
-| `fsflagsi`           | `Set FP Accrued Exception Flags Immediate (Bits 4:0 of fcsr Control and Status Register)` |
-
-:RV32FD - "RV32F and RV32D Common Floating-Point Instructions"
-
-| **Instruction Name** | **Instruction Description**                                                                                                    |
-|:---------------------|:-------------------------------------------------------------------------------------------------------------------------------|
-| `flq`                | `Loads a quadruple-precision foating-point value from memory into foating-point register frd`                                  |
-| `fsq`                | `Stores a quadruple-precision foating-point value from foating-point register frs2 to memory`                                  |
-| `fmadd.q`            | `Multiply the quadruple-precision values in frs1 and frs2, then add rs3 and write the result to frd`                           |
-| `fmsub.q`            | `Multiply the quadruple-precision values in frs1 and frs2, then subtract rs3 and write the result to frd`                      |
-| `fnmsub.q`           | `Multiply the quadruple-precision value in frs1 with the negated value in frs2, then add rs3 and write the result to frd`      |
-| `fnmadd.q`           | `Multiply the quadruple-precision value in frs1 with the negated value in frs2, then subtract rs3 and write the result to frd` |
-| `fadd.q`             | `Add the quadruple-precision values in frs1 and frs2, then write the result to frd`                                            |
-| `fsub.q`             | `Subtract the quadruple-precision values in frs1 from frs2, then write the result to frd`                                      |
-| `fmul.q`             | `Multiply the quadruple-precision values in frs1 and frs2, then write the result to frd`                                       |
-| `fdiv.q`             | `Divide the quadruple-precision value in frs1 into frs2, then write the result to frd`                                         |
-| `fsgnj.q`            | `Take the quadruple-precision value from frs1 and inject the sign bit from frs2, then write the result to frd`                 |
-| `fsgnjn.q`           | `Take the quadruple-precision value from frs1 and inject the negated sign bit from frs2, then write the result to frd`         |
-| `fsgnjx.q`           | `Take the quadruple-precision value from frs1 and inject the xor of the sign bits frs1 and frs2, then write the result to frd` |
-| `fmin.s`             | `Take the smaller quadruple-precision value from frs1 and frs2, then write the result to frd`                                  |
-| `fmax.s`             | `Take the larger quadruple-precision value from frs1 and frs2, then write the result to frd`                                   |
-| `fcvt.s.q`           | `Convert the quadruple-precision value in frs1 to single-precision, then write the result to frd`                              |
-| `fcvt.q.s`           | `Convert the single-precision value in frs1 to quadruple-precision, then write the result to frd`                              |
-| `fcvt.d.q`           | `Convert the quadruple-precision value in frs1 to double-precision, then write the result to frd`                              |
-| `fcvt.q.d`           | `Convert the double-precision value in frs1 to quadruple-precision, then write the result to frd`                              |
-| `fsqrt.q`            | `Calculate the square root of the quadruple-precision value in frs1, then write the result to frd`                             |
-| `fle.q`              | `Set rd to 1 if frs1 is less than or equal to frs2, otherwise set rd to 0`                                                     |
-| `flt.q`              | `Set rd to 1 if frs1 is less than frs2, otherwise set rd to 0`                                                                 |
-| `feq.q`              | `Set rd to 1 if frs1 is equal to frs2, otherwise set rd to 0`                                                                  |
-| `fcvt.w.q`           | `Convert the quadruple-precision value in frs1 to a 32-bit signed integer, then write the result to rd`                        |
-| `fcvt.wu.q`          | `Convert the quadruple-precision value in frs1 to a 32-bit unsigned integer, then write the result to rd`                      |
-| `fcvt.q.w`           | `Convert the 64-bit signed integer in rs1 to a quadruple-precision value, then write the result to frd`                        |
-| `fcvt.q.wu`          | `Convert the 64-bit unsigned integer in rs1 to a quadruple-precision value, then write the result to frd`                      |
-| `fclass.q`           | `Set rd to a 10-bit mask indicating the class of the quadruple-precision value in frs1`                                        |
-
-:RV32Q - "RV32Q Standard Extension for Quadruple-Precision Floating-Point"
-
-| **Instruction Name** | **Instruction Description**                                                                               |
-|:---------------------|:----------------------------------------------------------------------------------------------------------|
-| `fcvt.l.q`           | `Convert the quadruple-precision value in frs1 to a 64-bit signed integer, then write the result to rd`   |
-| `fcvt.lu.q`          | `Convert the quadruple-precision value in frs1 to a 64-bit unsigned integer, then write the result to rd` |
-| `fcvt.q.l`           | `Convert the 64-bit signed integer in rs1 to a quadruple-precision value, then write the result to frd`   |
-| `fcvt.q.lu`          | `Convert the 64-bit unsigned integer in rs1 to a quadruple-precision value, then write the result to frd` |
-
-:RV64Q - "RV64Q Standard Extension for Quadruple-Precision Floating-Point (+ RV32Q)"
-
-| **Instruction Name** | **Instruction Description**                                                          |
-|:---------------------|:-------------------------------------------------------------------------------------|
-| `fmv.x.q`            | `Write the sign extended quadruple-precision value in frs1 into integer register rd` |
-| `fmv.q.x`            | `Write the 64-bit integer register rs1 into the quadruple-precision register frd`    |
-
-:RV128Q - "RV128Q Standard Extension for Quadruple-Precision Floating-Point (+ RV64Q)"
-
-| **Instruction Name** | **Instruction Description**          |
-|:---------------------|:-------------------------------------|
-| `nop`                | `No operation`                       |
-| `#li`                | `Load immediate`                     |
-| `mv`                 | `Copy register`                      |
-| `not`                | `One's complement`                   |
-| `neg`                | `Two's complement`                   |
-| `negw`               | `Two's complement Word`              |
-| `sext.w`             | `Sign extend Word`                   |
-| `seqz`               | `Set if = zero`                      |
-| `snez`               | `Set if != zero`                     |
-| `sltz`               | `Set if < zero`                      |
-| `sgtz`               | `Set if > zero`                      |
-| `fmv.s`              | `Single-precision move`              |
-| `fabs.s`             | `Single-precision absolute value`    |
-| `fneg.s`             | `Single-precision negate`            |
-| `fmv.d`              | `Double-precision move`              |
-| `fabs.d`             | `Double-precision absolute value`    |
-| `fneg.d`             | `Double-precision negate`            |
-| `fmv.q`              | `Quadruple-precision move`           |
-| `fabs.q`             | `Quadruple-precision absolute value` |
-| `fneg.q`             | `Quadruple-precision negate`         |
-| `beqz`               | `Branch if = zero`                   |
-| `bnez`               | `Branch if != zero`                  |
-| `blez`               | `Branch if <= zero`                  |
-| `bgez`               | `Branch if >= zero`                  |
-| `bltz`               | `Branch if < zero`                   |
-| `bgtz`               | `Branch if > zero`                   |
-| `j`                  | `Jump`                               |
-| `jr`                 | `Jump register`                      |
-| `ret`                | `Return from subroutine`             |
-
-:Pseudo-Instructions
+:RV64ZXK - Specific Extension for Scalar Cryptography Instructions (64 bit)

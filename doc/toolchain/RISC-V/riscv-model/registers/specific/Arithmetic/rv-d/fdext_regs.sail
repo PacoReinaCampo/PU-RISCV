@@ -109,9 +109,16 @@ register f31 : fregtype
 
 function dirty_fd_context() -> unit = {
   assert(hartSupports(Ext_F));
-  mstatus[FS] = extStatus_to_bits(Dirty);
+  mstatus[FS] = extStatus_map(Dirty);
   mstatus[SD] = 0b1;
-  long_csr_write_callback("mstatus", "mstatush", mstatus.bits);
+  long_csr_write_callback("mstatus", "mstatush", read_mstatus().bits);
+  // When V=1 both vsstatus.FS and mstatus.FS are in effect, and modifying
+  // floating-point state must set both to Dirty.
+  if inVirtualPrivilege() then {
+    vsstatus[FS] = extStatus_map(Dirty);
+    vsstatus[SD] = 0b1;
+    csr_write_callback("vsstatus", vsstatus.bits[xlen - 1 .. 0]);
+  }
 }
 
 function dirty_fd_context_if_present() -> unit = {
@@ -281,7 +288,7 @@ function rF_or_X_S(i : fregidx) -> bits(32) = {
 }
 
 function rF_or_X_D(i : fregidx) -> bits(64) = {
-  assert(flen >= 64);
+  assert(flen >= 64 | hartSupports(Ext_Zdinx));
   assert(hartSupports(Ext_F) != hartSupports(Ext_Zfinx));
   if   hartSupports(Ext_F)
   then F_D(i)
@@ -311,7 +318,7 @@ function wF_or_X_S(i : fregidx, data : bits(32)) -> unit = {
 }
 
 function wF_or_X_D(i : fregidx, data : bits(64)) -> unit = {
-  assert (flen >= 64);
+  assert (flen >= 64 | hartSupports(Ext_Zdinx));
   assert(hartSupports(Ext_F) != hartSupports(Ext_Zfinx));
   if   hartSupports(Ext_F)
   then F_D(i) = data
@@ -438,12 +445,19 @@ function write_fcsr(frm : bits(3), fflags : bits(5)) -> unit = {
 
 // OR flags into the fflags register.
 function accrue_fflags(flags : bits(5)) -> unit = {
-  let f = fcsr[FFLAGS] | flags;
-  if  fcsr[FFLAGS] != f
-  then {
-    fcsr[FFLAGS] = f;
-    dirty_fd_context_if_present();
+  let new_fflags = fcsr[FFLAGS] | flags;
+  let fflags_changed = fcsr[FFLAGS] != new_fflags;
+
+  let set_dirty : bool = match fflags_dirty_policy {
+    Fflags_Dirty_Precise => fflags_changed,
+    Fflags_Dirty_Flag => flags != zeros(),
+    Fflags_Dirty_Instruction => true,
   };
+
+  fcsr[FFLAGS] = new_fflags;
+
+  if set_dirty then dirty_fd_context_if_present();
+
   csr_write_callback("fflags", zero_extend(fcsr[FFLAGS]));
   csr_write_callback("fcsr", zero_extend(fcsr.bits));
 }

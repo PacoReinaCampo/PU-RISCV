@@ -1,238 +1,573 @@
 ## INSTRUCTION CLASSES
 
-| **Instruction** | **Class**       |
-|:----------------|:----------------|
-| `lui`           | `alu`           |
-| `auipc`         | `alu`           |
-| `jal`           | `jump`          |
-| `jalr`          | `jump,indirect` |
-| `beq`           | `branch`        |
-| `bne`           | `branch`        |
-| `blt`           | `branch`        |
-| `bge`           | `branch`        |
-| `bltu`          | `branch`        |
-| `bgeu`          | `branch`        |
-| `lb`            | `load`          |
-| `lh`            | `load`          |
-| `lw`            | `load`          |
-| `lbu`           | `load`          |
-| `lhu`           | `load`          |
-| `lwu`           | `load`          |
-| `sb`            | `store`         |
-| `sh`            | `store`         |
-| `sw`            | `store`         |
-| `addi`          | `alu`           |
-| `slti`          | `alu`           |
-| `sltiu`         | `alu`           |
-| `xori`          | `alu`           |
-| `ori`           | `alu`           |
-| `andi`          | `alu`           |
-| `slli`          | `alu`           |
-| `srli`          | `alu`           |
-| `srai`          | `alu`           |
-| `add`           | `alu`           |
-| `sub`           | `alu`           |
-| `sll`           | `alu`           |
-| `slt`           | `alu`           |
-| `sltu`          | `alu`           |
-| `xor`           | `alu`           |
-| `srl`           | `alu`           |
-| `sra`           | `alu`           |
-| `or`            | `alu`           |
-| `and`           | `alu`           |
-| `fence`         | `fence`         |
-| `fence.i`       | `fence`         |
+| **Extension** | **Name**        | **Variable-Fields**  | **Class** |
+|:--------------|:----------------|:---------------------|:----------|
+| `rv_p`        | `abs`           | `rd, rs1`            | `packed`  |
+| `rv_p`        | `cls`           | `rd, rs1`            | `packed`  |
+| `rv_p`        | `clz`           | `rd, rs1`            | `packed`  |
+| `rv_p`        | `max`           | `rd, rs1, rs2`       | `packed`  |
+| `rv_p`        | `maxu`          | `rd, rs1, rs2`       | `packed`  |
+| `rv_p`        | `merge`         | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `min`           | `rd, rs1, rs2`       | `packed`  |
+| `rv_p`        | `minu`          | `rd, rs1, rs2`       | `packed`  |
+| `rv_p`        | `mvm`           | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `mvmn`          | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `paadd_b`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `paadd_h`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `paaddu_b`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `paaddu_h`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `paas_hx`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pabd_b`        | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pabd_h`        | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pabdsumau_b`   | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pabdsumu_b`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pabdu_b`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pabdu_h`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pack`          | `rd, rs1, rs2`       | `packed`  |
+| `rv_p`        | `padd_b`        | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `padd_bs`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `padd_h`        | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `padd_hs`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pasa_hx`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pas_hx`        | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pasub_b`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pasub_h`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pasubu_b`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pasubu_h`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pli_b`         | `p_imm8, rd`         | `packed`  |
+| `rv_p`        | `pli_h`         | `p_imm10, rd`        | `packed`  |
+| `rv_p`        | `plui_h`        | `p_imm10, rd`        | `packed`  |
+| `rv_p`        | `pm2adda_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm2adda_hx`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm2addasu_h`   | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm2addau_h`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm2add_h`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm2add_hx`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm2addsu_h`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm2addu_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm2sadd_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm2sadd_hx`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm2suba_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm2suba_hx`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm2sub_h`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm2sub_hx`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm4adda_b`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm4addasu_b`   | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm4addau_b`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm4add_b`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm4addsu_b`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pm4addu_b`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmax_b`        | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmax_h`        | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmaxu_b`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmaxu_h`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmhacc_h`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmhacc_h_b0`   | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmhacc_h_b1`   | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmhaccsu_h`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmhaccsu_h_b0` | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmhaccsu_h_b1` | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmhaccu_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmhracc_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmhraccsu_h`   | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmhraccu_h`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmin_b`        | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmin_h`        | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pminu_b`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pminu_h`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmq2adda_h`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmq2add_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmqr2adda_h`   | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmqr2add_h`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmseq_b`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmseq_h`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmslt_b`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmslt_h`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmsltu_b`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmsltu_h`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmul_h_b00`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmul_h_b01`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmul_h_b11`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulh_h`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulh_h_b0`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulh_h_b1`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulhr_h`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulhrsu_h`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulhru_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulhsu_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulhsu_h_b0`  | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulhsu_h_b1`  | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulhu_h`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulq_h`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulqr_h`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulsu_h_b00`  | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulsu_h_b11`  | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulu_h_b00`   | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulu_h_b01`   | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pmulu_h_b11`   | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `ppaire_b`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `ppaireo_b`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `ppaireo_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `ppairo_b`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `ppairoe_b`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `ppairoe_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `ppairo_h`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `predsum_bs`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `predsum_hs`    | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `predsumu_bs`   | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `predsumu_hs`   | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psabs_b`       | `rs1, rd`            | `packed`  |
+| `rv_p`        | `psabs_h`       | `rs1, rd`            | `packed`  |
+| `rv_p`        | `psadd_b`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psadd_h`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psaddu_b`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psaddu_h`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psa_hx`        | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psas_hx`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psati_h`       | `p_w_uimm4, rs1, rd` | `packed`  |
+| `rv_p`        | `psext_h_b`     | `rs1, rd`            | `packed`  |
+| `rv_p`        | `psh1add_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psll_bs`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psll_hs`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pslli_b`       | `p_w_uimm3, rs1, rd` | `packed`  |
+| `rv_p`        | `pslli_h`       | `p_w_uimm4, rs1, rd` | `packed`  |
+| `rv_p`        | `psra_bs`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psra_hs`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psrai_b`       | `p_w_uimm3, rs1, rd` | `packed`  |
+| `rv_p`        | `psrai_h`       | `p_w_uimm4, rs1, rd` | `packed`  |
+| `rv_p`        | `psrari_h`      | `p_w_uimm4, rs1, rd` | `packed`  |
+| `rv_p`        | `psrl_bs`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psrl_hs`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psrli_b`       | `p_w_uimm3, rs1, rd` | `packed`  |
+| `rv_p`        | `psrli_h`       | `p_w_uimm4, rs1, rd` | `packed`  |
+| `rv_p`        | `pssa_hx`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pssh1sadd_h`   | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pssha_hs`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psshar_hs`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psshl_hs`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psshlr_hs`     | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psslai_h`      | `p_w_uimm4, rs1, rd` | `packed`  |
+| `rv_p`        | `pssub_b`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pssub_h`       | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pssubu_b`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pssubu_h`      | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psub_b`        | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `psub_h`        | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `pusati_h`      | `p_w_uimm4, rs1, rd` | `packed`  |
+| `rv_p`        | `sext_b`        | `rd, rs1`            | `packed`  |
+| `rv_p`        | `sext_h`        | `rd, rs1`            | `packed`  |
+| `rv_p`        | `sh1add`        | `rd, rs1, rs2`       | `packed`  |
+| `rv_p`        | `slx`           | `rs2, rs1, rd`       | `packed`  |
+| `rv_p`        | `srx`           | `rs2, rs1, rd`       | `packed`  |
 
-:RV32I - "RV32I Base Integer Instruction Set"
+:RVP - Specific Extension for Packed SIMD Instructions
 
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `ld`            | `load`    |
-| `sd`            | `store`   |
-| `addiw`         | `alu`     |
-| `slliw`         | `alu`     |
-| `srliw`         | `alu`     |
-| `sraiw`         | `alu`     |
-| `addw`          | `alu`     |
-| `subw`          | `alu`     |
-| `sllw`          | `alu`     |
-| `srlw`          | `alu`     |
-| `sraw`          | `alu`     |
+| **Extension** | **Name**       | **Variable-Fields**          | **Class** |
+|:--------------|:---------------|:-----------------------------|:----------|
+| `rv32_p`      | `addd`         | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `mqrwacc`      | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `mqwacc`       | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `nclip`        | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `nclipi`       | `p_w_uimm6, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `nclipiu`      | `p_w_uimm6, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `nclipr`       | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `nclipri`      | `p_w_uimm6, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `nclipriu`     | `p_w_uimm6, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `nclipru`      | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `nclipu`       | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `nsra`         | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `nsrai`        | `p_w_uimm6, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `nsrar`        | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `nsrari`       | `p_w_uimm6, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `nsrl`         | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `nsrli`        | `p_w_uimm6, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `paadd_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `paadd_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `paadd_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `paaddu_db`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `paaddu_dh`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `paaddu_dw`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `paas_dhx`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pabd_db`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pabd_dh`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pabdu_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pabdu_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `padd_db`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `padd_dbs`     | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `padd_dh`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `padd_dhs`     | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `padd_dw`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `padd_dws`     | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `pasa_dhx`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pas_dhx`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pasub_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pasub_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pasub_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pasubu_db`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pasubu_dh`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pasubu_dw`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pli_db`       | `p_imm8, p_rd_p`             | `packed`  |
+| `rv32_p`      | `pli_dh`       | `p_imm10, p_rd_p`            | `packed`  |
+| `rv32_p`      | `plui_dh`      | `p_imm10, p_rd_p`            | `packed`  |
+| `rv32_p`      | `pm2wadda_h`   | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pm2wadda_hx`  | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pm2waddasu_h` | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pm2waddau_h`  | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pm2wadd_h`    | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pm2wadd_hx`   | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pm2waddsu_h`  | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pm2waddu_h`   | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pm2wsuba_h`   | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pm2wsuba_hx`  | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pm2wsub_h`    | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pm2wsub_hx`   | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pmax_db`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmax_dh`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmax_dw`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmaxu_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmaxu_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmaxu_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmin_db`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmin_dh`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmin_dw`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pminu_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pminu_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pminu_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmqrwacc_h`   | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pmqwacc_h`    | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pmseq_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmseq_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmseq_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmslt_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmslt_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmslt_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmsltu_db`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmsltu_dh`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pmsltu_dw`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pnclip_bs`    | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `pnclip_hs`    | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `pnclipi_b`    | `p_w_uimm4, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `pnclipi_h`    | `p_w_uimm5, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `pnclipiu_b`   | `p_w_uimm4, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `pnclipiu_h`   | `p_w_uimm5, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `pnclipr_bs`   | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `pnclipr_hs`   | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `pnclipri_b`   | `p_w_uimm4, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `pnclipri_h`   | `p_w_uimm5, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `pnclipriu_b`  | `p_w_uimm4, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `pnclipriu_h`  | `p_w_uimm5, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `pnclipru_bs`  | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `pnclipru_hs`  | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `pnclipu_bs`   | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `pnclipu_hs`   | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `pnsra_bs`     | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `pnsra_hs`     | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `pnsrai_b`     | `p_w_uimm4, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `pnsrai_h`     | `p_w_uimm5, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `pnsrar_bs`    | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `pnsrar_hs`    | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `pnsrari_b`    | `p_w_uimm4, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `pnsrari_h`    | `p_w_uimm5, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `pnsrl_bs`     | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `pnsrl_hs`     | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `pnsrli_b`     | `p_w_uimm4, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `pnsrli_h`     | `p_w_uimm5, p_rs1_p, rd`     | `packed`  |
+| `rv32_p`      | `ppaire_db`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `ppaire_dh`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `ppaireo_db`   | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `ppaireo_dh`   | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `ppairo_db`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `ppairo_dh`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `ppairoe_db`   | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `ppairoe_dh`   | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `predsum_dbs`  | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `predsum_dhs`  | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `predsumu_dbs` | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `predsumu_dhs` | `rs2, p_rs1_p, rd`           | `packed`  |
+| `rv32_p`      | `psabs_db`     | `p_rs1_p, p_rd_p`            | `packed`  |
+| `rv32_p`      | `psabs_dh`     | `p_rs1_p, p_rd_p`            | `packed`  |
+| `rv32_p`      | `psadd_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `psadd_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `psadd_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `psaddu_db`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `psaddu_dh`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `psaddu_dw`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `psa_dhx`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `psas_dhx`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `psati_dh`     | `p_w_uimm4, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `psati_dw`     | `p_w_uimm5, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `psext_dh_b`   | `p_rs1_p, p_rd_p`            | `packed`  |
+| `rv32_p`      | `psext_dw_b`   | `p_rs1_p, p_rd_p`            | `packed`  |
+| `rv32_p`      | `psext_dw_h`   | `p_rs1_p, p_rd_p`            | `packed`  |
+| `rv32_p`      | `psh1add_dh`   | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `psh1add_dw`   | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `psll_dbs`     | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psll_dhs`     | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psll_dws`     | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `pslli_db`     | `p_w_uimm3, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `pslli_dh`     | `p_w_uimm4, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `pslli_dw`     | `p_w_uimm5, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `psra_dbs`     | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psra_dhs`     | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psra_dws`     | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psrai_db`     | `p_w_uimm3, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `psrai_dh`     | `p_w_uimm4, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `psrai_dw`     | `p_w_uimm5, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `psrari_dh`    | `p_w_uimm4, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `psrari_dw`    | `p_w_uimm5, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `psrl_dbs`     | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psrl_dhs`     | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psrl_dws`     | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psrli_db`     | `p_w_uimm3, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `psrli_dh`     | `p_w_uimm4, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `psrli_dw`     | `p_w_uimm5, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `pssa_dhx`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pssh1sadd_dh` | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pssh1sadd_dw` | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pssha_dhs`    | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `pssha_dws`    | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psshar_dhs`   | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psshar_dws`   | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psshl_dhs`    | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psshl_dws`    | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psshlr_dhs`   | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psshlr_dws`   | `rs2, p_rs1_p, p_rd_p`       | `packed`  |
+| `rv32_p`      | `psslai_dh`    | `p_w_uimm4, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `psslai_dw`    | `p_w_uimm5, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `pssub_db`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pssub_dh`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pssub_dw`     | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pssubu_db`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pssubu_dh`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pssubu_dw`    | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `psub_db`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `psub_dh`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `psub_dw`      | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `pusati_dh`    | `p_w_uimm4, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `pusati_dw`    | `p_w_uimm5, p_rs1_p, p_rd_p` | `packed`  |
+| `rv32_p`      | `pwadda_b`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwadda_h`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwaddau_b`    | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwaddau_h`    | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwadd_b`      | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwadd_h`      | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwaddu_b`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwaddu_h`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwmacc_h`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwmaccsu_h`   | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwmaccu_h`    | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwmul_b`      | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwmul_h`      | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwmulsu_b`    | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwmulsu_h`    | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwmulu_b`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwmulu_h`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwsla_bs`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwsla_hs`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwslai_b`     | `p_w_uimm4, rs1, p_rd_p`     | `packed`  |
+| `rv32_p`      | `pwslai_h`     | `p_w_uimm5, rs1, p_rd_p`     | `packed`  |
+| `rv32_p`      | `pwsll_bs`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwsll_hs`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwslli_b`     | `p_w_uimm4, rs1, p_rd_p`     | `packed`  |
+| `rv32_p`      | `pwslli_h`     | `p_w_uimm5, rs1, p_rd_p`     | `packed`  |
+| `rv32_p`      | `pwsuba_b`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwsuba_h`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwsubau_b`    | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwsubau_h`    | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwsub_b`      | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwsub_h`      | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwsubu_b`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `pwsubu_h`     | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `rev_rv32`     | `rd, rs1`                    | `packed`  |
+| `rv32_p`      | `subd`         | `p_rs2_p, p_rs1_p, p_rd_p`   | `packed`  |
+| `rv32_p`      | `wadd`         | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wadda`        | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `waddau`       | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `waddu`        | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wmacc`        | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wmaccsu`      | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wmaccu`       | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wmul`         | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wmulsu`       | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wmulu`        | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wsla`         | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wslai`        | `p_w_uimm6, rs1, p_rd_p`     | `packed`  |
+| `rv32_p`      | `wsll`         | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wslli`        | `p_w_uimm6, rs1, p_rd_p`     | `packed`  |
+| `rv32_p`      | `wsub`         | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wsuba`        | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wsubau`       | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wsubu`        | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wzip16p`      | `rs2, rs1, p_rd_p`           | `packed`  |
+| `rv32_p`      | `wzip8p`       | `rs2, rs1, p_rd_p`           | `packed`  |
 
-:RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
+:RV32P - Specific Extension for Packed SIMD Instructions (32 bit)
 
-| **Instruction** | **Class**      |
-|:----------------|:---------------|
-| `mul`           | `alu,multiply` |
-| `mulh`          | `alu,multiply` |
-| `mulhsu`        | `alu,multiply` |
-| `mulhu`         | `alu,multiply` |
-| `div`           | `alu,divide`   |
-| `divu`          | `alu,divide`   |
-| `rem`           | `alu,divide`   |
-| `remu`          | `alu,divide`   |
+| **Extension** | **Name**        | **Variable-Fields**  | **Class** |
+|:--------------|:----------------|:---------------------|:----------|
+| `rv64_p`      | `absw`          | `rd, rs1`            | `packed`  |
+| `rv64_p`      | `clsw`          | `rd, rs1`            | `packed`  |
+| `rv64_p`      | `clzw`          | `rd, rs1`            | `packed`  |
+| `rv64_p`      | `maccsu_w00`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `maccsu_w11`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `maccu_w00`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `maccu_w01`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `maccu_w11`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `macc_w00`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `macc_w01`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `macc_w11`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `mqacc_w00`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `mqacc_w01`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `mqacc_w11`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `mqracc_w00`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `mqracc_w01`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `mqracc_w11`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `mulsu_w00`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `mulsu_w11`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `mulu_w00`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `mulu_w01`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `mulu_w11`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `mul_w00`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `mul_w01`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `mul_w11`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `paaddu_w`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `paadd_w`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `paas_wx`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `padd_w`        | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `padd_ws`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pasa_wx`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pasubu_w`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pasub_w`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pas_wx`        | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pli_w`         | `p_imm10, rd`        | `packed`  |
+| `rv64_p`      | `plui_w`        | `p_imm10, rd`        | `packed`  |
+| `rv64_p`      | `pm2addasu_w`   | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm2addau_w`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm2adda_w`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm2adda_wx`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm2addsu_w`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm2addu_w`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm2add_w`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm2add_wx`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm2suba_w`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm2suba_wx`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm2sub_w`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm2sub_wx`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm4adda_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm4addasu_h`   | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm4addau_h`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm4add_h`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm4addsu_h`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pm4addu_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmaccsu_w_h00` | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmaccsu_w_h11` | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmaccu_w_h00`  | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmaccu_w_h01`  | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmaccu_w_h11`  | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmacc_w_h00`   | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmacc_w_h01`   | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmacc_w_h11`   | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmaxu_w`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmax_w`        | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmhaccsu_w`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmhaccsu_w_h0` | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmhaccsu_w_h1` | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmhaccu_w`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmhacc_w`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmhacc_w_h0`   | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmhacc_w_h1`   | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmhraccsu_w`   | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmhraccu_w`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmhracc_w`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pminu_w`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmin_w`        | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmq2adda_w`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmq2add_w`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmqacc_w_h00`  | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmqacc_w_h01`  | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmqacc_w_h11`  | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmqr2adda_w`   | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmqr2add_w`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmqracc_w_h00` | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmqracc_w_h01` | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmqracc_w_h11` | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmseq_w`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmsltu_w`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmslt_w`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulhrsu_w`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulhru_w`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulhr_w`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulhsu_w`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulhsu_w_h0`  | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulhsu_w_h1`  | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulhu_w`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulh_w`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulh_w_h0`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulh_w_h1`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulqr_w`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulq_w`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulsu_w_h00`  | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulsu_w_h11`  | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulu_w_h00`   | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulu_w_h01`   | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmulu_w_h11`   | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmul_w_h00`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmul_w_h01`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pmul_w_h11`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pnclipp_b`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pnclipp_h`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pnclipp_w`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pnclipup_b`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pnclipup_h`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pnclipup_w`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `ppaire_h`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `ppaireo_w`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `ppairoe_w`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `ppairo_w`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `predsumu_ws`   | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `predsum_ws`    | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `psaddu_w`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `psadd_w`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `psas_wx`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `psati_w`       | `p_w_uimm5, rs1, rd` | `packed`  |
+| `rv64_p`      | `psa_wx`        | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `psext_w_b`     | `rs1, rd`            | `packed`  |
+| `rv64_p`      | `psext_w_h`     | `rs1, rd`            | `packed`  |
+| `rv64_p`      | `psh1add_w`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pslli_w`       | `p_w_uimm5, rs1, rd` | `packed`  |
+| `rv64_p`      | `psll_ws`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `psrai_w`       | `p_w_uimm5, rs1, rd` | `packed`  |
+| `rv64_p`      | `psrari_w`      | `p_w_uimm5, rs1, rd` | `packed`  |
+| `rv64_p`      | `psra_ws`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `psrli_w`       | `p_w_uimm5, rs1, rd` | `packed`  |
+| `rv64_p`      | `psrl_ws`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pssa_wx`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pssh1sadd_w`   | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `psshar_ws`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pssha_ws`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `psshlr_ws`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `psshl_ws`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `psslai_w`      | `p_w_uimm5, rs1, rd` | `packed`  |
+| `rv64_p`      | `pssubu_w`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pssub_w`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `psub_w`        | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `pusati_w`      | `p_w_uimm5, rs1, rd` | `packed`  |
+| `rv64_p`      | `rev`           | `rd, rs1`            | `packed`  |
+| `rv64_p`      | `rev16`         | `rd, rs1`            | `packed`  |
+| `rv64_p`      | `sati`          | `p_w_uimm6, rs1, rd` | `packed`  |
+| `rv64_p`      | `sha`           | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `shar`          | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `shl`           | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `shlr`          | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `srari`         | `p_w_uimm6, rs1, rd` | `packed`  |
+| `rv64_p`      | `unzip16hp`     | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `unzip16p`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `unzip8hp`      | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `unzip8p`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `usati`         | `p_w_uimm6, rs1, rd` | `packed`  |
+| `rv64_p`      | `zip16hp`       | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `zip16p`        | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `zip8hp`        | `rs2, rs1, rd`       | `packed`  |
+| `rv64_p`      | `zip8p`         | `rs2, rs1, rd`       | `packed`  |
 
-:RV32M - "RV32M Standard Extension for Integer Multiply and Divide"
-
-| **Instruction** | **Class**      |
-|:----------------|:---------------|
-| `mulw`          | `alu,multiply` |
-| `divw`          | `alu,multiply` |
-| `divuw`         | `alu,multiply` |
-| `remw`          | `alu,divide`   |
-| `remuw`         | `alu,divide`   |
-
-:RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `lr.w`          | `atomic`  |
-| `sc.w`          | `atomic`  |
-| `amoswap.w`     | `atomic`  |
-| `amoadd.w`      | `atomic`  |
-| `amoxor.w`      | `atomic`  |
-| `amoor.w`       | `atomic`  |
-| `amoand.w`      | `atomic`  |
-| `amomin.w`      | `atomic`  |
-| `amomax.w`      | `atomic`  |
-| `amominu.w`     | `atomic`  |
-| `amomaxu.w`     | `atomic`  |
-
-:RV32A - "RV32A Standard Extension for Atomic Instructions"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `lr.d`          | `atomic`  |
-| `sc.d`          | `atomic`  |
-| `amoswap.d`     | `atomic`  |
-| `amoadd.d`      | `atomic`  |
-| `amoxor.d`      | `atomic`  |
-| `amoor.d`       | `atomic`  |
-| `amoand.d`      | `atomic`  |
-| `amomin.d`      | `atomic`  |
-| `amomax.d`      | `atomic`  |
-| `amominu.d`     | `atomic`  |
-| `amomaxu.d`     | `atomic`  |
-
-:RV64A - "RV64A Standard Extension for Atomic Instructions (+ RV32A)"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `ecall`         | `system`  |
-| `ebreak`        | `system`  |
-| `uret`          | `system`  |
-| `sret`          | `system`  |
-| `hret`          | `system`  |
-| `mret`          | `system`  |
-| `dret`          | `system`  |
-| `sfence.vm`     | `system`  |
-| `wfi`           | `system`  |
-| `rdcycle`       | `csr`     |
-| `rdtime`        | `csr`     |
-| `rdinstret`     | `csr`     |
-| `rdcycleh`      | `csr`     |
-| `rdtimeh`       | `csr`     |
-| `rdinstreth`    | `csr`     |
-| `csrrw`         | `csr`     |
-| `csrrs`         | `csr`     |
-| `csrrc`         | `csr`     |
-| `csrrwi`        | `csr`     |
-| `csrrsi`        | `csr`     |
-| `csrrci`        | `csr`     |
-
-:RV32S - "RV32S Standard Extension for Supervisor-level Instructions"
-
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `flw`           | `fpu,load`  |
-| `fsw`           | `fpu,store` |
-| `fmadd.s`       | `fpu,fma`   |
-| `fmsub.s`       | `fpu,fma`   |
-| `fnmadd.s`      | `fpu,fma`   |
-| `fnmsub.s`      | `fpu,fma`   |
-| `fadd.s`        | `fpu`       |
-| `fsub.s`        | `fpu`       |
-| `fmul.s`        | `fpu`       |
-| `fdiv.s`        | `fpu,fdiv`  |
-| `fsgnj.s`       | `fpu`       |
-| `fsgnjn.s`      | `fpu`       |
-| `fsgnjx.s`      | `fpu`       |
-| `fmin.s`        | `fpu`       |
-| `fmax.s`        | `fpu`       |
-| `fsqrt.s`       | `fpu,fsqrt` |
-| `fle.s`         | `fpu`       |
-| `flt.s`         | `fpu`       |
-| `feq.s`         | `fpu`       |
-| `fcvt.w.s`      | `fpu,fcvt`  |
-| `fcvt.wu.s`     | `fpu,fcvt`  |
-| `fcvt.s.w`      | `fpu,fcvt`  |
-| `fcvt.s.wu`     | `fpu,fcvt`  |
-| `fmv.x.s`       | `fpu,fmove` |
-| `fclass.s`      | `fpu`       |
-| `fmv.s.x`       | `fpu,fmove` |
-
-:RV32F - "RV32F Standard Extension for Single-Precision Floating-Point"
-
-| **Instruction** | **Class**  |
-|:----------------|:-----------|
-| `fcvt.l.s`      | `fpu,fcvt` |
-| `fcvt.lu.s`     | `fpu,fcvt` |
-| `fcvt.s.l`      | `fpu,fcvt` |
-| `fcvt.s.lu`     | `fpu,fcvt` |
-
-:RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
-
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `fld`           | `fpu,load`  |
-| `fsd`           | `fpu,store` |
-| `fmadd.d`       | `fpu,fma`   |
-| `fmsub.d`       | `fpu,fma`   |
-| `fnmadd.d`      | `fpu,fma`   |
-| `fnmsub.d`      | `fpu,fma`   |
-| `fadd.d`        | `fpu`       |
-| `fsub.d`        | `fpu`       |
-| `fmul.d`        | `fpu`       |
-| `fdiv.d`        | `fpu,fdiv`  |
-| `fsgnj.d`       | `fpu`       |
-| `fsgnjn.d`      | `fpu`       |
-| `fsgnjx.d`      | `fpu`       |
-| `fmin.d`        | `fpu`       |
-| `fmax.d`        | `fpu`       |
-| `fcvt.s.d`      | `fpu,fcvt`  |
-| `fcvt.d.s`      | `fpu,fcvt`  |
-| `fsqrt.d`       | `fpu,fsqrt` |
-| `fle.d`         | `fpu`       |
-| `flt.d`         | `fpu`       |
-| `feq.d`         | `fpu`       |
-| `fcvt.w.d`      | `fpu,fcvt`  |
-| `fcvt.wu.d`     | `fpu,fcvt`  |
-| `fcvt.d.w`      | `fpu,fcvt`  |
-| `fcvt.d.wu`     | `fpu,fcvt`  |
-| `fclass.d`      | `fpu`       |
-
-:RV32D - "RV32D Standard Extension for Double-Precision Floating-Point"
-
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `fcvt.l.d`      | `fpu,fcvt`  |
-| `fcvt.lu.d`     | `fpu,fcvt`  |
-| `fmv.x.d`       | `fpu,fmove` |
-| `fcvt.d.l`      | `fpu,fcvt`  |
-| `fcvt.d.lu`     | `fpu,fcvt`  |
-| `fmv.d.x`       | `fpu,fmove` |
-
-:RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32D)"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `frcsr`         | `csr`     |
-| `frrm`          | `csr`     |
-| `frflags`       | `csr`     |
-| `fscsr`         | `csr`     |
-| `fsrm`          | `csr`     |
-| `fsflags`       | `csr`     |
-| `fsrmi`         | `csr`     |
-| `fsflagsi`      | `csr`     |
-
-:RV32FD - "RV32F and RV32D Common Floating-Point Instructions"
+:RV64P - Specific Extension for Packed SIMD Instructions (64 bit)

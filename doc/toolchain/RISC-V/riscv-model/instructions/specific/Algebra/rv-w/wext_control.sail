@@ -1,133 +1,139 @@
 // =======================================================================================
-// This Sail RISC-V architecture model, comprising all files and
+// This Sail RISC-W architecture model, comprising all files and
 // directories except where otherwise noted is subject the BSD
 // two-clause license in the LICENSE file.
 //
 // SPDX-License-Identifier: BSD-2-Clause
 // =======================================================================================
 
-function clause currentlyEnabled(Ext_Zvl32b) = hartSupports(Ext_Zvl32b)
-function clause currentlyEnabled(Ext_Zvl64b) = hartSupports(Ext_Zvl64b)
-function clause currentlyEnabled(Ext_Zvl128b) = hartSupports(Ext_Zvl128b)
-function clause currentlyEnabled(Ext_Zvl256b) = hartSupports(Ext_Zvl256b)
-function clause currentlyEnabled(Ext_Zvl512b) = hartSupports(Ext_Zvl512b)
-function clause currentlyEnabled(Ext_Zvl1024b) = hartSupports(Ext_Zvl1024b)
+function clause currentlyEnabled(Ext_W) = hartSupports(Ext_W) & misa[W] == 0b1
 
-// TODO: the interaction of Ext_Zve32x with a writable misa.V when misa.V == 0 needs settling.
-function clause currentlyEnabled(Ext_Zve32x) = hartSupports(Ext_Zve32x) & currentlyEnabled(Ext_Zvl32b) & (mstatus[VS] != 0b00) & currentlyEnabled(Ext_Zicsr)
-function clause currentlyEnabled(Ext_Zve32f) = hartSupports(Ext_Zve32f) & currentlyEnabled(Ext_Zve32x) & currentlyEnabled(Ext_F)
-function clause currentlyEnabled(Ext_Zve64x) = hartSupports(Ext_Zve64x) & currentlyEnabled(Ext_Zvl64b) & currentlyEnabled(Ext_Zve32x)
-function clause currentlyEnabled(Ext_Zve64f) = hartSupports(Ext_Zve64f) & currentlyEnabled(Ext_Zve64x) & currentlyEnabled(Ext_Zve32f)
-function clause currentlyEnabled(Ext_Zve64d) = hartSupports(Ext_Zve64d) & currentlyEnabled(Ext_Zve64f) & currentlyEnabled(Ext_D)
+let w_max_index_eew_exp : nat = config extensions.W.max_index_eew_exp
 
-function clause currentlyEnabled(Ext_V) = hartSupports(Ext_V) & (misa[V] == 0b1) & currentlyEnabled(Ext_Zvl128b) & currentlyEnabled(Ext_Zve64d)
-
-function clause currentlyEnabled(Ext_Zvfh)    = hartSupports(Ext_Zvfh)     & currentlyEnabled(Ext_Zve32f) & currentlyEnabled(Ext_Zfhmin)
-function clause currentlyEnabled(Ext_Zvfhmin) = (hartSupports(Ext_Zvfhmin) & currentlyEnabled(Ext_Zve32f)) | currentlyEnabled(Ext_Zvfh)
-
-// Get the total number of elements in a register group (not considering `vl`).
+// Get the total number of elements in a register group (not considering `wl`).
 // For fractional groups (negative LMUL_pow) we return the number of elements
 // in a single register. The fractional aspect is handled by `init_masked_result()`.
 //
 // The minimum number of elements is 1.
-// The maximum is VLMAX = LMUL*VLEN/SEW. VLMAX can never be more than vlen
+// The maximum is WLMAX = LMUL*WLEN/SEW. WLMAX can never be more than wlen
 // because the minimum SEW is 8 and the maximum LMUL is 8. This is also
 // true because all elements must be able to fit into a single register
 // at 1-bit per element for masks.
-function get_num_elem(LMUL_pow : LMUL_pow, SEW : sew_bitsize) -> range(1, vlen) = {
-  assert(vlen >= SEW);
-  (2 ^ max(0, LMUL_pow)) * vlen / SEW
+function w_get_num_elem(W_LMUL_pow : W_LMUL_pow, SEW : w_sew_bitsize) -> range(1, wlen) = {
+  assert(wlen >= SEW);
+  (2 ^ max(0, W_LMUL_pow)) * wlen / SEW
 }
 
-// Read a single element of a vector register group (starting at vrid).
-val read_single_element : forall 'sew, is_sew_bitsize('sew) . (int('sew), nat, vregidx) -> bits('sew)
-function read_single_element(EEW, index, vrid) = {
-  assert(EEW <= vlen);
-  static_assert(vlen % EEW == 0);
+// Read a single element of a matrix register group (starting at wrid).
+val w_read_single_element : forall 'sew, w_is_sew_bitsize('sew). (int('sew), nat, wregidx) -> bits('sew)
+function w_read_single_element(EEW, index, wrid) = {
+  assert(EEW <= wlen);
+  static_assert(wlen % EEW == 0);
 
-  // Number of EEW-bit elements per vector register.
-  let elem_per_reg = vlen / EEW;
+  // Number of EEW-bit elements per matrix register.
+  let elem_per_reg = wlen / EEW;
 
   // Register in group. Max LMUL is 8, so this should be in [0, 8).
   let reg_in_group = index / elem_per_reg;
   assert(reg_in_group < 8);
 
   // Get the actual register in the group that we need to write, and the index into it.
-  let vrid = vrid + reg_in_group;
+  let wrid = wrid + reg_in_group;
   let index = index % elem_per_reg;
+
   // Bit offset in register.
   let offset = index * EEW;
 
-  V(vrid)[(offset + EEW - 1) .. offset]
+  W(wrid)[offset + EEW - 1 .. offset]
 }
 
-// The general vreg reading operation with num_elem as max(VLMAX,VLEN/SEW)).
-val read_vreg : forall 'n 'sew 'p, 'n >= 0 & is_sew_bitsize('sew) . (int('n), int('sew), int('p), vregidx) -> vector('n, bits('sew))
-function read_vreg(num_elem, SEW, LMUL_pow, vrid) = {
-  let vrid_val = unsigned(vregidx_bits(vrid));
-  let LMUL_pow_reg = if LMUL_pow < 0 then 0 else LMUL_pow;
+// The general wreg reading operation with num_elem as max(WLMAX,WLEN/SEW)).
+val w_read_wreg : forall 'n 'sew 'p, 'n >= 0 & w_is_sew_bitsize('sew). (int('n), int('sew), int('p), wregidx) -> vector(
+    'n,
+    bits('sew),
+  )
+function w_read_wreg(num_elem, SEW, W_LMUL_pow, wrid) = {
+  let wrid_val = unsigned(w_wregidx_bits(wrid));
+  let LMUL_pow_reg = if W_LMUL_pow < 0 then { 0 } else { W_LMUL_pow };
   let LMUL = 2 ^ LMUL_pow_reg;
-  let vrid_end = vrid_val + LMUL;
-  assert(vrid_end <= 32, "Invalid register group: group " ^ dec_str(vrid_val) ^ " ends at " ^ dec_str(vrid_end) ^ " and overflows the largest register number (32).");
-  assert(vrid_val % LMUL == 0, "Invalid register group: group " ^ dec_str(vrid_val) ^ " is not a multiple of its EMUL " ^ dec_str(LMUL) ^ ".");
+  let wrid_end = wrid_val + LMUL;
+  assert(
+    wrid_end <= 32,
+     "Invalid register group: group "
+    ^ dec_str(wrid_val)
+    ^ " ends at "
+    ^ dec_str(wrid_end)
+    ^ " and overflows the largest register number (32)."
+  );
+  assert(
+    wrid_val % LMUL == 0,
+    "Invalid register group: group " ^ dec_str(wrid_val) ^ " is not a multiple of its EMUL " ^ dec_str(LMUL) ^ "."
+  );
 
   var result : vector('n, bits('sew)) = vector_init(zeros());
 
   foreach (i from 0 to (num_elem - 1)) {
-    result[i] = read_single_element(SEW, i, vrid);
+    result[i] = w_read_single_element(SEW, i, wrid)
   };
 
   result
 }
 
-// Write a single element of a vector register group (starting at vrid),
+// Write a single element of a matrix register group (starting at wrid),
 // leaving all other elements unchanged.
-val write_single_element : forall 'sew, is_sew_bitsize('sew) . (int('sew), nat, vregidx, bits('sew)) -> unit
-function write_single_element(EEW, index, vrid, value) = {
-  assert(EEW <= vlen);
-  static_assert(vlen % EEW == 0);
+val w_write_single_element : forall 'sew, w_is_sew_bitsize('sew). (int('sew), nat, wregidx, bits('sew)) -> unit
+function w_write_single_element(EEW, index, wrid, value) = {
+  assert(EEW <= wlen);
+  static_assert(wlen % EEW == 0);
 
-  // Number of EEW-bit elements per vector register.
-  let elem_per_reg = vlen / EEW;
+  // Number of EEW-bit elements per matrix register.
+  let elem_per_reg = wlen / EEW;
 
   // Register in group. Max LMUL is 8, so this should be in [0, 8).
   let reg_in_group = index / elem_per_reg;
   assert(reg_in_group < 8);
 
   // Get the actual register in the group that we need to write, and the index into it.
-  let vrid = vrid + reg_in_group;
+  let wrid = wrid + reg_in_group;
   let index = index % elem_per_reg;
+
   // Bit offset in register.
   let offset = index * EEW;
 
-  V(vrid) = [V(vrid) with (offset + EEW - 1) .. offset = value];
+  W(wrid) = [W(wrid) with (offset + EEW - 1) .. offset = value]
 }
 
-// Write a complete vector register group.
+// Write a complete matrix register group.
 //
 // num_elem: Number of elements in the entire group (ignoring
-//           fractional lmul and vl).
+//           fractional lmul and wl).
 // SEW:      Element size in bits.
 // LMUL_pow: LMUL exponent; size of the register group.
 //           Negative values indicate fractions of a single register, but
 //           we still require the full register's worth of elements.
-// vrid:     Index of the first register in the group.
+// wrid:     Index of the first register in the group.
 // data:     Data of each element.
 //
-val write_vreg : forall 'n 'sew, 'n >= 0 & is_sew_bitsize('sew) . (int('n), int('sew), LMUL_pow, vregidx, vector('n, bits('sew))) -> unit
-function write_vreg(num_elem, SEW, LMUL_pow, vrid, vec) = {
+val w_write_wreg : forall 'n 'sew, 'n >= 0 & w_is_sew_bitsize('sew). (
+    int('n),
+    int('sew),
+    W_LMUL_pow,
+    wregidx,
+    vector('n, bits('sew)),
+  ) -> unit
+function w_write_wreg(num_elem, SEW, W_LMUL_pow, wrid, vec) = {
   // Number of registers in the group (treating fractional lmul as 0).
-  let group_size = 2 ^ max(LMUL_pow, 0);
+  let group_size = 2 ^ max(W_LMUL_pow, 0);
 
-  assert(SEW <= vlen);
-  static_assert(vlen % SEW == 0);
+  assert(SEW <= wlen);
+  static_assert(wlen % SEW == 0);
 
-  // Number of SEW-bit elements per vector register.
-  let elem_per_reg = vlen / SEW;
+  // Number of SEW-bit elements per matrix register.
+  let elem_per_reg = wlen / SEW;
 
   // Normally num_elem == group_size * elem_per_reg, however
   // in the specific case of fractional lmul with widening instructions
-  // get_num_elem() returns vlen / SEW, but SEW is doubled before
+  // get_num_elem() returns wlen / SEW, but SEW is doubled before
   // feeding into this instruction, so elem_per_reg is half the
   // pre-widening value. Since `group_size` will be unchanged
   // (because max(LMUL_pow, 0) is still 0), we will end up
@@ -137,32 +143,114 @@ function write_vreg(num_elem, SEW, LMUL_pow, vrid, vec) = {
   assert(num_elem == group_size * elem_per_reg | num_elem == 2 * group_size * elem_per_reg);
 
   foreach (reg_in_group from 0 to (group_size - 1)) {
-    var reg_value : vlenbits = zeros();
+    var reg_value : wlenbits = zeros();
     foreach (i_elem from 0 to (elem_per_reg - 1)) {
-      reg_value[(i_elem * SEW) + SEW - 1 .. (i_elem * SEW)] = vec[reg_in_group * elem_per_reg + i_elem];
+      reg_value[(i_elem * SEW) + SEW - 1 .. i_elem * SEW] = vec[reg_in_group * elem_per_reg + i_elem]
     };
-    V(vrid + reg_in_group) = reg_value;
+    W(wrid + reg_in_group) = reg_value
   }
 }
 
-// Mask register reading operation with num_elem as max(VLMAX,vlen/SEW)).
-val read_vmask : forall 'n, 0 < 'n <= vlen . (int('n), bits(1), vregidx) -> bits('n)
-function read_vmask(num_elem, vm, vrid) =
-  if vm == 0b1 then ones() else ones('n - num_elem) @ V(vrid)[num_elem - 1 .. 0]
+// Mask register reading operation with num_elem as max(WLMAX,wlen/SEW)).
+val w_read_wmask : forall 'n, 0 < 'n <= wlen. (int('n), bits(1), wregidx) -> bits('n)
+function w_read_wmask(num_elem, wm, wrid) =
+  if wm == 0b1 then {
+    ones()
+  } else {
+    ones(sizeof('n) - num_elem) @ W(wrid)[num_elem - 1 .. 0]
+  }
 
-// This is a special version of read_vmask for carry/borrow instructions, where vm=1 means no carry.
-val read_vmask_carry : forall 'n, 0 < 'n <= vlen . (int('n), bits(1), vregidx) -> bits('n)
-function read_vmask_carry(num_elem, vm, vrid) =
-  if vm == 0b1 then zeros() else zeros('n - num_elem) @ V(vrid)[num_elem - 1 .. 0]
+// This is a special version of read_wmask for carry/borrow instructions, where wm=1 means no carry.
+val w_read_wmask_carry : forall 'n, 0 < 'n <= wlen. (int('n), bits(1), wregidx) -> bits('n)
+function w_read_wmask_carry(num_elem, wm, wrid) =
+  if wm == 0b1 then {
+    zeros()
+  } else {
+    zeros(sizeof('n) - num_elem) @ W(wrid)[num_elem - 1 .. 0]
+  }
 
-// Mask register writing operation with num_elem as max(VLMAX,vlen/SEW))
-val write_vmask : forall 'n, 'n > 0. (int('n), vregidx, bits('n)) -> unit
-function write_vmask(num_elem, vrid, v) = {
+// Mask register writing operation with num_elem as max(WLMAX,wlen/SEW))
+val w_write_wmask : forall 'n, 'n > 0. (int('n), wregidx, bits('n)) -> unit
+function w_write_wmask(num_elem, wrid, w) = {
   // TODO: This should be part of the type signature.
-  assert(0 < num_elem & num_elem <= vlen);
+  assert(0 < num_elem & num_elem <= wlen);
 
   // Mask tail is always agnostic. Currently we always
   // leave it undisturbed.
   // TODO: Configuration support for ones/undisturbed.
-  V(vrid) = [V(vrid) with (num_elem - 1) .. 0 = v]
+  W(wrid) = [W(wrid) with (num_elem - 1) .. 0 = w]
+}
+
+let w_columns : range(1, 65536) = config extensions.W.columns
+
+// Row-major coordinate view: p = i * COLS + j.
+function w_flat_index(i : nat, j : nat) -> nat = {
+  assert(j < w_columns);
+  i * w_columns + j
+}
+
+val w_read_element : forall 'sew, w_is_sew_bitsize('sew). (int('sew), nat, nat, wregidx) -> bits('sew)
+function w_read_element(EEW, i, j, rid) =
+  w_read_single_element(EEW, w_flat_index(i, j), rid)
+
+val w_write_element : forall 'sew, w_is_sew_bitsize('sew). (int('sew), nat, nat, wregidx, bits('sew)) -> unit
+function w_write_element(EEW, i, j, rid, value) =
+  w_write_single_element(EEW, w_flat_index(i, j), rid, value)
+
+// Explicit coordinate views. Padding belongs to no architectural element.
+val w_shape_vector : forall ('a : Type) 'n 'c, 'n > 0 & 'c > 0. (vector('n, 'a), int('c)) -> vector(
+    div('n + 'c - 1, 'c),
+    vector('c, 'a),
+  )
+function w_shape_vector(input, cols) = {
+  var output : vector(div('n + 'c - 1, 'c), vector('c, 'a)) = vector_init(vector_init(input[0]));
+  foreach (p from 0 to (sizeof('n) - 1)) {
+    let i = p / cols;
+    let j = p % cols;
+    assert(i < (sizeof('n) + cols - 1) / cols & j < cols);
+    output[i][j] = input[p]
+  };
+  output
+}
+
+// Native bit rows avoid generic vector(bit) specialisation in the C++ backend.
+val w_shape_bits : forall 'n 'c, 'n > 0 & 'c > 0. (bits('n), int('c)) -> vector(div('n + 'c - 1, 'c), bits('c))
+function w_shape_bits(input, cols) = {
+  var output : vector(div('n + 'c - 1, 'c), bits('c)) = vector_init(zeros());
+  foreach (p from 0 to (sizeof('n) - 1)) {
+    let i = p / cols;
+    let j = p % cols;
+    assert(i < (sizeof('n) + cols - 1) / cols & j < cols);
+    output[i][j] = input[p]
+  };
+  output
+}
+overload w_shape = { w_shape_vector, w_shape_bits }
+val w_unshape_vector : forall ('a : Type) 'n 'c, 'n > 0 & 'c > 0. (
+    int('n),
+    vector(div('n + 'c - 1, 'c), vector('c, 'a)),
+    int('c),
+  ) -> vector('n, 'a)
+function w_unshape_vector(n, input, cols) = {
+  var output : vector('n, 'a) = vector_init(input[0][0]);
+  foreach (p from 0 to (n - 1)) {
+    let i = p / cols;
+    let j = p % cols;
+    assert(i < (sizeof('n) + cols - 1) / cols & j < cols);
+    output[p] = input[i][j]
+  };
+  output
+}
+val w_unshape_bits : forall 'n 'c, 'n > 0 & 'c > 0. (int('n), vector(div('n + 'c - 1, 'c), bits('c)), int('c)) -> bits(
+    'n,
+  )
+function w_unshape_bits(n, input, cols) = {
+  var output : bits('n) = zeros();
+  foreach (p from 0 to (n - 1)) {
+    let i = p / cols;
+    let j = p % cols;
+    assert(i < (sizeof('n) + cols - 1) / cols & j < cols);
+    output[p] = input[i][j]
+  };
+  output
 }

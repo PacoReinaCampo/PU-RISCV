@@ -1,0 +1,67 @@
+## INSTRUCTION LENGTHS
+
+| **Extension** | **Name**     | **Length** |
+|:--------------|:-------------|:-----------|
+| `rv_zvkg`     | `vghsh_vv`   | `VLEN`     |
+| `rv_zvkg`     | `vgmul_vv`   | `VLEN`     |
+| `rv_zvkned`   | `vaesdf_vs`  | `VLEN`     |
+| `rv_zvkned`   | `vaesdf_vv`  | `VLEN`     |
+| `rv_zvkned`   | `vaesdm_vs`  | `VLEN`     |
+| `rv_zvkned`   | `vaesdm_vv`  | `VLEN`     |
+| `rv_zvkned`   | `vaesef_vs`  | `VLEN`     |
+| `rv_zvkned`   | `vaesef_vv`  | `VLEN`     |
+| `rv_zvkned`   | `vaesem_vs`  | `VLEN`     |
+| `rv_zvkned`   | `vaesem_vv`  | `VLEN`     |
+| `rv_zvkned`   | `vaeskf1_vi` | `VLEN`     |
+| `rv_zvkned`   | `vaeskf2_vi` | `VLEN`     |
+| `rv_zvkned`   | `vaesz_vs`   | `VLEN`     |
+| `rv_zvknha`   | `vsha2ch_vv` | `VLEN`     |
+| `rv_zvknha`   | `vsha2cl_vv` | `VLEN`     |
+| `rv_zvknha`   | `vsha2ms_vv` | `VLEN`     |
+| `rv_zvknhb`   | `vsha2ch_vv` | `VLEN`     |
+| `rv_zvknhb`   | `vsha2cl_vv` | `VLEN`     |
+| `rv_zvknhb`   | `vsha2ms_vv` | `VLEN`     |
+| `rv_zvkn`     | `vaesdf_vs`  | `VLEN`     |
+| `rv_zvkn`     | `vaesdf_vv`  | `VLEN`     |
+| `rv_zvkn`     | `vaesdm_vs`  | `VLEN`     |
+| `rv_zvkn`     | `vaesdm_vv`  | `VLEN`     |
+| `rv_zvkn`     | `vaesef_vs`  | `VLEN`     |
+| `rv_zvkn`     | `vaesef_vv`  | `VLEN`     |
+| `rv_zvkn`     | `vaesem_vs`  | `VLEN`     |
+| `rv_zvkn`     | `vaesem_vv`  | `VLEN`     |
+| `rv_zvkn`     | `vaeskf1_vi` | `VLEN`     |
+| `rv_zvkn`     | `vaeskf2_vi` | `VLEN`     |
+| `rv_zvkn`     | `vaesz_vs`   | `VLEN`     |
+| `rv_zvkn`     | `vandn_vv`   | `VLEN`     |
+| `rv_zvkn`     | `vandn_vx`   | `VLEN`     |
+| `rv_zvkn`     | `vbrev8_v`   | `VLEN`     |
+| `rv_zvkn`     | `vrev8_v`    | `VLEN`     |
+| `rv_zvkn`     | `vrol_vv`    | `VLEN`     |
+| `rv_zvkn`     | `vrol_vx`    | `VLEN`     |
+| `rv_zvkn`     | `vror_vi`    | `VLEN`     |
+| `rv_zvkn`     | `vror_vv`    | `VLEN`     |
+| `rv_zvkn`     | `vror_vx`    | `VLEN`     |
+| `rv_zvkn`     | `vsha2ch_vv` | `VLEN`     |
+| `rv_zvkn`     | `vsha2cl_vv` | `VLEN`     |
+| `rv_zvkn`     | `vsha2ms_vv` | `VLEN`     |
+| `rv_zvksed`   | `vsm4k_vi`   | `VLEN`     |
+| `rv_zvksed`   | `vsm4r_vs`   | `VLEN`     |
+| `rv_zvksed`   | `vsm4r_vv`   | `VLEN`     |
+| `rv_zvksh`    | `vsm3c_vi`   | `VLEN`     |
+| `rv_zvksh`    | `vsm3me_vv`  | `VLEN`     |
+| `rv_zvks`     | `vandn_vv`   | `VLEN`     |
+| `rv_zvks`     | `vandn_vx`   | `VLEN`     |
+| `rv_zvks`     | `vbrev8_v`   | `VLEN`     |
+| `rv_zvks`     | `vrev8_v`    | `VLEN`     |
+| `rv_zvks`     | `vrol_vv`    | `VLEN`     |
+| `rv_zvks`     | `vrol_vx`    | `VLEN`     |
+| `rv_zvks`     | `vror_vi`    | `VLEN`     |
+| `rv_zvks`     | `vror_vv`    | `VLEN`     |
+| `rv_zvks`     | `vror_vx`    | `VLEN`     |
+| `rv_zvks`     | `vsm3c_vi`   | `VLEN`     |
+| `rv_zvks`     | `vsm3me_vv`  | `VLEN`     |
+| `rv_zvks`     | `vsm4k_vi`   | `VLEN`     |
+| `rv_zvks`     | `vsm4r_vs`   | `VLEN`     |
+| `rv_zvks`     | `vsm4r_vv`   | `VLEN`     |
+
+:RVZVK - Specific Extension for Vector Cryptography Instructions

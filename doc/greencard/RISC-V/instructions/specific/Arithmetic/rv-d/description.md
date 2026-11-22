@@ -1,96 +1,60 @@
 ## INSTRUCTION DESCRIPTIONS
 
-| **Instruction Name** | **Instruction Description**                                                                                                 |
-|:---------------------|:----------------------------------------------------------------------------------------------------------------------------|
-| `flw`                | `Loads a single-precision foating-point value from memory into foating-point register frd`                                  |
-| `fsw`                | `Stores a single-precision foating-point value from foating-point register frs2 to memory`                                  |
-| `fmadd.s`            | `Multiply the single-precision values in frs1 and frs2, then add rs3 and write the result to frd`                           |
-| `fmsub.s`            | `Multiply the single-precision values in frs1 and frs2, then subtract rs3 and write the result to frd`                      |
-| `fnmsub.s`           | `Multiply the single-precision value in frs1 with the negated value in frs2, then add rs3 and write the result to frd`      |
-| `fnmadd.s`           | `Multiply the single-precision value in frs1 with the negated value in frs2, then subtract rs3 and write the result to frd` |
-| `fadd.s`             | `Add the single-precision values in frs1 and frs2, then write the result to frd`                                            |
-| `fsub.s`             | `Subtract the single-precision values in frs1 from frs2, then write the result to frd`                                      |
-| `fmul.s`             | `Multiply the single-precision values in frs1 and frs2, then write the result to frd`                                       |
-| `fdiv.s`             | `Divide the single-precision value in frs1 into frs2, then write the result to frd`                                         |
-| `fsgnj.s`            | `Take the single-precision value from frs1 and inject the sign bit from frs2, then write the result to frd`                 |
-| `fsgnjn.s`           | `Take the single-precision value from frs1 and inject the negated sign bit from frs2, then write the result to frd`         |
-| `fsgnjx.s`           | `Take the single-precision value from frs1 and inject the xor of the sign bits frs1 and frs2, then write the result to frd` |
-| `fmin.s`             | `Take the smaller single-precision value from frs1 and frs2, then write the result to frd`                                  |
-| `fmax.s`             | `Take the larger single-precision value from frs1 and frs2, then write the result to frd`                                   |
-| `fsqrt.s`            | `Calculate the square root of the single-precision value in frs1, then write the result to frd`                             |
-| `fle.s`              | `Set rd to 1 if the single-precision value in frs1 is less than or equal to frs2, otherwise set rd to 0`                    |
-| `flt.s`              | `Set rd to 1 if the single-precision value in frs1 is less than frs2, otherwise set rd to 0`                                |
-| `feq.s`              | `Set rd to 1 if the single-precision value in frs1 is equal to frs2, otherwise set rd to 0`                                 |
-| `fcvt.w.s`           | `Convert the single-precision value in frs1 to a 32-bit signed integer, then write the result to rd`                        |
-| `fcvt.wu.s`          | `Convert the single-precision value in frs1 to a 32-bit unsigned integer, then write the result to rd`                      |
-| `fcvt.s.w`           | `Convert the 32-bit signed integer in rs1 to a single-precision value, then write the result to frd`                        |
-| `fcvt.s.wu`          | `Convert the 32-bit unsigned integer in rs1 to a single-precision value, then write the result to frd`                      |
-| `fclass.s`           | `Set rd to a 10-bit mask indicating the class of the single-precision value in frs1`                                        |
+| **Extension** | **Name**      | **Variable-Fields**          | **Description**                                                                                                                                                                                                                             |
+|:--------------|:--------------|:-----------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv_d`        | `fadd_d`      | `rd, rs1, rs2, rm`           | `Add the values in rs1 and rs2 and write the double-precision result to rd using rounding mode rm`                                                                                                                                          |
+| `rv_d`        | `fclass_d`    | `rd, rs1`                    | `Write a 10-bit classification mask for the double-precision value in rs1 to integer register rd`                                                                                                                                           |
+| `rv_d`        | `fcvt_d_s`    | `rd, rs1, rm`                | `Convert the single-precision value in rs1 to a double-precision value and write the result to floating-point register rd. The conversion is exact and rm does not affect the result`                                                       |
+| `rv_d`        | `fcvt_d_w`    | `rd, rs1, rm`                | `Convert the 32-bit signed integer in rs1 to a double-precision value and write the result to floating-point register rd. The conversion is exact and rm does not affect the result`                                                        |
+| `rv_d`        | `fcvt_d_wu`   | `rd, rs1, rm`                | `Convert the 32-bit unsigned integer in rs1 to a double-precision value and write the result to floating-point register rd. The conversion is exact and rm does not affect the result`                                                      |
+| `rv_d`        | `fcvt_s_d`    | `rd, rs1, rm`                | `Convert the double-precision value in rs1 to a single-precision value and write the result to floating-point register rd using rounding mode rm`                                                                                           |
+| `rv_d`        | `fcvt_w_d`    | `rd, rs1, rm`                | `Convert the double-precision value in rs1 to a 32-bit signed integer and write the result to integer register rd using rounding mode rm. Sign-extend the 32-bit result to XLEN`                                                            |
+| `rv_d`        | `fcvt_wu_d`   | `rd, rs1, rm`                | `Convert the double-precision value in rs1 to a 32-bit unsigned integer and write the result to integer register rd using rounding mode rm. Sign-extend the 32-bit result to XLEN`                                                          |
+| `rv_d`        | `fdiv_d`      | `rd, rs1, rs2, rm`           | `Divide the value in rs1 by the value in rs2 and write the double-precision result to rd using rounding mode rm`                                                                                                                            |
+| `rv_d`        | `feq_d`       | `rd, rs1, rs2`               | `Set integer register rd to 1 when the double-precision value in rs1 is equal to the value in rs2, or to 0 otherwise. A NaN input yields 0 and sets the invalid flag only for a signaling NaN`                                              |
+| `rv_d`        | `fld`         | `rd, rs1, imm12`             | `Load 64 bits from the address in integer register rs1 plus signed offset imm12 into floating-point register rd`                                                                                                                            |
+| `rv_d`        | `fle_d`       | `rd, rs1, rs2`               | `Set integer register rd to 1 when the double-precision value in rs1 is less than or equal to the value in rs2, or to 0 otherwise. A NaN input yields 0 and sets the invalid flag for either kind of NaN`                                   |
+| `rv_d`        | `flt_d`       | `rd, rs1, rs2`               | `Set integer register rd to 1 when the double-precision value in rs1 is less than the value in rs2, or to 0 otherwise. A NaN input yields 0 and sets the invalid flag for either kind of NaN`                                               |
+| `rv_d`        | `fmadd_d`     | `rd, rs1, rs2, rs3, rm`      | `Multiply rs1 by rs2 and add rs3 and write the double-precision result to rd using rounding mode rm. Round only once`                                                                                                                       |
+| `rv_d`        | `fmax_d`      | `rd, rs1, rs2`               | `Write the double-precision maximum of rs1 and rs2 to rd. Return the numeric input when only one input is NaN and the canonical NaN when both are NaN. Order negative zero below positive zero and set the invalid flag for signaling NaNs` |
+| `rv_d`        | `fmin_d`      | `rd, rs1, rs2`               | `Write the double-precision minimum of rs1 and rs2 to rd. Return the numeric input when only one input is NaN and the canonical NaN when both are NaN. Order negative zero below positive zero and set the invalid flag for signaling NaNs` |
+| `rv_d`        | `fmsub_d`     | `rd, rs1, rs2, rs3, rm`      | `Multiply rs1 by rs2 and subtract rs3 and write the double-precision result to rd using rounding mode rm. Round only once`                                                                                                                  |
+| `rv_d`        | `fmul_d`      | `rd, rs1, rs2, rm`           | `Multiply the values in rs1 and rs2 and write the double-precision result to rd using rounding mode rm`                                                                                                                                     |
+| `rv_d`        | `fnmadd_d`    | `rd, rs1, rs2, rs3, rm`      | `Negate the product of rs1 and rs2 and subtract rs3 and write the double-precision result to rd using rounding mode rm. Round only once`                                                                                                    |
+| `rv_d`        | `fnmsub_d`    | `rd, rs1, rs2, rs3, rm`      | `Negate the product of rs1 and rs2 and add rs3 and write the double-precision result to rd using rounding mode rm. Round only once`                                                                                                         |
+| `rv_d`        | `fsd`         | `imm12hi, rs1, rs2, imm12lo` | `Store the low 64 bits of floating-point register rs2 to the address in integer register rs1 plus the signed offset formed from imm12hi and imm12lo`                                                                                        |
+| `rv_d`        | `fsgnj_d`     | `rd, rs1, rs2`               | `Copy the magnitude of the double-precision value in rs1 into rd and set its sign to the sign of rs2`                                                                                                                                       |
+| `rv_d`        | `fsgnjn_d`    | `rd, rs1, rs2`               | `Copy the magnitude of the double-precision value in rs1 into rd and set its sign to the inverted sign of rs2`                                                                                                                              |
+| `rv_d`        | `fsgnjx_d`    | `rd, rs1, rs2`               | `Copy the magnitude of the double-precision value in rs1 into rd and set its sign to the XOR of the signs of rs1 and rs2`                                                                                                                   |
+| `rv_d`        | `fsqrt_d`     | `rd, rs1, rm`                | `Compute the square root of rs1 and write the double-precision result to rd using rounding mode rm`                                                                                                                                         |
+| `rv_d`        | `fsub_d`      | `rd, rs1, rs2, rm`           | `Subtract rs2 from rs1 and write the double-precision result to rd using rounding mode rm`                                                                                                                                                  |
+| `rv_d_zfa`    | `fcvtmod_w_d` | `rd, rs1`                    | `Round the double-precision value in rs1 toward zero, take the low 32 bits, and sign-extend them into integer register rd. Return zero for NaN or infinity and raise the same flags as FCVT.W.D with RTZ`                                   |
+| `rv_d_zfa`    | `fleq_d`      | `rd, rs1, rs2`               | `Set integer register rd to 1 when the double-precision value in rs1 is less than or equal to the value in rs2, or to 0 otherwise. A NaN input yields 0 and sets the invalid flag only for a signaling NaN`                                 |
+| `rv_d_zfa`    | `fli_d`       | `rd, rs1`                    | `Use the encoded rs1 field as an index into the double-precision immediate table and load that constant into rd`                                                                                                                            |
+| `rv_d_zfa`    | `fltq_d`      | `rd, rs1, rs2`               | `Set integer register rd to 1 when the double-precision value in rs1 is less than the value in rs2, or to 0 otherwise. A NaN input yields 0 and sets the invalid flag only for a signaling NaN`                                             |
+| `rv_d_zfa`    | `fmaxm_d`     | `rd, rs1, rs2`               | `Write the double-precision maximum of rs1 and rs2 to rd. Return the canonical NaN if either input is NaN. Order negative zero below positive zero and set the invalid flag for signaling NaNs`                                             |
+| `rv_d_zfa`    | `fminm_d`     | `rd, rs1, rs2`               | `Write the double-precision minimum of rs1 and rs2 to rd. Return the canonical NaN if either input is NaN. Order negative zero below positive zero and set the invalid flag for signaling NaNs`                                             |
+| `rv_d_zfa`    | `fround_d`    | `rd, rs1, rm`                | `Round the double-precision value in rs1 to an integral floating-point value using rm and write it to rd. Set the invalid flag for signaling NaNs. Suppress the inexact flag`                                                               |
+| `rv_d_zfa`    | `froundnx_d`  | `rd, rs1, rm`                | `Round the double-precision value in rs1 to an integral floating-point value using rm and write it to rd. Set the invalid flag for signaling NaNs and the inexact flag when a non-NaN input changes`                                        |
+| `rv_d_zfhmin` | `fcvt_d_h`    | `rd, rs1, rm`                | `Convert the half-precision value in rs1 to a double-precision value and write the result to floating-point register rd. The conversion is exact and rm does not affect the result`                                                         |
+| `rv_d_zfhmin` | `fcvt_h_d`    | `rd, rs1, rm`                | `Convert the double-precision value in rs1 to a half-precision value and write the result to floating-point register rd using rounding mode rm`                                                                                             |
 
-:RV32F - "RV32F Standard Extension for Single-Precision Floating-Point"
+:RVD - Specific Extension for Double-Precision Floating-Point Instructions
 
-| **Instruction Name** | **Instruction Description**                                                                            |
-|:---------------------|:-------------------------------------------------------------------------------------------------------|
-| `fcvt.l.s`           | `Convert the single-precision value in frs1 to a 64-bit signed integer, then write the result to rd`   |
-| `fcvt.lu.s`          | `Convert the single-precision value in frs1 to a 64-bit unsigned integer, then write the result to rd` |
-| `fmv.x.s`            | `Write the sign extended single-precision value in frs1 into the integer register rd`                  |
-| `fcvt.s.l`           | `Convert the 64-bit signed integer in rs1 to a single-precision value, then write the result to frd`   |
-| `fcvt.s.lu`          | `Convert the 64-bit unsigned integer in rs1 to a single-precision value, then write the result to frd` |
-| `fmv.s.x`            | `Write the lower 32-bits of the integer register rs1 into the single-precision register frd`           |
+| **Extension** | **Name**   | **Variable-Fields** | **Description**                                                                             |
+|:--------------|:-----------|:--------------------|:--------------------------------------------------------------------------------------------|
+| `rv32_d_zfa`  | `fmvh_x_d` | `rd, rs1`           | `Copy bits 63:32 of floating-point register rs1 to integer register rd`                     |
+| `rv32_d_zfa`  | `fmvp_d_x` | `rd, rs1, rs2`      | `Copy rs1 into the low 32 bits and rs2 into the high 32 bits of floating-point register rd` |
 
-:RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
+:RV32D - Specific Extension for Double-Precision Floating-Point Instructions (32 bit)
 
-| **Instruction Name** | **Instruction Description**                                                                                                 |
-|:---------------------|:----------------------------------------------------------------------------------------------------------------------------|
-| `fld`                | `Loads a double-precision foating-point value from memory into foating-point register frd`                                  |
-| `fsd`                | `Stores a double-precision foating-point value from foating-point register frs2 to memory`                                  |
-| `fmadd.d`            | `Multiply the double-precision values in frs1 and frs2, then add rs3 and write the result to frd`                           |
-| `fmsub.d`            | `Multiply the double-precision values in frs1 and frs2, then subtract rs3 and write the result to frd`                      |
-| `fnmsub.d`           | `Multiply the double-precision value in frs1 with the negated value in frs2, then add rs3 and write the result to frd`      |
-| `fnmadd.d`           | `Multiply the double-precision value in frs1 with the negated value in frs2, then subtract rs3 and write the result to frd` |
-| `fadd.d`             | `Add the double-precision values in frs1 and frs2, then write the result to frd`                                            |
-| `fsub.d`             | `Subtract the double-precision values in frs1 from frs2, then write the result to frd`                                      |
-| `fmul.d`             | `Multiply the double-precision values in frs1 and frs2, then write the result to frd`                                       |
-| `fdiv.d`             | `Divide the double-precision value in frs1 into frs2, then write the result to frd`                                         |
-| `fsgnj.d`            | `Take the double-precision value from frs1 and inject the sign bit from frs2, then write the result to frd`                 |
-| `fsgnjn.d`           | `Take the double-precision value from frs1 and inject the negated sign bit from frs2, then write the result to frd`         |
-| `fsgnjx.d`           | `Take the double-precision value from frs1 and inject the xor of the sign bits frs1 and frs2, then write the result to frd` |
-| `fmin.s`             | `Take the smaller double-precision value from frs1 and frs2, then write the result to frd`                                  |
-| `fmax.s`             | `Take the larger double-precision value from frs1 and frs2, then write the result to frd`                                   |
-| `fcvt.s.d`           | `Convert the double-precision value in frs1 to single-precision, then write the result to frd`                              |
-| `fcvt.d.s`           | `Convert the single-precision value in frs1 to double-precision, then write the result to frd`                              |
-| `fsqrt.d`            | `Calculate the square root of the double-precision value in frs1, then write the result to frd`                             |
-| `fle.d`              | `Set rd to 1 if frs1 is less than or equal to frs2, otherwise set rd to 0`                                                  |
-| `flt.d`              | `Set rd to 1 if frs1 is less than frs2, otherwise set rd to 0`                                                              |
-| `feq.d`              | `Set rd to 1 if frs1 is equal to frs2, otherwise set rd to 0`                                                               |
-| `fcvt.w.d`           | `Convert the double-precision value in frs1 to a 32-bit signed integer, then write the result to rd`                        |
-| `fcvt.wu.d`          | `Convert the double-precision value in frs1 to a 32-bit unsigned integer, then write the result to rd`                      |
-| `fcvt.d.w`           | `Convert the 64-bit signed integer in rs1 to a double-precision value, then write the result to frd`                        |
-| `fcvt.d.wu`          | `Convert the 64-bit unsigned integer in rs1 to a double-precision value, then write the result to frd`                      |
-| `fmv.x.d`            | `Write the sign extended double-precision value in frs1 into integer register rd`                                           |
-| `fclass.d`           | `Set rd to a 10-bit mask indicating the class of the double-precision value in frs1`                                        |
-| `fmv.d.x`            | `Write the 64-bit integer register rs1 into the double-precision register frd`                                              |
+| **Extension** | **Name**    | **Variable-Fields** | **Description**                                                                                                                                    |
+|:--------------|:------------|:--------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------|
+| `rv64_d`      | `fcvt_d_l`  | `rd, rs1, rm`       | `Convert the 64-bit signed integer in rs1 to a double-precision value and write the result to floating-point register rd using rounding mode rm`   |
+| `rv64_d`      | `fcvt_d_lu` | `rd, rs1, rm`       | `Convert the 64-bit unsigned integer in rs1 to a double-precision value and write the result to floating-point register rd using rounding mode rm` |
+| `rv64_d`      | `fcvt_l_d`  | `rd, rs1, rm`       | `Convert the double-precision value in rs1 to a 64-bit signed integer and write the result to integer register rd using rounding mode rm`          |
+| `rv64_d`      | `fcvt_lu_d` | `rd, rs1, rm`       | `Convert the double-precision value in rs1 to a 64-bit unsigned integer and write the result to integer register rd using rounding mode rm`        |
+| `rv64_d`      | `fmv_d_x`   | `rd, rs1`           | `Copy the low 64 bits of integer register rs1 into floating-point register rd`                                                                     |
+| `rv64_d`      | `fmv_x_d`   | `rd, rs1`           | `Copy the low 64 bits of floating-point register rs1 into integer register rd with sign extension to XLEN`                                         |
 
-:RV32D - "RV32D Standard Extension for Double-Precision Floating-Point"
-
-| **Instruction Name** | **Instruction Description**                                                                            |
-|:---------------------|:-------------------------------------------------------------------------------------------------------|
-| `fcvt.l.d`           | `Convert the double-precision value in frs1 to a 64-bit signed integer, then write the result to rd`   |
-| `fcvt.lu.d`          | `Convert the double-precision value in frs1 to a 64-bit unsigned integer, then write the result to rd` |
-| `fcvt.d.l`           | `Convert the 64-bit signed integer in rs1 to a double-precision value, then write the result to frd`   |
-| `fcvt.d.lu`          | `Convert the 64-bit unsigned integer in rs1 to a double-precision value, then write the result to frd` |
-
-:RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32D)"
-
-| **Instruction Name** | **Instruction Description**                                                               |
-|:---------------------|:------------------------------------------------------------------------------------------|
-| `frcsr`              | `Read FP Control and Status Register`                                                     |
-| `frrm`               | `Read FP Rounding Mode (Bits 7:5 of fcsr Control and Status Register)`                    |
-| `frflags`            | `Read FP Accrued Exception Flags (Bits 4:0 of fcsr Control and Status Register)`          |
-| `fscsr`              | `Read FP Control and Status Register`                                                     |
-| `fsrm`               | `Set FP Rounding Mode (Bits 7:5 of fcsr Control and Status Register)`                     |
-| `fsflags`            | `Set FP Accrued Exception Flags (Bits 4:0 of fcsr Control and Status Register)`           |
-| `fsrmi`              | `Set FP Rounding Mode Immediate (Bits 7:5 of fcsr Control and Status Register)`           |
-| `fsflagsi`           | `Set FP Accrued Exception Flags Immediate (Bits 4:0 of fcsr Control and Status Register)` |
-
-:RV32FD - "RV32F and RV32D Common Floating-Point Instructions"
+:RV64D - Specific Extension for Double-Precision Floating-Point Instructions (64 bit)

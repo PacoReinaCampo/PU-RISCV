@@ -1,62 +1,24 @@
 ## PSEUDO-INSTRUCTIONS
 
-| **Pseudo**   | **Opcode**              | **Format**       | **Constraint**                   |
-|:-------------|:------------------------|:-----------------|:---------------------------------|
-| `nop`        | `addi`                  | `none`           | `rd_eq_x0 rs1_eq_x0 imm_eq_zero` |
-| `#lla,la`    | `{lui,slli,addi,addiw}` | `rd,symbol`      | `-`                              |
-| `#la`        | `auipc,{ld,lw}`         | `rd,symbol`      | `-`                              |
-| `#lla,la`    | `auipc,addi`            | `rd,symbol`      | `-`                              |
-| `#la.tls.gd` | `auipc,addi`            | `rd,symbol`      | `-`                              |
-| `#la.tls.ie` | `auipc,{ld,lw}`         | `rd,symbol`      | `-`                              |
-| `#li`        | `{lui,slli,addi,addiw}` | `rd,rs1`         | `-`                              |
-| `mv`         | `addi`                  | `rd,rs1`         | `imm_eq_zero`                    |
-| `not`        | `xori`                  | `rd,rs1`         | `imm_eq_n1`                      |
-| `neg`        | `sub`                   | `rd,rs2`         | `rs1_eq_x0`                      |
-| `negw`       | `subw`                  | `rd,rs2`         | `rs1_eq_x0`                      |
-| `sext.w`     | `addiw`                 | `rd,rs1`         | `imm_eq_zero`                    |
-| `seqz`       | `sltiu`                 | `rd,rs1`         | `imm_eq_p1`                      |
-| `snez`       | `sltu`                  | `rd,rs2`         | `rs1_eq_x0`                      |
-| `sltz`       | `slt`                   | `rd,rs1`         | `rs2_eq_x0`                      |
-| `sgtz`       | `slt`                   | `rd,rs2`         | `rs1_eq_x0`                      |
-| `fmv.s`      | `fsgnj.s`               | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fabs.s`     | `fsgnjx.s`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fneg.s`     | `fsgnjn.s`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fmv.d`      | `fsgnj.d`               | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fabs.d`     | `fsgnjx.d`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fneg.d`     | `fsgnjn.d`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fmv.q`      | `fsgnj.q`               | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fabs.q`     | `fsgnjx.q`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `fneg.q`     | `fsgnjn.q`              | `rd,rs1`         | `rs2_eq_rs1`                     |
-| `beqz`       | `beq`                   | `rs1,offset`     | `rs2_eq_x0`                      |
-| `bnez`       | `bne`                   | `rs1,offset`     | `rs2_eq_x0`                      |
-| `blez`       | `bge`                   | `rs2,offset`     | `rs1_eq_x0`                      |
-| `bgez`       | `bge`                   | `rs1,offset`     | `rs2_eq_x0`                      |
-| `bltz`       | `blt`                   | `rs1,offset`     | `rs2_eq_x0`                      |
-| `bgtz`       | `blt`                   | `rs2,offset`     | `rs1_eq_x0`                      |
-| `ble`        | `bge`                   | `rs2,rs1,offset` | `-`                              |
-| `bleu`       | `bgeu`                  | `rs2,rs1,offset` | `-`                              |
-| `bgt`        | `blt`                   | `rs2,rs1,offset` | `-`                              |
-| `bgtu`       | `bltu`                  | `rs2,rs1,offset` | `-`                              |
-| `j`          | `jal`                   | `offset`         | `rd_eq_x0`                       |
-| `jal`        | `jal`                   | `offset`         | `rd_eq_ra`                       |
-| `ret`        | `jalr`                  | `none`           | `rd_eq_x0 rs1_eq_ra`             |
-| `jr`         | `jalr`                  | `rs1`            | `rd_eq_x0 imm_eq_zero`           |
-| `jalr`       | `jalr`                  | `rs1`            | `rd_eq_ra imm_eq_zero`           |
-| `#call`      | `{auipc,jalr}`          | `offset`         | `-`                              |
-| `#tail`      | `{auipc,jalr}`          | `offset`         | `-`                              |
-| `rdcycle`    | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc00`         |
-| `rdtime`     | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc01`         |
-| `rdinstret`  | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc02`         |
-| `rdcycleh`   | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc80`         |
-| `rdtimeh`    | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc81`         |
-| `rdinstreth` | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0xc82`         |
-| `frcsr`      | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0x003`         |
-| `frrm`       | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0x002`         |
-| `frflags`    | `csrrs`                 | `rd`             | `rs1_eq_x0 csr_eq_0x001`         |
-| `fscsr`      | `csrrw`                 | `rd,rs1`         | `csr_eq_0x003`                   |
-| `fsrm`       | `csrrw`                 | `rd,rs1`         | `csr_eq_0x002`                   |
-| `fsflags`    | `csrrw`                 | `rd,rs1`         | `csr_eq_0x001`                   |
-| `fsrmi`      | `csrrwi`                | `rd,zimm`        | `csr_eq_0x002`                   |
-| `fsflagsi`   | `csrrwi`                | `rd,zimm`        | `csr_eq_0x001`                   |
+| **Extension** | **Name**   | **Variable-Fields** | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:-----------|:--------------------|:-----------------------|:-----------------------------------|
+| `rv_f`        | `fmv_x_w`  | `rd, rs1`           | `fmv_x_s`              | `111000000000-----000-----1010011` |
+| `rv_f`        | `fmv_w_x`  | `rd, rs1`           | `fmv_s_x`              | `111100000000-----000-----1010011` |
+| `rv_f`        | `fsgnj_s`  | `rd, rs1`           | `fmv_s`                | `0010000----------000-----1010011` |
+| `rv_f`        | `fsgnjx_s` | `rd, rs1`           | `fabs_s`               | `0010000----------010-----1010011` |
+| `rv_f`        | `fsgnjn_s` | `rd, rs1`           | `fneg_s`               | `0010000----------001-----1010011` |
 
-:Pseudo-Instructions
+:RVF - RVF Specific Extension for Single-Precision Floating-Point Instructions
+
+| **Extension** | **Name** | **Variable-Fields** | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:---------|:--------------------|:-----------------------|:-----------------------------------|
+| `rv_zicsr`    | `csrrs`  | `rd`                | `frflags`              | `00000000000100000010-----1110011` |
+| `rv_zicsr`    | `csrrw`  | `rd, rs1`           | `fsflags`              | `000000000001-----001-----1110011` |
+| `rv_zicsr`    | `csrrwi` | `rd, zimm5`         | `fsflagsi`             | `000000000001-----101-----1110011` |
+| `rv_zicsr`    | `csrrs`  | `rd`                | `frrm`                 | `00000000001000000010-----1110011` |
+| `rv_zicsr`    | `csrrw`  | `rd, rs1`           | `fsrm`                 | `000000000010-----001-----1110011` |
+| `rv_zicsr`    | `csrrwi` | `rd, zimm5`         | `fsrmi`                | `000000000010-----101-----1110011` |
+| `rv_zicsr`    | `csrrw`  | `rd, rs1`           | `fscsr`                | `000000000011-----001-----1110011` |
+| `rv_zicsr`    | `csrrs`  | `rd`                | `frcsr`                | `00000000001100000010-----1110011` |
+
+:RVZI - RVZI Specific Extension for Single-Precision Floating-Point Instructions

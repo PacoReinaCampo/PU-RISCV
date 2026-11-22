@@ -16,11 +16,63 @@ mapping maybe_vmask : string <-> bits(1) = {
   sep() ^ "v0.t"  <-> 0b0
 }
 
+let vstart_arith_zero_required : bool = config extensions.V.vstart.zero_required.arith
+let vstart_scalar_move_zero_required : bool = config extensions.V.vstart.zero_required.scalar_move
+
+// Returns true if the instruction should raise an illegal instruction
+// exception due to a non-zero vstart, depending on the instruction class.
+//
+// VSTART_ARITH       - Standard arithmetic instructions. The model never
+//                  produces a non-zero vstart for these instructions, so
+//                  the spec permits trapping on a non-zero vstart. This
+//                  is configurable via `extensions.V.vstart.zero_required.arith`.
+//
+// VSTART_LOAD_STORE  - Memory instructions (loads, stores, segment, indexed,
+//                  fault-only-first, whole-register, and mask load/store).
+//                  Any in-bounds vstart is allowed since vstart is required
+//                  for trap resumption; only an out-of-bounds vstart (greater
+//                  than the largest element index) traps. Not configurable.
+//
+// VSTART_SCALAR_MOVE - Scalar move instructions (vmv.x.s, vmv.s.x, vfmv.f.s,
+//                  vfmv.s.f). Both trapping and not trapping on a non-zero
+//                  vstart are permitted, see https://github.com/riscv/riscv-isa-manual/issues/2564
+//                  Configurable via `extensions.V.vstart.zero_required.scalar_move`
+//
+// VSTART_MANDATORY   - Instructions where the spec explicitly requires an
+//                  illegal instruction exception when vstart is non-zero:
+//                  all reductions, vcompress, vcpop.m, vfirst.m,
+//                  vmsbf/sif/sof.m, and viota.m. Always traps, not
+//                  configurable.
+//
+// num_elem is what get_num_elem returned, and EMUL_pow is the EMUL used
+// to compute it. A vstart past the largest element index (VLMAX - 1) is
+// reserved. We need EMUL_pow to work out VLMAX when LMUL is fractional.
+function illegal_vstart(cls : vstart_class, num_elem : nat, EMUL_pow : int) -> bool = {
+  let vs = unsigned(vstart);
+  // For fractional LMUL, get_num_elem returns a whole register of elements,
+  // which is bigger than VLMAX, so divide to get VLMAX. When EMUL_pow >= 0,
+  // num_elem already equals VLMAX and we use it as-is.
+  let VLMAX = if EMUL_pow >= 0 then num_elem else num_elem / (2 ^ (0 - EMUL_pow));
+  // An out-of-bounds vstart (>= VLMAX) is reserved. The spec recommends but
+  // does not require trapping, whether it traps is configurable.
+  let out_of_bounds : bool = match vstart_reserved_behavior {
+    Vstart_Illegal => vs >= VLMAX,
+    Vstart_Ignore  => false,
+  };
+  match cls {
+    // Out-of-bounds vstart traps per config, in-bounds non-zero traps per config.
+    VSTART_ARITH       => out_of_bounds | (vstart_arith_zero_required & vs != 0),
+    VSTART_LOAD_STORE  => out_of_bounds,
+    VSTART_SCALAR_MOVE => out_of_bounds | (vstart_scalar_move_zero_required & vs != 0),
+    VSTART_MANDATORY   => vs != 0
+  }
+}
+
 // Check for valid EEW and EMUL values in:
 //
 // 1. vector widening/narrowing instructions
 // 2. vector load/store instructions
-function valid_eew_emul(EEW : int, EMUL_pow : int) -> bool = {
+function valid_eew_emul(EEW : nat, EMUL_pow : int) -> bool = {
   EEW >= 8 & EEW <= elen & EMUL_pow >= -3 & EMUL_pow <= 3
 }
 
@@ -30,11 +82,6 @@ function valid_eew_emul(EEW : int, EMUL_pow : int) -> bool = {
 // 2. vset{i}vl{i} and whole-register loads, stores, and moves do not depend upon vtype.
 function valid_vtype() -> bool = {
   vtype[vill] == 0b0
-}
-
-// Check for vstart value
-function assert_vstart(i : int) -> bool = {
-  unsigned(vstart) == i
 }
 
 // Check for valid destination register when vector masking is enabled:
@@ -48,10 +95,8 @@ function valid_rd_mask(rd : vregidx, vm : bits(1)) -> bool = {
 
 // Check that a vector register number for a vector register group is
 // a multiple of its EMUL. Fractional EMULs are rounded up to 1.
-function valid_reg_group(r : vregidx, EMUL_pow : int) -> bool = {
-  let reg_group_size = if EMUL_pow > 0 then 2 ^ EMUL_pow else 1;
-  unsigned(vregidx_bits(r)) % reg_group_size == 0
-}
+function valid_reg_group(r : vregidx, EMUL_pow : int) -> bool =
+  (unsigned(vregidx_bits(r)) % (2 ^ max(EMUL_pow, 0))) == 0
 
 // For whole register loads/stores: "The nf field encodes how many
 // vector registers to load and store using the NFIELDS encoding. The
@@ -69,8 +114,8 @@ function valid_whole_register(r : vregidx, nf : nfields_pow2) -> bool = {
 // of the source register group.
 // This also checks that the source and destination register groups are valid.
 function valid_reg_overlap(rs : vregidx, rd : vregidx, EMUL_pow_rs : int, EMUL_pow_rd : int) -> bool = {
-  let rs_group = if EMUL_pow_rs > 0 then 2 ^ EMUL_pow_rs else 1;
-  let rd_group = if EMUL_pow_rd > 0 then 2 ^ EMUL_pow_rd else 1;
+  let rs_group = 2 ^ max(EMUL_pow_rs, 0);
+  let rd_group = 2 ^ max(EMUL_pow_rd, 0);
   let rs_int = unsigned(vregidx_bits(rs));
   let rd_int = unsigned(vregidx_bits(rd));
 
@@ -85,12 +130,84 @@ function valid_reg_overlap(rs : vregidx, rd : vregidx, EMUL_pow_rs : int, EMUL_p
   } else true;
 }
 
+function valid_disjoint_reg_groups(rs : vregidx, rd : vregidx, EMUL_pow_rs : int, EMUL_pow_rd : int) -> bool = {
+  let rs_group = 2 ^ max(EMUL_pow_rs, 0);
+  let rd_group = 2 ^ max(EMUL_pow_rd, 0);
+  let rs_int = unsigned(vregidx_bits(rs));
+  let rd_int = unsigned(vregidx_bits(rd));
+
+  if rs_int % rs_group != 0 | rd_int % rd_group != 0
+  then return false;
+
+  rs_int + rs_group <= rd_int | rd_int + rd_group <= rs_int
+}
+
+// Check for valid overlaps in segmented instructions that have an additional number of data fields
+function valid_disjoint_reg_groups_segmented(rs : vregidx, rd : vregidx, EMUL_pow_rs : int, EMUL_pow_rd : int, data_fields: nfields) -> bool = {
+  let rs_group = 2 ^ max(EMUL_pow_rs, 0);
+  let rd_group = 2 ^ max(EMUL_pow_rd, 0);
+  let rs_int = unsigned(vregidx_bits(rs));
+  let rd_int = unsigned(vregidx_bits(rd));
+
+  if rs_int % rs_group != 0 | rd_int % rd_group != 0
+  then return false;
+
+  rs_int + rs_group <= rd_int | rd_int + rd_group * data_fields <= rs_int
+}
+
+// Check for valid overlaps between source register groups: overlaps
+// are not allowed if the EEWs are different for the two groups; a
+// mask register is considered to have EEW of 1. This also checks if
+// the register groups are valid.
+function valid_src_overlap(rs1 : vregidx, EEW_rs1 : nat, EMUL_pow_rs1 : int,
+                           rs2 : vregidx, EEW_rs2 : nat, EMUL_pow_rs2 : int) -> bool = {
+  let rs1_group = 2 ^ max(EMUL_pow_rs1, 0);
+  let rs2_group = 2 ^ max(EMUL_pow_rs2, 0);
+  let rs1_int = unsigned(vregidx_bits(rs1));
+  let rs2_int = unsigned(vregidx_bits(rs2));
+
+  if rs1_int % rs1_group != 0 | rs2_int % rs2_group != 0
+  then return false;
+
+  if EEW_rs1 == EEW_rs2 then return true;
+
+  rs1_int + rs1_group <= rs2_int | rs2_int + rs2_group <= rs1_int
+}
+
+// Check for Source-EEW overlap against every field of a `data_fields` segment.
+// Same-EEW overlap is allowed; any other overlap is reserved.
+function valid_src_overlap_segmented(rs1 : vregidx, EEW_rs1 : nat, EMUL_pow_rs1 : int,
+                                     rs2 : vregidx, EEW_rs2 : nat, EMUL_pow_rs2 : int,
+                                     data_fields : nfields) -> bool =
+  if EEW_rs1 == EEW_rs2
+  then valid_reg_group(rs1, EMUL_pow_rs1) & valid_reg_group(rs2, EMUL_pow_rs2)
+  else valid_disjoint_reg_groups_segmented(rs1, rs2, EMUL_pow_rs1, EMUL_pow_rs2, data_fields)
+
+// Check for valid overlaps between a source register group and the v0
+// mask register; this is a specialization of `valid_src_overlap` for
+// the mask register.
+// TODO: `EEW_rs` is always != 1, but this is unfortunately not
+// guaranteed by the `nat` type.  Once the type of `EEW_rs` is made
+// `sew_bitsize` or similar, the assert could be removed.
+function valid_vm_src_overlap(vm : bits(1), rs : vregidx, EEW_rs : nat) -> bool = {
+  assert(EEW_rs != 1);
+  vm != 0b0 | rs != zvreg
+}
+
 // Check for valid register grouping in vector segment load/store instructions:
 // The EMUL of load vd or store vs3 times the number of fields per segment
 // must not be larger than 8. (EMUL * NFIELDS <= 8)
-function valid_segment(nf : nfields, EMUL_pow : int) -> bool = {
+function valid_segment_group_size(nf : nfields, EMUL_pow : int) -> bool = {
   if EMUL_pow < 0 then nf / (2 ^ (0 - EMUL_pow)) <= 8
   else nf * 2 ^ EMUL_pow <= 8
+}
+
+// A segment load/store uses NFIELDS register groups of ceil(EMUL) registers
+// each, starting at reg. If those would run past v31 the encoding is
+// reserved, so check the last register stays in range.
+function valid_segment_group_without_overflow(reg : vregidx, nf : nfields, EMUL_pow : int) -> bool = {
+  let EMUL_reg = 2 ^ max(EMUL_pow, 0);
+  unsigned(vregidx_bits(reg)) + nf * EMUL_reg <= 32
 }
 
 /// "VSMUL.VX and VSMUL.VV are not included in EEW=64 in Zve64*."
@@ -180,43 +297,46 @@ function illegal_vd_unmasked() -> bool = {
 //   1. integer/fixed-point widening/narrowing instructions
 //   2. vector integer extension: vzext, vsext
 //   3. vector crypto extension: zvbb
-function illegal_variable_width(vd : vregidx, vm : bits(1), SEW_new : int, LMUL_pow_new : int) -> bool = {
+function illegal_variable_width(vd : vregidx, vm : bits(1), SEW_new : nat, LMUL_pow_new : int) -> bool = {
   not(valid_vtype()) | not(valid_rd_mask(vd, vm)) | not(valid_eew_emul(SEW_new, LMUL_pow_new))
 }
 
 // e. Normal check for reduction instructions:
 //  The destination vector register can overlap the source operands, including the mask register.
-//  Vector reduction operations raise an illegal instruction exception if vstart is non-zero.
 function illegal_reduction() -> bool = {
-  not(valid_vtype()) | not(assert_vstart(0))
+  not(valid_vtype())
 }
 
 // f. Variable width check for widening reduction instructions
-function illegal_widening_reduction(EEW : int) -> bool = {
-  not(valid_vtype()) | not(assert_vstart(0)) | not(EEW >= 8 & EEW <= elen)
+function illegal_widening_reduction(EEW : nat) -> bool = {
+  illegal_reduction() | not(EEW >= 8 & EEW <= elen)
 }
 
 // g. Non-indexed load instruction check
-function illegal_load(vd : vregidx, vm : bits(1), nf : nfields, EEW : int, EMUL_pow : int) -> bool = {
+function illegal_load(vd : vregidx, vm : bits(1), nf : nfields, EEW : nat, EMUL_pow : int) -> bool = {
   not(valid_vtype()) | not(valid_rd_mask(vd, vm)) |
-  not(valid_eew_emul(EEW, EMUL_pow)) | not(valid_segment(nf, EMUL_pow))
+  not(valid_eew_emul(EEW, EMUL_pow)) | not(valid_segment_group_size(nf, EMUL_pow)) |
+  not(valid_segment_group_without_overflow(vd, nf, EMUL_pow))
 }
 
 // h. Non-indexed store instruction check (with vs3 rather than vd)
-function illegal_store(nf : nfields, EEW : int, EMUL_pow : int) -> bool = {
-  not(valid_vtype()) | not(valid_eew_emul(EEW, EMUL_pow)) | not(valid_segment(nf, EMUL_pow))
+function illegal_store(vs3 : vregidx, nf : nfields, EEW : nat, EMUL_pow : int) -> bool = {
+  not(valid_vtype()) | not(valid_eew_emul(EEW, EMUL_pow)) | not(valid_segment_group_size(nf, EMUL_pow)) |
+  not(valid_segment_group_without_overflow(vs3, nf, EMUL_pow))
 }
 
 // i. Indexed load instruction check
-function illegal_indexed_load(vd : vregidx, vm : bits(1), nf : nfields, EEW_index : int, EMUL_pow_index : int, EMUL_pow_data : int) -> bool = {
+function illegal_indexed_load(vd : vregidx, vm : bits(1), nf : nfields, EEW_index : nat, EMUL_pow_index : int, EMUL_pow_data : int) -> bool = {
   not(valid_vtype()) | not(valid_rd_mask(vd, vm)) |
-  not(valid_eew_emul(EEW_index, EMUL_pow_index)) | not(valid_segment(nf, EMUL_pow_data))
+  not(valid_eew_emul(EEW_index, EMUL_pow_index)) | not(valid_segment_group_size(nf, EMUL_pow_data)) |
+  not(valid_segment_group_without_overflow(vd, nf, EMUL_pow_data))
 }
 
 // j. Indexed store instruction check (with vs3 rather than vd)
-function illegal_indexed_store(nf : nfields, EEW_index : int, EMUL_pow_index : int, EMUL_pow_data : int) -> bool = {
+function illegal_indexed_store(vs3 : vregidx, nf : nfields, EEW_index : nat, EMUL_pow_index : int, EMUL_pow_data : int) -> bool = {
   not(valid_vtype()) | not(valid_eew_emul(EEW_index, EMUL_pow_index)) |
-  not(valid_segment(nf, EMUL_pow_data))
+  not(valid_segment_group_size(nf, EMUL_pow_data)) |
+  not(valid_segment_group_without_overflow(vs3, nf, EMUL_pow_data))
 }
 
 // Scalar register shaping
@@ -269,19 +389,10 @@ function write_velem_quad_vec(vd, SEW, input, i) = {
     write_single_element(SEW, 4 * i + j, vd, input[j]);
 }
 
-// Get the starting element index from csr vtype
-function get_start_element() -> result(nat, unit) = {
-  let start_element = unsigned(vstart);
-  let SEW_pow = get_sew_pow();
-  // The use of vstart values greater than the largest element
-  // index for the current SEW setting is reserved.
-  //
-  // TODO: the bound here might be incorrect.
-  // See https://github.com/riscv/sail-riscv/pull/755#discussion_r2035095825
-  if start_element > (2 ^ (3 + vlen_exp - SEW_pow) - 1)
-  then Err(())
-  else Ok(start_element)
-}
+// Get the starting element index from the vstart csr. The validity of
+// vstart is checked by illegal_vstart at the start of each instruction,
+// so this just returns the value.
+function get_start_element() -> velemidx = unsigned(vstart)
 
 // Get the ending element index from csr vl
 function get_end_element() -> int = unsigned(vl) - 1
@@ -293,12 +404,9 @@ function get_end_element() -> int = unsigned(vl) - 1
 //   vector1 is the result vector with values applied to masked elements
 //   vector2 is a "mask" vector that is true for an element if the corresponding element
 //     in the result vector should be updated by the calling instruction
-val init_masked_result : forall 'n 'm 'p, 'n >= 0 . (int('n), int('m), int('p), vector('n, bits('m)), bits('n)) -> result((vector('n, bits('m)), bits('n)), unit)
+val init_masked_result : forall 'n 'm 'p, 'n >= 0 . (int('n), int('m), int('p), vector('n, bits('m)), bits('n)) -> (vector('n, bits('m)), bits('n))
 function init_masked_result(num_elem, _EEW, LMUL_pow, vd_val, vm_val) = {
-  let start_element : nat = match get_start_element() {
-    Ok(v)   => v,
-    Err(()) => return Err(())
-  };
+  let start_element = get_start_element();
   let end_element   = get_end_element();
   let tail_ag : agtype = get_vtype_vta();
   let mask_ag : agtype = get_vtype_vma();
@@ -318,21 +426,21 @@ function init_masked_result(num_elem, _EEW, LMUL_pow, vd_val, vm_val) = {
       // Tail elements defined by vl
       result[i] = match tail_ag {
         UNDISTURBED => vd_val[i],
-        AGNOSTIC    => vd_val[i] // TODO: configuration support
+        AGNOSTIC    => if algebra_agnostic_ones then ones() else vd_val[i] // TODO: configuration support
       };
       mask[i] = 0b0
     } else if i >= real_num_elem then {
       // Tail elements defined by lmul < 1
       result[i] = match tail_ag {
         UNDISTURBED => vd_val[i],
-        AGNOSTIC    => vd_val[i] // TODO: configuration support
+        AGNOSTIC    => if algebra_agnostic_ones then ones() else vd_val[i] // TODO: configuration support
       };
       mask[i] = 0b0
     } else if vm_val[i] == 0b0 then {
       // Inactive body elements defined by vm
       result[i] = match mask_ag {
         UNDISTURBED => vd_val[i],
-        AGNOSTIC    => vd_val[i] // TODO: configuration support
+        AGNOSTIC    => if algebra_agnostic_ones then ones() else vd_val[i] // TODO: configuration support
       };
       mask[i] = 0b0
     } else {
@@ -341,19 +449,16 @@ function init_masked_result(num_elem, _EEW, LMUL_pow, vd_val, vm_val) = {
     }
   };
 
-  Ok((result, mask))
+  (result, mask)
 }
 
 // For instructions like vector reduction and vector store,
 // masks on prestart, inactive and tail elements only affect the validation of source register elements
 // (vs3 for store and vs2 for reduction). There's no destination register to be masked.
 // In these cases, this function can be called to simply get the mask vector for vs (without the prepared vd result vector).
-val init_masked_source : forall 'n 'p, 'n > 0. (int('n), int('p), bits('n)) -> result(bits('n), unit)
+val init_masked_source : forall 'n 'p, 'n > 0. (int('n), int('p), bits('n)) -> bits('n)
 function init_masked_source(num_elem, LMUL_pow, vm_val) = {
-  let start_element : nat = match get_start_element() {
-    Ok(v)   => v,
-    Err(()) => return Err(())
-  };
+  let start_element = get_start_element();
   let end_element   = get_end_element();
   var mask : bits('n) = undefined;
 
@@ -380,17 +485,14 @@ function init_masked_source(num_elem, LMUL_pow, vm_val) = {
     }
   };
 
-  Ok(mask)
+  mask
 }
 
 // Mask handling for carry functions that use masks as input/output
 // Only prestart and tail elements are masked in a mask value
-val init_masked_result_carry : forall 'n, 'n >= 0 . (int('n), sew_bitsize, int, bits('n)) -> result((bits('n), bits('n)), unit)
+val init_masked_result_carry : forall 'n, 'n >= 0 . (int('n), sew_bitsize, int, bits('n)) -> (bits('n), bits('n))
 function init_masked_result_carry(num_elem, _EEW, LMUL_pow, vd_val) = {
-  let start_element : nat = match get_start_element() {
-    Ok(v)   => v,
-    Err(()) => return Err(())
-  };
+  let start_element = get_start_element();
   let end_element   = get_end_element();
   var mask : bits('n) = undefined;
   var result : bits('n) = undefined;
@@ -420,16 +522,13 @@ function init_masked_result_carry(num_elem, _EEW, LMUL_pow, vd_val) = {
     }
   };
 
-  Ok(result, mask)
+  (result, mask)
 }
 
 // Mask handling for cmp functions that use masks as output
-val init_masked_result_cmp : forall 'n, 'n >= 0 . (int('n), sew_bitsize, int, bits('n), bits('n)) -> result((bits('n), bits('n)), unit)
+val init_masked_result_cmp : forall 'n, 'n >= 0 . (int('n), sew_bitsize, int, bits('n), bits('n)) -> (bits('n), bits('n))
 function init_masked_result_cmp(num_elem, _EEW, LMUL_pow, vd_val, vm_val) = {
-  let start_element : nat = match get_start_element() {
-    Ok(v)   => v,
-    Err(()) => return Err(())
-  };
+  let start_element = get_start_element();
   let end_element   = get_end_element();
   let mask_ag : agtype = get_vtype_vma();
   var mask : bits('n) = undefined;
@@ -458,7 +557,7 @@ function init_masked_result_cmp(num_elem, _EEW, LMUL_pow, vd_val, vm_val) = {
       // Inactive body elements defined by vm
       result[i] = match mask_ag {
         UNDISTURBED => vd_val[i],
-        AGNOSTIC    => vd_val[i] // TODO: configuration support
+        AGNOSTIC    => if algebra_agnostic_ones then ones() else vd_val[i] // TODO: configuration support
       };
       mask[i] = 0b0
     } else {
@@ -467,7 +566,7 @@ function init_masked_result_cmp(num_elem, _EEW, LMUL_pow, vd_val, vm_val) = {
     }
   };
 
-  Ok(result, mask)
+  (result, mask)
 }
 
 // For vector load/store segment instructions:
@@ -506,32 +605,17 @@ function get_shift_amount(bit_val, SEW) = {
 // Fixed point rounding increment
 val get_fixed_rounding_incr : forall ('m 'n : Int), ('m > 0 & 'n >= 0). (bits('m), int('n)) -> bits(1)
 function get_fixed_rounding_incr(vec_elem, shift_amount) = {
-  if shift_amount == 0 then 0b0
-  else {
-    let rounding_mode = vcsr[vxrm];
-    // TODO: Change the type signature to enforce this assertion.
-    assert(shift_amount < 'm);
-    match rounding_mode {
-      0b00 => vec_elem[shift_amount - 1],
-      0b01 => {
-        bool_to_bit(
-          vec_elem[shift_amount - 1] == 0b1 &
-          ((if shift_amount == 1 then false else vec_elem[shift_amount - 2 .. 0] != zeros()) | vec_elem[shift_amount] == 0b1))
-      },
-      0b10 => 0b0,
-      0b11 => bool_to_bit(
-        vec_elem[shift_amount] != 0b1 & vec_elem[shift_amount - 1 .. 0] != zeros())
-    }
-  }
+  algebra_rounding_incr(vec_elem, shift_amount, vcsr[vxrm])
 }
 
 // Fixed point unsigned saturation
 val unsigned_saturation : forall ('m 'n: Int), ('n >= 'm > 1). (int('m), bits('n)) -> bits('m)
 function unsigned_saturation(len, elem) = {
   if unsigned(elem) > unsigned(ones('m)) then {
-    vcsr[vxsat] = 0b1;
+    write_vxsat(0b1);
     ones('m)
   } else {
+    write_vxsat(vcsr[vxsat]);
     elem['m - 1 .. 0]
   }
 }
@@ -540,12 +624,13 @@ function unsigned_saturation(len, elem) = {
 val signed_saturation : forall ('m 'n: Int), ('n >= 'm > 1). (int('m), bits('n)) -> bits('m)
 function signed_saturation(len, elem) = {
   if signed(elem) > signed(0b0 @ ones('m - 1)) then {
-    vcsr[vxsat] = 0b1;
+    write_vxsat(0b1);
     0b0 @ ones('m - 1)
   } else if signed(elem) < signed(0b1 @ zeros('m - 1)) then {
-    vcsr[vxsat] = 0b1;
+    write_vxsat(0b1);
     0b1 @ zeros('m - 1)
   } else {
+    write_vxsat(vcsr[vxsat]);
     elem['m - 1 .. 0]
   };
 }

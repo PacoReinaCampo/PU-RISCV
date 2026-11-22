@@ -106,7 +106,7 @@
 | `WFWNMACC`  | `WA_FORMAT`  | `ARITHMETIC` | `RVW`         | `{WW, WF}`           |
 | `WFWMSAC`   | `WA_FORMAT`  | `ARITHMETIC` | `RVW`         | `{WW, WF}`           |
 | `WFWNMSAC`  | `WA_FORMAT`  | `ARITHMETIC` | `RVW`         | `{WW, WF}`           |
-| `WFSQRT_W`  | `WS2_FORMAT` | `ARITHMETIC` | `RVW`         | `-`                  |
+| `WFSQRT_W`  | `WS2_FORMAT` | `ARITHMETIC` | `RVW`         | `none`               |
 | `WFMIN`     | `WA_FORMAT`  | `ARITHMETIC` | `RVW`         | `{WW, WF}`           |
 | `WFMAX`     | `WA_FORMAT`  | `ARITHMETIC` | `RVW`         | `{WW, WF}`           |
 | `WFSGNJ`    | `WA_FORMAT`  | `ARITHMETIC` | `RVW`         | `{WW, WF}`           |
@@ -118,7 +118,7 @@
 | `WMFLE`     | `WA_FORMAT`  | `COMPARE`    | `RVW`         | `{WW, WF}`           |
 | `WMFGT`     | `WA_FORMAT`  | `COMPARE`    | `RVW`         | `{WF}`               |
 | `WMFGE`     | `WA_FORMAT`  | `COMPARE`    | `RVW`         | `{WF}`               |
-| `WFCLASS_W` | `WS2_FORMAT` | `COMPARE`    | `RVW`         | `-`                  |
+| `WFCLASS_W` | `WS2_FORMAT` | `COMPARE`    | `RVW`         | `none`               |
 | `WFMERGE`   | `WA_FORMAT`  | `ARITHMETIC` | `RVW`         | `{WFM}`              |
 | `WFMV`      | `WA_FORMAT`  | `ARITHMETIC` | `RVW`         | `{WF}`               |
 

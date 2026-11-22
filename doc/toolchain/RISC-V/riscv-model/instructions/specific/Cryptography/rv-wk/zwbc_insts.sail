@@ -1,183 +1,152 @@
-// =======================================================================================
-// This Sail RISC-V architecture model, comprising all files and
-// directories except where otherwise noted is subject the BSD
-// two-clause license in the LICENSE file.
-//
 // SPDX-License-Identifier: BSD-2-Clause
-// =======================================================================================
+// Experimental Zwbc: SEW=64; private bank state; shared pure polynomial product.
 
-function clause currentlyEnabled(Ext_Zvbc) = hartSupports(Ext_Zvbc) & currentlyEnabled(Ext_Zve64x)
+function clause currentlyEnabled(Ext_Zwbc) = hartSupports(Ext_Zwbc) & currentlyEnabled(Ext_W)
 
-union clause instruction = VCLMUL_VV : (bits(1), vregidx, vregidx, vregidx)
+union clause instruction = W_CLMUL_WW : (bits(1), wregidx, wregidx, wregidx)
+mapping clause encdec = W_CLMUL_WW(mask_bit, src2, ws1, dst)
+ <-> 0b001100 @ mask_bit @ w_encdec_wreg(src2) @ w_encdec_wreg(ws1) @ 0b010 @ w_encdec_wreg(dst) @ 0b0001011
+ when currentlyEnabled(Ext_Zwbc) & w_get_sew() == 64
+mapping clause assembly = W_CLMUL_WW(mask_bit, src2, ws1, dst)
+ <-> "wclmul.ww" ^ spc() ^ w_wreg_name(dst) ^ sep() ^ w_wreg_name(src2) ^ sep() ^ w_wreg_name(ws1) ^ w_maybe_wmask(mask_bit)
+function clause execute(W_CLMUL_WW(mask_bit, src2, ws1, dst)) = {
+  let sew = w_get_sew();
+  let lmul = w_get_lmul_pow();
+  let n = w_get_num_elem(lmul, sew);
+  if w_illegal_wstart(W_WSTART_ARITH, n, lmul) |
+     w_illegal_normal(dst, mask_bit) |
+     not(w_valid_reg_group(src2, lmul)) |
+     not(w_valid_reg_group(dst, lmul)) |
+     not(w_valid_wm_src_overlap(mask_bit, src2, sew))
 
-$[wavedrom "_ _ _ _ OPMVV _ OP-V"]
-mapping clause encdec = VCLMUL_VV (vm, vs2, vs1, vd)
-  <-> 0b001100 @ vm @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when currentlyEnabled(Ext_Zvbc) & get_sew() == 64
+     | not(w_valid_reg_group(ws1, lmul)) | not(w_valid_wm_src_overlap(mask_bit, ws1, sew))
 
-mapping clause assembly = VCLMUL_VV (vm, vs2, vs1, vd)
-  <-> "vclmul.vv" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1) ^ maybe_vmask(vm)
-
-function clause execute VCLMUL_VV(vm, vs2, vs1, vd) = {
-  let SEW       = get_sew();
-  let LMUL_pow  = get_lmul_pow();
-
-  if not(valid_reg_group(vs1, LMUL_pow)) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
   then return Illegal_Instruction();
+  let rhs = w_read_wreg(n, sew, lmul, src2);
 
-  let 'n = get_num_elem(LMUL_pow, SEW);
-  let 'm = SEW;
+  let lhs = w_read_wreg(n, sew, lmul, ws1);
 
-  let vm_val  : bits('n) = read_vmask('n, vm, zvreg);
-  let vd_val  : vector('n, bits('m)) = read_vreg('n, SEW, LMUL_pow, vd);
-  let vs1_val : vector('n, bits('m)) = read_vreg('n, SEW, LMUL_pow, vs1);
-  let vs2_val : vector('n, bits('m)) = read_vreg('n, SEW, LMUL_pow, vs2);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result('n, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-  var result = initial_result;
-
-  foreach (i from 0 to ('n - 1)) {
-    if mask[i] == 0b1 then {
-      let prod  = carryless_mul(vs1_val[i], vs2_val[i]);
-      result[i] = prod['m - 1 .. 0];
+  let previous = w_read_wreg(n, sew, lmul, dst);
+  let input_mask = w_read_wmask(n, mask_bit, w_zwreg);
+  let (initial, active) = w_init_masked_result(n, sew, lmul, previous, input_mask);
+  var result = initial;
+  foreach (p from 0 to n - 1) {
+    if active[p] == 0b1 then {
+      let product = carryless_mul(lhs[p], rhs[p]);
+      result[p] = product[sew - 1 .. 0]
     }
   };
-  write_vreg('n, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  w_write_wreg(n, sew, lmul, dst, result);
+  w_set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-union clause instruction = VCLMUL_VX : (bits(1), vregidx, regidx, vregidx)
+union clause instruction = W_CLMUL_WX : (bits(1), wregidx, regidx, wregidx)
+mapping clause encdec = W_CLMUL_WX(mask_bit, src2, rs1, dst)
+ <-> 0b001100 @ mask_bit @ w_encdec_wreg(src2) @ encdec_reg(rs1) @ 0b110 @ w_encdec_wreg(dst) @ 0b0001011
+ when currentlyEnabled(Ext_Zwbc) & w_get_sew() == 64
+mapping clause assembly = W_CLMUL_WX(mask_bit, src2, rs1, dst)
+ <-> "wclmul.wx" ^ spc() ^ w_wreg_name(dst) ^ sep() ^ w_wreg_name(src2) ^ sep() ^ reg_name(rs1) ^ w_maybe_wmask(mask_bit)
+function clause execute(W_CLMUL_WX(mask_bit, src2, rs1, dst)) = {
+  let sew = w_get_sew();
+  let lmul = w_get_lmul_pow();
+  let n = w_get_num_elem(lmul, sew);
+  if w_illegal_wstart(W_WSTART_ARITH, n, lmul) |
+     w_illegal_normal(dst, mask_bit) |
+     not(w_valid_reg_group(src2, lmul)) |
+     not(w_valid_reg_group(dst, lmul)) |
+     not(w_valid_wm_src_overlap(mask_bit, src2, sew))
 
-$[wavedrom "_ _ _ _ OPMVX _ OP-V"]
-mapping clause encdec = VCLMUL_VX (vm, vs2, rs1, vd)
-  <-> 0b001100 @ vm @ encdec_vreg(vs2) @ encdec_reg(rs1) @ 0b110 @ encdec_vreg(vd) @ 0b1010111
-  when currentlyEnabled(Ext_Zvbc) & get_sew() == 64
-
-mapping clause assembly = VCLMUL_VX (vm, vs2, rs1, vd)
-  <-> "vclmul.vx" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ reg_name(rs1) ^ maybe_vmask(vm)
-
-function clause execute VCLMUL_VX(vm, vs2, rs1, vd) = {
-  let SEW       = get_sew();
-  let LMUL_pow  = get_lmul_pow();
-
-  if not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
   then return Illegal_Instruction();
+  let rhs = w_read_wreg(n, sew, lmul, src2);
 
-  let 'n = get_num_elem(LMUL_pow, SEW);
-  let 'm = SEW;
+  let lhs = w_get_scalar(rs1, sew);
 
-  let vm_val  : bits('n) = read_vmask('n, vm, zvreg);
-  let rs1_val : bits('m) = get_scalar(rs1, SEW);
-  let vd_val  : vector('n, bits('m)) = read_vreg('n, SEW, LMUL_pow, vd);
-  let vs2_val : vector('n, bits('m)) = read_vreg('n, SEW, LMUL_pow, vs2);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result('n, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-  var result = initial_result;
-
-  foreach (i from 0 to ('n - 1)) {
-    if mask[i] == 0b1 then {
-      let prod  = carryless_mul(rs1_val, vs2_val[i]);
-      result[i] = prod['m - 1 .. 0];
+  let previous = w_read_wreg(n, sew, lmul, dst);
+  let input_mask = w_read_wmask(n, mask_bit, w_zwreg);
+  let (initial, active) = w_init_masked_result(n, sew, lmul, previous, input_mask);
+  var result = initial;
+  foreach (p from 0 to n - 1) {
+    if active[p] == 0b1 then {
+      let product = carryless_mul(lhs, rhs[p]);
+      result[p] = product[sew - 1 .. 0]
     }
   };
-  write_vreg('n, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  w_write_wreg(n, sew, lmul, dst, result);
+  w_set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-union clause instruction = VCLMULH_VV : (bits(1), vregidx, vregidx, vregidx)
+union clause instruction = W_CLMULH_WW : (bits(1), wregidx, wregidx, wregidx)
+mapping clause encdec = W_CLMULH_WW(mask_bit, src2, ws1, dst)
+ <-> 0b001101 @ mask_bit @ w_encdec_wreg(src2) @ w_encdec_wreg(ws1) @ 0b010 @ w_encdec_wreg(dst) @ 0b0001011
+ when currentlyEnabled(Ext_Zwbc) & w_get_sew() == 64
+mapping clause assembly = W_CLMULH_WW(mask_bit, src2, ws1, dst)
+ <-> "wclmulh.ww" ^ spc() ^ w_wreg_name(dst) ^ sep() ^ w_wreg_name(src2) ^ sep() ^ w_wreg_name(ws1) ^ w_maybe_wmask(mask_bit)
+function clause execute(W_CLMULH_WW(mask_bit, src2, ws1, dst)) = {
+  let sew = w_get_sew();
+  let lmul = w_get_lmul_pow();
+  let n = w_get_num_elem(lmul, sew);
+  if w_illegal_wstart(W_WSTART_ARITH, n, lmul) |
+     w_illegal_normal(dst, mask_bit) |
+     not(w_valid_reg_group(src2, lmul)) |
+     not(w_valid_reg_group(dst, lmul)) |
+     not(w_valid_wm_src_overlap(mask_bit, src2, sew))
 
-$[wavedrom "_ _ _ _ OPMVV _ OP-V"]
-mapping clause encdec = VCLMULH_VV (vm, vs2, vs1, vd)
-  <-> 0b001101 @ vm @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when currentlyEnabled(Ext_Zvbc) & get_sew() == 64
+     | not(w_valid_reg_group(ws1, lmul)) | not(w_valid_wm_src_overlap(mask_bit, ws1, sew))
 
-mapping clause assembly = VCLMULH_VV (vm, vs2, vs1, vd)
-  <-> "vclmulh.vv" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1) ^ maybe_vmask(vm)
-
-function clause execute VCLMULH_VV(vm, vs2, vs1, vd) = {
-  let SEW       = get_sew();
-  let LMUL_pow  = get_lmul_pow();
-
-  if not(valid_reg_group(vs1, LMUL_pow)) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
   then return Illegal_Instruction();
+  let rhs = w_read_wreg(n, sew, lmul, src2);
 
-  let 'n = get_num_elem(LMUL_pow, SEW);
-  let 'm = SEW;
+  let lhs = w_read_wreg(n, sew, lmul, ws1);
 
-  let vm_val  : bits('n) = read_vmask('n, vm, zvreg);
-  let vd_val  : vector('n, bits('m)) = read_vreg('n, SEW, LMUL_pow, vd);
-  let vs1_val : vector('n, bits('m)) = read_vreg('n, SEW, LMUL_pow, vs1);
-  let vs2_val : vector('n, bits('m)) = read_vreg('n, SEW, LMUL_pow, vs2);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result('n, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-  var result = initial_result;
-
-  foreach (i from 0 to ('n - 1)) {
-    if mask[i] == 0b1 then {
-      let prod  = carryless_mul(vs1_val[i], vs2_val[i]);
-      result[i] = prod[2 * SEW - 1 .. SEW];
+  let previous = w_read_wreg(n, sew, lmul, dst);
+  let input_mask = w_read_wmask(n, mask_bit, w_zwreg);
+  let (initial, active) = w_init_masked_result(n, sew, lmul, previous, input_mask);
+  var result = initial;
+  foreach (p from 0 to n - 1) {
+    if active[p] == 0b1 then {
+      let product = carryless_mul(lhs[p], rhs[p]);
+      result[p] = product[2 * sew - 1 .. sew]
     }
   };
-  write_vreg('n, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  w_write_wreg(n, sew, lmul, dst, result);
+  w_set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-union clause instruction = VCLMULH_VX : (bits(1), vregidx, regidx, vregidx)
+union clause instruction = W_CLMULH_WX : (bits(1), wregidx, regidx, wregidx)
+mapping clause encdec = W_CLMULH_WX(mask_bit, src2, rs1, dst)
+ <-> 0b001101 @ mask_bit @ w_encdec_wreg(src2) @ encdec_reg(rs1) @ 0b110 @ w_encdec_wreg(dst) @ 0b0001011
+ when currentlyEnabled(Ext_Zwbc) & w_get_sew() == 64
+mapping clause assembly = W_CLMULH_WX(mask_bit, src2, rs1, dst)
+ <-> "wclmulh.wx" ^ spc() ^ w_wreg_name(dst) ^ sep() ^ w_wreg_name(src2) ^ sep() ^ reg_name(rs1) ^ w_maybe_wmask(mask_bit)
+function clause execute(W_CLMULH_WX(mask_bit, src2, rs1, dst)) = {
+  let sew = w_get_sew();
+  let lmul = w_get_lmul_pow();
+  let n = w_get_num_elem(lmul, sew);
+  if w_illegal_wstart(W_WSTART_ARITH, n, lmul) |
+     w_illegal_normal(dst, mask_bit) |
+     not(w_valid_reg_group(src2, lmul)) |
+     not(w_valid_reg_group(dst, lmul)) |
+     not(w_valid_wm_src_overlap(mask_bit, src2, sew))
 
-$[wavedrom "_ _ _ _ OPMVX _ OP-V"]
-mapping clause encdec = VCLMULH_VX (vm, vs2, rs1, vd)
-  <-> 0b001101 @ vm @ encdec_vreg(vs2) @ encdec_reg(rs1) @ 0b110 @ encdec_vreg(vd) @ 0b1010111
-  when currentlyEnabled(Ext_Zvbc) & get_sew() == 64
-
-mapping clause assembly = VCLMULH_VX (vm, vs2, rs1, vd)
-  <-> "vclmulh.vx" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ reg_name(rs1) ^ maybe_vmask(vm)
-
-function clause execute VCLMULH_VX(vm, vs2, rs1, vd) = {
-  let SEW       = get_sew();
-  let LMUL_pow  = get_lmul_pow();
-
-  if not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
   then return Illegal_Instruction();
+  let rhs = w_read_wreg(n, sew, lmul, src2);
 
-  let 'n = get_num_elem(LMUL_pow, SEW);
-  let 'm = SEW;
+  let lhs = w_get_scalar(rs1, sew);
 
-  let vm_val  : bits('n) = read_vmask('n, vm, zvreg);
-  let rs1_val : bits('m) = get_scalar(rs1, SEW);
-  let vd_val  : vector('n, bits('m)) = read_vreg('n, SEW, LMUL_pow, vd);
-  let vs2_val : vector('n, bits('m)) = read_vreg('n, SEW, LMUL_pow, vs2);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result('n, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-  var result = initial_result;
-
-  foreach (i from 0 to ('n - 1)) {
-    if mask[i] == 0b1 then {
-      let prod  = carryless_mul(rs1_val, vs2_val[i]);
-      result[i] = prod[2 * SEW - 1 .. SEW];
+  let previous = w_read_wreg(n, sew, lmul, dst);
+  let input_mask = w_read_wmask(n, mask_bit, w_zwreg);
+  let (initial, active) = w_init_masked_result(n, sew, lmul, previous, input_mask);
+  var result = initial;
+  foreach (p from 0 to n - 1) {
+    if active[p] == 0b1 then {
+      let product = carryless_mul(lhs, rhs[p]);
+      result[p] = product[2 * sew - 1 .. sew]
     }
   };
-  write_vreg('n, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  w_write_wreg(n, sew, lmul, dst, result);
+  w_set_wstart(zeros());
   RETIRE_SUCCESS
 }

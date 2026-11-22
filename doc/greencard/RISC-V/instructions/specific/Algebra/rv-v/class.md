@@ -1,627 +1,722 @@
 ## INSTRUCTION CLASSES
 
-**Vector Instructions Formats**
-
-  | **Category** | **Operands**       | **Operation**   |
-  |:-------------|:-------------------|:----------------|
-  | `OPIVV`      | `vector-vector`    | `Integer`       |
-  | `OPIVX`      | `vector-scalar`    | `Integer`       |
-  | `OPIVI`      | `vector-immediate` | `Integer`       |
-  | `OPFVV`      | `vector-vector`    | `Float`         |
-  | `OPFVF`      | `vector-scalar`    | `Float`         |
-  | `OPMVV`      | `vector-vector`    | `Mask`          |
-  | `OPMVX`      | `vector-scalar`    | `Mask`          |
-  | `OPCFG`      | `scalars-imms`     | `Configuration` |
-
-**OPCFG (Configuration Setting)**
-
-  | **Name**   | **Opcode / Argument**                              | **Class**              |
-  |:-----------|:---------------------------------------------------|:-----------------------|
-  | `vsetivli` | `31=1 30=1 zimm10   zimm5 14..12=0x7 rd 6..0=0x57` | `vector,configuration` |
-  | `vsetvli`  | `31=0 zimm11          rs1 14..12=0x7 rd 6..0=0x57` | `vector,configuration` |
-  | `vsetvl`   | `31=1 30..25=0x0 rs2  rs1 14..12=0x7 rd 6..0=0x57` | `vector,configuration` |
-
-  : Configuration Setting
-
-**OPLS (Vector Loads and Store)**
-
-* **Vector Unit-Stride Instructions (including segment part)**
-
-  | **Name**  | **Opcode / Argument**                                            | **Class**           |
-  |:----------|:-----------------------------------------------------------------|:--------------------|
-  | `vlm.v`   | `31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0  vd 6..0=0x07` | `vector,load,mask`  |
-  | `vsm.v`   | `31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0 vs3 6..0=0x27` | `vector,store,mask` |
-  | `vle8.v`  | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x0  vd 6..0=0x07`      | `vector,load`       |
-  | `vle16.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x5  vd 6..0=0x07`      | `vector,load`       |
-  | `vle32.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x6  vd 6..0=0x07`      | `vector,load`       |
-  | `vle64.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x7  vd 6..0=0x07`      | `vector,load`       |
-  | `vse8.v`  | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x0 vs3 6..0=0x27`      | `vector,store`      |
-  | `vse16.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x5 vs3 6..0=0x27`      | `vector,store`      |
-  | `vse32.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x6 vs3 6..0=0x27`      | `vector,store`      |
-  | `vse64.v` | `nf 28=0 27..26=0 vm 24..20=0 rs1 14..12=0x7 vs3 6..0=0x27`      | `vector,store`      |
-
-  : Vector Unit-Stride Instructions (including segment part)
-
-* **Vector Indexed-Unordered Instructions (including segment part)**
-
-  | **Name**     | **Opcode / Argument**                                  | **Class**      |
-  |:-------------|:-------------------------------------------------------|:---------------|
-  | `vluxei8.v`  | `nf 28=0 27..26=1 vm vs2 rs1 14..12=0x0  vd 6..0=0x07` | `vector,load`  |
-  | `vluxei16.v` | `nf 28=0 27..26=1 vm vs2 rs1 14..12=0x5  vd 6..0=0x07` | `vector,load`  |
-  | `vluxei32.v` | `nf 28=0 27..26=1 vm vs2 rs1 14..12=0x6  vd 6..0=0x07` | `vector,load`  |
-  | `vluxei64.v` | `nf 28=0 27..26=1 vm vs2 rs1 14..12=0x7  vd 6..0=0x07` | `vector,load`  |
-  | `vsuxei8.v`  | `nf 28=0 27..26=1 vm vs2 rs1 14..12=0x0 vs3 6..0=0x27` | `vector,store` |
-  | `vsuxei16.v` | `nf 28=0 27..26=1 vm vs2 rs1 14..12=0x5 vs3 6..0=0x27` | `vector,store` |
-  | `vsuxei32.v` | `nf 28=0 27..26=1 vm vs2 rs1 14..12=0x6 vs3 6..0=0x27` | `vector,store` |
-  | `vsuxei64.v` | `nf 28=0 27..26=1 vm vs2 rs1 14..12=0x7 vs3 6..0=0x27` | `vector,store` |
-
-  : Vector Indexed-Unordered Instructions (including segment part)
-
-* **Vector Strided Instructions (including segment part)**
-
-  | **Name**   | **Opcode / Argument**                                  | **Class**      |
-  |:-----------|:-------------------------------------------------------|:---------------|
-  | `vlse8.v`  | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x0  vd 6..0=0x07` | `vector,load`  |
-  | `vlse16.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x5  vd 6..0=0x07` | `vector,load`  |
-  | `vlse32.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x6  vd 6..0=0x07` | `vector,load`  |
-  | `vlse64.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x7  vd 6..0=0x07` | `vector,load`  |
-  | `vsse8.v`  | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x0 vs3 6..0=0x27` | `vector,store` |
-  | `vsse16.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x5 vs3 6..0=0x27` | `vector,store` |
-  | `vsse32.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x6 vs3 6..0=0x27` | `vector,store` |
-  | `vsse64.v` | `nf 28=0 27..26=2 vm rs2 rs1 14..12=0x7 vs3 6..0=0x27` | `vector,store` |
-
-  : Vector Strided Instructions (including segment part)
-
-* **Vector Indexed-Ordered Instructions (including segment part)**
-
-  | **Name**     | **Opcode / Argument**                                  | **Class**      |
-  |:-------------|:-------------------------------------------------------|:---------------|
-  | `vloxei8.v`  | `nf 28=0 27..26=3 vm vs2 rs1 14..12=0x0  vd 6..0=0x07` | `vector,load`  |
-  | `vloxei16.v` | `nf 28=0 27..26=3 vm vs2 rs1 14..12=0x5  vd 6..0=0x07` | `vector,load`  |
-  | `vloxei32.v` | `nf 28=0 27..26=3 vm vs2 rs1 14..12=0x6  vd 6..0=0x07` | `vector,load`  |
-  | `vloxei64.v` | `nf 28=0 27..26=3 vm vs2 rs1 14..12=0x7  vd 6..0=0x07` | `vector,load`  |
-  | `vsoxei8.v`  | `nf 28=0 27..26=3 vm vs2 rs1 14..12=0x0 vs3 6..0=0x27` | `vector,store` |
-  | `vsoxei16.v` | `nf 28=0 27..26=3 vm vs2 rs1 14..12=0x5 vs3 6..0=0x27` | `vector,store` |
-  | `vsoxei32.v` | `nf 28=0 27..26=3 vm vs2 rs1 14..12=0x6 vs3 6..0=0x27` | `vector,store` |
-  | `vsoxei64.v` | `nf 28=0 27..26=3 vm vs2 rs1 14..12=0x7 vs3 6..0=0x27` | `vector,store` |
-
-  : Vector Indexed-Ordered Instructions (including segment part)
-
-* **Unit-stride Fault-Only-First Loads**
-
-  | **Name**    | **Opcode / Argument**                                          | **Class**                      |
-  |:------------|:---------------------------------------------------------------|:-------------------------------|
-  | `vle8ff.v`  | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x0  vd 6..0=0x07` | `vector,load,fault-only-first` |
-  | `vle16ff.v` | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x5  vd 6..0=0x07` | `vector,load,fault-only-first` |
-  | `vle32ff.v` | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x6  vd 6..0=0x07` | `vector,load,fault-only-first` |
-  | `vle64ff.v` | `nf 28=0 27..26=0 vm 24..20=0x10 rs1 14..12=0x7  vd 6..0=0x07` | `vector,load,fault-only-first` |
-
-  : Unit-stride Fault-Only-First Loads
-
-* **Vector Load/Store Whole Registers**
-
-  | **Name**    | **Opcode / Argument**                                                  | **Class**                     |
-  |:------------|:-----------------------------------------------------------------------|:------------------------------|
-  | `vl1re8.v`  | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl1re16.v` | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl1re32.v` | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl1re64.v` | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl2re8.v`  | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl2re16.v` | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl2re32.v` | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl2re64.v` | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl4re8.v`  | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl4re16.v` | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl4re32.v` | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl4re64.v` | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl8re8.v`  | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl8re16.v` | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x5 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl8re32.v` | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x6 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vl8re64.v` | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x7 vd  6..0=0x07` | `vector,load,whole-register`  |
-  | `vs1r.v`    | `31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vs3 6..0=0x27` | `vector,store,whole-register` |
-  | `vs2r.v`    | `31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vs3 6..0=0x27` | `vector,store,whole-register` |
-  | `vs4r.v`    | `31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vs3 6..0=0x27` | `vector,store,whole-register` |
-  | `vs8r.v`    | `31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 vs3 6..0=0x27` | `vector,store,whole-register` |
-
-  : Vector Load/Store Whole Registers
-
-**Vector Float-Point Instructions**
-
-* **OPFVF**
-
-  | **Name**          | **Opcode / Argument**                                   | **Class**                       |
-  |:------------------|:--------------------------------------------------------|:--------------------------------|
-  | `vfadd.vf`        | `31..26=0x00 vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,alu,floating-point`     |
-  | `vfsub.vf`        | `31..26=0x02 vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,alu,floating-point`     |
-  | `vfmin.vf`        | `31..26=0x04 vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,alu,floating-point`     |
-  | `vfmax.vf`        | `31..26=0x06 vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,alu,floating-point`     |
-  | `vfsgnj.vf`       | `31..26=0x08 vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,logical,floating-point` |
-  | `vfsgnjn.vf`      | `31..26=0x09 vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,logical,floating-point` |
-  | `vfsgnjx.vf`      | `31..26=0x0a vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,logical,floating-point` |
-  | `vfslide1up.vf`   | `31..26=0x0e vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,permute,floating-point` |
-  | `vfslide1down.vf` | `31..26=0x0f vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,permute,floating-point` |
-  | `vfmv.s.f`        | `31..26=0x10 25=1 24..20=0 rs1 14..12=0x5 vd 6..0=0x57` | `vector,move,floating-point`    |
-
-  : OPFVF I
-
-  | **Name**      | **Opcode / Argument**                                   | **Class**                            |
-  |:--------------|:--------------------------------------------------------|:-------------------------------------|
-  | `vfmerge.vfm` | `31..26=0x17 25=0 vs2 rs1 14..12=0x5 vd 6..0=0x57`      | `vector,merge,floating-point`        |
-  | `vfmv.v.f`    | `31..26=0x17 25=1 24..20=0 rs1 14..12=0x5 vd 6..0=0x57` | `vector,move,floating-point`         |
-  | `vmfeq.vf`    | `31..26=0x18 vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,compare,floating-point,mask` |
-  | `vmfle.vf`    | `31..26=0x19 vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,compare,floating-point,mask` |
-  | `vmflt.vf`    | `31..26=0x1b vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,compare,floating-point,mask` |
-  | `vmfne.vf`    | `31..26=0x1c vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,compare,floating-point,mask` |
-  | `vmfgt.vf`    | `31..26=0x1d vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,compare,floating-point,mask` |
-  | `vmfge.vf`    | `31..26=0x1f vm vs2 rs1 14..12=0x5 vd 6..0=0x57`        | `vector,compare,floating-point,mask` |
-
-  : OPFVF II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                        |
-  |:-------------|:-------------------------------------------------|:---------------------------------|
-  | `vfdiv.vf`   | `31..26=0x20 vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,alu,floating-point`      |
-  | `vfrdiv.vf`  | `31..26=0x21 vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,alu,floating-point`      |
-  | `vfmul.vf`   | `31..26=0x24 vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,alu,floating-point`      |
-  | `vfrsub.vf`  | `31..26=0x27 vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,alu,floating-point`      |
-  | `vfmadd.vf`  | `31..26=0x28 vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfnmadd.vf` | `31..26=0x29 vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfmsub.vf`  | `31..26=0x2a vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfnmsub.vf` | `31..26=0x2b vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfmacc.vf`  | `31..26=0x2c vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfnmacc.vf` | `31..26=0x2d vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfmsac.vf`  | `31..26=0x2e vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfnmsac.vf` | `31..26=0x2f vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,multiply,floating-point` |
-
-  : OPFVF III
-
-  | **Name**      | **Opcode / Argument**                            | **Class**                        |
-  |:--------------|:-------------------------------------------------|:---------------------------------|
-  | `vfwadd.vf`   | `31..26=0x30 vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,alu,floating-point`      |
-  | `vfwsub.vf`   | `31..26=0x32 vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,alu,floating-point`      |
-  | `vfwadd.wf`   | `31..26=0x34 vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,alu,floating-point`      |
-  | `vfwsub.wf`   | `31..26=0x36 vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,alu,floating-point`      |
-  | `vfwmul.vf`   | `31..26=0x38 vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,alu,floating-point`      |
-  | `vfwmacc.vf`  | `31..26=0x3c vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfwnmacc.vf` | `31..26=0x3d vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfwmsac.vf`  | `31..26=0x3e vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfwnmsac.vf` | `31..26=0x3f vm vs2 rs1 14..12=0x5 vd 6..0=0x57` | `vector,multiply,floating-point` |
-
-  : OPFVF IV
-
-* **OPFVV**
-
-  | **Name**       | **Opcode / Argument**                                   | **Class**                         |
-  |:---------------|:--------------------------------------------------------|:----------------------------------|
-  | `vfadd.vv`     | `31..26=0x00 vm vs2 vs1 14..12=0x1 vd 6..0=0x57`        | `vector,alu,floating-point`       |
-  | `vfredusum.vs` | `31..26=0x01 vm vs2 vs1 14..12=0x1 vd 6..0=0x57`        | `vector,reduction,floating-point` |
-  | `vfsub.vv`     | `31..26=0x02 vm vs2 vs1 14..12=0x1 vd 6..0=0x57`        | `vector,alu,floating-point`       |
-  | `vfredosum.vs` | `31..26=0x03 vm vs2 vs1 14..12=0x1 vd 6..0=0x57`        | `vector,reduction,floating-point` |
-  | `vfmin.vv`     | `31..26=0x04 vm vs2 vs1 14..12=0x1 vd 6..0=0x57`        | `vector,alu,floating-point`       |
-  | `vfredmin.vs`  | `31..26=0x05 vm vs2 vs1 14..12=0x1 vd 6..0=0x57`        | `vector,reduction,floating-point` |
-  | `vfmax.vv`     | `31..26=0x06 vm vs2 vs1 14..12=0x1 vd 6..0=0x57`        | `vector,alu,floating-point`       |
-  | `vfredmax.vs`  | `31..26=0x07 vm vs2 vs1 14..12=0x1 vd 6..0=0x57`        | `vector,reduction,floating-point` |
-  | `vfsgnj.vv`    | `31..26=0x08 vm vs2 vs1 14..12=0x1 vd 6..0=0x57`        | `vector,logical,floating-point`   |
-  | `vfsgnjn.vv`   | `31..26=0x09 vm vs2 vs1 14..12=0x1 vd 6..0=0x57`        | `vector,logical,floating-point`   |
-  | `vfsgnjx.vv`   | `31..26=0x0a vm vs2 vs1 14..12=0x1 vd 6..0=0x57`        | `vector,logical,floating-point`   |
-  | `vfmv.f.s`     | `31..26=0x10 25=1 vs2 19..15=0 14..12=0x1 rd 6..0=0x57` | `vector,move,floating-point`      |
-
-  : OPFVV I
-
-  | **Name**   | **Opcode / Argument**                            | **Class**                            |
-  |:-----------|:-------------------------------------------------|:-------------------------------------|
-  | `vmfeq.vv` | `31..26=0x18 vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,compare,floating-point,mask` |
-  | `vmfle.vv` | `31..26=0x19 vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,compare,floating-point,mask` |
-  | `vmflt.vv` | `31..26=0x1b vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,compare,floating-point,mask` |
-  | `vmfne.vv` | `31..26=0x1c vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,compare,floating-point,mask` |
-
-  : OPFVV II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                        |
-  |:-------------|:-------------------------------------------------|:---------------------------------|
-  | `vfdiv.vv`   | `31..26=0x20 vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,alu,floating-point`      |
-  | `vfmul.vv`   | `31..26=0x24 vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,alu,floating-point`      |
-  | `vfmadd.vv`  | `31..26=0x28 vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfnmadd.vv` | `31..26=0x29 vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfmsub.vv`  | `31..26=0x2a vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfnmsub.vv` | `31..26=0x2b vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfmacc.vv`  | `31..26=0x2c vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfnmacc.vv` | `31..26=0x2d vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfmsac.vv`  | `31..26=0x2e vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,multiply,floating-point` |
-  | `vfnmsac.vv` | `31..26=0x2f vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,multiply,floating-point` |
-
-  : OPFVV III
-
-  | **Name**           | **Opcode / Argument**                                    | **Class**                       |
-  |:-------------------|:---------------------------------------------------------|:--------------------------------|
-  | `vfcvt.xu.f.v`     | `31..26=0x12 vm vs2 19..15=0x00 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfcvt.x.f.v`      | `31..26=0x12 vm vs2 19..15=0x01 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfcvt.f.xu.v`     | `31..26=0x12 vm vs2 19..15=0x02 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfcvt.f.x.v`      | `31..26=0x12 vm vs2 19..15=0x03 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfcvt.rtz.xu.f.v` | `31..26=0x12 vm vs2 19..15=0x06 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfcvt.rtz.x.f.v`  | `31..26=0x12 vm vs2 19..15=0x07 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-
-  : OPFVV IV
-
-  | **Name**            | **Opcode / Argument**                                    | **Class**                       |
-  |:--------------------|:---------------------------------------------------------|:--------------------------------|
-  | `vfwcvt.xu.f.v`     | `31..26=0x12 vm vs2 19..15=0x08 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfwcvt.x.f.v`      | `31..26=0x12 vm vs2 19..15=0x09 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfwcvt.f.xu.v`     | `31..26=0x12 vm vs2 19..15=0x0A 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfwcvt.f.x.v`      | `31..26=0x12 vm vs2 19..15=0x0B 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfwcvt.f.f.v`      | `31..26=0x12 vm vs2 19..15=0x0C 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfwcvt.rtz.xu.f.v` | `31..26=0x12 vm vs2 19..15=0x0E 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfwcvt.rtz.x.f.v`  | `31..26=0x12 vm vs2 19..15=0x0F 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-
-  : OPFVV V
-
-  | **Name**            | **Opcode / Argument**                                    | **Class**                       |
-  |:--------------------|:---------------------------------------------------------|:--------------------------------|
-  | `vfncvt.xu.f.w`     | `31..26=0x12 vm vs2 19..15=0x10 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfncvt.x.f.w`      | `31..26=0x12 vm vs2 19..15=0x11 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfncvt.f.xu.w`     | `31..26=0x12 vm vs2 19..15=0x12 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfncvt.f.x.w`      | `31..26=0x12 vm vs2 19..15=0x13 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfncvt.f.f.w`      | `31..26=0x12 vm vs2 19..15=0x14 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfncvt.rod.f.f.w`  | `31..26=0x12 vm vs2 19..15=0x15 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfncvt.rtz.xu.f.w` | `31..26=0x12 vm vs2 19..15=0x16 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-  | `vfncvt.rtz.x.f.w`  | `31..26=0x12 vm vs2 19..15=0x17 14..12=0x1 vd 6..0=0x57` | `vector,convert,floating-point` |
-
-  : OPFVV VI
-
-  | **Name**     | **Opcode / Argument**                                    | **Class**                        |
-  |:-------------|:---------------------------------------------------------|:---------------------------------|
-  | `vfsqrt.v`   | `31..26=0x13 vm vs2 19..15=0x00 14..12=0x1 vd 6..0=0x57` | `vector,alu,floating-point`      |
-  | `vfrsqrt7.v` | `31..26=0x13 vm vs2 19..15=0x04 14..12=0x1 vd 6..0=0x57` | `vector,alu,floating-point`      |
-  | `vfrec7.v`   | `31..26=0x13 vm vs2 19..15=0x05 14..12=0x1 vd 6..0=0x57` | `vector,alu,floating-point`      |
-  | `vfclass.v`  | `31..26=0x13 vm vs2 19..15=0x10 14..12=0x1 vd 6..0=0x57` | `vector,classify,floating-point` |
-
-  : OPFVV VII
-
-  | **Name**        | **Opcode / Argument**                            | **Class**                         |
-  |:----------------|:-------------------------------------------------|:----------------------------------|
-  | `vfwadd.vv`     | `31..26=0x30 vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,alu,floating-point`       |
-  | `vfwredusum.vs` | `31..26=0x31 vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,reduction,floating-point` |
-  | `vfwsub.vv`     | `31..26=0x32 vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,alu,floating-point`       |
-  | `vfwredosum.vs` | `31..26=0x33 vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,reduction,floating-point` |
-  | `vfwadd.wv`     | `31..26=0x34 vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,alu,floating-point`       |
-  | `vfwsub.wv`     | `31..26=0x36 vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,alu,floating-point`       |
-  | `vfwmul.vv`     | `31..26=0x38 vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,alu,floating-point`       |
-  | `vfwmacc.vv`    | `31..26=0x3c vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,multiply,floating-point`  |
-  | `vfwnmacc.vv`   | `31..26=0x3d vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,multiply,floating-point`  |
-  | `vfwmsac.vv`    | `31..26=0x3e vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,multiply,floating-point`  |
-  | `vfwnmsac.vv`   | `31..26=0x3f vm vs2 vs1 14..12=0x1 vd 6..0=0x57` | `vector,multiply,floating-point`  |
-
-  : OPFVV VIII
-
-**Vector Integer Instructions**
-
-* **OPIVX**
-
-  | **Name**        | **Opcode / Argument**                            | **Class**            |
-  |:----------------|:-------------------------------------------------|:---------------------|
-  | `vadd.vx`       | `31..26=0x00 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vsub.vx`       | `31..26=0x02 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vrsub.vx`      | `31..26=0x03 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vminu.vx`      | `31..26=0x04 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vmin.vx`       | `31..26=0x05 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vmaxu.vx`      | `31..26=0x06 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vmax.vx`       | `31..26=0x07 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vand.vx`       | `31..26=0x09 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vor.vx`        | `31..26=0x0a vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vxor.vx`       | `31..26=0x0b vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vrgather.vx`   | `31..26=0x0c vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,permute`     |
-  | `vslideup.vx`   | `31..26=0x0e vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,permute`     |
-  | `vslidedown.vx` | `31..26=0x0f vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,permute`     |
-
-  : OPIVX I
-
-  | **Name**     | **Opcode / Argument**                                   | **Class**                     |
-  |:-------------|:--------------------------------------------------------|:------------------------------|
-  | `vadc.vxm`   | `31..26=0x10 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57`      | `vector,alu,integer`          |
-  | `vmadc.vxm`  | `31..26=0x11 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57`      | `vector,alu,integer,mask`     |
-  | `vmadc.vx`   | `31..26=0x11 25=1 vs2 rs1 14..12=0x4 vd 6..0=0x57`      | `vector,alu,integer,mask`     |
-  | `vsbc.vxm`   | `31..26=0x12 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57`      | `vector,alu,integer`          |
-  | `vmsbc.vxm`  | `31..26=0x13 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57`      | `vector,alu,integer,mask`     |
-  | `vmsbc.vx`   | `31..26=0x13 25=1 vs2 rs1 14..12=0x4 vd 6..0=0x57`      | `vector,alu,integer,mask`     |
-  | `vmerge.vxm` | `31..26=0x17 25=0 vs2 rs1 14..12=0x4 vd 6..0=0x57`      | `vector,merge,integer`        |
-  | `vmv.v.x`    | `31..26=0x17 25=1 24..20=0 rs1 14..12=0x4 vd 6..0=0x57` | `vector,move,integer`         |
-  | `vmseq.vx`   | `31..26=0x18 vm vs2 rs1 14..12=0x4 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsne.vx`   | `31..26=0x19 vm vs2 rs1 14..12=0x4 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsltu.vx`  | `31..26=0x1a vm vs2 rs1 14..12=0x4 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmslt.vx`   | `31..26=0x1b vm vs2 rs1 14..12=0x4 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsleu.vx`  | `31..26=0x1c vm vs2 rs1 14..12=0x4 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsle.vx`   | `31..26=0x1d vm vs2 rs1 14..12=0x4 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsgtu.vx`  | `31..26=0x1e vm vs2 rs1 14..12=0x4 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsgt.vx`   | `31..26=0x1f vm vs2 rs1 14..12=0x4 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-
-  : OPIVX II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                |
-  |:-------------|:-------------------------------------------------|:-------------------------|
-  | `vsaddu.vx`  | `31..26=0x20 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vsadd.vx`   | `31..26=0x21 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vssubu.vx`  | `31..26=0x22 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vssub.vx`   | `31..26=0x23 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vsll.vx`    | `31..26=0x25 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer`     |
-  | `vsmul.vx`   | `31..26=0x27 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vsrl.vx`    | `31..26=0x28 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer`     |
-  | `vsra.vx`    | `31..26=0x29 vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer`     |
-  | `vssrl.vx`   | `31..26=0x2a vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vssra.vx`   | `31..26=0x2b vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vnsrl.wx`   | `31..26=0x2c vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer`     |
-  | `vnsra.wx`   | `31..26=0x2d vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,integer`     |
-  | `vnclipu.wx` | `31..26=0x2e vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vnclip.wx`  | `31..26=0x2f vm vs2 rs1 14..12=0x4 vd 6..0=0x57` | `vector,alu,fixed-point` |
-
-  : OPIVX III
-
-* **OPIVV**
-
-  | **Name**          | **Opcode / Argument**                            | **Class**            |
-  |:------------------|:-------------------------------------------------|:---------------------|
-  | `vadd.vv`         | `31..26=0x00 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vsub.vv`         | `31..26=0x02 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vminu.vv`        | `31..26=0x04 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vmin.vv`         | `31..26=0x05 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vmaxu.vv`        | `31..26=0x06 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vmax.vv`         | `31..26=0x07 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vand.vv`         | `31..26=0x09 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vor.vv`          | `31..26=0x0a vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vxor.vv`         | `31..26=0x0b vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vrgather.vv`     | `31..26=0x0c vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,permute`     |
-  | `vrgatherei16.vv` | `31..26=0x0e vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,permute`     |
-
-  : OPIVV I
-
-  | **Name**     | **Opcode / Argument**                                   | **Class**                     |
-  |:-------------|:--------------------------------------------------------|:------------------------------|
-  | `vadc.vvm`   | `31..26=0x10 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57`      | `vector,alu,integer`          |
-  | `vmadc.vvm`  | `31..26=0x11 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57`      | `vector,alu,integer,mask`     |
-  | `vmadc.vv`   | `31..26=0x11 25=1 vs2 vs1 14..12=0x0 vd 6..0=0x57`      | `vector,alu,integer,mask`     |
-  | `vsbc.vvm`   | `31..26=0x12 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57`      | `vector,alu,integer`          |
-  | `vmsbc.vvm`  | `31..26=0x13 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57`      | `vector,alu,integer,mask`     |
-  | `vmsbc.vv`   | `31..26=0x13 25=1 vs2 vs1 14..12=0x0 vd 6..0=0x57`      | `vector,alu,integer,mask`     |
-  | `vmerge.vvm` | `31..26=0x17 25=0 vs2 vs1 14..12=0x0 vd 6..0=0x57`      | `vector,merge,integer`        |
-  | `vmv.v.v`    | `31..26=0x17 25=1 24..20=0 vs1 14..12=0x0 vd 6..0=0x57` | `vector,move,integer`         |
-  | `vmseq.vv`   | `31..26=0x18 vm vs2 vs1 14..12=0x0 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsne.vv`   | `31..26=0x19 vm vs2 vs1 14..12=0x0 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsltu.vv`  | `31..26=0x1a vm vs2 vs1 14..12=0x0 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmslt.vv`   | `31..26=0x1b vm vs2 vs1 14..12=0x0 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsleu.vv`  | `31..26=0x1c vm vs2 vs1 14..12=0x0 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsle.vv`   | `31..26=0x1d vm vs2 vs1 14..12=0x0 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-
-  : OPIVV II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                |
-  |:-------------|:-------------------------------------------------|:-------------------------|
-  | `vsaddu.vv`  | `31..26=0x20 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vsadd.vv`   | `31..26=0x21 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vssubu.vv`  | `31..26=0x22 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vssub.vv`   | `31..26=0x23 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vsll.vv`    | `31..26=0x25 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,integer`     |
-  | `vsmul.vv`   | `31..26=0x27 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vsrl.vv`    | `31..26=0x28 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,integer`     |
-  | `vsra.vv`    | `31..26=0x29 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,integer`     |
-  | `vssrl.vv`   | `31..26=0x2a vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vssra.vv`   | `31..26=0x2b vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vnsrl.wv`   | `31..26=0x2c vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,integer`     |
-  | `vnsra.wv`   | `31..26=0x2d vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,integer`     |
-  | `vnclipu.wv` | `31..26=0x2e vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vnclip.wv`  | `31..26=0x2f vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,alu,fixed-point` |
-
-  : OPIVV III
-
-  | **Name**       | **Opcode / Argument**                            | **Class**                  |
-  |:---------------|:-------------------------------------------------|:---------------------------|
-  | `vwredsumu.vs` | `31..26=0x30 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,reduction,integer` |
-  | `vwredsum.vs`  | `31..26=0x31 vm vs2 vs1 14..12=0x0 vd 6..0=0x57` | `vector,reduction,integer` |
-
-  : OPIVV IV
-
-* **OPIVI**
-
-  | **Name**        | **Opcode / Argument**                              | **Class**            |
-  |:----------------|:---------------------------------------------------|:---------------------|
-  | `vadd.vi`       | `31..26=0x00 vm vs2 simm5 14..12=0x3 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vrsub.vi`      | `31..26=0x03 vm vs2 simm5 14..12=0x3 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vand.vi`       | `31..26=0x09 vm vs2 simm5 14..12=0x3 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vor.vi`        | `31..26=0x0a vm vs2 simm5 14..12=0x3 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vxor.vi`       | `31..26=0x0b vm vs2 simm5 14..12=0x3 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vrgather.vi`   | `31..26=0x0c vm vs2 simm5 14..12=0x3 vd 6..0=0x57` | `vector,permute`     |
-  | `vslideup.vi`   | `31..26=0x0e vm vs2 simm5 14..12=0x3 vd 6..0=0x57` | `vector,permute`     |
-  | `vslidedown.vi` | `31..26=0x0f vm vs2 simm5 14..12=0x3 vd 6..0=0x57` | `vector,permute`     |
-
-  : OPIVI I
-
-  | **Name**     | **Opcode / Argument**                                     | **Class**                     |
-  |:-------------|:----------------------------------------------------------|:------------------------------|
-  | `vadc.vim`   | `31..26=0x10 25=0 vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,alu,integer`          |
-  | `vmadc.vim`  | `31..26=0x11 25=0 vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,alu,integer,mask`     |
-  | `vmadc.vi`   | `31..26=0x11 25=1 vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,alu,integer,mask`     |
-  | `vmerge.vim` | `31..26=0x17 25=0 vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,merge,integer`        |
-  | `vmv.v.i`    | `31..26=0x17 25=1 24..20=0 simm5 14..12=0x3 vd 6..0=0x57` | `vector,move,integer`         |
-  | `vmseq.vi`   | `31..26=0x18 vm vs2 simm5 14..12=0x3 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsne.vi`   | `31..26=0x19 vm vs2 simm5 14..12=0x3 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsleu.vi`  | `31..26=0x1c vm vs2 simm5 14..12=0x3 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsle.vi`   | `31..26=0x1d vm vs2 simm5 14..12=0x3 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsgtu.vi`  | `31..26=0x1e vm vs2 simm5 14..12=0x3 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-  | `vmsgt.vi`   | `31..26=0x1f vm vs2 simm5 14..12=0x3 vd 6..0=0x57`        | `vector,compare,integer,mask` |
-
-  : OPIVI II
-
-  | **Name**     | **Opcode / Argument**                                   | **Class**                    |
-  |:-------------|:--------------------------------------------------------|:-----------------------------|
-  | `vsaddu.vi`  | `31..26=0x20 vm vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,alu,fixed-point`     |
-  | `vsadd.vi`   | `31..26=0x21 vm vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,alu,fixed-point`     |
-  | `vsll.vi`    | `31..26=0x25 vm vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,alu,integer`         |
-  | `vmv1r.v`    | `31..26=0x27 25=1 vs2 19..15=0 14..12=0x3 vd 6..0=0x57` | `vector,move,whole-register` |
-  | `vmv2r.v`    | `31..26=0x27 25=1 vs2 19..15=1 14..12=0x3 vd 6..0=0x57` | `vector,move,whole-register` |
-  | `vmv4r.v`    | `31..26=0x27 25=1 vs2 19..15=3 14..12=0x3 vd 6..0=0x57` | `vector,move,whole-register` |
-  | `vmv8r.v`    | `31..26=0x27 25=1 vs2 19..15=7 14..12=0x3 vd 6..0=0x57` | `vector,move,whole-register` |
-  | `vsrl.vi`    | `31..26=0x28 vm vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,alu,integer`         |
-  | `vsra.vi`    | `31..26=0x29 vm vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,alu,integer`         |
-  | `vssrl.vi`   | `31..26=0x2a vm vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,alu,fixed-point`     |
-  | `vssra.vi`   | `31..26=0x2b vm vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,alu,fixed-point`     |
-  | `vnsrl.wi`   | `31..26=0x2c vm vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,alu,integer`         |
-  | `vnsra.wi`   | `31..26=0x2d vm vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,alu,integer`         |
-  | `vnclipu.wi` | `31..26=0x2e vm vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,alu,fixed-point`     |
-  | `vnclip.wi`  | `31..26=0x2f vm vs2 simm5 14..12=0x3 vd 6..0=0x57`      | `vector,alu,fixed-point`     |
-
-  : OPIVI III
-
-* **OPI (Vector Integer Extension Instructions)**
-
-  | **Name**    | **Opcode / Argument**                                 | **Class**            |
-  |:------------|:------------------------------------------------------|:---------------------|
-  | `vzext.vf8` | `31..26=0x12 vm vs2 19..15=2 14..12=0x2 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vsext.vf8` | `31..26=0x12 vm vs2 19..15=3 14..12=0x2 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vzext.vf4` | `31..26=0x12 vm vs2 19..15=4 14..12=0x2 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vsext.vf4` | `31..26=0x12 vm vs2 19..15=5 14..12=0x2 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vzext.vf2` | `31..26=0x12 vm vs2 19..15=6 14..12=0x2 vd 6..0=0x57` | `vector,alu,integer` |
-  | `vsext.vf2` | `31..26=0x12 vm vs2 19..15=7 14..12=0x2 vd 6..0=0x57` | `vector,alu,integer` |
-
-  : Vector Integer Extension Instructions I
-
-  | **Name**       | **Opcode / Argument**                              | **Class**                 |
-  |:---------------|:---------------------------------------------------|:--------------------------|
-  | `vcompress.vm` | `31..26=0x17 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,permute,compress` |
-  | `vmandn.mm`    | `31..26=0x18 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,logical,mask`     |
-  | `vmand.mm`     | `31..26=0x19 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,logical,mask`     |
-  | `vmor.mm`      | `31..26=0x1a 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,logical,mask`     |
-  | `vmxor.mm`     | `31..26=0x1b 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,logical,mask`     |
-  | `vmorn.mm`     | `31..26=0x1c 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,logical,mask`     |
-  | `vmnand.mm`    | `31..26=0x1d 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,logical,mask`     |
-  | `vmnor.mm`     | `31..26=0x1e 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,logical,mask`     |
-  | `vmxnor.mm`    | `31..26=0x1f 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,logical,mask`     |
-
-  : Vector Integer Extension Instructions II
-
-  | **Name**   | **Opcode / Argument**                                         | **Class**            |
-  |:-----------|:--------------------------------------------------------------|:---------------------|
-  | `vmsbf.m`  | `31..26=0x14 vm vs2 19..15=0x01 14..12=0x2 vd 6..0=0x57`      | `vector,mask,prefix` |
-  | `vmsof.m`  | `31..26=0x14 vm vs2 19..15=0x02 14..12=0x2 vd 6..0=0x57`      | `vector,mask,prefix` |
-  | `vmsif.m`  | `31..26=0x14 vm vs2 19..15=0x03 14..12=0x2 vd 6..0=0x57`      | `vector,mask,prefix` |
-  | `viota.m`  | `31..26=0x14 vm vs2 19..15=0x10 14..12=0x2 vd 6..0=0x57`      | `vector,mask,prefix` |
-  | `vid.v`    | `31..26=0x14 vm 24..20=0 19..15=0x11 14..12=0x2 vd 6..0=0x57` | `vector,index`       |
-  | `vcpop.m`  | `31..26=0x10 vm vs2 19..15=0x10 14..12=0x2 rd 6..0=0x57`      | `vector,mask,count`  |
-  | `vfirst.m` | `31..26=0x10 vm vs2 19..15=0x11 14..12=0x2 rd 6..0=0x57`      | `vector,mask,search` |
-
-  : Vector Integer Extension Instructions III
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                 |
-  |:-------------|:-------------------------------------------------|:--------------------------|
-  | `vdivu.vv`   | `31..26=0x20 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,divide,integer`   |
-  | `vdiv.vv`    | `31..26=0x21 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,divide,integer`   |
-  | `vremu.vv`   | `31..26=0x22 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,divide,integer`   |
-  | `vrem.vv`    | `31..26=0x23 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,divide,integer`   |
-  | `vmulhu.vv`  | `31..26=0x24 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vmul.vv`    | `31..26=0x25 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vmulhsu.vv` | `31..26=0x26 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vmulh.vv`   | `31..26=0x27 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vmadd.vv`   | `31..26=0x29 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vnmsub.vv`  | `31..26=0x2b vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vmacc.vv`   | `31..26=0x2d vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vnmsac.vv`  | `31..26=0x2f vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,multiply,integer` |
-
-  : Vector Integer Extension Instructions IV
-
-  | **Name**      | **Opcode / Argument**                            | **Class**                 |
-  |:--------------|:-------------------------------------------------|:--------------------------|
-  | `vwaddu.vv`   | `31..26=0x30 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwadd.vv`    | `31..26=0x31 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwsubu.vv`   | `31..26=0x32 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwsub.vv`    | `31..26=0x33 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwaddu.wv`   | `31..26=0x34 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwadd.wv`    | `31..26=0x35 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwsubu.wv`   | `31..26=0x36 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwsub.wv`    | `31..26=0x37 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwmulu.vv`   | `31..26=0x38 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vwmulsu.vv`  | `31..26=0x3a vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vwmul.vv`    | `31..26=0x3b vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vwmaccu.vv`  | `31..26=0x3c vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vwmacc.vv`   | `31..26=0x3d vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vwmaccsu.vv` | `31..26=0x3f vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,multiply,integer` |
-
-  : Vector Integer Extension Instructions V
-
-**Vector Mask Instructions**
-
-* **OPMVV**
-
-  | **Name**      | **Opcode / Argument**                            | **Class**                  |
-  |:--------------|:-------------------------------------------------|:---------------------------|
-  | `vredsum.vs`  | `31..26=0x00 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,reduction,integer` |
-  | `vredand.vs`  | `31..26=0x01 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,reduction,integer` |
-  | `vredor.vs`   | `31..26=0x02 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,reduction,integer` |
-  | `vredxor.vs`  | `31..26=0x03 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,reduction,integer` |
-  | `vredminu.vs` | `31..26=0x04 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,reduction,integer` |
-  | `vredmin.vs`  | `31..26=0x05 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,reduction,integer` |
-  | `vredmaxu.vs` | `31..26=0x06 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,reduction,integer` |
-  | `vredmax.vs`  | `31..26=0x07 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,reduction,integer` |
-  | `vaaddu.vv`   | `31..26=0x08 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,alu,fixed-point`   |
-  | `vaadd.vv`    | `31..26=0x09 vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,alu,fixed-point`   |
-  | `vasubu.vv`   | `31..26=0x0a vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,alu,fixed-point`   |
-  | `vasub.vv`    | `31..26=0x0b vm vs2 vs1 14..12=0x2 vd 6..0=0x57` | `vector,alu,fixed-point`   |
-
-  : OPMVV I
-
-  | **Name**  | **Opcode / Argument**                                   | **Class**             |
-  |:----------|:--------------------------------------------------------|:----------------------|
-  | `vmv.x.s` | `31..26=0x10 25=1 vs2 19..15=0 14..12=0x2 rd 6..0=0x57` | `vector,move,integer` |
-
-  : OPMVV II
-
-* **OPMVX**
-
-  | **Name**    | **Opcode / Argument**                            | **Class**                |
-  |:------------|:-------------------------------------------------|:-------------------------|
-  | `vaaddu.vx` | `31..26=0x08 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vaadd.vx`  | `31..26=0x09 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vasubu.vx` | `31..26=0x0a vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,alu,fixed-point` |
-  | `vasub.vx`  | `31..26=0x0b vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,alu,fixed-point` |
-
-  : OPMVX I
-
-  | **Name**         | **Opcode / Argument**                                   | **Class**             |
-  |:-----------------|:--------------------------------------------------------|:----------------------|
-  | `vmv.s.x`        | `31..26=0x10 25=1 24..20=0 rs1 14..12=0x6 vd 6..0=0x57` | `vector,move,integer` |
-  | `vslide1up.vx`   | `31..26=0x0e vm vs2 rs1 14..12=0x6 vd 6..0=0x57`        | `vector,permute`      |
-  | `vslide1down.vx` | `31..26=0x0f vm vs2 rs1 14..12=0x6 vd 6..0=0x57`        | `vector,permute`      |
-
-  : OPMVX II
-
-  | **Name**     | **Opcode / Argument**                            | **Class**                 |
-  |:-------------|:-------------------------------------------------|:--------------------------|
-  | `vdivu.vx`   | `31..26=0x20 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,divide,integer`   |
-  | `vdiv.vx`    | `31..26=0x21 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,divide,integer`   |
-  | `vremu.vx`   | `31..26=0x22 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,divide,integer`   |
-  | `vrem.vx`    | `31..26=0x23 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,divide,integer`   |
-  | `vmulhu.vx`  | `31..26=0x24 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vmul.vx`    | `31..26=0x25 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vmulhsu.vx` | `31..26=0x26 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vmulh.vx`   | `31..26=0x27 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vmadd.vx`   | `31..26=0x29 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vnmsub.vx`  | `31..26=0x2b vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vmacc.vx`   | `31..26=0x2d vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vnmsac.vx`  | `31..26=0x2f vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-
-  : OPMVX III
-
-  | **Name**      | **Opcode / Argument**                            | **Class**                 |
-  |:--------------|:-------------------------------------------------|:--------------------------|
-  | `vwaddu.vx`   | `31..26=0x30 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwadd.vx`    | `31..26=0x31 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwsubu.vx`   | `31..26=0x32 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwsub.vx`    | `31..26=0x33 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwaddu.wx`   | `31..26=0x34 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwadd.wx`    | `31..26=0x35 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwsubu.wx`   | `31..26=0x36 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwsub.wx`    | `31..26=0x37 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,alu,integer`      |
-  | `vwmulu.vx`   | `31..26=0x38 vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vwmulsu.vx`  | `31..26=0x3a vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vwmul.vx`    | `31..26=0x3b vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vwmaccu.vx`  | `31..26=0x3c vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vwmacc.vx`   | `31..26=0x3d vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vwmaccus.vx` | `31..26=0x3e vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-  | `vwmaccsu.vx` | `31..26=0x3f vm vs2 rs1 14..12=0x6 vd 6..0=0x57` | `vector,multiply,integer` |
-
-  : OPMVX IV
+| **Extension** | **Name**            | **Variable-Fields**  | **Class**                                 |
+|:--------------|:--------------------|:---------------------|:------------------------------------------|
+| `rv_v`        | `vaaddu_vv`         | `vm, vs2, vs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vaaddu_vx`         | `vm, vs2, rs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vaadd_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vaadd_vx`          | `vm, vs2, rs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vadc_vim`          | `vs2, simm5, vd`     | `vector, alu, integer`                    |
+| `rv_v`        | `vadc_vvm`          | `vs2, vs1, vd`       | `vector, alu, integer`                    |
+| `rv_v`        | `vadc_vxm`          | `vs2, rs1, vd`       | `vector, alu, integer`                    |
+| `rv_v`        | `vadd_vi`           | `vm, vs2, simm5, vd` | `vector, alu, integer`                    |
+| `rv_v`        | `vadd_vv`           | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vadd_vx`           | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vand_vi`           | `vm, vs2, simm5, vd` | `vector, alu, integer`                    |
+| `rv_v`        | `vand_vv`           | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vand_vx`           | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vasubu_vv`         | `vm, vs2, vs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vasubu_vx`         | `vm, vs2, rs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vasub_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vasub_vx`          | `vm, vs2, rs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vcompress_vm`      | `vs2, vs1, vd`       | `vector, permute, compress`               |
+| `rv_v`        | `vcpop_m`           | `vm, vs2, rd`        | `vector, mask, count`                     |
+| `rv_v`        | `vdivu_vv`          | `vm, vs2, vs1, vd`   | `vector, divide, integer`                 |
+| `rv_v`        | `vdivu_vx`          | `vm, vs2, rs1, vd`   | `vector, divide, integer`                 |
+| `rv_v`        | `vdiv_vv`           | `vm, vs2, vs1, vd`   | `vector, divide, integer`                 |
+| `rv_v`        | `vdiv_vx`           | `vm, vs2, rs1, vd`   | `vector, divide, integer`                 |
+| `rv_v`        | `vfadd_vf`          | `vm, vs2, rs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfadd_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfclass_v`         | `vm, vs2, vd`        | `vector, classify, floating-point`        |
+| `rv_v`        | `vfcvt_f_xu_v`      | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfcvt_f_x_v`       | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfcvt_rtz_x_f_v`   | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfcvt_rtz_xu_f_v`  | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfcvt_x_f_v`       | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfcvt_xu_f_v`      | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfdiv_vf`          | `vm, vs2, rs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfdiv_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfirst_m`          | `vm, vs2, rd`        | `vector, mask, search`                    |
+| `rv_v`        | `vfmacc_vf`         | `vm, vs2, rs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfmacc_vv`         | `vm, vs2, vs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfmadd_vf`         | `vm, vs2, rs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfmadd_vv`         | `vm, vs2, vs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfmax_vf`          | `vm, vs2, rs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfmax_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfmerge_vfm`       | `vs2, rs1, vd`       | `vector, merge, floating-point`           |
+| `rv_v`        | `vfmin_vf`          | `vm, vs2, rs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfmin_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfmsac_vf`         | `vm, vs2, rs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfmsac_vv`         | `vm, vs2, vs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfmsub_vf`         | `vm, vs2, rs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfmsub_vv`         | `vm, vs2, vs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfmul_vf`          | `vm, vs2, rs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfmul_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfmv_f_s`          | `vs2, rd`            | `vector, move, floating-point`            |
+| `rv_v`        | `vfmv_s_f`          | `rs1, vd`            | `vector, move, floating-point`            |
+| `rv_v`        | `vfmv_v_f`          | `rs1, vd`            | `vector, move, floating-point`            |
+| `rv_v`        | `vfncvt_f_f_w`      | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfncvt_f_xu_w`     | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfncvt_f_x_w`      | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfncvt_rod_f_f_w`  | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfncvt_rtz_x_f_w`  | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfncvt_rtz_xu_f_w` | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfncvt_x_f_w`      | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfncvt_xu_f_w`     | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfnmacc_vf`        | `vm, vs2, rs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfnmacc_vv`        | `vm, vs2, vs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfnmadd_vf`        | `vm, vs2, rs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfnmadd_vv`        | `vm, vs2, vs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfnmsac_vf`        | `vm, vs2, rs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfnmsac_vv`        | `vm, vs2, vs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfnmsub_vf`        | `vm, vs2, rs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfnmsub_vv`        | `vm, vs2, vs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfrdiv_vf`         | `vm, vs2, rs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfrec7_v`          | `vm, vs2, vd`        | `vector, alu, floating-point`             |
+| `rv_v`        | `vfredmax_vs`       | `vm, vs2, vs1, vd`   | `vector, reduction, floating-point`       |
+| `rv_v`        | `vfredmin_vs`       | `vm, vs2, vs1, vd`   | `vector, reduction, floating-point`       |
+| `rv_v`        | `vfredosum_vs`      | `vm, vs2, vs1, vd`   | `vector, reduction, floating-point`       |
+| `rv_v`        | `vfredusum_vs`      | `vm, vs2, vs1, vd`   | `vector, reduction, floating-point`       |
+| `rv_v`        | `vfrsqrt7_v`        | `vm, vs2, vd`        | `vector, alu, floating-point`             |
+| `rv_v`        | `vfrsub_vf`         | `vm, vs2, rs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfsgnjn_vf`        | `vm, vs2, rs1, vd`   | `vector, logical, floating-point`         |
+| `rv_v`        | `vfsgnjn_vv`        | `vm, vs2, vs1, vd`   | `vector, logical, floating-point`         |
+| `rv_v`        | `vfsgnj_vf`         | `vm, vs2, rs1, vd`   | `vector, logical, floating-point`         |
+| `rv_v`        | `vfsgnj_vv`         | `vm, vs2, vs1, vd`   | `vector, logical, floating-point`         |
+| `rv_v`        | `vfsgnjx_vf`        | `vm, vs2, rs1, vd`   | `vector, logical, floating-point`         |
+| `rv_v`        | `vfsgnjx_vv`        | `vm, vs2, vs1, vd`   | `vector, logical, floating-point`         |
+| `rv_v`        | `vfslide1down_vf`   | `vm, vs2, rs1, vd`   | `vector, permute, floating-point`         |
+| `rv_v`        | `vfslide1up_vf`     | `vm, vs2, rs1, vd`   | `vector, permute, floating-point`         |
+| `rv_v`        | `vfsqrt_v`          | `vm, vs2, vd`        | `vector, alu, floating-point`             |
+| `rv_v`        | `vfsub_vf`          | `vm, vs2, rs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfsub_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfwadd_vf`         | `vm, vs2, rs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfwadd_vv`         | `vm, vs2, vs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfwadd_wf`         | `vm, vs2, rs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfwadd_wv`         | `vm, vs2, vs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfwcvt_f_f_v`      | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfwcvt_f_xu_v`     | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfwcvt_f_x_v`      | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfwcvt_rtz_x_f_v`  | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfwcvt_rtz_xu_f_v` | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfwcvt_x_f_v`      | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfwcvt_xu_f_v`     | `vm, vs2, vd`        | `vector, convert, floating-point`         |
+| `rv_v`        | `vfwmacc_vf`        | `vm, vs2, rs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfwmacc_vv`        | `vm, vs2, vs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfwmsac_vf`        | `vm, vs2, rs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfwmsac_vv`        | `vm, vs2, vs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfwmul_vf`         | `vm, vs2, rs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfwmul_vv`         | `vm, vs2, vs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfwnmacc_vf`       | `vm, vs2, rs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfwnmacc_vv`       | `vm, vs2, vs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfwnmsac_vf`       | `vm, vs2, rs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfwnmsac_vv`       | `vm, vs2, vs1, vd`   | `vector, multiply, floating-point`        |
+| `rv_v`        | `vfwredosum_vs`     | `vm, vs2, vs1, vd`   | `vector, reduction, floating-point`       |
+| `rv_v`        | `vfwredusum_vs`     | `vm, vs2, vs1, vd`   | `vector, reduction, floating-point`       |
+| `rv_v`        | `vfwsub_vf`         | `vm, vs2, rs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfwsub_vv`         | `vm, vs2, vs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfwsub_wf`         | `vm, vs2, rs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vfwsub_wv`         | `vm, vs2, vs1, vd`   | `vector, alu, floating-point`             |
+| `rv_v`        | `vid_v`             | `vm, vd`             | `vector, index`                           |
+| `rv_v`        | `viota_m`           | `vm, vs2, vd`        | `vector, mask, prefix`                    |
+| `rv_v`        | `vl1re16_v`         | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl1re32_v`         | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl1re64_v`         | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl1re8_v`          | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl2re16_v`         | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl2re32_v`         | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl2re64_v`         | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl2re8_v`          | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl4re16_v`         | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl4re32_v`         | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl4re64_v`         | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl4re8_v`          | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl8re16_v`         | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl8re32_v`         | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl8re64_v`         | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vl8re8_v`          | `rs1, vd`            | `vector, load, whole-register`            |
+| `rv_v`        | `vle16ff_v`         | `vm, rs1, vd`        | `vector, load, fault-only-first`          |
+| `rv_v`        | `vle16_v`           | `vm, rs1, vd`        | `vector, load`                            |
+| `rv_v`        | `vle32ff_v`         | `vm, rs1, vd`        | `vector, load, fault-only-first`          |
+| `rv_v`        | `vle32_v`           | `vm, rs1, vd`        | `vector, load`                            |
+| `rv_v`        | `vle64ff_v`         | `vm, rs1, vd`        | `vector, load, fault-only-first`          |
+| `rv_v`        | `vle64_v`           | `vm, rs1, vd`        | `vector, load`                            |
+| `rv_v`        | `vle8ff_v`          | `vm, rs1, vd`        | `vector, load, fault-only-first`          |
+| `rv_v`        | `vle8_v`            | `vm, rs1, vd`        | `vector, load`                            |
+| `rv_v`        | `vlm_v`             | `rs1, vd`            | `vector, load, mask`                      |
+| `rv_v`        | `vloxei16_v`        | `vm, vs2, rs1, vd`   | `vector, load`                            |
+| `rv_v`        | `vloxei32_v`        | `vm, vs2, rs1, vd`   | `vector, load`                            |
+| `rv_v`        | `vloxei64_v`        | `vm, vs2, rs1, vd`   | `vector, load`                            |
+| `rv_v`        | `vloxei8_v`         | `vm, vs2, rs1, vd`   | `vector, load`                            |
+| `rv_v`        | `vloxseg2ei16_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg2ei32_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg2ei64_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg2ei8_v`     | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg3ei16_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg3ei32_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg3ei64_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg3ei8_v`     | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg4ei16_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg4ei32_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg4ei64_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg4ei8_v`     | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg5ei16_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg5ei32_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg5ei64_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg5ei8_v`     | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg6ei16_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg6ei32_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg6ei64_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg6ei8_v`     | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg7ei16_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg7ei32_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg7ei64_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg7ei8_v`     | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg8ei16_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg8ei32_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg8ei64_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vloxseg8ei8_v`     | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlse16_v`          | `vm, rs2, rs1, vd`   | `vector, load`                            |
+| `rv_v`        | `vlse32_v`          | `vm, rs2, rs1, vd`   | `vector, load`                            |
+| `rv_v`        | `vlse64_v`          | `vm, rs2, rs1, vd`   | `vector, load`                            |
+| `rv_v`        | `vlse8_v`           | `vm, rs2, rs1, vd`   | `vector, load`                            |
+| `rv_v`        | `vlseg2e16ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg2e16_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg2e32ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg2e32_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg2e64ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg2e64_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg2e8ff_v`      | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg2e8_v`        | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg3e16ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg3e16_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg3e32ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg3e32_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg3e64ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg3e64_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg3e8ff_v`      | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg3e8_v`        | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg4e16ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg4e16_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg4e32ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg4e32_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg4e64ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg4e64_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg4e8ff_v`      | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg4e8_v`        | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg5e16ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg5e16_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg5e32ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg5e32_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg5e64ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg5e64_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg5e8ff_v`      | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg5e8_v`        | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg6e16ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg6e16_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg6e32ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg6e32_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg6e64ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg6e64_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg6e8ff_v`      | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg6e8_v`        | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg7e16ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg7e16_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg7e32ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg7e32_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg7e64ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg7e64_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg7e8ff_v`      | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg7e8_v`        | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg8e16ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg8e16_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg8e32ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg8e32_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg8e64ff_v`     | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg8e64_v`       | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlseg8e8ff_v`      | `vm, rs1, vd`        | `vector, load, fault-only-first, segment` |
+| `rv_v`        | `vlseg8e8_v`        | `vm, rs1, vd`        | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg2e16_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg2e32_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg2e64_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg2e8_v`       | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg3e16_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg3e32_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg3e64_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg3e8_v`       | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg4e16_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg4e32_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg4e64_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg4e8_v`       | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg5e16_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg5e32_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg5e64_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg5e8_v`       | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg6e16_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg6e32_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg6e64_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg6e8_v`       | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg7e16_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg7e32_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg7e64_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg7e8_v`       | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg8e16_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg8e32_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg8e64_v`      | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vlsseg8e8_v`       | `vm, rs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxei16_v`        | `vm, vs2, rs1, vd`   | `vector, load`                            |
+| `rv_v`        | `vluxei32_v`        | `vm, vs2, rs1, vd`   | `vector, load`                            |
+| `rv_v`        | `vluxei64_v`        | `vm, vs2, rs1, vd`   | `vector, load`                            |
+| `rv_v`        | `vluxei8_v`         | `vm, vs2, rs1, vd`   | `vector, load`                            |
+| `rv_v`        | `vluxseg2ei16_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg2ei32_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg2ei64_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg2ei8_v`     | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg3ei16_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg3ei32_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg3ei64_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg3ei8_v`     | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg4ei16_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg4ei32_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg4ei64_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg4ei8_v`     | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg5ei16_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg5ei32_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg5ei64_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg5ei8_v`     | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg6ei16_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg6ei32_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg6ei64_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg6ei8_v`     | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg7ei16_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg7ei32_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg7ei64_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg7ei8_v`     | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg8ei16_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg8ei32_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg8ei64_v`    | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vluxseg8ei8_v`     | `vm, vs2, rs1, vd`   | `vector, load, segment`                   |
+| `rv_v`        | `vmacc_vv`          | `vm, vs2, vs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vmacc_vx`          | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vmadc_vi`          | `vs2, simm5, vd`     | `vector, alu, integer, mask`              |
+| `rv_v`        | `vmadc_vim`         | `vs2, simm5, vd`     | `vector, alu, integer, mask`              |
+| `rv_v`        | `vmadc_vv`          | `vs2, vs1, vd`       | `vector, alu, integer, mask`              |
+| `rv_v`        | `vmadc_vvm`         | `vs2, vs1, vd`       | `vector, alu, integer, mask`              |
+| `rv_v`        | `vmadc_vx`          | `vs2, rs1, vd`       | `vector, alu, integer, mask`              |
+| `rv_v`        | `vmadc_vxm`         | `vs2, rs1, vd`       | `vector, alu, integer, mask`              |
+| `rv_v`        | `vmadd_vv`          | `vm, vs2, vs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vmadd_vx`          | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vmand_mm`          | `vs2, vs1, vd`       | `vector, logical, mask`                   |
+| `rv_v`        | `vmandn_mm`         | `vs2, vs1, vd`       | `vector, logical, mask`                   |
+| `rv_v`        | `vmaxu_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vmaxu_vx`          | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vmax_vv`           | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vmax_vx`           | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vmerge_vim`        | `vs2, simm5, vd`     | `vector, merge, integer`                  |
+| `rv_v`        | `vmerge_vvm`        | `vs2, vs1, vd`       | `vector, merge, integer`                  |
+| `rv_v`        | `vmerge_vxm`        | `vs2, rs1, vd`       | `vector, merge, integer`                  |
+| `rv_v`        | `vmfeq_vf`          | `vm, vs2, rs1, vd`   | `vector, compare, floating-point, mask`   |
+| `rv_v`        | `vmfeq_vv`          | `vm, vs2, vs1, vd`   | `vector, compare, floating-point, mask`   |
+| `rv_v`        | `vmfge_vf`          | `vm, vs2, rs1, vd`   | `vector, compare, floating-point, mask`   |
+| `rv_v`        | `vmfgt_vf`          | `vm, vs2, rs1, vd`   | `vector, compare, floating-point, mask`   |
+| `rv_v`        | `vmfle_vf`          | `vm, vs2, rs1, vd`   | `vector, compare, floating-point, mask`   |
+| `rv_v`        | `vmfle_vv`          | `vm, vs2, vs1, vd`   | `vector, compare, floating-point, mask`   |
+| `rv_v`        | `vmflt_vf`          | `vm, vs2, rs1, vd`   | `vector, compare, floating-point, mask`   |
+| `rv_v`        | `vmflt_vv`          | `vm, vs2, vs1, vd`   | `vector, compare, floating-point, mask`   |
+| `rv_v`        | `vmfne_vf`          | `vm, vs2, rs1, vd`   | `vector, compare, floating-point, mask`   |
+| `rv_v`        | `vmfne_vv`          | `vm, vs2, vs1, vd`   | `vector, compare, floating-point, mask`   |
+| `rv_v`        | `vminu_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vminu_vx`          | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vmin_vv`           | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vmin_vx`           | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vmnand_mm`         | `vs2, vs1, vd`       | `vector, logical, mask`                   |
+| `rv_v`        | `vmnor_mm`          | `vs2, vs1, vd`       | `vector, logical, mask`                   |
+| `rv_v`        | `vmor_mm`           | `vs2, vs1, vd`       | `vector, logical, mask`                   |
+| `rv_v`        | `vmorn_mm`          | `vs2, vs1, vd`       | `vector, logical, mask`                   |
+| `rv_v`        | `vmsbc_vv`          | `vs2, vs1, vd`       | `vector, alu, integer, mask`              |
+| `rv_v`        | `vmsbc_vvm`         | `vs2, vs1, vd`       | `vector, alu, integer, mask`              |
+| `rv_v`        | `vmsbc_vx`          | `vs2, rs1, vd`       | `vector, alu, integer, mask`              |
+| `rv_v`        | `vmsbc_vxm`         | `vs2, rs1, vd`       | `vector, alu, integer, mask`              |
+| `rv_v`        | `vmsbf_m`           | `vm, vs2, vd`        | `vector, mask, prefix`                    |
+| `rv_v`        | `vmseq_vi`          | `vm, vs2, simm5, vd` | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmseq_vv`          | `vm, vs2, vs1, vd`   | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmseq_vx`          | `vm, vs2, rs1, vd`   | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsgtu_vi`         | `vm, vs2, simm5, vd` | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsgtu_vx`         | `vm, vs2, rs1, vd`   | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsgt_vi`          | `vm, vs2, simm5, vd` | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsgt_vx`          | `vm, vs2, rs1, vd`   | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsif_m`           | `vm, vs2, vd`        | `vector, mask, prefix`                    |
+| `rv_v`        | `vmsleu_vi`         | `vm, vs2, simm5, vd` | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsleu_vv`         | `vm, vs2, vs1, vd`   | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsleu_vx`         | `vm, vs2, rs1, vd`   | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsle_vi`          | `vm, vs2, simm5, vd` | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsle_vv`          | `vm, vs2, vs1, vd`   | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsle_vx`          | `vm, vs2, rs1, vd`   | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsltu_vv`         | `vm, vs2, vs1, vd`   | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsltu_vx`         | `vm, vs2, rs1, vd`   | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmslt_vv`          | `vm, vs2, vs1, vd`   | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmslt_vx`          | `vm, vs2, rs1, vd`   | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsne_vi`          | `vm, vs2, simm5, vd` | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsne_vv`          | `vm, vs2, vs1, vd`   | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsne_vx`          | `vm, vs2, rs1, vd`   | `vector, compare, integer, mask`          |
+| `rv_v`        | `vmsof_m`           | `vm, vs2, vd`        | `vector, mask, prefix`                    |
+| `rv_v`        | `vmulhsu_vv`        | `vm, vs2, vs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vmulhsu_vx`        | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vmulhu_vv`         | `vm, vs2, vs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vmulhu_vx`         | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vmulh_vv`          | `vm, vs2, vs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vmulh_vx`          | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vmul_vv`           | `vm, vs2, vs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vmul_vx`           | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vmv1r_v`           | `vs2, vd`            | `vector, move, whole-register`            |
+| `rv_v`        | `vmv2r_v`           | `vs2, vd`            | `vector, move, whole-register`            |
+| `rv_v`        | `vmv4r_v`           | `vs2, vd`            | `vector, move, whole-register`            |
+| `rv_v`        | `vmv8r_v`           | `vs2, vd`            | `vector, move, whole-register`            |
+| `rv_v`        | `vmv_s_x`           | `rs1, vd`            | `vector, move, integer`                   |
+| `rv_v`        | `vmv_v_i`           | `simm5, vd`          | `vector, move, integer`                   |
+| `rv_v`        | `vmv_v_v`           | `vs1, vd`            | `vector, move, integer`                   |
+| `rv_v`        | `vmv_v_x`           | `rs1, vd`            | `vector, move, integer`                   |
+| `rv_v`        | `vmv_x_s`           | `vs2, rd`            | `vector, move, integer`                   |
+| `rv_v`        | `vmxnor_mm`         | `vs2, vs1, vd`       | `vector, logical, mask`                   |
+| `rv_v`        | `vmxor_mm`          | `vs2, vs1, vd`       | `vector, logical, mask`                   |
+| `rv_v`        | `vnclipu_wi`        | `vm, vs2, zimm5, vd` | `vector, alu, fixed-point`                |
+| `rv_v`        | `vnclipu_wv`        | `vm, vs2, vs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vnclipu_wx`        | `vm, vs2, rs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vnclip_wi`         | `vm, vs2, zimm5, vd` | `vector, alu, fixed-point`                |
+| `rv_v`        | `vnclip_wv`         | `vm, vs2, vs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vnclip_wx`         | `vm, vs2, rs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vnmsac_vv`         | `vm, vs2, vs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vnmsac_vx`         | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vnmsub_vv`         | `vm, vs2, vs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vnmsub_vx`         | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vnsra_wi`          | `vm, vs2, zimm5, vd` | `vector, alu, integer`                    |
+| `rv_v`        | `vnsra_wv`          | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vnsra_wx`          | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vnsrl_wi`          | `vm, vs2, zimm5, vd` | `vector, alu, integer`                    |
+| `rv_v`        | `vnsrl_wv`          | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vnsrl_wx`          | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vor_vi`            | `vm, vs2, simm5, vd` | `vector, alu, integer`                    |
+| `rv_v`        | `vor_vv`            | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vor_vx`            | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vredand_vs`        | `vm, vs2, vs1, vd`   | `vector, reduction, integer`              |
+| `rv_v`        | `vredmaxu_vs`       | `vm, vs2, vs1, vd`   | `vector, reduction, integer`              |
+| `rv_v`        | `vredmax_vs`        | `vm, vs2, vs1, vd`   | `vector, reduction, integer`              |
+| `rv_v`        | `vredminu_vs`       | `vm, vs2, vs1, vd`   | `vector, reduction, integer`              |
+| `rv_v`        | `vredmin_vs`        | `vm, vs2, vs1, vd`   | `vector, reduction, integer`              |
+| `rv_v`        | `vredor_vs`         | `vm, vs2, vs1, vd`   | `vector, reduction, integer`              |
+| `rv_v`        | `vredsum_vs`        | `vm, vs2, vs1, vd`   | `vector, reduction, integer`              |
+| `rv_v`        | `vredxor_vs`        | `vm, vs2, vs1, vd`   | `vector, reduction, integer`              |
+| `rv_v`        | `vremu_vv`          | `vm, vs2, vs1, vd`   | `vector, divide, integer`                 |
+| `rv_v`        | `vremu_vx`          | `vm, vs2, rs1, vd`   | `vector, divide, integer`                 |
+| `rv_v`        | `vrem_vv`           | `vm, vs2, vs1, vd`   | `vector, divide, integer`                 |
+| `rv_v`        | `vrem_vx`           | `vm, vs2, rs1, vd`   | `vector, divide, integer`                 |
+| `rv_v`        | `vrgatherei16_vv`   | `vm, vs2, vs1, vd`   | `vector, permute`                         |
+| `rv_v`        | `vrgather_vi`       | `vm, vs2, zimm5, vd` | `vector, permute`                         |
+| `rv_v`        | `vrgather_vv`       | `vm, vs2, vs1, vd`   | `vector, permute`                         |
+| `rv_v`        | `vrgather_vx`       | `vm, vs2, rs1, vd`   | `vector, permute`                         |
+| `rv_v`        | `vrsub_vi`          | `vm, vs2, simm5, vd` | `vector, alu, integer`                    |
+| `rv_v`        | `vrsub_vx`          | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vs1r_v`            | `rs1, vs3`           | `vector, store, whole-register`           |
+| `rv_v`        | `vs2r_v`            | `rs1, vs3`           | `vector, store, whole-register`           |
+| `rv_v`        | `vs4r_v`            | `rs1, vs3`           | `vector, store, whole-register`           |
+| `rv_v`        | `vs8r_v`            | `rs1, vs3`           | `vector, store, whole-register`           |
+| `rv_v`        | `vsaddu_vi`         | `vm, vs2, simm5, vd` | `vector, alu, fixed-point`                |
+| `rv_v`        | `vsaddu_vv`         | `vm, vs2, vs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vsaddu_vx`         | `vm, vs2, rs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vsadd_vi`          | `vm, vs2, simm5, vd` | `vector, alu, fixed-point`                |
+| `rv_v`        | `vsadd_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vsadd_vx`          | `vm, vs2, rs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vsbc_vvm`          | `vs2, vs1, vd`       | `vector, alu, integer`                    |
+| `rv_v`        | `vsbc_vxm`          | `vs2, rs1, vd`       | `vector, alu, integer`                    |
+| `rv_v`        | `vse16_v`           | `vm, rs1, vs3`       | `vector, store`                           |
+| `rv_v`        | `vse32_v`           | `vm, rs1, vs3`       | `vector, store`                           |
+| `rv_v`        | `vse64_v`           | `vm, rs1, vs3`       | `vector, store`                           |
+| `rv_v`        | `vse8_v`            | `vm, rs1, vs3`       | `vector, store`                           |
+| `rv_v`        | `vsetivli`          | `zimm10, zimm5, rd`  | `vector, configuration`                   |
+| `rv_v`        | `vsetvl`            | `rs2, rs1, rd`       | `vector, configuration`                   |
+| `rv_v`        | `vsetvli`           | `zimm11, rs1, rd`    | `vector, configuration`                   |
+| `rv_v`        | `vsext_vf2`         | `vm, vs2, vd`        | `vector, alu, integer`                    |
+| `rv_v`        | `vsext_vf4`         | `vm, vs2, vd`        | `vector, alu, integer`                    |
+| `rv_v`        | `vsext_vf8`         | `vm, vs2, vd`        | `vector, alu, integer`                    |
+| `rv_v`        | `vslide1down_vx`    | `vm, vs2, rs1, vd`   | `vector, permute`                         |
+| `rv_v`        | `vslide1up_vx`      | `vm, vs2, rs1, vd`   | `vector, permute`                         |
+| `rv_v`        | `vslidedown_vi`     | `vm, vs2, zimm5, vd` | `vector, permute`                         |
+| `rv_v`        | `vslidedown_vx`     | `vm, vs2, rs1, vd`   | `vector, permute`                         |
+| `rv_v`        | `vslideup_vi`       | `vm, vs2, zimm5, vd` | `vector, permute`                         |
+| `rv_v`        | `vslideup_vx`       | `vm, vs2, rs1, vd`   | `vector, permute`                         |
+| `rv_v`        | `vsll_vi`           | `vm, vs2, zimm5, vd` | `vector, alu, integer`                    |
+| `rv_v`        | `vsll_vv`           | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vsll_vx`           | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vsmul_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vsmul_vx`          | `vm, vs2, rs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vsm_v`             | `rs1, vs3`           | `vector, store, mask`                     |
+| `rv_v`        | `vsoxei16_v`        | `vm, vs2, rs1, vs3`  | `vector, store`                           |
+| `rv_v`        | `vsoxei32_v`        | `vm, vs2, rs1, vs3`  | `vector, store`                           |
+| `rv_v`        | `vsoxei64_v`        | `vm, vs2, rs1, vs3`  | `vector, store`                           |
+| `rv_v`        | `vsoxei8_v`         | `vm, vs2, rs1, vs3`  | `vector, store`                           |
+| `rv_v`        | `vsoxseg2ei16_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg2ei32_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg2ei64_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg2ei8_v`     | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg3ei16_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg3ei32_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg3ei64_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg3ei8_v`     | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg4ei16_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg4ei32_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg4ei64_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg4ei8_v`     | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg5ei16_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg5ei32_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg5ei64_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg5ei8_v`     | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg6ei16_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg6ei32_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg6ei64_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg6ei8_v`     | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg7ei16_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg7ei32_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg7ei64_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg7ei8_v`     | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg8ei16_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg8ei32_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg8ei64_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsoxseg8ei8_v`     | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsra_vi`           | `vm, vs2, zimm5, vd` | `vector, alu, integer`                    |
+| `rv_v`        | `vsra_vv`           | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vsra_vx`           | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vsrl_vi`           | `vm, vs2, zimm5, vd` | `vector, alu, integer`                    |
+| `rv_v`        | `vsrl_vv`           | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vsrl_vx`           | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vsse16_v`          | `vm, rs2, rs1, vs3`  | `vector, store`                           |
+| `rv_v`        | `vsse32_v`          | `vm, rs2, rs1, vs3`  | `vector, store`                           |
+| `rv_v`        | `vsse64_v`          | `vm, rs2, rs1, vs3`  | `vector, store`                           |
+| `rv_v`        | `vsse8_v`           | `vm, rs2, rs1, vs3`  | `vector, store`                           |
+| `rv_v`        | `vsseg2e16_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg2e32_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg2e64_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg2e8_v`        | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg3e16_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg3e32_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg3e64_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg3e8_v`        | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg4e16_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg4e32_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg4e64_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg4e8_v`        | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg5e16_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg5e32_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg5e64_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg5e8_v`        | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg6e16_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg6e32_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg6e64_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg6e8_v`        | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg7e16_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg7e32_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg7e64_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg7e8_v`        | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg8e16_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg8e32_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg8e64_v`       | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vsseg8e8_v`        | `vm, rs1, vs3`       | `vector, store, segment`                  |
+| `rv_v`        | `vssra_vi`          | `vm, vs2, zimm5, vd` | `vector, alu, fixed-point`                |
+| `rv_v`        | `vssra_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vssra_vx`          | `vm, vs2, rs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vssrl_vi`          | `vm, vs2, zimm5, vd` | `vector, alu, fixed-point`                |
+| `rv_v`        | `vssrl_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vssrl_vx`          | `vm, vs2, rs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vssseg2e16_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg2e32_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg2e64_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg2e8_v`       | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg3e16_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg3e32_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg3e64_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg3e8_v`       | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg4e16_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg4e32_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg4e64_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg4e8_v`       | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg5e16_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg5e32_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg5e64_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg5e8_v`       | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg6e16_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg6e32_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg6e64_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg6e8_v`       | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg7e16_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg7e32_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg7e64_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg7e8_v`       | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg8e16_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg8e32_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg8e64_v`      | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssseg8e8_v`       | `vm, rs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vssubu_vv`         | `vm, vs2, vs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vssubu_vx`         | `vm, vs2, rs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vssub_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vssub_vx`          | `vm, vs2, rs1, vd`   | `vector, alu, fixed-point`                |
+| `rv_v`        | `vsub_vv`           | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vsub_vx`           | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vsuxei16_v`        | `vm, vs2, rs1, vs3`  | `vector, store`                           |
+| `rv_v`        | `vsuxei32_v`        | `vm, vs2, rs1, vs3`  | `vector, store`                           |
+| `rv_v`        | `vsuxei64_v`        | `vm, vs2, rs1, vs3`  | `vector, store`                           |
+| `rv_v`        | `vsuxei8_v`         | `vm, vs2, rs1, vs3`  | `vector, store`                           |
+| `rv_v`        | `vsuxseg2ei16_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg2ei32_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg2ei64_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg2ei8_v`     | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg3ei16_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg3ei32_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg3ei64_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg3ei8_v`     | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg4ei16_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg4ei32_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg4ei64_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg4ei8_v`     | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg5ei16_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg5ei32_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg5ei64_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg5ei8_v`     | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg6ei16_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg6ei32_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg6ei64_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg6ei8_v`     | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg7ei16_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg7ei32_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg7ei64_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg7ei8_v`     | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg8ei16_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg8ei32_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg8ei64_v`    | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vsuxseg8ei8_v`     | `vm, vs2, rs1, vs3`  | `vector, store, segment`                  |
+| `rv_v`        | `vwaddu_vv`         | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwaddu_vx`         | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwaddu_wv`         | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwaddu_wx`         | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwadd_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwadd_vx`          | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwadd_wv`          | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwadd_wx`          | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwmaccsu_vv`       | `vm, vs2, vs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vwmaccsu_vx`       | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vwmaccus_vx`       | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vwmaccu_vv`        | `vm, vs2, vs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vwmaccu_vx`        | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vwmacc_vv`         | `vm, vs2, vs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vwmacc_vx`         | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vwmulsu_vv`        | `vm, vs2, vs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vwmulsu_vx`        | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vwmulu_vv`         | `vm, vs2, vs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vwmulu_vx`         | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vwmul_vv`          | `vm, vs2, vs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vwmul_vx`          | `vm, vs2, rs1, vd`   | `vector, multiply, integer`               |
+| `rv_v`        | `vwredsumu_vs`      | `vm, vs2, vs1, vd`   | `vector, reduction, integer`              |
+| `rv_v`        | `vwredsum_vs`       | `vm, vs2, vs1, vd`   | `vector, reduction, integer`              |
+| `rv_v`        | `vwsubu_vv`         | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwsubu_vx`         | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwsubu_wv`         | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwsubu_wx`         | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwsub_vv`          | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwsub_vx`          | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwsub_wv`          | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vwsub_wx`          | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vxor_vi`           | `vm, vs2, simm5, vd` | `vector, alu, integer`                    |
+| `rv_v`        | `vxor_vv`           | `vm, vs2, vs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vxor_vx`           | `vm, vs2, rs1, vd`   | `vector, alu, integer`                    |
+| `rv_v`        | `vzext_vf2`         | `vm, vs2, vd`        | `vector, alu, integer`                    |
+| `rv_v`        | `vzext_vf4`         | `vm, vs2, vd`        | `vector, alu, integer`                    |
+| `rv_v`        | `vzext_vf8`         | `vm, vs2, vd`        | `vector, alu, integer`                    |
+
+:RVV - Specific Extension for Vector Operations
+
+| **Extension**      | **Name**               | **Variable-Fields**             | **Class**                                         |
+|:-------------------|:-----------------------|:--------------------------------|:--------------------------------------------------|
+| `rv_zvabd`         | `vabdu_vv`             | `vm, vs2, vs1, vd`              | `vector, alu, integer`                            |
+| `rv_zvabd`         | `vabdu_vx`             | `vm, vs2, rs1, vd`              | `vector, alu, integer`                            |
+| `rv_zvabd`         | `vabd_vv`              | `vm, vs2, vs1, vd`              | `vector, alu, integer`                            |
+| `rv_zvabd`         | `vabd_vx`              | `vm, vs2, rs1, vd`              | `vector, alu, integer`                            |
+| `rv_zvabd`         | `vwabdau_vv`           | `vm, vs2, vs1, vd`              | `vector, alu, integer`                            |
+| `rv_zvabd`         | `vwabdau_vx`           | `vm, vs2, rs1, vd`              | `vector, alu, integer`                            |
+| `rv_zvabd`         | `vwabda_vv`            | `vm, vs2, vs1, vd`              | `vector, alu, integer`                            |
+| `rv_zvabd`         | `vwabda_vx`            | `vm, vs2, rs1, vd`              | `vector, alu, integer`                            |
+| `rv_zvbb`          | `vandn_vv`             | `vm, vs2, vs1, vd`              | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vandn_vx`             | `vm, vs2, rs1, vd`              | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vbrev8_v`             | `vm, vs2, vd`                   | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vbrev_v`              | `vm, vs2, vd`                   | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vclz_v`               | `vm, vs2, vd`                   | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vcpop_v`              | `vm, vs2, vd`                   | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vctz_v`               | `vm, vs2, vd`                   | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vrev8_v`              | `vm, vs2, vd`                   | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vrol_vv`              | `vm, vs2, vs1, vd`              | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vrol_vx`              | `vm, vs2, rs1, vd`              | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vror_vi`              | `zimm6hi, vm, vs2, zimm6lo, vd` | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vror_vv`              | `vm, vs2, vs1, vd`              | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vror_vx`              | `vm, vs2, rs1, vd`              | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vwsll_vi`             | `vm, vs2, zimm5, vd`            | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vwsll_vv`             | `vm, vs2, vs1, vd`              | `vector, alu, bit-manipulation`                   |
+| `rv_zvbb`          | `vwsll_vx`             | `vm, vs2, rs1, vd`              | `vector, alu, bit-manipulation`                   |
+| `rv_zvbc`          | `vclmulh_vv`           | `vm, vs2, vs1, vd`              | `vector, alu, bit-manipulation`                   |
+| `rv_zvbc`          | `vclmulh_vx`           | `vm, vs2, rs1, vd`              | `vector, alu, bit-manipulation`                   |
+| `rv_zvbc`          | `vclmul_vv`            | `vm, vs2, vs1, vd`              | `vector, alu, bit-manipulation`                   |
+| `rv_zvbc`          | `vclmul_vx`            | `vm, vs2, rs1, vd`              | `vector, alu, bit-manipulation`                   |
+| `rv_zvdot4a`       | `vdot4asu_vv`          | `vm, vs2, vs1, vd`              | `vector, alu, integer, dot-product`               |
+| `rv_zvdot4a`       | `vdot4asu_vx`          | `vm, vs2, rs1, vd`              | `vector, alu, integer, dot-product`               |
+| `rv_zvdot4a`       | `vdot4aus_vx`          | `vm, vs2, rs1, vd`              | `vector, alu, integer, dot-product`               |
+| `rv_zvdot4a`       | `vdot4au_vv`           | `vm, vs2, vs1, vd`              | `vector, alu, integer, dot-product`               |
+| `rv_zvdot4a`       | `vdot4au_vx`           | `vm, vs2, rs1, vd`              | `vector, alu, integer, dot-product`               |
+| `rv_zvdot4a`       | `vdot4a_vv`            | `vm, vs2, vs1, vd`              | `vector, alu, integer, dot-product`               |
+| `rv_zvdot4a`       | `vdot4a_vx`            | `vm, vs2, rs1, vd`              | `vector, alu, integer, dot-product`               |
+| `rv_zvfbdota32f`   | `vfbdota_vv`           | `vm, vs2x8, ci, vs1, vd`        | `vector, alu, floating-point, dot-product`        |
+| `rv_zvfbfmin`      | `vfncvtbf16_f_f_w`     | `vm, vs2, vd`                   | `vector, alu, floating-point, conversion`         |
+| `rv_zvfbfmin`      | `vfwcvtbf16_f_f_v`     | `vm, vs2, vd`                   | `vector, alu, floating-point, conversion`         |
+| `rv_zvfbfwma`      | `vfwmaccbf16_vf`       | `vm, vs2, rs1, vd`              | `vector, alu, floating-point, fused-multiply-add` |
+| `rv_zvfbfwma`      | `vfwmaccbf16_vv`       | `vm, vs2, vs1, vd`              | `vector, alu, floating-point, fused-multiply-add` |
+| `rv_zvfofp4min`    | `vfext_vf2`            | `vm, vs2, vd`                   | `vector, alu, floating-point, conversion`         |
+| `rv_zvfofp8min`    | `vfncvtbf16_sat_f_f_w` | `vm, vs2, vd`                   | `vector, alu, floating-point, conversion`         |
+| `rv_zvfofp8min`    | `vfncvt_f_f_q`         | `vm, vs2, vd`                   | `vector, alu, floating-point, conversion`         |
+| `rv_zvfofp8min`    | `vfncvt_sat_f_f_q`     | `vm, vs2, vd`                   | `vector, alu, floating-point, conversion`         |
+| `rv_zvfqwbdota8f`  | `vfqwbdota_alt_vv`     | `vm, vs2x8, ci, vs1, vd`        | `vector, alu, floating-point, dot-product`        |
+| `rv_zvfqwbdota8f`  | `vfqwbdota_vv`         | `vm, vs2x8, ci, vs1, vd`        | `vector, alu, floating-point, dot-product`        |
+| `rv_zvfqwdota8f`   | `vfqwdota_alt_vv`      | `vm, vs2, vs1, vd`              | `vector, alu, floating-point, dot-product`        |
+| `rv_zvfqwdota8f`   | `vfqwdota_vv`          | `vm, vs2, vs1, vd`              | `vector, alu, floating-point, dot-product`        |
+| `rv_zvfwbdota16bf` | `vfwbdota_vv`          | `vm, vs2x8, ci, vs1, vd`        | `vector, alu, floating-point, dot-product`        |
+| `rv_zvfwdota16bf`  | `vfwdota_vv`           | `vm, vs2, vs1, vd`              | `vector, alu, floating-point, dot-product`        |
+| `rv_zvqwbdota8i`   | `vqwbdotas_vv`         | `vm, vs2x8, ci, vs1, vd`        | `vector, alu, integer, dot-product`               |
+| `rv_zvqwbdota8i`   | `vqwbdotau_vv`         | `vm, vs2x8, ci, vs1, vd`        | `vector, alu, integer, dot-product`               |
+| `rv_zvqwdota8i`    | `vqwdotas_vv`          | `vm, vs2, vs1, vd`              | `vector, alu, integer, dot-product`               |
+| `rv_zvqwdota8i`    | `vqwdotau_vv`          | `vm, vs2, vs1, vd`              | `vector, alu, integer, dot-product`               |
+| `rv_zvt16e`        | `vtle16`               | `rs2, rs1`                      | `vector, matrix, load`                            |
+| `rv_zvt16e`        | `vtse16`               | `rs2, rs1`                      | `vector, matrix, store`                           |
+| `rv_zvt64e`        | `vtle64`               | `rs2, rs1`                      | `vector, matrix, load`                            |
+| `rv_zvt64e`        | `vtse64`               | `rs2, rs1`                      | `vector, matrix, store`                           |
+| `rv_zvt8e`         | `vtle8`                | `rs2, rs1`                      | `vector, matrix, load`                            |
+| `rv_zvt8e`         | `vtse8`                | `rs2, rs1`                      | `vector, matrix, store`                           |
+| `rv_zvtbase`       | `msetmtype`            | `rs2, rs1, rd`                  | `vector, matrix, configuration`                   |
+| `rv_zvtbase`       | `msetmtypei`           | `altfmt, vsew, mtwiden, rd`     | `vector, matrix, configuration`                   |
+| `rv_zvtbase`       | `msettk`               | `rs1, rd`                       | `vector, matrix, configuration`                   |
+| `rv_zvtbase`       | `msettm`               | `rs1, rd`                       | `vector, matrix, configuration`                   |
+| `rv_zvtbase`       | `msettn`               | `rs1, rd`                       | `vector, matrix, configuration`                   |
+| `rv_zvtbase`       | `vtdiscard`            | `none`                          | `vector, matrix, context`                         |
+| `rv_zvtbase`       | `vtle32`               | `rs2, rs1`                      | `vector, matrix, load`                            |
+| `rv_zvtbase`       | `vtmv_t_v`             | `vs2, rs1`                      | `vector, matrix, move`                            |
+| `rv_zvtbase`       | `vtmv_v_t`             | `rs1, vd`                       | `vector, matrix, move`                            |
+| `rv_zvtbase`       | `vtse32`               | `rs2, rs1`                      | `vector, matrix, store`                           |
+| `rv_zvtbase`       | `vtzero`               | `zvt_mtd16`                     | `vector, matrix, context`                         |
+| `rv_zvtbf16fmm`    | `vtfmm_alt_tvv`        | `vs2, vs1, zvt_mtd8`            | `vector, matrix, multiply-accumulate`             |
+| `rv_zvtdmm`        | `vtfmm_tvv`            | `vs2, vs1, zvt_mtd8`            | `vector, matrix, multiply-accumulate`             |
+| `rv_zvtfmm`        | `vtfmm_tvv`            | `vs2, vs1, zvt_mtd8`            | `vector, matrix, multiply-accumulate`             |
+| `rv_zvtfp16fmm`    | `vtfmm_tvv`            | `vs2, vs1, zvt_mtd8`            | `vector, matrix, multiply-accumulate`             |
+| `rv_zvti8i32mm`    | `vtmms_tvv`            | `vs2, vs1, zvt_mtd8`            | `vector, matrix, multiply-accumulate`             |
+| `rv_zvti8i32mm`    | `vtmmu_tvv`            | `vs2, vs1, zvt_mtd8`            | `vector, matrix, multiply-accumulate`             |
+| `rv_zvtofp8fmm`    | `vtfmm_alt_tvv`        | `vs2, vs1, zvt_mtd8`            | `vector, matrix, multiply-accumulate`             |
+| `rv_zvtofp8fmm`    | `vtfmm_tvv`            | `vs2, vs1, zvt_mtd8`            | `vector, matrix, multiply-accumulate`             |
+| `rv_zvzip`         | `vpaire_vv`            | `vm, vs2, vs1, vd`              | `vector, permutation`                             |
+| `rv_zvzip`         | `vpairo_vv`            | `vm, vs2, vs1, vd`              | `vector, permutation`                             |
+| `rv_zvzip`         | `vunzipe_v`            | `vm, vs2, vd`                   | `vector, permutation`                             |
+| `rv_zvzip`         | `vunzipo_v`            | `vm, vs2, vd`                   | `vector, permutation`                             |
+| `rv_zvzip`         | `vzip_vv`              | `vm, vs2, vs1, vd`              | `vector, permutation`                             |
+
+:RVZV - Specific Extension for Vector Operations

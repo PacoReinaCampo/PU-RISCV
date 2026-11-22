@@ -1,27 +1,24 @@
-# Old Names for fmv.x.w/fmv.w.x
+## PSEUDO-INSTRUCTIONS
 
-```
-$pseudo_op rv_f::fmv.x.w fmv.x.s   rd rs1 24..20=0 31..27=0x1C 14..12=0 26..25=0 6..2=0x14 1..0=3
-$pseudo_op rv_f::fmv.w.x fmv.s.x   rd rs1 24..20=0 31..27=0x1E 14..12=0 26..25=0 6..2=0x14 1..0=3
-```
+| **Extension** | **Name**   | **Variable-Fields** | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:-----------|:--------------------|:-----------------------|:-----------------------------------|
+| `rv_f`        | `fmv_x_w`  | `rd, rs1`           | `fmv_x_s`              | `111000000000-----000-----1010011` |
+| `rv_f`        | `fmv_w_x`  | `rd, rs1`           | `fmv_s_x`              | `111100000000-----000-----1010011` |
+| `rv_f`        | `fsgnj_s`  | `rd, rs1`           | `fmv_s`                | `0010000----------000-----1010011` |
+| `rv_f`        | `fsgnjx_s` | `rd, rs1`           | `fabs_s`               | `0010000----------010-----1010011` |
+| `rv_f`        | `fsgnjn_s` | `rd, rs1`           | `fneg_s`               | `0010000----------001-----1010011` |
 
-# Pseudo-Intructions
+:RVF - RVF Specific Extension for Single-Precision Floating-Point Instructions
 
-```
-$pseudo_op rv_f::fsgnj.s  fmv.s   rd rs1 rs2=rs1 31..27=0x04 14..12=0 26..25=0 6..2=0x14 1..0=3
-$pseudo_op rv_f::fsgnjx.s fabs.s  rd rs1 rs2=rs1 31..27=0x04 14..12=2 26..25=0 6..2=0x14 1..0=3
-$pseudo_op rv_f::fsgnjn.s fneg.s  rd rs1 rs2=rs1 31..27=0x04 14..12=1 26..25=0 6..2=0x14 1..0=3
-```
+| **Extension** | **Name** | **Variable-Fields** | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:---------|:--------------------|:-----------------------|:-----------------------------------|
+| `rv_zicsr`    | `csrrs`  | `rd`                | `frflags`              | `00000000000100000010-----1110011` |
+| `rv_zicsr`    | `csrrw`  | `rd, rs1`           | `fsflags`              | `000000000001-----001-----1110011` |
+| `rv_zicsr`    | `csrrwi` | `rd, zimm5`         | `fsflagsi`             | `000000000001-----101-----1110011` |
+| `rv_zicsr`    | `csrrs`  | `rd`                | `frrm`                 | `00000000001000000010-----1110011` |
+| `rv_zicsr`    | `csrrw`  | `rd, rs1`           | `fsrm`                 | `000000000010-----001-----1110011` |
+| `rv_zicsr`    | `csrrwi` | `rd, zimm5`         | `fsrmi`                | `000000000010-----101-----1110011` |
+| `rv_zicsr`    | `csrrw`  | `rd, rs1`           | `fscsr`                | `000000000011-----001-----1110011` |
+| `rv_zicsr`    | `csrrs`  | `rd`                | `frcsr`                | `00000000001100000010-----1110011` |
 
-# CSRs
-
-```
-$pseudo_op rv_zicsr::csrrs  frflags    rd 19..15=0 31..20=0x001 14..12=2 6..2=0x1C 1..0=3
-$pseudo_op rv_zicsr::csrrw  fsflags    rd rs1      31..20=0x001 14..12=1 6..2=0x1C 1..0=3
-$pseudo_op rv_zicsr::csrrwi fsflagsi   rd zimm5     31..20=0x001 14..12=5 6..2=0x1C 1..0=3
-$pseudo_op rv_zicsr::csrrs  frrm       rd 19..15=0 31..20=0x002 14..12=2 6..2=0x1C 1..0=3
-$pseudo_op rv_zicsr::csrrw  fsrm       rd rs1      31..20=0x002 14..12=1 6..2=0x1C 1..0=3
-$pseudo_op rv_zicsr::csrrwi fsrmi      rd zimm5     31..20=0x002 14..12=5 6..2=0x1C 1..0=3
-$pseudo_op rv_zicsr::csrrw  fscsr      rd rs1      31..20=0x003 14..12=1 6..2=0x1C 1..0=3
-$pseudo_op rv_zicsr::csrrs  frcsr      rd 19..15=0 31..20=0x003 14..12=2 6..2=0x1C 1..0=3
-```
+:RVZI - RVZI Specific Extension for Single-Precision Floating-Point Instructions

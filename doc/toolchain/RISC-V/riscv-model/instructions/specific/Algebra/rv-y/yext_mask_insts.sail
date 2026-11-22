@@ -1,5 +1,5 @@
 // =======================================================================================
-// This Sail RISC-V architecture model, comprising all files and
+// This Sail RISC-Y architecture model, comprising all files and
 // directories except where otherwise noted is subject the BSD
 // two-clause license in the LICENSE file.
 //
@@ -7,386 +7,469 @@
 // =======================================================================================
 
 // ******************************************************************************
-// This file implements part of the vector extension.
-// Chapter 15: vector mask instructions
+// This file implements part of the tensor extension.
+// Chapter 15: tensor mask instructions
 // ******************************************************************************
 
 // ****************************** OPMVV (MMTYPE) ********************************
-union clause instruction = MMTYPE : (mmfunct6, vregidx, vregidx, vregidx)
+union clause instruction = Y_MMTYPE : (y_mmfunct6, yregidx, yregidx, yregidx)
 
-mapping encdec_mmfunct6 : mmfunct6 <-> bits(6) = {
-  MM_VMAND     <-> 0b011001,
-  MM_VMNAND    <-> 0b011101,
-  MM_VMANDN    <-> 0b011000,
-  MM_VMXOR     <-> 0b011011,
-  MM_VMOR      <-> 0b011010,
-  MM_VMNOR     <-> 0b011110,
-  MM_VMORN     <-> 0b011100,
-  MM_VMXNOR    <-> 0b011111
+mapping y_encdec_mmfunct6 : y_mmfunct6 <-> bits(6) = {
+ Y_MM_YMAND     <-> 0b011001,
+ Y_MM_YMNAND    <-> 0b011101,
+ Y_MM_YMANDN    <-> 0b011000,
+ Y_MM_YMXOR     <-> 0b011011,
+ Y_MM_YMOR      <-> 0b011010,
+ Y_MM_YMNOR     <-> 0b011110,
+ Y_MM_YMORN     <-> 0b011100,
+ Y_MM_YMXNOR    <-> 0b011111
 }
 
-mapping clause encdec = MMTYPE(funct6, vs2, vs1, vd)
-  <-> encdec_mmfunct6(funct6) @ 0b1 @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_MMTYPE(funct6, ys2, ys1, yd)
+ <-> y_encdec_mmfunct6(funct6) @ 0b1 @ y_encdec_yreg(ys2) @ y_encdec_yreg(ys1) @ 0b010 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute MMTYPE(funct6, vs2, vs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = vlen;
+function clause execute(Y_MMTYPE(funct6, ys2, ys1, yd)) = {
+  let SEW = y_get_sew();
+  let num_elem = ylen;
 
-  if illegal_vd_unmasked() then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vs1_val : bits('n) = read_vmask(num_elem, 0b0, vs1);
-  let vs2_val : bits('n) = read_vmask(num_elem, 0b0, vs2);
-  let vd_val  : bits('n) = read_vmask(num_elem, 0b0, vd);
-
-  let (initial_result, mask) : (bits('n), bits('n)) = match init_masked_result_carry(num_elem, SEW, 0, vd_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if y_illegal_yd_unmasked() | y_illegal_ystart(Y_YSTART_ARITH, num_elem, 0) then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ys1_val : bits('n) = y_read_ymask(num_elem, 0b0, ys1);
+  let ys2_val : bits('n) = y_read_ymask(num_elem, 0b0, ys2);
+  let yd_val : bits('n) = y_read_ymask(num_elem, 0b0, yd);
+
+  let (initial_result, mask) : (bits('n), bits('n)) = y_init_masked_result_carry(num_elem, SEW, 0, yd_val);
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = match funct6 {
-        MM_VMAND     => (vs2_val & vs1_val)[i],
-        MM_VMNAND    => ~(vs2_val & vs1_val)[i],
-        MM_VMANDN    => (vs2_val & ~(vs1_val))[i],
-        MM_VMXOR     => (vs2_val ^ vs1_val)[i],
-        MM_VMOR      => (vs2_val | vs1_val)[i],
-        MM_VMNOR     => (~(vs2_val | vs1_val))[i],
-        MM_VMORN     => (vs2_val | ~(vs1_val))[i],
-        MM_VMXNOR    => (~(vs2_val ^ vs1_val))[i]
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys1_val_view = y_shape(ys1_val, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys1_val_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = match funct6 {
+          Y_MM_YMAND  => bool_to_bit((ys2_val_view[i][j][k] == bitone) & (ys1_val_view[i][j][k] == bitone)),
+          Y_MM_YMNAND => bool_to_bit(
+            not((ys2_val_view[i][j][k] == bitone) & (ys1_val_view[i][j][k] == bitone)),
+          ),
+          Y_MM_YMANDN => bool_to_bit((ys2_val_view[i][j][k] == bitone) & not(ys1_val_view[i][j][k] == bitone)),
+          Y_MM_YMXOR  => bool_to_bit((ys2_val_view[i][j][k] == bitone) != (ys1_val_view[i][j][k] == bitone)),
+          Y_MM_YMOR   => bool_to_bit((ys2_val_view[i][j][k] == bitone) | (ys1_val_view[i][j][k] == bitone)),
+          Y_MM_YMNOR  => bool_to_bit(
+            not((ys2_val_view[i][j][k] == bitone) | (ys1_val_view[i][j][k] == bitone)),
+          ),
+          Y_MM_YMORN  => bool_to_bit((ys2_val_view[i][j][k] == bitone) | not(ys1_val_view[i][j][k] == bitone)),
+          Y_MM_YMXNOR => bool_to_bit((ys2_val_view[i][j][k] == bitone) == (ys1_val_view[i][j][k] == bitone)),
+        }
       }
-    }
-  };
-
-  write_vmask(num_elem, vd, result);
-  set_vstart(zeros());
-  RETIRE_SUCCESS
-}
-
-mapping mmtype_mnemonic : mmfunct6 <-> string = {
-  MM_VMAND     <-> "vmand.mm",
-  MM_VMNAND    <-> "vmnand.mm",
-  MM_VMANDN    <-> "vmandn.mm",
-  MM_VMXOR     <-> "vmxor.mm",
-  MM_VMOR      <-> "vmor.mm",
-  MM_VMNOR     <-> "vmnor.mm",
-  MM_VMORN     <-> "vmorn.mm",
-  MM_VMXNOR    <-> "vmxnor.mm"
-}
-
-mapping clause assembly = MMTYPE(funct6, vs2, vs1, vd)
-  <-> mmtype_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1)
-
-// ************************ OPMVV (vcpop in VWXUNARY0) **************************
-union clause instruction = VCPOP_M : (bits(1), vregidx, regidx)
-
-mapping clause encdec = VCPOP_M(vm, vs2, rd)
-  <-> 0b010000 @ vm @ encdec_vreg(vs2) @ 0b10000 @ 0b010 @ encdec_reg(rd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
-
-function clause execute VCPOP_M(vm, vs2, rd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = vlen;
-
-  if illegal_vd_unmasked() | not(assert_vstart(0)) then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n) = read_vmask(num_elem, vm, zvreg);
-  let vs2_val : bits('n) = read_vmask(num_elem, 0b0, vs2);
-
-  let (_, mask) : (bits('n), bits('n)) = match init_masked_result_cmp(num_elem, SEW, 0, vs2_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-
-  var count : nat = 0;
-  foreach (i from 0 to (num_elem - 1)) {
-    if (mask & vs2_val)[i] == 0b1 then count = count + 1;
-  };
-
-  X(rd) = to_bits_unsafe(xlen, count);
-  set_vstart(zeros());
-  RETIRE_SUCCESS
-}
-
-mapping clause assembly = VCPOP_M(vm, vs2, rd)
-  <-> "vcpop.m" ^ spc() ^ reg_name(rd) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
-
-// ************************ OPMVV (vfirst in VWXUNARY0) *************************
-union clause instruction = VFIRST_M : (bits(1), vregidx, regidx)
-
-mapping clause encdec = VFIRST_M(vm, vs2, rd)
-  <-> 0b010000 @ vm @ encdec_vreg(vs2) @ 0b10001 @ 0b010 @ encdec_reg(rd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
-
-function clause execute VFIRST_M(vm, vs2, rd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = vlen;
-
-  if illegal_vd_unmasked() | not(assert_vstart(0)) then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n) = read_vmask(num_elem, vm, zvreg);
-  let vs2_val : bits('n) = read_vmask(num_elem, 0b0, vs2);
-
-  let (_, mask) : (bits('n), bits('n)) = match init_masked_result_cmp(num_elem, SEW, 0, vs2_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-
-  var index : int = -1;
-  foreach (i from 0 to (num_elem - 1)) {
-    if index == -1 then {
-      if (mask & vs2_val)[i] == 0b1 then index = i;
     };
+    result = y_unshape_bits(length(result), result_view, y_columns, y_depth)
   };
 
-  X(rd) = to_bits_unsafe(xlen, index);
-  set_vstart(zeros());
+  y_write_ymask(num_elem, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VFIRST_M(vm, vs2, rd)
-  <-> "vfirst.m" ^ spc() ^ reg_name(rd) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping y_mmtype_mnemonic : y_mmfunct6 <-> string = {
+ Y_MM_YMAND     <-> "ymand.mm",
+ Y_MM_YMNAND    <-> "ymnand.mm",
+ Y_MM_YMANDN    <-> "ymandn.mm",
+ Y_MM_YMXOR     <-> "ymxor.mm",
+ Y_MM_YMOR      <-> "ymor.mm",
+ Y_MM_YMNOR     <-> "ymnor.mm",
+ Y_MM_YMORN     <-> "ymorn.mm",
+ Y_MM_YMXNOR    <-> "ymxnor.mm"
+}
 
-// ************************* OPMVV (vmsbf in VMUNARY0) **************************
-union clause instruction = VMSBF_M : (bits(1), vregidx, vregidx)
+mapping clause assembly = Y_MMTYPE(funct6, ys2, ys1, yd)
+ <-> y_mmtype_mnemonic(funct6) ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ sep() ^ y_yreg_name(ys1)
 
-mapping clause encdec = VMSBF_M(vm, vs2, vd)
-  <-> 0b010100 @ vm @ encdec_vreg(vs2) @ 0b00001 @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+// ************************ OPMVV (vcpop in YWXUNARY0) **************************
+union clause instruction = Y_YCPOP_M : (bits(1), yregidx, regidx)
 
-function clause execute VMSBF_M(vm, vs2, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = vlen;
+mapping clause encdec = Y_YCPOP_M(ym, ys2, rd)
+ <-> 0b010000 @ ym @ y_encdec_yreg(ys2) @ 0b10000 @ 0b010 @ encdec_reg(rd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-  if illegal_normal(vd, vm) | not(assert_vstart(0)) | vd == vs2
-  then return Illegal_Instruction();
+function clause execute(Y_YCPOP_M(ym, ys2, rd)) = {
+  let num_elem = ylen;
 
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n) = read_vmask(num_elem, vm, zvreg);
-  let vs2_val : bits('n) = read_vmask(num_elem, 0b0, vs2);
-  let vd_val  : bits('n) = read_vmask(num_elem, 0b0, vd);
-
-  let (initial_result, mask) : (bits('n), bits('n)) = match init_masked_result_cmp(num_elem, SEW, 0, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-  var result = initial_result;
-
-  var found_elem : bool = false;
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      if vs2_val[i] == 0b1 then found_elem = true;
-      result[i] = bool_to_bit(not(found_elem))
-    }
+  if y_illegal_yd_unmasked() | y_illegal_ystart(Y_YSTART_MANDATORY, num_elem, 0) then {
+    return Illegal_Instruction()
   };
 
-  write_vmask(num_elem, vd, result);
-  set_vstart(zeros());
+  let (n as 'n) = num_elem;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let ys2_val : bits('n) = y_read_ymask(num_elem, 0b0, ys2);
+
+  let mask : bits('n) = y_init_masked_source(num_elem, 0, ym_val);
+
+  X(rd) = to_bits(xlen, count_ones(mask & ys2_val));
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VMSBF_M(vm, vs2, vd)
-  <-> "vmsbf.m" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping clause assembly = Y_YCPOP_M(ym, ys2, rd)
+ <-> "ycpop.m" ^ spc() ^ reg_name(rd) ^ sep() ^ y_yreg_name(ys2) ^ y_maybe_ymask(ym)
 
-// ************************* OPMVV (vmsif in VMUNARY0) **************************
-union clause instruction = VMSIF_M : (bits(1), vregidx, vregidx)
+// ************************ OPMVV (vfirst in YWXUNARY0) *************************
+union clause instruction = Y_YFIRST_M : (bits(1), yregidx, regidx)
 
-mapping clause encdec = VMSIF_M(vm, vs2, vd)
-  <-> 0b010100 @ vm @ encdec_vreg(vs2) @ 0b00011 @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_YFIRST_M(ym, ys2, rd)
+ <-> 0b010000 @ ym @ y_encdec_yreg(ys2) @ 0b10001 @ 0b010 @ encdec_reg(rd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute VMSIF_M(vm, vs2, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = vlen;
+function clause execute(Y_YFIRST_M(ym, ys2, rd)) = {
+  let num_elem = ylen;
 
-  if illegal_normal(vd, vm) | not(assert_vstart(0)) | vd == vs2
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n) = read_vmask(num_elem, vm, zvreg);
-  let vs2_val : bits('n) = read_vmask(num_elem, 0b0, vs2);
-  let vd_val  : bits('n) = read_vmask(num_elem, 0b0, vd);
-
-  let (initial_result, mask) : (bits('n), bits('n)) = match init_masked_result_cmp(num_elem, SEW, 0, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
-  };
-  var result = initial_result;
-
-  var found_elem : bool = false;
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = bool_to_bit(not(found_elem));
-      if vs2_val[i] == 0b1 then found_elem = true
-    }
+  if y_illegal_yd_unmasked() | y_illegal_ystart(Y_YSTART_MANDATORY, num_elem, 0) then {
+    return Illegal_Instruction()
   };
 
-  write_vmask(num_elem, vd, result);
-  set_vstart(zeros());
+  let (n as 'n) = num_elem;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let ys2_val : bits('n) = y_read_ymask(num_elem, 0b0, ys2);
+
+  let mask : bits('n) = y_init_masked_source(num_elem, 0, ym_val);
+
+  let active = mask & ys2_val;
+
+  X(rd) =
+    if active == zeros() then {
+      ones()
+    } else {
+      to_bits(count_trailing_zeros(active))
+    };
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VMSIF_M(vm, vs2, vd)
-  <-> "vmsif.m" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping clause assembly = Y_YFIRST_M(ym, ys2, rd)
+ <-> "yfirst.m" ^ spc() ^ reg_name(rd) ^ sep() ^ y_yreg_name(ys2) ^ y_maybe_ymask(ym)
 
-// ************************* OPMVV (vmsof in VMUNARY0) **************************
-union clause instruction = VMSOF_M : (bits(1), vregidx, vregidx)
+// ************************* OPMVV (vmsbf in YMUNARY0) **************************
+union clause instruction = Y_YMSBF_M : (bits(1), yregidx, yregidx)
 
-mapping clause encdec = VMSOF_M(vm, vs2, vd)
-  <-> 0b010100 @ vm @ encdec_vreg(vs2) @ 0b00010 @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_YMSBF_M(ym, ys2, yd)
+ <-> 0b010100 @ ym @ y_encdec_yreg(ys2) @ 0b00001 @ 0b010 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute VMSOF_M(vm, vs2, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = vlen;
+function clause execute(Y_YMSBF_M(ym, ys2, yd)) = {
+  let SEW = y_get_sew();
+  let num_elem = ylen;
 
-  if illegal_normal(vd, vm) | not(assert_vstart(0)) | vd == vs2
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n) = read_vmask(num_elem, vm, zvreg);
-  let vs2_val : bits('n) = read_vmask(num_elem, 0b0, vs2);
-  let vd_val  : bits('n) = read_vmask(num_elem, 0b0, vd);
-
-  let (initial_result, mask) : (bits('n), bits('n)) = match init_masked_result_cmp(num_elem, SEW, 0, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if y_illegal_ystart(Y_YSTART_MANDATORY, num_elem, 0) | y_illegal_normal(yd, ym) | yd == ys2 then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let ys2_val : bits('n) = y_read_ymask(num_elem, 0b0, ys2);
+  let yd_val : bits('n) = y_read_ymask(num_elem, 0b0, yd);
+
+  let (initial_result, mask) : (bits('n), bits('n)) = y_init_masked_result_cmp(num_elem, SEW, 0, yd_val, ym_val);
   var result = initial_result;
 
   var found_elem : bool = false;
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      if (vs2_val[i] == 0b1) & not(found_elem) then {
-        result[i] = 0b1;
-        found_elem = true
-      } else {
-        result[i] = 0b0
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        if ys2_val_view[i][j][k] == 0b1 then {
+          found_elem = true
+        };
+        result_view[i][j][k] = bool_to_bit(not(found_elem))
       }
-    }
+    };
+    result = y_unshape_bits(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vmask(num_elem, vd, result);
-  set_vstart(zeros());
+  y_write_ymask(num_elem, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VMSOF_M(vm, vs2, vd)
-  <-> "vmsof.m" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping clause assembly = Y_YMSBF_M(ym, ys2, yd)
+ <-> "ymsbf.m" ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ y_maybe_ymask(ym)
 
-// ************************* OPMVV (viota in VMUNARY0) **************************
-union clause instruction = VIOTA_M : (bits(1), vregidx, vregidx)
+// ************************* OPMVV (vmsif in YMUNARY0) **************************
+union clause instruction = Y_YMSIF_M : (bits(1), yregidx, yregidx)
 
-mapping clause encdec = VIOTA_M(vm, vs2, vd)
-  <-> 0b010100 @ vm @ encdec_vreg(vs2) @ 0b10000 @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_YMSIF_M(ym, ys2, yd)
+ <-> 0b010100 @ ym @ y_encdec_yreg(ys2) @ 0b00011 @ 0b010 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute VIOTA_M(vm, vs2, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_YMSIF_M(ym, ys2, yd)) = {
+  let SEW = y_get_sew();
+  let num_elem = ylen;
 
-  if illegal_normal(vd, vm) |
-     not(assert_vstart(0)) |
-     not(valid_reg_group(vd, LMUL_pow)) |
-     vd == vs2
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vs2_val : bits('n)             = read_vmask(num_elem, 0b0, vs2);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)   => v,
-    Err(()) => return Illegal_Instruction()
+  if y_illegal_ystart(Y_YSTART_MANDATORY, num_elem, 0) | y_illegal_normal(yd, ym) | yd == ys2 then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let ys2_val : bits('n) = y_read_ymask(num_elem, 0b0, ys2);
+  let yd_val : bits('n) = y_read_ymask(num_elem, 0b0, yd);
+
+  let (initial_result, mask) : (bits('n), bits('n)) = y_init_masked_result_cmp(num_elem, SEW, 0, yd_val, ym_val);
+  var result = initial_result;
+
+  var found_elem : bool = false;
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = bool_to_bit(not(found_elem));
+        if ys2_val_view[i][j][k] == 0b1 then {
+          found_elem = true
+        }
+      }
+    };
+    result = y_unshape_bits(length(result), result_view, y_columns, y_depth)
+  };
+
+  y_write_ymask(num_elem, yd, result);
+  y_set_ystart(zeros());
+  RETIRE_SUCCESS
+}
+
+mapping clause assembly = Y_YMSIF_M(ym, ys2, yd)
+ <-> "ymsif.m" ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ y_maybe_ymask(ym)
+
+// ************************* OPMVV (vmsof in YMUNARY0) **************************
+union clause instruction = Y_YMSOF_M : (bits(1), yregidx, yregidx)
+
+mapping clause encdec = Y_YMSOF_M(ym, ys2, yd)
+ <-> 0b010100 @ ym @ y_encdec_yreg(ys2) @ 0b00010 @ 0b010 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
+
+function clause execute(Y_YMSOF_M(ym, ys2, yd)) = {
+  let SEW = y_get_sew();
+  let num_elem = ylen;
+
+  if y_illegal_ystart(Y_YSTART_MANDATORY, num_elem, 0) | y_illegal_normal(yd, ym) | yd == ys2 then {
+    return Illegal_Instruction()
+  };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let ys2_val : bits('n) = y_read_ymask(num_elem, 0b0, ys2);
+  let yd_val : bits('n) = y_read_ymask(num_elem, 0b0, yd);
+
+  let (initial_result, mask) : (bits('n), bits('n)) = y_init_masked_result_cmp(num_elem, SEW, 0, yd_val, ym_val);
+  var result = initial_result;
+
+  var found_elem : bool = false;
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        if (ys2_val_view[i][j][k] == 0b1) & not(found_elem) then {
+          result_view[i][j][k] = 0b1;
+          found_elem = true
+        } else {
+          result_view[i][j][k] = 0b0
+        }
+      }
+    };
+    result = y_unshape_bits(length(result), result_view, y_columns, y_depth)
+  };
+
+  y_write_ymask(num_elem, yd, result);
+  y_set_ystart(zeros());
+  RETIRE_SUCCESS
+}
+
+mapping clause assembly = Y_YMSOF_M(ym, ys2, yd)
+ <-> "ymsof.m" ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ y_maybe_ymask(ym)
+
+// ************************* OPMVV (viota in YMUNARY0) **************************
+union clause instruction = Y_YIOTA_M : (bits(1), yregidx, yregidx)
+
+mapping clause encdec = Y_YIOTA_M(ym, ys2, yd)
+ <-> 0b010100 @ ym @ y_encdec_yreg(ys2) @ 0b10000 @ 0b010 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
+
+function clause execute(Y_YIOTA_M(ym, ys2, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
+
+  if    y_illegal_ystart(Y_YSTART_MANDATORY, num_elem, Y_LMUL_pow)
+   |  y_illegal_normal(yd, ym)
+   |  not(y_valid_reg_group(yd, Y_LMUL_pow))
+   |  yd
+   == ys2 then {
+    return Illegal_Instruction()
+  };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let ys2_val : bits('n) = y_read_ymask(num_elem, 0b0, ys2);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
   var sum : int = 0;
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then {
-      result[i] = to_bits_unsafe(SEW, sum);
-      if vs2_val[i] == 0b1 then sum = sum + 1
-    }
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    let ys2_val_view = y_shape(ys2_val, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(i < length(ys2_val_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = to_bits_unsafe(SEW, sum);
+        if ys2_val_view[i][j][k] == 0b1 then {
+          sum = sum + 1
+        }
+      }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VIOTA_M(vm, vs2, vd)
-  <-> "viota.m" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ maybe_vmask(vm)
+mapping clause assembly = Y_YIOTA_M(ym, ys2, yd)
+ <-> "yiota.m" ^ spc() ^ y_yreg_name(yd) ^ sep() ^ y_yreg_name(ys2) ^ y_maybe_ymask(ym)
 
-// ************************** OPMVV (vid in VMUNARY0) ***************************
-union clause instruction = VID_V : (bits(1), vregidx)
+// ************************** OPMVV (vid in YMUNARY0) ***************************
+union clause instruction = Y_YID_Y : (bits(1), yregidx)
 
-mapping clause encdec = VID_V(vm, vd)
-  <-> 0b010100 @ vm @ 0b00000 @ 0b10001 @ 0b010 @ encdec_vreg(vd) @ 0b1010111
-  when (currentlyEnabled(Ext_Zve32x) & get_sew() <= 32)
-     | (currentlyEnabled(Ext_Zve64x) & get_sew() <= 64)
+mapping clause encdec = Y_YID_Y(ym, yd)
+ <-> 0b010100 @ ym @ 0b00000 @ 0b10001 @ 0b010 @ y_encdec_yreg(yd) @ 0b0101011
+ when (currentlyEnabled(Ext_Y) & y_get_sew() <= 32)
+  | ((currentlyEnabled(Ext_Y) & yelen >= 64) & y_get_sew() <= 64)
 
-function clause execute VID_V(vm, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute(Y_YID_Y(ym, yd)) = {
+  let SEW = y_get_sew();
+  let Y_LMUL_pow = y_get_lmul_pow();
+  let num_elem = y_get_num_elem(Y_LMUL_pow, SEW);
 
-  if illegal_normal(vd, vm) | not(valid_reg_group(vd, LMUL_pow))
-  then return Illegal_Instruction();
-
-  let 'n = num_elem;
-  let 'm = SEW;
-
-  let vm_val  : bits('n)             = read_vmask(num_elem, vm, zvreg);
-  let vd_val  : vector('n, bits('m)) = read_vreg(num_elem, SEW, LMUL_pow, vd);
-
-  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = match init_masked_result(num_elem, SEW, LMUL_pow, vd_val, vm_val) {
-    Ok(v)    => v,
-    Err(())  => return Illegal_Instruction()
+  if   y_illegal_ystart(Y_YSTART_ARITH, num_elem, Y_LMUL_pow)
+   | y_illegal_normal(yd, ym)
+   | not(y_valid_reg_group(yd, Y_LMUL_pow)) then {
+    return Illegal_Instruction()
   };
+
+  let (n as 'n) = num_elem;
+  let (m as 'm) = SEW;
+
+  let ym_val : bits('n) = y_read_ymask(num_elem, ym, y_zyreg);
+  let yd_val : vector('n, bits('m)) = y_read_yreg(num_elem, SEW, Y_LMUL_pow, yd);
+
+  let (initial_result, mask) : (vector('n, bits('m)), bits('n)) = y_init_masked_result(
+    num_elem,
+    SEW,
+    Y_LMUL_pow,
+    yd_val,
+    ym_val,
+  );
   var result = initial_result;
 
-  foreach (i from 0 to (num_elem - 1)) {
-    if mask[i] == 0b1 then result[i] = to_bits_unsafe(SEW, i)
+  {
+    let mask_view = y_shape(mask, y_columns, y_depth);
+    var result_view = y_shape(result, y_columns, y_depth);
+    foreach (p from 0 to (num_elem - 1)) {
+      let i = p / (y_columns * y_depth);
+      let j = (p / y_depth) % y_columns;
+      let k = p % y_depth;
+      assert(i < length(mask_view));
+      assert(i < length(result_view));
+      assert(j < y_columns & k < y_depth);
+
+      if mask_view[i][j][k] == 0b1 then {
+        result_view[i][j][k] = to_bits_unsafe(SEW, p)
+      }
+    };
+    result = y_unshape_vector(length(result), result_view, y_columns, y_depth)
   };
 
-  write_vreg(num_elem, SEW, LMUL_pow, vd, result);
-  set_vstart(zeros());
+  y_write_yreg(num_elem, SEW, Y_LMUL_pow, yd, result);
+  y_set_ystart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VID_V(vm, vd)
-  <-> "vid.v" ^ spc() ^ vreg_name(vd) ^ maybe_vmask(vm)
+mapping clause assembly = Y_YID_Y(ym, yd)
+ <-> "yid.y" ^ spc() ^ y_yreg_name(yd) ^ y_maybe_ymask(ym)

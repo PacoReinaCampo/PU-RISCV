@@ -1,0 +1,67 @@
+## INSTRUCTION LENGTHS
+
+| **Extension** | **Name**     | **Length** |
+|:--------------|:-------------|:-----------|
+| `rv_zykg`     | `yghsh_yy`   | `YLEN`     |
+| `rv_zykg`     | `ygmul_yy`   | `YLEN`     |
+| `rv_zykned`   | `yaesdf_ys`  | `YLEN`     |
+| `rv_zykned`   | `yaesdf_yy`  | `YLEN`     |
+| `rv_zykned`   | `yaesdm_ys`  | `YLEN`     |
+| `rv_zykned`   | `yaesdm_yy`  | `YLEN`     |
+| `rv_zykned`   | `yaesef_ys`  | `YLEN`     |
+| `rv_zykned`   | `yaesef_yy`  | `YLEN`     |
+| `rv_zykned`   | `yaesem_ys`  | `YLEN`     |
+| `rv_zykned`   | `yaesem_yy`  | `YLEN`     |
+| `rv_zykned`   | `yaeskf1_yi` | `YLEN`     |
+| `rv_zykned`   | `yaeskf2_yi` | `YLEN`     |
+| `rv_zykned`   | `yaesz_ys`   | `YLEN`     |
+| `rv_zyknha`   | `ysha2ch_yy` | `YLEN`     |
+| `rv_zyknha`   | `ysha2cl_yy` | `YLEN`     |
+| `rv_zyknha`   | `ysha2ms_yy` | `YLEN`     |
+| `rv_zyknhb`   | `ysha2ch_yy` | `YLEN`     |
+| `rv_zyknhb`   | `ysha2cl_yy` | `YLEN`     |
+| `rv_zyknhb`   | `ysha2ms_yy` | `YLEN`     |
+| `rv_zykn`     | `yaesdf_ys`  | `YLEN`     |
+| `rv_zykn`     | `yaesdf_yy`  | `YLEN`     |
+| `rv_zykn`     | `yaesdm_ys`  | `YLEN`     |
+| `rv_zykn`     | `yaesdm_yy`  | `YLEN`     |
+| `rv_zykn`     | `yaesef_ys`  | `YLEN`     |
+| `rv_zykn`     | `yaesef_yy`  | `YLEN`     |
+| `rv_zykn`     | `yaesem_ys`  | `YLEN`     |
+| `rv_zykn`     | `yaesem_yy`  | `YLEN`     |
+| `rv_zykn`     | `yaeskf1_yi` | `YLEN`     |
+| `rv_zykn`     | `yaeskf2_yi` | `YLEN`     |
+| `rv_zykn`     | `yaesz_ys`   | `YLEN`     |
+| `rv_zykn`     | `yandn_yy`   | `YLEN`     |
+| `rv_zykn`     | `yandn_yx`   | `YLEN`     |
+| `rv_zykn`     | `ybrev8_y`   | `YLEN`     |
+| `rv_zykn`     | `yrev8_y`    | `YLEN`     |
+| `rv_zykn`     | `yrol_yy`    | `YLEN`     |
+| `rv_zykn`     | `yrol_yx`    | `YLEN`     |
+| `rv_zykn`     | `yror_yi`    | `YLEN`     |
+| `rv_zykn`     | `yror_yy`    | `YLEN`     |
+| `rv_zykn`     | `yror_yx`    | `YLEN`     |
+| `rv_zykn`     | `ysha2ch_yy` | `YLEN`     |
+| `rv_zykn`     | `ysha2cl_yy` | `YLEN`     |
+| `rv_zykn`     | `ysha2ms_yy` | `YLEN`     |
+| `rv_zyksed`   | `ysm4k_yi`   | `YLEN`     |
+| `rv_zyksed`   | `ysm4r_ys`   | `YLEN`     |
+| `rv_zyksed`   | `ysm4r_yy`   | `YLEN`     |
+| `rv_zyksh`    | `ysm3c_yi`   | `YLEN`     |
+| `rv_zyksh`    | `ysm3me_yy`  | `YLEN`     |
+| `rv_zyks`     | `yandn_yy`   | `YLEN`     |
+| `rv_zyks`     | `yandn_yx`   | `YLEN`     |
+| `rv_zyks`     | `ybrev8_y`   | `YLEN`     |
+| `rv_zyks`     | `yrev8_y`    | `YLEN`     |
+| `rv_zyks`     | `yrol_yy`    | `YLEN`     |
+| `rv_zyks`     | `yrol_yx`    | `YLEN`     |
+| `rv_zyks`     | `yror_yi`    | `YLEN`     |
+| `rv_zyks`     | `yror_yy`    | `YLEN`     |
+| `rv_zyks`     | `yror_yx`    | `YLEN`     |
+| `rv_zyks`     | `ysm3c_yi`   | `YLEN`     |
+| `rv_zyks`     | `ysm3me_yy`  | `YLEN`     |
+| `rv_zyks`     | `ysm4k_yi`   | `YLEN`     |
+| `rv_zyks`     | `ysm4r_ys`   | `YLEN`     |
+| `rv_zyks`     | `ysm4r_yy`   | `YLEN`     |
+
+:RVZYK - Specific Extension for Tensor Cryptography Instructions

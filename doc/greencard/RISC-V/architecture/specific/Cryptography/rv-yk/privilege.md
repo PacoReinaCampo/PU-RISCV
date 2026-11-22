@@ -1,0 +1,67 @@
+## INSTRUCTION PRIVILEGE
+
+| **Extension** | **Name**     | **Privilege** |
+|:--------------|:-------------|:--------------|
+| `rv_zykg`     | `yghsh_yy`   | `U`           |
+| `rv_zykg`     | `ygmul_yy`   | `U`           |
+| `rv_zykned`   | `yaesdf_ys`  | `U`           |
+| `rv_zykned`   | `yaesdf_yy`  | `U`           |
+| `rv_zykned`   | `yaesdm_ys`  | `U`           |
+| `rv_zykned`   | `yaesdm_yy`  | `U`           |
+| `rv_zykned`   | `yaesef_ys`  | `U`           |
+| `rv_zykned`   | `yaesef_yy`  | `U`           |
+| `rv_zykned`   | `yaesem_ys`  | `U`           |
+| `rv_zykned`   | `yaesem_yy`  | `U`           |
+| `rv_zykned`   | `yaeskf1_yi` | `U`           |
+| `rv_zykned`   | `yaeskf2_yi` | `U`           |
+| `rv_zykned`   | `yaesz_ys`   | `U`           |
+| `rv_zyknha`   | `ysha2ch_yy` | `U`           |
+| `rv_zyknha`   | `ysha2cl_yy` | `U`           |
+| `rv_zyknha`   | `ysha2ms_yy` | `U`           |
+| `rv_zyknhb`   | `ysha2ch_yy` | `U`           |
+| `rv_zyknhb`   | `ysha2cl_yy` | `U`           |
+| `rv_zyknhb`   | `ysha2ms_yy` | `U`           |
+| `rv_zykn`     | `yaesdf_ys`  | `U`           |
+| `rv_zykn`     | `yaesdf_yy`  | `U`           |
+| `rv_zykn`     | `yaesdm_ys`  | `U`           |
+| `rv_zykn`     | `yaesdm_yy`  | `U`           |
+| `rv_zykn`     | `yaesef_ys`  | `U`           |
+| `rv_zykn`     | `yaesef_yy`  | `U`           |
+| `rv_zykn`     | `yaesem_ys`  | `U`           |
+| `rv_zykn`     | `yaesem_yy`  | `U`           |
+| `rv_zykn`     | `yaeskf1_yi` | `U`           |
+| `rv_zykn`     | `yaeskf2_yi` | `U`           |
+| `rv_zykn`     | `yaesz_ys`   | `U`           |
+| `rv_zykn`     | `yandn_yy`   | `U`           |
+| `rv_zykn`     | `yandn_yx`   | `U`           |
+| `rv_zykn`     | `ybrev8_y`   | `U`           |
+| `rv_zykn`     | `yrev8_y`    | `U`           |
+| `rv_zykn`     | `yrol_yy`    | `U`           |
+| `rv_zykn`     | `yrol_yx`    | `U`           |
+| `rv_zykn`     | `yror_yi`    | `U`           |
+| `rv_zykn`     | `yror_yy`    | `U`           |
+| `rv_zykn`     | `yror_yx`    | `U`           |
+| `rv_zykn`     | `ysha2ch_yy` | `U`           |
+| `rv_zykn`     | `ysha2cl_yy` | `U`           |
+| `rv_zykn`     | `ysha2ms_yy` | `U`           |
+| `rv_zyksed`   | `ysm4k_yi`   | `U`           |
+| `rv_zyksed`   | `ysm4r_ys`   | `U`           |
+| `rv_zyksed`   | `ysm4r_yy`   | `U`           |
+| `rv_zyksh`    | `ysm3c_yi`   | `U`           |
+| `rv_zyksh`    | `ysm3me_yy`  | `U`           |
+| `rv_zyks`     | `yandn_yy`   | `U`           |
+| `rv_zyks`     | `yandn_yx`   | `U`           |
+| `rv_zyks`     | `ybrev8_y`   | `U`           |
+| `rv_zyks`     | `yrev8_y`    | `U`           |
+| `rv_zyks`     | `yrol_yy`    | `U`           |
+| `rv_zyks`     | `yrol_yx`    | `U`           |
+| `rv_zyks`     | `yror_yi`    | `U`           |
+| `rv_zyks`     | `yror_yy`    | `U`           |
+| `rv_zyks`     | `yror_yx`    | `U`           |
+| `rv_zyks`     | `ysm3c_yi`   | `U`           |
+| `rv_zyks`     | `ysm3me_yy`  | `U`           |
+| `rv_zyks`     | `ysm4k_yi`   | `U`           |
+| `rv_zyks`     | `ysm4r_ys`   | `U`           |
+| `rv_zyks`     | `ysm4r_yy`   | `U`           |
+
+:RVZYK - Specific Extension for Tensor Cryptography Instructions

@@ -1,179 +1,67 @@
-# Zykg - Vector GCM/GMAC
+## INSTRUCTION OPCODES
 
-# Vector Multiply over GHASH Galois-Field
+| **Extension** | **Name**     | **Variable-Fields**             | **Encoding**                       | **Match**    | **Mask**     |
+|:--------------|:-------------|:--------------------------------|:-----------------------------------|:-------------|:-------------|
+| `rv_zykg`     | `yghsh_yy`   | `ys2, ys1, yd`                  | `1011001----------010-----1111111` | `0xb200207f` | `0xfe00707f` |
+| `rv_zykg`     | `ygmul_yy`   | `ys2, yd`                       | `1010001-----10001010-----1111111` | `0xa208a07f` | `0xfe0ff07f` |
+| `rv_zykned`   | `yaesdf_ys`  | `ys2, yd`                       | `1010011-----00001010-----1111111` | `0xa600a07f` | `0xfe0ff07f` |
+| `rv_zykned`   | `yaesdf_yy`  | `ys2, yd`                       | `1010001-----00001010-----1111111` | `0xa200a07f` | `0xfe0ff07f` |
+| `rv_zykned`   | `yaesdm_ys`  | `ys2, yd`                       | `1010011-----00000010-----1111111` | `0xa600207f` | `0xfe0ff07f` |
+| `rv_zykned`   | `yaesdm_yy`  | `ys2, yd`                       | `1010001-----00000010-----1111111` | `0xa200207f` | `0xfe0ff07f` |
+| `rv_zykned`   | `yaesef_ys`  | `ys2, yd`                       | `1010011-----00011010-----1111111` | `0xa601a07f` | `0xfe0ff07f` |
+| `rv_zykned`   | `yaesef_yy`  | `ys2, yd`                       | `1010001-----00011010-----1111111` | `0xa201a07f` | `0xfe0ff07f` |
+| `rv_zykned`   | `yaesem_ys`  | `ys2, yd`                       | `1010011-----00010010-----1111111` | `0xa601207f` | `0xfe0ff07f` |
+| `rv_zykned`   | `yaesem_yy`  | `ys2, yd`                       | `1010001-----00010010-----1111111` | `0xa201207f` | `0xfe0ff07f` |
+| `rv_zykned`   | `yaeskf1_yi` | `ys2, zimm5, yd`                | `1000101----------010-----1111111` | `0x8a00207f` | `0xfe00707f` |
+| `rv_zykned`   | `yaeskf2_yi` | `ys2, zimm5, yd`                | `1010101----------010-----1111111` | `0xaa00207f` | `0xfe00707f` |
+| `rv_zykned`   | `yaesz_ys`   | `ys2, yd`                       | `1010011-----00111010-----1111111` | `0xa603a07f` | `0xfe0ff07f` |
+| `rv_zyknha`   | `ysha2ch_yy` | `ys2, ys1, yd`                  | `1011101----------010-----1111111` | `0xba00207f` | `0xfe00707f` |
+| `rv_zyknha`   | `ysha2cl_yy` | `ys2, ys1, yd`                  | `1011111----------010-----1111111` | `0xbe00207f` | `0xfe00707f` |
+| `rv_zyknha`   | `ysha2ms_yy` | `ys2, ys1, yd`                  | `1011011----------010-----1111111` | `0xb600207f` | `0xfe00707f` |
+| `rv_zyknhb`   | `ysha2ch_yy` | `ys2, ys1, yd`                  | `1011101----------010-----1111111` | `0xba00207f` | `0xfe00707f` |
+| `rv_zyknhb`   | `ysha2cl_yy` | `ys2, ys1, yd`                  | `1011111----------010-----1111111` | `0xbe00207f` | `0xfe00707f` |
+| `rv_zyknhb`   | `ysha2ms_yy` | `ys2, ys1, yd`                  | `1011011----------010-----1111111` | `0xb600207f` | `0xfe00707f` |
+| `rv_zykn`     | `yaesdf_ys`  | `ys2, yd`                       | `1010011-----00001010-----1111111` | `0xa600a07f` | `0xfe0ff07f` |
+| `rv_zykn`     | `yaesdf_yy`  | `ys2, yd`                       | `1010001-----00001010-----1111111` | `0xa200a07f` | `0xfe0ff07f` |
+| `rv_zykn`     | `yaesdm_ys`  | `ys2, yd`                       | `1010011-----00000010-----1111111` | `0xa600207f` | `0xfe0ff07f` |
+| `rv_zykn`     | `yaesdm_yy`  | `ys2, yd`                       | `1010001-----00000010-----1111111` | `0xa200207f` | `0xfe0ff07f` |
+| `rv_zykn`     | `yaesef_ys`  | `ys2, yd`                       | `1010011-----00011010-----1111111` | `0xa601a07f` | `0xfe0ff07f` |
+| `rv_zykn`     | `yaesef_yy`  | `ys2, yd`                       | `1010001-----00011010-----1111111` | `0xa201a07f` | `0xfe0ff07f` |
+| `rv_zykn`     | `yaesem_ys`  | `ys2, yd`                       | `1010011-----00010010-----1111111` | `0xa601207f` | `0xfe0ff07f` |
+| `rv_zykn`     | `yaesem_yy`  | `ys2, yd`                       | `1010001-----00010010-----1111111` | `0xa201207f` | `0xfe0ff07f` |
+| `rv_zykn`     | `yaeskf1_yi` | `ys2, zimm5, yd`                | `1000101----------010-----1111111` | `0x8a00207f` | `0xfe00707f` |
+| `rv_zykn`     | `yaeskf2_yi` | `ys2, zimm5, yd`                | `1010101----------010-----1111111` | `0xaa00207f` | `0xfe00707f` |
+| `rv_zykn`     | `yaesz_ys`   | `ys2, yd`                       | `1010011-----00111010-----1111111` | `0xa603a07f` | `0xfe0ff07f` |
+| `rv_zykn`     | `yandn_yy`   | `ym, ys2, ys1, yd`              | `000001-----------000-----0101011` | `0x0400002b` | `0xfc00707f` |
+| `rv_zykn`     | `yandn_yx`   | `ym, ys2, rs1, yd`              | `000001-----------100-----0101011` | `0x0400402b` | `0xfc00707f` |
+| `rv_zykn`     | `ybrev8_y`   | `ym, ys2, yd`                   | `010010------01000010-----0101011` | `0x4804202b` | `0xfc0ff07f` |
+| `rv_zykn`     | `yrev8_y`    | `ym, ys2, yd`                   | `010010------01001010-----0101011` | `0x4804a02b` | `0xfc0ff07f` |
+| `rv_zykn`     | `yrol_yy`    | `ym, ys2, ys1, yd`              | `010101-----------000-----0101011` | `0x5400002b` | `0xfc00707f` |
+| `rv_zykn`     | `yrol_yx`    | `ym, ys2, rs1, yd`              | `010101-----------100-----0101011` | `0x5400402b` | `0xfc00707f` |
+| `rv_zykn`     | `yror_yi`    | `zimm6hi, ym, ys2, zimm6lo, yd` | `01010------------011-----0101011` | `0x5000302b` | `0xf800707f` |
+| `rv_zykn`     | `yror_yy`    | `ym, ys2, ys1, yd`              | `010100-----------000-----0101011` | `0x5000002b` | `0xfc00707f` |
+| `rv_zykn`     | `yror_yx`    | `ym, ys2, rs1, yd`              | `010100-----------100-----0101011` | `0x5000402b` | `0xfc00707f` |
+| `rv_zykn`     | `ysha2ch_yy` | `ys2, ys1, yd`                  | `1011101----------010-----1111111` | `0xba00207f` | `0xfe00707f` |
+| `rv_zykn`     | `ysha2cl_yy` | `ys2, ys1, yd`                  | `1011111----------010-----1111111` | `0xbe00207f` | `0xfe00707f` |
+| `rv_zykn`     | `ysha2ms_yy` | `ys2, ys1, yd`                  | `1011011----------010-----1111111` | `0xb600207f` | `0xfe00707f` |
+| `rv_zyksed`   | `ysm4k_yi`   | `ys2, zimm5, yd`                | `1000011----------010-----1111111` | `0x8600207f` | `0xfe00707f` |
+| `rv_zyksed`   | `ysm4r_ys`   | `ys2, yd`                       | `1010011-----10000010-----1111111` | `0xa608207f` | `0xfe0ff07f` |
+| `rv_zyksed`   | `ysm4r_yy`   | `ys2, yd`                       | `1010001-----10000010-----1111111` | `0xa208207f` | `0xfe0ff07f` |
+| `rv_zyksh`    | `ysm3c_yi`   | `ys2, zimm5, yd`                | `1010111----------010-----1111111` | `0xae00207f` | `0xfe00707f` |
+| `rv_zyksh`    | `ysm3me_yy`  | `ys2, ys1, yd`                  | `1000001----------010-----1111111` | `0x8200207f` | `0xfe00707f` |
+| `rv_zyks`     | `yandn_yy`   | `ym, ys2, ys1, yd`              | `000001-----------000-----0101011` | `0x0400002b` | `0xfc00707f` |
+| `rv_zyks`     | `yandn_yx`   | `ym, ys2, rs1, yd`              | `000001-----------100-----0101011` | `0x0400402b` | `0xfc00707f` |
+| `rv_zyks`     | `ybrev8_y`   | `ym, ys2, yd`                   | `010010------01000010-----0101011` | `0x4804202b` | `0xfc0ff07f` |
+| `rv_zyks`     | `yrev8_y`    | `ym, ys2, yd`                   | `010010------01001010-----0101011` | `0x4804a02b` | `0xfc0ff07f` |
+| `rv_zyks`     | `yrol_yy`    | `ym, ys2, ys1, yd`              | `010101-----------000-----0101011` | `0x5400002b` | `0xfc00707f` |
+| `rv_zyks`     | `yrol_yx`    | `ym, ys2, rs1, yd`              | `010101-----------100-----0101011` | `0x5400402b` | `0xfc00707f` |
+| `rv_zyks`     | `yror_yi`    | `zimm6hi, ym, ys2, zimm6lo, yd` | `01010------------011-----0101011` | `0x5000302b` | `0xf800707f` |
+| `rv_zyks`     | `yror_yy`    | `ym, ys2, ys1, yd`              | `010100-----------000-----0101011` | `0x5000002b` | `0xfc00707f` |
+| `rv_zyks`     | `yror_yx`    | `ym, ys2, rs1, yd`              | `010100-----------100-----0101011` | `0x5000402b` | `0xfc00707f` |
+| `rv_zyks`     | `ysm3c_yi`   | `ys2, zimm5, yd`                | `1010111----------010-----1111111` | `0xae00207f` | `0xfe00707f` |
+| `rv_zyks`     | `ysm3me_yy`  | `ys2, ys1, yd`                  | `1000001----------010-----1111111` | `0x8200207f` | `0xfe00707f` |
+| `rv_zyks`     | `ysm4k_yi`   | `ys2, zimm5, yd`                | `1000011----------010-----1111111` | `0x8600207f` | `0xfe00707f` |
+| `rv_zyks`     | `ysm4r_ys`   | `ys2, yd`                       | `1010011-----10000010-----1111111` | `0xa608207f` | `0xfe0ff07f` |
+| `rv_zyks`     | `ysm4r_yy`   | `ys2, yd`                       | `1010001-----10000010-----1111111` | `0xa208207f` | `0xfe0ff07f` |
 
-```
-vgmul.vv 31..26=0x28 25=1 vs2 19..15=0x11 14..12=0x2 vd 6..0=0x77
-```
-
-# Vector Add-Multiply over GHASH Galois-Field
-
-```
-vghsh.vv 31..26=0x2C 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x77
-```
-
-# Zykn, Vector Crypto Extension, NIST Algorithm Suite
-
-# Import Zykb (proper subset of Zybb extension)
-
-```
-$import rv_zybb::vandn.vv
-$import rv_zybb::vandn.vx
-$import rv_zybb::vbrev8.v
-$import rv_zybb::vrev8.v
-$import rv_zybb::vrol.vv
-$import rv_zybb::vrol.vx
-$import rv_zybb::vror.vv
-$import rv_zybb::vror.vx
-$import rv_zybb::vror.vi
-```
-
-# Import Zykned
-
-```
-$import rv_zykned::vaesef.vs
-$import rv_zykned::vaesef.vv
-$import rv_zykned::vaesem.vs
-$import rv_zykned::vaesem.vv
-$import rv_zykned::vaesdf.vs
-$import rv_zykned::vaesdf.vv
-$import rv_zykned::vaesdm.vs
-$import rv_zykned::vaesdm.vv
-$import rv_zykned::vaeskf1.vi
-$import rv_zykned::vaeskf2.vi
-$import rv_zykned::vaesz.vs
-```
-
-# Import Zyknh
-
-
-`Zykn` implies `Zyknhb`. We import the instructions from `rv_zyknha`, because we cannot import already imported instructions, `rv_zyknhb` imports them from `rv_zyknha`, and the instructions are identical.
-
-```
-$import rv_zyknha::vsha2ms.vv
-$import rv_zyknha::vsha2ch.vv
-$import rv_zyknha::vsha2cl.vv
-```
-
-# Zyk, Vector Crypto Extension, ShangMi Algorithm Suite
-
-# Import Zykb (proper subset of the Zybb extension)
-
-```
-$import rv_zybb::vandn.vv
-$import rv_zybb::vandn.vx
-$import rv_zybb::vbrev8.v
-$import rv_zybb::vrev8.v
-$import rv_zybb::vrol.vv
-$import rv_zybb::vrol.vx
-$import rv_zybb::vror.vv
-$import rv_zybb::vror.vx
-$import rv_zybb::vror.vi
-```
-
-# Import Zyksed
-
-```
-$import rv_zyksed::vsm4k.vi
-$import rv_zyksed::vsm4r.vv
-$import rv_zyksed::vsm4r.vs
-```
-
-# Import Zyksh
-
-```
-$import rv_zyksh::vsm3c.vi
-$import rv_zyksh::vsm3me.vv
-```
-
-# Zyksh - Vector Crypto SM3 (Hash)
-
-# SM3 Message Compression
-
-```
-vsm3c.vi     31..26=0x2B 25=1 vs2 zimm5 14..12=0x2 vd 6..0=0x77
-```
-
-# SM3 Message Expansion
-
-```
-vsm3me.vv    31..26=0x20 25=1 vs2 vs1   14..12=0x2 vd 6..0=0x77
-```
-
-# Zykned - Vector Crypto AES Encryption & Decryption (Singe Round)
-
-# AES Single Round Decryption
-
-```
-vaesdf.vv    31..26=0x28 25=1 vs2 19..15=0x1 14..12=0x2 vd 6..0=0x77
-vaesdf.vs    31..26=0x29 25=1 vs2 19..15=0x1 14..12=0x2 vd 6..0=0x77
-vaesdm.vv    31..26=0x28 25=1 vs2 19..15=0x0 14..12=0x2 vd 6..0=0x77
-vaesdm.vs    31..26=0x29 25=1 vs2 19..15=0x0 14..12=0x2 vd 6..0=0x77
-```
-
-# AES Single Round Encryption
-
-```
-vaesef.vv    31..26=0x28 25=1 vs2 19..15=0x3 14..12=0x2 vd 6..0=0x77
-vaesef.vs    31..26=0x29 25=1 vs2 19..15=0x3 14..12=0x2 vd 6..0=0x77
-vaesem.vv    31..26=0x28 25=1 vs2 19..15=0x2 14..12=0x2 vd 6..0=0x77
-vaesem.vs    31..26=0x29 25=1 vs2 19..15=0x2 14..12=0x2 vd 6..0=0x77
-```
-
-# AES Scalar Round Zero Encryption/Decryption
-
-```
-vaesz.vs     31..26=0x29 25=1 vs2 19..15=0x7 14..12=0x2 vd 6..0=0x77
-```
-
-# AES-128 Forward Key Schedule
-
-```
-vaeskf1.vi   31..26=0x22 25=1 vs2 zimm5      14..12=0x2 vd 6..0=0x77
-```
-# AES-256 Forward Key Schedule
-
-```
-vaeskf2.vi   31..26=0x2A 25=1 vs2 zimm5      14..12=0x2 vd 6..0=0x77
-```
-
-# Zyknha - Vector Crypto SHA-256 Secure Hash
-
-The following three instructions are defined in both Zyknha and Zyknhb:
-
-- in Zyknha, they support SHA-256 (SEW=32) only,
-- in Zyknhb, they support both SHA-256 (SEW=32) and SHA-512 (SEW=64).
-
-```
-vsha2ms.vv    31..26=0x2D 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x77
-vsha2ch.vv    31..26=0x2E 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x77
-vsha2cl.vv    31..26=0x2F 25=1 vs2 vs1 14..12=0x2 vd 6..0=0x77
-```
-
-# Zyknhb - Vector Crypto SHA-256 and SHA-512 Secure Hash
-
-The following three instructions are defined in both Zyknha and Zyknhb:
-
-- in Zyknha, they support SHA-256 (SEW=32) only,
-- in Zyknhb, they support both SHA-256 (SEW=32) and SHA-512 (SEW=64).
-
-```
-$import rv_zyknha::vsha2ms.vv
-$import rv_zyknha::vsha2ch.vv
-$import rv_zyknha::vsha2cl.vv
-```
-
-# Zyksed - Vector Crypto SM4 (Block Cipher)
-
-# SM4 Key Expansion
-
-```
-vsm4k.vi     31..26=0x21 25=1 vs2 zimm5       14..12=0x2 vd 6..0=0x77
-```
-
-# SM4 Encryption/Decryption Rounds
-
-```
-vsm4r.vv     31..26=0x28 25=1 vs2 19..15=0x10 14..12=0x2 vd 6..0=0x77
-vsm4r.vs     31..26=0x29 25=1 vs2 19..15=0x10 14..12=0x2 vd 6..0=0x77
-```
+:RVZYK - Specific Extension for Tensor Cryptography Instructions

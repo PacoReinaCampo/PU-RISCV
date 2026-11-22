@@ -1,53 +1,18 @@
 ## INSTRUCTION TYPES
 
-| **Type** | **Type Name** | **Bit Encoding**                                                                            |
-|:---------|:--------------|:--------------------------------------------------------------------------------------------|
-| `32`     | `Base`        | `31:25                       24:20     19:15     14:12        11:7              6:0`        |
-| `r`      | `Register`    | `31:25=funct7                24:20=rs2 19:15=rs1 14:12=funct3 11:7=rd           6:0=opcode` |
-| `i`      | `Immediate`   | `31:20[11:0]=imm                       19:15=rs1 14:12=funct3 11:7=rd           6:0=opcode` |
-| `s`      | `Store`       | `31:25[11:5]=imm             24:20=rs2 19:15=rs1 14:12=funct3 11:7[4:0]=imm     6:0=opcode` |
-| `b`      | `Branch`      | `31:25[12-10:5]=imm          24:20=rs2 19:15=rs1 14:12=funct3 11:7[4:1-11]=imm  6:0=opcode` |
-| `u`      | `Upper`       | `31:12[31:12]=imm                                             11:7=rd           6:0=opcode` |
-| `j`      | `Jump`        | `31:12[20-10:1-11-19:12]=imm                                  11:7=rd           6:0=opcode` |
+| **Extension**  | **Name**          | **Variable-Fields** | **Encoding**                       | **Match**    | **Mask**     | **Type** |
+|:---------------|:------------------|:--------------------|:-----------------------------------|:-------------|:-------------|:---------|
+| `rv_sdext`     | `dret`            | `none`              | `01111011001000000000000001110011` | `0x7b200073` | `0xffffffff` | `I`      |
+| `rv_smrnmi`    | `mnret`           | `none`              | `01110000001000000000000001110011` | `0x70200073` | `0xffffffff` | `I`      |
+| `rv_ssctr`     | `sctrclr`         | `none`              | `00010000010000000000000001110011` | `0x10400073` | `0xffffffff` | `I`      |
+| `rv_s`         | `sfence_vma`      | `rs1, rs2`          | `0001001----------000000001110011` | `0x12000073` | `0xfe007fff` | `I`      |
+| `rv_s`         | `sret`            | `none`              | `00010000001000000000000001110011` | `0x10200073` | `0xffffffff` | `I`      |
+| `rv_svinval_h` | `hinval_gvma`     | `rs1, rs2`          | `0110011----------000000001110011` | `0x66000073` | `0xfe007fff` | `I`      |
+| `rv_svinval_h` | `hinval_vvma`     | `rs1, rs2`          | `0010011----------000000001110011` | `0x26000073` | `0xfe007fff` | `I`      |
+| `rv_svinval`   | `sfence_inval_ir` | `none`              | `00011000000100000000000001110011` | `0x18100073` | `0xffffffff` | `I`      |
+| `rv_svinval`   | `sfence_w_inval`  | `none`              | `00011000000000000000000001110011` | `0x18000073` | `0xffffffff` | `I`      |
+| `rv_svinval`   | `sinval_vma`      | `rs1, rs2`          | `0001011----------000000001110011` | `0x16000073` | `0xfe007fff` | `I`      |
+| `rv_system`    | `mret`            | `none`              | `00110000001000000000000001110011` | `0x30200073` | `0xffffffff` | `I`      |
+| `rv_system`    | `wfi`             | `none`              | `00010000010100000000000001110011` | `0x10500073` | `0xffffffff` | `I`      |
 
-:RISC-V Base 32-Bit Instruction Type
-
-| **Type** | **Type Name** | **Bit Encoding**                                                                |
-|:---------|:--------------|:--------------------------------------------------------------------------------|
-| `32`     | `Base`        | `31:25                     24:20     19:15     14:12        11:7    6:0`        |
-| `r4`     | `Register`    | `31:27=rs3    26:25=funct2 24:20=rs2 19:15=rs1 14:12=funct3 11:7=rd 6:0=opcode` |
-
-:RISC-V Float-Point 32-Bit Instruction Type
-
-| **Type** | **Type Name**          | **Bit Encoding**                                                      |
-|:---------|:-----------------------|:----------------------------------------------------------------------|
-| `16`     | `Compressed`           | `15:13        12:10             9:7      6:5     4:2      1:0`        |
-| `cr`     | `Register`             | `15:12=funct4           11:7=rd/rs1      6:2=rs2          1:0=opcode` |
-| `ci`     | `Immediate`            | `15:13=funct3 12=imm    11:7=rd/rs1      6:2=imm          1:0=opcode` |
-| `css`    | `Stack-relative Store` | `15:13=funct3 12:7=imm                   6:2=rs2          1:0=opcode` |
-| `ciw`    | `Wide Immediate`       | `15:13=funct3 12:5=imm                           4:2=rd'  1:0=opcode` |
-| `cl`     | `Load`                 | `15:13=funct3 12:10=imm         9:7=rs1' 6:5=imm 4:2=rd'  1:0=opcode` |
-| `cs`     | `Store`                | `15:13=funct3 12:10=imm         9:7=rs1' 6:5=imm 4:2=rs2' 1:0=opcode` |
-| `cb`     | `Branch`               | `15:13=funct3 12:10=imm         9:7=rs1' 6:2=imm          1:0=opcode` |
-| `cj`     | `Jump`                 | `15:13=funct3 12:2=imm                                    1:0=opcode` |
-
-:RISC-V Compressed 16-Bit Instruction Type
-
-| **Type** | **Type Name** | **Bit Encoding**                                                                             |
-|:---------|:--------------|:---------------------------------------------------------------------------------------------|
-| `64`     | `Extended`    | `63:48                       47:38     37:28     27:22        21:12             11:0`        |
-| `or`     | `Register`    | `63:54=funct16                                   27:22=funct6 21:12=rd          11:0=opcode` |
-| `oi`     | `Immediate`   | `63:38[21:0]=imm                       37:28=rs1 27:22=funct6 21:12=rd          11:0=opcode` |
-| `os`     | `Store`       | `63:48[21:10]=imm            47:38=rs2 37:28=rs1 27:22=funct6 21:12[9:0]=imm    11:0=opcode` |
-| `ob`     | `Branch`      | `63:48[22-20:10]=imm         47:38=rs2 37:28=rs1 27:22=funct6 21:12[9:1-21]=imm 11:0=opcode` |
-| `ou`     | `Upper`       | `63:22[63:22]=imm                                             21:12=rd          11:0=opcode` |
-| `oj`     | `Jump`        | `63:22[38-20:1-21-37:22]=imm                                  21:12=rd          11:0=opcode` |
-
-:RISC-V Extended 64-Bit Instruction Type
-
-| **Type** | **Type Name** | **Bit Encoding**                                                                   |
-|:---------|:--------------|:-----------------------------------------------------------------------------------|
-| `64`     | `Extended`    | `63:48                      47:38     37:28     27:22        21:12    11:0`        |
-| `or4`    | `Register`    | `63:54=rs3     53:48=funct6 47:38=rs2 37:28=rs1 27:22=funct6 21:12=rd 11:0=opcode` |
-
-:RISC-V Float-Point 64-Bit Instruction Type
+:RVS - Specific Extension for Supervisor-level Instructions

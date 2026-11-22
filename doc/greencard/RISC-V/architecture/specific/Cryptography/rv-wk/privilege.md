@@ -1,0 +1,67 @@
+## INSTRUCTION PRIVILEGE
+
+| **Extension** | **Name**     | **Privilege** |
+|:--------------|:-------------|:--------------|
+| `rv_zwkg`     | `wghsh_ww`   | `U`           |
+| `rv_zwkg`     | `wgmul_ww`   | `U`           |
+| `rv_zwkned`   | `waesdf_ws`  | `U`           |
+| `rv_zwkned`   | `waesdf_ww`  | `U`           |
+| `rv_zwkned`   | `waesdm_ws`  | `U`           |
+| `rv_zwkned`   | `waesdm_ww`  | `U`           |
+| `rv_zwkned`   | `waesef_ws`  | `U`           |
+| `rv_zwkned`   | `waesef_ww`  | `U`           |
+| `rv_zwkned`   | `waesem_ws`  | `U`           |
+| `rv_zwkned`   | `waesem_ww`  | `U`           |
+| `rv_zwkned`   | `waeskf1_wi` | `U`           |
+| `rv_zwkned`   | `waeskf2_wi` | `U`           |
+| `rv_zwkned`   | `waesz_ws`   | `U`           |
+| `rv_zwknha`   | `wsha2ch_ww` | `U`           |
+| `rv_zwknha`   | `wsha2cl_ww` | `U`           |
+| `rv_zwknha`   | `wsha2ms_ww` | `U`           |
+| `rv_zwknhb`   | `wsha2ch_ww` | `U`           |
+| `rv_zwknhb`   | `wsha2cl_ww` | `U`           |
+| `rv_zwknhb`   | `wsha2ms_ww` | `U`           |
+| `rv_zwkn`     | `waesdf_ws`  | `U`           |
+| `rv_zwkn`     | `waesdf_ww`  | `U`           |
+| `rv_zwkn`     | `waesdm_ws`  | `U`           |
+| `rv_zwkn`     | `waesdm_ww`  | `U`           |
+| `rv_zwkn`     | `waesef_ws`  | `U`           |
+| `rv_zwkn`     | `waesef_ww`  | `U`           |
+| `rv_zwkn`     | `waesem_ws`  | `U`           |
+| `rv_zwkn`     | `waesem_ww`  | `U`           |
+| `rv_zwkn`     | `waeskf1_wi` | `U`           |
+| `rv_zwkn`     | `waeskf2_wi` | `U`           |
+| `rv_zwkn`     | `waesz_ws`   | `U`           |
+| `rv_zwkn`     | `wandn_ww`   | `U`           |
+| `rv_zwkn`     | `wandn_wx`   | `U`           |
+| `rv_zwkn`     | `wbrev8_w`   | `U`           |
+| `rv_zwkn`     | `wrev8_w`    | `U`           |
+| `rv_zwkn`     | `wrol_ww`    | `U`           |
+| `rv_zwkn`     | `wrol_wx`    | `U`           |
+| `rv_zwkn`     | `wror_wi`    | `U`           |
+| `rv_zwkn`     | `wror_ww`    | `U`           |
+| `rv_zwkn`     | `wror_wx`    | `U`           |
+| `rv_zwkn`     | `wsha2ch_ww` | `U`           |
+| `rv_zwkn`     | `wsha2cl_ww` | `U`           |
+| `rv_zwkn`     | `wsha2ms_ww` | `U`           |
+| `rv_zwksed`   | `wsm4k_wi`   | `U`           |
+| `rv_zwksed`   | `wsm4r_ws`   | `U`           |
+| `rv_zwksed`   | `wsm4r_ww`   | `U`           |
+| `rv_zwksh`    | `wsm3c_wi`   | `U`           |
+| `rv_zwksh`    | `wsm3me_ww`  | `U`           |
+| `rv_zwks`     | `wandn_ww`   | `U`           |
+| `rv_zwks`     | `wandn_wx`   | `U`           |
+| `rv_zwks`     | `wbrev8_w`   | `U`           |
+| `rv_zwks`     | `wrev8_w`    | `U`           |
+| `rv_zwks`     | `wrol_ww`    | `U`           |
+| `rv_zwks`     | `wrol_wx`    | `U`           |
+| `rv_zwks`     | `wror_wi`    | `U`           |
+| `rv_zwks`     | `wror_ww`    | `U`           |
+| `rv_zwks`     | `wror_wx`    | `U`           |
+| `rv_zwks`     | `wsm3c_wi`   | `U`           |
+| `rv_zwks`     | `wsm3me_ww`  | `U`           |
+| `rv_zwks`     | `wsm4k_wi`   | `U`           |
+| `rv_zwks`     | `wsm4r_ws`   | `U`           |
+| `rv_zwks`     | `wsm4r_ww`   | `U`           |
+
+:RVZWK - Specific Extension for Matrix Cryptography Instructions

@@ -12,9 +12,16 @@ function clause currentlyEnabled(Ext_Zvl128b) = hartSupports(Ext_Zvl128b)
 function clause currentlyEnabled(Ext_Zvl256b) = hartSupports(Ext_Zvl256b)
 function clause currentlyEnabled(Ext_Zvl512b) = hartSupports(Ext_Zvl512b)
 function clause currentlyEnabled(Ext_Zvl1024b) = hartSupports(Ext_Zvl1024b)
+function clause currentlyEnabled(Ext_Zvl2048b) = hartSupports(Ext_Zvl2048b)
+function clause currentlyEnabled(Ext_Zvl4096b) = hartSupports(Ext_Zvl4096b)
+function clause currentlyEnabled(Ext_Zvl8192b) = hartSupports(Ext_Zvl8192b)
+function clause currentlyEnabled(Ext_Zvl16384b) = hartSupports(Ext_Zvl16384b)
+function clause currentlyEnabled(Ext_Zvl32768b) = hartSupports(Ext_Zvl32768b)
+function clause currentlyEnabled(Ext_Zvl65536b) = hartSupports(Ext_Zvl65536b)
 
 // TODO: the interaction of Ext_Zve32x with a writable misa.V when misa.V == 0 needs settling.
-function clause currentlyEnabled(Ext_Zve32x) = hartSupports(Ext_Zve32x) & currentlyEnabled(Ext_Zvl32b) & (mstatus[VS] != 0b00) & currentlyEnabled(Ext_Zicsr)
+function clause currentlyEnabled(Ext_Zve32x) = hartSupports(Ext_Zve32x) & currentlyEnabled(Ext_Zvl32b) & currentlyEnabled(Ext_Zicsr) &
+  mstatus[VS] != 0b00 & (if inVirtualPrivilege() then vsstatus[VS] != 0b00 else true)
 function clause currentlyEnabled(Ext_Zve32f) = hartSupports(Ext_Zve32f) & currentlyEnabled(Ext_Zve32x) & currentlyEnabled(Ext_F)
 function clause currentlyEnabled(Ext_Zve64x) = hartSupports(Ext_Zve64x) & currentlyEnabled(Ext_Zvl64b) & currentlyEnabled(Ext_Zve32x)
 function clause currentlyEnabled(Ext_Zve64f) = hartSupports(Ext_Zve64f) & currentlyEnabled(Ext_Zve64x) & currentlyEnabled(Ext_Zve32f)
@@ -24,6 +31,8 @@ function clause currentlyEnabled(Ext_V) = hartSupports(Ext_V) & (misa[V] == 0b1)
 
 function clause currentlyEnabled(Ext_Zvfh)    = hartSupports(Ext_Zvfh)     & currentlyEnabled(Ext_Zve32f) & currentlyEnabled(Ext_Zfhmin)
 function clause currentlyEnabled(Ext_Zvfhmin) = (hartSupports(Ext_Zvfhmin) & currentlyEnabled(Ext_Zve32f)) | currentlyEnabled(Ext_Zvfh)
+
+let max_index_eew_exp : nat = config extensions.V.max_index_eew_exp
 
 // Get the total number of elements in a register group (not considering `vl`).
 // For fractional groups (negative LMUL_pow) we return the number of elements

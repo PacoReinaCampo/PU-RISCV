@@ -6,136 +6,138 @@
 // SPDX-License-Identifier: BSD-2-Clause
 // =======================================================================================
 
-function clause currentlyEnabled(Ext_Zvknha) = hartSupports(Ext_Zvknha) & currentlyEnabled(Ext_Zve32x)
-function clause currentlyEnabled(Ext_Zvknhb) = hartSupports(Ext_Zvknhb) & currentlyEnabled(Ext_Zve64x)
+function xw_crypto_knha_enabled() -> bool = (config extensions.Xw.crypto.knha : bool) & xw_enabled()
+function xw_crypto_knhb_enabled() -> bool = (config extensions.Xw.crypto.knhb : bool) & xw_64_enabled()
 
-union clause instruction = VSHA2MS_VV : (vregidx, vregidx, vregidx)
+union clause instruction = XWK_WSHA2MS_WW : (wregidx, wregidx, wregidx)
 
-$[wavedrom "_ _ _ _ OPMVV _ OP-VE"]
-mapping clause encdec = VSHA2MS_VV(vs2, vs1, vd)
-  <-> 0b101101 @ 0b1 @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b010 @ encdec_vreg(vd) @ 0b1110111
-  when (currentlyEnabled(Ext_Zvknha) & get_sew() == 32) | (currentlyEnabled(Ext_Zvknhb) & (get_sew() == 32 | get_sew() == 64)) & zvknhab_check_encdec(vs2, vs1, vd)
+$[wavedrom "_ _ _ _ OPMWW _ CUSTOM-2"]
+mapping clause encdec = XWK_WSHA2MS_WW(ws2, ws1, wd)
+  <-> 0b101101 @ 0b1 @ encdec_wreg(ws2) @ encdec_wreg(ws1) @ 0b010 @ encdec_wreg(wd) @ 0b1011011
+  when valid_wtype() & ((xw_crypto_knha_enabled() & w_get_sew() == 32) | (xw_crypto_knhb_enabled() & (w_get_sew() == 32 | w_get_sew() == 64))) & zwknhab_check_encdec(ws2, ws1, wd)
 
-mapping clause assembly = VSHA2MS_VV(vs2, vs1, vd)
-  <-> "vsha2ms.vv" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1)
+mapping clause assembly = XWK_WSHA2MS_WW(ws2, ws1, wd)
+  <-> "wsha2ms.ww" ^ spc() ^ wreg_name(wd) ^ sep() ^ wreg_name(ws2) ^ sep() ^ wreg_name(ws1)
 
-function clause execute VSHA2MS_VV(vs2, vs1, vd) = {
-  let 'SEW     = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute XWK_WSHA2MS_WW(ws2, ws1, wd) = {
+  let 'SEW     = w_get_sew();
+  let LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(LMUL_pow, SEW);
 
-  if not(valid_reg_group(vs1, LMUL_pow)) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
+  if not(w_valid_reg_group(ws1, LMUL_pow)) |
+     not(w_valid_reg_group(ws2, LMUL_pow)) |
+     not(w_valid_reg_group(wd, LMUL_pow))
   then return Illegal_Instruction();
 
   assert(SEW == 32 | SEW == 64);
 
-  let vs2_val = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vs1_val = read_vreg(num_elem, SEW, LMUL_pow, vs1);
-  let vd_val  = read_vreg(num_elem, SEW, LMUL_pow, vd);
+  let ws2_val = read_wreg(num_elem, SEW, LMUL_pow, ws2);
+  let ws1_val = read_wreg(num_elem, SEW, LMUL_pow, ws1);
+  let wd_val  = read_wreg(num_elem, SEW, LMUL_pow, wd);
 
   var w : vector(20, bits('SEW)) = vector_init(zeros());
 
-  let eg_len   = (unsigned(vl) / 4);
-  let eg_start = (unsigned(vstart) / 4);
+  let group_count = (unsigned(wl) / 4);
+  let first_group = (unsigned(wstart) / 4);
 
-  foreach (i from eg_start to (eg_len - 1)) {
-    assert(i * 4 + 3 < num_elem);
+  foreach (group_index from first_group to (group_count - 1)) {
+    let position = group_index * 4;
+    assert(position + 3 < num_elem);
 
     w = [w with
-      0  = vd_val[i*4],
-      1  = vd_val[i*4+1],
-      2  = vd_val[i*4+2],
-      3  = vd_val[i*4+3],
+      0  = wd_val[position],
+      1  = wd_val[position + 1],
+      2  = wd_val[position + 2],
+      3  = wd_val[position + 3],
 
-      4  = vs2_val[i*4],
-      9  = vs2_val[i*4+1],
-      10 = vs2_val[i*4+2],
-      11 = vs2_val[i*4+3],
+      4  = ws2_val[position],
+      9  = ws2_val[position + 1],
+      10 = ws2_val[position + 2],
+      11 = ws2_val[position + 3],
 
-      12 = vs1_val[i*4],
-      13 = vs1_val[i*4+1],
-      14 = vs1_val[i*4+2],
-      15 = vs1_val[i*4+3]
+      12 = ws1_val[position],
+      13 = ws1_val[position + 1],
+      14 = ws1_val[position + 2],
+      15 = ws1_val[position + 3]
     ];
 
-    w[16] = zvk_sig1(w[14], SEW) + w[9]  + zvk_sig0(w[1], SEW) + w[0];
-    w[17] = zvk_sig1(w[15], SEW) + w[10] + zvk_sig0(w[2], SEW) + w[1];
-    w[18] = zvk_sig1(w[16], SEW) + w[11] + zvk_sig0(w[3], SEW) + w[2];
-    w[19] = zvk_sig1(w[17], SEW) + w[12] + zvk_sig0(w[4], SEW) + w[3];
+    w[16] = zwk_sig1(w[14], SEW) + w[9]  + zwk_sig0(w[1], SEW) + w[0];
+    w[17] = zwk_sig1(w[15], SEW) + w[10] + zwk_sig0(w[2], SEW) + w[1];
+    w[18] = zwk_sig1(w[16], SEW) + w[11] + zwk_sig0(w[3], SEW) + w[2];
+    w[19] = zwk_sig1(w[17], SEW) + w[12] + zwk_sig0(w[4], SEW) + w[3];
 
-    write_velem_quad(vd, SEW, w[19] @ w[18] @ w[17] @ w[16], i);
+    write_welem_quad(wd, SEW, w[19] @ w[18] @ w[17] @ w[16], group_index);
   };
 
-  set_vstart(zeros());
+  set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-union clause instruction = ZVKSHA2TYPE : (zvk_vsha2_funct6, vregidx, vregidx, vregidx)
+union clause instruction = XWK_ZWKSHA2TYPE : (zwk_wsha2_funct6, wregidx, wregidx, wregidx)
 
-mapping encdec_vsha2 : zvk_vsha2_funct6 <-> bits(6) = {
-  ZVK_VSHA2CH_VV <-> 0b101110,
-  ZVK_VSHA2CL_VV <-> 0b101111,
+mapping wk_encdec_vsha2 : zwk_wsha2_funct6 <-> bits(6) = {
+  XWK_ZWK_WSHA2CH_WW <-> 0b101110,
+  XWK_ZWK_WSHA2CL_WW <-> 0b101111,
 }
 
-$[wavedrom "VSHA2C.OP _ _ _ OPMVV _ OP-VE"]
-mapping clause encdec = ZVKSHA2TYPE(funct6, vs2, vs1, vd)
-  <-> encdec_vsha2(funct6) @ 0b1 @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b010 @ encdec_vreg(vd) @ 0b1110111
-  when (currentlyEnabled(Ext_Zvknha) & get_sew() == 32) | (currentlyEnabled(Ext_Zvknhb) & (get_sew() == 32 | get_sew() == 64)) & zvknhab_check_encdec(vs2, vs1, vd)
+$[wavedrom "WSHA2C.OP _ _ _ OPMWW _ CUSTOM-2"]
+mapping clause encdec = XWK_ZWKSHA2TYPE(funct6, ws2, ws1, wd)
+  <-> wk_encdec_vsha2(funct6) @ 0b1 @ encdec_wreg(ws2) @ encdec_wreg(ws1) @ 0b010 @ encdec_wreg(wd) @ 0b1011011
+  when valid_wtype() & ((xw_crypto_knha_enabled() & w_get_sew() == 32) | (xw_crypto_knhb_enabled() & (w_get_sew() == 32 | w_get_sew() == 64))) & zwknhab_check_encdec(ws2, ws1, wd)
 
-mapping vsha2_mnemonic : zvk_vsha2_funct6 <-> string = {
-  ZVK_VSHA2CH_VV <-> "vsha2ch.vv",
-  ZVK_VSHA2CL_VV <-> "vsha2cl.vv",
+mapping wk_sha2_mnemonic : zwk_wsha2_funct6 <-> string = {
+  XWK_ZWK_WSHA2CH_WW <-> "wsha2ch.ww",
+  XWK_ZWK_WSHA2CL_WW <-> "wsha2cl.ww",
 }
 
-mapping clause assembly = ZVKSHA2TYPE(funct6, vs2, vs1, vd)
-  <-> vsha2_mnemonic(funct6) ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1)
+mapping clause assembly = XWK_ZWKSHA2TYPE(funct6, ws2, ws1, wd)
+  <-> wk_sha2_mnemonic(funct6) ^ spc() ^ wreg_name(wd) ^ sep() ^ wreg_name(ws2) ^ sep() ^ wreg_name(ws1)
 
-function clause execute ZVKSHA2TYPE(funct6, vs2, vs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute XWK_ZWKSHA2TYPE(funct6, ws2, ws1, wd) = {
+  let SEW      = w_get_sew();
+  let LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(LMUL_pow, SEW);
 
-  if not(valid_reg_group(vs1, LMUL_pow)) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
+  if not(w_valid_reg_group(ws1, LMUL_pow)) |
+     not(w_valid_reg_group(ws2, LMUL_pow)) |
+     not(w_valid_reg_group(wd, LMUL_pow))
   then return Illegal_Instruction();
 
   assert(SEW == 32 | SEW == 64);
 
-  let vs2_val = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vs1_val = read_vreg(num_elem, SEW, LMUL_pow, vs1);
-  let vd_val  = read_vreg(num_elem, SEW, LMUL_pow, vd);
+  let ws2_val = read_wreg(num_elem, SEW, LMUL_pow, ws2);
+  let ws1_val = read_wreg(num_elem, SEW, LMUL_pow, ws1);
+  let wd_val  = read_wreg(num_elem, SEW, LMUL_pow, wd);
 
-  let eg_len   = (unsigned(vl) / 4);
-  let eg_start = (unsigned(vstart) / 4);
+  let group_count = (unsigned(wl) / 4);
+  let first_group = (unsigned(wstart) / 4);
 
-  foreach (i from eg_start to (eg_len - 1)) {
-    assert(i * 4 + 3 < num_elem);
+  foreach (group_index from first_group to (group_count - 1)) {
+    let position = group_index * 4;
+    assert(position + 3 < num_elem);
 
-    var f = vs2_val[i*4+0];
-    var e = vs2_val[i*4+1];
-    var b = vs2_val[i*4+2];
-    var a = vs2_val[i*4+3];
+    var f = ws2_val[position + 0];
+    var e = ws2_val[position + 1];
+    var b = ws2_val[position + 2];
+    var a = ws2_val[position + 3];
 
-    var h = vd_val[i*4+0];
-    var g = vd_val[i*4+1];
-    var d = vd_val[i*4+2];
-    var c = vd_val[i*4+3];
+    var h = wd_val[position + 0];
+    var g = wd_val[position + 1];
+    var d = wd_val[position + 2];
+    var c = wd_val[position + 3];
 
-    let message_sched_plus_c = get_velem_quad(vs1_val, i);
+    let message_sched_plus_c = get_welem_quad(ws1_val, group_index);
 
-    let w0 = if funct6 == ZVK_VSHA2CL_VV
+    let w0 = if funct6 == XWK_ZWK_WSHA2CL_WW
              then message_sched_plus_c[(SEW * 1) - 1 .. 0]
              else message_sched_plus_c[(SEW * 3) - 1 .. (SEW * 2)];
 
-    let w1 = if funct6 == ZVK_VSHA2CL_VV
+    let w1 = if funct6 == XWK_ZWK_WSHA2CL_WW
              then message_sched_plus_c[(SEW * 2) - 1 .. SEW]
              else message_sched_plus_c[(SEW * 4) - 1 .. (SEW * 3)];
 
-    var T1 = h + zvk_sum1(e, SEW) + zvk_ch(e,f,g) + w0;
-    var T2 = zvk_sum0(a, SEW) + zvk_maj(a, b, c);
+    var T1 = h + zwk_sum1(e, SEW) + zwk_ch(e,f,g) + w0;
+    var T2 = zwk_sum0(a, SEW) + zwk_maj(a, b, c);
 
     h  = g;
     g  = f;
@@ -146,8 +148,8 @@ function clause execute ZVKSHA2TYPE(funct6, vs2, vs1, vd) = {
     b  = a;
     a  = T1 + T2;
 
-    T1 = h + zvk_sum1(e, SEW) + zvk_ch(e, f, g) + w1;
-    T2 = zvk_sum0(a, SEW) + zvk_maj(a, b, c);
+    T1 = h + zwk_sum1(e, SEW) + zwk_ch(e, f, g) + w1;
+    T2 = zwk_sum0(a, SEW) + zwk_maj(a, b, c);
     h  = g;
     g  = f;
     f  = e;
@@ -157,9 +159,9 @@ function clause execute ZVKSHA2TYPE(funct6, vs2, vs1, vd) = {
     b  = a;
     a  = T1 + T2;
 
-    write_velem_quad(vd, SEW, a @ b @ e @ f, i);
+    write_welem_quad(wd, SEW, a @ b @ e @ f, group_index);
   };
 
-  set_vstart(zeros());
+  set_wstart(zeros());
   RETIRE_SUCCESS
 }

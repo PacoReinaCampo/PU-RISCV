@@ -1,238 +1,67 @@
 ## INSTRUCTION CLASSES
 
-| **Instruction** | **Class**       |
-|:----------------|:----------------|
-| `lui`           | `alu`           |
-| `auipc`         | `alu`           |
-| `jal`           | `jump`          |
-| `jalr`          | `jump,indirect` |
-| `beq`           | `branch`        |
-| `bne`           | `branch`        |
-| `blt`           | `branch`        |
-| `bge`           | `branch`        |
-| `bltu`          | `branch`        |
-| `bgeu`          | `branch`        |
-| `lb`            | `load`          |
-| `lh`            | `load`          |
-| `lw`            | `load`          |
-| `lbu`           | `load`          |
-| `lhu`           | `load`          |
-| `lwu`           | `load`          |
-| `sb`            | `store`         |
-| `sh`            | `store`         |
-| `sw`            | `store`         |
-| `addi`          | `alu`           |
-| `slti`          | `alu`           |
-| `sltiu`         | `alu`           |
-| `xori`          | `alu`           |
-| `ori`           | `alu`           |
-| `andi`          | `alu`           |
-| `slli`          | `alu`           |
-| `srli`          | `alu`           |
-| `srai`          | `alu`           |
-| `add`           | `alu`           |
-| `sub`           | `alu`           |
-| `sll`           | `alu`           |
-| `slt`           | `alu`           |
-| `sltu`          | `alu`           |
-| `xor`           | `alu`           |
-| `srl`           | `alu`           |
-| `sra`           | `alu`           |
-| `or`            | `alu`           |
-| `and`           | `alu`           |
-| `fence`         | `fence`         |
-| `fence.i`       | `fence`         |
+| **Extension** | **Name**     | **Variable-Fields**             | **Class**              |
+|:--------------|:-------------|:--------------------------------|:-----------------------|
+| `rv_zykg`     | `yghsh_yy`   | `ys2, ys1, yd`                  | `tensor, cryptography` |
+| `rv_zykg`     | `ygmul_yy`   | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykned`   | `yaesdf_ys`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykned`   | `yaesdf_yy`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykned`   | `yaesdm_ys`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykned`   | `yaesdm_yy`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykned`   | `yaesef_ys`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykned`   | `yaesef_yy`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykned`   | `yaesem_ys`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykned`   | `yaesem_yy`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykned`   | `yaeskf1_yi` | `ys2, zimm5, yd`                | `tensor, cryptography` |
+| `rv_zykned`   | `yaeskf2_yi` | `ys2, zimm5, yd`                | `tensor, cryptography` |
+| `rv_zykned`   | `yaesz_ys`   | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zyknha`   | `ysha2ch_yy` | `ys2, ys1, yd`                  | `tensor, cryptography` |
+| `rv_zyknha`   | `ysha2cl_yy` | `ys2, ys1, yd`                  | `tensor, cryptography` |
+| `rv_zyknha`   | `ysha2ms_yy` | `ys2, ys1, yd`                  | `tensor, cryptography` |
+| `rv_zyknhb`   | `ysha2ch_yy` | `ys2, ys1, yd`                  | `tensor, cryptography` |
+| `rv_zyknhb`   | `ysha2cl_yy` | `ys2, ys1, yd`                  | `tensor, cryptography` |
+| `rv_zyknhb`   | `ysha2ms_yy` | `ys2, ys1, yd`                  | `tensor, cryptography` |
+| `rv_zykn`     | `yaesdf_ys`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykn`     | `yaesdf_yy`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykn`     | `yaesdm_ys`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykn`     | `yaesdm_yy`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykn`     | `yaesef_ys`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykn`     | `yaesef_yy`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykn`     | `yaesem_ys`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykn`     | `yaesem_yy`  | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykn`     | `yaeskf1_yi` | `ys2, zimm5, yd`                | `tensor, cryptography` |
+| `rv_zykn`     | `yaeskf2_yi` | `ys2, zimm5, yd`                | `tensor, cryptography` |
+| `rv_zykn`     | `yaesz_ys`   | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zykn`     | `yandn_yy`   | `ym, ys2, ys1, yd`              | `tensor, cryptography` |
+| `rv_zykn`     | `yandn_yx`   | `ym, ys2, rs1, yd`              | `tensor, cryptography` |
+| `rv_zykn`     | `ybrev8_y`   | `ym, ys2, yd`                   | `tensor, cryptography` |
+| `rv_zykn`     | `yrev8_y`    | `ym, ys2, yd`                   | `tensor, cryptography` |
+| `rv_zykn`     | `yrol_yy`    | `ym, ys2, ys1, yd`              | `tensor, cryptography` |
+| `rv_zykn`     | `yrol_yx`    | `ym, ys2, rs1, yd`              | `tensor, cryptography` |
+| `rv_zykn`     | `yror_yi`    | `zimm6hi, ym, ys2, zimm6lo, yd` | `tensor, cryptography` |
+| `rv_zykn`     | `yror_yy`    | `ym, ys2, ys1, yd`              | `tensor, cryptography` |
+| `rv_zykn`     | `yror_yx`    | `ym, ys2, rs1, yd`              | `tensor, cryptography` |
+| `rv_zykn`     | `ysha2ch_yy` | `ys2, ys1, yd`                  | `tensor, cryptography` |
+| `rv_zykn`     | `ysha2cl_yy` | `ys2, ys1, yd`                  | `tensor, cryptography` |
+| `rv_zykn`     | `ysha2ms_yy` | `ys2, ys1, yd`                  | `tensor, cryptography` |
+| `rv_zyksed`   | `ysm4k_yi`   | `ys2, zimm5, yd`                | `tensor, cryptography` |
+| `rv_zyksed`   | `ysm4r_ys`   | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zyksed`   | `ysm4r_yy`   | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zyksh`    | `ysm3c_yi`   | `ys2, zimm5, yd`                | `tensor, cryptography` |
+| `rv_zyksh`    | `ysm3me_yy`  | `ys2, ys1, yd`                  | `tensor, cryptography` |
+| `rv_zyks`     | `yandn_yy`   | `ym, ys2, ys1, yd`              | `tensor, cryptography` |
+| `rv_zyks`     | `yandn_yx`   | `ym, ys2, rs1, yd`              | `tensor, cryptography` |
+| `rv_zyks`     | `ybrev8_y`   | `ym, ys2, yd`                   | `tensor, cryptography` |
+| `rv_zyks`     | `yrev8_y`    | `ym, ys2, yd`                   | `tensor, cryptography` |
+| `rv_zyks`     | `yrol_yy`    | `ym, ys2, ys1, yd`              | `tensor, cryptography` |
+| `rv_zyks`     | `yrol_yx`    | `ym, ys2, rs1, yd`              | `tensor, cryptography` |
+| `rv_zyks`     | `yror_yi`    | `zimm6hi, ym, ys2, zimm6lo, yd` | `tensor, cryptography` |
+| `rv_zyks`     | `yror_yy`    | `ym, ys2, ys1, yd`              | `tensor, cryptography` |
+| `rv_zyks`     | `yror_yx`    | `ym, ys2, rs1, yd`              | `tensor, cryptography` |
+| `rv_zyks`     | `ysm3c_yi`   | `ys2, zimm5, yd`                | `tensor, cryptography` |
+| `rv_zyks`     | `ysm3me_yy`  | `ys2, ys1, yd`                  | `tensor, cryptography` |
+| `rv_zyks`     | `ysm4k_yi`   | `ys2, zimm5, yd`                | `tensor, cryptography` |
+| `rv_zyks`     | `ysm4r_ys`   | `ys2, yd`                       | `tensor, cryptography` |
+| `rv_zyks`     | `ysm4r_yy`   | `ys2, yd`                       | `tensor, cryptography` |
 
-:RV32I - "RV32I Base Integer Instruction Set"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `ld`            | `load`    |
-| `sd`            | `store`   |
-| `addiw`         | `alu`     |
-| `slliw`         | `alu`     |
-| `srliw`         | `alu`     |
-| `sraiw`         | `alu`     |
-| `addw`          | `alu`     |
-| `subw`          | `alu`     |
-| `sllw`          | `alu`     |
-| `srlw`          | `alu`     |
-| `sraw`          | `alu`     |
-
-:RV64I - "RV64I Base Integer Instruction Set (+ RV32I)"
-
-| **Instruction** | **Class**      |
-|:----------------|:---------------|
-| `mul`           | `alu,multiply` |
-| `mulh`          | `alu,multiply` |
-| `mulhsu`        | `alu,multiply` |
-| `mulhu`         | `alu,multiply` |
-| `div`           | `alu,divide`   |
-| `divu`          | `alu,divide`   |
-| `rem`           | `alu,divide`   |
-| `remu`          | `alu,divide`   |
-
-:RV32M - "RV32M Standard Extension for Integer Multiply and Divide"
-
-| **Instruction** | **Class**      |
-|:----------------|:---------------|
-| `mulw`          | `alu,multiply` |
-| `divw`          | `alu,multiply` |
-| `divuw`         | `alu,multiply` |
-| `remw`          | `alu,divide`   |
-| `remuw`         | `alu,divide`   |
-
-:RV64M - "RV64M Standard Extension for Integer Multiply and Divide (+ RV32M)"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `lr.w`          | `atomic`  |
-| `sc.w`          | `atomic`  |
-| `amoswap.w`     | `atomic`  |
-| `amoadd.w`      | `atomic`  |
-| `amoxor.w`      | `atomic`  |
-| `amoor.w`       | `atomic`  |
-| `amoand.w`      | `atomic`  |
-| `amomin.w`      | `atomic`  |
-| `amomax.w`      | `atomic`  |
-| `amominu.w`     | `atomic`  |
-| `amomaxu.w`     | `atomic`  |
-
-:RV32A - "RV32A Standard Extension for Atomic Instructions"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `lr.d`          | `atomic`  |
-| `sc.d`          | `atomic`  |
-| `amoswap.d`     | `atomic`  |
-| `amoadd.d`      | `atomic`  |
-| `amoxor.d`      | `atomic`  |
-| `amoor.d`       | `atomic`  |
-| `amoand.d`      | `atomic`  |
-| `amomin.d`      | `atomic`  |
-| `amomax.d`      | `atomic`  |
-| `amominu.d`     | `atomic`  |
-| `amomaxu.d`     | `atomic`  |
-
-:RV64A - "RV64A Standard Extension for Atomic Instructions (+ RV32A)"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `ecall`         | `system`  |
-| `ebreak`        | `system`  |
-| `uret`          | `system`  |
-| `sret`          | `system`  |
-| `hret`          | `system`  |
-| `mret`          | `system`  |
-| `dret`          | `system`  |
-| `sfence.vm`     | `system`  |
-| `wfi`           | `system`  |
-| `rdcycle`       | `csr`     |
-| `rdtime`        | `csr`     |
-| `rdinstret`     | `csr`     |
-| `rdcycleh`      | `csr`     |
-| `rdtimeh`       | `csr`     |
-| `rdinstreth`    | `csr`     |
-| `csrrw`         | `csr`     |
-| `csrrs`         | `csr`     |
-| `csrrc`         | `csr`     |
-| `csrrwi`        | `csr`     |
-| `csrrsi`        | `csr`     |
-| `csrrci`        | `csr`     |
-
-:RV32S - "RV32S Standard Extension for Supervisor-level Instructions"
-
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `flw`           | `fpu,load`  |
-| `fsw`           | `fpu,store` |
-| `fmadd.s`       | `fpu,fma`   |
-| `fmsub.s`       | `fpu,fma`   |
-| `fnmadd.s`      | `fpu,fma`   |
-| `fnmsub.s`      | `fpu,fma`   |
-| `fadd.s`        | `fpu`       |
-| `fsub.s`        | `fpu`       |
-| `fmul.s`        | `fpu`       |
-| `fdiv.s`        | `fpu,fdiv`  |
-| `fsgnj.s`       | `fpu`       |
-| `fsgnjn.s`      | `fpu`       |
-| `fsgnjx.s`      | `fpu`       |
-| `fmin.s`        | `fpu`       |
-| `fmax.s`        | `fpu`       |
-| `fsqrt.s`       | `fpu,fsqrt` |
-| `fle.s`         | `fpu`       |
-| `flt.s`         | `fpu`       |
-| `feq.s`         | `fpu`       |
-| `fcvt.w.s`      | `fpu,fcvt`  |
-| `fcvt.wu.s`     | `fpu,fcvt`  |
-| `fcvt.s.w`      | `fpu,fcvt`  |
-| `fcvt.s.wu`     | `fpu,fcvt`  |
-| `fmv.x.s`       | `fpu,fmove` |
-| `fclass.s`      | `fpu`       |
-| `fmv.s.x`       | `fpu,fmove` |
-
-:RV32F - "RV32F Standard Extension for Single-Precision Floating-Point"
-
-| **Instruction** | **Class**  |
-|:----------------|:-----------|
-| `fcvt.l.s`      | `fpu,fcvt` |
-| `fcvt.lu.s`     | `fpu,fcvt` |
-| `fcvt.s.l`      | `fpu,fcvt` |
-| `fcvt.s.lu`     | `fpu,fcvt` |
-
-:RV64F - "RV64F Standard Extension for Single-Precision Floating-Point (+ RV32F)"
-
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `fld`           | `fpu,load`  |
-| `fsd`           | `fpu,store` |
-| `fmadd.d`       | `fpu,fma`   |
-| `fmsub.d`       | `fpu,fma`   |
-| `fnmadd.d`      | `fpu,fma`   |
-| `fnmsub.d`      | `fpu,fma`   |
-| `fadd.d`        | `fpu`       |
-| `fsub.d`        | `fpu`       |
-| `fmul.d`        | `fpu`       |
-| `fdiv.d`        | `fpu,fdiv`  |
-| `fsgnj.d`       | `fpu`       |
-| `fsgnjn.d`      | `fpu`       |
-| `fsgnjx.d`      | `fpu`       |
-| `fmin.d`        | `fpu`       |
-| `fmax.d`        | `fpu`       |
-| `fcvt.s.d`      | `fpu,fcvt`  |
-| `fcvt.d.s`      | `fpu,fcvt`  |
-| `fsqrt.d`       | `fpu,fsqrt` |
-| `fle.d`         | `fpu`       |
-| `flt.d`         | `fpu`       |
-| `feq.d`         | `fpu`       |
-| `fcvt.w.d`      | `fpu,fcvt`  |
-| `fcvt.wu.d`     | `fpu,fcvt`  |
-| `fcvt.d.w`      | `fpu,fcvt`  |
-| `fcvt.d.wu`     | `fpu,fcvt`  |
-| `fclass.d`      | `fpu`       |
-
-:RV32D - "RV32D Standard Extension for Double-Precision Floating-Point"
-
-| **Instruction** | **Class**   |
-|:----------------|:------------|
-| `fcvt.l.d`      | `fpu,fcvt`  |
-| `fcvt.lu.d`     | `fpu,fcvt`  |
-| `fmv.x.d`       | `fpu,fmove` |
-| `fcvt.d.l`      | `fpu,fcvt`  |
-| `fcvt.d.lu`     | `fpu,fcvt`  |
-| `fmv.d.x`       | `fpu,fmove` |
-
-:RV64D - "RV64D Standard Extension for Double-Precision Floating-Point (+ RV32D)"
-
-| **Instruction** | **Class** |
-|:----------------|:----------|
-| `frcsr`         | `csr`     |
-| `frrm`          | `csr`     |
-| `frflags`       | `csr`     |
-| `fscsr`         | `csr`     |
-| `fsrm`          | `csr`     |
-| `fsflags`       | `csr`     |
-| `fsrmi`         | `csr`     |
-| `fsflagsi`      | `csr`     |
-
-:RV32FD - "RV32F and RV32D Common Floating-Point Instructions"
+:RVZYK - Specific Extension for Tensor Cryptography Instructions

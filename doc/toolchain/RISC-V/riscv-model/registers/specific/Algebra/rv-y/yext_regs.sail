@@ -1,352 +1,423 @@
 // =======================================================================================
-// This Sail RISC-V architecture model, comprising all files and
+// This Sail RISC-Y architecture model, comprising all files and
 // directories except where otherwise noted is subject the BSD
 // two-clause license in the LICENSE file.
 //
 // SPDX-License-Identifier: BSD-2-Clause
 // =======================================================================================
 
-newtype vregidx = Vregidx : bits(5)
-newtype vregno = Vregno : range(0, 31)
+newtype yregidx = Yregidx : bits(5)
+newtype yregno = Yregno : range(0, 31)
 
-function vregidx_to_vregno (Vregidx(b) : vregidx) -> vregno = Vregno(unsigned(b))
-function vregno_to_vregidx (Vregno(b) : vregno) -> vregidx = Vregidx(to_bits(5, b))
+function y_yregidx_to_yregno(Yregidx(b) : yregidx) -> yregno = Yregno(unsigned(b))
+function y_yregno_to_yregidx(Yregno(b) : yregno) -> yregidx = Yregidx(to_bits(5, b))
 
-function vregidx_offset(Vregidx(r) : vregidx, o : bits(5)) -> vregidx = Vregidx(r + o)
-function vregidx_offset_range(Vregidx(r) : vregidx, o : range(0, 31)) -> vregidx = Vregidx(r + o)
+function y_yregidx_offset(Yregidx(r) : yregidx, o : bits(5)) -> yregidx = Yregidx(r + o)
+function y_yregidx_offset_range(Yregidx(r) : yregidx, o : range(0, 31)) -> yregidx = Yregidx(r + o)
 
-overload operator + = { vregidx_offset, vregidx_offset_range }
+overload operator + = { y_yregidx_offset, y_yregidx_offset_range }
 
-function vregidx_bits (Vregidx(b) : vregidx) -> bits(5) = b
+function y_yregidx_bits(Yregidx(b) : yregidx) -> bits(5) = b
 
-mapping encdec_vreg : vregidx <-> bits(5) = { Vregidx(r) <-> r }
+mapping y_encdec_yreg : yregidx <-> bits(5) = { Yregidx(r) <-> r }
 
-val vreg_write_callback = pure {cpp: "vreg_write_callback"} : (vregidx, vlenbits) -> unit
-function vreg_write_callback(_) = ()
-
-let zvreg : vregidx = Vregidx(0b00000) // v0, zero register
-
-// vector registers
-register vr0 : vlenbits
-register vr1 : vlenbits
-register vr2 : vlenbits
-register vr3 : vlenbits
-register vr4 : vlenbits
-register vr5 : vlenbits
-register vr6 : vlenbits
-register vr7 : vlenbits
-register vr8 : vlenbits
-register vr9 : vlenbits
-register vr10 : vlenbits
-register vr11 : vlenbits
-register vr12 : vlenbits
-register vr13 : vlenbits
-register vr14 : vlenbits
-register vr15 : vlenbits
-register vr16 : vlenbits
-register vr17 : vlenbits
-register vr18 : vlenbits
-register vr19 : vlenbits
-register vr20 : vlenbits
-register vr21 : vlenbits
-register vr22 : vlenbits
-register vr23 : vlenbits
-register vr24 : vlenbits
-register vr25 : vlenbits
-register vr26 : vlenbits
-register vr27 : vlenbits
-register vr28 : vlenbits
-register vr29 : vlenbits
-register vr30 : vlenbits
-register vr31 : vlenbits
-
-mapping vreg_name_raw : bits(5) <-> string = {
-    0b00000 <-> "v0",
-    0b00001 <-> "v1",
-    0b00010 <-> "v2",
-    0b00011 <-> "v3",
-    0b00100 <-> "v4",
-    0b00101 <-> "v5",
-    0b00110 <-> "v6",
-    0b00111 <-> "v7",
-    0b01000 <-> "v8",
-    0b01001 <-> "v9",
-    0b01010 <-> "v10",
-    0b01011 <-> "v11",
-    0b01100 <-> "v12",
-    0b01101 <-> "v13",
-    0b01110 <-> "v14",
-    0b01111 <-> "v15",
-    0b10000 <-> "v16",
-    0b10001 <-> "v17",
-    0b10010 <-> "v18",
-    0b10011 <-> "v19",
-    0b10100 <-> "v20",
-    0b10101 <-> "v21",
-    0b10110 <-> "v22",
-    0b10111 <-> "v23",
-    0b11000 <-> "v24",
-    0b11001 <-> "v25",
-    0b11010 <-> "v26",
-    0b11011 <-> "v27",
-    0b11100 <-> "v28",
-    0b11101 <-> "v29",
-    0b11110 <-> "v30",
-    0b11111 <-> "v31"
+val y_yreg_write_callback : (yregidx, ylenbits) -> unit
+function y_yreg_write_callback(rid, value) = {
+  if algebra_trace_writes then
+    print_endline("ALGEBRA Y " ^ dec_str(unsigned(y_yregidx_bits(rid))) ^ " " ^ hex_str(unsigned(value)))
 }
 
-mapping vreg_name : vregidx <-> string = { Vregidx(i) <-> vreg_name_raw(i) }
+let y_zyreg : yregidx = Yregidx(0b00000) // y0, default mask register
 
-function rV (Vregno(r) : vregno) -> vlenbits = {
+// tensor registers
+register yr0 : ylenbits
+register yr1 : ylenbits
+register yr2 : ylenbits
+register yr3 : ylenbits
+register yr4 : ylenbits
+register yr5 : ylenbits
+register yr6 : ylenbits
+register yr7 : ylenbits
+register yr8 : ylenbits
+register yr9 : ylenbits
+register yr10 : ylenbits
+register yr11 : ylenbits
+register yr12 : ylenbits
+register yr13 : ylenbits
+register yr14 : ylenbits
+register yr15 : ylenbits
+register yr16 : ylenbits
+register yr17 : ylenbits
+register yr18 : ylenbits
+register yr19 : ylenbits
+register yr20 : ylenbits
+register yr21 : ylenbits
+register yr22 : ylenbits
+register yr23 : ylenbits
+register yr24 : ylenbits
+register yr25 : ylenbits
+register yr26 : ylenbits
+register yr27 : ylenbits
+register yr28 : ylenbits
+register yr29 : ylenbits
+register yr30 : ylenbits
+register yr31 : ylenbits
+
+mapping y_yreg_name_raw : bits(5) <-> string = {
+  0b00000 <-> "y0",
+  0b00001 <-> "y1",
+  0b00010 <-> "y2",
+  0b00011 <-> "y3",
+  0b00100 <-> "y4",
+  0b00101 <-> "y5",
+  0b00110 <-> "y6",
+  0b00111 <-> "y7",
+  0b01000 <-> "y8",
+  0b01001 <-> "y9",
+  0b01010 <-> "y10",
+  0b01011 <-> "y11",
+  0b01100 <-> "y12",
+  0b01101 <-> "y13",
+  0b01110 <-> "y14",
+  0b01111 <-> "y15",
+  0b10000 <-> "y16",
+  0b10001 <-> "y17",
+  0b10010 <-> "y18",
+  0b10011 <-> "y19",
+  0b10100 <-> "y20",
+  0b10101 <-> "y21",
+  0b10110 <-> "y22",
+  0b10111 <-> "y23",
+  0b11000 <-> "y24",
+  0b11001 <-> "y25",
+  0b11010 <-> "y26",
+  0b11011 <-> "y27",
+  0b11100 <-> "y28",
+  0b11101 <-> "y29",
+  0b11110 <-> "y30",
+  0b11111 <-> "y31"
+}
+
+mapping y_yreg_name : yregidx <-> string = { Yregidx(i) <-> y_yreg_name_raw(i) }
+
+function y_rY(Yregno(r) : yregno) -> ylenbits = {
   match r {
-    0 => vr0,
-    1 => vr1,
-    2 => vr2,
-    3 => vr3,
-    4 => vr4,
-    5 => vr5,
-    6 => vr6,
-    7 => vr7,
-    8 => vr8,
-    9 => vr9,
-    10 => vr10,
-    11 => vr11,
-    12 => vr12,
-    13 => vr13,
-    14 => vr14,
-    15 => vr15,
-    16 => vr16,
-    17 => vr17,
-    18 => vr18,
-    19 => vr19,
-    20 => vr20,
-    21 => vr21,
-    22 => vr22,
-    23 => vr23,
-    24 => vr24,
-    25 => vr25,
-    26 => vr26,
-    27 => vr27,
-    28 => vr28,
-    29 => vr29,
-    30 => vr30,
-    31 => vr31,
+    0 => yr0,
+    1 => yr1,
+    2 => yr2,
+    3 => yr3,
+    4 => yr4,
+    5 => yr5,
+    6 => yr6,
+    7 => yr7,
+    8 => yr8,
+    9 => yr9,
+    10 => yr10,
+    11 => yr11,
+    12 => yr12,
+    13 => yr13,
+    14 => yr14,
+    15 => yr15,
+    16 => yr16,
+    17 => yr17,
+    18 => yr18,
+    19 => yr19,
+    20 => yr20,
+    21 => yr21,
+    22 => yr22,
+    23 => yr23,
+    24 => yr24,
+    25 => yr25,
+    26 => yr26,
+    27 => yr27,
+    28 => yr28,
+    29 => yr29,
+    30 => yr30,
+    31 => yr31,
   }
 }
 
-function dirty_v_context() -> unit = {
-  assert(hartSupports(Ext_Zve32x));
-  mstatus[VS] = extStatus_to_bits(Dirty);
-  mstatus[SD] = 0b1;
-  long_csr_write_callback("mstatus", "mstatush", mstatus.bits);
-}
+// W/Y state is independent of mstatus.VS and the Y register bank.
+// Internal emulator bookkeeping, not a new architectural CSR or mstatus bit.
+register y_context_dirty : bool
+function y_clear_context_dirty() -> unit = { y_context_dirty = false }
+function y_dirty_y_context() -> unit = { y_context_dirty = true }
 
-function wV (Vregno(r) : vregno, v : vlenbits) -> unit = {
+function y_wY(Yregno(r) : yregno, y : ylenbits) -> unit = {
   match r {
-    0 => vr0 = v,
-    1 => vr1 = v,
-    2 => vr2 = v,
-    3 => vr3 = v,
-    4 => vr4 = v,
-    5 => vr5 = v,
-    6 => vr6 = v,
-    7 => vr7 = v,
-    8 => vr8 = v,
-    9 => vr9 = v,
-    10 => vr10 = v,
-    11 => vr11 = v,
-    12 => vr12 = v,
-    13 => vr13 = v,
-    14 => vr14 = v,
-    15 => vr15 = v,
-    16 => vr16 = v,
-    17 => vr17 = v,
-    18 => vr18 = v,
-    19 => vr19 = v,
-    20 => vr20 = v,
-    21 => vr21 = v,
-    22 => vr22 = v,
-    23 => vr23 = v,
-    24 => vr24 = v,
-    25 => vr25 = v,
-    26 => vr26 = v,
-    27 => vr27 = v,
-    28 => vr28 = v,
-    29 => vr29 = v,
-    30 => vr30 = v,
-    31 => vr31 = v,
+    0 => yr0 = y,
+    1 => yr1 = y,
+    2 => yr2 = y,
+    3 => yr3 = y,
+    4 => yr4 = y,
+    5 => yr5 = y,
+    6 => yr6 = y,
+    7 => yr7 = y,
+    8 => yr8 = y,
+    9 => yr9 = y,
+    10 => yr10 = y,
+    11 => yr11 = y,
+    12 => yr12 = y,
+    13 => yr13 = y,
+    14 => yr14 = y,
+    15 => yr15 = y,
+    16 => yr16 = y,
+    17 => yr17 = y,
+    18 => yr18 = y,
+    19 => yr19 = y,
+    20 => yr20 = y,
+    21 => yr21 = y,
+    22 => yr22 = y,
+    23 => yr23 = y,
+    24 => yr24 = y,
+    25 => yr25 = y,
+    26 => yr26 = y,
+    27 => yr27 = y,
+    28 => yr28 = y,
+    29 => yr29 = y,
+    30 => yr30 = y,
+    31 => yr31 = y,
   };
 
-  dirty_v_context();
+  y_dirty_y_context();
 
-  vreg_write_callback(vregno_to_vregidx(Vregno(r)), v);
+  y_yreg_write_callback(y_yregno_to_yregidx(Yregno(r)), y)
 }
 
-function rV_bits(i: vregidx) -> vlenbits = rV(vregidx_to_vregno(i))
+function y_rY_bits(i : yregidx) -> ylenbits = y_rY(y_yregidx_to_yregno(i))
 
-function wV_bits(i: vregidx, data: vlenbits) -> unit = {
-  wV(vregidx_to_vregno(i)) = data
+function y_wY_bits(i : yregidx, data : ylenbits) -> unit = {
+  y_wY(y_yregidx_to_yregno(i)) = data
 }
 
-overload V = {rV_bits, wV_bits, rV, wV}
+overload Y = {y_rY_bits, y_wY_bits, y_rY, y_wY}
 
-function init_vregs() -> unit = {
-  let zero_vreg : vlenbits = zeros();
-  vr0  = zero_vreg;
-  vr1  = zero_vreg;
-  vr2  = zero_vreg;
-  vr3  = zero_vreg;
-  vr4  = zero_vreg;
-  vr5  = zero_vreg;
-  vr6  = zero_vreg;
-  vr7  = zero_vreg;
-  vr8  = zero_vreg;
-  vr9  = zero_vreg;
-  vr10 = zero_vreg;
-  vr11 = zero_vreg;
-  vr12 = zero_vreg;
-  vr13 = zero_vreg;
-  vr14 = zero_vreg;
-  vr15 = zero_vreg;
-  vr16 = zero_vreg;
-  vr17 = zero_vreg;
-  vr18 = zero_vreg;
-  vr19 = zero_vreg;
-  vr20 = zero_vreg;
-  vr21 = zero_vreg;
-  vr22 = zero_vreg;
-  vr23 = zero_vreg;
-  vr24 = zero_vreg;
-  vr25 = zero_vreg;
-  vr26 = zero_vreg;
-  vr27 = zero_vreg;
-  vr28 = zero_vreg;
-  vr29 = zero_vreg;
-  vr30 = zero_vreg;
-  vr31 = zero_vreg
+function y_init_yregs() -> unit = {
+  let zero_yreg : ylenbits = zeros();
+  yr0 = zero_yreg;
+  yr1 = zero_yreg;
+  yr2 = zero_yreg;
+  yr3 = zero_yreg;
+  yr4 = zero_yreg;
+  yr5 = zero_yreg;
+  yr6 = zero_yreg;
+  yr7 = zero_yreg;
+  yr8 = zero_yreg;
+  yr9 = zero_yreg;
+  yr10 = zero_yreg;
+  yr11 = zero_yreg;
+  yr12 = zero_yreg;
+  yr13 = zero_yreg;
+  yr14 = zero_yreg;
+  yr15 = zero_yreg;
+  yr16 = zero_yreg;
+  yr17 = zero_yreg;
+  yr18 = zero_yreg;
+  yr19 = zero_yreg;
+  yr20 = zero_yreg;
+  yr21 = zero_yreg;
+  yr22 = zero_yreg;
+  yr23 = zero_yreg;
+  yr24 = zero_yreg;
+  yr25 = zero_yreg;
+  yr26 = zero_yreg;
+  yr27 = zero_yreg;
+  yr28 = zero_yreg;
+  yr29 = zero_yreg;
+  yr30 = zero_yreg;
+  yr31 = zero_yreg
 }
 
-// vector csrs
+// tensor csrs
 
-register vstart : xlenbits
-register vl     : xlenbits
+// Although `ystart` is XLEN-bit wide, it is defined to have only
+// enough writable bits to hold the largest element index (one less
+// than the maximum YLMAX).The maximum tensor length is obtained with
+// the largest LMUL setting (8) and the smallest SEW setting (8), so
+// YLMAX_max = 8*YLEN/8 = YLEN. For example, for YLEN=256, ystart
+// would have 8 bits to represent indices from 0 through 255.
+register ystart : bits(ylen_exp)
 
-let VLENB : xlenbits = to_bits(vlen / 8)
+// The number of bits implemented in yl depends on the
+// implementation’s maximum tensor length of the smallest supported
+// type. `yl` specifies a number of elements, which can be one greater
+// than the last index.
+register yl : bits(ylen_exp + 1)
 
-bitfield Vtype  : xlenbits = {
-  vill      : xlen - 1,
-  reserved  : xlen - 2 .. 8,
-  vma       : 7,
-  vta       : 6,
-  vsew      : 5 .. 3,
-  vlmul     : 2 .. 0
+let YLENB : xlenbits = to_bits(ylen / 8)
+
+bitfield Ytype  : xlenbits = {
+ yill      : xlen - 1,
+ y_reserved  : xlen - 2 .. 8,
+ yma       : 7,
+ yta       : 6,
+ ysew      : 5 .. 3,
+ ylmul     : 2 .. 0
 }
-register vtype : Vtype
+register ytype : Ytype
 
-type SEW_pow = range(3, 6)
-type LMUL_pow = range(-3, 3)
+type Y_SEW_pow = range(3, 6)
+type Y_LMUL_pow = range(-3, 3)
 
-function is_invalid_sew_pow(v : bits(3)) -> bool =
-  v >_u 0b011
+function y_is_invalid_sew_pow(y : bits(3)) -> bool =
+  y >_u 0b011
 
-function is_invalid_lmul_pow(v : bits(3)) -> bool =
-  v == 0b100
+function y_is_invalid_lmul_pow(y : bits(3)) -> bool =
+  y == 0b100
 
 // The dynamic selected element width (SEW).
 // This returns the power of 2 exponent in *bits* (hence the + 3).
-function get_sew_pow() -> SEW_pow = {
-  let sew_pow = unsigned(vtype[vsew]);
+function y_get_sew_pow() -> Y_SEW_pow = {
+  let sew_pow = unsigned(ytype[ysew]);
   assert(sew_pow < 4, "Reserved SEW stored in vtype register. This should be impossible.");
   sew_pow + 3
 }
 
 // Valid SEW sizes in bits.
-type sew_bitsize = {8, 16, 32, 64}
-type is_sew_bitsize('n) -> Bool = 'n in {8, 16, 32, 64}
+type y_sew_bitsize = {8, 16, 32, 64}
+type y_is_sew_bitsize('n) -> Bool = 'n in {8, 16, 32, 64}
 
 // this returns the actual value of SEW
-function get_sew() -> sew_bitsize =
-  2 ^ get_sew_pow()
+function y_get_sew() -> y_sew_bitsize =
+  2 ^ y_get_sew_pow()
 
 // this returns the value of SEW in bytes
-function get_sew_bytes() -> {1, 2, 4, 8} =
-  get_sew() / 8
+function y_get_sew_bytes() -> {1, 2, 4, 8} =
+  y_get_sew() / 8
 
-// The vector register group multiplier (LMUL).
+// The tensor register group multiplier (LMUL).
 // This returns the power of 2 exponent.
-function get_lmul_pow() -> LMUL_pow = {
-  let lmul_pow = signed(vtype[vlmul]);
+function y_get_lmul_pow() -> Y_LMUL_pow = {
+  let lmul_pow = signed(ytype[ylmul]);
   assert(lmul_pow > -4, "Reserved LMUL stored in vtype register. This should be impossible.");
   lmul_pow
 }
 
-enum agtype = { UNDISTURBED, AGNOSTIC }
+enum y_agtype = { Y_UNDISTURBED, Y_AGNOSTIC }
 
-function decode_agtype(ag : bits(1)) -> agtype = {
+function y_decode_agtype(ag : bits(1)) -> y_agtype = {
   match ag {
-    0b0 => UNDISTURBED,
-    0b1 => AGNOSTIC
+    0b0 => Y_UNDISTURBED,
+    0b1 => Y_AGNOSTIC,
   }
 }
 
-function get_vtype_vma() -> agtype = decode_agtype(vtype[vma])
+function y_get_ytype_yma() -> y_agtype = y_decode_agtype(ytype[yma])
 
-function get_vtype_vta() -> agtype = decode_agtype(vtype[vta])
+function y_get_ytype_yta() -> y_agtype = y_decode_agtype(ytype[yta])
 
-bitfield Vcsr : bits(3) = {
-  vxrm  : 2 .. 1,
-  vxsat : 0
+bitfield Ycsr : bits(3) = {
+ yxrm  : 2 .. 1,
+ yxsat : 0
 }
-register vcsr : Vcsr
+register ycsr : Ycsr
 
-mapping clause csr_name_map = 0x008  <-> "vstart"
-mapping clause csr_name_map = 0x009  <-> "vxsat"
-mapping clause csr_name_map = 0x00A  <-> "vxrm"
-mapping clause csr_name_map = 0x00F  <-> "vcsr"
-mapping clause csr_name_map = 0xC20  <-> "vl"
-mapping clause csr_name_map = 0xC21  <-> "vtype"
-mapping clause csr_name_map = 0xC22  <-> "vlenb"
+mapping clause csr_name_map = 0x804  <-> "ystart"
+mapping clause csr_name_map = 0x805  <-> "yxsat"
+mapping clause csr_name_map = 0x806  <-> "yxrm"
+mapping clause csr_name_map = 0x807  <-> "ycsr"
+mapping clause csr_name_map = 0xCC4  <-> "yl"
+mapping clause csr_name_map = 0xCC5  <-> "ytype"
+mapping clause csr_name_map = 0xCC6  <-> "ylenb"
 
-function clause is_CSR_accessible(0x008, _, _) = currentlyEnabled(Ext_Zve32x) // vstart
-function clause is_CSR_accessible(0x009, _, _) = currentlyEnabled(Ext_Zve32x) // vxsat
-function clause is_CSR_accessible(0x00A, _, _) = currentlyEnabled(Ext_Zve32x) // vxrm
-function clause is_CSR_accessible(0x00F, _, _) = currentlyEnabled(Ext_Zve32x) // vcsr
-function clause is_CSR_accessible(0xC20, _, _) = currentlyEnabled(Ext_Zve32x) // vl
-function clause is_CSR_accessible(0xC21, _, _) = currentlyEnabled(Ext_Zve32x) // vtype
-function clause is_CSR_accessible(0xC22, _, _) = currentlyEnabled(Ext_Zve32x) // vlenb
+function clause is_CSR_accessible(0x804, _, _) = currentlyEnabled(Ext_Y) // ystart
+function clause is_CSR_accessible(0x805, _, _) = currentlyEnabled(Ext_Y) // yxsat
+function clause is_CSR_accessible(0x806, _, _) = currentlyEnabled(Ext_Y) // yxrm
+function clause is_CSR_accessible(0x807, _, _) = currentlyEnabled(Ext_Y) // ycsr
+function clause is_CSR_accessible(0xCC4, _, _) = currentlyEnabled(Ext_Y) // yl
+function clause is_CSR_accessible(0xCC5, _, _) = currentlyEnabled(Ext_Y) // ytype
+function clause is_CSR_accessible(0xCC6, _, _) = currentlyEnabled(Ext_Y) // ylenb
 
-function clause is_CSR_exception_virtual(0x008, _, _) = false // vstart
-function clause is_CSR_exception_virtual(0x009, _, _) = false // vxsat
-function clause is_CSR_exception_virtual(0x00A, _, _) = false // vxrm
-function clause is_CSR_exception_virtual(0x00F, _, _) = false // vcsr
-function clause is_CSR_exception_virtual(0xC20, _, _) = false // vl
-function clause is_CSR_exception_virtual(0xC21, _, _) = false // vtype
-function clause is_CSR_exception_virtual(0xC22, _, _) = false // vlenb
+function clause is_CSR_exception_virtual(0x804, _, _) = false // ystart
+function clause is_CSR_exception_virtual(0x805, _, _) = false // yxsat
+function clause is_CSR_exception_virtual(0x806, _, _) = false // yxrm
+function clause is_CSR_exception_virtual(0x807, _, _) = false // ycsr
+function clause is_CSR_exception_virtual(0xCC4, _, _) = false // yl
+function clause is_CSR_exception_virtual(0xCC5, _, _) = false // ytype
+function clause is_CSR_exception_virtual(0xCC6, _, _) = false // ylenb
 
-function clause read_CSR(0x008) = vstart
-function clause read_CSR(0x009) = zero_extend(vcsr[vxsat])
-function clause read_CSR(0x00A) = zero_extend(vcsr[vxrm])
-function clause read_CSR(0x00F) = zero_extend(vcsr.bits)
-function clause read_CSR(0xC20) = vl
-function clause read_CSR(0xC21) = vtype.bits
-function clause read_CSR(0xC22) = VLENB
+function clause read_CSR(0x804) = zero_extend(ystart)
+function clause read_CSR(0x805) = zero_extend(ycsr[yxsat])
+function clause read_CSR(0x806) = zero_extend(ycsr[yxrm])
+function clause read_CSR(0x807) = zero_extend(ycsr.bits)
+function clause read_CSR(0xCC4) = zero_extend(yl)
+function clause read_CSR(0xCC5) = ytype.bits
+function clause read_CSR(0xCC6) = YLENB
 
-// Note: The spec recommends trapping if vstart is out of bounds but the
+// Note: The spec recommends trapping if ystart is out of bounds but the
 // current implementation does not yet do that.
 
-function set_vstart(value : bits(16)) -> unit = {
-  dirty_v_context();
-  vstart = zero_extend(value[(vlen_exp - 1) .. 0]);
-  csr_write_callback("vstart", vstart);
+function y_set_ystart(value : bits(16)) -> unit = {
+  y_dirty_y_context();
+  ystart = value[ylen_exp - 1 .. 0];
+  csr_write_callback("ystart", zero_extend(ystart))
 }
 
-private function write_vcsr(vxrm_val : bits(2), vxsat_val : bits(1)) -> unit = {
-  vcsr[vxrm]  = vxrm_val; // Note: frm can be an illegal value, 101, 110, 111
-  vcsr[vxsat] = vxsat_val;
-  dirty_v_context()
+private function y_write_ycsr(yxrm_val : bits(2), yxsat_val : bits(1)) -> unit = {
+  ycsr[yxrm] = yxrm_val; // Note: frm can be an illegal value, 101, 110, 111
+  ycsr[yxsat] = yxsat_val;
+  y_dirty_y_context()
 }
 
-function clause write_CSR(0x008, value) = { set_vstart(value[15 .. 0]); Ok(vstart) }
-function clause write_CSR(0x009, value) = { write_vcsr (vcsr[vxrm], value[0 .. 0]); Ok(zero_extend(vcsr[vxsat])) }
-function clause write_CSR(0x00A, value) = { write_vcsr (value[1 .. 0], vcsr[vxsat]); Ok(zero_extend(vcsr[vxrm])) }
-function clause write_CSR(0x00F, value) = { write_vcsr (value [2 .. 1], value [0 .. 0]); Ok(zero_extend(vcsr.bits)) }
+function y_write_yxsat(yxsat_val : bits(1)) -> unit = {
+  if ycsr[yxsat] != yxsat_val then {
+    ycsr[yxsat] = yxsat_val;
+    y_dirty_y_context()
+  };
+  csr_write_callback("yxsat", zero_extend(ycsr[yxsat]));
+  csr_write_callback("ycsr", zero_extend(ycsr.bits))
+}
+
+function clause write_CSR(0x804, value) = {
+  y_set_ystart(value[15 .. 0]);
+  Ok(zero_extend(ystart))
+}
+function clause write_CSR(0x805, value) = {
+  y_write_ycsr(ycsr[yxrm], value[0 .. 0]);
+  Ok(zero_extend(ycsr[yxsat]))
+}
+function clause write_CSR(0x806, value) = {
+  y_write_ycsr(value[1 .. 0], ycsr[yxsat]);
+  Ok(zero_extend(ycsr[yxrm]))
+}
+function clause write_CSR(0x807, value) = {
+  y_write_ycsr(value[2 .. 1], value[0 .. 0]);
+  Ok(zero_extend(ycsr.bits))
+}
+
+// Reset only this extension's control state.
+function y_reset() -> unit = {
+  y_context_dirty = false;
+  ystart = zeros();
+  yl = zeros();
+  ycsr.bits = zeros();
+  ytype.bits = 0b1 @ zeros(xlen - 1)
+}
+
+// Emulator-level save/restore API; no new architectural CSR or instruction.
+struct y_context_snapshot = {
+  data : vector(32, ylenbits),
+  start : bits(ylen_exp),
+  active : bits(ylen_exp + 1),
+  datatype : xlenbits,
+  control : bits(3),
+  dirty : bool
+}
+function y_save_context() -> y_context_snapshot = {
+  var data : vector(32, ylenbits) = vector_init(zeros());
+  foreach (p from 0 to 31) { data[p] = Y(Yregno(p)) };
+  struct { data = data, start = ystart, active = yl,
+    datatype = ytype.bits, control = ycsr.bits, dirty = y_context_dirty }
+}
+function y_restore_context(saved : y_context_snapshot) -> unit = {
+  foreach (p from 0 to 31) { Y(Yregno(p)) = saved.data[p] };
+  ystart = saved.start;
+  yl = saved.active;
+  ytype.bits = saved.datatype;
+  ycsr.bits = saved.control;
+  y_context_dirty = saved.dirty;
+  csr_write_callback("ystart", zero_extend(ystart));
+  csr_write_callback("yl", zero_extend(yl));
+  csr_write_callback("ytype", ytype.bits);
+  csr_write_callback("ycsr", zero_extend(ycsr.bits))
+}

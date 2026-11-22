@@ -6,40 +6,40 @@
 // SPDX-License-Identifier: BSD-2-Clause
 // =======================================================================================
 
-function clause currentlyEnabled(Ext_Zvkg) = hartSupports(Ext_Zvkg) & currentlyEnabled(Ext_Zve32x)
+function xw_crypto_kg_enabled() -> bool = (config extensions.Xw.crypto.kg : bool) & xw_enabled()
 
-union clause instruction = VGHSH_VV : (vregidx, vregidx, vregidx)
+union clause instruction = XWK_WGHSH_WW : (wregidx, wregidx, wregidx)
 
-$[wavedrom "_ _ _ OPMVV _ OP-VE"]
-mapping clause encdec = VGHSH_VV(vs2, vs1, vd)
-  <-> 0b1011001 @ encdec_vreg(vs2) @ encdec_vreg(vs1) @ 0b010 @ encdec_vreg(vd) @ 0b1110111
-  when currentlyEnabled(Ext_Zvkg) & get_sew() == 32 & zvk_check_encdec(128, 4)
+$[wavedrom "_ _ _ OPMWW _ CUSTOM-2"]
+mapping clause encdec = XWK_WGHSH_WW(ws2, ws1, wd)
+  <-> 0b1011001 @ encdec_wreg(ws2) @ encdec_wreg(ws1) @ 0b010 @ encdec_wreg(wd) @ 0b1011011
+  when valid_wtype() & xw_crypto_kg_enabled() & w_get_sew() == 32 & zwk_check_encdec(128, 4)
 
-function clause execute VGHSH_VV(vs2, vs1, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute XWK_WGHSH_WW(ws2, ws1, wd) = {
+  let SEW      = w_get_sew();
+  let LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(LMUL_pow, SEW);
 
-  if not(valid_reg_group(vs1, LMUL_pow)) |
-     not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
+  if not(w_valid_reg_group(ws1, LMUL_pow)) |
+     not(w_valid_reg_group(ws2, LMUL_pow)) |
+     not(w_valid_reg_group(wd, LMUL_pow))
   then return Illegal_Instruction();
 
   assert(SEW == 32);
 
-  let vs2_val = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vs1_val = read_vreg(num_elem, SEW, LMUL_pow, vs1);
-  let vd_val  = read_vreg(num_elem, SEW, LMUL_pow, vd);
+  let ws2_val = read_wreg(num_elem, SEW, LMUL_pow, ws2);
+  let ws1_val = read_wreg(num_elem, SEW, LMUL_pow, ws1);
+  let wd_val  = read_wreg(num_elem, SEW, LMUL_pow, wd);
 
-  let eg_len   = (unsigned(vl) / 4);
-  let eg_start = (unsigned(vstart) / 4);
+  let group_count = (unsigned(wl) / 4);
+  let first_group = (unsigned(wstart) / 4);
 
-  foreach (i from eg_start to (eg_len - 1)) {
-    assert(i * 4 + 3 < num_elem);
+  foreach (group_index from first_group to (group_count - 1)) {
+    assert(group_index * 4 + 3 < num_elem);
 
-    let Y : bits(128) = get_velem_quad(vd_val, i);
-    let X : bits(128) = get_velem_quad(vs1_val, i);
-    var H : bits(128) = brev8(get_velem_quad(vs2_val, i));
+    let Y : bits(128) = get_welem_quad(wd_val, group_index);
+    let X : bits(128) = get_welem_quad(ws1_val, group_index);
+    var H : bits(128) = brev8(get_welem_quad(ws2_val, group_index));
 
     var Z : bits(128) = zeros();
     let S : bits(128) = brev8(Y ^ X);
@@ -52,45 +52,45 @@ function clause execute VGHSH_VV(vs2, vs1, vd) = {
       if reduce then H = H[127..8] @ (H[7..0] ^ 0x87);
     };
 
-    write_velem_quad(vd, SEW, brev8(Z), i);
+    write_welem_quad(wd, SEW, brev8(Z), group_index);
   };
 
-  set_vstart(zeros());
+  set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VGHSH_VV(vs2, vs1, vd)
-  <-> "vghsh.vv" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2) ^ sep() ^ vreg_name(vs1)
+mapping clause assembly = XWK_WGHSH_WW(ws2, ws1, wd)
+  <-> "wghsh.ww" ^ spc() ^ wreg_name(wd) ^ sep() ^ wreg_name(ws2) ^ sep() ^ wreg_name(ws1)
 
-union clause instruction = VGMUL_VV : (vregidx, vregidx)
+union clause instruction = XWK_WGMUL_WW : (wregidx, wregidx)
 
-$[wavedrom "_ _ _ OPMVV _ OP-VE"]
-mapping clause encdec = VGMUL_VV(vs2, vd)
-  <-> 0b1010001 @ encdec_vreg(vs2) @ 0b10001 @ 0b010 @ encdec_vreg(vd) @ 0b1110111
-  when currentlyEnabled(Ext_Zvkg) & get_sew() == 32 & zvk_check_encdec(128, 4)
+$[wavedrom "_ _ _ OPMWW _ CUSTOM-2"]
+mapping clause encdec = XWK_WGMUL_WW(ws2, wd)
+  <-> 0b1010001 @ encdec_wreg(ws2) @ 0b10001 @ 0b010 @ encdec_wreg(wd) @ 0b1011011
+  when valid_wtype() & xw_crypto_kg_enabled() & w_get_sew() == 32 & zwk_check_encdec(128, 4)
 
-function clause execute VGMUL_VV(vs2, vd) = {
-  let SEW      = get_sew();
-  let LMUL_pow = get_lmul_pow();
-  let num_elem = get_num_elem(LMUL_pow, SEW);
+function clause execute XWK_WGMUL_WW(ws2, wd) = {
+  let SEW      = w_get_sew();
+  let LMUL_pow = w_get_lmul_pow();
+  let num_elem = w_get_num_elem(LMUL_pow, SEW);
 
-  if not(valid_reg_group(vs2, LMUL_pow)) |
-     not(valid_reg_group(vd, LMUL_pow))
+  if not(w_valid_reg_group(ws2, LMUL_pow)) |
+     not(w_valid_reg_group(wd, LMUL_pow))
   then return Illegal_Instruction();
 
   assert(SEW == 32);
 
-  let vs2_val = read_vreg(num_elem, SEW, LMUL_pow, vs2);
-  let vd_val  = read_vreg(num_elem, SEW, LMUL_pow, vd);
+  let ws2_val = read_wreg(num_elem, SEW, LMUL_pow, ws2);
+  let wd_val  = read_wreg(num_elem, SEW, LMUL_pow, wd);
 
-  let eg_len   = (unsigned(vl) / 4);
-  let eg_start = (unsigned(vstart) / 4);
+  let group_count = (unsigned(wl) / 4);
+  let first_group = (unsigned(wstart) / 4);
 
-  foreach (i from eg_start to (eg_len - 1)) {
-    assert(i * 4 + 3 < num_elem);
+  foreach (group_index from first_group to (group_count - 1)) {
+    assert(group_index * 4 + 3 < num_elem);
 
-    let Y : bits(128) = brev8(get_velem_quad(vd_val, i));
-    var H : bits(128) = brev8(get_velem_quad(vs2_val, i));
+    let Y : bits(128) = brev8(get_welem_quad(wd_val, group_index));
+    var H : bits(128) = brev8(get_welem_quad(ws2_val, group_index));
     var Z : bits(128) = zeros();
 
     foreach (b from 0 to 127) {
@@ -101,12 +101,12 @@ function clause execute VGMUL_VV(vs2, vd) = {
       if reduce then H = H[127..8] @ (H[7..0] ^ 0x87);
     };
 
-    write_velem_quad(vd, SEW, brev8(Z), i);
+    write_welem_quad(wd, SEW, brev8(Z), group_index);
   };
 
-  set_vstart(zeros());
+  set_wstart(zeros());
   RETIRE_SUCCESS
 }
 
-mapping clause assembly = VGMUL_VV(vs2, vd)
-  <-> "vgmul.vv" ^ spc() ^ vreg_name(vd) ^ sep() ^ vreg_name(vs2)
+mapping clause assembly = XWK_WGMUL_WW(ws2, wd)
+  <-> "wgmul.ww" ^ spc() ^ wreg_name(wd) ^ sep() ^ wreg_name(ws2)

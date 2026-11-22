@@ -106,7 +106,7 @@
 | `VFWNMACC`  | `VA_FORMAT`  | `ARITHMETIC` | `RVV`         | `{VV, VF}`           |
 | `VFWMSAC`   | `VA_FORMAT`  | `ARITHMETIC` | `RVV`         | `{VV, VF}`           |
 | `VFWNMSAC`  | `VA_FORMAT`  | `ARITHMETIC` | `RVV`         | `{VV, VF}`           |
-| `VFSQRT_V`  | `VS2_FORMAT` | `ARITHMETIC` | `RVV`         | `-`                  |
+| `VFSQRT_V`  | `VS2_FORMAT` | `ARITHMETIC` | `RVV`         | `none`               |
 | `VFMIN`     | `VA_FORMAT`  | `ARITHMETIC` | `RVV`         | `{VV, VF}`           |
 | `VFMAX`     | `VA_FORMAT`  | `ARITHMETIC` | `RVV`         | `{VV, VF}`           |
 | `VFSGNJ`    | `VA_FORMAT`  | `ARITHMETIC` | `RVV`         | `{VV, VF}`           |
@@ -118,7 +118,7 @@
 | `VMFLE`     | `VA_FORMAT`  | `COMPARE`    | `RVV`         | `{VV, VF}`           |
 | `VMFGT`     | `VA_FORMAT`  | `COMPARE`    | `RVV`         | `{VF}`               |
 | `VMFGE`     | `VA_FORMAT`  | `COMPARE`    | `RVV`         | `{VF}`               |
-| `VFCLASS_V` | `VS2_FORMAT` | `COMPARE`    | `RVV`         | `-`                  |
+| `VFCLASS_V` | `VS2_FORMAT` | `COMPARE`    | `RVV`         | `none`               |
 | `VFMERGE`   | `VA_FORMAT`  | `ARITHMETIC` | `RVV`         | `{VFM}`              |
 | `VFMV`      | `VA_FORMAT`  | `ARITHMETIC` | `RVV`         | `{VF}`               |
 

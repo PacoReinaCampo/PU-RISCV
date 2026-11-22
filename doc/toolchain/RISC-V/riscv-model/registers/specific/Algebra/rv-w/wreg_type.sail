@@ -1,131 +1,316 @@
 // =======================================================================================
-// This Sail RISC-V architecture model, comprising all files and
+// This Sail RISC-W architecture model, comprising all files and
 // directories except where otherwise noted is subject the BSD
 // two-clause license in the LICENSE file.
 //
 // SPDX-License-Identifier: BSD-2-Clause
 // =======================================================================================
 
-// Definitions for vector registers (V extension)
+// Definitions for matrix registers (W extension)
 
-type vlenbits = bits(vlen)
+type wlenbits = bits(wlen)
 
-// vector instruction types
+// matrix instruction types
 
-enum vvfunct6     = { VV_VADD, VV_VSUB, VV_VMINU, VV_VMIN, VV_VMAXU, VV_VMAX, VV_VAND, VV_VOR, VV_VXOR, VV_VRGATHER, VV_VRGATHEREI16, VV_VSADDU, VV_VSADD, VV_VSSUBU, VV_VSSUB, VV_VSLL, VV_VSMUL, VV_VSRL, VV_VSRA, VV_VSSRL, VV_VSSRA }
+enum w_wwfunct6 = {
+  W_WW_WADD,
+  W_WW_WSUB,
+  W_WW_WMINU,
+  W_WW_WMIN,
+  W_WW_WMAXU,
+  W_WW_WMAX,
+  W_WW_WAND,
+  W_WW_WOR,
+  W_WW_WXOR,
+  W_WW_WRGATHER,
+  W_WW_WRGATHEREI16,
+  W_WW_WSADDU,
+  W_WW_WSADD,
+  W_WW_WSSUBU,
+  W_WW_WSSUB,
+  W_WW_WSLL,
+  W_WW_WSMUL,
+  W_WW_WSRL,
+  W_WW_WSRA,
+  W_WW_WSSRL,
+  W_WW_WSSRA,
+}
 
-enum vvcmpfunct6  = { VVCMP_VMSEQ, VVCMP_VMSNE, VVCMP_VMSLTU, VVCMP_VMSLT, VVCMP_VMSLEU, VVCMP_VMSLE }
+enum w_wwcmpfunct6 = { W_WWCMP_WMSEQ, W_WWCMP_WMSNE, W_WWCMP_WMSLTU, W_WWCMP_WMSLT, W_WWCMP_WMSLEU, W_WWCMP_WMSLE }
 
-enum vvmfunct6    = { VVM_VMADC, VVM_VMSBC }
+enum w_wwmfunct6 = { W_WWM_WMADC, W_WWM_WMSBC }
 
-enum vvmcfunct6   = { VVMC_VMADC, VVMC_VMSBC }
+enum w_wwmcfunct6 = { W_WWMC_WMADC, W_WWMC_WMSBC }
 
-enum vvmsfunct6   = { VVMS_VADC, VVMS_VSBC }
+enum w_wwmsfunct6 = { W_WWMS_WADC, W_WWMS_WSBC }
 
-enum vxmfunct6    = { VXM_VMADC, VXM_VMSBC }
+enum w_wxmfunct6 = { W_WXM_WMADC, W_WXM_WMSBC }
 
-enum vxmcfunct6   = { VXMC_VMADC, VXMC_VMSBC }
+enum w_wxmcfunct6 = { W_WXMC_WMADC, W_WXMC_WMSBC }
 
-enum vxmsfunct6   = { VXMS_VADC, VXMS_VSBC }
+enum w_wxmsfunct6 = { W_WXMS_WADC, W_WXMS_WSBC }
 
-enum vimfunct6    = { VIM_VMADC }
+enum w_wimfunct6 = { W_WIM_WMADC }
 
-enum vimcfunct6   = { VIMC_VMADC }
+enum w_wimcfunct6 = { W_WIMC_WMADC }
 
-enum vimsfunct6   = { VIMS_VADC }
+enum w_wimsfunct6 = { W_WIMS_WADC }
 
-enum vxcmpfunct6  = { VXCMP_VMSEQ, VXCMP_VMSNE, VXCMP_VMSLTU, VXCMP_VMSLT, VXCMP_VMSLEU, VXCMP_VMSLE, VXCMP_VMSGTU, VXCMP_VMSGT }
+enum w_wxcmpfunct6 = {
+  W_WXCMP_WMSEQ,
+  W_WXCMP_WMSNE,
+  W_WXCMP_WMSLTU,
+  W_WXCMP_WMSLT,
+  W_WXCMP_WMSLEU,
+  W_WXCMP_WMSLE,
+  W_WXCMP_WMSGTU,
+  W_WXCMP_WMSGT,
+}
 
-enum vicmpfunct6  = { VICMP_VMSEQ, VICMP_VMSNE, VICMP_VMSLEU, VICMP_VMSLE, VICMP_VMSGTU, VICMP_VMSGT }
+enum w_wicmpfunct6 = { W_WICMP_WMSEQ, W_WICMP_WMSNE, W_WICMP_WMSLEU, W_WICMP_WMSLE, W_WICMP_WMSGTU, W_WICMP_WMSGT }
 
-enum nvfunct6     = { NV_VNCLIPU, NV_VNCLIP }
+enum w_nwfunct6 = { W_NW_WNCLIPU, W_NW_WNCLIP }
 
-enum nvsfunct6    = { NVS_VNSRL, NVS_VNSRA }
+enum w_nwsfunct6 = { W_NWS_WNSRL, W_NWS_WNSRA }
 
-enum nxfunct6     = { NX_VNCLIPU, NX_VNCLIP}
+enum w_nxfunct6 = { W_NX_WNCLIPU, W_NX_WNCLIP }
 
-enum nxsfunct6    = { NXS_VNSRL, NXS_VNSRA }
+enum w_nxsfunct6 = { W_NXS_WNSRL, W_NXS_WNSRA }
 
-enum mmfunct6     = { MM_VMAND, MM_VMNAND, MM_VMANDN, MM_VMXOR, MM_VMOR, MM_VMNOR, MM_VMORN, MM_VMXNOR }
+enum w_mmfunct6 = { W_MM_WMAND, W_MM_WMNAND, W_MM_WMANDN, W_MM_WMXOR, W_MM_WMOR, W_MM_WMNOR, W_MM_WMORN, W_MM_WMXNOR }
 
-enum nifunct6     = { NI_VNCLIPU, NI_VNCLIP }
+enum w_nifunct6 = { W_NI_WNCLIPU, W_NI_WNCLIP }
 
-enum nisfunct6    = { NIS_VNSRL, NIS_VNSRA }
+enum w_nisfunct6 = { W_NIS_WNSRL, W_NIS_WNSRA }
 
-enum wvvfunct6    = { WVV_VADD, WVV_VSUB, WVV_VADDU, WVV_VSUBU, WVV_VWMUL, WVV_VWMULU, WVV_VWMULSU }
+enum w_wide_wwfunct6 = {
+  W_WIDE_WW_WADD,
+  W_WIDE_WW_WSUB,
+  W_WIDE_WW_WADDU,
+  W_WIDE_WW_WSUBU,
+  W_WIDE_WW_WWMUL,
+  W_WIDE_WW_WWMULU,
+  W_WIDE_WW_WWMULSU,
+}
 
-enum wvfunct6     = { WV_VADD, WV_VSUB, WV_VADDU, WV_VSUBU }
+enum w_wide_wfunct6 = { W_WIDE_W_WADD, W_WIDE_W_WSUB, W_WIDE_W_WADDU, W_WIDE_W_WSUBU }
 
-enum wvxfunct6    = { WVX_VADD, WVX_VSUB, WVX_VADDU, WVX_VSUBU, WVX_VWMUL, WVX_VWMULU, WVX_VWMULSU }
+enum w_wide_wxfunct6 = {
+  W_WIDE_WX_WADD,
+  W_WIDE_WX_WSUB,
+  W_WIDE_WX_WADDU,
+  W_WIDE_WX_WSUBU,
+  W_WIDE_WX_WWMUL,
+  W_WIDE_WX_WWMULU,
+  W_WIDE_WX_WWMULSU,
+}
 
-enum wxfunct6     = { WX_VADD, WX_VSUB, WX_VADDU, WX_VSUBU }
+enum w_wide_xfunct6 = { W_WIDE_X_WADD, W_WIDE_X_WSUB, W_WIDE_X_WADDU, W_WIDE_X_WSUBU }
 
-enum vextfunct6   = { VEXT2_ZVF2, VEXT2_SVF2, VEXT4_ZVF4, VEXT4_SVF4, VEXT8_ZVF8, VEXT8_SVF8 }
+enum w_wextfunct6 = { W_WEXT2_ZVF2, W_WEXT2_SVF2, W_WEXT4_ZVF4, W_WEXT4_SVF4, W_WEXT8_ZVF8, W_WEXT8_SVF8 }
 
-enum vxfunct6     = { VX_VADD, VX_VSUB, VX_VRSUB, VX_VMINU, VX_VMIN, VX_VMAXU, VX_VMAX, VX_VAND, VX_VOR, VX_VXOR, VX_VSADDU, VX_VSADD, VX_VSSUBU, VX_VSSUB, VX_VSLL, VX_VSMUL, VX_VSRL, VX_VSRA, VX_VSSRL, VX_VSSRA }
+enum w_wxfunct6 = {
+  W_WX_WADD,
+  W_WX_WSUB,
+  W_WX_WRSUB,
+  W_WX_WMINU,
+  W_WX_WMIN,
+  W_WX_WMAXU,
+  W_WX_WMAX,
+  W_WX_WAND,
+  W_WX_WOR,
+  W_WX_WXOR,
+  W_WX_WSADDU,
+  W_WX_WSADD,
+  W_WX_WSSUBU,
+  W_WX_WSSUB,
+  W_WX_WSLL,
+  W_WX_WSMUL,
+  W_WX_WSRL,
+  W_WX_WSRA,
+  W_WX_WSSRL,
+  W_WX_WSSRA,
+}
 
-enum vifunct6     = { VI_VADD, VI_VRSUB, VI_VAND, VI_VOR, VI_VXOR, VI_VSADDU, VI_VSADD, VI_VSLL, VI_VSRL, VI_VSRA, VI_VSSRL, VI_VSSRA }
+enum w_wifunct6 = {
+  W_WI_WADD,
+  W_WI_WRSUB,
+  W_WI_WAND,
+  W_WI_WOR,
+  W_WI_WXOR,
+  W_WI_WSADDU,
+  W_WI_WSADD,
+  W_WI_WSLL,
+  W_WI_WSRL,
+  W_WI_WSRA,
+  W_WI_WSSRL,
+  W_WI_WSSRA,
+}
 
-enum vxsgfunct6   = { VX_VSLIDEUP, VX_VSLIDEDOWN, VX_VRGATHER }
+enum w_wxsgfunct6 = { W_WX_WSLIDEUP, W_WX_WSLIDEDOWN, W_WX_WRGATHER }
 
-enum visgfunct6   = { VI_VSLIDEUP, VI_VSLIDEDOWN, VI_VRGATHER }
+enum w_wisgfunct6 = { W_WI_WSLIDEUP, W_WI_WSLIDEDOWN, W_WI_WRGATHER }
 
-enum mvvfunct6    = { MVV_VAADDU, MVV_VAADD, MVV_VASUBU, MVV_VASUB, MVV_VMUL, MVV_VMULH, MVV_VMULHU, MVV_VMULHSU, MVV_VDIVU, MVV_VDIV, MVV_VREMU, MVV_VREM }
+enum w_mwwfunct6 = {
+  W_MWW_WAADDU,
+  W_MWW_WAADD,
+  W_MWW_WASUBU,
+  W_MWW_WASUB,
+  W_MWW_WMUL,
+  W_MWW_WMULH,
+  W_MWW_WMULHU,
+  W_MWW_WMULHSU,
+  W_MWW_WDIVU,
+  W_MWW_WDIV,
+  W_MWW_WREMU,
+  W_MWW_WREM,
+}
 
-enum mvvmafunct6  = { MVV_VMACC, MVV_VNMSAC, MVV_VMADD, MVV_VNMSUB }
+enum w_mwwmafunct6 = { W_MWW_WMACC, W_MWW_WNMSAC, W_MWW_WMADD, W_MWW_WNMSUB }
 
-enum rmvvfunct6   = { MVV_VREDSUM, MVV_VREDAND, MVV_VREDOR, MVV_VREDXOR, MVV_VREDMINU, MVV_VREDMIN, MVV_VREDMAXU, MVV_VREDMAX }
+enum w_rmwwfunct6 = {
+  W_MWW_WREDSUM,
+  W_MWW_WREDAND,
+  W_MWW_WREDOR,
+  W_MWW_WREDXOR,
+  W_MWW_WREDMINU,
+  W_MWW_WREDMIN,
+  W_MWW_WREDMAXU,
+  W_MWW_WREDMAX,
+}
 
-enum rivvfunct6   = { IVV_VWREDSUMU, IVV_VWREDSUM }
+enum w_riwwfunct6 = { W_IVV_WWREDSUMU, W_IVV_WWREDSUM }
 
-enum rfvvfunct6   = { FVV_VFREDOSUM, FVV_VFREDUSUM, FVV_VFREDMAX, FVV_VFREDMIN }
+enum w_rfwwfunct6 = { W_FWW_WFREDOSUM, W_FWW_WFREDUSUM, W_FWW_WFREDMAX, W_FWW_WFREDMIN }
 
-enum rfwvvfunct6  = { FVV_VFWREDOSUM, FVV_VFWREDUSUM }
+enum w_rfwide_wwfunct6 = { W_FWW_WFWREDOSUM, W_FWW_WFWREDUSUM }
 
-enum wmvvfunct6   = { WMVV_VWMACCU, WMVV_VWMACC, WMVV_VWMACCSU }
+enum w_wide_mwwfunct6 = { W_WIDE_MWW_WWMACCU, W_WIDE_MWW_WWMACC, W_WIDE_MWW_WWMACCSU }
 
-enum mvxfunct6    = { MVX_VAADDU, MVX_VAADD, MVX_VASUBU, MVX_VASUB, MVX_VSLIDE1UP, MVX_VSLIDE1DOWN, MVX_VMUL, MVX_VMULH, MVX_VMULHU, MVX_VMULHSU, MVX_VDIVU, MVX_VDIV, MVX_VREMU, MVX_VREM }
+enum w_mwxfunct6 = {
+  W_MWX_WAADDU,
+  W_MWX_WAADD,
+  W_MWX_WASUBU,
+  W_MWX_WASUB,
+  W_MWX_WSLIDE1UP,
+  W_MWX_WSLIDE1DOWN,
+  W_MWX_WMUL,
+  W_MWX_WMULH,
+  W_MWX_WMULHU,
+  W_MWX_WMULHSU,
+  W_MWX_WDIVU,
+  W_MWX_WDIV,
+  W_MWX_WREMU,
+  W_MWX_WREM,
+}
 
-enum mvxmafunct6  = { MVX_VMACC, MVX_VNMSAC, MVX_VMADD, MVX_VNMSUB }
+enum w_mwxmafunct6 = { W_MWX_WMACC, W_MWX_WNMSAC, W_MWX_WMADD, W_MWX_WNMSUB }
 
-enum wmvxfunct6   = { WMVX_VWMACCU, WMVX_VWMACC, WMVX_VWMACCUS, WMVX_VWMACCSU }
+enum w_wide_mwxfunct6 = { W_WIDE_MWX_WWMACCU, W_WIDE_MWX_WWMACC, W_WIDE_MWX_WWMACCUS, W_WIDE_MWX_WWMACCSU }
 
-enum maskfunct3   = { VV_VMERGE, VI_VMERGE, VX_VMERGE }
+enum w_maskfunct3 = { W_WW_WMERGE, W_WI_WMERGE, W_WX_WMERGE }
 
-enum vlewidth     = { VLE8, VLE16, VLE32, VLE64 }
+enum w_wlewidth = { W_WLE8, W_WLE16, W_WLE32, W_WLE64 }
 
-enum fvvfunct6    = { FVV_VADD, FVV_VSUB, FVV_VMIN, FVV_VMAX, FVV_VSGNJ, FVV_VSGNJN, FVV_VSGNJX, FVV_VDIV, FVV_VMUL }
+enum w_fwwfunct6 = {
+  W_FWW_WADD,
+  W_FWW_WSUB,
+  W_FWW_WMIN,
+  W_FWW_WMAX,
+  W_FWW_WSGNJ,
+  W_FWW_WSGNJN,
+  W_FWW_WSGNJX,
+  W_FWW_WDIV,
+  W_FWW_WMUL,
+}
 
-enum fvvmafunct6  = { FVV_VMADD, FVV_VNMADD, FVV_VMSUB, FVV_VNMSUB, FVV_VMACC, FVV_VNMACC, FVV_VMSAC, FVV_VNMSAC }
+enum w_fwwmafunct6 = {
+  W_FWW_WMADD,
+  W_FWW_WNMADD,
+  W_FWW_WMSUB,
+  W_FWW_WNMSUB,
+  W_FWW_WMACC,
+  W_FWW_WNMACC,
+  W_FWW_WMSAC,
+  W_FWW_WNMSAC,
+}
 
-enum fwvvfunct6   = { FWVV_VADD, FWVV_VSUB, FWVV_VMUL }
+enum w_fwide_wwfunct6 = { W_FWIDE_WW_WADD, W_FWIDE_WW_WSUB, W_FWIDE_WW_WMUL }
 
-enum fwvvmafunct6 = { FWVV_VMACC, FWVV_VNMACC, FWVV_VMSAC, FWVV_VNMSAC }
+enum w_fwide_wwmafunct6 = { W_FWIDE_WW_WMACC, W_FWIDE_WW_WNMACC, W_FWIDE_WW_WMSAC, W_FWIDE_WW_WNMSAC }
 
-enum fwvfunct6    = { FWV_VADD, FWV_VSUB }
+enum w_fwide_wfunct6 = { W_FWIDE_W_WADD, W_FWIDE_W_WSUB }
 
-enum fvvmfunct6   = { FVVM_VMFEQ, FVVM_VMFLE, FVVM_VMFLT, FVVM_VMFNE }
+enum w_fwwmfunct6 = { W_FWWM_WMFEQ, W_FWWM_WMFLE, W_FWWM_WMFLT, W_FWWM_WMFNE }
 
-enum vfunary0     = { FV_CVT_XU_F, FV_CVT_X_F, FV_CVT_F_XU, FV_CVT_F_X, FV_CVT_RTZ_XU_F, FV_CVT_RTZ_X_F }
+enum w_wfunary0 = { W_FW_CVT_XU_F, W_FW_CVT_X_F, W_FW_CVT_F_XU, W_FW_CVT_F_X, W_FW_CVT_RTZ_XU_F, W_FW_CVT_RTZ_X_F }
 
-enum vfwunary0    = { FWV_CVT_XU_F, FWV_CVT_X_F, FWV_CVT_F_XU, FWV_CVT_F_X, FWV_CVT_F_F, FWV_CVT_RTZ_XU_F, FWV_CVT_RTZ_X_F }
+enum w_vfwunary0 = {
+  W_FWIDE_W_CVT_XU_F,
+  W_FWIDE_W_CVT_X_F,
+  W_FWIDE_W_CVT_F_XU,
+  W_FWIDE_W_CVT_F_X,
+  W_FWIDE_W_CVT_F_F,
+  W_FWIDE_W_CVT_RTZ_XU_F,
+  W_FWIDE_W_CVT_RTZ_X_F,
+}
 
-enum vfnunary0    = { FNV_CVT_XU_F, FNV_CVT_X_F, FNV_CVT_F_XU, FNV_CVT_F_X, FNV_CVT_F_F, FNV_CVT_ROD_F_F, FNV_CVT_RTZ_XU_F, FNV_CVT_RTZ_X_F}
+enum w_vfnunary0 = {
+  W_FNV_CVT_XU_F,
+  W_FNV_CVT_X_F,
+  W_FNV_CVT_F_XU,
+  W_FNV_CVT_F_X,
+  W_FNV_CVT_F_F,
+  W_FNV_CVT_ROD_F_F,
+  W_FNV_CVT_RTZ_XU_F,
+  W_FNV_CVT_RTZ_X_F,
+}
 
-enum vfunary1     = { FVV_VSQRT, FVV_VRSQRT7, FVV_VREC7, FVV_VCLASS }
+enum w_wfunary1 = { W_FWW_WSQRT, W_FWW_WRSQRT7, W_FWW_WREC7, W_FWW_WCLASS }
 
-enum fvffunct6    = { VF_VADD, VF_VSUB, VF_VMIN, VF_VMAX, VF_VSGNJ, VF_VSGNJN, VF_VSGNJX, VF_VDIV, VF_VRDIV, VF_VMUL, VF_VRSUB, VF_VSLIDE1UP, VF_VSLIDE1DOWN }
+enum w_fwffunct6 = {
+  W_WF_WADD,
+  W_WF_WSUB,
+  W_WF_WMIN,
+  W_WF_WMAX,
+  W_WF_WSGNJ,
+  W_WF_WSGNJN,
+  W_WF_WSGNJX,
+  W_WF_WDIV,
+  W_WF_WRDIV,
+  W_WF_WMUL,
+  W_WF_WRSUB,
+  W_WF_WSLIDE1UP,
+  W_WF_WSLIDE1DOWN,
+}
 
-enum fvfmafunct6  = { VF_VMADD, VF_VNMADD, VF_VMSUB, VF_VNMSUB, VF_VMACC, VF_VNMACC, VF_VMSAC, VF_VNMSAC }
+enum w_fwfmafunct6 = {
+  W_WF_WMADD,
+  W_WF_WNMADD,
+  W_WF_WMSUB,
+  W_WF_WNMSUB,
+  W_WF_WMACC,
+  W_WF_WNMACC,
+  W_WF_WMSAC,
+  W_WF_WNMSAC,
+}
 
-enum fwvffunct6   = { FWVF_VADD, FWVF_VSUB, FWVF_VMUL }
+enum w_fwide_wffunct6 = { W_FWIDE_WF_WADD, W_FWIDE_WF_WSUB, W_FWIDE_WF_WMUL }
 
-enum fwvfmafunct6 = { FWVF_VMACC, FWVF_VNMACC, FWVF_VMSAC, FWVF_VNMSAC }
+enum w_fwide_wfmafunct6 = { W_FWIDE_WF_WMACC, W_FWIDE_WF_WNMACC, W_FWIDE_WF_WMSAC, W_FWIDE_WF_WNMSAC }
 
-enum fwffunct6    = { FWF_VADD, FWF_VSUB }
+enum w_fwide_ffunct6 = { W_FWIDE_F_WADD, W_FWIDE_F_WSUB }
 
-enum fvfmfunct6   = { VFM_VMFEQ, VFM_VMFLE, VFM_VMFLT, VFM_VMFNE, VFM_VMFGT, VFM_VMFGE }
+enum w_fwfmfunct6 = { W_WFM_WMFEQ, W_WFM_WMFLE, W_WFM_WMFLT, W_WFM_WMFNE, W_WFM_WMFGT, W_WFM_WMFGE }
 
-enum vmlsop       = { VLM, VSM }
+enum w_wmlsop = { W_WLM, W_WSM }
 
-enum indexed_mop  = { INDEXED_UNORDERED, INDEXED_ORDERED }
+enum w_indexed_mop = { W_INDEXED_UNORDERED, W_INDEXED_ORDERED }
+
+// Classifies matrix instructions by their wstart trap policy
+enum w_wstart_class = {
+  W_WSTART_ARITH, // matrix arithmetic: trap on nonzero wstart (configurable)
+  W_WSTART_LOAD_STORE, // memory ops: always accept any wstart
+  W_WSTART_SCALAR_MOVE, // vmv.x.s, vfmv.f.s etc: always accept any wstart
+  W_WSTART_MANDATORY, // reductions, vcompress, etc.: always trap on nonzero wstart
+}

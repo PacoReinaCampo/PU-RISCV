@@ -1,17 +1,23 @@
-```
-$pseudo_op rv_w::wl1re8.w wl1r.w 31..29=0 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 wd  6..0=0x07
-$pseudo_op rv_w::wl2re8.w wl2r.w 31..29=1 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 wd  6..0=0x07
-$pseudo_op rv_w::wl4re8.w wl4r.w 31..29=3 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 wd  6..0=0x07
-$pseudo_op rv_w::wl8re8.w wl8r.w 31..29=7 28=0 27..26=0 25=1 24..20=0x08 rs1 14..12=0x0 wd  6..0=0x07
+## PSEUDO-INSTRUCTIONS
 
-$pseudo_op rv_w::wlm.w wle1.w  31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0  wd 6..0=0x07
-$pseudo_op rv_w::wsm.w wse1.w  31..28=0 27..26=0 25=1 24..20=0xb rs1 14..12=0x0 ws3 6..0=0x27
+| **Extension** | **Name**        | **Variable-Fields** | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:----------------|:--------------------|:-----------------------|:-----------------------------------|
+| `rv_w`        | `wcpop_m`       | `wm, ws2, rd`       | `wpopc_m`              | `010000------10000010-----0001011` |
+| `rv_w`        | `wfredusum_ws`  | `wm, ws2, ws1, wd`  | `wfredsum_ws`          | `000001-----------001-----0001011` |
+| `rv_w`        | `wfwredusum_ws` | `wm, ws2, ws1, wd`  | `wfwredsum_ws`         | `110001-----------001-----0001011` |
+| `rv_w`        | `wl1re8_w`      | `rs1, wd`           | `wl1r_w`               | `000000101000-----000-----0000111` |
+| `rv_w`        | `wl2re8_w`      | `rs1, wd`           | `wl2r_w`               | `001000101000-----000-----0000111` |
+| `rv_w`        | `wl4re8_w`      | `rs1, wd`           | `wl4r_w`               | `011000101000-----000-----0000111` |
+| `rv_w`        | `wl8re8_w`      | `rs1, wd`           | `wl8r_w`               | `111000101000-----000-----0000111` |
+| `rv_w`        | `wlm_w`         | `rs1, wd`           | `wle1_w`               | `000000101011-----000-----0000111` |
+| `rv_w`        | `wmandn_mm`     | `ws2, ws1, wd`      | `wmandnot_mm`          | `0110001----------010-----0001011` |
+| `rv_w`        | `wmorn_mm`      | `ws2, ws1, wd`      | `wmornot_mm`           | `0111001----------010-----0001011` |
+| `rv_w`        | `wsm_w`         | `rs1, ws3`          | `wse1_w`               | `000000101011-----000-----0100111` |
 
-$pseudo_op rv_w::wfredusum.ws  wfredsum.ws 31..26=0x01 wm ws2 ws1 14..12=0x1 wd 6..0=0x5b
-$pseudo_op rv_w::wfwredusum.ws wfwredsum.ws 31..26=0x31 wm ws2 ws1 14..12=0x1 wd 6..0=0x5b
+:RVV - Specific Extension for Vector Operations
 
-$pseudo_op rv_w::wcpop.m wpopc.m  31..26=0x10 wm ws2 19..15=0x10 14..12=0x2 rd 6..0=0x5b
+| **Extension** | **Name**  | **Variable-Fields** | **Pseudo-Instruction** | **Encoding**                       |
+|:--------------|:----------|:--------------------|:-----------------------|:-----------------------------------|
+| `rv_zwabd`    | `wabd_wx` | `wm, ws2, wd`       | `wabs_w`               | `010101------00000110-----0001011` |
 
-$pseudo_op rv_w::wmorn.mm  wmornot.mm 31..26=0x1c wm ws2 ws1 14..12=0x2 wd 6..0=0x5b
-$pseudo_op rv_w::wmandn.mm wmandnot.mm  31..26=0x18 wm ws2 ws1 14..12=0x2 wd 6..0=0x5b
-```
+:RVZW - Specific Extension for Matrix Operations

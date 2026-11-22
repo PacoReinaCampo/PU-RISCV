@@ -106,7 +106,7 @@
 | `YFWNMACC`  | `YA_FORMAT`  | `ARITHMETIC` | `RVY`         | `{YY, VF}`           |
 | `YFWMSAC`   | `YA_FORMAT`  | `ARITHMETIC` | `RVY`         | `{YY, VF}`           |
 | `YFWNMSAC`  | `YA_FORMAT`  | `ARITHMETIC` | `RVY`         | `{YY, VF}`           |
-| `YFSQRT_Y`  | `YS2_FORMAT` | `ARITHMETIC` | `RVY`         | `-`                  |
+| `YFSQRT_Y`  | `YS2_FORMAT` | `ARITHMETIC` | `RVY`         | `none`               |
 | `YFMIN`     | `YA_FORMAT`  | `ARITHMETIC` | `RVY`         | `{YY, VF}`           |
 | `YFMAX`     | `YA_FORMAT`  | `ARITHMETIC` | `RVY`         | `{YY, VF}`           |
 | `YFSGNJ`    | `YA_FORMAT`  | `ARITHMETIC` | `RVY`         | `{YY, VF}`           |
@@ -118,7 +118,7 @@
 | `YMFLE`     | `YA_FORMAT`  | `COMPARE`    | `RVY`         | `{YY, VF}`           |
 | `YMFGT`     | `YA_FORMAT`  | `COMPARE`    | `RVY`         | `{VF}`               |
 | `YMFGE`     | `YA_FORMAT`  | `COMPARE`    | `RVY`         | `{VF}`               |
-| `YFCLASS_Y` | `YS2_FORMAT` | `COMPARE`    | `RVY`         | `-`                  |
+| `YFCLASS_Y` | `YS2_FORMAT` | `COMPARE`    | `RVY`         | `none`               |
 | `YFMERGE`   | `YA_FORMAT`  | `ARITHMETIC` | `RVY`         | `{VFM}`              |
 | `YFMV`      | `YA_FORMAT`  | `ARITHMETIC` | `RVY`         | `{VF}`               |
 

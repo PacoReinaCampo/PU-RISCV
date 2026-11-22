@@ -1,3 +1,7 @@
-* **RV32N - "RV32N Standard Extension for User-Level Interrupts"**
+## INSTRUCTION PSEUDO-CODE (PL)
 
-* **RV64N - "RV64N Standard Extension for User-Level Interrupts (in addition to RV32N)"**
+| **Extension** | **Name** | **Variable-Fields** | **Pseudo-Code**                                                                                                      |
+|:--------------|:---------|:--------------------|:---------------------------------------------------------------------------------------------------------------------|
+| `rv_n`        | `uret`   | `none`              | `require_extension(N); target = uepc; ustatus.UIE = ustatus.UPIE; ustatus.UPIE = 1; privilege = PRV_U; pc = target;` |
+
+:RVN - Specific Extension for User-level Interrupts Instructions
